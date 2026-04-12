@@ -242,40 +242,9 @@ function NavItem({ item, pathname }: NavItemProps) {
   );
 }
 
-function loadOpenState(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem('docs-nav-open') ?? '[]');
-  } catch {
-    return [];
-  }
-}
-
-function saveOpenState(sections: Set<string>) {
-  try {
-    localStorage.setItem('docs-nav-open', JSON.stringify([...sections]));
-  } catch {
-    // localStorage unavailable in SSR or restricted environments
-  }
-}
-
 export function DocsLayout({ nav, children }: DocsLayoutProps) {
   useDocsLiveReload();
   const pathname = usePathname();
-  const [openSections, _setOpenSections] = useState<Set<string>>(() => {
-    // Start collapsed (GitBook default) — NavItem auto-expands ancestor of current page
-    const initial = new Set<string>();
-    // Merge with localStorage state
-    const saved = loadOpenState();
-    for (const s of saved) {
-      initial.add(s);
-    }
-    return initial;
-  });
-
-  // Persist open sections to localStorage
-  useEffect(() => {
-    saveOpenState(openSections);
-  }, [openSections]);
 
   function handleNavigate() {
     document.documentElement.removeAttribute('data-mobile-nav-open');
@@ -331,7 +300,13 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
         />
 
         <Link href="/docs" className="docs-header-logo">
-          📖 MUTX Docs
+          <span className="docs-header-logo-mark" aria-hidden="true">
+            <span className="docs-header-logo-mark-inner">M</span>
+          </span>
+          <span className="docs-header-logo-copy">
+            <span className="docs-header-logo-title">MUTX Docs</span>
+            <span className="docs-header-logo-meta">operator manual</span>
+          </span>
         </Link>
 
         <div className="flex-1" />
@@ -394,6 +369,14 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
           className="docs-sidebar docs-mobile-sidebar"
           aria-label="Documentation navigation"
         >
+          <div className="docs-sidebar-intro">
+            <p className="docs-sidebar-kicker">Canonical reference</p>
+            <h2 className="docs-sidebar-title">Read the product the same way the repo works.</h2>
+            <p className="docs-sidebar-copy">
+              Setup, platform contracts, and operating notes stay here in the same brand frame as
+              the product, not in a detached knowledge base.
+            </p>
+          </div>
           <nav aria-label="Docs nav">
             {nav.map((item) => (
               <NavItem key={item.route} item={item} pathname={pathname} />
@@ -403,8 +386,10 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
         {/* ── Main content ── */}
         <main className="docs-content">
-          <DocsBreadcrumbs />
-          {children}
+          <div className="docs-content-shell">
+            <DocsBreadcrumbs />
+            {children}
+          </div>
         </main>
       </div>
     </div>

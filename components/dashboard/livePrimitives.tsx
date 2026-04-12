@@ -107,7 +107,7 @@ export function LivePanel({
   return (
     <section
       className={cn(
-        "dashboard-entry overflow-hidden rounded-[22px] border shadow-[0_18px_48px_rgba(1,5,11,0.24)]",
+        "dashboard-entry overflow-hidden rounded-[28px] border shadow-[0_20px_56px_rgba(2,2,5,0.24)]",
         className,
       )}
       style={{
@@ -120,17 +120,17 @@ export function LivePanel({
         className="flex items-center justify-between gap-3 border-b px-4 py-3"
         style={{
           borderColor: dashboardTokens.borderSubtle,
-          backgroundColor: "color-mix(in srgb, rgba(17, 24, 33, 0.94) 86%, transparent)",
+          backgroundColor: "color-mix(in srgb, rgba(17, 16, 21, 0.94) 86%, transparent)",
         }}
       >
         <div className="min-w-0">
-          <h2 className="truncate text-[13px] font-semibold uppercase tracking-[0.12em] text-[#eff5fb]">
+          <h2 className="truncate text-[13px] font-semibold uppercase tracking-[0.14em] text-[#fff1df]">
             {title}
           </h2>
         </div>
         <div className="flex items-center gap-3">
           {meta ? (
-            <span className="hidden text-[10px] font-medium uppercase tracking-[0.16em] text-[#7f92a6] sm:inline">
+            <span className="hidden text-[10px] font-medium uppercase tracking-[0.18em] text-[#b09376] sm:inline">
               {meta}
             </span>
           ) : null}
@@ -155,7 +155,7 @@ export function LiveStatCard({
 }) {
   return (
     <article
-      className="dashboard-entry rounded-[18px] border p-3.5"
+      className="dashboard-entry rounded-[24px] border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradientStrong,
@@ -164,14 +164,14 @@ export function LiveStatCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7f92a6]">{label}</p>
-          <p className="mt-2 truncate text-[1.22rem] font-semibold tracking-[-0.04em] text-[#f3f7fb]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: dashboardTokens.textMuted }}>{label}</p>
+          <p className="mt-2 truncate font-[family:var(--font-site-display)] text-[1.28rem] font-semibold tracking-[-0.05em] text-[#fff3e2]">
             {value}
           </p>
         </div>
         {status ? <StatusBadge status={status} /> : null}
       </div>
-      <p className="mt-3 text-[12px] leading-5 text-[#9fb0c2]">{detail}</p>
+      <p className="mt-3 text-[12px] leading-5 text-[#c0ab90]">{detail}</p>
     </article>
   );
 }
@@ -203,7 +203,7 @@ export function LiveMiniStat({
 }) {
   return (
     <div
-      className="rounded-[16px] border p-3"
+          className="rounded-[18px] border p-3"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         backgroundColor: dashboardTokens.bgInset,
@@ -244,7 +244,7 @@ export function LiveAuthRequired({
     <LivePanel title={title} meta="auth required">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(260px,0.92fr)]">
         <div
-          className="rounded-[20px] border p-4"
+          className="rounded-[24px] border p-5"
           style={{
             borderColor: dashboardTokens.borderStrong,
             background: dashboardTokens.panelGradientStrong,
@@ -262,11 +262,11 @@ export function LiveAuthRequired({
               <Lock className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8091a3]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#b09376]">
                 Sign-in gate
               </p>
-              <p className="mt-2 text-base font-semibold text-white">{title}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">{message}</p>
+              <p className="mt-2 font-[family:var(--font-site-display)] text-lg font-semibold text-[#fff3e2]">{title}</p>
+              <p className="mt-2 text-sm leading-6 text-[#c0ab90]">{message}</p>
             </div>
           </div>
         </div>

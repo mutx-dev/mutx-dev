@@ -151,6 +151,9 @@ class User(Base):
     refresh_token_sessions: Mapped[list["RefreshTokenSession"]] = relationship(
         "RefreshTokenSession", back_populates="user", cascade="all, delete-orphan"
     )
+    external_auth_identities: Mapped[list["ExternalAuthIdentity"]] = relationship(
+        "ExternalAuthIdentity", back_populates="user", cascade="all, delete-orphan"
+    )
     settings: Mapped[list["UserSetting"]] = relationship(
         "UserSetting", back_populates="user", cascade="all, delete-orphan"
     )
@@ -163,9 +166,47 @@ class User(Base):
     document_jobs: Mapped[list["DocumentJob"]] = relationship(
         "DocumentJob", back_populates="user", cascade="all, delete-orphan"
     )
+    reasoning_jobs: Mapped[list["ReasoningJob"]] = relationship(
+        "ReasoningJob", back_populates="user", cascade="all, delete-orphan"
+    )
     swarms: Mapped[list["Swarm"]] = relationship(
         "Swarm", back_populates="user", cascade="all, delete-orphan"
     )
+
+
+class ExternalAuthIdentity(Base):
+    __tablename__ = "external_auth_identities"
+    __table_args__ = (
+        UniqueConstraint(
+            "provider",
+            "provider_user_id",
+            name="uq_external_auth_identities_provider_user",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    provider_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    provider_username: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    provider_display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    profile: Mapped[dict | list | str | int | float | bool | None] = mapped_column(
+        JSONText(), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="external_auth_identities")
 
 
 class UserSetting(Base):
@@ -498,6 +539,9 @@ class AgentRun(Base):
     document_job: Mapped[Optional["DocumentJob"]] = relationship(
         "DocumentJob", back_populates="run", uselist=False
     )
+    reasoning_job: Mapped[Optional["ReasoningJob"]] = relationship(
+        "ReasoningJob", back_populates="run", uselist=False
+    )
     traces: Mapped[list["AgentRunTrace"]] = relationship(
         "AgentRunTrace", back_populates="run", cascade="all, delete-orphan"
     )
@@ -588,6 +632,75 @@ class DocumentArtifact(Base):
     )
 
     job: Mapped["DocumentJob"] = relationship("DocumentJob", back_populates="artifacts")
+
+
+class ReasoningJob(Base):
+    __tablename__ = "reasoning_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agent_runs.id"), nullable=False, unique=True, index=True
+    )
+    template_id: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    execution_mode: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="draft", index=True)
+    parameters: Mapped[dict | None] = mapped_column(JSONText(), nullable=True)
+    result_summary: Mapped[dict | None] = mapped_column(JSONText(), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    claimed_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    claim_token: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        index=True,
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="reasoning_jobs")
+    run: Mapped["AgentRun"] = relationship("AgentRun", back_populates="reasoning_job")
+    artifacts: Mapped[list["ReasoningArtifact"]] = relationship(
+        "ReasoningArtifact", back_populates="job", cascade="all, delete-orphan"
+    )
+
+
+class ReasoningArtifact(Base):
+    __tablename__ = "reasoning_artifacts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("reasoning_jobs.id"), nullable=False, index=True
+    )
+    role: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    storage_backend: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    storage_uri: Mapped[str | None] = mapped_column(Text, nullable=True)
+    local_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    size_bytes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    sha256: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    extra_metadata: Mapped[dict | None] = mapped_column(JSONText(), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    job: Mapped["ReasoningJob"] = relationship("ReasoningJob", back_populates="artifacts")
 
 
 class WebhookDeliveryLog(Base):

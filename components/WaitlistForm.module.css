@@ -28,7 +28,7 @@
   padding: 0 0.75rem;
   border-radius: 999px;
   border: 1px solid rgba(248, 247, 245, 0.18);
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;

@@ -36,14 +36,16 @@ def test_clawhub_list_hits_canonical_route_and_renders_skills(monkeypatch) -> No
                 {
                     "id": skill_id,
                     "name": "weather-skill",
-                    "stars": 42,
                     "author": "fortunexbt",
+                    "source": "orchestra-research",
+                    "available": True,
                 },
                 {
                     "id": str(uuid.uuid4()),
                     "name": "calculator-skill",
-                    "stars": 15,
                     "author": "openclaw",
+                    "source": "workspace",
+                    "available": False,
                 },
             ],
         )
@@ -60,9 +62,9 @@ def test_clawhub_list_hits_canonical_route_and_renders_skills(monkeypatch) -> No
     assert captured["path"] == "/v1/clawhub/skills"
     assert skill_id in result.output
     assert "weather-skill" in result.output
-    assert "42" in result.output
     assert "fortunexbt" in result.output
     assert "calculator-skill" in result.output
+    assert "orchestra-research" in result.output
 
 
 def test_clawhub_list_empty(monkeypatch) -> None:
@@ -79,6 +81,39 @@ def test_clawhub_list_empty(monkeypatch) -> None:
 
     assert result.exit_code == 0
     assert "No skills found" in result.output
+
+
+def test_clawhub_bundles_hits_canonical_route(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        return DummyResponse(
+            200,
+            [
+                {
+                    "id": "orchestra-research-foundation",
+                    "name": "Research Foundation",
+                    "skill_count": 8,
+                    "available_skill_count": 6,
+                    "recommended_template_id": "orchestra_research_foundation",
+                }
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
+    monkeypatch.setattr(
+        "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["clawhub", "bundles"])
+
+    assert result.exit_code == 0
+    assert captured["path"] == "/v1/clawhub/bundles"
+    assert "orchestra-research-foundation" in result.output
+    assert "Research Foundation" in result.output
+    assert "6/8" in result.output
 
 
 def test_clawhub_install_hits_canonical_route(monkeypatch) -> None:
@@ -126,7 +161,50 @@ def test_clawhub_install_agent_not_found(monkeypatch) -> None:
     result = runner.invoke(cli, ["clawhub", "install", "-a", agent_id, "-s", skill_id])
 
     assert result.exit_code == 0
-    assert f"Error: Agent {agent_id} not found" in result.output
+    assert "Unknown skill or agent not found" in result.output
+
+
+def test_clawhub_install_bundle_hits_canonical_route(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["json"] = json
+        return DummyResponse(
+            200,
+            {
+                "bundle_id": "orchestra-research-foundation",
+                "installed_skill_ids": ["langchain", "llamaindex"],
+                "unavailable_skill_ids": ["0-autoresearch-skill"],
+            },
+        )
+
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
+    monkeypatch.setattr(
+        "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(post=fake_post)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "clawhub",
+            "install-bundle",
+            "-a",
+            agent_id,
+            "-b",
+            "orchestra-research-foundation",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["path"] == "/v1/clawhub/install-bundle"
+    assert captured["json"] == {
+        "agent_id": agent_id,
+        "bundle_id": "orchestra-research-foundation",
+    }
+    assert "2 installed, 1 unavailable" in result.output
 
 
 def test_clawhub_uninstall_hits_canonical_route(monkeypatch) -> None:

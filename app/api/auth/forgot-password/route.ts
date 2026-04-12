@@ -1,27 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
 
-import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
-import { validateRequest, schemas } from '@/app/api/_lib/validation'
-import { withErrorHandling } from '@/app/api/_lib/errors'
+import { getApiBaseUrl } from "@/app/api/_lib/controlPlane";
+import { validateRequest, schemas } from "@/app/api/_lib/validation";
+import { withErrorHandling } from "@/app/api/_lib/errors";
 
-
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async (req: Request) => {
-    const validation = await validateRequest(schemas.forgotPassword, req)
+    const validation = await validateRequest(schemas.forgotPassword, req);
     if (!validation.success) {
-      return validation.response
+      return validation.response;
     }
 
     const response = await fetch(`${getApiBaseUrl()}/v1/auth/forgot-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(validation.data),
-      cache: 'no-store',
-    })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...validation.data,
+        email_link_origin: request.nextUrl.origin,
+      }),
+      cache: "no-store",
+    });
 
-    const payload = await response.json().catch(() => ({ detail: 'Failed to send reset email' }))
-    return NextResponse.json(payload, { status: response.status })
-  })(request)
+    const payload = await response
+      .json()
+      .catch(() => ({ detail: "Failed to send reset email" }));
+    return NextResponse.json(payload, { status: response.status });
+  })(request);
 }

@@ -50,7 +50,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${appFontVariables} h-full font-[family:var(--font-display)]`}>
+    <div className={`${appFontVariables} h-full font-[family:var(--font-site-body)]`}>
       <ErrorBoundary>
         <DesktopStatusProvider>
           <DesktopWindowProvider>

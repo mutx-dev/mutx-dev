@@ -37,10 +37,10 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className={cn("flex h-full shrink-0 flex-col border-r px-4 py-4", className)}
+      className={cn("flex h-full shrink-0 flex-col border-r px-4 py-5", className)}
       style={{
         width,
-        backgroundColor: dashboardTokens.bgCanvas,
+        background: dashboardTokens.shellGradient,
         borderColor: dashboardTokens.borderSubtle,
         color: dashboardTokens.textPrimary,
         fontFamily: dashboardTokens.fontSans,
@@ -85,7 +85,7 @@ export function Sidebar({
               );
 
               const sharedClassName = cn(
-                "flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors",
+                "flex w-full items-center gap-3 rounded-full border px-3 py-2.5 text-left transition-colors",
                 item.disabled ? "cursor-not-allowed opacity-50" : undefined,
               );
 

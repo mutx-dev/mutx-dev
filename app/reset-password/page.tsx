@@ -85,7 +85,7 @@ function ResetPasswordForm() {
 
   if (tokenError) {
     return (
-      <AuthSurface {...authSurfaceProps}>
+      <AuthSurface {...authSurfaceProps} variant="recovery">
         <div className={styles.formWrap}>
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-rose-400/20 bg-rose-400/10">
             <AlertCircle className="h-7 w-7 text-rose-300" />
@@ -115,7 +115,7 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <AuthSurface {...authSurfaceProps}>
+      <AuthSurface {...authSurfaceProps} variant="recovery">
         <div className={styles.formWrap}>
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
             <Lock className="h-7 w-7 text-emerald-300" />
@@ -138,7 +138,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <AuthSurface {...authSurfaceProps}>
+    <AuthSurface {...authSurfaceProps} variant="recovery">
       <div className={styles.formWrap}>
         <div>
           <h2 className={styles.sectionTitle}>Choose a new password</h2>

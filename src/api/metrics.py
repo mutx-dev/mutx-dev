@@ -98,6 +98,26 @@ mutx_document_execution_duration_seconds = Histogram(
     ["template_id", "status"],
     buckets=[0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0],
 )
+mutx_reasoning_queue_depth = Gauge(
+    "mutx_reasoning_queue_depth",
+    "Current size of the reasoning workflow queue",
+)
+mutx_reasoning_jobs_total = Counter(
+    "mutx_reasoning_jobs_total",
+    "Total reasoning workflow jobs by template and status",
+    ["template_id", "status"],
+)
+mutx_reasoning_artifact_ops_total = Counter(
+    "mutx_reasoning_artifact_ops_total",
+    "Reasoning artifact operations by operation and storage backend",
+    ["operation", "storage_backend"],
+)
+mutx_reasoning_execution_duration_seconds = Histogram(
+    "mutx_reasoning_execution_duration_seconds",
+    "Reasoning workflow execution duration in seconds",
+    ["template_id", "status"],
+    buckets=[0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0],
+)
 
 # API metrics
 mutx_api_calls_total = Counter("mutx_api_calls_total", "Total API calls", ["endpoint"])

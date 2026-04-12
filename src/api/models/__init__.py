@@ -1,5 +1,6 @@
 from src.api.models.models import (
     User,
+    ExternalAuthIdentity,
     UserSetting,
     Agent,
     AgentVersion,
@@ -16,6 +17,8 @@ from src.api.models.models import (
     AgentRunTrace,
     DocumentArtifact,
     DocumentJob,
+    ReasoningArtifact,
+    ReasoningJob,
     WebhookDeliveryLog,
     DeploymentEvent,
     DeploymentVersion,
@@ -48,6 +51,7 @@ from src.api.models.plan_tiers import (
 
 __all__ = [
     "User",
+    "ExternalAuthIdentity",
     "UserSetting",
     "Agent",
     "AgentVersion",
@@ -64,6 +68,8 @@ __all__ = [
     "AgentRunTrace",
     "DocumentArtifact",
     "DocumentJob",
+    "ReasoningArtifact",
+    "ReasoningJob",
     "WebhookDeliveryLog",
     "DeploymentEvent",
     "DeploymentVersion",

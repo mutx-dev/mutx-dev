@@ -12,11 +12,19 @@ type PicoContactFormProps = {
   open: boolean
   onClose: () => void
   defaultInterest?: string
+  defaultMessage?: string
   source?: string
   onSuccess?: () => void
 }
 
-export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico-landing', onSuccess }: PicoContactFormProps) {
+export function PicoContactForm({
+  open,
+  onClose,
+  defaultInterest,
+  defaultMessage,
+  source = 'pico-landing',
+  onSuccess,
+}: PicoContactFormProps) {
   const t = useTranslations('pico.contactForm')
   const locale = useLocale()
   const prefersReducedMotion = useReducedMotion()
@@ -137,7 +145,6 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
                 </div>
 
                 <form className={s.form} onSubmit={handleSubmit}>
-                  {/* Honeypot */}
                   <input
                     ref={honeypotRef}
                     name="website"
@@ -251,6 +258,7 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
                       id="pico-message"
                       name="message"
                       rows={3}
+                      defaultValue={defaultMessage}
                       placeholder={t('messagePlaceholder')}
                       className={s.textarea}
                     />

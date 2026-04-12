@@ -7,15 +7,25 @@ from typing import Optional
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.api.auth.password import hash_password, verify_password
 from src.api.config import get_settings
-from src.api.models.models import User, APIKey, Plan, Agent, Deployment, RefreshTokenSession
+from src.api.models.models import (
+    User,
+    APIKey,
+    Plan,
+    Agent,
+    Deployment,
+    ExternalAuthIdentity,
+    RefreshTokenSession,
+)
 from src.api.security import hash_token_value
 from src.api.services.email.email_service import (
     generate_token,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
 )
+from src.api.services.social_auth import OAuthUserProfile
 
 settings = get_settings()
 
@@ -68,17 +78,22 @@ class UserService:
         name: str,
         password: Optional[str] = None,
         plan: str = "FREE",
+        *,
+        is_email_verified: bool = False,
     ) -> User:
         password_hash = None
         if password:
             password_hash = hash_password(password)
 
+        now = datetime.now(timezone.utc)
         user = User(
             id=uuid.uuid4(),
             email=email,
             name=name,
             password_hash=password_hash,
             plan=plan,
+            is_email_verified=is_email_verified,
+            email_verified_at=now if is_email_verified else None,
         )
         self.session.add(user)
         await self.session.commit()
@@ -140,6 +155,19 @@ class UserService:
         result = await self.session.execute(select(User).where(User.id == user_id))
         return result.scalar_one_or_none()
 
+    async def get_external_auth_identity(
+        self, provider: str, provider_user_id: str
+    ) -> Optional[ExternalAuthIdentity]:
+        result = await self.session.execute(
+            select(ExternalAuthIdentity)
+            .options(selectinload(ExternalAuthIdentity.user))
+            .where(
+                ExternalAuthIdentity.provider == provider,
+                ExternalAuthIdentity.provider_user_id == provider_user_id,
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def get_user_by_api_key(self, api_key: str) -> Optional[User]:
         result = await self.session.execute(select(User).where(User.api_key == api_key))
         return result.scalar_one_or_none()
@@ -150,6 +178,66 @@ class UserService:
             return None
         if not verify_password(password, user.password_hash):
             return None
+        return user
+
+    async def get_or_create_user_for_oauth(self, profile: OAuthUserProfile) -> User:
+        identity = await self.get_external_auth_identity(
+            profile.provider.value,
+            profile.provider_user_id,
+        )
+        now = datetime.now(timezone.utc)
+
+        if identity is not None:
+            identity.provider_email = profile.email
+            identity.provider_username = profile.username
+            identity.provider_display_name = profile.display_name
+            identity.avatar_url = profile.avatar_url
+            identity.profile = profile.profile
+            identity.updated_at = now
+
+            user = identity.user
+            if profile.email_verified and not user.is_email_verified:
+                user.is_email_verified = True
+                user.email_verified_at = now
+                user.email_verification_token = None
+                user.email_verification_expires_at = None
+                user.updated_at = now
+
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
+
+        user = await self.get_user_by_email(profile.email)
+        if user is None:
+            user = await self.create_user(
+                email=profile.email,
+                name=profile.display_name,
+                password=None,
+                is_email_verified=profile.email_verified,
+            )
+        elif profile.email_verified and not user.is_email_verified:
+            user.is_email_verified = True
+            user.email_verified_at = now
+            user.email_verification_token = None
+            user.email_verification_expires_at = None
+            user.updated_at = now
+            await self.session.commit()
+            await self.session.refresh(user)
+
+        identity = ExternalAuthIdentity(
+            id=uuid.uuid4(),
+            user_id=user.id,
+            provider=profile.provider.value,
+            provider_user_id=profile.provider_user_id,
+            provider_email=profile.email,
+            provider_username=profile.username,
+            provider_display_name=profile.display_name,
+            avatar_url=profile.avatar_url,
+            profile=profile.profile,
+        )
+        self.session.add(identity)
+        await self.session.commit()
+        await self.session.refresh(user)
         return user
 
     async def update_user_plan(self, user_id: uuid.UUID, plan: Plan) -> User:

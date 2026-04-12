@@ -1,6 +1,14 @@
 "use client";
 
-import { type ElementType, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type ElementType,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   AlertCircle,
   ArrowRight,
@@ -48,7 +56,13 @@ type StepStatus = "pending" | "running" | "complete" | "error";
 type RuntimeMode = "hosted" | "local";
 type AuthMode = "login" | "register" | "local";
 type RuntimeAction = "import" | "install" | "tui";
-type StepId = "preflight" | "mode" | "auth" | "runtime" | "assistant" | "verify";
+type StepId =
+  | "preflight"
+  | "mode"
+  | "auth"
+  | "runtime"
+  | "assistant"
+  | "verify";
 type CockpitVariant = "standalone" | "home" | "advanced";
 
 interface OnboardingStep {
@@ -77,13 +91,46 @@ interface PreflightResult {
   localCpPath: string | null;
 }
 
+interface AccountReadiness {
+  email: string | null;
+  isEmailVerified: boolean | null;
+  webhookCount: number | null;
+  loading: boolean;
+  error: string | null;
+}
+
 const STEP_ORDER: Array<Omit<OnboardingStep, "status" | "error">> = [
-  { id: "preflight", title: "Environment", description: "Interrogate the real desktop runtime and bridge health." },
-  { id: "mode", title: "Target", description: "Point this shell at hosted or local control." },
-  { id: "auth", title: "Identity", description: "Sync browser auth, CLI auth, and the native bridge." },
-  { id: "runtime", title: "Runtime", description: "Import, repair, or inspect OpenClaw from this machine." },
-  { id: "assistant", title: "Assistant", description: "Bind a real assistant and workspace through the native flow." },
-  { id: "verify", title: "Control", description: "Use the same surface for day-one setup and steady-state operations." },
+  {
+    id: "preflight",
+    title: "Environment",
+    description: "Interrogate the real desktop runtime and bridge health.",
+  },
+  {
+    id: "mode",
+    title: "Target",
+    description: "Point this shell at hosted or local control.",
+  },
+  {
+    id: "auth",
+    title: "Identity",
+    description: "Sync browser auth, CLI auth, and the native bridge.",
+  },
+  {
+    id: "runtime",
+    title: "Runtime",
+    description: "Import, repair, or inspect OpenClaw from this machine.",
+  },
+  {
+    id: "assistant",
+    title: "Assistant",
+    description: "Bind a real assistant and workspace through the native flow.",
+  },
+  {
+    id: "verify",
+    title: "Control",
+    description:
+      "Use the same surface for day-one setup and steady-state operations.",
+  },
 ];
 
 function computeWizardProgress(state: WizardState | null) {
@@ -93,16 +140,23 @@ function computeWizardProgress(state: WizardState | null) {
 
   const completed = state.steps.filter((step) => step.completed).length;
   const activeBonus =
-    state.status && !["complete", "completed", "failed", "error"].includes(state.status.toLowerCase())
+    state.status &&
+    !["complete", "completed", "failed", "error"].includes(
+      state.status.toLowerCase(),
+    )
       ? 0.5
       : 0;
   return Math.min(
     100,
-    Math.round(((completed + activeBonus) / Math.max(state.steps.length, 1)) * 100),
+    Math.round(
+      ((completed + activeBonus) / Math.max(state.steps.length, 1)) * 100,
+    ),
   );
 }
 
-function normalizeWizardState(state: Partial<WizardState> | null | undefined): WizardState | null {
+function normalizeWizardState(
+  state: Partial<WizardState> | null | undefined,
+): WizardState | null {
   if (!state || typeof state !== "object") {
     return null;
   }
@@ -110,9 +164,13 @@ function normalizeWizardState(state: Partial<WizardState> | null | undefined): W
   return {
     provider: typeof state.provider === "string" ? state.provider : "openclaw",
     status: typeof state.status === "string" ? state.status : "idle",
-    current_step: typeof state.current_step === "string" ? state.current_step : "idle",
-    completed_steps: Array.isArray(state.completed_steps) ? state.completed_steps : [],
-    failed_step: typeof state.failed_step === "string" ? state.failed_step : null,
+    current_step:
+      typeof state.current_step === "string" ? state.current_step : "idle",
+    completed_steps: Array.isArray(state.completed_steps)
+      ? state.completed_steps
+      : [],
+    failed_step:
+      typeof state.failed_step === "string" ? state.failed_step : null,
     last_error: typeof state.last_error === "string" ? state.last_error : null,
     steps: Array.isArray(state.steps) ? state.steps : [],
     providers: Array.isArray(state.providers) ? state.providers : [],
@@ -128,31 +186,42 @@ async function postJson(url: string, body: Record<string, unknown>) {
     cache: "no-store",
   });
 
-  const payload = await response.json().catch(() => ({ detail: "Request failed" }));
+  const payload = await response
+    .json()
+    .catch(() => ({ detail: "Request failed" }));
   if (!response.ok) {
     throw new Error(
       typeof payload?.detail === "string"
         ? payload.detail
         : typeof payload?.error?.message === "string"
           ? payload.error.message
-          : "Request failed"
+          : "Request failed",
     );
   }
 
   return payload;
 }
 
-function extractString(record: Record<string, unknown> | null | undefined, key: string) {
+function extractString(
+  record: Record<string, unknown> | null | undefined,
+  key: string,
+) {
   const value = record?.[key];
   return typeof value === "string" && value.trim().length > 0 ? value : null;
 }
 
-function extractBoolean(record: Record<string, unknown> | null | undefined, key: string) {
+function extractBoolean(
+  record: Record<string, unknown> | null | undefined,
+  key: string,
+) {
   const value = record?.[key];
   return typeof value === "boolean" ? value : null;
 }
 
-function extractRecord(record: Record<string, unknown> | null | undefined, key: string) {
+function extractRecord(
+  record: Record<string, unknown> | null | undefined,
+  key: string,
+) {
   const value = record?.[key];
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
@@ -187,7 +256,9 @@ function SurfaceCard({
           : "border-white/10";
 
   return (
-    <section className={`rounded-[28px] border bg-[rgba(6,10,18,0.82)] p-5 shadow-[0_24px_80px_rgba(2,8,23,0.35)] ${toneClass}`}>
+    <section
+      className={`rounded-[28px] border bg-[rgba(6,10,18,0.82)] p-5 shadow-[0_24px_80px_rgba(2,8,23,0.35)] ${toneClass}`}
+    >
       {eyebrow ? (
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
           {eyebrow}
@@ -216,7 +287,9 @@ function StatusPill({
           : "border-white/10 bg-white/5 text-slate-300";
 
   return (
-    <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${className}`}>
+    <span
+      className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${className}`}
+    >
       {label}
     </span>
   );
@@ -251,7 +324,11 @@ function ActionButton({
       disabled={disabled || loading}
       className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${toneClass}`}
     >
-      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Icon className="h-4 w-4" />
+      )}
       {label}
     </button>
   );
@@ -283,7 +360,9 @@ function SignalTile({
         {label}
       </p>
       <p className="mt-2 text-lg font-semibold text-white">{value}</p>
-      {detail ? <p className="mt-2 text-sm leading-5 text-slate-400">{detail}</p> : null}
+      {detail ? (
+        <p className="mt-2 text-sm leading-5 text-slate-400">{detail}</p>
+      ) : null}
     </div>
   );
 }
@@ -298,7 +377,9 @@ function MetricChip({
   tone?: string;
 }) {
   return (
-    <div className={`rounded-[22px] border px-4 py-3 ${tone || "border-white/10 bg-black/20"}`}>
+    <div
+      className={`rounded-[22px] border px-4 py-3 ${tone || "border-white/10 bg-black/20"}`}
+    >
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
         {label}
       </p>
@@ -330,7 +411,7 @@ function DeskPanel({
             ? "border-emerald-200 bg-[linear-gradient(180deg,#f7fcf8_0%,#eef8f2_100%)]"
             : tone === "warning"
               ? "border-amber-200 bg-[linear-gradient(180deg,#fffaf0_0%,#fbf3e2_100%)]"
-            : tone === "danger"
+              : tone === "danger"
                 ? "border-rose-200 bg-[linear-gradient(180deg,#fff6f7_0%,#fbecee_100%)]"
                 : "border-[#d9dee6] bg-[linear-gradient(180deg,#fbfcfe_0%,#f4f6fa_100%)]",
         className,
@@ -346,11 +427,21 @@ function DeskPanel({
       >
         <div className="min-w-0">
           {meta ? (
-            <p className={cn("text-[10px] font-semibold uppercase tracking-[0.18em]", tone === "graphite" ? "text-[#8d97a4]" : "text-[#7d8793]")}>
+            <p
+              className={cn(
+                "text-[10px] font-semibold uppercase tracking-[0.18em]",
+                tone === "graphite" ? "text-[#8d97a4]" : "text-[#7d8793]",
+              )}
+            >
               {meta}
             </p>
           ) : null}
-          <h2 className={cn("mt-1 text-[0.97rem] font-semibold tracking-[-0.03em]", tone === "graphite" ? "text-[#f5f7fb]" : "text-[#171a1f]")}>
+          <h2
+            className={cn(
+              "mt-1 text-[0.97rem] font-semibold tracking-[-0.03em]",
+              tone === "graphite" ? "text-[#f5f7fb]" : "text-[#171a1f]",
+            )}
+          >
             {title}
           </h2>
         </div>
@@ -384,9 +475,15 @@ function DeskMetric({
               : "border-[#d9dee6] bg-[linear-gradient(180deg,#ffffff_0%,#f4f6fa_100%)]",
       )}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7d8692]">{label}</p>
-      <p className="mt-2 text-[0.98rem] font-semibold tracking-[-0.03em] text-[#171a1f]">{value}</p>
-      {detail ? <p className="mt-2 text-[11.5px] leading-5 text-[#6f7885]">{detail}</p> : null}
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7d8692]">
+        {label}
+      </p>
+      <p className="mt-2 text-[0.98rem] font-semibold tracking-[-0.03em] text-[#171a1f]">
+        {value}
+      </p>
+      {detail ? (
+        <p className="mt-2 text-[11.5px] leading-5 text-[#6f7885]">{detail}</p>
+      ) : null}
     </div>
   );
 }
@@ -420,7 +517,11 @@ function DeskActionButton({
             : "border-[#d7dce4] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f9_100%)] text-[#2a3340] hover:bg-[#eef2f7]",
       )}
     >
-      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Icon className="h-4 w-4" />
+      )}
       {label}
     </button>
   );
@@ -436,7 +537,9 @@ function DeskKeyValue({
   return (
     <div className="flex items-start justify-between gap-4 border-b border-[#e7ebf1] py-3 text-[12.5px] last:border-b-0 last:pb-0">
       <span className="text-[#76808c]">{label}</span>
-      <span className="max-w-[68%] break-all text-right text-[#1b2430]">{value || "n/a"}</span>
+      <span className="max-w-[68%] break-all text-right text-[#1b2430]">
+        {value || "n/a"}
+      </span>
     </div>
   );
 }
@@ -474,9 +577,15 @@ function DeskStepRow({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[13px] font-semibold text-[#171a1f]">{step.title}</p>
-          <p className="mt-1 text-[11.5px] leading-5 text-[#707985]">{step.description}</p>
-          {step.error ? <p className="mt-2 text-[12px] text-[#b42336]">{step.error}</p> : null}
+          <p className="text-[13px] font-semibold text-[#171a1f]">
+            {step.title}
+          </p>
+          <p className="mt-1 text-[11.5px] leading-5 text-[#707985]">
+            {step.description}
+          </p>
+          {step.error ? (
+            <p className="mt-2 text-[12px] text-[#b42336]">{step.error}</p>
+          ) : null}
         </div>
         <span
           className={cn(
@@ -535,8 +644,12 @@ function StepRow({
         <div className="mt-0.5">{icon}</div>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-white">{step.title}</p>
-          <p className="mt-1 text-sm leading-5 text-slate-400">{step.description}</p>
-          {step.error ? <p className="mt-2 text-sm text-rose-300">{step.error}</p> : null}
+          <p className="mt-1 text-sm leading-5 text-slate-400">
+            {step.description}
+          </p>
+          {step.error ? (
+            <p className="mt-2 text-sm text-rose-300">{step.error}</p>
+          ) : null}
         </div>
       </div>
     </button>
@@ -553,7 +666,9 @@ function DetailRow({
   return (
     <div className="flex items-start justify-between gap-4 border-b border-white/5 py-3 text-sm last:border-b-0 last:pb-0">
       <span className="text-slate-500">{label}</span>
-      <span className="max-w-[65%] break-all text-right text-slate-200">{value || "n/a"}</span>
+      <span className="max-w-[65%] break-all text-right text-slate-200">
+        {value || "n/a"}
+      </span>
     </div>
   );
 }
@@ -594,7 +709,8 @@ export function DesktopOperatorCockpit({
   variant?: CockpitVariant;
 }) {
   const { status, refetch, isDesktop } = useDesktopStatus();
-  const { currentWindow, openPreferences, updateCurrentWindow } = useDesktopWindow();
+  const { currentWindow, openPreferences, updateCurrentWindow } =
+    useDesktopWindow();
   const {
     job,
     resetJob,
@@ -609,7 +725,7 @@ export function DesktopOperatorCockpit({
     STEP_ORDER.map((step, index) => ({
       ...step,
       status: index === 0 ? "running" : "pending",
-    }))
+    })),
   );
   const [currentStep, setCurrentStep] = useState<StepId>("preflight");
   const [logs, setLogs] = useState<string[]>([]);
@@ -635,16 +751,26 @@ export function DesktopOperatorCockpit({
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [snapshotError, setSnapshotError] = useState<string | null>(null);
   const [copiedGateway, setCopiedGateway] = useState(false);
+  const [accountReadiness, setAccountReadiness] = useState<AccountReadiness>({
+    email: null,
+    isEmailVerified: null,
+    webhookCount: null,
+    loading: false,
+    error: null,
+  });
 
   const standalone = variant === "standalone";
   const advancedView = variant === "advanced";
 
   const currentStepIndex = useMemo(
     () => STEP_ORDER.findIndex((step) => step.id === currentStep),
-    [currentStep]
+    [currentStep],
   );
 
-  const runtimeOpenclaw = (runtimeInfo?.openclaw || null) as Record<string, unknown> | null;
+  const runtimeOpenclaw = (runtimeInfo?.openclaw || null) as Record<
+    string,
+    unknown
+  > | null;
   const runtimeLocalControl = runtimeInfo?.local_control_plane || null;
   const runtimeGatewayUrl =
     extractString(runtimeOpenclaw, "gateway_url") ||
@@ -653,12 +779,22 @@ export function DesktopOperatorCockpit({
   const runtimeBinaryPath =
     extractString(runtimeOpenclaw, "binary_path") || preflight?.openclawBinary;
   const runtimeConfigPath = extractString(runtimeOpenclaw, "config_path");
-  const runtimePrivacySummary = extractString(runtimeOpenclaw, "privacy_summary");
-  const runtimeKeysStayLocal = extractBoolean(runtimeOpenclaw, "keys_remain_local");
+  const runtimePrivacySummary = extractString(
+    runtimeOpenclaw,
+    "privacy_summary",
+  );
+  const runtimeKeysStayLocal = extractBoolean(
+    runtimeOpenclaw,
+    "keys_remain_local",
+  );
 
-  const desktopSeatReady = Boolean(status.authenticated) && (Boolean(status.assistant?.found) || isComplete);
+  const desktopSeatReady =
+    Boolean(status.authenticated) &&
+    (Boolean(status.assistant?.found) || isComplete);
   const bridgeIssue =
-    !status.bridge.ready && status.bridge.lastError && !/Bridge exited with code:\s*0/i.test(status.bridge.lastError)
+    !status.bridge.ready &&
+    status.bridge.lastError &&
+    !/Bridge exited with code:\s*0/i.test(status.bridge.lastError)
       ? status.bridge.lastError
       : null;
   const bridgeTone = status.bridge.ready
@@ -675,29 +811,42 @@ export function DesktopOperatorCockpit({
       : bridgeIssue
         ? "Bridge Degraded"
         : "Bridge Idle";
-  const environmentTone =
-    bridgeIssue
-      ? "danger"
-      : !preflight
-        ? "neutral"
-        : !preflight.cliAvailable
-          ? "danger"
-          : preflight.openclawHealth === "healthy"
-            ? "good"
-            : "warn";
+  const environmentTone = bridgeIssue
+    ? "danger"
+    : !preflight
+      ? "neutral"
+      : !preflight.cliAvailable
+        ? "danger"
+        : preflight.openclawHealth === "healthy"
+          ? "good"
+          : "warn";
   const setupProgress = computeWizardProgress(setupState);
   const setupStateStatus = setupState?.status?.toLowerCase() || "idle";
   const setupStateActive =
-    loading || ["running", "pending", "starting", "in_progress"].includes(setupStateStatus);
+    loading ||
+    ["running", "pending", "starting", "in_progress"].includes(
+      setupStateStatus,
+    );
   const setupStateFailed = ["failed", "error"].includes(setupStateStatus);
 
   function addLog(message: string) {
-    setLogs((prev) => [...prev.slice(-119), `[${new Date().toLocaleTimeString()}] ${message}`]);
+    setLogs((prev) => [
+      ...prev.slice(-119),
+      `[${new Date().toLocaleTimeString()}] ${message}`,
+    ]);
   }
 
-  function setStepState(id: StepId, nextStatus: StepStatus, stepError?: string) {
+  function setStepState(
+    id: StepId,
+    nextStatus: StepStatus,
+    stepError?: string,
+  ) {
     setSteps((prev) =>
-      prev.map((step) => (step.id === id ? { ...step, status: nextStatus, error: stepError } : step))
+      prev.map((step) =>
+        step.id === id
+          ? { ...step, status: nextStatus, error: stepError }
+          : step,
+      ),
     );
   }
 
@@ -705,8 +854,10 @@ export function DesktopOperatorCockpit({
     setCurrentStep(id);
     setSteps((prev) =>
       prev.map((step) =>
-        step.id === id && step.status === "pending" ? { ...step, status: "running" } : step
-      )
+        step.id === id && step.status === "pending"
+          ? { ...step, status: "running" }
+          : step,
+      ),
     );
   }
 
@@ -736,7 +887,7 @@ export function DesktopOperatorCockpit({
       setSnapshotError(
         snapshotErrorValue instanceof Error
           ? snapshotErrorValue.message
-          : "Failed to load runtime snapshot"
+          : "Failed to load runtime snapshot",
       );
     } finally {
       setSnapshotLoading(false);
@@ -760,6 +911,73 @@ export function DesktopOperatorCockpit({
       );
     }
   }, []);
+
+  const loadAccountReadiness = useCallback(async () => {
+    if (!status.authenticated) {
+      setAccountReadiness({
+        email: null,
+        isEmailVerified: null,
+        webhookCount: null,
+        loading: false,
+        error: null,
+      });
+      return;
+    }
+
+    setAccountReadiness((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const [meResponse, webhooksResponse] = await Promise.all([
+        fetch("/api/auth/me", {
+          credentials: "include",
+          cache: "no-store",
+        }),
+        fetch("/api/webhooks", {
+          credentials: "include",
+          cache: "no-store",
+        }),
+      ]);
+
+      const mePayload = await meResponse.json().catch(() => null);
+      const webhookPayload = await webhooksResponse.json().catch(() => null);
+
+      if (!meResponse.ok) {
+        throw new Error(
+          typeof mePayload?.detail === "string"
+            ? mePayload.detail
+            : "Failed to load account state",
+        );
+      }
+
+      const rawWebhooks = Array.isArray(webhookPayload)
+        ? webhookPayload
+        : Array.isArray(webhookPayload?.webhooks)
+          ? webhookPayload.webhooks
+          : [];
+
+      setAccountReadiness({
+        email: typeof mePayload?.email === "string" ? mePayload.email : null,
+        isEmailVerified:
+          typeof mePayload?.is_email_verified === "boolean"
+            ? mePayload.is_email_verified
+            : null,
+        webhookCount: rawWebhooks.length,
+        loading: false,
+        error: null,
+      });
+    } catch (accountError) {
+      setAccountReadiness({
+        email: null,
+        isEmailVerified: null,
+        webhookCount: null,
+        loading: false,
+        error:
+          accountError instanceof Error
+            ? accountError.message
+            : "Failed to load account readiness",
+      });
+    }
+  }, [status.authenticated]);
 
   useEffect(() => {
     if (!isDesktop) {
@@ -810,6 +1028,10 @@ export function DesktopOperatorCockpit({
   }, [job.status, loadSetupState, loadSnapshot, refetch]);
 
   useEffect(() => {
+    void loadAccountReadiness();
+  }, [loadAccountReadiness]);
+
+  useEffect(() => {
     if (!preflight) {
       return;
     }
@@ -844,12 +1066,7 @@ export function DesktopOperatorCockpit({
     }
 
     setCurrentStep("assistant");
-  }, [
-    preflight,
-    status.authenticated,
-    status.assistant?.found,
-    isComplete,
-  ]);
+  }, [preflight, status.authenticated, status.assistant?.found, isComplete]);
 
   useEffect(() => {
     if (bridgeIssue && bridgeIssue !== lastBridgeLogRef.current) {
@@ -917,23 +1134,37 @@ export function DesktopOperatorCockpit({
         configPath: extractString(runtimeOpenclaw, "config_path"),
         mutxHome: extractString(runtimeOpenclaw, "home_path"),
         authenticated: status.authenticated,
-        openclawBinary: status.openclaw.binaryPath || extractString(runtimeOpenclaw, "binary_path"),
-        openclawHealth: status.openclaw.health || extractString(runtimeGateway, "status") || "unknown",
-        openclawGateway: status.openclaw.gatewayUrl || extractString(runtimeGateway, "gateway_url"),
+        openclawBinary:
+          status.openclaw.binaryPath ||
+          extractString(runtimeOpenclaw, "binary_path"),
+        openclawHealth:
+          status.openclaw.health ||
+          extractString(runtimeGateway, "status") ||
+          "unknown",
+        openclawGateway:
+          status.openclaw.gatewayUrl ||
+          extractString(runtimeGateway, "gateway_url"),
         openclawSummary: extractString(runtimeGateway, "doctor_summary"),
         farameshAvailable: status.faramesh.available || Boolean(governance),
         farameshSummary: null,
         localCpReady: Boolean(status.localControlPlane.ready),
-        localCpPath: status.localControlPlane.path || runtimeLocalControl?.path || null,
+        localCpPath:
+          status.localControlPlane.path || runtimeLocalControl?.path || null,
       };
 
       setPreflight(nextPreflight);
       setRuntimeAction(nextPreflight.openclawBinary ? "import" : "install");
-      addLog(`Bridge ${status.bridge.pythonCommand ? `using ${status.bridge.pythonCommand}` : "responded successfully"}`);
+      addLog(
+        `Bridge ${status.bridge.pythonCommand ? `using ${status.bridge.pythonCommand}` : "responded successfully"}`,
+      );
       addLog(`MUTX ${nextPreflight.mutxVersion || "unknown"} detected`);
-      addLog(`API target: ${nextPreflight.apiUrl || "unknown"} (${nextPreflight.apiUrlSource || "source unknown"})`);
+      addLog(
+        `API target: ${nextPreflight.apiUrl || "unknown"} (${nextPreflight.apiUrlSource || "source unknown"})`,
+      );
       addLog(`OpenClaw health: ${nextPreflight.openclawHealth}`);
-      addLog(`Faramesh: ${nextPreflight.farameshAvailable ? "running" : "not running"}`);
+      addLog(
+        `Faramesh: ${nextPreflight.farameshAvailable ? "running" : "not running"}`,
+      );
 
       completeStep("preflight");
       if (!(status.authenticated || nextPreflight.authenticated)) {
@@ -946,7 +1177,10 @@ export function DesktopOperatorCockpit({
         goToStep("verify");
       }
     } catch (preflightError) {
-      const message = preflightError instanceof Error ? preflightError.message : "Preflight failed";
+      const message =
+        preflightError instanceof Error
+          ? preflightError.message
+          : "Preflight failed";
       setError(message);
       addLog(`Preflight failed: ${message}`);
       setStepState("preflight", "error", message);
@@ -962,9 +1196,14 @@ export function DesktopOperatorCockpit({
     try {
       const result = (await runDoctorJob()) as DoctorResult;
       setDoctorResult(result);
-      addLog(`Doctor: API ${result.api_health}, gateway ${result.openclaw?.status || "unknown"}`);
+      addLog(
+        `Doctor: API ${result.api_health}, gateway ${result.openclaw?.status || "unknown"}`,
+      );
     } catch (doctorError) {
-      const message = doctorError instanceof Error ? doctorError.message : "Diagnostics failed";
+      const message =
+        doctorError instanceof Error
+          ? doctorError.message
+          : "Diagnostics failed";
       setError(message);
       addLog(`Doctor failed: ${message}`);
     } finally {
@@ -986,7 +1225,10 @@ export function DesktopOperatorCockpit({
       }
       addLog(`Opened Terminal${result.cwd ? ` at ${result.cwd}` : ""}`);
     } catch (terminalError) {
-      const message = terminalError instanceof Error ? terminalError.message : "Could not open Terminal";
+      const message =
+        terminalError instanceof Error
+          ? terminalError.message
+          : "Could not open Terminal";
       setError(message);
       addLog(`Terminal launch failed: ${message}`);
     }
@@ -1007,7 +1249,9 @@ export function DesktopOperatorCockpit({
         addLog("Starting the local control plane...");
         const result = await window.mutxDesktop!.bridge.controlPlane.start();
         if (!result.success) {
-          throw new Error(result.error || "Failed to start local control plane");
+          throw new Error(
+            result.error || "Failed to start local control plane",
+          );
         }
         addLog("Local control plane is ready");
       }
@@ -1020,7 +1264,10 @@ export function DesktopOperatorCockpit({
         goToStep("auth");
       }
     } catch (modeError) {
-      const message = modeError instanceof Error ? modeError.message : "Could not select mode";
+      const message =
+        modeError instanceof Error
+          ? modeError.message
+          : "Could not select mode";
       setError(message);
       addLog(`Mode selection failed: ${message}`);
       setStepState("mode", "error", message);
@@ -1055,7 +1302,11 @@ export function DesktopOperatorCockpit({
           throw new Error("Email and password are required");
         }
         addLog(`Registering ${email}...`);
-        payload = await postJson("/api/auth/register", { name, email, password });
+        payload = await postJson("/api/auth/register", {
+          name,
+          email,
+          password,
+        });
       } else {
         if (!email.trim() || !password) {
           throw new Error("Email and password are required");
@@ -1064,26 +1315,83 @@ export function DesktopOperatorCockpit({
         payload = await postJson("/api/auth/login", { email, password });
       }
 
-      const accessToken = typeof payload.access_token === "string" ? payload.access_token : null;
+      const accessToken =
+        typeof payload.access_token === "string" ? payload.access_token : null;
       const refreshToken =
-        typeof payload.refresh_token === "string" ? payload.refresh_token : undefined;
-      if (!accessToken) {
-        throw new Error("Authentication succeeded but no access token was returned");
+        typeof payload.refresh_token === "string"
+          ? payload.refresh_token
+          : undefined;
+      const requiresEmailVerification =
+        payload.requires_email_verification === true;
+
+      if (authMode === "register" && requiresEmailVerification) {
+        const verificationMessage = `Verification email sent to ${email}. Confirm it before syncing desktop auth.`;
+        setError(verificationMessage);
+        addLog(verificationMessage);
+        setStepState(
+          "auth",
+          "error",
+          "Email verification required before desktop sync",
+        );
+        return;
       }
 
-      await window.mutxDesktop!.bridge.auth.storeTokens(accessToken, refreshToken, apiUrl);
+      if (!accessToken) {
+        throw new Error(
+          "Authentication succeeded but no access token was returned",
+        );
+      }
+
+      await window.mutxDesktop!.bridge.auth.storeTokens(
+        accessToken,
+        refreshToken,
+        apiUrl,
+      );
       addLog("Browser session and CLI auth are synced");
 
       completeStep("auth");
       await refetch();
       goToStep(preflight?.openclawBinary ? "assistant" : "runtime");
     } catch (authError) {
-      const message = authError instanceof Error ? authError.message : "Authentication failed";
+      const message =
+        authError instanceof Error
+          ? authError.message
+          : "Authentication failed";
       setError(message);
       addLog(`Authentication failed: ${message}`);
       setStepState("auth", "error", message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function openHostedAuthSurface(mode: Exclude<AuthMode, "local">) {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const targetUrl = new URL(`/${mode}`, window.location.origin);
+    targetUrl.searchParams.set("next", "/dashboard");
+
+    if (email.trim()) {
+      targetUrl.searchParams.set("email", email.trim());
+    }
+
+    try {
+      if (window.mutxDesktop?.openExternal) {
+        await window.mutxDesktop.openExternal(targetUrl.toString());
+      } else {
+        window.open(targetUrl.toString(), "_blank", "noopener,noreferrer");
+      }
+
+      addLog(`Opened hosted ${mode} flow in the browser`);
+    } catch (openError) {
+      const message =
+        openError instanceof Error
+          ? openError.message
+          : "Could not open the hosted auth surface";
+      setError(message);
+      addLog(`Hosted auth launch failed: ${message}`);
     }
   }
 
@@ -1093,13 +1401,15 @@ export function DesktopOperatorCockpit({
     try {
       setRuntimeAction("tui");
       addLog("Opening OpenClaw surface in Terminal...");
-      const result = await window.mutxDesktop!.bridge.runtime.openSurface("tui");
+      const result =
+        await window.mutxDesktop!.bridge.runtime.openSurface("tui");
       if (!result.success) {
         throw new Error(result.error || "Could not open OpenClaw TUI");
       }
       addLog("OpenClaw TUI opened");
     } catch (tuiError) {
-      const message = tuiError instanceof Error ? tuiError.message : "Could not open TUI";
+      const message =
+        tuiError instanceof Error ? tuiError.message : "Could not open TUI";
       setError(message);
       addLog(`TUI launch failed: ${message}`);
     } finally {
@@ -1109,13 +1419,17 @@ export function DesktopOperatorCockpit({
 
   async function openRuntimeConfig() {
     try {
-      const result = await window.mutxDesktop!.bridge.runtime.openSurface("configure");
+      const result =
+        await window.mutxDesktop!.bridge.runtime.openSurface("configure");
       if (!result.success) {
         throw new Error(result.error || "Could not open runtime configuration");
       }
       addLog("Opened runtime configuration surface");
     } catch (configError) {
-      const message = configError instanceof Error ? configError.message : "Runtime config failed";
+      const message =
+        configError instanceof Error
+          ? configError.message
+          : "Runtime config failed";
       setError(message);
       addLog(`Runtime config launch failed: ${message}`);
     }
@@ -1147,7 +1461,7 @@ export function DesktopOperatorCockpit({
         runtimeMode,
         assistantName,
         runtimeAction,
-        "npm"
+        "npm",
       );
 
       if (!result.success) {
@@ -1171,7 +1485,10 @@ export function DesktopOperatorCockpit({
       await loadSnapshot();
       await refetch();
     } catch (setupError) {
-      const message = setupError instanceof Error ? setupError.message : "Could not deploy assistant";
+      const message =
+        setupError instanceof Error
+          ? setupError.message
+          : "Could not deploy assistant";
       setError(message);
       addLog(`Setup failed: ${message}`);
       await loadSetupState();
@@ -1187,13 +1504,18 @@ export function DesktopOperatorCockpit({
     }
 
     try {
-      const result = await window.mutxDesktop!.bridge.system.revealInFinder(status.assistant.workspace);
+      const result = await window.mutxDesktop!.bridge.system.revealInFinder(
+        status.assistant.workspace,
+      );
       if (!result.success) {
         throw new Error(result.error || "Could not reveal workspace");
       }
       addLog(`Revealed workspace ${status.assistant.workspace}`);
     } catch (workspaceError) {
-      const message = workspaceError instanceof Error ? workspaceError.message : "Workspace reveal failed";
+      const message =
+        workspaceError instanceof Error
+          ? workspaceError.message
+          : "Workspace reveal failed";
       setError(message);
       addLog(`Workspace reveal failed: ${message}`);
     }
@@ -1201,13 +1523,19 @@ export function DesktopOperatorCockpit({
 
   async function handleRevealPolicy() {
     try {
-      const result = await window.mutxDesktop!.bridge.system.revealInFinder("~/.mutx/policies");
+      const result =
+        await window.mutxDesktop!.bridge.system.revealInFinder(
+          "~/.mutx/policies",
+        );
       if (!result.success) {
         throw new Error(result.error || "Could not reveal policy directory");
       }
       addLog("Opened policy directory in Finder");
     } catch (policyError) {
-      const message = policyError instanceof Error ? policyError.message : "Policy reveal failed";
+      const message =
+        policyError instanceof Error
+          ? policyError.message
+          : "Policy reveal failed";
       setError(message);
       addLog(`Policy reveal failed: ${message}`);
     }
@@ -1228,7 +1556,10 @@ export function DesktopOperatorCockpit({
       await runRuntimeResyncJob();
       addLog("Runtime state resynced");
     } catch (resyncError) {
-      const message = resyncError instanceof Error ? resyncError.message : "Runtime resync failed";
+      const message =
+        resyncError instanceof Error
+          ? resyncError.message
+          : "Runtime resync failed";
       setError(message);
       addLog(`Runtime resync failed: ${message}`);
     }
@@ -1240,7 +1571,9 @@ export function DesktopOperatorCockpit({
       addLog("Governance daemon restarted");
     } catch (governanceError) {
       const message =
-        governanceError instanceof Error ? governanceError.message : "Governance restart failed";
+        governanceError instanceof Error
+          ? governanceError.message
+          : "Governance restart failed";
       setError(message);
       addLog(`Governance restart failed: ${message}`);
     }
@@ -1307,7 +1640,10 @@ export function DesktopOperatorCockpit({
           <SignalTile
             label="CLI"
             value={preflight?.cliAvailable ? "Available" : "Missing"}
-            detail={preflight?.configPath || "Bridge-backed CLI config not detected yet."}
+            detail={
+              preflight?.configPath ||
+              "Bridge-backed CLI config not detected yet."
+            }
             tone={preflight?.cliAvailable ? "good" : "danger"}
           />
           <SignalTile
@@ -1322,7 +1658,11 @@ export function DesktopOperatorCockpit({
           />
           <SignalTile
             label="OpenClaw"
-            value={preflight?.openclawBinary ? preflight.openclawHealth : "Not installed"}
+            value={
+              preflight?.openclawBinary
+                ? preflight.openclawHealth
+                : "Not installed"
+            }
             detail={
               preflight?.openclawSummary ||
               preflight?.openclawBinary ||
@@ -1339,7 +1679,10 @@ export function DesktopOperatorCockpit({
           <SignalTile
             label="Governance"
             value={preflight?.farameshAvailable ? "Active" : "Idle"}
-            detail={preflight?.farameshSummary || "Faramesh daemon status unavailable."}
+            detail={
+              preflight?.farameshSummary ||
+              "Faramesh daemon status unavailable."
+            }
             tone={preflight?.farameshAvailable ? "good" : "warn"}
           />
         </div>
@@ -1349,7 +1692,10 @@ export function DesktopOperatorCockpit({
           <DetailRow label="API target" value={preflight?.apiUrl} />
           <DetailRow label="API source" value={preflight?.apiUrlSource} />
           <DetailRow label="Gateway URL" value={preflight?.openclawGateway} />
-          <DetailRow label="Python command" value={status.bridge.pythonCommand} />
+          <DetailRow
+            label="Python command"
+            value={status.bridge.pythonCommand}
+          />
           <DetailRow label="Bridge script" value={status.bridge.scriptPath} />
         </div>
       </div>
@@ -1390,7 +1736,9 @@ export function DesktopOperatorCockpit({
           <Server className="h-8 w-8 text-emerald-300" />
           <p className="mt-4 text-lg font-semibold text-white">Local</p>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            Drive a local stack on <span className="text-slate-200">{LOCAL_API_URL}</span> and bootstrap the control plane if needed.
+            Drive a local stack on{" "}
+            <span className="text-slate-200">{LOCAL_API_URL}</span> and
+            bootstrap the control plane if needed.
           </p>
         </button>
       </div>
@@ -1412,7 +1760,11 @@ export function DesktopOperatorCockpit({
                   : "border-white/10 bg-white/5 text-slate-400 hover:bg-white/10"
               }`}
             >
-              {mode === "login" ? "Login" : mode === "register" ? "Register" : "Local Bootstrap"}
+              {mode === "login"
+                ? "Login"
+                : mode === "register"
+                  ? "Register"
+                  : "Local Bootstrap"}
             </button>
           ))}
         </div>
@@ -1459,6 +1811,48 @@ export function DesktopOperatorCockpit({
           loading={loading}
           tone="primary"
         />
+
+        {authMode !== "local" ? (
+          <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Hosted provider auth
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Google, GitHub, Discord, and the real email confirmation flow now
+              live on the hosted auth pages. Use that lane when you need
+              provider signup or inbox verification on the Railway deployment,
+              then return here to sync the desktop bridge with password auth.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <ActionButton
+                label={
+                  authMode === "register"
+                    ? "Open Hosted Sign Up"
+                    : "Open Hosted Sign In"
+                }
+                onClick={() =>
+                  void openHostedAuthSurface(
+                    authMode === "register" ? "register" : "login",
+                  )
+                }
+                icon={ArrowUpRight}
+              />
+              <ActionButton
+                label={
+                  authMode === "register"
+                    ? "Open Hosted Sign In"
+                    : "Open Hosted Sign Up"
+                }
+                onClick={() =>
+                  void openHostedAuthSurface(
+                    authMode === "register" ? "login" : "register",
+                  )
+                }
+                icon={Globe}
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -1477,7 +1871,9 @@ export function DesktopOperatorCockpit({
             }`}
           >
             <FolderOpen className="h-7 w-7 text-amber-300" />
-            <p className="mt-3 text-base font-semibold text-white">Import existing runtime</p>
+            <p className="mt-3 text-base font-semibold text-white">
+              Import existing runtime
+            </p>
             <p className="mt-1 text-sm text-slate-400">
               Adopt the local OpenClaw installation without relocating it.
             </p>
@@ -1493,7 +1889,9 @@ export function DesktopOperatorCockpit({
             }`}
           >
             <Wrench className="h-7 w-7 text-cyan-300" />
-            <p className="mt-3 text-base font-semibold text-white">Install or repair runtime</p>
+            <p className="mt-3 text-base font-semibold text-white">
+              Install or repair runtime
+            </p>
             <p className="mt-1 text-sm text-slate-400">
               Let MUTX reconcile the local runtime into a sane state.
             </p>
@@ -1509,9 +1907,12 @@ export function DesktopOperatorCockpit({
             }`}
           >
             <Terminal className="h-7 w-7 text-slate-200" />
-            <p className="mt-3 text-base font-semibold text-white">Inspect via TUI first</p>
+            <p className="mt-3 text-base font-semibold text-white">
+              Inspect via TUI first
+            </p>
             <p className="mt-1 text-sm text-slate-400">
-              Open the runtime surface in Terminal before letting setup continue.
+              Open the runtime surface in Terminal before letting setup
+              continue.
             </p>
           </button>
         </div>
@@ -1523,13 +1924,22 @@ export function DesktopOperatorCockpit({
             icon={ArrowRight}
             tone="primary"
           />
-          <ActionButton label="Configure Runtime" onClick={() => void openRuntimeConfig()} icon={Settings2} />
           <ActionButton
-            label={status.localControlPlane?.ready ? "Stop Local Stack" : "Start Local Stack"}
+            label="Configure Runtime"
+            onClick={() => void openRuntimeConfig()}
+            icon={Settings2}
+          />
+          <ActionButton
+            label={
+              status.localControlPlane?.ready
+                ? "Stop Local Stack"
+                : "Start Local Stack"
+            }
             onClick={() => void handleControlPlaneToggle()}
             icon={status.localControlPlane?.ready ? Square : Play}
             loading={
-              (job.id === "controlPlaneStart" || job.id === "controlPlaneStop") &&
+              (job.id === "controlPlaneStart" ||
+                job.id === "controlPlaneStop") &&
               job.status === "running"
             }
             tone={status.localControlPlane?.ready ? "danger" : "default"}
@@ -1552,7 +1962,9 @@ export function DesktopOperatorCockpit({
 
         <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
           <p className="text-sm text-slate-400">
-            This runs the real desktop setup wizard through the Python bridge. It is the point where MUTX actually binds a workspace and assistant, not just a cosmetic step.
+            This runs the real desktop setup wizard through the Python bridge.
+            It is the point where MUTX actually binds a workspace and assistant,
+            not just a cosmetic step.
           </p>
         </div>
 
@@ -1573,7 +1985,9 @@ export function DesktopOperatorCockpit({
                   Live wizard state
                 </p>
                 <p className="mt-2 text-base font-semibold text-white">
-                  {setupState.current_step || setupState.failed_step || "waiting"}
+                  {setupState.current_step ||
+                    setupState.failed_step ||
+                    "waiting"}
                 </p>
                 <p className="mt-1 text-sm leading-6 text-slate-400">
                   {setupState.last_error ||
@@ -1582,14 +1996,24 @@ export function DesktopOperatorCockpit({
               </div>
               <StatusPill
                 label={setupState.status || "idle"}
-                tone={setupStateFailed ? "danger" : setupStateActive ? "warn" : "neutral"}
+                tone={
+                  setupStateFailed
+                    ? "danger"
+                    : setupStateActive
+                      ? "warn"
+                      : "neutral"
+                }
               />
             </div>
             <div className="mt-4 overflow-hidden rounded-full border border-white/10 bg-black/30">
               <div
                 className={cn(
                   "h-2 rounded-full transition-all duration-300",
-                  setupStateFailed ? "bg-rose-400" : setupStateActive ? "bg-cyan-300" : "bg-emerald-300",
+                  setupStateFailed
+                    ? "bg-rose-400"
+                    : setupStateActive
+                      ? "bg-cyan-300"
+                      : "bg-emerald-300",
                 )}
                 style={{ width: `${Math.max(setupProgress, 6)}%` }}
               />
@@ -1670,8 +2094,48 @@ export function DesktopOperatorCockpit({
       <div className="space-y-4">
         <div className="rounded-[22px] border border-emerald-500/20 bg-emerald-500/10 p-4">
           <p className="text-sm leading-6 text-emerald-100">
-            The desktop seat has enough state to move into steady-state operation. You can stay here for recovery and setup, or shift into the advanced control view.
+            The desktop seat has enough state to move into steady-state
+            operation. You can stay here for recovery and setup, or shift into
+            the advanced control view.
           </p>
+        </div>
+
+        <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
+          <div className="grid gap-3 md:grid-cols-2">
+            <DetailRow
+              label="Hosted identity"
+              value={accountReadiness.email || status.user?.email}
+            />
+            <DetailRow
+              label="Email verification"
+              value={
+                accountReadiness.loading
+                  ? "checking"
+                  : accountReadiness.isEmailVerified === true
+                    ? "verified"
+                    : accountReadiness.isEmailVerified === false
+                      ? "pending"
+                      : "unknown"
+              }
+            />
+            <DetailRow
+              label="Webhook routes"
+              value={
+                accountReadiness.loading
+                  ? "loading"
+                  : accountReadiness.webhookCount != null
+                    ? `${accountReadiness.webhookCount} configured`
+                    : "unknown"
+              }
+            />
+            <DetailRow
+              label="Readiness notes"
+              value={
+                accountReadiness.error ||
+                "Identity and webhook state are loaded from the live hosted APIs."
+              }
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -1681,8 +2145,22 @@ export function DesktopOperatorCockpit({
             icon={ArrowRight}
             tone="primary"
           />
-          <ActionButton label="Open Terminal" onClick={() => void openTerminal()} icon={Terminal} />
-          <ActionButton label="Reveal Workspace" onClick={() => void handleRevealWorkspace()} icon={FolderOpen} disabled={!status.assistant?.workspace} />
+          <ActionButton
+            label="Open Webhooks"
+            onClick={() => navigate("/dashboard/webhooks")}
+            icon={Workflow}
+          />
+          <ActionButton
+            label="Open Terminal"
+            onClick={() => void openTerminal()}
+            icon={Terminal}
+          />
+          <ActionButton
+            label="Reveal Workspace"
+            onClick={() => void handleRevealWorkspace()}
+            icon={FolderOpen}
+            disabled={!status.assistant?.workspace}
+          />
         </div>
       </div>
     );
@@ -1720,9 +2198,15 @@ export function DesktopOperatorCockpit({
       <div className="min-h-screen bg-[linear-gradient(180deg,#04070d_0%,#09111d_55%,#050910_100%)]">
         <DesktopRouteListener />
         <main className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-6 py-10">
-          <SurfaceCard title="Desktop mode required" eyebrow="MUTX.app" tone="warn">
+          <SurfaceCard
+            title="Desktop mode required"
+            eyebrow="MUTX.app"
+            tone="warn"
+          >
             <p className="text-sm leading-7 text-slate-300">
-              The native operator cockpit depends on the Electron bridge. Open this route inside MUTX.app to use runtime inspection, local stack control, governance, and setup actions.
+              The native operator cockpit depends on the Electron bridge. Open
+              this route inside MUTX.app to use runtime inspection, local stack
+              control, governance, and setup actions.
             </p>
           </SurfaceCard>
         </main>
@@ -1750,28 +2234,54 @@ export function DesktopOperatorCockpit({
           <DeskPanel
             title="Machine Brief"
             meta="Live state"
-            tone={environmentTone === "danger" ? "danger" : environmentTone === "warn" ? "warning" : "default"}
+            tone={
+              environmentTone === "danger"
+                ? "danger"
+                : environmentTone === "warn"
+                  ? "warning"
+                  : "default"
+            }
           >
             <div className="space-y-1">
-              <DeskKeyValue label="MUTX version" value={preflight?.mutxVersion || status.mutxVersion} />
+              <DeskKeyValue
+                label="MUTX version"
+                value={preflight?.mutxVersion || status.mutxVersion}
+              />
               <DeskKeyValue label="CLI config" value={preflight?.configPath} />
               <DeskKeyValue label="MUTX home" value={preflight?.mutxHome} />
-              <DeskKeyValue label="API target" value={preflight?.apiUrl || status.apiUrl} />
+              <DeskKeyValue
+                label="API target"
+                value={preflight?.apiUrl || status.apiUrl}
+              />
               <DeskKeyValue label="Gateway URL" value={runtimeGatewayUrl} />
               <DeskKeyValue
                 label="Local control path"
-                value={runtimeLocalControl?.path || preflight?.localCpPath || status.localControlPlane?.path}
+                value={
+                  runtimeLocalControl?.path ||
+                  preflight?.localCpPath ||
+                  status.localControlPlane?.path
+                }
               />
-              <DeskKeyValue label="Python command" value={status.bridge.pythonCommand} />
-              <DeskKeyValue label="Bridge script" value={status.bridge.scriptPath} />
+              <DeskKeyValue
+                label="Python command"
+                value={status.bridge.pythonCommand}
+              />
+              <DeskKeyValue
+                label="Bridge script"
+                value={status.bridge.scriptPath}
+              />
             </div>
           </DeskPanel>
         </div>
 
         <div className="space-y-4">
           <DeskPanel
-            title={advancedView ? "Advanced Operator Control" : "Mission Control"}
-            meta={advancedView ? "Native control surface" : "Desktop operator seat"}
+            title={
+              advancedView ? "Advanced Operator Control" : "Mission Control"
+            }
+            meta={
+              advancedView ? "Native control surface" : "Desktop operator seat"
+            }
             className="min-h-[320px]"
           >
             <div className="flex flex-wrap items-center gap-2">
@@ -1810,7 +2320,9 @@ export function DesktopOperatorCockpit({
                     : "border-[#d7dce4] bg-[#f5f7fa] text-[#66707d]",
                 )}
               >
-                {status.faramesh?.available ? "Governance Active" : "Governance Idle"}
+                {status.faramesh?.available
+                  ? "Governance Active"
+                  : "Governance Idle"}
               </span>
             </div>
 
@@ -1822,7 +2334,10 @@ export function DesktopOperatorCockpit({
                     : "Use the whole window like an operator desk, not a web dashboard."}
                 </h1>
                 <p className="mt-3 max-w-3xl text-[13px] leading-6 text-[#66707d]">
-                  The desktop shell now keeps setup, recovery, runtime control, and local diagnostics in one native workspace. The summary, active setup lane, and machine-side inspector stay visible together so the window feels useful when it expands.
+                  The desktop shell now keeps setup, recovery, runtime control,
+                  and local diagnostics in one native workspace. The summary,
+                  active setup lane, and machine-side inspector stay visible
+                  together so the window feels useful when it expands.
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -1838,17 +2353,32 @@ export function DesktopOperatorCockpit({
                     icon={Radar}
                     loading={job.id === "doctor" && job.status === "running"}
                   />
-                  <DeskActionButton label="Open Terminal" onClick={() => void openTerminal()} icon={Terminal} />
-                  <DeskActionButton label="Open TUI" onClick={() => void openTui()} icon={TerminalSquare} />
                   <DeskActionButton
-                    label={status.localControlPlane?.ready ? "Stop Local Stack" : "Start Local Stack"}
+                    label="Open Terminal"
+                    onClick={() => void openTerminal()}
+                    icon={Terminal}
+                  />
+                  <DeskActionButton
+                    label="Open TUI"
+                    onClick={() => void openTui()}
+                    icon={TerminalSquare}
+                  />
+                  <DeskActionButton
+                    label={
+                      status.localControlPlane?.ready
+                        ? "Stop Local Stack"
+                        : "Start Local Stack"
+                    }
                     onClick={() => void handleControlPlaneToggle()}
                     icon={status.localControlPlane?.ready ? Square : Play}
                     loading={
-                      (job.id === "controlPlaneStart" || job.id === "controlPlaneStop") &&
+                      (job.id === "controlPlaneStart" ||
+                        job.id === "controlPlaneStop") &&
                       job.status === "running"
                     }
-                    tone={status.localControlPlane?.ready ? "danger" : "default"}
+                    tone={
+                      status.localControlPlane?.ready ? "danger" : "default"
+                    }
                   />
                   {!advancedView ? (
                     <DeskActionButton
@@ -1871,8 +2401,18 @@ export function DesktopOperatorCockpit({
               <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(145px,1fr))] self-start">
                 <DeskMetric
                   label="Environment"
-                  value={!preflight ? "Inspecting" : preflight.cliAvailable ? "Reachable" : "Broken"}
-                  detail={!preflight ? "Bridge preflight is still running." : preflight.configPath}
+                  value={
+                    !preflight
+                      ? "Inspecting"
+                      : preflight.cliAvailable
+                        ? "Reachable"
+                        : "Broken"
+                  }
+                  detail={
+                    !preflight
+                      ? "Bridge preflight is still running."
+                      : preflight.configPath
+                  }
                   tone={environmentTone}
                 />
                 <DeskMetric
@@ -1886,27 +2426,49 @@ export function DesktopOperatorCockpit({
                           ? "Degraded"
                           : "Idle"
                   }
-                  detail={bridgeIssue || status.bridge.pythonCommand || "Interpreter unresolved"}
+                  detail={
+                    bridgeIssue ||
+                    status.bridge.pythonCommand ||
+                    "Interpreter unresolved"
+                  }
                   tone={bridgeTone}
                 />
                 <DeskMetric
                   label="API Target"
                   value={runtimeMode === "local" ? "Local" : "Hosted"}
-                  detail={runtimeMode === "local" ? LOCAL_API_URL : HOSTED_API_URL}
+                  detail={
+                    runtimeMode === "local" ? LOCAL_API_URL : HOSTED_API_URL
+                  }
                   tone={runtimeMode === "local" ? "good" : "neutral"}
                 />
                 <DeskMetric
                   label="Runtime"
-                  value={runtimeAction === "install" ? "Repair" : runtimeAction === "import" ? "Import" : "TUI"}
-                  detail={preflight?.openclawBinary || "No OpenClaw binary detected yet."}
+                  value={
+                    runtimeAction === "install"
+                      ? "Repair"
+                      : runtimeAction === "import"
+                        ? "Import"
+                        : "TUI"
+                  }
+                  detail={
+                    preflight?.openclawBinary ||
+                    "No OpenClaw binary detected yet."
+                  }
                   tone={runtimeAction === "install" ? "warn" : "neutral"}
                 />
                 <DeskMetric
                   label="Seat State"
-                  value={desktopSeatReady ? "Ready" : isComplete ? "Almost Ready" : "Not Ready"}
+                  value={
+                    desktopSeatReady
+                      ? "Ready"
+                      : isComplete
+                        ? "Almost Ready"
+                        : "Not Ready"
+                  }
                   detail={
                     desktopSeatReady
-                      ? status.assistant?.workspace || "Desktop handoff is live."
+                      ? status.assistant?.workspace ||
+                        "Desktop handoff is live."
                       : "Finish identity, runtime, and assistant binding."
                   }
                   tone={desktopSeatReady ? "good" : "warn"}
@@ -1923,8 +2485,10 @@ export function DesktopOperatorCockpit({
             {bridgeIssue ? (
               <div className="mt-4 rounded-[16px] border border-amber-200 bg-[#fff8eb] px-4 py-3 text-[12.5px] leading-6 text-[#9a6700]">
                 Bridge recovery: MUTX is currently using{" "}
-                <span className="font-mono text-[#6b4900]">{status.bridge.pythonCommand || "an unknown interpreter"}</span>.
-                The latest bridge failure was{" "}
+                <span className="font-mono text-[#6b4900]">
+                  {status.bridge.pythonCommand || "an unknown interpreter"}
+                </span>
+                . The latest bridge failure was{" "}
                 <span className="font-mono text-[#6b4900]">{bridgeIssue}</span>.
               </div>
             ) : null}
@@ -1951,7 +2515,10 @@ export function DesktopOperatorCockpit({
                 <DeskMetric
                   label="Assistant"
                   value={status.assistant?.name || "Not bound"}
-                  detail={status.assistant?.workspace || "Run setup to bind the desktop workspace."}
+                  detail={
+                    status.assistant?.workspace ||
+                    "Run setup to bind the desktop workspace."
+                  }
                   tone={status.assistant?.found ? "good" : "warn"}
                 />
                 <DeskMetric
@@ -1969,10 +2536,15 @@ export function DesktopOperatorCockpit({
               </div>
 
               <div className="mt-4 space-y-1">
-                <DeskKeyValue label="Runtime config" value={runtimeConfigPath} />
+                <DeskKeyValue
+                  label="Runtime config"
+                  value={runtimeConfigPath}
+                />
                 <DeskKeyValue
                   label="Local control plane"
-                  value={runtimeLocalControl?.path || status.localControlPlane?.path}
+                  value={
+                    runtimeLocalControl?.path || status.localControlPlane?.path
+                  }
                 />
                 <DeskKeyValue
                   label="Privacy"
@@ -1998,7 +2570,9 @@ export function DesktopOperatorCockpit({
                   label="Resync Runtime"
                   onClick={() => void handleRuntimeResync()}
                   icon={RefreshCw}
-                  loading={job.id === "runtimeResync" && job.status === "running"}
+                  loading={
+                    job.id === "runtimeResync" && job.status === "running"
+                  }
                 />
                 <DeskActionButton
                   label="Reveal Workspace"
@@ -2015,26 +2589,50 @@ export function DesktopOperatorCockpit({
               tone={status.faramesh?.available ? "success" : "warning"}
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <DeskMetric label="Provider" value={governance?.provider || "unknown"} />
-                <DeskMetric label="Pending" value={String(governance?.pending_approvals ?? 0)} />
-                <DeskMetric label="Permits Today" value={String(governance?.permits_today ?? 0)} />
-                <DeskMetric label="Defers Today" value={String(governance?.defers_today ?? 0)} />
+                <DeskMetric
+                  label="Provider"
+                  value={governance?.provider || "unknown"}
+                />
+                <DeskMetric
+                  label="Pending"
+                  value={String(governance?.pending_approvals ?? 0)}
+                />
+                <DeskMetric
+                  label="Permits Today"
+                  value={String(governance?.permits_today ?? 0)}
+                />
+                <DeskMetric
+                  label="Defers Today"
+                  value={String(governance?.defers_today ?? 0)}
+                />
               </div>
               <div className="mt-4 space-y-1">
                 <DeskKeyValue
                   label="Daemon status"
-                  value={governance?.status || (status.faramesh?.available ? "active" : "idle")}
+                  value={
+                    governance?.status ||
+                    (status.faramesh?.available ? "active" : "idle")
+                  }
                 />
-                <DeskKeyValue label="Last decision" value={formatTimestamp(governance?.last_decision_at)} />
+                <DeskKeyValue
+                  label="Last decision"
+                  value={formatTimestamp(governance?.last_decision_at)}
+                />
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <DeskActionButton
                   label="Restart Daemon"
                   icon={RefreshCw}
                   onClick={() => void handleGovernanceRestart()}
-                  loading={job.id === "governanceRestart" && job.status === "running"}
+                  loading={
+                    job.id === "governanceRestart" && job.status === "running"
+                  }
                 />
-                <DeskActionButton label="Open Policy" icon={FolderOpen} onClick={() => void handleRevealPolicy()} />
+                <DeskActionButton
+                  label="Open Policy"
+                  icon={FolderOpen}
+                  onClick={() => void handleRevealPolicy()}
+                />
               </div>
             </DeskPanel>
           </div>
@@ -2046,7 +2644,9 @@ export function DesktopOperatorCockpit({
           <DeskPanel title="Operator Feed" meta="Setup log" tone="graphite">
             <div className="h-[340px] overflow-y-auto rounded-[16px] border border-[#2a3139] bg-black/30 p-4 font-mono text-[12px] leading-6 text-[#d9e1ea]">
               {logs.length === 0 ? (
-                <p className="text-[#758090]">Waiting for the first real bridge event...</p>
+                <p className="text-[#758090]">
+                  Waiting for the first real bridge event...
+                </p>
               ) : (
                 logs.map((log, index) => <p key={index}>{log}</p>)
               )}
@@ -2061,14 +2661,18 @@ export function DesktopOperatorCockpit({
                 </div>
               ) : sessions.length > 0 ? (
                 sessions.slice(0, 6).map((session) => (
-                  <div key={session.id} className="rounded-[16px] border border-[#e1e6ed] bg-white/78 px-4 py-3.5">
+                  <div
+                    key={session.id}
+                    className="rounded-[16px] border border-[#e1e6ed] bg-white/78 px-4 py-3.5"
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-[13px] font-semibold text-[#171a1f]">
                           {session.channel || session.kind || session.id}
                         </p>
                         <p className="mt-1 text-[12px] text-[#6d7784]">
-                          {session.model || "model unknown"} • {session.age || "age unknown"}
+                          {session.model || "model unknown"} •{" "}
+                          {session.age || "age unknown"}
                         </p>
                       </div>
                       <span className="rounded-full border border-[#d7dce4] bg-[#f5f7fa] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#66707d]">
@@ -2079,7 +2683,8 @@ export function DesktopOperatorCockpit({
                 ))
               ) : (
                 <div className="rounded-[16px] border border-dashed border-[#d7dce4] bg-white/60 px-4 py-5 text-[13px] leading-6 text-[#6b7582]">
-                  No local assistant sessions detected yet. Open the TUI or start a conversation to see local activity here.
+                  No local assistant sessions detected yet. Open the TUI or
+                  start a conversation to see local activity here.
                 </div>
               )}
             </div>
@@ -2092,24 +2697,35 @@ export function DesktopOperatorCockpit({
                   label="API"
                   value={doctorResult.api_health || "unknown"}
                   detail={doctorResult.api_url}
-                  tone={doctorResult.api_health === "ok" || doctorResult.api_health === "healthy" ? "good" : "warn"}
+                  tone={
+                    doctorResult.api_health === "ok" ||
+                    doctorResult.api_health === "healthy"
+                      ? "good"
+                      : "warn"
+                  }
                 />
                 <DeskMetric
                   label="Gateway"
                   value={doctorResult.openclaw.status || "unknown"}
                   detail={doctorResult.openclaw.doctor_summary}
-                  tone={doctorResult.openclaw.status === "healthy" ? "good" : "warn"}
+                  tone={
+                    doctorResult.openclaw.status === "healthy" ? "good" : "warn"
+                  }
                 />
                 <DeskMetric
                   label="Assistant"
                   value={doctorResult.assistant?.name || "Not ready"}
-                  detail={doctorResult.assistant?.workspace || "No desktop-bound assistant yet."}
+                  detail={
+                    doctorResult.assistant?.workspace ||
+                    "No desktop-bound assistant yet."
+                  }
                   tone={doctorResult.assistant ? "good" : "warn"}
                 />
               </div>
             ) : (
               <div className="rounded-[16px] border border-[#e1e6ed] bg-white/70 px-4 py-4 text-[13px] leading-6 text-[#67717e]">
-                Run the desktop doctor when you want a deeper snapshot of API reachability, runtime state, and assistant wiring.
+                Run the desktop doctor when you want a deeper snapshot of API
+                reachability, runtime state, and assistant wiring.
               </div>
             )}
           </DeskPanel>
@@ -2119,14 +2735,22 @@ export function DesktopOperatorCockpit({
   }
 
   const content = (
-    <main className={standalone ? "flex min-h-screen w-full flex-col gap-6 px-4 py-5 lg:px-6 xl:px-8 2xl:px-10" : "flex flex-col gap-6"}>
+    <main
+      className={
+        standalone
+          ? "flex min-h-screen w-full flex-col gap-6 px-4 py-5 lg:px-6 xl:px-8 2xl:px-10"
+          : "flex flex-col gap-6"
+      }
+    >
       <section className="grid gap-6 min-[1500px]:grid-cols-[minmax(0,1.42fr)_minmax(360px,0.78fr)]">
         <div className="rounded-[34px] border border-[#183044] bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_28%),linear-gradient(180deg,rgba(7,15,27,0.96)_0%,rgba(4,9,16,0.98)_100%)] p-6 shadow-[0_32px_120px_rgba(2,8,23,0.45)]">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-50">
                 <Radar className="h-3.5 w-3.5" />
-                {advancedView ? "Advanced Operator Cockpit" : "Native Operator Cockpit"}
+                {advancedView
+                  ? "Advanced Operator Cockpit"
+                  : "Native Operator Cockpit"}
               </div>
               <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                 {advancedView
@@ -2134,21 +2758,27 @@ export function DesktopOperatorCockpit({
                   : "Make this machine a serious operator seat."}
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                The desktop app now uses one mission-control home for first-run setup, recovery, and steady-state runtime work. The browser mirror still exists, but it no longer pretends to be the native product.
+                The desktop app now uses one mission-control home for first-run
+                setup, recovery, and steady-state runtime work. The browser
+                mirror still exists, but it no longer pretends to be the native
+                product.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               <StatusPill
-                label={status.authenticated ? "Session Synced" : "Session Pending"}
+                label={
+                  status.authenticated ? "Session Synced" : "Session Pending"
+                }
                 tone={status.authenticated ? "good" : "warn"}
               />
+              <StatusPill label={bridgeLabel} tone={bridgeTone} />
               <StatusPill
-                label={bridgeLabel}
-                tone={bridgeTone}
-              />
-              <StatusPill
-                label={status.faramesh?.available ? "Governance Active" : "Governance Idle"}
+                label={
+                  status.faramesh?.available
+                    ? "Governance Active"
+                    : "Governance Idle"
+                }
                 tone={status.faramesh?.available ? "good" : "neutral"}
               />
             </div>
@@ -2157,14 +2787,36 @@ export function DesktopOperatorCockpit({
           <div className="mt-8 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]">
             <SignalTile
               label="Environment"
-              value={!preflight ? "Inspecting" : preflight.cliAvailable ? "Reachable" : "Broken"}
-              detail={!preflight ? "Bridge preflight is still running." : preflight.configPath}
+              value={
+                !preflight
+                  ? "Inspecting"
+                  : preflight.cliAvailable
+                    ? "Reachable"
+                    : "Broken"
+              }
+              detail={
+                !preflight
+                  ? "Bridge preflight is still running."
+                  : preflight.configPath
+              }
               tone={environmentTone}
             />
             <SignalTile
               label="Bridge"
-              value={status.bridge.ready ? "Ready" : status.bridge.state === "starting" ? "Restarting" : bridgeIssue ? "Degraded" : "Idle"}
-              detail={bridgeIssue || status.bridge.pythonCommand || "Interpreter unresolved"}
+              value={
+                status.bridge.ready
+                  ? "Ready"
+                  : status.bridge.state === "starting"
+                    ? "Restarting"
+                    : bridgeIssue
+                      ? "Degraded"
+                      : "Idle"
+              }
+              detail={
+                bridgeIssue ||
+                status.bridge.pythonCommand ||
+                "Interpreter unresolved"
+              }
               tone={bridgeTone}
             />
             <SignalTile
@@ -2175,13 +2827,27 @@ export function DesktopOperatorCockpit({
             />
             <SignalTile
               label="Runtime"
-              value={runtimeAction === "install" ? "Repair" : runtimeAction === "import" ? "Import" : "TUI"}
-              detail={preflight?.openclawBinary || "No OpenClaw binary detected yet."}
+              value={
+                runtimeAction === "install"
+                  ? "Repair"
+                  : runtimeAction === "import"
+                    ? "Import"
+                    : "TUI"
+              }
+              detail={
+                preflight?.openclawBinary || "No OpenClaw binary detected yet."
+              }
               tone={runtimeAction === "install" ? "warn" : "neutral"}
             />
             <SignalTile
               label="Seat State"
-              value={desktopSeatReady ? "Ready" : isComplete ? "Almost Ready" : "Not Ready"}
+              value={
+                desktopSeatReady
+                  ? "Ready"
+                  : isComplete
+                    ? "Almost Ready"
+                    : "Not Ready"
+              }
               detail={
                 desktopSeatReady
                   ? status.assistant?.workspace || "Dashboard handoff is live."
@@ -2204,22 +2870,45 @@ export function DesktopOperatorCockpit({
               icon={Radar}
               loading={job.id === "doctor" && job.status === "running"}
             />
-            <ActionButton label="Open Terminal" onClick={() => void openTerminal()} icon={Terminal} />
-            <ActionButton label="Open TUI" onClick={() => void openTui()} icon={TerminalSquare} />
             <ActionButton
-              label={status.localControlPlane?.ready ? "Stop Local Stack" : "Start Local Stack"}
+              label="Open Terminal"
+              onClick={() => void openTerminal()}
+              icon={Terminal}
+            />
+            <ActionButton
+              label="Open TUI"
+              onClick={() => void openTui()}
+              icon={TerminalSquare}
+            />
+            <ActionButton
+              label={
+                status.localControlPlane?.ready
+                  ? "Stop Local Stack"
+                  : "Start Local Stack"
+              }
               onClick={() => void handleControlPlaneToggle()}
               icon={status.localControlPlane?.ready ? Square : Play}
               loading={
-                (job.id === "controlPlaneStart" || job.id === "controlPlaneStop") &&
+                (job.id === "controlPlaneStart" ||
+                  job.id === "controlPlaneStop") &&
                 job.status === "running"
               }
               tone={status.localControlPlane?.ready ? "danger" : "default"}
             />
             {!advancedView ? (
-              <ActionButton label="Open Advanced Control" onClick={launchAdvancedControl} icon={ArrowRight} tone="primary" />
+              <ActionButton
+                label="Open Advanced Control"
+                onClick={launchAdvancedControl}
+                icon={ArrowRight}
+                tone="primary"
+              />
             ) : (
-              <ActionButton label="Return Home" onClick={() => navigate("/dashboard")} icon={ArrowRight} tone="primary" />
+              <ActionButton
+                label="Return Home"
+                onClick={() => navigate("/dashboard")}
+                icon={ArrowRight}
+                tone="primary"
+              />
             )}
           </div>
 
@@ -2231,7 +2920,12 @@ export function DesktopOperatorCockpit({
 
           {bridgeIssue ? (
             <div className="mt-4 rounded-[22px] border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-100">
-              Bridge recovery: MUTX is currently using <span className="font-mono text-amber-50">{status.bridge.pythonCommand || "an unknown interpreter"}</span>. The latest bridge failure was <span className="font-mono text-amber-50">{bridgeIssue}</span>.
+              Bridge recovery: MUTX is currently using{" "}
+              <span className="font-mono text-amber-50">
+                {status.bridge.pythonCommand || "an unknown interpreter"}
+              </span>
+              . The latest bridge failure was{" "}
+              <span className="font-mono text-amber-50">{bridgeIssue}</span>.
             </div>
           ) : null}
         </div>
@@ -2239,16 +2933,38 @@ export function DesktopOperatorCockpit({
         <SurfaceCard
           title="System Brief"
           eyebrow="Live State"
-          tone={environmentTone === "danger" ? "danger" : environmentTone === "warn" ? "warn" : "good"}
+          tone={
+            environmentTone === "danger"
+              ? "danger"
+              : environmentTone === "warn"
+                ? "warn"
+                : "good"
+          }
         >
           <div className="space-y-3">
-            <DetailRow label="MUTX version" value={preflight?.mutxVersion || status.mutxVersion} />
+            <DetailRow
+              label="MUTX version"
+              value={preflight?.mutxVersion || status.mutxVersion}
+            />
             <DetailRow label="CLI config" value={preflight?.configPath} />
             <DetailRow label="MUTX home" value={preflight?.mutxHome} />
-            <DetailRow label="API target" value={preflight?.apiUrl || status.apiUrl} />
+            <DetailRow
+              label="API target"
+              value={preflight?.apiUrl || status.apiUrl}
+            />
             <DetailRow label="Gateway URL" value={runtimeGatewayUrl} />
-            <DetailRow label="Local control path" value={runtimeLocalControl?.path || preflight?.localCpPath || status.localControlPlane?.path} />
-            <DetailRow label="Python command" value={status.bridge.pythonCommand} />
+            <DetailRow
+              label="Local control path"
+              value={
+                runtimeLocalControl?.path ||
+                preflight?.localCpPath ||
+                status.localControlPlane?.path
+              }
+            />
+            <DetailRow
+              label="Python command"
+              value={status.bridge.pythonCommand}
+            />
             <DetailRow label="Bridge script" value={status.bridge.scriptPath} />
           </div>
         </SurfaceCard>
@@ -2274,32 +2990,44 @@ export function DesktopOperatorCockpit({
                 </div>
                 <StatusPill
                   label={setupState?.status || (loading ? "running" : "idle")}
-                  tone={setupStateFailed ? "danger" : setupStateActive ? "warn" : "neutral"}
+                  tone={
+                    setupStateFailed
+                      ? "danger"
+                      : setupStateActive
+                        ? "warn"
+                        : "neutral"
+                  }
                 />
               </div>
               <div className="mt-4 overflow-hidden rounded-full border border-white/10 bg-black/30">
                 <div
                   className={cn(
                     "h-2 rounded-full transition-all duration-300",
-                    setupStateFailed ? "bg-rose-400" : setupStateActive ? "bg-cyan-300" : "bg-emerald-300",
+                    setupStateFailed
+                      ? "bg-rose-400"
+                      : setupStateActive
+                        ? "bg-cyan-300"
+                        : "bg-emerald-300",
                   )}
                   style={{ width: `${Math.max(setupProgress, 6)}%` }}
                 />
               </div>
               {setupState?.last_error ? (
-                <p className="mt-3 text-sm text-rose-200">{setupState.last_error}</p>
+                <p className="mt-3 text-sm text-rose-200">
+                  {setupState.last_error}
+                </p>
               ) : null}
             </div>
 
             <div className="space-y-3">
-            {steps.map((step, index) => (
-              <StepRow
-                key={step.id}
-                step={step}
-                active={index === currentStepIndex}
-                onClick={() => setCurrentStep(step.id)}
-              />
-            ))}
+              {steps.map((step, index) => (
+                <StepRow
+                  key={step.id}
+                  step={step}
+                  active={index === currentStepIndex}
+                  onClick={() => setCurrentStep(step.id)}
+                />
+              ))}
             </div>
           </div>
         </SurfaceCard>
@@ -2330,7 +3058,9 @@ export function DesktopOperatorCockpit({
           <SurfaceCard title="Operator Feed" eyebrow="Setup Log">
             <div className="h-[360px] overflow-y-auto rounded-[22px] border border-white/10 bg-black/40 p-4 font-mono text-sm">
               {logs.length === 0 ? (
-                <p className="text-slate-600">Waiting for the first real bridge event...</p>
+                <p className="text-slate-600">
+                  Waiting for the first real bridge event...
+                </p>
               ) : (
                 logs.map((log, index) => (
                   <p key={index} className="leading-6 text-slate-300">
@@ -2341,31 +3071,46 @@ export function DesktopOperatorCockpit({
             </div>
           </SurfaceCard>
 
-          <SurfaceCard title="Diagnostics" eyebrow="Doctor" tone={doctorResult ? "good" : "default"}>
+          <SurfaceCard
+            title="Diagnostics"
+            eyebrow="Doctor"
+            tone={doctorResult ? "good" : "default"}
+          >
             {doctorResult ? (
               <div className="space-y-3">
                 <SignalTile
                   label="API"
                   value={doctorResult.api_health || "unknown"}
                   detail={doctorResult.api_url}
-                  tone={doctorResult.api_health === "ok" || doctorResult.api_health === "healthy" ? "good" : "warn"}
+                  tone={
+                    doctorResult.api_health === "ok" ||
+                    doctorResult.api_health === "healthy"
+                      ? "good"
+                      : "warn"
+                  }
                 />
                 <SignalTile
                   label="Gateway"
                   value={doctorResult.openclaw.status || "unknown"}
                   detail={doctorResult.openclaw.doctor_summary}
-                  tone={doctorResult.openclaw.status === "healthy" ? "good" : "warn"}
+                  tone={
+                    doctorResult.openclaw.status === "healthy" ? "good" : "warn"
+                  }
                 />
                 <SignalTile
                   label="Assistant"
                   value={doctorResult.assistant?.name || "Not ready"}
-                  detail={doctorResult.assistant?.workspace || "No desktop-bound assistant yet."}
+                  detail={
+                    doctorResult.assistant?.workspace ||
+                    "No desktop-bound assistant yet."
+                  }
                   tone={doctorResult.assistant ? "good" : "warn"}
                 />
               </div>
             ) : (
               <div className="rounded-[22px] border border-white/10 bg-black/20 p-4 text-sm leading-6 text-slate-400">
-                Run the desktop doctor when you want a deeper snapshot of API reachability, runtime state, and assistant wiring.
+                Run the desktop doctor when you want a deeper snapshot of API
+                reachability, runtime state, and assistant wiring.
               </div>
             )}
           </SurfaceCard>
@@ -2383,9 +3128,12 @@ export function DesktopOperatorCockpit({
               <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-white">{status.assistant?.name || "Assistant not bound"}</p>
+                    <p className="text-sm font-medium text-white">
+                      {status.assistant?.name || "Assistant not bound"}
+                    </p>
                     <p className="mt-1 text-xs text-slate-500">
-                      {status.assistant?.workspace || "Run setup to bind the desktop workspace."}
+                      {status.assistant?.workspace ||
+                        "Run setup to bind the desktop workspace."}
                     </p>
                   </div>
                   <Bot className="h-5 w-5 text-cyan-300" />
@@ -2395,8 +3143,12 @@ export function DesktopOperatorCockpit({
               <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-white">Gateway URL</p>
-                    <p className="mt-1 break-all text-xs text-slate-500">{runtimeGatewayUrl || "not detected"}</p>
+                    <p className="text-sm font-medium text-white">
+                      Gateway URL
+                    </p>
+                    <p className="mt-1 break-all text-xs text-slate-500">
+                      {runtimeGatewayUrl || "not detected"}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -2416,7 +3168,9 @@ export function DesktopOperatorCockpit({
                 <HardDrive className="mt-0.5 h-4 w-4 text-sky-300" />
                 <div>
                   <p className="font-medium text-white">Binary Path</p>
-                  <p className="mt-1 break-all text-xs text-slate-500">{runtimeBinaryPath || "not available"}</p>
+                  <p className="mt-1 break-all text-xs text-slate-500">
+                    {runtimeBinaryPath || "not available"}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3 rounded-[22px] border border-white/10 bg-black/20 px-4 py-3">
@@ -2424,7 +3178,9 @@ export function DesktopOperatorCockpit({
                 <div>
                   <p className="font-medium text-white">Local Control Plane</p>
                   <p className="mt-1 break-all text-xs text-slate-500">
-                    {runtimeLocalControl?.path || status.localControlPlane?.path || "not available"}
+                    {runtimeLocalControl?.path ||
+                      status.localControlPlane?.path ||
+                      "not available"}
                   </p>
                 </div>
               </div>
@@ -2433,7 +3189,8 @@ export function DesktopOperatorCockpit({
                 <div>
                   <p className="font-medium text-white">Runtime Details</p>
                   <p className="mt-1 text-xs text-slate-500">
-                    {runtimePrivacySummary || "Desktop runtime state is synced from the local OpenClaw install."}
+                    {runtimePrivacySummary ||
+                      "Desktop runtime state is synced from the local OpenClaw install."}
                   </p>
                   <p className="mt-2 text-xs text-slate-500">
                     {runtimeKeysStayLocal === null
@@ -2443,7 +3200,9 @@ export function DesktopOperatorCockpit({
                         : "Keys may be proxied through the runtime"}
                   </p>
                   {runtimeConfigPath ? (
-                    <p className="mt-2 break-all text-xs text-slate-600">{runtimeConfigPath}</p>
+                    <p className="mt-2 break-all text-xs text-slate-600">
+                      {runtimeConfigPath}
+                    </p>
                   ) : null}
                 </div>
               </div>
@@ -2457,10 +3216,22 @@ export function DesktopOperatorCockpit({
           tone={status.faramesh?.available ? "good" : "warn"}
         >
           <div className="grid gap-3 sm:grid-cols-2">
-            <MetricChip label="Provider" value={governance?.provider || "unknown"} />
-            <MetricChip label="Pending" value={String(governance?.pending_approvals ?? 0)} />
-            <MetricChip label="Permits Today" value={String(governance?.permits_today ?? 0)} />
-            <MetricChip label="Defers Today" value={String(governance?.defers_today ?? 0)} />
+            <MetricChip
+              label="Provider"
+              value={governance?.provider || "unknown"}
+            />
+            <MetricChip
+              label="Pending"
+              value={String(governance?.pending_approvals ?? 0)}
+            />
+            <MetricChip
+              label="Permits Today"
+              value={String(governance?.permits_today ?? 0)}
+            />
+            <MetricChip
+              label="Defers Today"
+              value={String(governance?.defers_today ?? 0)}
+            />
           </div>
           <div className="mt-4 space-y-3 rounded-[22px] border border-white/10 bg-black/20 p-4">
             <div className="flex items-start gap-3">
@@ -2468,7 +3239,8 @@ export function DesktopOperatorCockpit({
               <div>
                 <p className="text-sm font-medium text-white">Daemon Status</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  {governance?.status || (status.faramesh?.available ? "active" : "idle")}
+                  {governance?.status ||
+                    (status.faramesh?.available ? "active" : "idle")}
                 </p>
                 <p className="mt-1 text-xs text-slate-600">
                   Last decision: {formatTimestamp(governance?.last_decision_at)}
@@ -2480,9 +3252,15 @@ export function DesktopOperatorCockpit({
                 label="Restart Daemon"
                 icon={RefreshCw}
                 onClick={() => void handleGovernanceRestart()}
-                loading={job.id === "governanceRestart" && job.status === "running"}
+                loading={
+                  job.id === "governanceRestart" && job.status === "running"
+                }
               />
-              <ActionButton label="Open Policy" icon={FolderOpen} onClick={() => void handleRevealPolicy()} />
+              <ActionButton
+                label="Open Policy"
+                icon={FolderOpen}
+                onClick={() => void handleRevealPolicy()}
+              />
             </div>
           </div>
         </SurfaceCard>
@@ -2496,10 +3274,15 @@ export function DesktopOperatorCockpit({
                 Loading local session snapshot...
               </div>
             ) : sessions.length > 0 ? (
-              sessions.slice(0, 4).map((session) => <SessionRow key={session.id} session={session} />)
+              sessions
+                .slice(0, 4)
+                .map((session) => (
+                  <SessionRow key={session.id} session={session} />
+                ))
             ) : (
               <div className="rounded-[22px] border border-dashed border-white/10 bg-black/20 px-4 py-5 text-sm text-slate-500">
-                No local assistant sessions detected yet. Open the TUI or start a conversation to see local activity here.
+                No local assistant sessions detected yet. Open the TUI or start
+                a conversation to see local activity here.
               </div>
             )}
           </div>
@@ -2520,11 +3303,20 @@ export function DesktopOperatorCockpit({
               onClick={() => void handleRuntimeResync()}
               loading={job.id === "runtimeResync" && job.status === "running"}
             />
-            <ActionButton label="Reveal Workspace" icon={FolderOpen} onClick={() => void handleRevealWorkspace()} disabled={!status.assistant?.workspace} />
-            <ActionButton label="Open Terminal" icon={ArrowUpRight} onClick={() => void openTerminal()} />
+            <ActionButton
+              label="Reveal Workspace"
+              icon={FolderOpen}
+              onClick={() => void handleRevealWorkspace()}
+              disabled={!status.assistant?.workspace}
+            />
+            <ActionButton
+              label="Open Terminal"
+              icon={ArrowUpRight}
+              onClick={() => void openTerminal()}
+            />
           </div>
 
-          {(job.error || snapshotError) ? (
+          {job.error || snapshotError ? (
             <div className="mt-5 rounded-[22px] border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
               {job.error || snapshotError}
             </div>
@@ -2532,7 +3324,9 @@ export function DesktopOperatorCockpit({
 
           {doctorResult ? (
             <details className="mt-5 rounded-[22px] border border-white/10 bg-black/20 p-4 text-sm text-slate-300">
-              <summary className="cursor-pointer font-medium text-white">Raw diagnostics payload</summary>
+              <summary className="cursor-pointer font-medium text-white">
+                Raw diagnostics payload
+              </summary>
               <pre className="mt-4 max-h-80 overflow-auto text-xs text-slate-400">
                 {JSON.stringify(doctorResult, null, 2)}
               </pre>
@@ -2540,7 +3334,6 @@ export function DesktopOperatorCockpit({
           ) : null}
         </SurfaceCard>
       </section>
-
     </main>
   );
 

@@ -17,6 +17,7 @@ const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.mutxx.dev', 'pico.localhost'])
+const PICO_AUTH_PATHS = new Set(['/login', '/register', '/forgot-password', '/reset-password'])
 const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, (typeof PICO_LOCALES)[number]>> = {
   JP: 'ja',
@@ -374,6 +375,9 @@ export function proxy(request: NextRequest) {
   if (PICO_HOSTS.has(host)) {
     // API routes must hit the real /api/* handlers, not /pico/api/*
     if (normalizedPath.startsWith('/api')) {
+      return finalizeResponse(NextResponse.next(), host, normalizedPath)
+    }
+    if (PICO_AUTH_PATHS.has(normalizedPath)) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
     // pico.mutx.dev/* -> /pico/* with locale detection

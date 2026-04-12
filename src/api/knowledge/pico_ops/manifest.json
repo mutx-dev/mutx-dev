@@ -1,0 +1,179 @@
+{
+  "docs": [
+    {
+      "id": "skill",
+      "filename": "SKILL.md",
+      "topics": ["workflow", "operating-model", "guidance"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["choose", "install", "repair", "migrate", "compare", "optimize", "integrate"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "scope-and-persona",
+      "filename": "SCOPE_AND_PERSONA.md",
+      "topics": ["persona", "audience", "coaching"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["choose", "repair", "compare"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "interaction-protocol",
+      "filename": "INTERACTION_PROTOCOL.md",
+      "topics": ["conversation", "workflow", "questioning"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["repair", "install", "compare"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "user-profiling",
+      "filename": "USER_PROFILING.md",
+      "topics": ["profiling", "skill-level", "context"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["choose", "install", "repair", "migrate", "compare", "optimize"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "install-flow",
+      "filename": "INSTALL_FLOW.md",
+      "topics": ["install", "bootstrap", "order-of-operations"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["install", "repair", "migrate"],
+      "officialFallbackExpected": true,
+      "visible": true
+    },
+    {
+      "id": "troubleshooting-flow",
+      "filename": "TROUBLESHOOTING_FLOW.md",
+      "topics": ["diagnostics", "triage", "repair"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["repair", "optimize", "tailscale", "integrate"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "command-format",
+      "filename": "COMMAND_FORMAT.md",
+      "topics": ["commands", "verification", "formatting"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["install", "repair", "migrate", "integrate"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "web-research-policy",
+      "filename": "WEB_RESEARCH_POLICY.md",
+      "topics": ["research", "official-docs", "version-sensitive"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["install", "repair", "compare", "integrate", "optimize"],
+      "officialFallbackExpected": true,
+      "visible": true
+    },
+    {
+      "id": "safety-policy",
+      "filename": "SAFETY_POLICY.md",
+      "topics": ["safety", "risk", "exposure", "secrets"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["repair", "integrate", "optimize", "tailscale"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "tailscale-playbook",
+      "filename": "TAILSCALE_PLAYBOOK.md",
+      "topics": ["tailscale", "remote-access", "networking", "ssh"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["tailscale", "install", "repair", "integrate"],
+      "officialFallbackExpected": true,
+      "visible": true,
+      "officialLinks": [
+        "https://tailscale.com/download",
+        "https://tailscale.com/kb"
+      ]
+    },
+    {
+      "id": "hermes",
+      "filename": "HERMES.md",
+      "topics": ["hermes", "gateway", "profiles", "memory"],
+      "agents": ["hermes"],
+      "intents": ["choose", "install", "repair", "compare", "optimize", "integrate"],
+      "officialFallbackExpected": true,
+      "visible": true
+    },
+    {
+      "id": "openclaw",
+      "filename": "OPENCLAW.md",
+      "topics": ["openclaw", "channels", "gateway", "workspace"],
+      "agents": ["openclaw"],
+      "intents": ["choose", "install", "repair", "compare", "integrate", "optimize"],
+      "officialFallbackExpected": true,
+      "visible": true
+    },
+    {
+      "id": "nanoclaw",
+      "filename": "NANOCLAW.md",
+      "topics": ["nanoclaw", "containers", "auditability", "isolation"],
+      "agents": ["nanoclaw"],
+      "intents": ["choose", "install", "repair", "compare", "optimize"],
+      "officialFallbackExpected": true,
+      "visible": true
+    },
+    {
+      "id": "picoclaw",
+      "filename": "PICOCLAW.md",
+      "topics": ["picoclaw", "edge", "lightweight", "low-resource"],
+      "agents": ["picoclaw"],
+      "intents": ["choose", "install", "repair", "compare", "optimize"],
+      "officialFallbackExpected": true,
+      "visible": true
+    },
+    {
+      "id": "decision-matrix",
+      "filename": "DECISION_MATRIX.md",
+      "topics": ["comparison", "recommendation", "tradeoffs"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["choose", "compare", "migrate"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "examples",
+      "filename": "EXAMPLES.md",
+      "topics": ["answer-style", "format", "examples"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["install", "repair", "compare", "tailscale", "integrate"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "tools",
+      "filename": "TOOLS.md",
+      "topics": ["tool-selection", "capabilities", "mapping"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["repair", "optimize", "integrate"],
+      "officialFallbackExpected": false,
+      "visible": true
+    },
+    {
+      "id": "readme",
+      "filename": "README.md",
+      "topics": ["pack-overview"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["choose"],
+      "officialFallbackExpected": false,
+      "visible": false
+    },
+    {
+      "id": "builder-setup",
+      "filename": "BUILDER_SETUP.md",
+      "topics": ["builder", "internal-reference"],
+      "agents": ["hermes", "openclaw", "nanoclaw", "picoclaw"],
+      "intents": ["choose"],
+      "officialFallbackExpected": false,
+      "visible": false
+    }
+  ]
+}

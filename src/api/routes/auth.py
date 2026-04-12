@@ -1,6 +1,7 @@
 from ipaddress import ip_address
 from datetime import datetime, timezone
 from typing import Optional
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict, EmailStr
@@ -22,6 +23,13 @@ from src.api.services.email.email_service import (
     send_verification_email,
     send_password_reset_email,
 )
+from src.api.services.social_auth import (
+    OAuthProvider,
+    SocialAuthError,
+    build_authorization_url,
+    exchange_code_for_user_profile,
+    get_provider_client_id,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 settings = get_settings()
@@ -36,6 +44,7 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     name: str
     password: str
+    verification_origin: str | None = None
 
 
 class LoginRequest(BaseModel):
@@ -60,6 +69,11 @@ class TokenResponse(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int
+
+
+class RegisterResponse(TokenResponse):
+    verification_email_sent: bool = True
+    requires_email_verification: bool = False
 
 
 class UserResponse(BaseModel):
@@ -111,7 +125,71 @@ def _assert_local_bootstrap_allowed(request: Request) -> None:
         )
 
 
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+def _normalize_origin(value: str | None) -> str | None:
+    if not value:
+        return None
+
+    parsed = urlsplit(value)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        return None
+
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
+def _get_allowed_frontend_origins() -> set[str]:
+    origins = {settings.frontend_url.rstrip("/")}
+    configured = settings.cors_origins if isinstance(settings.cors_origins, list) else []
+    for origin in configured:
+        normalized = _normalize_origin(origin)
+        if normalized:
+            origins.add(normalized.rstrip("/"))
+    return origins
+
+
+def _is_allowed_frontend_origin(origin: str) -> bool:
+    if origin in _get_allowed_frontend_origins():
+        return True
+
+    parsed = urlsplit(origin)
+    host = (parsed.hostname or "").lower()
+
+    if host == "mutx.dev" or host.endswith(".mutx.dev"):
+        return True
+
+    if host in {"localhost", "127.0.0.1", "::1"} or host.endswith(".localhost"):
+        return True
+
+    return False
+
+
+def _resolve_frontend_origin(requested_origin: str | None) -> str:
+    normalized = _normalize_origin(requested_origin)
+    if normalized and _is_allowed_frontend_origin(normalized):
+        return normalized
+    return settings.frontend_url.rstrip("/")
+
+
+def _validate_oauth_redirect_uri(provider: OAuthProvider, redirect_uri: str) -> str:
+    parsed = urlsplit(redirect_uri)
+    origin = _normalize_origin(redirect_uri)
+
+    if origin is None or not _is_allowed_frontend_origin(origin):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OAuth redirect URI must target an allowed frontend origin.",
+        )
+
+    expected_suffix = f"/api/auth/oauth/{provider.value}/callback"
+    if parsed.path != expected_suffix:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OAuth redirect URI path is invalid.",
+        )
+
+    return redirect_uri
+
+
+@router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
 async def register(request: RegisterRequest, session: AsyncSession = Depends(get_db)):
     user_service = UserService(session)
 
@@ -137,7 +215,12 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
 
     # Send verification email
     token = await user_service.create_email_verification_token(user.id)
-    send_verification_email(user.email, user.name, token)
+    send_verification_email(
+        user.email,
+        user.name,
+        token,
+        frontend_url=_resolve_frontend_origin(request.verification_origin),
+    )
 
     access_token, access_token_expires_at, refresh_token = await issue_token_pair(session, user.id)
 
@@ -149,10 +232,11 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
         user_id=user.id,
     )
 
-    return TokenResponse(
+    return RegisterResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         expires_in=_get_expires_in_seconds(access_token_expires_at),
+        requires_email_verification=settings.require_email_verification,
     )
 
 
@@ -301,6 +385,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
 # New request models for password reset and email verification
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
+    email_link_origin: str | None = None
 
 
 class ResetPasswordRequest(BaseModel):
@@ -314,10 +399,20 @@ class VerifyEmailRequest(BaseModel):
 
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
+    verification_origin: str | None = None
 
 
 class MessageResponse(BaseModel):
     message: str
+
+
+class OAuthAuthorizeResponse(BaseModel):
+    authorization_url: str
+
+
+class OAuthExchangeRequest(BaseModel):
+    code: str
+    redirect_uri: str
 
 
 VERIFICATION_EMAIL_RESPONSE_MESSAGE = (
@@ -336,7 +431,12 @@ async def forgot_password(request: ForgotPasswordRequest, session: AsyncSession 
         # Create reset token
         token = await user_service.create_password_reset_token(user.id)
         # Send email
-        send_password_reset_email(user.email, user.name, token)
+        send_password_reset_email(
+            user.email,
+            user.name,
+            token,
+            frontend_url=_resolve_frontend_origin(request.email_link_origin),
+        )
 
     # Always return success to prevent email enumeration
     return MessageResponse(
@@ -402,9 +502,77 @@ async def resend_verification(
     # Create new verification token
     token = await user_service.create_email_verification_token(user.id)
     # Send email
-    send_verification_email(user.email, user.name, token)
+    send_verification_email(
+        user.email,
+        user.name,
+        token,
+        frontend_url=_resolve_frontend_origin(request.verification_origin),
+    )
 
     return MessageResponse(message=VERIFICATION_EMAIL_RESPONSE_MESSAGE)
+
+
+@router.get("/oauth/{provider}/authorize", response_model=OAuthAuthorizeResponse)
+async def authorize_oauth(provider: OAuthProvider, redirect_uri: str, state: str):
+    validated_redirect_uri = _validate_oauth_redirect_uri(provider, redirect_uri)
+    client_id = get_provider_client_id(provider)
+
+    if not client_id:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{provider.value.title()} OAuth is not configured.",
+        )
+
+    return OAuthAuthorizeResponse(
+        authorization_url=build_authorization_url(
+            provider,
+            client_id=client_id,
+            redirect_uri=validated_redirect_uri,
+            state=state,
+        )
+    )
+
+
+@router.post("/oauth/{provider}/exchange", response_model=TokenResponse)
+async def exchange_oauth_code(
+    provider: OAuthProvider,
+    request: OAuthExchangeRequest,
+    session: AsyncSession = Depends(get_db),
+):
+    validated_redirect_uri = _validate_oauth_redirect_uri(provider, request.redirect_uri)
+    user_service = UserService(session)
+
+    try:
+        profile = await exchange_code_for_user_profile(
+            provider,
+            code=request.code,
+            redirect_uri=validated_redirect_uri,
+        )
+    except SocialAuthError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+    user = await user_service.get_or_create_user_for_oauth(profile)
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is deactivated",
+        )
+
+    access_token, access_token_expires_at, refresh_token = await issue_token_pair(session, user.id)
+
+    await log_analytics_event(
+        session,
+        event_name="User logged in",
+        event_type=AnalyticsEventType.USER_LOGIN,
+        user_id=user.id,
+        properties={"provider": provider.value},
+    )
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=_get_expires_in_seconds(access_token_expires_at),
+    )
 
 
 # SSO OAuth Routes

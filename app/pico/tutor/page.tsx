@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import { PicoTutorPageClient } from '@/components/pico/PicoTutorPageClient'
 
 export default function PicoTutorPage() {
-  redirect('/pico')
+  return <PicoTutorPageClient />
 }

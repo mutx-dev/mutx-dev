@@ -31,6 +31,7 @@ export type DesktopRouteKey =
   | "agents"
   | "deployments"
   | "documents"
+  | "reasoning"
   | "runs"
   | "monitoring"
   | "traces"
@@ -113,6 +114,18 @@ export const DESKTOP_ROUTE_META: Record<DesktopRouteKey, DesktopRouteMeta> = {
     section: "execution",
     icon: FileText,
     iconTone: "text-amber-300 bg-amber-400/10",
+    requiresAuth: true,
+  },
+  reasoning: {
+    key: "reasoning",
+    title: "Reasoning",
+    path: "/dashboard/reasoning",
+    publicHref: "/dashboard/reasoning",
+    description: "Autoreason refinement jobs with blind judging, artifact capture, and run-linked traces.",
+    badge: "execution",
+    section: "execution",
+    icon: Brain,
+    iconTone: "text-violet-300 bg-violet-400/10",
     requiresAuth: true,
   },
   runs: {
@@ -368,6 +381,7 @@ export const DESKTOP_ROUTE_ORDER: DesktopRouteKey[] = [
   "runs",
   "monitoring",
   "documents",
+  "reasoning",
   "traces",
   "observability",
   "sessions",

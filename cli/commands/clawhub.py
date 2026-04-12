@@ -11,7 +11,7 @@ def clawhub_group():
 
 @clawhub_group.command(name="list")
 def list_skills():
-    """List trending skills from ClawHub"""
+    """List skills from the MUTX catalog."""
     config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
@@ -33,11 +33,46 @@ def list_skills():
         click.echo("No skills found.")
         return
 
-    click.echo(f"{'ID':<20} | {'NAME':<20} | {'STARS':<6} | {'AUTHOR':<20}")
-    click.echo("-" * 75)
+    click.echo(f"{'ID':<24} | {'NAME':<28} | {'SRC':<18} | {'AVAIL':<5} | {'AUTHOR':<20}")
+    click.echo("-" * 108)
     for skill in skills:
         click.echo(
-            f"{skill['id']:<20} | {skill['name']:<20} | {skill['stars']:<6} | {skill['author']:<20}"
+            f"{skill['id']:<24} | {skill['name'][:28]:<28} | {skill.get('source', 'catalog')[:18]:<18} | "
+            f"{('yes' if skill.get('available', True) else 'no'):<5} | {skill['author'][:20]:<20}"
+        )
+
+
+@clawhub_group.command(name="bundles")
+def list_bundles():
+    """List curated skill bundles."""
+    config = current_config()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(config)
+    response = client.get("/v1/clawhub/bundles")
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code != 200:
+        click.echo(f"Error: {response.text}", err=True)
+        return
+
+    bundles = response.json()
+    if not bundles:
+        click.echo("No bundles found.")
+        return
+
+    click.echo(f"{'ID':<32} | {'NAME':<28} | {'SKILLS':<13} | {'TEMPLATE':<28}")
+    click.echo("-" * 113)
+    for bundle in bundles:
+        skill_ratio = f"{bundle.get('available_skill_count', 0)}/{bundle.get('skill_count', 0)}"
+        click.echo(
+            f"{bundle['id']:<32} | {bundle['name'][:28]:<28} | "
+            f"{skill_ratio:<13} | {str(bundle.get('recommended_template_id') or '')[:28]:<28}"
         )
 
 
@@ -67,7 +102,45 @@ def install_skill(agent_id: str, skill_id: str):
     if response.status_code == 200:
         click.echo(f"Successfully initiated installation of '{skill_id}' for agent {agent_id}")
     elif response.status_code == 404:
-        click.echo(f"Error: Agent {agent_id} not found", err=True)
+        click.echo(f"Error: Unknown skill or agent not found for '{skill_id}'", err=True)
+    elif response.status_code == 409:
+        click.echo(f"Error: {response.json().get('detail', response.text)}", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
+@clawhub_group.command(name="install-bundle")
+@click.option("--agent-id", "-a", required=True, help="Agent ID to install the bundle to")
+@click.option("--bundle-id", "-b", required=True, help="Bundle ID to install")
+def install_bundle(agent_id: str, bundle_id: str):
+    """Install a curated bundle to an agent"""
+    cli_config = current_config()
+    if not cli_config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(cli_config)
+    response = client.post(
+        "/v1/clawhub/install-bundle",
+        json={
+            "agent_id": agent_id,
+            "bundle_id": bundle_id,
+        },
+    )
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        payload = response.json()
+        click.echo(
+            f"Installed bundle '{bundle_id}' for agent {agent_id}: "
+            f"{len(payload.get('installed_skill_ids', []))} installed, "
+            f"{len(payload.get('unavailable_skill_ids', []))} unavailable"
+        )
+    elif response.status_code == 404:
+        click.echo(f"Error: Unknown bundle or agent not found for '{bundle_id}'", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)
 

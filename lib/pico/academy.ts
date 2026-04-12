@@ -1,3 +1,11 @@
+import {
+  createDefaultPicoPlatformPreferences,
+  normalizePersistedLessonWorkspace,
+  normalizePicoPlatformPreferences,
+  type PicoLessonWorkspaceState,
+  type PicoPlatformPreferences,
+} from '@/lib/pico/platformState'
+
 export type PicoPlan = 'free' | 'starter' | 'pro'
 export type PicoLessonDifficulty = 'setup' | 'operator' | 'builder'
 
@@ -70,6 +78,8 @@ export type PicoProgressState = {
   supportRequests: number
   helpfulResponses: number
   sharedProjects: string[]
+  lessonWorkspaces: Record<string, PicoLessonWorkspaceState>
+  platform: PicoPlatformPreferences
   autopilot: {
     costThresholdPercent: number
     alertChannel: 'in_app' | 'email' | 'webhook'
@@ -943,6 +953,8 @@ export function createDefaultPicoProgress(): PicoProgressState {
     supportRequests: 0,
     helpfulResponses: 0,
     sharedProjects: [],
+    lessonWorkspaces: {},
+    platform: createDefaultPicoPlatformPreferences(),
     autopilot: { ...DEFAULT_AUTOPILOT_STATE },
   }
 }
@@ -950,6 +962,75 @@ export function createDefaultPicoProgress(): PicoProgressState {
 function uniqueStrings(value: unknown): string[] {
   if (!Array.isArray(value)) return []
   return Array.from(new Set(value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)))
+}
+
+function normalizeLessonWorkspaceMap(value: unknown): Record<string, PicoLessonWorkspaceState> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {}
+  }
+
+  const entries = Object.entries(value as Record<string, unknown>)
+  return Object.fromEntries(
+    entries
+      .filter(([key]) => typeof key === 'string' && key.trim().length > 0)
+      .map(([key, workspace]) => [key, normalizePersistedLessonWorkspace(workspace)]),
+  )
+}
+
+function parseTimestamp(value: string | null | undefined) {
+  if (!value) return 0
+  const parsed = new Date(value).getTime()
+  return Number.isNaN(parsed) ? 0 : parsed
+}
+
+function mergeLessonWorkspaceMaps(
+  localMap: Record<string, PicoLessonWorkspaceState>,
+  remoteMap: Record<string, PicoLessonWorkspaceState>,
+) {
+  const lessonSlugs = Array.from(new Set([...Object.keys(remoteMap), ...Object.keys(localMap)]))
+
+  return Object.fromEntries(
+    lessonSlugs.map((lessonSlug) => {
+      const localWorkspace = localMap[lessonSlug]
+      const remoteWorkspace = remoteMap[lessonSlug]
+
+      if (!localWorkspace) {
+        return [lessonSlug, remoteWorkspace]
+      }
+
+      if (!remoteWorkspace) {
+        return [lessonSlug, localWorkspace]
+      }
+
+      const localTimestamp = parseTimestamp(localWorkspace.updatedAt)
+      const remoteTimestamp = parseTimestamp(remoteWorkspace.updatedAt)
+
+      if (remoteTimestamp > localTimestamp) {
+        return [lessonSlug, remoteWorkspace]
+      }
+
+      if (localTimestamp > remoteTimestamp) {
+        return [lessonSlug, localWorkspace]
+      }
+
+      return [
+        lessonSlug,
+        normalizePersistedLessonWorkspace({
+          ...remoteWorkspace,
+          ...localWorkspace,
+          completedStepIndexes: Array.from(
+            new Set([
+              ...remoteWorkspace.completedStepIndexes,
+              ...localWorkspace.completedStepIndexes,
+            ]),
+          ).sort((left, right) => left - right),
+          notes: localWorkspace.notes || remoteWorkspace.notes,
+          evidence: localWorkspace.evidence || remoteWorkspace.evidence,
+          updatedAt: localWorkspace.updatedAt || remoteWorkspace.updatedAt,
+        }),
+      ]
+    }),
+  )
 }
 
 export function normalizePicoProgress(value: Partial<PicoProgressState> | null | undefined): PicoProgressState {
@@ -974,6 +1055,15 @@ export function normalizePicoProgress(value: Partial<PicoProgressState> | null |
     supportRequests: typeof candidate.supportRequests === 'number' ? candidate.supportRequests : 0,
     helpfulResponses: typeof candidate.helpfulResponses === 'number' ? candidate.helpfulResponses : 0,
     sharedProjects: uniqueStrings(candidate.sharedProjects),
+    lessonWorkspaces: normalizeLessonWorkspaceMap(candidate.lessonWorkspaces),
+    platform: {
+      ...createDefaultPicoPlatformPreferences(),
+      ...normalizePicoPlatformPreferences(candidate.platform),
+      updatedAt:
+        typeof candidate.platform?.updatedAt === 'string'
+          ? candidate.platform.updatedAt
+          : fallback.platform.updatedAt,
+    },
     autopilot: {
       costThresholdPercent:
         typeof candidate.autopilot?.costThresholdPercent === 'number'
@@ -1088,6 +1178,11 @@ export function mergePicoProgress(localValue: Partial<PicoProgressState> | null 
     remote.completedLessons.length === 0 &&
     remote.milestoneEvents.length === 0 &&
     remote.sharedProjects.length === 0 &&
+    Object.keys(remote.lessonWorkspaces).length === 0 &&
+    remote.platform.activeSurface === null &&
+    remote.platform.lastOpenedLessonSlug === null &&
+    remote.platform.railCollapsed === false &&
+    remote.platform.helpLaneOpen === false &&
     remote.tutorQuestions === 0 &&
     remote.supportRequests === 0
 
@@ -1102,6 +1197,20 @@ export function mergePicoProgress(localValue: Partial<PicoProgressState> | null 
     completedLessons: Array.from(new Set([...remote.completedLessons, ...local.completedLessons])),
     milestoneEvents: Array.from(new Set([...remote.milestoneEvents, ...local.milestoneEvents])),
     sharedProjects: Array.from(new Set([...remote.sharedProjects, ...local.sharedProjects])),
+    lessonWorkspaces: mergeLessonWorkspaceMaps(local.lessonWorkspaces, remote.lessonWorkspaces),
+    platform: {
+      ...remote.platform,
+      activeSurface: local.platform.activeSurface ?? remote.platform.activeSurface,
+      lastOpenedLessonSlug:
+        local.platform.lastOpenedLessonSlug ?? remote.platform.lastOpenedLessonSlug,
+      railCollapsed: local.platform.railCollapsed,
+      helpLaneOpen: local.platform.helpLaneOpen,
+      updatedAt:
+        parseTimestamp(remote.platform.updatedAt ?? remote.updatedAt) >
+        parseTimestamp(local.platform.updatedAt ?? local.updatedAt)
+          ? remote.platform.updatedAt
+          : local.platform.updatedAt,
+    },
     tutorQuestions: Math.max(remote.tutorQuestions, local.tutorQuestions),
     supportRequests: Math.max(remote.supportRequests, local.supportRequests),
     helpfulResponses: Math.max(remote.helpfulResponses, local.helpfulResponses),
@@ -1221,6 +1330,38 @@ export function markProjectShared(progressInput: Partial<PicoProgressState>, pro
     updatedAt: new Date().toISOString(),
   })
   return next
+}
+
+export function updateLessonWorkspace(
+  progressInput: Partial<PicoProgressState>,
+  lessonSlug: string,
+  workspace: PicoLessonWorkspaceState,
+): PicoProgressState {
+  const progress = normalizePicoProgress(progressInput)
+  return normalizePicoProgress({
+    ...progress,
+    lessonWorkspaces: {
+      ...progress.lessonWorkspaces,
+      [lessonSlug]: normalizePersistedLessonWorkspace(workspace),
+    },
+    updatedAt: new Date().toISOString(),
+  })
+}
+
+export function updatePlatformPreferences(
+  progressInput: Partial<PicoProgressState>,
+  patch: Partial<PicoPlatformPreferences>,
+): PicoProgressState {
+  const progress = normalizePicoProgress(progressInput)
+  return normalizePicoProgress({
+    ...progress,
+    platform: {
+      ...progress.platform,
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    },
+    updatedAt: new Date().toISOString(),
+  })
 }
 
 export function searchLessonCorpus(query: string) {

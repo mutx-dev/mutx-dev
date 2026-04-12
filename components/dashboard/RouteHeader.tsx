@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { dashboardTokens } from "@/components/dashboard/tokens";
 
 interface RouteHeaderStat {
   label: string;
@@ -21,13 +22,13 @@ interface RouteHeaderProps {
 function getStatToneClass(tone: RouteHeaderStat["tone"]) {
   switch (tone) {
     case "success":
-      return "border-emerald-400/24 bg-emerald-400/12 text-emerald-100";
+      return "border-[#7d6a42] bg-[#31251a] text-[#f3d39b]";
     case "warning":
-      return "border-amber-300/28 bg-amber-300/12 text-amber-100";
+      return "border-[#8a6439] bg-[#352515] text-[#ffd59a]";
     case "danger":
-      return "border-rose-400/24 bg-rose-400/12 text-rose-100";
+      return "border-[#7f4333] bg-[#351d18] text-[#ffc6b5]";
     default:
-      return "border-[#364151] bg-[#111821] text-[#d8e2ed]";
+      return "border-[#4d3829] bg-[#1a1411] text-[#f2dfc4]";
   }
 }
 
@@ -35,7 +36,7 @@ export function RouteHeader({
   title,
   description,
   icon: Icon,
-  iconTone = "text-sky-100 bg-sky-400/10 border-sky-400/20",
+  iconTone = "text-[#ffddb1] bg-[#3a2a1e] border-[#6c4b34]",
   badge,
   stats = [],
   className,
@@ -43,56 +44,83 @@ export function RouteHeader({
   return (
     <section
       className={cn(
-        "dashboard-entry overflow-hidden rounded-[22px] border px-4 py-4 shadow-[0_18px_48px_rgba(2,6,12,0.26)]",
+        "dashboard-entry overflow-hidden rounded-[32px] border shadow-[0_24px_64px_rgba(2,2,5,0.28)]",
         className,
       )}
       style={{
-        borderColor: "rgba(124, 143, 164, 0.2)",
+        borderColor: dashboardTokens.borderSubtle,
         background:
-          "radial-gradient(circle at top right, rgba(122, 214, 255, 0.08), transparent 22%), linear-gradient(180deg, rgba(22,29,39,0.98) 0%, rgba(13,18,25,0.98) 100%)",
+          "radial-gradient(circle at top right, rgba(212,171,115,0.12), transparent 22%), linear-gradient(180deg, rgba(25,23,30,0.98) 0%, rgba(13,12,16,0.98) 100%)",
       }}
     >
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <div className="min-w-0 space-y-2">
-          {badge ? (
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7f92a6]">
-              {badge}
-            </p>
-          ) : null}
-
-          <div className="flex items-start gap-3.5">
+      <div className="grid gap-0 xl:grid-cols-[minmax(0,1.4fr)_minmax(260px,0.6fr)]">
+        <div className="min-w-0 px-6 py-6">
+          <div className="flex items-start gap-4">
             <div
               className={cn(
-                "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border",
+                "mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] border",
                 iconTone,
               )}
             >
               <Icon className="h-4 w-4" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-[1.22rem] font-semibold tracking-[-0.04em] text-[#f2f7fc] sm:text-[1.38rem]">
+            <div className="min-w-0 space-y-3">
+              {badge ? (
+                <p
+                  className="text-[10px] font-semibold uppercase tracking-[0.22em]"
+                  style={{ color: dashboardTokens.textMuted }}
+                >
+                  {badge}
+                </p>
+              ) : null}
+              <h1 className="font-[family:var(--font-site-display)] text-[1.5rem] font-semibold tracking-[-0.06em] text-[#fff3e2] sm:text-[1.8rem]">
                 {title}
               </h1>
-              <p className="mt-1 max-w-3xl text-[13px] leading-6 text-[#a8b6c5]">{description}</p>
+              <p
+                className="max-w-3xl text-[13px] leading-6"
+                style={{ color: dashboardTokens.textSubtle }}
+              >
+                {description}
+              </p>
             </div>
           </div>
         </div>
 
-        {stats.length > 0 ? (
-          <div className="grid min-w-0 grid-cols-2 gap-2 xl:flex xl:flex-wrap xl:justify-end">
-            {stats.map((stat) => (
-              <div
-                key={`${stat.label}-${stat.value}`}
-                className={cn("rounded-[14px] border px-3 py-2.5", getStatToneClass(stat.tone))}
-              >
-                <p className="text-[10px] uppercase tracking-[0.16em] opacity-70">{stat.label}</p>
-                <p className="mt-1 font-[family:var(--font-mono)] text-[11.5px] font-semibold uppercase tracking-[0.06em]">
-                  {stat.value}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : null}
+        <div
+          className="border-t px-6 py-5 xl:border-l xl:border-t-0"
+          style={{ borderColor: dashboardTokens.borderSubtle }}
+        >
+          <p
+            className="text-[10px] font-semibold uppercase tracking-[0.2em]"
+            style={{ color: dashboardTokens.textMuted }}
+          >
+            Route status
+          </p>
+          {stats.length > 0 ? (
+            <div className="mt-4 space-y-2.5">
+              {stats.map((stat) => (
+                <div
+                  key={`${stat.label}-${stat.value}`}
+                  className={cn(
+                    "flex items-center justify-between gap-3 rounded-[16px] border px-3 py-3",
+                    getStatToneClass(stat.tone),
+                  )}
+                >
+                  <p className="text-[10px] uppercase tracking-[0.16em] opacity-70">
+                    {stat.label}
+                  </p>
+                  <p className="font-[family:var(--font-mono)] text-[11.5px] font-semibold uppercase tracking-[0.06em]">
+                    {stat.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
+              This route is mounted inside the unified operator shell and ready for live data.
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );

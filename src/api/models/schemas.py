@@ -513,6 +513,127 @@ class DocumentJobHistoryResponse(BaseModel):
     template_id: str | None = None
 
 
+class ReasoningTemplateFieldResponse(BaseModel):
+    name: str
+    type: str
+    required: bool = True
+    accepts_multiple: bool = False
+    description: str
+
+
+class ReasoningTemplateOutputResponse(BaseModel):
+    role: str
+    kind: str
+    description: str
+
+
+class ReasoningTemplateResponse(BaseModel):
+    id: str
+    name: str
+    summary: str
+    description: str
+    supports_managed: bool = True
+    supports_local: bool = True
+    inputs: list[ReasoningTemplateFieldResponse] = Field(default_factory=list)
+    outputs: list[ReasoningTemplateOutputResponse] = Field(default_factory=list)
+
+
+class ReasoningArtifactRegistrationCreate(BaseModel):
+    role: str = Field(..., min_length=1, max_length=120)
+    kind: str = Field(..., min_length=1, max_length=120)
+    storage_backend: str = Field(default="local_reference", min_length=1, max_length=64)
+    filename: str = Field(..., min_length=1, max_length=255)
+    local_path: str | None = None
+    storage_uri: str | None = None
+    content_type: str | None = Field(default=None, max_length=255)
+    size_bytes: int | None = Field(default=None, ge=0)
+    sha256: str | None = Field(default=None, max_length=64)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ReasoningArtifactResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    job_id: uuid.UUID
+    role: str
+    kind: str
+    storage_backend: str
+    storage_uri: str | None = None
+    local_path: str | None = None
+    filename: str
+    content_type: str | None = None
+    size_bytes: int | None = None
+    sha256: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+    updated_at: datetime
+
+
+class ReasoningJobCreate(BaseModel):
+    template_id: str = Field(..., min_length=1, max_length=120)
+    execution_mode: str = Field(default="managed", min_length=1, max_length=32)
+    parameters: dict[str, Any] = Field(default_factory=dict)
+
+
+class ReasoningJobDispatchRequest(BaseModel):
+    mode: str = Field(default="managed", min_length=1, max_length=32)
+
+
+class ReasoningJobLocalLaunchRequest(BaseModel):
+    output_dir: str | None = None
+
+
+class ReasoningJobLocalLaunchResponse(BaseModel):
+    job_id: uuid.UUID
+    template_id: str
+    execution_mode: str
+    manifest: dict[str, Any] = Field(default_factory=dict)
+    artifacts: list[ReasoningArtifactResponse] = Field(default_factory=list)
+
+
+class ReasoningJobEventCreate(BaseModel):
+    event_type: str = Field(..., min_length=1, max_length=100)
+    message: str | None = Field(default=None, max_length=5000)
+    payload: dict[str, Any] = Field(default_factory=dict)
+    status: str | None = Field(default=None, max_length=50)
+    output_text: str | None = None
+    error_message: str | None = None
+    result_summary: dict[str, Any] | None = None
+    timestamp: datetime | None = None
+
+
+class ReasoningJobResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    run_id: uuid.UUID
+    template_id: str
+    execution_mode: str
+    status: str
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    result_summary: dict[str, Any] = Field(default_factory=dict)
+    error_message: str | None = None
+    claimed_by: str | None = None
+    claimed_at: datetime | None = None
+    last_heartbeat_at: datetime | None = None
+    attempts: int = 0
+    dispatched_at: datetime | None = None
+    completed_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+    artifacts: list[ReasoningArtifactResponse] = Field(default_factory=list)
+
+
+class ReasoningJobHistoryResponse(BaseModel):
+    items: list[ReasoningJobResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    status: str | None = None
+    template_id: str | None = None
+
+
 class AgentStatusUpdate(BaseModel):
     agent_id: uuid.UUID
     status: AgentStatus
@@ -558,6 +679,48 @@ class AssistantTemplateResponse(BaseModel):
     agent_type: AgentType
     starter_prompt: str
     default_config: OpenClawAgentConfig | dict[str, Any]
+    category: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    is_official: bool = False
+    source_path: Optional[str] = None
+    version: Optional[str] = None
+    validation_status: Optional[str] = None
+    validation_message: Optional[str] = None
+    bundle_ids: list[str] = Field(default_factory=list)
+
+
+class ClawHubSkillBundleResponse(BaseModel):
+    id: str
+    name: str
+    summary: str
+    description: str
+    skill_ids: list[str] = Field(default_factory=list)
+    skill_count: int = 0
+    available_skill_count: int = 0
+    unavailable_skill_ids: list[str] = Field(default_factory=list)
+    recommended_template_id: Optional[str] = None
+    recommended_swarm_blueprint_id: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    source: str = "orchestra-research"
+
+
+class SwarmBlueprintRoleResponse(BaseModel):
+    id: str
+    title: str
+    bundle_id: str
+    goal: str
+
+
+class SwarmBlueprintResponse(BaseModel):
+    id: str
+    name: str
+    summary: str
+    description: str
+    roles: list[SwarmBlueprintRoleResponse] = Field(default_factory=list)
+    recommended_min_agents: int = 1
+    recommended_max_agents: int = 1
+    coordination_notes: str
+    tags: list[str] = Field(default_factory=list)
 
 
 class StarterDeploymentCreate(BaseModel):
@@ -589,6 +752,12 @@ class AssistantSkillResponse(BaseModel):
     installed: bool = False
     tags: list[str] = Field(default_factory=list)
     path: Optional[str] = None
+    canonical_name: Optional[str] = None
+    upstream_path: Optional[str] = None
+    upstream_repo: Optional[str] = None
+    upstream_commit: Optional[str] = None
+    license: Optional[str] = None
+    available: bool = True
 
 
 class AssistantChannelResponse(BaseModel):

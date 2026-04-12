@@ -14,7 +14,9 @@ import {
   mergePicoProgress,
   normalizePicoProgress,
   selectTrack,
+  updateLessonWorkspace,
   updateAutopilotSettings,
+  updatePlatformPreferences,
   type PicoProgressState,
 } from '@/lib/pico/academy'
 
@@ -42,6 +44,13 @@ function readLocalProgress() {
 function writeLocalProgress(progress: PicoProgressState) {
   if (typeof window === 'undefined') return
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
+}
+
+export function shouldSyncHydratedProgress(
+  remoteValue: PicoProgressState,
+  mergedValue: PicoProgressState
+) {
+  return JSON.stringify(normalizePicoProgress(remoteValue)) !== JSON.stringify(normalizePicoProgress(mergedValue))
 }
 
 export function usePicoProgress() {
@@ -98,6 +107,10 @@ export function usePicoProgress() {
         writeLocalProgress(merged)
         setProgress(merged)
         setSyncState('synced')
+
+        if (shouldSyncHydratedProgress(remote, merged)) {
+          void persistRemote(merged)
+        }
       } catch {
         setSyncState('offline')
       } finally {
@@ -130,6 +143,10 @@ export function usePicoProgress() {
       recordTutorQuestion: () => update((current) => markTutorQuestion(current)),
       recordSupportRequest: () => update((current) => markSupportRequest(current)),
       shareProject: (projectId: string) => update((current) => markProjectShared(current, projectId)),
+      setLessonWorkspace: (lessonSlug: string, workspace: PicoProgressState['lessonWorkspaces'][string]) =>
+        update((current) => updateLessonWorkspace(current, lessonSlug, workspace)),
+      setPlatform: (patch: Partial<PicoProgressState['platform']>) =>
+        update((current) => updatePlatformPreferences(current, patch)),
       setAutopilot: (patch: Partial<PicoProgressState['autopilot']>) =>
         update((current) => updateAutopilotSettings(current, patch)),
       reset: () => {

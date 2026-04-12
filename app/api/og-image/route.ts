@@ -17,7 +17,7 @@ const BG = "#060810";
 const BG_GRADIENT_END = "#0c1220";
 const TEXT_WHITE = "#ffffff";
 const TEXT_MUTED = "#94a3b8";
-const ACCENT = "#68e1ff";
+const ACCENT = "#d4ab73";
 const LOGO_RED = "#FF4E4E";
 
 // ---------------------------------------------------------------------------
@@ -176,8 +176,8 @@ function buildCard({
                           display: "inline-flex",
                           alignItems: "center",
                           gap: 8,
-                          backgroundColor: "rgba(104, 225, 255, 0.1)",
-                          border: `1px solid rgba(104, 225, 255, 0.25)`,
+                          backgroundColor: "rgba(212, 171, 115, 0.1)",
+                          border: `1px solid rgba(212, 171, 115, 0.25)`,
                           borderRadius: 100,
                           padding: "6px 16px",
                           fontSize: 14,

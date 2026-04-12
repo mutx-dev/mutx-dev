@@ -24,7 +24,6 @@ export function PicoLangSwitcher() {
   const containerRef = useRef<HTMLDivElement>(null)
   const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0]
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return
     function handleClick(e: MouseEvent) {
@@ -36,7 +35,6 @@ export function PicoLangSwitcher() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [open])
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return
     function handleKey(e: KeyboardEvent) {
@@ -79,6 +77,7 @@ export function PicoLangSwitcher() {
         }}
       >
         <span aria-hidden="true">{current.flag}</span>
+        <span className="sr-only">{current.label}</span>
         <span style={{ fontSize: '0.68rem', opacity: 0.6 }}>▾</span>
       </button>
 
@@ -109,7 +108,7 @@ export function PicoLangSwitcher() {
               aria-selected={l.code === locale}
               onClick={() => handleSelect(l.code)}
               style={{
-                background: l.code === locale ? 'rgba(74,222,128,0.1)' : 'transparent',
+                background: l.code === locale ? 'rgba(212,171,115,0.12)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 padding: '7px 10px',
@@ -118,7 +117,7 @@ export function PicoLangSwitcher() {
                 alignItems: 'center',
                 gap: '8px',
                 fontSize: '0.85rem',
-                color: l.code === locale ? '#4ade80' : 'rgba(238,240,246,0.75)',
+                color: l.code === locale ? '#d4ab73' : 'rgba(238,240,246,0.75)',
                 textAlign: 'left',
                 transition: 'background 0.15s',
               }}

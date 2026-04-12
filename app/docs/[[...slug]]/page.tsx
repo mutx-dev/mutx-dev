@@ -207,58 +207,95 @@ const AREA_LABELS: Record<string, string> = {
 
 function DocsHomePage() {
   const nav = parseSummary();
+  const areas = nav.filter(
+    (section) => section.children.length > 0 && section.route !== "/docs",
+  );
 
   return (
     <div className="docs-article-layout">
       <div className="docs-article-main docs-home">
-        <div className="docs-home-hero">
-          <h1 className="docs-home-title">Documentation Hub</h1>
-          <p className="docs-home-sub">
-            Best entry point for setup, platform references, and operator docs.
-            Use this section when you want the code-accurate view of setup, runtime
-            surfaces, and current gaps.
-          </p>
-        </div>
+        <section className="docs-home-billboard">
+          <div className="docs-home-billboard-copy">
+            <p className="docs-home-kicker">Field manual</p>
+            <h1 className="docs-home-title">Read MUTX like a shipped system, not a static help center.</h1>
+            <p className="docs-home-sub">
+              This is the code-accurate route into setup, platform references, and operator
+              behavior. Start with one guided entry point, then move through the product by area.
+            </p>
+            <div className="docs-home-actions">
+              <Link href="/docs/deployment/quickstart" className="docs-home-primary">
+                Open quickstart
+              </Link>
+              <Link href="/docs/reference" className="docs-home-secondary">
+                Read API reference
+              </Link>
+            </div>
+          </div>
 
-        <div className="docs-home-cards">
-          {FEATURED.map((card) => (
-            <Link key={card.href} href={card.href} className="docs-home-card">
-              <span className="docs-home-card-title">{card.title}</span>
-              <span className="docs-home-card-desc">{card.desc}</span>
-            </Link>
-          ))}
-        </div>
+          <div className="docs-home-ledger">
+            <p className="docs-home-ledger-label">Manual index</p>
+            {FEATURED.slice(0, 3).map((card, index) => (
+              <Link key={card.href} href={card.href} className="docs-home-ledger-item">
+                <span className="docs-home-ledger-index">{String(index + 1).padStart(2, "0")}</span>
+                <span>
+                  <span className="docs-home-ledger-title">{card.title}</span>
+                  <span className="docs-home-ledger-desc">{card.desc}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-        <div className="docs-home-sections">
-          <h2 className="docs-home-section-title">By Area</h2>
-          {nav.map((section) => {
-            const label =
-              AREA_LABELS[section.slug] ?? section.title;
-            if (section.children.length === 0) return null;
-            // Skip the Documentation Hub section — we're already on it
-            if (section.route === '/docs') return null;
+        <section className="docs-home-featured">
+          <div className="docs-home-section-heading">
+            <p className="docs-home-kicker">Entry points</p>
+            <h2 className="docs-home-section-title">Start from the shortest meaningful route.</h2>
+          </div>
+          <div className="docs-home-featured-list">
+            {FEATURED.map((card) => (
+              <Link key={card.href} href={card.href} className="docs-home-featured-item">
+                <span className="docs-home-featured-title">{card.title}</span>
+                <span className="docs-home-featured-desc">{card.desc}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-            return (
-              <div key={section.slug} className="docs-home-section">
-                <SectionLanding
-                  title={label}
-                  children={section.children}
-                />
-              </div>
-            );
-          })}
-        </div>
+        <section className="docs-home-areas">
+          <div className="docs-home-section-heading">
+            <p className="docs-home-kicker">By area</p>
+            <h2 className="docs-home-section-title">Move through the platform one surface at a time.</h2>
+          </div>
 
-        <div className="docs-home-truth-rules">
-          <h2 className="docs-home-section-title">Truth rules</h2>
+          <div className="docs-home-area-list">
+            {areas.map((section, index) => {
+              const label = AREA_LABELS[section.slug] ?? section.title;
+
+              return (
+                <div key={section.slug} className="docs-home-area-block">
+                  <div className="docs-home-area-meta">
+                    <span className="docs-home-area-index">{String(index + 1).padStart(2, "0")}</span>
+                    <h3 className="docs-home-area-title">{label}</h3>
+                  </div>
+                  <SectionLanding title={label} children={section.children} />
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="docs-home-appendix">
+          <div className="docs-home-section-heading">
+            <p className="docs-home-kicker">Truth rules</p>
+            <h2 className="docs-home-section-title">When docs drift, trust the executable system.</h2>
+          </div>
           <p className="docs-home-truth">
-            When docs and code disagree, trust the code. Source of truth order:{" "}
-            <code>src/api/routes/</code> for backend behavior,{" "}
-            <code>app/api/</code> for browser-facing proxy behavior,{" "}
-            <code>app/</code> for site and app surfaces, <code>cli/</code> for
-            terminal workflows, <code>sdk/mutx/</code> for SDK behavior.
+            Source of truth order: <code>src/api/routes/</code> for backend behavior,{" "}
+            <code>app/api/</code> for browser-facing proxy behavior, <code>app/</code> for site
+            and app surfaces, <code>cli/</code> for terminal workflows, and{" "}
+            <code>sdk/mutx/</code> for SDK behavior.
           </p>
-        </div>
+        </section>
       </div>
     </div>
   );

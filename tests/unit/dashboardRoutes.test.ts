@@ -651,6 +651,116 @@ describe('dashboard route proxies', () => {
     expect(response.status).toBe(200)
   })
 
+  it('proxies reasoning template fetches', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify([{ id: 'autoreason_refine' }]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/reasoning/templates/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/reasoning/templates')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/reasoning/templates',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch reasoning templates',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('proxies reasoning job listing with a default page size', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ items: [], total: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/reasoning/jobs/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/reasoning/jobs')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/reasoning/jobs?limit=24',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch reasoning jobs',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('forwards reasoning job creation bodies to the backend', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'job_abc', template_id: 'autoreason_refine' }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { POST } = await import('../../app/api/dashboard/reasoning/jobs/route')
+
+    const request = {
+      json: async () => ({
+        template_id: 'autoreason_refine',
+        execution_mode: 'managed',
+        parameters: { task_prompt: 'Refine this memo' },
+      }),
+    } as NextRequest
+    const response = await POST(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/reasoning/jobs',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template_id: 'autoreason_refine',
+          execution_mode: 'managed',
+          parameters: { task_prompt: 'Refine this memo' },
+        }),
+        fallbackMessage: 'Failed to create reasoning job',
+      },
+    )
+    expect(response.status).toBe(201)
+  })
+
+  it('forwards reasoning dispatch bodies to the backend', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'job_abc', status: 'queued' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { POST } = await import('../../app/api/dashboard/reasoning/jobs/[jobId]/dispatch/route')
+
+    const request = {
+      json: async () => ({ mode: 'managed' }),
+    } as NextRequest
+    const response = await POST(request, {
+      params: Promise.resolve({ jobId: 'job_abc' }),
+    })
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/reasoning/jobs/job_abc/dispatch',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'managed' }),
+        fallbackMessage: 'Failed to dispatch reasoning job',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
   it('proxies dashboard monitoring alerts with a default page size', async () => {
     proxyJson.mockResolvedValue(
       new Response(JSON.stringify({ items: [], total: 0, unresolved_count: 0 }), {

@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 
 import { MarketingHomePage } from "@/components/site/marketing/MarketingHomePage";
 import { PublicFooter } from "@/components/site/PublicFooter";
-import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl, getSiteUrl } from "@/lib/seo";
 
-const homeTitle = "MUTX | See What Your AI Agents Are Doing";
+const homeTitle = "MUTX | A Field Novel For Deployed Agents";
 const homeDescription =
-  "MUTX gives you clear visibility, real control, and full audit trails for every AI agent you run. Download the Mac app.";
+  "MUTX turns agent operations into a readable system with boundaries, proof, and calm operator surfaces. Start with the product, the release lane, or the repo.";
 
 export const metadata: Metadata = {
   title: homeTitle,
@@ -81,7 +80,6 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageStructuredData) }}
       />
-      <PublicNav />
       <MarketingHomePage />
       <PublicFooter showCallout={false} />
     </PublicSurface>

@@ -16,7 +16,7 @@ export default function OnboardingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${appFontVariables} min-h-screen font-[family:var(--font-display)]`}>
+    <div className={`${appFontVariables} min-h-screen font-[family:var(--font-site-body)]`}>
       {children}
     </div>
   );

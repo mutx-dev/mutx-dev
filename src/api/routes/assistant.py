@@ -105,7 +105,12 @@ async def install_assistant_skill(
     agent = await get_owned_agent(agent_id, db, current_user)
     if not is_assistant_agent(agent):
         raise HTTPException(status_code=400, detail="Agent is not an assistant runtime")
-    update_assistant_skills(agent, skill_id=skill_id, install=True)
+    try:
+        update_assistant_skills(agent, skill_id=skill_id, install=True)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Unknown skill: {skill_id}") from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     await db.commit()
     return list_assistant_skills(agent)
 

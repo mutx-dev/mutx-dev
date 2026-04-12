@@ -105,7 +105,7 @@ export async function buildOgImage({ title, description, badge, host = DEFAULT_H
           }}
         />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 930, zIndex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 930 }}>
           {displayBadge ? (
             <div
               style={{
@@ -158,7 +158,6 @@ export async function buildOgImage({ title, description, badge, host = DEFAULT_H
             alignItems: 'center',
             justifyContent: 'space-between',
             width: '100%',
-            zIndex: 1,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
