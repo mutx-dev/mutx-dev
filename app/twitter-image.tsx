@@ -1,5 +1,5 @@
 import { getSiteUrl } from '@/lib/seo'
-import { buildOgImage } from '@/lib/og-image'
+import { buildOgImageResponseWithCache } from '@/lib/og-image'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -32,7 +32,7 @@ export default async function Image({
   )
   const badge = trim(typeof query.badge === 'string' ? query.badge.toUpperCase() : 'MUTX', 24)
 
-  return buildOgImage({
+  return buildOgImageResponseWithCache({
     title,
     description,
     badge,
