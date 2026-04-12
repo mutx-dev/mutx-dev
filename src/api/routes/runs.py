@@ -57,6 +57,7 @@ def _serialize_trace(trace: AgentRunTrace) -> RunTraceResponse:
 
 
 def _serialize_run(run: AgentRun) -> RunResponse:
+    metadata = _decode_json(run.run_metadata)
     return RunResponse(
         id=run.id,
         agent_id=run.agent_id,
@@ -64,11 +65,16 @@ def _serialize_run(run: AgentRun) -> RunResponse:
         input_text=run.input_text,
         output_text=run.output_text,
         error_message=run.error_message,
-        metadata=_decode_json(run.run_metadata),
+        metadata=metadata,
         started_at=run.started_at,
         completed_at=run.completed_at,
         created_at=run.created_at,
         trace_count=len(getattr(run, "traces", [])),
+        subject_type=metadata.get("subject_type"),
+        subject_id=metadata.get("subject_id"),
+        subject_label=metadata.get("subject_label"),
+        template_id=metadata.get("template_id"),
+        execution_mode=metadata.get("execution_mode"),
     )
 
 

@@ -1,6 +1,7 @@
 from cli.services.agents import AgentsService
 from cli.services.assistant import AssistantService, TemplatesService
 from cli.services.auth import AuthService
+from cli.services.documents import DocumentsService
 from cli.errors import (
     APIRequestError,
     AuthenticationExpiredError,
@@ -22,6 +23,13 @@ from cli.services.models import (
     DeploymentEventHistory,
     DeploymentEventRecord,
     DeploymentRecord,
+    DocumentArtifactRecord,
+    DocumentJobHistoryRecord,
+    DocumentJobRecord,
+    DocumentLocalLaunchRecord,
+    DocumentTemplateFieldRecord,
+    DocumentTemplateOutputRecord,
+    DocumentTemplateRecord,
     LogEntry,
     MetricPoint,
     OnboardingStateRecord,
@@ -51,6 +59,14 @@ __all__ = [
     "DeploymentEventRecord",
     "DeploymentRecord",
     "DeploymentsService",
+    "DocumentArtifactRecord",
+    "DocumentJobHistoryRecord",
+    "DocumentJobRecord",
+    "DocumentLocalLaunchRecord",
+    "DocumentTemplateFieldRecord",
+    "DocumentTemplateOutputRecord",
+    "DocumentTemplateRecord",
+    "DocumentsService",
     "InvalidCredentialsError",
     "LogEntry",
     "MetricPoint",

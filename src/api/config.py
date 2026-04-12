@@ -212,6 +212,36 @@ class Settings(BaseSettings):
             "RAG_API_ENABLED",
         ),
     )
+    documents_enabled: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "MUTX_DOCUMENTS_ENABLED",
+            "DOCUMENTS_ENABLED",
+        ),
+    )
+    artifacts_dir: str = Field(
+        default_factory=lambda: os.path.join(os.getcwd(), ".mutx-artifacts"),
+        validation_alias=AliasChoices(
+            "MUTX_ARTIFACTS_DIR",
+            "ARTIFACTS_DIR",
+        ),
+    )
+    document_max_upload_mb: int = Field(
+        default=25,
+        ge=1,
+        validation_alias=AliasChoices(
+            "MUTX_DOCUMENT_MAX_UPLOAD_MB",
+            "DOCUMENT_MAX_UPLOAD_MB",
+        ),
+    )
+    document_worker_poll_seconds: int = Field(
+        default=5,
+        ge=1,
+        validation_alias=AliasChoices(
+            "MUTX_DOCUMENT_WORKER_POLL_SECONDS",
+            "DOCUMENT_WORKER_POLL_SECONDS",
+        ),
+    )
 
     # Lead pipeline notifications
     lead_discord_webhook_url: Optional[str] = Field(

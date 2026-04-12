@@ -258,7 +258,16 @@ def _timestamp_column_type(sync_connection: Connection) -> str:
 
 
 def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
-    from src.api.models.models import Agent, AgentLog, Alert, RefreshTokenSession, UsageEvent
+    from src.api.models.models import (
+        Agent,
+        AgentLog,
+        AgentRun,
+        Alert,
+        DocumentArtifact,
+        DocumentJob,
+        RefreshTokenSession,
+        UsageEvent,
+    )
 
     repaired_objects: list[str] = []
 
@@ -350,6 +359,41 @@ def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
             ):
                 index.create(bind=sync_connection, checkfirst=True)
                 repaired_objects.append(f"{UsageEvent.__tablename__}.{index.name}")
+
+    if (
+        _is_postgresql(sync_connection)
+        and _has_table(sync_connection, AgentRun.__tablename__)
+        and (agent_id_column := _get_column(sync_connection, AgentRun.__tablename__, "agent_id"))
+        and not bool(agent_id_column.get("nullable", False))
+    ):
+        sync_connection.execute(text("ALTER TABLE agent_runs ALTER COLUMN agent_id DROP NOT NULL"))
+        repaired_objects.append("agent_runs.agent_id.nullable")
+
+    if not _has_table(sync_connection, DocumentJob.__tablename__):
+        DocumentJob.__table__.create(bind=sync_connection, checkfirst=True)
+        repaired_objects.append(DocumentJob.__tablename__)
+    else:
+        for index in sorted(DocumentJob.__table__.indexes, key=lambda item: item.name or ""):
+            if index.name and not _has_index(
+                sync_connection,
+                DocumentJob.__tablename__,
+                index.name,
+            ):
+                index.create(bind=sync_connection, checkfirst=True)
+                repaired_objects.append(f"{DocumentJob.__tablename__}.{index.name}")
+
+    if not _has_table(sync_connection, DocumentArtifact.__tablename__):
+        DocumentArtifact.__table__.create(bind=sync_connection, checkfirst=True)
+        repaired_objects.append(DocumentArtifact.__tablename__)
+    else:
+        for index in sorted(DocumentArtifact.__table__.indexes, key=lambda item: item.name or ""):
+            if index.name and not _has_index(
+                sync_connection,
+                DocumentArtifact.__tablename__,
+                index.name,
+            ):
+                index.create(bind=sync_connection, checkfirst=True)
+                repaired_objects.append(f"{DocumentArtifact.__tablename__}.{index.name}")
 
     return repaired_objects
 
