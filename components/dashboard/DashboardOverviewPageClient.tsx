@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { Activity, AlertTriangle, Bot, Layers3, Wallet, Webhook } from "lucide-react";
 
 import { ApiRequestError, normalizeCollection, readJson } from "@/components/app/http";
@@ -458,9 +459,10 @@ export function DashboardOverviewPageClient() {
                 />
                 <div className="grid gap-3">
                   {runs.slice(0, 5).map((run) => (
-                    <div
+                    <Link
                       key={run.id}
-                      className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 md:grid-cols-[minmax(0,1fr)_auto]"
+                      href="/dashboard/runs"
+                      className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-colors hover:border-white/20 hover:bg-white/[0.04] md:grid-cols-[minmax(0,1fr)_auto]"
                     >
                       <div className="min-w-0">
                         <p className="truncate font-mono text-sm text-white">{run.id}</p>
@@ -474,7 +476,7 @@ export function DashboardOverviewPageClient() {
                           {run.completed_at ? formatRelativeTime(run.completed_at) : "in flight"}
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
