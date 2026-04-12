@@ -10,6 +10,11 @@ type OgImageOptions = {
   host?: string
 }
 
+type CachedImageEntry = {
+  png: Uint8Array
+  expiresAt: number
+}
+
 const WIDTH = 1200
 const HEIGHT = 630
 const BG = '#060810'
@@ -19,9 +24,16 @@ const TEXT_MUTED = '#94a3b8'
 const ACCENT = '#68e1ff'
 const LOGO_RED = '#FF4E4E'
 const DEFAULT_HOST = 'mutx.dev'
+const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000
+const IMAGE_CACHE_MAX_ENTRIES = 200
+const RENDER_RATE_LIMIT_WINDOW_MS = 60 * 1000
+const RENDER_RATE_LIMIT_MAX = 120
 
 let geistRegular: ArrayBuffer | undefined
 let geistBold: ArrayBuffer | undefined
+const imageCache = new Map<string, CachedImageEntry>()
+const inflightImageRenders = new Map<string, Promise<Uint8Array>>()
+const renderTimestamps: number[] = []
 
 async function loadFont(weight: 'regular' | 'bold' = 'regular'): Promise<ArrayBuffer> {
   if (weight === 'bold' && geistBold) return geistBold
@@ -196,4 +208,98 @@ export async function buildOgImage({ title, description, badge, host = DEFAULT_H
       { name: 'Geist', data: boldFontData, style: 'normal', weight: 700 },
     ],
   })
+}
+
+function cacheKey({ title, description, badge, host = DEFAULT_HOST }: OgImageOptions) {
+  return JSON.stringify({
+    title: trimCopy(title.trim(), 96),
+    description: description?.trim() ? trimCopy(description.trim(), 180) : '',
+    badge: badge?.trim() ? trimCopy(badge.trim().toUpperCase(), 36) : '',
+    host: trimCopy(host.replace(/^https?:\/\//, '').replace(/\/$/, ''), 36),
+  })
+}
+
+function getCachedPng(key: string) {
+  const entry = imageCache.get(key)
+  if (!entry) return undefined
+
+  if (entry.expiresAt <= Date.now()) {
+    imageCache.delete(key)
+    return undefined
+  }
+
+  return entry.png
+}
+
+function putCachedPng(key: string, png: Uint8Array) {
+  if (imageCache.size >= IMAGE_CACHE_MAX_ENTRIES) {
+    const firstKey = imageCache.keys().next().value
+    if (firstKey) imageCache.delete(firstKey)
+  }
+
+  imageCache.set(key, {
+    png,
+    expiresAt: Date.now() + IMAGE_CACHE_TTL_MS,
+  })
+}
+
+function canRenderNow() {
+  const now = Date.now()
+  while (renderTimestamps.length > 0 && renderTimestamps[0] <= now - RENDER_RATE_LIMIT_WINDOW_MS) {
+    renderTimestamps.shift()
+  }
+
+  if (renderTimestamps.length >= RENDER_RATE_LIMIT_MAX) {
+    return false
+  }
+
+  renderTimestamps.push(now)
+  return true
+}
+
+export async function buildOgImageResponseWithCache(options: OgImageOptions): Promise<Response> {
+  const key = cacheKey(options)
+  const cached = getCachedPng(key)
+  if (cached) {
+    return new Response(cached.slice(), {
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    })
+  }
+
+  if (!canRenderNow()) {
+    return new Response('Too Many Requests', {
+      status: 429,
+      headers: {
+        'Cache-Control': 'public, max-age=60',
+      },
+    })
+  }
+
+  const renderPromise =
+    inflightImageRenders.get(key) ??
+    (async () => {
+      const rendered = await buildOgImage(options)
+      const pngBuffer = new Uint8Array(await rendered.arrayBuffer())
+      putCachedPng(key, pngBuffer)
+      return pngBuffer
+    })()
+
+  inflightImageRenders.set(key, renderPromise)
+
+  try {
+    const png = await renderPromise
+    return new Response(png.slice(), {
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    })
+  } finally {
+    if (inflightImageRenders.get(key) === renderPromise) {
+      inflightImageRenders.delete(key)
+    }
+  }
 }
