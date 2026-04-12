@@ -71,7 +71,7 @@ def list_bundles():
     for bundle in bundles:
         click.echo(
             f"{bundle['id']:<32} | {bundle['name'][:28]:<28} | "
-            f"{f\"{bundle.get('available_skill_count', 0)}/{bundle.get('skill_count', 0)}\":<13} | "
+            f"{(str(bundle.get('available_skill_count', 0)) + '/' + str(bundle.get('skill_count', 0))):<13} | "
             f"{str(bundle.get('recommended_template_id') or '')[:28]:<28}"
         )
 
