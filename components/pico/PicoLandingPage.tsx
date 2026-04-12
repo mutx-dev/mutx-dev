@@ -12,10 +12,6 @@ import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
 
-/* ------------------------------------------------------------------ */
-/*  Icon helper                                                        */
-/* ------------------------------------------------------------------ */
-
 const HOW_ICONS = ['path', 'support', 'shield', 'expert'] as const
 
 function HowItWorksIcon({ kind }: { kind: string }) {
@@ -53,10 +49,6 @@ function HowItWorksIcon({ kind }: { kind: string }) {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
-
 export function PicoLandingPage() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
@@ -69,17 +61,16 @@ export function PicoLandingPage() {
   }, [])
 
   return (
-    <div className={s.page}>
+    <div data-testid="pico-waitlist-landing" className={s.page}>
       <PicoContactForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
         defaultInterest={formInterest}
       />
 
-      {/* Navigation */}
       <nav className={s.nav}>
         <div className={s.navInner}>
-          <Link href="https://pico.mutx.dev" className={s.navBrand}>
+          <Link href="/pico" className={s.navBrand}>
             <span className={s.navLogo}>
               <Image src="/pico/logo.png" alt="PicoMUTX logo" width={20} height={20} priority />
             </span>
@@ -98,8 +89,6 @@ export function PicoLandingPage() {
       </nav>
 
       <main className={s.main}>
-
-        {/* ---- Hero (Section 1) ---- */}
         <section className={s.hero}>
           <div className={s.heroAmbient} aria-hidden="true" />
           <div className={s.heroGrid}>
@@ -144,7 +133,6 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Problem (Section 2) ---- */}
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -169,7 +157,6 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Platform Intro + What You Get (Sections 3+4 combined) ---- */}
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -181,9 +168,7 @@ export function PicoLandingPage() {
               {Array.from({ length: 4 }, (_, i) => (
                 <SiteReveal key={i} delay={i * 0.06}>
                   <motion.div
-                    whileHover={
-                      prefersReducedMotion ? undefined : { y: -3 }
-                    }
+                    whileHover={prefersReducedMotion ? undefined : { y: -3 }}
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className={s.howCard}
                   >
@@ -199,7 +184,6 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Who It&apos;s For / Not For (Sections 5+6 merged) ---- */}
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -237,7 +221,6 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Before / After (Section 7) ---- */}
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -248,9 +231,7 @@ export function PicoLandingPage() {
               {Array.from({ length: 4 }, (_, i) => (
                 <SiteReveal key={i} delay={i * 0.05}>
                   <motion.div
-                    whileHover={
-                      prefersReducedMotion ? undefined : { y: -2 }
-                    }
+                    whileHover={prefersReducedMotion ? undefined : { y: -2 }}
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className={s.baCard}
                   >
@@ -270,7 +251,6 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Why Pre-Register + Founding (Sections 8+9 merged) ---- */}
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -289,7 +269,6 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- FAQ (Section 10) ---- */}
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -307,7 +286,6 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Final CTA (Section 11) ---- */}
         <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
             <div className={s.ctaPanel}>
@@ -344,7 +322,6 @@ export function PicoLandingPage() {
             </div>
           </div>
         </section>
-
       </main>
     </div>
   )

@@ -1,4 +1,4 @@
-import { getLessonBySlug, searchLessonCorpus, type PicoProgressState } from '@/lib/pico/academy'
+import { getLessonBySlug, searchLessonCorpus } from '@/lib/pico/academy'
 
 export type PicoTutorAnswer = {
   answer: string
@@ -14,6 +14,37 @@ export type PicoTutorAnswer = {
   escalationReason: string | null
 }
 
+export type PicoTutorCommand = {
+  label: string
+  code: string
+  language: string
+  note?: string | null
+}
+
+export type PicoTutorSource = {
+  kind: 'lesson' | 'knowledge_pack' | 'official'
+  title: string
+  sourcePath: string
+  href?: string | null
+  excerpt?: string | null
+}
+
+export type PicoTutorStructuredReply = {
+  situation: string
+  diagnosis: string
+  steps: string[]
+  commands: PicoTutorCommand[]
+  verify: string[]
+  ifThisFails: string[]
+  officialLinks: Array<{
+    label: string
+    href: string
+    sourcePath: string
+  }>
+  sources: PicoTutorSource[]
+  nextQuestion?: string | null
+}
+
 export type PicoTutorReply = {
   title: string
   summary: string
@@ -25,6 +56,10 @@ export type PicoTutorReply = {
   recommendedLessonIds: string[]
   escalate: boolean
   escalationReason?: string
+  structured: PicoTutorStructuredReply
+  intent: 'choose' | 'install' | 'repair' | 'migrate' | 'compare' | 'tailscale' | 'optimize' | 'integrate'
+  skillLevel: 'beginner' | 'intermediate' | 'advanced'
+  usedOfficialFallback: boolean
 }
 
 const RISKY_KEYWORDS = [
@@ -35,22 +70,13 @@ const RISKY_KEYWORDS = [
   'credential',
   'token',
   'secret',
-  'gdpr',
-  'legal',
-  'contract',
   'security',
   'breach',
-]
-
-const SUPPORT_DOC = {
-  label: 'Support lane',
-  href: '/pico/support',
-  sourcePath: 'pico/support',
-}
+] as const
 
 export function answerPicoTutorQuestion(
   question: string,
-  options?: { lessonSlug?: string | null; progress?: Partial<PicoProgressState> | null },
+  options?: { lessonSlug?: string | null },
 ): PicoTutorAnswer {
   const normalizedQuestion = question.trim()
   const lowerQuestion = normalizedQuestion.toLowerCase()
@@ -91,24 +117,24 @@ export function answerPicoTutorQuestion(
         best.validation,
         'Escalate with the exact command, environment, and intended action before executing the risky part.',
       ],
-      escalationReason: 'Security or irreversible action detected. Escalate before executing the risky step.',
+      escalationReason:
+        'Security or irreversible action detected. Escalate before executing the risky step.',
     }
   }
 
   const nextActions = best.steps.slice(0, 3).map((step) => `${step.title}: ${step.body}`)
   const troubleshooting = best.troubleshooting[0]
-  const answer = [
-    `Best match: ${best.title}.`,
-    best.objective,
-    `Do this next: ${nextActions[0] ?? best.validation}`,
-    troubleshooting ? `Watch for this failure mode: ${troubleshooting}` : '',
-    `Validation: ${best.validation}`,
-  ]
-    .filter(Boolean)
-    .join(' ')
 
   return {
-    answer,
+    answer: [
+      `Best match: ${best.title}.`,
+      best.objective,
+      `Do this next: ${nextActions[0] ?? best.validation}`,
+      troubleshooting ? `Watch for this failure mode: ${troubleshooting}` : '',
+      `Validation: ${best.validation}`,
+    ]
+      .filter(Boolean)
+      .join(' '),
     lessonSlug: best.slug,
     lessonTitle: best.title,
     matches: matches.map((match) => ({
@@ -118,42 +144,56 @@ export function answerPicoTutorQuestion(
       reason: `Matched lesson body, troubleshooting, and validation steps for ${match.lesson.title}.`,
     })),
     nextActions,
-    escalationReason: matches[0]?.score && matches[0].score >= 4 ? null : 'Low-confidence match. Escalate if the first next action does not fix it.',
+    escalationReason:
+      matches[0]?.score && matches[0].score >= 4
+        ? null
+        : 'Low-confidence match. Escalate if the first next action does not fix it.',
   }
 }
 
-export function answerTutorQuestion(
-  question: string,
-  options?: { lessonSlug?: string | null; progress?: Partial<PicoProgressState> | null | Record<string, unknown> },
-): PicoTutorReply {
-  const answer = answerPicoTutorQuestion(question, {
-    lessonSlug: options?.lessonSlug ?? null,
-    progress: options?.progress as Partial<PicoProgressState> | null | undefined,
-  })
-  const lessons = answer.matches.map((match) => ({
-    id: match.slug,
-    title: match.title,
-    href: `/pico/academy/${match.slug}`,
-  }))
+type LegacyTutorReply = Omit<PicoTutorReply, 'structured' | 'intent' | 'skillLevel' | 'usedOfficialFallback'> & {
+  structured?: PicoTutorStructuredReply
+  intent?: PicoTutorReply['intent']
+  skillLevel?: PicoTutorReply['skillLevel']
+  usedOfficialFallback?: boolean
+}
 
-  const docs = [SUPPORT_DOC, ...lessons.map((lesson) => ({
-    label: lesson.title,
-    href: lesson.href,
-    sourcePath: `pico/academy/${lesson.id}`,
-  }))].slice(0, 4)
+export function normalizeTutorReplyPayload(payload: LegacyTutorReply | { reply?: LegacyTutorReply } | null | undefined): PicoTutorReply | null {
+  const raw =
+    payload && 'answer' in payload && typeof payload.answer === 'string'
+      ? payload
+      : payload && 'reply' in payload && payload.reply && typeof payload.reply.answer === 'string'
+        ? payload.reply
+        : null
 
-  const topScore = answer.matches[0]?.score ?? 0
+  if (!raw) {
+    return null
+  }
+
+  if (raw.structured && raw.intent && raw.skillLevel && typeof raw.usedOfficialFallback === 'boolean') {
+    return raw as PicoTutorReply
+  }
 
   return {
-    title: answer.lessonTitle ?? 'Pico tutor answer',
-    summary: answer.answer,
-    answer: answer.answer,
-    confidence: answer.escalationReason ? 'low' : topScore >= 5 ? 'high' : 'medium',
-    nextActions: answer.nextActions,
-    lessons,
-    docs,
-    recommendedLessonIds: lessons.map((lesson) => lesson.id),
-    escalate: Boolean(answer.escalationReason),
-    escalationReason: answer.escalationReason ?? undefined,
+    ...raw,
+    structured: raw.structured ?? {
+      situation: raw.summary,
+      diagnosis: raw.answer,
+      steps: raw.nextActions,
+      commands: [],
+      verify: [],
+      ifThisFails: raw.escalationReason ? [raw.escalationReason] : [],
+      officialLinks: raw.docs,
+      sources: raw.docs.map((doc) => ({
+        kind: doc.href.startsWith('http') ? 'official' : 'knowledge_pack',
+        title: doc.label,
+        sourcePath: doc.sourcePath,
+        href: doc.href,
+      })),
+      nextQuestion: null,
+    },
+    intent: raw.intent ?? 'repair',
+    skillLevel: raw.skillLevel ?? 'intermediate',
+    usedOfficialFallback: raw.usedOfficialFallback ?? false,
   }
 }

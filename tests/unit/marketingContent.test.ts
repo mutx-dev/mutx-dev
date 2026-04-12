@@ -19,9 +19,13 @@ describe('marketingHomepage', () => {
     expect(marketingHomepage.hero.tagline.length).toBeGreaterThan(0)
     expect(typeof marketingHomepage.hero.title).toBe('string')
     expect(marketingHomepage.hero.title.length).toBeGreaterThan(0)
+    expect(typeof marketingHomepage.hero.chapterLabel).toBe('string')
+    expect(marketingHomepage.hero.chapterLabel.length).toBeGreaterThan(0)
     expect(typeof marketingHomepage.hero.backgroundSrc).toBe('string')
     expect(typeof marketingHomepage.hero.backgroundAlt).toBe('string')
     expect(marketingHomepage.hero.backgroundAlt.length).toBeGreaterThan(0)
+    expect(Array.isArray(marketingHomepage.hero.ledger)).toBe(true)
+    expect(marketingHomepage.hero.ledger.length).toBeGreaterThan(0)
     expect(Array.isArray(marketingHomepage.hero.actions)).toBe(true)
     expect(marketingHomepage.hero.actions.length).toBeGreaterThan(0)
   })
@@ -34,50 +38,71 @@ describe('marketingHomepage', () => {
     }
   })
 
-  it('has salesSections with required sub-sections', () => {
-    expect(marketingHomepage.salesSections).toBeDefined()
-    expect(marketingHomepage.salesSections.demo).toBeDefined()
-    expect(marketingHomepage.salesSections.examples).toBeDefined()
-    expect(marketingHomepage.salesSections.proof).toBeDefined()
-    expect(marketingHomepage.salesSections.cta).toBeDefined()
+  it('has the rewritten narrative sections', () => {
+    expect(marketingHomepage.chapters).toBeDefined()
+    expect(marketingHomepage.incidents).toBeDefined()
+    expect(marketingHomepage.controlRoom).toBeDefined()
+    expect(marketingHomepage.entryPoints).toBeDefined()
+    expect(marketingHomepage.cta).toBeDefined()
   })
 
-  it('demo section has tabs with mediaType and mediaSrc', () => {
-    const tabs = marketingHomepage.salesSections.demo.tabs
-    expect(Array.isArray(tabs)).toBe(true)
-    expect(tabs.length).toBeGreaterThan(0)
-    for (const tab of tabs) {
-      expect(tab.mediaType).toMatch(/^(image|gif)$/)
-      expect(typeof tab.mediaSrc).toBe('string')
-      expect(typeof tab.label).toBe('string')
-    }
-  })
-
-  it('examples section has items with required fields', () => {
-    const items = marketingHomepage.salesSections.examples.items
+  it('chapters have narrative content and media', () => {
+    const items = marketingHomepage.chapters.items
     expect(Array.isArray(items)).toBe(true)
     expect(items.length).toBeGreaterThan(0)
     for (const item of items) {
-      expect(typeof item.eyebrow).toBe('string')
+      expect(typeof item.chapter).toBe('string')
+      expect(typeof item.kicker).toBe('string')
       expect(typeof item.title).toBe('string')
-      expect(Array.isArray(item.apology)).toBe(true)
-      expect(typeof item.fallout).toBe('string')
+      expect(typeof item.imageSrc).toBe('string')
+      expect(Array.isArray(item.beats)).toBe(true)
+      expect(item.beats.length).toBeGreaterThan(0)
     }
   })
 
-  it('proof section has before/after items', () => {
-    const items = marketingHomepage.salesSections.proof.items
+  it('incident section has case files with trigger and log', () => {
+    const items = marketingHomepage.incidents.items
     expect(Array.isArray(items)).toBe(true)
+    expect(items.length).toBeGreaterThan(0)
     for (const item of items) {
+      expect(typeof item.label).toBe('string')
       expect(typeof item.title).toBe('string')
-      expect(typeof item.before).toBe('string')
-      expect(typeof item.after).toBe('string')
+      expect(typeof item.trigger).toBe('string')
+      expect(Array.isArray(item.log)).toBe(true)
+      expect(item.log.length).toBeGreaterThan(0)
+      expect(typeof item.resolution).toBe('string')
     }
   })
 
-  it('cta section has actions and media', () => {
-    const cta = marketingHomepage.salesSections.cta
+  it('control room has pillars and media', () => {
+    const controlRoom = marketingHomepage.controlRoom
+    expect(typeof controlRoom.mediaSrc).toBe('string')
+    expect(typeof controlRoom.mediaAlt).toBe('string')
+    expect(Array.isArray(controlRoom.pillars)).toBe(true)
+    expect(controlRoom.pillars.length).toBeGreaterThan(0)
+    for (const pillar of controlRoom.pillars) {
+      expect(typeof pillar.label).toBe('string')
+      expect(typeof pillar.title).toBe('string')
+      expect(typeof pillar.body).toBe('string')
+    }
+  })
+
+  it('entry points expose navigable choices', () => {
+    const items = marketingHomepage.entryPoints.items
+    expect(Array.isArray(items)).toBe(true)
+    expect(items.length).toBeGreaterThan(0)
+    for (const item of items) {
+      expect(typeof item.label).toBe('string')
+      expect(typeof item.title).toBe('string')
+      expect(typeof item.body).toBe('string')
+      expect(typeof item.href).toBe('string')
+    }
+  })
+
+  it('cta section has actions, quote, and media', () => {
+    const cta = marketingHomepage.cta
     expect(Array.isArray(cta.actions)).toBe(true)
+    expect(typeof cta.quote).toBe('string')
     expect(typeof cta.mediaSrc).toBe('string')
     expect(typeof cta.mediaAlt).toBe('string')
   })

@@ -17,9 +17,8 @@ from src.api.models.schemas import (
 from src.api.routes.agents import _serialize_agent
 from src.api.routes.deployments import _serialize_deployment
 from src.api.services.assistant_control_plane import (
-    DEFAULT_TEMPLATE_ID,
     assistant_template_catalog,
-    build_personal_assistant_config,
+    build_template_config,
     serialize_config,
 )
 from src.api.services.deployment_lifecycle import create_deployment_record
@@ -41,21 +40,22 @@ async def deploy_template(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if template_id != DEFAULT_TEMPLATE_ID:
-        raise HTTPException(status_code=404, detail="Starter template not found")
-
-    config = build_personal_assistant_config(
-        name=request.name,
-        description=request.description,
-        model=request.model,
-        workspace=request.workspace,
-        assistant_id=request.assistant_id,
-        skills=request.skills,
-        channels={
-            key: value.model_dump(exclude_none=True) for key, value in request.channels.items()
-        },
-        runtime_metadata=request.runtime_metadata,
-    )
+    try:
+        config = build_template_config(
+            template_id=template_id,
+            name=request.name,
+            description=request.description,
+            model=request.model,
+            workspace=request.workspace,
+            assistant_id=request.assistant_id,
+            skills=request.skills,
+            channels={
+                key: value.model_dump(exclude_none=True) for key, value in request.channels.items()
+            },
+            runtime_metadata=request.runtime_metadata,
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Starter template not found") from exc
 
     agent = Agent(
         name=request.name,

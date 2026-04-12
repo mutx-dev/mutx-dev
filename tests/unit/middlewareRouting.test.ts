@@ -192,6 +192,24 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=es')
   })
 
+  it('allows auth entry pages on the pico host without rewriting them into /pico/*', () => {
+    const loginResponse = proxy(
+      mockRequest('https://pico.mutx.dev/login?next=%2Fonboarding', { host: 'pico.mutx.dev' }),
+    )
+
+    expect(loginResponse.status).toBe(200)
+    expect(loginResponse.headers.get('x-middleware-rewrite')).toBeNull()
+    expect(loginResponse.headers.get('location')).toBeNull()
+
+    const registerResponse = proxy(
+      mockRequest('https://pico.mutx.dev/register?next=%2Facademy', { host: 'pico.mutx.dev' }),
+    )
+
+    expect(registerResponse.status).toBe(200)
+    expect(registerResponse.headers.get('x-middleware-rewrite')).toBeNull()
+    expect(registerResponse.headers.get('location')).toBeNull()
+  })
+
   it('still applies rate-limit headers on protected auth endpoints', () => {
     const response = proxy(
       mockRequest('https://app.mutx.dev/api/auth/login', { host: 'app.mutx.dev' }),

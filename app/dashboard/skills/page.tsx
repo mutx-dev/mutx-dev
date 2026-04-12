@@ -1,28 +1,32 @@
-"use client";
+'use client'
 
-import { DashboardSectionPage } from "@/components/dashboard/DashboardSectionPage";
-import { DesktopRouteBoundary } from "@/components/desktop/DesktopRouteBoundary";
+import { BrainCircuit } from 'lucide-react'
+
+import { RouteHeader } from '@/components/dashboard/RouteHeader'
+import { SkillsPageClient } from '@/components/dashboard/SkillsPageClient'
+import { DesktopRouteBoundary } from '@/components/desktop/DesktopRouteBoundary'
 
 export default function DashboardSkillsPage() {
   return (
     <DesktopRouteBoundary
-      routeKey="skills"
+      routeKey='skills'
       browserView={
-        <DashboardSectionPage
-          breadcrumbs={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Skills" },
-          ]}
-          title="Skills"
-          description="Assistant skills shell for installed workspace capabilities, registry-backed discovery, and safe mutation paths."
-          badge="assistant skills"
-          checks={[
-            "Bind skill listings and mutations to the mounted assistant and ClawHub routes.",
-            "Show installed versus available skills from the same backend source the CLI uses.",
-            "Avoid browser-only toggles that do not map to real workspace state.",
-          ]}
-        />
+        <div className='space-y-4'>
+          <RouteHeader
+            title='Skills'
+            description='Pinned Orchestra Research imports, curated bundles, and runtime-ready skill inventory for live assistants.'
+            icon={BrainCircuit}
+            iconTone='text-cyan-300 bg-cyan-400/10'
+            badge='skillpack control'
+            stats={[
+              { label: 'Catalog', value: 'ClawHub + Orchestra' },
+              { label: 'Mode', value: 'Live install', tone: 'success' },
+            ]}
+          />
+
+          <SkillsPageClient />
+        </div>
       }
     />
-  );
+  )
 }

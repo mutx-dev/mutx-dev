@@ -38,6 +38,38 @@ class Swarm:
         return f"Swarm(id={self.id}, name={self.name}, agents={len(self.agent_ids)})"
 
 
+class SwarmBlueprintRole:
+    """Represents a recommended role inside a curated swarm blueprint."""
+
+    def __init__(self, data: dict[str, Any]):
+        self.id: str = data["id"]
+        self.title: str = data["title"]
+        self.bundle_id: str = data["bundle_id"]
+        self.goal: str = data["goal"]
+        self._data = data
+
+
+class SwarmBlueprint:
+    """Represents a curated multi-agent swarm blueprint."""
+
+    def __init__(self, data: dict[str, Any]):
+        self.id: str = data["id"]
+        self.name: str = data["name"]
+        self.summary: str = data.get("summary", "")
+        self.description: str = data.get("description", "")
+        self.roles: list[SwarmBlueprintRole] = [
+            SwarmBlueprintRole(item) for item in data.get("roles", [])
+        ]
+        self.recommended_min_agents: int = int(data.get("recommended_min_agents", 1))
+        self.recommended_max_agents: int = int(data.get("recommended_max_agents", 1))
+        self.coordination_notes: str = data.get("coordination_notes", "")
+        self.tags: list[str] = list(data.get("tags") or [])
+        self._data = data
+
+    def __repr__(self) -> str:
+        return f"SwarmBlueprint(id={self.id}, roles={len(self.roles)})"
+
+
 class Swarms:
     """SDK resource for /swarms endpoints."""
 
@@ -75,6 +107,13 @@ class Swarms:
         data = response.json()
         return [Swarm(s) for s in data["items"]], data["total"]
 
+    def list_blueprints(self) -> list[SwarmBlueprint]:
+        """List curated multi-agent swarm blueprints."""
+        self._require_sync_client()
+        response = self._client.get("/swarms/blueprints")
+        response.raise_for_status()
+        return [SwarmBlueprint(item) for item in response.json()]
+
     async def alist(
         self,
         skip: int = 0,
@@ -89,6 +128,13 @@ class Swarms:
         response.raise_for_status()
         data = response.json()
         return [Swarm(s) for s in data["items"]], data["total"]
+
+    async def alist_blueprints(self) -> list[SwarmBlueprint]:
+        """List curated multi-agent swarm blueprints (async)."""
+        self._require_async_client()
+        response = await self._client.get("/swarms/blueprints")
+        response.raise_for_status()
+        return [SwarmBlueprint(item) for item in response.json()]
 
     def get(
         self,

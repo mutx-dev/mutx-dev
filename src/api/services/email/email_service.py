@@ -10,7 +10,6 @@ from src.api.config import get_settings
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
-VERIFICATION_TOKEN_EXPIRE_HOURS = 24
 PASSWORD_RESET_TOKEN_EXPIRE_HOURS = 1
 
 
@@ -54,9 +53,16 @@ def send_email(
         return False
 
 
-def send_verification_email(to_email: str, name: str, token: str) -> bool:
+def send_verification_email(
+    to_email: str,
+    name: str,
+    token: str,
+    *,
+    frontend_url: str | None = None,
+) -> bool:
     """Send email verification email."""
-    verify_url = f"{settings.frontend_url}/verify-email?token={token}"
+    base_url = (frontend_url or settings.frontend_url).rstrip("/")
+    verify_url = f"{base_url}/verify-email?token={token}"
 
     subject = "Verify your MUTX account"
     html_body = f"""
@@ -77,7 +83,7 @@ def send_verification_email(to_email: str, name: str, token: str) -> bool:
             <a href="{verify_url}" style="color: #4f46e5;">{verify_url}</a>
         </p>
         <p style="color: #999; font-size: 12px; margin-top: 30px;">
-            This link will expire in {VERIFICATION_TOKEN_EXPIRE_HOURS} hours.<br>
+            This link will expire in {settings.email_verification_token_expire_hours} hours.<br>
             If you didn't create an account with MUTX, you can safely ignore this email.
         </p>
     </body>
@@ -89,7 +95,7 @@ def send_verification_email(to_email: str, name: str, token: str) -> bool:
     Thanks for signing up! Please verify your email address by visiting this link:
     {verify_url}
     
-    This link will expire in {VERIFICATION_TOKEN_EXPIRE_HOURS} hours.
+    This link will expire in {settings.email_verification_token_expire_hours} hours.
     
     If you didn't create an account with MUTX, you can safely ignore this email.
     """
@@ -97,9 +103,16 @@ def send_verification_email(to_email: str, name: str, token: str) -> bool:
     return send_email(to_email, subject, html_body, text_body)
 
 
-def send_password_reset_email(to_email: str, name: str, token: str) -> bool:
+def send_password_reset_email(
+    to_email: str,
+    name: str,
+    token: str,
+    *,
+    frontend_url: str | None = None,
+) -> bool:
     """Send password reset email."""
-    reset_url = f"{settings.frontend_url}/reset-password?token={token}"
+    base_url = (frontend_url or settings.frontend_url).rstrip("/")
+    reset_url = f"{base_url}/reset-password?token={token}"
 
     subject = "Reset your MUTX password"
     html_body = f"""

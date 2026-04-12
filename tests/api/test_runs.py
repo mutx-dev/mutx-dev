@@ -48,6 +48,7 @@ async def test_create_run_persists_trace_data_and_returns_details(client, test_a
     assert history["total"] == 1
     assert len(history["items"]) == 1
     assert history["items"][0]["trace_count"] == 2
+    assert history["items"][0]["subject_type"] is None
 
 
 @pytest.mark.asyncio

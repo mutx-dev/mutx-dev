@@ -3,10 +3,23 @@ import { AuthPage } from "@/components/auth/AuthPage";
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[] }>;
+  searchParams: Promise<{
+    next?: string | string[];
+    error?: string | string[];
+    email?: string | string[];
+  }>;
 }) {
   const params = await searchParams;
   const nextPath = Array.isArray(params.next) ? params.next[0] : params.next;
+  const error = Array.isArray(params.error) ? params.error[0] : params.error;
+  const email = Array.isArray(params.email) ? params.email[0] : params.email;
 
-  return <AuthPage mode="register" nextPath={nextPath} />;
+  return (
+    <AuthPage
+      mode="register"
+      nextPath={nextPath}
+      initialError={error}
+      initialEmail={email}
+    />
+  );
 }

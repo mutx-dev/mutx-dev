@@ -13,6 +13,14 @@ from pathlib import Path
 from typing import Any
 
 from src.api.models import Agent, AgentType
+from src.api.services.orchestra_research_catalog import (
+    managed_skill_roots,
+    orchestra_bundles,
+    orchestra_skills,
+    orchestra_source,
+    orchestra_swarm_blueprints,
+    orchestra_templates,
+)
 from src.api.services.gateway_runtime import (
     get_detected_gateway_port,
     get_detected_gateway_token,
@@ -36,6 +44,12 @@ class SkillCatalogItem:
     is_official: bool = False
     tags: tuple[str, ...] = ()
     path: str | None = None
+    canonical_name: str | None = None
+    upstream_path: str | None = None
+    upstream_repo: str | None = None
+    upstream_commit: str | None = None
+    license: str | None = None
+    available: bool = True
 
 
 OFFICIAL_SKILL_CATALOG: tuple[SkillCatalogItem, ...] = (
@@ -191,22 +205,170 @@ def build_personal_assistant_config(
     }
 
 
-def assistant_template_catalog() -> list[dict[str, Any]]:
+def _clone_config(config: dict[str, Any]) -> dict[str, Any]:
+    return json.loads(json.dumps(config))
+
+
+def _merge_channel_map(
+    base_channels: dict[str, dict[str, Any]] | None,
+    override_channels: dict[str, dict[str, Any]] | None,
+) -> dict[str, dict[str, Any]]:
+    normalized = default_channel_map()
+    for source in (base_channels or {}, override_channels or {}):
+        for channel_id, payload in source.items():
+            existing = normalized.get(
+                channel_id,
+                {
+                    "label": channel_id.replace("_", " ").title(),
+                    "enabled": False,
+                    "mode": "pairing",
+                    "allow_from": [],
+                },
+            )
+            if isinstance(payload, dict):
+                existing.update(payload)
+            normalized[channel_id] = existing
+    return normalized
+
+
+def _base_personal_template() -> dict[str, Any]:
     default_config = build_personal_assistant_config()
-    return [
-        {
-            "id": DEFAULT_TEMPLATE_ID,
-            "name": "Personal Assistant",
-            "summary": "Deploy an OpenClaw-backed assistant as the first MUTX agent.",
-            "description": (
-                "A branded starter template for a single-operator assistant with safe channel "
-                "defaults, workspace memory, and a control-plane-friendly runtime surface."
-            ),
-            "agent_type": AgentType.OPENCLAW,
-            "starter_prompt": "Authenticate, deploy the assistant, then connect channels and skills.",
-            "default_config": default_config,
+    return {
+        "id": DEFAULT_TEMPLATE_ID,
+        "name": "Personal Assistant",
+        "summary": "Deploy an OpenClaw-backed assistant as the first MUTX agent.",
+        "description": (
+            "A branded starter template for a single-operator assistant with safe channel "
+            "defaults, workspace memory, and a control-plane-friendly runtime surface."
+        ),
+        "agent_type": AgentType.OPENCLAW,
+        "starter_prompt": "Authenticate, deploy the assistant, then connect channels and skills.",
+        "default_config": default_config,
+        "category": "mutx",
+        "tags": ["starter", "assistant", "mutx"],
+        "is_official": True,
+        "source_path": None,
+        "version": "1.0.0",
+        "validation_status": "native",
+        "validation_message": "First-party MUTX starter template.",
+        "bundle_ids": [],
+    }
+
+
+def _normalized_orchestra_templates() -> list[dict[str, Any]]:
+    normalized: list[dict[str, Any]] = []
+    for template in orchestra_templates():
+        entry = _clone_config(template)
+        entry.setdefault("agent_type", AgentType.OPENCLAW)
+        entry.setdefault(
+            "starter_prompt",
+            "Deploy this research operator, then connect the recommended bundle and swarm blueprint.",
+        )
+        entry.setdefault("category", "orchestra-research")
+        entry.setdefault("tags", [])
+        entry.setdefault("bundle_ids", [])
+        normalized.append(entry)
+    return normalized
+
+
+def assistant_template_catalog() -> list[dict[str, Any]]:
+    templates = [_base_personal_template()]
+    templates.extend(_normalized_orchestra_templates())
+    return templates
+
+
+def get_template_definition(template_id: str) -> dict[str, Any] | None:
+    if template_id == DEFAULT_TEMPLATE_ID:
+        return _base_personal_template()
+    return next(
+        (
+            _clone_config(template)
+            for template in _normalized_orchestra_templates()
+            if str(template.get("id") or "") == template_id
+        ),
+        None,
+    )
+
+
+def build_template_config(
+    *,
+    template_id: str,
+    name: str,
+    description: str | None = None,
+    model: str | None = None,
+    workspace: str | None = None,
+    assistant_id: str | None = None,
+    skills: list[str] | None = None,
+    channels: dict[str, dict[str, Any]] | None = None,
+    runtime_metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    if template_id == DEFAULT_TEMPLATE_ID:
+        return build_personal_assistant_config(
+            name=name,
+            description=description,
+            model=model,
+            workspace=workspace,
+            assistant_id=assistant_id,
+            skills=skills,
+            channels=channels,
+            runtime_metadata=runtime_metadata,
+        )
+
+    template = get_template_definition(template_id)
+    if template is None:
+        raise KeyError(template_id)
+
+    base_config = template.get("default_config")
+    if not isinstance(base_config, dict):
+        raise KeyError(template_id)
+
+    config = _clone_config(base_config)
+    resolved_name = name or str(config.get("name") or template.get("name") or "Assistant")
+    resolved_assistant_id = assistant_id or str(
+        config.get("assistant_id") or slugify_assistant_id(resolved_name)
+    )
+    resolved_workspace = workspace or str(config.get("workspace") or resolved_assistant_id)
+    resolved_skills = [str(item) for item in (skills or config.get("skills") or []) if str(item)]
+
+    metadata = config.get("metadata")
+    if not isinstance(metadata, dict):
+        metadata = {}
+    runtime = metadata.get("runtime")
+    if not isinstance(runtime, dict):
+        runtime = {}
+    runtime.update(runtime_metadata or {})
+    metadata["runtime"] = runtime
+    metadata["starter"] = True
+    metadata["description"] = description
+    metadata["starter_template"] = template_id
+
+    gateway = config.get("gateway")
+    if not isinstance(gateway, dict):
+        gateway = {
+            "port": 18789,
+            "auth_mode": "token",
+            "dashboard_allowed_origins": [],
         }
-    ]
+
+    return {
+        "name": resolved_name,
+        "system_prompt": str(config.get("system_prompt") or ""),
+        "version": int(config.get("version") or 1),
+        "runtime": str(config.get("runtime") or DEFAULT_TEMPLATE_ID),
+        "template": template_id,
+        "assistant_id": resolved_assistant_id,
+        "workspace": resolved_workspace,
+        "model": str(model or config.get("model") or DEFAULT_ASSISTANT_MODEL),
+        "safety_mode": str(config.get("safety_mode") or "pairing"),
+        "skills": list(dict.fromkeys(resolved_skills)),
+        "channels": _merge_channel_map(
+            config.get("channels") if isinstance(config.get("channels"), dict) else None,
+            channels,
+        ),
+        "wakeups": config.get("wakeups") if isinstance(config.get("wakeups"), list) else [],
+        "metadata": metadata,
+        "gateway": gateway,
+    }
 
 
 def is_assistant_agent(agent: Agent) -> bool:
@@ -258,6 +420,7 @@ def _extract_skill_metadata(skill_file: Path) -> SkillCatalogItem | None:
 def _candidate_skill_roots() -> list[Path]:
     state_dir = get_detected_openclaw_state_dir()
     roots = [
+        *managed_skill_roots(),
         Path.home() / ".hermes" / "skills",
         Path.home() / ".openclaw" / "skills",
     ]
@@ -296,11 +459,145 @@ def discover_workspace_skills() -> list[SkillCatalogItem]:
     return sorted(discovered.values(), key=lambda item: item.name.lower())
 
 
+def _merge_catalog_item(existing: SkillCatalogItem, discovered: SkillCatalogItem) -> SkillCatalogItem:
+    return SkillCatalogItem(
+        id=existing.id,
+        name=existing.name,
+        description=existing.description,
+        author=existing.author,
+        category=existing.category,
+        source=existing.source,
+        is_official=existing.is_official,
+        tags=existing.tags or discovered.tags,
+        path=discovered.path or existing.path,
+        canonical_name=existing.canonical_name,
+        upstream_path=existing.upstream_path,
+        upstream_repo=existing.upstream_repo,
+        upstream_commit=existing.upstream_commit,
+        license=existing.license,
+        available=True,
+    )
+
+
+def _orchestra_skill_catalog_items(
+    workspace_skill_map: dict[str, SkillCatalogItem],
+) -> list[SkillCatalogItem]:
+    source = orchestra_source()
+    repo_url = str(source.get("repo_url") or "https://github.com/Orchestra-Research/AI-Research-SKILLs")
+    commit = str(source.get("commit") or "") or None
+    license_name = str(source.get("license") or "MIT")
+
+    items: list[SkillCatalogItem] = []
+    for raw in orchestra_skills():
+        skill_id = str(raw.get("id") or "").strip()
+        if not skill_id:
+            continue
+        discovered = workspace_skill_map.get(skill_id)
+        items.append(
+            SkillCatalogItem(
+                id=skill_id,
+                name=str(raw.get("name") or skill_id.replace("-", " ").title()),
+                description=str(raw.get("description") or ""),
+                author=str(raw.get("author") or "Orchestra Research"),
+                category=str(raw.get("category_name") or raw.get("category_id") or "Orchestra Research"),
+                source="orchestra-research",
+                is_official=False,
+                tags=tuple(str(tag) for tag in (raw.get("tags") or []) if tag),
+                path=discovered.path if discovered else None,
+                canonical_name=str(raw.get("canonical_name") or "") or None,
+                upstream_path=str(raw.get("upstream_path") or "") or None,
+                upstream_repo=repo_url,
+                upstream_commit=commit,
+                license=license_name,
+                available=discovered is not None,
+            )
+        )
+    return items
+
+
 def list_skill_catalog() -> list[SkillCatalogItem]:
+    workspace_items = discover_workspace_skills()
+    workspace_skill_map: dict[str, SkillCatalogItem] = {item.id: item for item in workspace_items}
     catalog: dict[str, SkillCatalogItem] = {item.id: item for item in OFFICIAL_SKILL_CATALOG}
-    for item in discover_workspace_skills():
-        catalog.setdefault(item.id, item)
-    return sorted(catalog.values(), key=lambda item: item.name.lower())
+
+    for item in _orchestra_skill_catalog_items(workspace_skill_map):
+        catalog[item.id] = item
+
+    for item in workspace_items:
+        existing = catalog.get(item.id)
+        catalog[item.id] = _merge_catalog_item(existing, item) if existing else item
+
+    return sorted(catalog.values(), key=lambda item: (not item.available, item.name.lower()))
+
+
+def find_skill_catalog_item(skill_id: str) -> SkillCatalogItem | None:
+    normalized = str(skill_id).strip()
+    if not normalized:
+        return None
+    return next((item for item in list_skill_catalog() if item.id == normalized), None)
+
+
+def list_skill_bundles() -> list[dict[str, Any]]:
+    catalog = {item.id: item for item in list_skill_catalog()}
+    bundles: list[dict[str, Any]] = []
+    for raw in orchestra_bundles():
+        skill_ids = [str(item) for item in (raw.get("skill_ids") or []) if str(item)]
+        available = [skill_id for skill_id in skill_ids if catalog.get(skill_id) and catalog[skill_id].available]
+        unavailable = [skill_id for skill_id in skill_ids if skill_id not in available]
+        bundles.append(
+            {
+                "id": str(raw.get("id") or ""),
+                "name": str(raw.get("name") or ""),
+                "summary": str(raw.get("summary") or ""),
+                "description": str(raw.get("description") or ""),
+                "skill_ids": skill_ids,
+                "skill_count": len(skill_ids),
+                "available_skill_count": len(available),
+                "unavailable_skill_ids": unavailable,
+                "recommended_template_id": raw.get("recommended_template_id"),
+                "recommended_swarm_blueprint_id": raw.get("recommended_swarm_blueprint_id"),
+                "tags": [str(tag) for tag in (raw.get("tags") or []) if tag],
+                "source": "orchestra-research",
+            }
+        )
+    return bundles
+
+
+def get_skill_bundle(bundle_id: str) -> dict[str, Any] | None:
+    normalized = str(bundle_id).strip()
+    if not normalized:
+        return None
+    return next((item for item in list_skill_bundles() if item["id"] == normalized), None)
+
+
+def install_skill_bundle(agent: Agent, *, bundle_id: str) -> dict[str, Any]:
+    bundle = get_skill_bundle(bundle_id)
+    if bundle is None:
+        raise KeyError(bundle_id)
+
+    config = deserialize_config(agent.config)
+    skills = list_installed_skill_ids(agent)
+    installed_now: list[str] = []
+    for skill_id in bundle["skill_ids"]:
+        item = find_skill_catalog_item(skill_id)
+        if item is None or not item.available:
+            continue
+        if skill_id not in skills:
+            skills.append(skill_id)
+            installed_now.append(skill_id)
+
+    config["skills"] = skills
+    agent.config = serialize_config(config)
+    return {
+        "bundle_id": bundle["id"],
+        "installed_skill_ids": installed_now,
+        "unavailable_skill_ids": list(bundle["unavailable_skill_ids"]),
+        "skills": skills,
+    }
+
+
+def list_swarm_blueprints() -> list[dict[str, Any]]:
+    return [item for item in orchestra_swarm_blueprints() if isinstance(item, dict)]
 
 
 def list_installed_skill_ids(agent: Agent) -> list[str]:
@@ -325,12 +622,24 @@ def list_assistant_skills(agent: Agent) -> list[dict[str, Any]]:
                 "installed": item.id in installed,
                 "tags": list(item.tags),
                 "path": item.path,
+                "canonical_name": item.canonical_name,
+                "upstream_path": item.upstream_path,
+                "upstream_repo": item.upstream_repo,
+                "upstream_commit": item.upstream_commit,
+                "license": item.license,
+                "available": item.available,
             }
         )
-    return sorted(entries, key=lambda entry: (not entry["installed"], entry["name"].lower()))
+    return sorted(entries, key=lambda entry: (not entry["installed"], not entry["available"], entry["name"].lower()))
 
 
 def update_assistant_skills(agent: Agent, *, skill_id: str, install: bool) -> dict[str, Any]:
+    item = find_skill_catalog_item(skill_id)
+    if install and item is None:
+        raise KeyError(skill_id)
+    if install and item is not None and not item.available:
+        raise RuntimeError(f"Skill '{skill_id}' is catalogued but not available on this runtime")
+
     config = deserialize_config(agent.config)
     skills = list_installed_skill_ids(agent)
     if install and skill_id not in skills:

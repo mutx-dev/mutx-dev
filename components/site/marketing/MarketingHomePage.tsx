@@ -9,6 +9,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import {
   marketingHomepage,
   type MarketingActionLink,
+  type MarketingEntryPoint,
 } from '@/lib/marketingContent'
 
 import core from './MarketingCore.module.css'
@@ -27,6 +28,10 @@ type HoverCardProps = {
   children: ReactNode
   delay?: number
   distance?: number
+}
+
+type EntryPointLinkProps = {
+  item: MarketingEntryPoint
 }
 
 function ActionLink({ action, className }: ActionLinkProps) {
@@ -58,6 +63,34 @@ function ActionLink({ action, className }: ActionLinkProps) {
   )
 }
 
+function EntryPointLink({ item }: EntryPointLinkProps) {
+  const content = (
+    <>
+      Enter page
+      <ArrowUpRight className="h-4 w-4" />
+    </>
+  )
+
+  if (item.external) {
+    return (
+      <a
+        href={item.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={home.entryLink}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <Link href={item.href} className={home.entryLink}>
+      {content}
+    </Link>
+  )
+}
+
 function HoverCard({ className, children, delay = 0, distance = 18 }: HoverCardProps) {
   const prefersReducedMotion = useReducedMotion()
 
@@ -83,13 +116,10 @@ function HoverCard({ className, children, delay = 0, distance = 18 }: HoverCardP
 
 export function MarketingHomePage() {
   const prefersReducedMotion = useReducedMotion()
-  const activeDemoId = marketingHomepage.salesSections.demo.tabs[0]?.id
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
-  const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.salesSections.cta.actions
-
-  const activeDemo =
-    marketingHomepage.salesSections.demo.tabs.find((tab) => tab.id === activeDemoId) ??
-    marketingHomepage.salesSections.demo.tabs[0]
+  const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.cta.actions
+  const secondaryHeroPrimaryAction = secondaryActions[0]
+  const secondaryHeroActions = secondaryActions.slice(1)
 
   return (
     <div className={`${core.page} ${core.homePage}`}>
@@ -128,38 +158,27 @@ export function MarketingHomePage() {
                   <span className={home.heroLockupWord} data-testid="homepage-lockup-word">
                     MUTX
                   </span>
-                <span className={home.heroLockupMeta} data-testid="homepage-lockup-meta">
-                  see · control · prove
-                </span>
+                  <span className={home.heroLockupMeta} data-testid="homepage-lockup-meta">
+                    see · constrain · prove
+                  </span>
                 </span>
               </div>
 
               <div className={home.heroContent} data-testid="homepage-hero-content">
-                <p className={home.heroEyebrow}>{marketingHomepage.hero.tagline}</p>
+                <p className={home.heroEyebrow}>{marketingHomepage.hero.chapterLabel}</p>
                 <h1 className={home.heroTitle}>{marketingHomepage.hero.title}</h1>
                 {marketingHomepage.hero.support && (
                   <p className={home.heroSupport}>{marketingHomepage.hero.support}</p>
                 )}
                 <div className={home.heroActions}>
-                  <ActionLink action={primaryAction} className={core.buttonPrimary} />
-                  <a
-                    href="https://github.com/mutx-dev/mutx-dev"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={core.buttonGhost}
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="h-4 w-4"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.922.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
-                    </svg>
-                    View GitHub
-                  </a>
+                  {primaryAction ? (
+                    <ActionLink action={primaryAction} className={core.buttonPrimary} />
+                  ) : null}
+                  {secondaryHeroPrimaryAction ? (
+                    <ActionLink action={secondaryHeroPrimaryAction} className={core.buttonGhost} />
+                  ) : null}
                   <div className={home.heroSecondaryActions}>
-                    {secondaryActions.map((action) => (
+                    {secondaryHeroActions.map((action) => (
                       <ActionLink
                         key={action.label}
                         action={action}
@@ -168,164 +187,217 @@ export function MarketingHomePage() {
                     ))}
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        <section className={home.socialProofStrip} data-testid="homepage-social-proof">
-          <div className={core.shell}>
-            <div className={home.socialProofInner}>
-              <p className={home.socialProofTagline}>Built around the surfaces that are actually live today</p>
-              <div className={home.socialProofMetrics}>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>v1.4</p>
-                  <p className={home.socialProofLabel}>Current release</p>
-                </div>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>RBAC</p>
-                  <p className={home.socialProofLabel}>Protected API surface</p>
-                </div>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>Preview</p>
-                  <p className={home.socialProofLabel}>Pico clearly marked beta</p>
-                </div>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>macOS</p>
-                  <p className={home.socialProofLabel}>Native desktop handoff</p>
+                <div className={home.heroLedger} data-testid="homepage-hero-ledger">
+                  {marketingHomepage.hero.ledger.map((line, index) => (
+                    <div key={line} className={home.heroLedgerLine}>
+                      <span className={home.heroLedgerIndex}>
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <p className={home.heroLedgerText}>{line}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className={home.demoSection} data-testid="homepage-demo-section">
+        <section className={home.storySection} data-testid="homepage-story-section">
           <div className={core.shell}>
-            <div className={home.demoLayout}>
-              <MarketingReveal className={home.demoIntro}>
-                <p className={home.sectionEyebrow}>{marketingHomepage.salesSections.demo.eyebrow}</p>
-                <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.demo.title}</h2>
-                <p className={home.sectionBody}>{marketingHomepage.salesSections.demo.body}</p>
+            <div className={home.storyShell}>
+              <MarketingReveal className={home.storyRail} distance={18}>
+                <p className={home.sectionEyebrow}>{marketingHomepage.chapters.eyebrow}</p>
+                <h2 className={home.sectionTitle}>{marketingHomepage.chapters.title}</h2>
+                <p className={home.sectionBody}>{marketingHomepage.chapters.body}</p>
+                <div className={home.storyIndex} data-testid="homepage-story-index">
+                  {marketingHomepage.chapters.items.map((item) => (
+                    <a key={item.id} href={`#${item.id}`} className={home.storyIndexLink}>
+                      <span className={home.storyIndexChapter}>{item.chapter}</span>
+                      <span className={home.storyIndexTitle}>{item.kicker}</span>
+                    </a>
+                  ))}
+                </div>
               </MarketingReveal>
 
-              <div className={home.demoStage}>
-                <motion.div
-                  className={home.demoFrame}
-                  id={`demo-panel-${activeDemo.id}`}
-                  role="tabpanel"
-                  aria-labelledby={`demo-tab-${activeDemo.id}`}
-                  data-testid="homepage-demo-panel"
-                  whileHover={
-                    prefersReducedMotion
-                      ? undefined
-                      : {
-                          y: -4,
-                          scale: 1.005,
-                        }
-                  }
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {activeDemo.mediaType === 'gif' ? (
-                    <img
-                      key={activeDemo.id}
-                      src={activeDemo.mediaSrc}
-                      alt={activeDemo.mediaAlt}
-                      className={home.demoVideo}
-                      decoding="async"
-                    />
-                  ) : (
-                    <Image
-                      key={activeDemo.id}
-                      src={activeDemo.mediaSrc}
-                      alt={activeDemo.mediaAlt}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 64rem"
-                      className={home.exampleImage}
-                    />
-                  )}
-                </motion.div>
+              <div className={home.storyScenes}>
+                {marketingHomepage.chapters.items.map((item, index) => (
+                  <MarketingReveal
+                    key={item.id}
+                    className={home.sceneReveal}
+                    delay={index * 0.06}
+                    distance={22}
+                  >
+                    <article id={item.id} className={home.sceneArticle}>
+                      <div className={home.sceneMeta}>
+                        <p className={home.sceneChapter}>{item.chapter}</p>
+                        <p className={home.sceneKicker}>{item.kicker}</p>
+                      </div>
 
+                      <div className={home.sceneGrid}>
+                        <div className={home.sceneCopy}>
+                          <h3 className={home.sceneTitle}>{item.title}</h3>
+                          <p className={home.sceneBody}>{item.body}</p>
+                          <blockquote className={home.sceneQuote}>{item.quote}</blockquote>
+                          <ul className={home.sceneBeats}>
+                            {item.beats.map((beat) => (
+                              <li key={beat}>{beat}</li>
+                            ))}
+                          </ul>
+                          <p className={home.sceneNote}>{item.note}</p>
+                        </div>
+
+                        <motion.div
+                          className={home.sceneMediaCard}
+                          whileHover={
+                            prefersReducedMotion
+                              ? undefined
+                              : {
+                                  y: -5,
+                                  rotate: -0.35,
+                                }
+                          }
+                          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                          <div className={home.sceneMediaFrame}>
+                            <Image
+                              src={item.imageSrc}
+                              alt={item.imageAlt}
+                              fill
+                              sizes="(max-width: 1024px) 100vw, 38rem"
+                              className={home.sceneMediaImage}
+                            />
+                          </div>
+                        </motion.div>
+                      </div>
+                    </article>
+                  </MarketingReveal>
+                ))}
               </div>
             </div>
           </div>
         </section>
 
-        <section className={home.examplesSection} data-testid="homepage-examples-section">
+        <section className={home.incidentSection} data-testid="homepage-incident-section">
           <div className={core.shell}>
-            <MarketingReveal className={home.examplesIntro}>
-              <p className={home.sectionEyebrow}>{marketingHomepage.salesSections.examples.eyebrow}</p>
-              <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.examples.title}</h2>
-              <p className={home.sectionBody}>{marketingHomepage.salesSections.examples.body}</p>
+            <MarketingReveal className={home.incidentIntro} distance={18}>
+              <p className={home.sectionEyebrow}>{marketingHomepage.incidents.eyebrow}</p>
+              <h2 className={home.sectionTitle}>{marketingHomepage.incidents.title}</h2>
+              <p className={home.sectionBody}>{marketingHomepage.incidents.body}</p>
             </MarketingReveal>
 
-            <div className={home.examplesGrid}>
-              {marketingHomepage.salesSections.examples.items.map((item, index) => (
+            <div className={home.incidentList}>
+              {marketingHomepage.incidents.items.map((item, index) => (
                 <HoverCard
-                  key={item.title}
-                  className={home.exampleCard}
+                  key={item.id}
+                  className={home.incidentCard}
                   delay={index * 0.07}
-                  distance={18}
+                  distance={20}
                 >
-                  <div className={home.terminalWindow}>
-                    <div className={home.terminalChrome}>
-                      <span className={home.terminalDot} data-tone="red" />
-                      <span className={home.terminalDot} data-tone="yellow" />
-                      <span className={home.terminalDot} data-tone="green" />
-                      <span className={home.terminalTitle}>{item.eyebrow}</span>
+                  <article className={home.incidentArticle}>
+                    <div className={home.incidentHeader}>
+                      <p className={home.incidentLabel}>{item.label}</p>
+                      <h3 className={home.incidentTitle}>{item.title}</h3>
+                      <p className={home.incidentTrigger}>{item.trigger}</p>
                     </div>
-                    <div className={home.terminalBody}>
-                      <p className={home.terminalPromptLine}>
-                        <span className={home.terminalPrompt}>{'>'}</span>
-                        <span className={home.terminalCommand}>{item.userPrompt}</span>
-                      </p>
-                      <div className={home.terminalReplyBlock}>
-                        {item.apology.map((line, lineIndex) => (
-                          <p key={lineIndex} className={home.terminalReplyLine}>
-                            <span className={home.terminalAgent}>agent</span>
-                            <span>{line}</span>
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className={home.exampleCopy}>
-                    <h3 className={home.exampleTitle}>{item.title}</h3>
-                    <p className={home.exampleOutcome}>{item.fallout}</p>
-                  </div>
+                    <div className={home.incidentTranscript}>
+                      {item.log.map((line) => (
+                        <p key={line} className={home.incidentLogLine}>
+                          <span className={home.incidentPrompt}>{'>'}</span>
+                          <span>{line}</span>
+                        </p>
+                      ))}
+                    </div>
+
+                    <p className={home.incidentResolution}>{item.resolution}</p>
+                  </article>
                 </HoverCard>
               ))}
             </div>
           </div>
         </section>
 
-        <section className={home.proofSection} data-testid="homepage-proof-section">
+        <section className={home.controlSection} data-testid="homepage-control-section">
           <div className={core.shell}>
-            <MarketingReveal className={home.proofIntro}>
-              <p className={home.sectionEyebrow}>{marketingHomepage.salesSections.proof.eyebrow}</p>
-              <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.proof.title}</h2>
-              <p className={home.sectionBody}>{marketingHomepage.salesSections.proof.body}</p>
+            <div className={home.controlShell}>
+              <MarketingReveal className={home.controlIntro} distance={18}>
+                <p className={home.sectionEyebrow}>{marketingHomepage.controlRoom.eyebrow}</p>
+                <h2 className={home.sectionTitle}>{marketingHomepage.controlRoom.title}</h2>
+                <p className={home.sectionBody}>{marketingHomepage.controlRoom.body}</p>
+              </MarketingReveal>
+
+              <motion.div
+                className={home.controlPreview}
+                data-testid="homepage-control-preview"
+                whileHover={
+                  prefersReducedMotion
+                    ? undefined
+                    : {
+                        y: -6,
+                        scale: 1.01,
+                      }
+                }
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className={home.controlPreviewFrame}>
+                  <Image
+                    src={marketingHomepage.controlRoom.mediaSrc}
+                    alt={marketingHomepage.controlRoom.mediaAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 54rem"
+                    className={home.controlPreviewImage}
+                  />
+                </div>
+                <div className={home.controlPreviewBands}>
+                  {marketingHomepage.controlRoom.pillars.map((pillar) => (
+                    <span key={pillar.label} className={home.controlPreviewBand}>
+                      {pillar.label}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+
+              <div className={home.controlPillars}>
+                {marketingHomepage.controlRoom.pillars.map((pillar, index) => (
+                  <MarketingReveal
+                    key={pillar.label}
+                    className={home.controlPillar}
+                    delay={index * 0.06}
+                    distance={18}
+                  >
+                    <p className={home.controlPillarLabel}>{pillar.label}</p>
+                    <h3 className={home.controlPillarTitle}>{pillar.title}</h3>
+                    <p className={home.controlPillarBody}>{pillar.body}</p>
+                  </MarketingReveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={home.entrySection} data-testid="homepage-entry-section">
+          <div className={core.shell}>
+            <MarketingReveal className={home.entryIntro} distance={18}>
+              <p className={home.sectionEyebrow}>{marketingHomepage.entryPoints.eyebrow}</p>
+              <h2 className={home.sectionTitle}>{marketingHomepage.entryPoints.title}</h2>
+              <p className={home.sectionBody}>{marketingHomepage.entryPoints.body}</p>
             </MarketingReveal>
 
-            <div className={home.proofGrid}>
-              {marketingHomepage.salesSections.proof.items.map((item, index) => (
+            <div className={home.entryGrid}>
+              {marketingHomepage.entryPoints.items.map((item, index) => (
                 <HoverCard
                   key={item.title}
-                  className={home.proofCard}
+                  className={home.entryCard}
                   delay={index * 0.07}
                   distance={20}
                 >
-                  <h3 className={home.proofCardTitle}>{item.title}</h3>
-                  <div className={home.proofCompare}>
-                    <div className={home.proofLane}>
-                      <p className={home.proofLaneLabel}>Before</p>
-                      <p className={home.proofLaneBody}>{item.before}</p>
-                    </div>
-                    <div className={home.proofLane}>
-                      <p className={home.proofLaneLabelMUTX}>With MUTX</p>
-                      <p className={home.proofLaneBodyMUTX}>{item.after}</p>
-                    </div>
-                  </div>
+                  <article className={home.entryArticle}>
+                    <p className={home.entryLabel}>{item.label}</p>
+                    <h3 className={home.entryTitle}>{item.title}</h3>
+                    <p className={home.entryBody}>{item.body}</p>
+                    <EntryPointLink item={item} />
+                  </article>
                 </HoverCard>
               ))}
             </div>
@@ -334,13 +406,16 @@ export function MarketingHomePage() {
 
         <section className={home.finalSection} data-testid="homepage-final-cta">
           <div className={core.shell}>
-            <MarketingReveal className={home.finalInner} distance={24}>
+            <MarketingReveal className={home.finalShell} distance={24}>
               <div className={home.finalCopy}>
-                <p className={home.sectionEyebrow}>{marketingHomepage.salesSections.cta.eyebrow}</p>
-                <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.cta.title}</h2>
-                <p className={home.sectionBody}>{marketingHomepage.salesSections.cta.body}</p>
+                <p className={home.sectionEyebrow}>{marketingHomepage.cta.eyebrow}</p>
+                <h2 className={home.sectionTitle}>{marketingHomepage.cta.title}</h2>
+                <p className={home.sectionBody}>{marketingHomepage.cta.body}</p>
+                <blockquote className={home.finalQuote}>{marketingHomepage.cta.quote}</blockquote>
                 <div className={home.finalActions}>
-                  <ActionLink action={finalPrimaryAction} className={core.buttonPrimary} />
+                  {finalPrimaryAction ? (
+                    <ActionLink action={finalPrimaryAction} className={core.buttonPrimary} />
+                  ) : null}
                   <div className={home.finalSecondaryActions}>
                     {finalSecondaryActions.map((action) => (
                       <ActionLink
@@ -354,27 +429,25 @@ export function MarketingHomePage() {
               </div>
 
               <motion.div
-                className={home.finalPreview}
-                data-testid="homepage-demo-preview"
+                className={home.finalPoster}
                 whileHover={
                   prefersReducedMotion
                     ? undefined
                     : {
                         y: -5,
-                        scale: 1.01,
+                        rotate: 0.35,
                       }
                 }
                 transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className={home.finalPreviewDevice}>
-                  <div className={home.finalPreviewScreen}>
-                    <img
-                      src={marketingHomepage.salesSections.cta.mediaSrc}
-                      alt={marketingHomepage.salesSections.cta.mediaAlt}
-                      className={home.finalPreviewImage}
-                      decoding="async"
-                    />
-                  </div>
+                <div className={home.finalPosterFrame}>
+                  <Image
+                    src={marketingHomepage.cta.mediaSrc}
+                    alt={marketingHomepage.cta.mediaAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 36rem"
+                    className={home.finalPosterImage}
+                  />
                 </div>
               </motion.div>
             </MarketingReveal>

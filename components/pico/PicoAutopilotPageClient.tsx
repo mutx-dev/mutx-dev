@@ -2,10 +2,17 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
+import { PicoSessionBanner } from '@/components/pico/PicoSessionBanner'
 import { PicoShell } from '@/components/pico/PicoShell'
+import { PicoSurfaceCompass } from '@/components/pico/PicoSurfaceCompass'
+import { picoClasses, picoEmber, picoInset, picoPanel, picoSoft } from '@/components/pico/picoTheme'
+import { usePicoLessonWorkspace } from '@/components/pico/usePicoLessonWorkspace'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
+import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoHref } from '@/lib/pico/navigation'
+import { cn } from '@/lib/utils'
 import {
   analyzeAutopilotIntegration,
   buildAutopilotTimeline,
@@ -95,22 +102,22 @@ function severityClasses(severity: AutopilotTimelineItem['severity']) {
     case 'warn':
       return 'border-amber-400/20 bg-amber-400/10 text-amber-50'
     case 'good':
-      return 'border-emerald-400/20 bg-emerald-400/10 text-emerald-50'
+      return 'border-[#7d5232] bg-[linear-gradient(180deg,rgba(103,57,29,0.22),rgba(45,27,16,0.18))] text-[#f7e2c8]'
     default:
-      return 'border-white/10 bg-white/5 text-slate-200'
+      return 'border-[#4a3423] bg-[rgba(255,247,235,0.04)] text-[#efe1cf]'
   }
 }
 
 function sectionClasses() {
-  return 'rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]'
+  return picoPanel('p-6')
 }
 
 function StatCard({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
-    <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{label}</p>
-      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
-      <p className="mt-2">{hint}</p>
+    <div className={picoClasses.metric}>
+      <p className={picoClasses.label}>{label}</p>
+      <p className={picoClasses.metricValue}>{value}</p>
+      <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">{hint}</p>
     </div>
   )
 }
@@ -122,10 +129,10 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
         <span>{item.sourceLabel}</span>
         <span>{formatTimestamp(item.occurredAt)} • {formatRelativeTime(item.occurredAt)}</span>
       </div>
-      <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
+      <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">{item.title}</h3>
       <p className="mt-2 text-sm leading-6">{item.detail}</p>
-      <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {item.impact}</p>
-      <Link href={item.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+      <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">Why it matters: {item.impact}</p>
+      <Link href={item.href} className={cn(picoClasses.link, 'mt-4 inline-flex')}>
         Jump to detail section
       </Link>
     </div>
@@ -134,12 +141,12 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
 
 function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
   return (
-    <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-      <p className="font-medium text-white">{state.title}</p>
+    <div className={picoSoft('p-5')}>
+      <p className="font-medium text-[#fff4e6]">{state.title}</p>
       <p className="mt-2">{state.body}</p>
       <Link
         href={state.nextStep.href}
-        className="mt-4 inline-flex rounded-full border border-emerald-400/30 px-4 py-2 text-sm font-medium text-emerald-200 transition hover:border-emerald-300/60 hover:text-emerald-100"
+        className={cn(picoClasses.secondaryButton, 'mt-4')}
       >
         {state.nextStep.label}
       </Link>
@@ -148,6 +155,8 @@ function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
 }
 
 export function PicoAutopilotPageClient() {
+  const pathname = usePathname()
+  const session = usePicoSession()
   const { progress, derived, actions, syncState } = usePicoProgress()
   const toHref = usePicoHref()
   const [runs, setRuns] = useState<AutopilotRunSummary[]>([])
@@ -161,6 +170,13 @@ export function PicoAutopilotPageClient() {
   const [error, setError] = useState<string | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
+  const [creatingApproval, setCreatingApproval] = useState(false)
+  const [approvalDraft, setApprovalDraft] = useState({
+    agentId: '',
+    sessionId: '',
+    actionType: 'OUTBOUND_SEND',
+    summary: 'Outbound send requires a human decision before the runtime crosses the line.',
+  })
 
   const pendingApprovals = useMemo(
     () => approvals.filter((approval) => approval.status === 'PENDING'),
@@ -171,6 +187,16 @@ export function PicoAutopilotPageClient() {
     () => approvals.filter((approval) => approval.status !== 'PENDING').slice(0, 4),
     [approvals],
   )
+
+  const latestRun = runs[0] ?? null
+
+  useEffect(() => {
+    setApprovalDraft((current) => ({
+      ...current,
+      agentId: current.agentId || latestRun?.agent_id || 'agent-founder-lab',
+      sessionId: current.sessionId || latestRun?.id || 'ses-pico-approval',
+    }))
+  }, [latestRun?.agent_id, latestRun?.id])
 
   async function load() {
     setLoadState('loading')
@@ -266,6 +292,12 @@ export function PicoAutopilotPageClient() {
   useEffect(() => {
     void load()
   }, [])
+
+  useEffect(() => {
+    if (progress.platform.activeSurface !== 'autopilot') {
+      actions.setPlatform({ activeSurface: 'autopilot' })
+    }
+  }, [actions, progress.platform.activeSurface])
 
   useEffect(() => {
     setThresholdDraft(progress.autopilot.costThresholdPercent)
@@ -425,6 +457,8 @@ export function PicoAutopilotPageClient() {
         throw new Error(extractErrorMessage(payload, `Failed to ${action} request`))
       }
 
+      actions.setAutopilot({ approvalGateEnabled: true })
+      actions.unlockMilestone('first_approval_gate_enabled')
       await load()
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : `Failed to ${action} request`)
@@ -433,9 +467,58 @@ export function PicoAutopilotPageClient() {
     }
   }
 
+  async function createApprovalRequest() {
+    if (!approvalDraft.agentId.trim() || !approvalDraft.sessionId.trim() || !approvalDraft.actionType.trim()) {
+      setError('agent, session, and action type are required before creating an approval request')
+      return
+    }
+
+    setCreatingApproval(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/pico/approvals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          agent_id: approvalDraft.agentId.trim(),
+          session_id: approvalDraft.sessionId.trim(),
+          action_type: approvalDraft.actionType.trim(),
+          payload: {
+            summary: approvalDraft.summary.trim(),
+            source: 'pico-autopilot',
+          },
+        }),
+      })
+
+      const payload = await readJsonSafely(response)
+      if (!response.ok) {
+        if (response.status === 401) {
+          setAuthRequired(true)
+          setLoadState('offline')
+        }
+
+        throw new Error(extractErrorMessage(payload, 'Failed to create approval request'))
+      }
+
+      actions.setAutopilot({ approvalGateEnabled: true })
+      await load()
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Failed to create approval request',
+      )
+    } finally {
+      setCreatingApproval(false)
+    }
+  }
+
   const liveValue = (value: string) => (authRequired ? '--' : value)
   const liveHint = (readyHint: string, offlineHint: string) => (authRequired ? offlineHint : readyHint)
-  const latestRun = runs[0] ?? null
   const primaryAutopilotHref = authRequired || !latestRun
     ? derived.nextLesson
       ? toHref(`/academy/${derived.nextLesson.slug}`)
@@ -446,21 +529,83 @@ export function PicoAutopilotPageClient() {
       ? `Finish ${derived.nextLesson.title} first`
       : 'Go back to academy'
     : `Inspect run ${latestRun.id.slice(0, 8)}`
+  const latestRunTimestamp = latestRun?.completed_at ?? latestRun?.started_at ?? latestRun?.created_at ?? null
+  const latestRunTraces = latestRun ? tracesByRunId[latestRun.id] ?? [] : []
+  const recoveryWorkspace = usePicoLessonWorkspace(derived.nextLesson?.slug ?? 'autopilot', derived.nextLesson?.steps.length ?? 0, {
+    progress,
+    persistRemote: derived.nextLesson
+      ? (lessonSlug, workspace) => actions.setLessonWorkspace(lessonSlug, workspace)
+      : undefined,
+  })
+  const recoveryFocusedStep =
+    derived.nextLesson && recoveryWorkspace.workspace.activeStepIndex >= 0
+      ? derived.nextLesson.steps[recoveryWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
+      : 'not set'
 
   return (
     <PicoShell
       eyebrow="Autopilot bridge"
       title="Trust the runtime because the surface tells the truth"
       description="First inspect the latest run. Then tighten the threshold. Then decide which risky actions deserve a gate. That is how trust gets earned here."
+      railCollapsed={progress.platform.railCollapsed}
+      helpLaneOpen={progress.platform.helpLaneOpen}
+      onToggleRail={() =>
+        actions.setPlatform({ railCollapsed: !progress.platform.railCollapsed })
+      }
+      onToggleHelpLane={() =>
+        actions.setPlatform({ helpLaneOpen: !progress.platform.helpLaneOpen })
+      }
       actions={
         <Link
           href={primaryAutopilotHref}
-          className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2904f] px-5 py-3 text-sm font-semibold text-[#21130c] transition hover:bg-[#eca265]"
         >
           {primaryAutopilotLabel}
         </Link>
       }
     >
+      <PicoSessionBanner session={session} nextPath={pathname} />
+      <PicoSurfaceCompass
+        title="Stay here only when the live runtime is the real source of truth"
+        body="Autopilot is for reading the current run, spend, alerts, and approvals. If the product still needs a lesson answer, go back to academy or tutor. If the runtime truth is visible but still not enough, escalate with the evidence attached."
+        status={
+          authRequired
+            ? 'hosted session required'
+            : latestRun
+              ? 'runtime visible'
+              : 'waiting for first run'
+        }
+        aside="A control room should not ask for faith. If there is no live signal, leave and create one. If the signal exists, use it to decide the next move immediately."
+        items={[
+          {
+            href: derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy'),
+            label: derived.nextLesson ? `Finish ${derived.nextLesson.title}` : 'Go back to academy',
+            caption: 'Return here when the real blocker is still on the lesson path rather than in the runtime.',
+            note: 'Back to lane',
+          },
+          {
+            href: toHref(`/tutor${derived.nextLesson ? `?lesson=${derived.nextLesson.slug}` : ''}`),
+            label: 'Ask tutor about the next move',
+            caption: 'Use tutor when the product likely still knows the answer and the issue is not live runtime state.',
+            note: 'Knowable',
+          },
+          {
+            href: '#recent-runs',
+            label: 'Stay on recent runs',
+            caption: 'Remain here when the latest execution, trace, or alert feed is the actual decision surface.',
+            note: 'Stay here',
+            tone: 'primary',
+          },
+          {
+            href: toHref('/support'),
+            label: 'Escalate with evidence',
+            caption: 'Escalate only after you have the packet, the run context, and the live signal that proves where the truth broke.',
+            note: 'Messy edge',
+            tone: 'soft',
+          },
+        ]}
+      />
+
       {authRequired ? (
         <div className="mb-6 rounded-[28px] border border-amber-400/20 bg-amber-400/10 p-6 text-sm leading-6 text-amber-50">
           Live Autopilot needs an authenticated MUTX session. Until then, there is no honest run, alert, budget, or approval feed to show you.
@@ -473,80 +618,351 @@ export function PicoAutopilotPageClient() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <StatCard
-          label="Runs"
-          value={liveValue(String(runs.length))}
-          hint={liveHint(
-            !integrationStatus.hasLiveAgent
-              ? 'No agent is connected to MUTX yet.'
-              : runs.length > 0
-                ? 'Recent executions pulled from MUTX.'
-                : 'An agent exists, but no run has landed yet.',
-            'Sign in to read live run history.',
-          )}
-        />
-        <StatCard
-          label="Failures"
-          value={liveValue(String(failedRuns.length))}
-          hint={liveHint(
-            failedRuns.length > 0 ? 'Failures are visible here. Good. Hidden failures are worse.' : 'No failed runs in the current window.',
-            'Sign in to see failed run count.',
-          )}
-        />
-        <StatCard
-          label="Alerts"
-          value={liveValue(String(alerts.filter((alert) => !alert.resolved).length))}
-          hint={liveHint(
-            alerts.some((alert) => !alert.resolved)
-              ? 'Unresolved operator pain from the monitoring feed.'
-              : integrationStatus.hasRuns
-                ? 'No unresolved alerts right now.'
-                : 'No alerts yet because nothing has executed.',
-            'Sign in to read live alerts.',
-          )}
-        />
-        <StatCard
-          label="Budget"
-          value={liveValue(budget ? formatPercent(budget.usage_percentage) : '--')}
-          hint={liveHint(
-            !integrationStatus.hasBudget
-              ? 'No live budget snapshot returned yet.'
-              : integrationStatus.hasUsage
-                ? `${formatPercent(progress.autopilot.costThresholdPercent)} threshold against live spend.`
-                : 'Budget exists, but usage is empty in the current window.',
-            'Sign in to read budget usage.',
-          )}
-        />
-        <StatCard
-          label="Approvals"
-          value={liveValue(String(pendingApprovals.length))}
-          hint={liveHint(
-            pendingApprovals.length > 0
-              ? 'Pending risky actions are waiting for a human call.'
-              : integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured
-                ? 'Approval history exists, but Pico gate is still off locally.'
-                : 'No risky actions are blocked right now.',
-            'Sign in to see live approvals.',
-          )}
-        />
-      </div>
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
+        <div className={picoPanel('overflow-hidden p-0')}>
+          <div className="grid gap-0 border-b border-[#3a291d] lg:grid-cols-[minmax(0,1fr),18rem]">
+            <div className="p-6 sm:p-7">
+              <p className={picoClasses.label}>Command brief</p>
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[#fff4e6] sm:text-5xl">
+                Read the runtime before you trust the automation
+              </h2>
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-[#d5c0a8] sm:text-base">
+                Autopilot only earns trust when the last run, the live spend, and the risky actions are visible in one surface. This page should feel like a control room, not a dashboard collage.
+              </p>
 
-      <section className="mt-6 grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
+              <div className={picoEmber('mt-6 p-5')}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={picoClasses.chip}>{loadStateLabel}</span>
+                  <span className={picoClasses.chip}>
+                    {authRequired ? 'Hosted session required' : 'Live control-plane feed'}
+                  </span>
+                  <span className={picoClasses.chip}>
+                    {progress.autopilot.approvalGateEnabled ? 'Gate configured in Pico' : 'Gate still off in Pico'}
+                  </span>
+                </div>
+                <p className="mt-4 text-sm leading-7 text-[#f0deca]">
+                  {authRequired
+                    ? 'Until a MUTX session is attached, this surface should refuse to invent truth. Use the academy to finish the setup path, then come back to read the real runtime.'
+                    : latestRun
+                      ? `Latest run ${latestRun.id.slice(0, 8)} is ${humanizeRunStatus(latestRun.status).toLowerCase()}${latestRunTimestamp ? ` as of ${formatTimestamp(latestRunTimestamp)}` : ''}. ${describeRunDetail(latestRun, latestRunTraces)}`
+                      : 'No live run is visible yet. The next honest move is to finish the academy path, trigger one real task, and return here only once the runtime has something to say.'}
+                </p>
+              </div>
+
+              <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                <div className={picoInset('p-5')}>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
+                    01 Inspect first
+                  </p>
+                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                    Start with the last run
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                    If the latest execution does not make sense, the rest of this surface is just decoration.
+                  </p>
+                  <Link href="#recent-runs" className={cn(picoClasses.link, 'mt-4 inline-flex')}>
+                    Open recent runs
+                  </Link>
+                </div>
+
+                <div className={picoInset('p-5')}>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
+                    02 Hold the line
+                  </p>
+                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                    Budget tells you when to stop
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                    Thresholds are useful only when they are anchored to live spend rather than gut feel.
+                  </p>
+                  <Link href="#budget-section" className={cn(picoClasses.link, 'mt-4 inline-flex')}>
+                    Tune spend guardrail
+                  </Link>
+                </div>
+
+                <div className={picoInset('p-5')}>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
+                    03 Gate risk
+                  </p>
+                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                    Risky actions stay visible
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                    Approvals should survive restarts, stay reviewable, and read like real decisions.
+                  </p>
+                  <Link href="#approvals-section" className={cn(picoClasses.link, 'mt-4 inline-flex')}>
+                    Open approval queue
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-[#3a291d] bg-[rgba(255,247,235,0.03)] p-6 lg:border-l lg:border-t-0">
+              <p className={picoClasses.label}>Operator rail</p>
+              <div className="mt-4 grid gap-3">
+                <div className={picoSoft('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Session status</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                    {authRequired ? 'auth required' : 'attached'}
+                  </p>
+                </div>
+                <div className={picoSoft('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Progress sync</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">{syncState}</p>
+                </div>
+                <div className={picoSoft('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Budget line</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                    {formatPercent(progress.autopilot.costThresholdPercent)}
+                  </p>
+                </div>
+                <div className={picoSoft('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Gate state</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                    {progress.autopilot.approvalGateEnabled ? 'enabled' : 'off'}
+                  </p>
+                </div>
+                <div className={picoSoft('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Active surface</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                    {progress.platform.activeSurface ?? 'none'}
+                  </p>
+                </div>
+                <div className={picoSoft('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Help lane</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                    {progress.platform.helpLaneOpen ? 'open' : 'closed'}
+                  </p>
+                </div>
+              </div>
+
+              <div className={picoInset('mt-4 p-4')}>
+                <p className={picoClasses.label}>Jump to subsystem</p>
+                <div className="mt-3 grid gap-2">
+                  <Link href="#timeline-section" className={picoClasses.secondaryButton}>
+                    Timeline
+                  </Link>
+                  <Link href="#recent-runs" className={picoClasses.tertiaryButton}>
+                    Recent runs
+                  </Link>
+                  <Link href="#alerts-section" className={picoClasses.tertiaryButton}>
+                    Alerts
+                  </Link>
+                  <Link href="#approvals-section" className={picoClasses.tertiaryButton}>
+                    Approval queue
+                  </Link>
+                </div>
+              </div>
+
+              <div className={picoInset('mt-4 p-4')}>
+                <p className={picoClasses.label}>If the feed is empty</p>
+                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                  Do not dress up missing runtime data. Finish the academy path, trigger one real action, and come back only when MUTX has something to report.
+                </p>
+                <Link
+                  href={derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy')}
+                  className={cn(picoClasses.secondaryButton, 'mt-4')}
+                >
+                  {derived.nextLesson ? `Open ${derived.nextLesson.title}` : 'Return to academy'}
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 border-t border-[#3a291d] p-6 md:grid-cols-2 xl:grid-cols-5">
+            <StatCard
+              label="Runs"
+              value={liveValue(String(runs.length))}
+              hint={liveHint(
+                !integrationStatus.hasLiveAgent
+                  ? 'No agent is connected to MUTX yet.'
+                  : runs.length > 0
+                    ? 'Recent executions pulled from MUTX.'
+                    : 'An agent exists, but no run has landed yet.',
+                'Sign in to read live run history.',
+              )}
+            />
+            <StatCard
+              label="Failures"
+              value={liveValue(String(failedRuns.length))}
+              hint={liveHint(
+                failedRuns.length > 0
+                  ? 'Failures are visible here. Good. Hidden failures are worse.'
+                  : 'No failed runs in the current window.',
+                'Sign in to see failed run count.',
+              )}
+            />
+            <StatCard
+              label="Alerts"
+              value={liveValue(String(alerts.filter((alert) => !alert.resolved).length))}
+              hint={liveHint(
+                alerts.some((alert) => !alert.resolved)
+                  ? 'Unresolved operator pain from the monitoring feed.'
+                  : integrationStatus.hasRuns
+                    ? 'No unresolved alerts right now.'
+                    : 'No alerts yet because nothing has executed.',
+                'Sign in to read live alerts.',
+              )}
+            />
+            <StatCard
+              label="Budget"
+              value={liveValue(budget ? formatPercent(budget.usage_percentage) : '--')}
+              hint={liveHint(
+                !integrationStatus.hasBudget
+                  ? 'No live budget snapshot returned yet.'
+                  : integrationStatus.hasUsage
+                    ? `${formatPercent(progress.autopilot.costThresholdPercent)} threshold against live spend.`
+                    : 'Budget exists, but usage is empty in the current window.',
+                'Sign in to read budget usage.',
+              )}
+            />
+            <StatCard
+              label="Approvals"
+              value={liveValue(String(pendingApprovals.length))}
+              hint={liveHint(
+                pendingApprovals.length > 0
+                  ? 'Pending risky actions are waiting for a human call.'
+                  : integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured
+                    ? 'Approval history exists, but Pico gate is still off locally.'
+                    : 'No risky actions are blocked right now.',
+                'Sign in to see live approvals.',
+              )}
+            />
+          </div>
+        </div>
+
+        <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
+          <section className={picoPanel('p-5')}>
+            <p className={picoClasses.label}>Control rules</p>
+            <div className="mt-4 grid gap-3">
+              <div className={picoInset('p-4')}>
+                <p className="font-medium text-[#fff4e6]">Runs before rules</p>
+                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                  Do not configure alerts and approvals around a workflow you have not inspected live.
+                </p>
+              </div>
+              <div className={picoInset('p-4')}>
+                <p className="font-medium text-[#fff4e6]">Thresholds before panic</p>
+                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                  Budget lines should explain what cost you are willing to tolerate before a human gets involved.
+                </p>
+              </div>
+              <div className={picoInset('p-4')}>
+                <p className="font-medium text-[#fff4e6]">Gates before damage</p>
+                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                  The approval queue exists so risky actions stay reversible and reviewable.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className={picoPanel('p-5')}>
+            <p className={picoClasses.label}>Current posture</p>
+            <div className="mt-4 grid gap-3">
+              <div className={picoSoft('p-4')}>
+                <p className="text-sm text-[#a8896e]">Latest run</p>
+                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  {authRequired
+                    ? 'unavailable'
+                    : latestRun
+                      ? humanizeRunStatus(latestRun.status).toLowerCase()
+                      : 'none yet'}
+                </p>
+              </div>
+              <div className={picoSoft('p-4')}>
+                <p className="text-sm text-[#a8896e]">Threshold breach</p>
+                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  {thresholdBreached ? 'breached' : 'clear'}
+                </p>
+              </div>
+              <div className={picoSoft('p-4')}>
+                <p className="text-sm text-[#a8896e]">Last breach marker</p>
+                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  {progress.autopilot.lastThresholdBreachAt
+                    ? formatTimestamp(progress.autopilot.lastThresholdBreachAt)
+                    : 'not recorded'}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {derived.nextLesson ? (
+            <section className={picoPanel('p-5')} data-testid="pico-autopilot-academy-context">
+              <p className={picoClasses.label}>Academy context</p>
+              <div className="mt-4 grid gap-3">
+                <div className={picoInset('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Recovery lesson</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">{derived.nextLesson.title}</p>
+                </div>
+                <div className={picoInset('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Workspace progress</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                    {recoveryWorkspace.completedStepCount}/{derived.nextLesson.steps.length}
+                  </p>
+                </div>
+                <div className={picoInset('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Focused step</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">{recoveryFocusedStep}</p>
+                </div>
+                <div className={picoInset('p-4')}>
+                  <p className="text-sm text-[#a8896e]">Proof state</p>
+                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                    {recoveryWorkspace.workspace.evidence.trim() ? 'captured' : 'missing'}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-[#d5c0a8]">
+                If this academy context is still incomplete, the lesson lane probably remains the real source of truth. Stay in Autopilot only when the live runtime is what actually broke next.
+              </p>
+            </section>
+          ) : null}
+
+          <section className={picoPanel('p-5')}>
+            <p className={picoClasses.label}>Route correction</p>
+            <div className="mt-4 grid gap-3">
+              <Link
+                href={derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy')}
+                className={picoClasses.secondaryButton}
+              >
+                {derived.nextLesson ? `Open ${derived.nextLesson.title}` : 'Return to academy'}
+              </Link>
+              <Link
+                href={toHref(`/tutor${derived.nextLesson ? `?lesson=${derived.nextLesson.slug}` : ''}`)}
+                className={picoClasses.tertiaryButton}
+              >
+                Ask tutor about the next move
+              </Link>
+              <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
+                Escalate to human help
+              </Link>
+            </div>
+            <div className={picoSoft('mt-4 p-4')}>
+              <p className={picoClasses.body}>
+                Stay here when the runtime is the source of truth. Go back to the academy when setup or the lesson workspace is still incomplete, use tutor when the next action is still probably documented, and escalate only when the live state stops being operable.
+              </p>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
         <div className="space-y-6">
           <div id="timeline-section" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Activity timeline</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">What happened, when, and why it matters</h2>
+                <p className={picoClasses.label}>Activity timeline</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+                  What happened, when, and why it matters
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                  This is the operator narrative. If the timeline is empty, the correct answer is that nothing meaningful has happened yet.
+                </p>
               </div>
-              <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-300">
-                {loadStateLabel}
-              </span>
+              <span className={picoClasses.chip}>{loadStateLabel}</span>
             </div>
             <div className="mt-5 space-y-4">
               {authRequired ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
                   No timeline without live control-plane access. That is the honest answer.
                 </div>
               ) : timeline.length === 0 ? (
@@ -560,23 +976,25 @@ export function PicoAutopilotPageClient() {
           <div id="recent-runs" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Runs</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Recent execution history</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
+                <p className={picoClasses.label}>Runs</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+                  Recent execution history
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
                   Start here. Read the latest run before you touch thresholds or approvals.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => void load()}
-                className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+                className={picoClasses.secondaryButton}
               >
                 Refresh live data
               </button>
             </div>
             <div className="mt-5 space-y-4">
               {authRequired ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
                   Sign in, then come back here to inspect the first real run.
                 </div>
               ) : runs.length === 0 ? (
@@ -585,23 +1003,29 @@ export function PicoAutopilotPageClient() {
                 runs.map((run) => {
                   const severity = getRunSeverity(run.status)
                   const traces = tracesByRunId[run.id] ?? []
+                  const runTimestamp = run.completed_at ?? run.started_at ?? run.created_at
+
                   return (
                     <article key={run.id} className={`rounded-[24px] border p-5 ${severityClasses(severity)}`}>
-                      <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <p className="text-xs uppercase tracking-[0.18em]">{humanizeRunStatus(run.status)}</p>
-                          <h3 className="mt-2 text-lg font-semibold text-white">Run {run.id.slice(0, 8)}</h3>
+                          <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                            Run {run.id.slice(0, 8)}
+                          </h3>
                         </div>
-                        <div className="text-right text-xs uppercase tracking-[0.18em] text-slate-300">
-                          <p>{formatTimestamp(run.completed_at ?? run.started_at ?? run.created_at)}</p>
-                          <p className="mt-1">{formatRelativeTime(run.completed_at ?? run.started_at ?? run.created_at)}</p>
+                        <div className="text-right text-xs uppercase tracking-[0.18em] text-[#d5c0a8]">
+                          <p>{formatTimestamp(runTimestamp)}</p>
+                          <p className="mt-1">{formatRelativeTime(runTimestamp)}</p>
                         </div>
                       </div>
-                      <p className="mt-4 text-sm leading-6">{describeRunDetail(run, traces)}</p>
-                      <div className="mt-4 grid gap-3 text-sm text-slate-300 md:grid-cols-2">
-                        <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
-                          <p className="font-medium text-white">Why it matters</p>
-                          <p className="mt-2">
+
+                      <p className="mt-4 text-sm leading-7">{describeRunDetail(run, traces)}</p>
+
+                      <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr),18rem]">
+                        <div className={picoInset('p-4')}>
+                          <p className={picoClasses.label}>Operator read</p>
+                          <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
                             {['FAILED', 'ERROR', 'CANCELLED'].includes(run.status.toUpperCase())
                               ? 'This job failed. If the agent is still trusted, it should be because you understand this failure.'
                               : ['RUNNING', 'QUEUED', 'PENDING'].includes(run.status.toUpperCase())
@@ -609,28 +1033,42 @@ export function PicoAutopilotPageClient() {
                                 : 'The job finished. Now verify the output is useful, not just technically complete.'}
                           </p>
                         </div>
-                        <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
-                          <p className="font-medium text-white">Trace signals</p>
-                          {traces.length === 0 ? (
-                            <p className="mt-2">No run traces were returned for this run.</p>
-                          ) : (
-                            <div className="mt-2 space-y-2">
-                              {[...traces].slice(-3).reverse().map((trace) => (
-                                <div key={`${trace.run_id}-${trace.sequence ?? trace.timestamp ?? trace.event_type}`} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
-                                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{trace.event_type}</p>
-                                  <p className="mt-1">{trace.message}</p>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+
+                        <div className={picoInset('p-4')}>
+                          <p className={picoClasses.label}>Run facts</p>
+                          <div className="mt-3 grid gap-2 text-sm text-[#d5c0a8]">
+                            <p>Agent: {run.agent_id ?? 'unknown'}</p>
+                            <p>Trace count: {run.trace_count ?? traces.length}</p>
+                            <p>
+                              {run.started_at
+                                ? `Started ${formatTimestamp(run.started_at)}`
+                                : 'Start time unavailable'}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                      <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                        <span className="text-slate-300">Agent: {run.agent_id ?? 'unknown'}</span>
-                        <span className="text-slate-300">Trace count: {run.trace_count ?? traces.length}</span>
-                        <span className="text-slate-300">
-                          {run.started_at ? `Started ${formatTimestamp(run.started_at)}` : 'Start time unavailable'}
-                        </span>
+
+                      <div className={picoInset('mt-4 p-4')}>
+                        <p className={picoClasses.label}>Trace signals</p>
+                        {traces.length === 0 ? (
+                          <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                            No run traces were returned for this run.
+                          </p>
+                        ) : (
+                          <div className="mt-3 grid gap-2">
+                            {[...traces].slice(-3).reverse().map((trace) => (
+                              <div
+                                key={`${trace.run_id}-${trace.sequence ?? trace.timestamp ?? trace.event_type}`}
+                                className={picoSoft('px-4 py-3')}
+                              >
+                                <p className="text-xs uppercase tracking-[0.16em] text-[#b09376]">
+                                  {trace.event_type}
+                                </p>
+                                <p className="mt-1 text-sm leading-6 text-[#d5c0a8]">{trace.message}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </article>
                   )
@@ -640,15 +1078,27 @@ export function PicoAutopilotPageClient() {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <div id="budget-section" className={sectionClasses()}>
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Budget</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Live spend and your line in the sand</h2>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Usage</p>
-                <p className="mt-3 text-3xl font-semibold text-white">{authRequired ? '--' : budget ? formatPercent(budget.usage_percentage) : '--'}</p>
-                <p className="mt-2">
+            <p className={picoClasses.label}>Budget</p>
+            <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+              Live spend and your line in the sand
+            </h2>
+
+            <div className="mt-5 grid gap-4">
+              <div className={picoInset('p-5')}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className={picoClasses.label}>Usage</p>
+                    <p className="mt-3 font-[family:var(--font-site-display)] text-5xl tracking-[-0.06em] text-[#fff4e6]">
+                      {authRequired ? '--' : budget ? formatPercent(budget.usage_percentage) : '--'}
+                    </p>
+                  </div>
+                  <span className={picoClasses.chip}>
+                    {thresholdBreached ? 'above threshold' : 'within threshold'}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
                   {authRequired
                     ? 'Live budget requires authentication.'
                     : budget
@@ -656,226 +1106,362 @@ export function PicoAutopilotPageClient() {
                       : 'No live budget snapshot returned.'}
                 </p>
               </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Threshold</p>
-                <p className="mt-3 text-3xl font-semibold text-white">{formatPercent(progress.autopilot.costThresholdPercent)}</p>
-                <p className="mt-2">Stored through Pico progress sync: {syncState}</p>
-              </div>
-            </div>
 
-            <div className="mt-5 rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5">
-              <label className="block text-sm text-slate-300">
-                <span className="block text-xs uppercase tracking-[0.24em] text-slate-500">Cost threshold percent</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={thresholdDraft}
-                  onChange={(event) => {
-                    setError(null)
-                    setThresholdDraft(Number(event.target.value))
-                  }}
-                  className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-100 outline-none"
-                />
-              </label>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={saveThreshold}
-                  disabled={Boolean(thresholdValidationError)}
-                  className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Save threshold
-                </button>
-              </div>
-              <p className="mt-4 text-sm leading-6 text-slate-300">
-                Pico stores the threshold here. Actual alert delivery still follows the real MUTX monitoring setup, so this surface does not pretend email or webhook routing is active when it is not.
-              </p>
-              {thresholdValidationError ? (
-                <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-50">
-                  {thresholdValidationError}
-                </div>
-              ) : null}
-              {thresholdBreached ? (
-                <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50">
-                  Threshold breached. Live usage is above the limit you configured.
-                </div>
-              ) : null}
-            </div>
+              <div className={picoSoft('p-5')}>
+                <p className={picoClasses.label}>Threshold</p>
+                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                  Pico stores the local budget line here. Real alert delivery still follows the live MUTX monitoring setup, so this surface refuses to pretend email or webhook routing is active when it is not.
+                </p>
 
-            <div className="mt-5 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
-                <p className="font-medium text-white">Top spenders</p>
-                <div className="mt-3 space-y-2">
-                  {authRequired ? (
-                    <p>Sign in to read the usage breakdown.</p>
-                  ) : usage?.usage_by_agent.length ? (
-                    usage.usage_by_agent.slice(0, 3).map((item) => (
-                      <div key={`${item.agent_id}-${item.agent_name}`} className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3">
-                        <p className="font-medium text-white">{item.agent_name}</p>
-                        <p className="mt-1">{item.credits_used} credits across {item.event_count} events</p>
-                      </div>
-                    ))
-                  ) : (
-                    <EmptyStatePanel state={usageEmptyState} />
-                  )}
+                <label className="mt-4 block text-sm text-[#d5c0a8]">
+                  <span className="block text-xs uppercase tracking-[0.24em] text-[#a8896e]">
+                    Cost threshold percent
+                  </span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={thresholdDraft}
+                    onChange={(event) => {
+                      setError(null)
+                      setThresholdDraft(Number(event.target.value))
+                    }}
+                    className="mt-3 w-full rounded-2xl border border-[#4a3423] bg-[rgba(255,247,235,0.04)] px-4 py-3 text-sm text-[#fff4e6] outline-none"
+                  />
+                </label>
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={saveThreshold}
+                    disabled={Boolean(thresholdValidationError)}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2904f] px-4 py-2 text-sm font-semibold text-[#21130c] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Save threshold
+                  </button>
+                  <span className={picoClasses.chip}>sync {syncState}</span>
                 </div>
+
+                {thresholdValidationError ? (
+                  <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-50">
+                    {thresholdValidationError}
+                  </div>
+                ) : null}
+                {thresholdBreached ? (
+                  <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50">
+                    Threshold breached. Live usage is above the limit you configured.
+                  </div>
+                ) : null}
               </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
-                <p className="font-medium text-white">Usage drivers</p>
-                <div className="mt-3 space-y-2">
-                  {authRequired ? (
-                    <p>Sign in to read the usage breakdown.</p>
-                  ) : usage?.usage_by_type.length ? (
-                    usage.usage_by_type.slice(0, 3).map((item) => (
-                      <div key={item.event_type} className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3">
-                        <p className="font-medium text-white">{item.event_type}</p>
-                        <p className="mt-1">{item.credits_used} credits across {item.event_count} events</p>
-                      </div>
-                    ))
-                  ) : (
-                    <EmptyStatePanel state={usageEmptyState} />
-                  )}
+
+              <div className="grid gap-4">
+                <div className={picoInset('p-4')}>
+                  <p className={picoClasses.label}>Top spenders</p>
+                  <div className="mt-3 grid gap-2">
+                    {authRequired ? (
+                      <p className="text-sm leading-6 text-[#d5c0a8]">Sign in to read the usage breakdown.</p>
+                    ) : usage?.usage_by_agent.length ? (
+                      usage.usage_by_agent.slice(0, 3).map((item) => (
+                        <div key={`${item.agent_id}-${item.agent_name}`} className={picoSoft('px-4 py-3')}>
+                          <p className="font-medium text-[#fff4e6]">{item.agent_name}</p>
+                          <p className="mt-1 text-sm leading-6 text-[#d5c0a8]">
+                            {item.credits_used} credits across {item.event_count} events
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <EmptyStatePanel state={usageEmptyState} />
+                    )}
+                  </div>
+                </div>
+
+                <div className={picoInset('p-4')}>
+                  <p className={picoClasses.label}>Usage drivers</p>
+                  <div className="mt-3 grid gap-2">
+                    {authRequired ? (
+                      <p className="text-sm leading-6 text-[#d5c0a8]">Sign in to read the usage breakdown.</p>
+                    ) : usage?.usage_by_type.length ? (
+                      usage.usage_by_type.slice(0, 3).map((item) => (
+                        <div key={item.event_type} className={picoSoft('px-4 py-3')}>
+                          <p className="font-medium text-[#fff4e6]">{item.event_type}</p>
+                          <p className="mt-1 text-sm leading-6 text-[#d5c0a8]">
+                            {item.credits_used} credits across {item.event_count} events
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <EmptyStatePanel state={usageEmptyState} />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div id="alerts-section" className={sectionClasses()}>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Alerts</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Meaningful monitoring events</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
-                  This is the live alert feed. No fake warning badges, no synthetic incidents.
-                </p>
-              </div>
-            </div>
+            <p className={picoClasses.label}>Alerts</p>
+            <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+              Meaningful monitoring events
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+              This is the live alert feed. No fake warning badges, no synthetic incidents.
+            </p>
+
             <div className="mt-5 space-y-4">
               {authRequired ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
                   Sign in to load live alerts.
                 </div>
               ) : alerts.length === 0 ? (
                 <EmptyStatePanel state={alertsEmptyState} />
               ) : (
                 alerts.map((alert) => (
-                  <article key={alert.id} className={`rounded-[24px] border p-5 ${severityClasses(alert.resolved ? 'good' : 'critical')}`}>
+                  <article
+                    key={alert.id}
+                    className={`rounded-[24px] border p-5 ${severityClasses(alert.resolved ? 'good' : 'critical')}`}
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="text-xs uppercase tracking-[0.18em]">{alert.type}</p>
-                        <h3 className="mt-2 text-lg font-semibold text-white">{alert.resolved ? 'Resolved alert' : 'Active alert'}</h3>
+                        <h3 className="mt-2 text-lg font-semibold text-[#fff4e6]">
+                          {alert.resolved ? 'Resolved alert' : 'Active alert'}
+                        </h3>
                       </div>
-                      <div className="text-right text-xs uppercase tracking-[0.18em] text-slate-300">
+                      <div className="text-right text-xs uppercase tracking-[0.18em] text-[#d5c0a8]">
                         <p>{formatTimestamp(alert.resolved_at ?? alert.created_at)}</p>
                         <p className="mt-1">{formatRelativeTime(alert.resolved_at ?? alert.created_at)}</p>
                       </div>
                     </div>
                     <p className="mt-4 text-sm leading-6">{alert.message}</p>
-                    <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-300">
+                    <div className="mt-3 flex flex-wrap gap-4 text-sm text-[#d5c0a8]">
                       <span>Agent: {alert.agent_id}</span>
                       <span>{alert.resolved ? 'Resolved' : 'Still active'}</span>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainAlertImpact(alert)}</p>
+                    <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                      Why it matters: {explainAlertImpact(alert)}
+                    </p>
                   </article>
                 ))
               )}
             </div>
           </div>
+        </aside>
+      </section>
 
-          <div id="approvals-section" className={sectionClasses()}>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approvals</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Risky actions and their decisions</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
-                  This queue is now the approval source of truth for Pico. It should not disappear because a process restarted.
+      <section id="approvals-section" className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
+        <div className={sectionClasses()}>
+          <p className={picoClasses.label}>Approvals</p>
+          <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+            Risky actions and their decisions
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+            This queue is now the approval source of truth for Pico. It should not disappear because a process restarted.
+          </p>
+
+          <div className="mt-5 space-y-4">
+            {authRequired ? (
+              <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
+                Sign in to load live approval requests.
+              </div>
+            ) : (
+              <>
+                <div className={picoInset('grid gap-4 p-5')}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className={picoClasses.label}>Create a gated action</p>
+                      <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                        Use this to exercise the live approval queue from Pico instead of waiting for another surface to create the request first.
+                      </p>
+                    </div>
+                    <span className={picoClasses.chip}>live queue write</span>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className="grid gap-2 text-sm text-[#d5c0a8]">
+                      <span className={picoClasses.label}>Agent ID</span>
+                      <input
+                        value={approvalDraft.agentId}
+                        onChange={(event) =>
+                          setApprovalDraft((current) => ({ ...current, agentId: event.target.value }))
+                        }
+                        className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
+                        placeholder="agent-founder-lab"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-sm text-[#d5c0a8]">
+                      <span className={picoClasses.label}>Session or run ID</span>
+                      <input
+                        value={approvalDraft.sessionId}
+                        onChange={(event) =>
+                          setApprovalDraft((current) => ({ ...current, sessionId: event.target.value }))
+                        }
+                        className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
+                        placeholder="ses-pico-approval"
+                      />
+                    </label>
+                  </div>
+
+                  <label className="grid gap-2 text-sm text-[#d5c0a8]">
+                    <span className={picoClasses.label}>Action type</span>
+                    <input
+                      value={approvalDraft.actionType}
+                      onChange={(event) =>
+                        setApprovalDraft((current) => ({ ...current, actionType: event.target.value }))
+                      }
+                      className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
+                      placeholder="OUTBOUND_SEND"
+                    />
+                  </label>
+
+                  <label className="grid gap-2 text-sm text-[#d5c0a8]">
+                    <span className={picoClasses.label}>Why this action needs a gate</span>
+                    <textarea
+                      value={approvalDraft.summary}
+                      onChange={(event) =>
+                        setApprovalDraft((current) => ({ ...current, summary: event.target.value }))
+                      }
+                      rows={4}
+                      className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
+                      placeholder="Describe the risky action clearly."
+                    />
+                  </label>
+
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() => void createApprovalRequest()}
+                      disabled={creatingApproval}
+                      className={picoClasses.primaryButton}
+                    >
+                      {creatingApproval ? 'Creating request...' : 'Create approval request'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setApprovalDraft({
+                          agentId: latestRun?.agent_id || 'agent-founder-lab',
+                          sessionId: latestRun?.id || 'ses-pico-approval',
+                          actionType: 'OUTBOUND_SEND',
+                          summary:
+                            'Outbound send requires a human decision before the runtime crosses the line.',
+                        })
+                      }
+                      className={picoClasses.secondaryButton}
+                    >
+                      Reset draft
+                    </button>
+                  </div>
+                </div>
+
+                {pendingApprovals.length === 0 && resolvedApprovals.length === 0 ? (
+                  <EmptyStatePanel state={approvalsEmptyState} />
+                ) : null}
+
+                {integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured ? (
+                  <div className="rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm leading-6 text-amber-50">
+                    Approval records already exist in MUTX, but Pico still shows the gate as off locally. Turn on the gate here so the product state matches the control-plane reality.
+                  </div>
+                ) : null}
+
+                {pendingApprovals.map((approval) => (
+                  <article key={approval.id} className={`rounded-[24px] border p-5 ${severityClasses('warn')}`}>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em]">Pending</p>
+                        <h3 className="mt-2 text-lg font-semibold text-[#fff4e6]">{approval.action_type}</h3>
+                      </div>
+                      <div className="text-right text-xs uppercase tracking-[0.18em] text-[#d5c0a8]">
+                        <p>{formatTimestamp(approval.created_at)}</p>
+                        <p className="mt-1">{formatRelativeTime(approval.created_at)}</p>
+                      </div>
+                    </div>
+                    <p className="mt-4 text-sm leading-6">
+                      {typeof approval.payload?.summary === 'string'
+                        ? approval.payload.summary
+                        : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                      Why it matters: {explainApprovalImpact(approval)}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => void resolveApproval(approval.id, 'approve')}
+                        disabled={resolvingApprovalId === approval.id}
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2904f] px-4 py-2 text-sm font-semibold text-[#21130c] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {resolvingApprovalId === approval.id ? 'Working...' : 'Approve'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void resolveApproval(approval.id, 'reject')}
+                        disabled={resolvingApprovalId === approval.id}
+                        className="rounded-full border border-[#4a3423] px-4 py-2 text-sm font-medium text-[#efe1cf] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {resolvingApprovalId === approval.id ? 'Working...' : 'Reject'}
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+
+        <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
+          <section className={picoPanel('p-5')}>
+            <p className={picoClasses.label}>Gate status</p>
+            <div className="mt-4 grid gap-3">
+              <div className={picoSoft('p-4')}>
+                <p className="text-sm text-[#a8896e]">Pending actions</p>
+                <p className="mt-1 text-2xl font-semibold text-[#fff4e6]">{liveValue(String(pendingApprovals.length))}</p>
+              </div>
+              <div className={picoSoft('p-4')}>
+                <p className="text-sm text-[#a8896e]">Decision history</p>
+                <p className="mt-1 text-2xl font-semibold text-[#fff4e6]">{liveValue(String(resolvedApprovals.length))}</p>
+              </div>
+              <div className={picoSoft('p-4')}>
+                <p className="text-sm text-[#a8896e]">Configured locally</p>
+                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  {progress.autopilot.approvalGateEnabled ? 'yes' : 'no'}
                 </p>
               </div>
             </div>
-            <div className="mt-5 space-y-4">
-              {authRequired ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  Sign in to load live approval requests.
-                </div>
-              ) : pendingApprovals.length === 0 && resolvedApprovals.length === 0 ? (
-                <EmptyStatePanel state={approvalsEmptyState} />
-              ) : (
-                <>
-                  {integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured ? (
-                    <div className="rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm leading-6 text-amber-50">
-                      Approval records already exist in MUTX, but Pico still shows the gate as off locally. Turn on the gate here so the product state matches the control-plane reality.
-                    </div>
-                  ) : null}
-                  {pendingApprovals.map((approval) => (
-                    <article key={approval.id} className={`rounded-[24px] border p-5 ${severityClasses('warn')}`}>
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.18em]">Pending</p>
-                          <h3 className="mt-2 text-lg font-semibold text-white">{approval.action_type}</h3>
-                        </div>
-                        <div className="text-right text-xs uppercase tracking-[0.18em] text-slate-300">
-                          <p>{formatTimestamp(approval.created_at)}</p>
-                          <p className="mt-1">{formatRelativeTime(approval.created_at)}</p>
-                        </div>
-                      </div>
-                      <p className="mt-4 text-sm leading-6">
-                        {typeof approval.payload?.summary === 'string'
-                          ? approval.payload.summary
-                          : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainApprovalImpact(approval)}</p>
-                      <div className="mt-4 flex flex-wrap gap-3">
-                        <button
-                          type="button"
-                          onClick={() => void resolveApproval(approval.id, 'approve')}
-                          disabled={resolvingApprovalId === approval.id}
-                          className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {resolvingApprovalId === approval.id ? 'Working...' : 'Approve'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void resolveApproval(approval.id, 'reject')}
-                          disabled={resolvingApprovalId === approval.id}
-                          className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {resolvingApprovalId === approval.id ? 'Working...' : 'Reject'}
-                        </button>
-                      </div>
-                    </article>
-                  ))}
+          </section>
 
-                  {resolvedApprovals.map((approval) => (
-                    <article key={approval.id} className={`rounded-[24px] border p-5 ${severityClasses(approval.status === 'APPROVED' ? 'good' : 'critical')}`}>
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.18em]">{approval.status}</p>
-                          <h3 className="mt-2 text-lg font-semibold text-white">{approval.action_type}</h3>
-                        </div>
-                        <div className="text-right text-xs uppercase tracking-[0.18em] text-slate-300">
-                          <p>{formatTimestamp(approval.resolved_at ?? approval.created_at)}</p>
-                          <p className="mt-1">{formatRelativeTime(approval.resolved_at ?? approval.created_at)}</p>
-                        </div>
+          {resolvedApprovals.length ? (
+            <section className={picoPanel('p-5')}>
+              <p className={picoClasses.label}>Recent decisions</p>
+              <div className="mt-4 grid gap-3">
+                {resolvedApprovals.map((approval) => (
+                  <article
+                    key={approval.id}
+                    className={`rounded-[24px] border p-4 ${severityClasses(approval.status === 'APPROVED' ? 'good' : 'critical')}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em]">{approval.status}</p>
+                        <h3 className="mt-2 text-base font-semibold text-[#fff4e6]">{approval.action_type}</h3>
                       </div>
-                      <p className="mt-4 text-sm leading-6">
-                        {typeof approval.payload?.summary === 'string'
-                          ? approval.payload.summary
-                          : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-300">
-                        <span>Agent: {approval.agent_id}</span>
-                        <span>Requester: {approval.requester}</span>
-                        <span>Approver: {approval.approver ?? 'unknown'}</span>
-                      </div>
-                      <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainApprovalImpact(approval)}</p>
-                    </article>
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+                      <span className={picoClasses.chip}>
+                        {formatRelativeTime(approval.resolved_at ?? approval.created_at)}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-sm leading-6">
+                      {typeof approval.payload?.summary === 'string'
+                        ? approval.payload.summary
+                        : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                      Why it matters: {explainApprovalImpact(approval)}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </aside>
       </section>
     </PicoShell>
   )

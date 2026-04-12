@@ -9,6 +9,7 @@ import {
   getRunsEmptyState,
   getUsageEmptyState,
 } from '../../components/pico/picoAutopilot'
+import { applyMilestone, createDefaultPicoProgress, updateAutopilotSettings } from '../../lib/pico/academy'
 
 describe('pico autopilot helpers', () => {
   const expectEmptyStateTitle = (state: { title?: string }, pattern: RegExp) => {
@@ -219,5 +220,33 @@ describe('pico autopilot helpers', () => {
     })
 
     expect(getApprovalsEmptyState(status, { label: 'Configure gate', href: '/pico/academy/add-an-approval-gate' }).title).toMatch(/gate is off/i)
+  })
+
+  it('unlocks the approval gate milestone when the local gate is enabled after a real resolution', () => {
+    const progress = applyMilestone(
+      updateAutopilotSettings(createDefaultPicoProgress(), { approvalGateEnabled: true }),
+      'first_approval_gate_enabled',
+    )
+
+    const status = analyzeAutopilotIntegration({
+      runs: [],
+      alerts: [],
+      approvals: [
+        {
+          id: 'approval-5',
+          agent_id: 'agent-1',
+          action_type: 'outbound_message_send',
+          status: 'APPROVED',
+          requester: 'operator@mutx.dev',
+          created_at: '2026-04-11T01:20:00.000Z',
+        },
+      ],
+      budget: null,
+      usage: null,
+      approvalGateConfigured: progress.autopilot.approvalGateEnabled,
+    })
+
+    expect(progress.milestoneEvents).toContain('first_approval_gate_enabled')
+    expect(getApprovalsEmptyState(status, { label: 'Configure gate', href: '/pico/academy/add-an-approval-gate' }).title).not.toMatch(/gate is off/i)
   })
 })

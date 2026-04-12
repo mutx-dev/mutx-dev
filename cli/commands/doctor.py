@@ -8,6 +8,11 @@ from cli.openclaw_runtime import collect_openclaw_runtime_snapshot, get_gateway_
 from cli.services import AssistantService, AuthService, CLIServiceError, RuntimeStateService
 from cli.setup_wizard import prepare_runtime_state_sync
 
+try:
+    from src.api.services.document_engine import get_document_engine_readiness
+except Exception:  # noqa: BLE001
+    get_document_engine_readiness = None
+
 
 @click.command(name="doctor")
 @click.option("--output", type=click.Choice(["table", "json"]), default="table")
@@ -25,6 +30,19 @@ def doctor_command(output: str):
         "api_health": "unreachable",
         "openclaw": get_gateway_health().to_payload(),
         "runtime_snapshot": collect_openclaw_runtime_snapshot().to_payload(),
+        "documents": (
+            get_document_engine_readiness().to_payload()
+            if callable(get_document_engine_readiness)
+            else {
+                "enabled": False,
+                "python_ok": False,
+                "predict_rlm_available": False,
+                "deno_available": False,
+                "ready": False,
+                "driver": "unavailable",
+                "artifacts_dir": None,
+            }
+        ),
         "user": None,
         "assistant": None,
     }
@@ -85,6 +103,14 @@ def doctor_command(output: str):
     click.echo(
         "Privacy: "
         f"{payload['runtime_snapshot']['privacy_summary'] or 'Local-only runtime tracking.'}"
+    )
+    click.echo(
+        "Documents: "
+        f"enabled={'yes' if payload['documents']['enabled'] else 'no'} | "
+        f"ready={'yes' if payload['documents']['ready'] else 'no'} | "
+        f"driver={payload['documents']['driver']} | "
+        f"deno={'yes' if payload['documents']['deno_available'] else 'no'} | "
+        f"predict_rlm={'yes' if payload['documents']['predict_rlm_available'] else 'no'}"
     )
     if payload["user"]:
         click.echo(

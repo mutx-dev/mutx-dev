@@ -774,6 +774,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/oauth/{provider}/authorize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Authorize Oauth */
+        get: operations["authorize_oauth_v1_auth_oauth__provider__authorize_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/oauth/{provider}/exchange": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Exchange Oauth Code */
+        post: operations["exchange_oauth_code_v1_auth_oauth__provider__exchange_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/sso/{provider}": {
         parameters: {
             query?: never;
@@ -4401,6 +4435,8 @@ export interface components {
              * Format: email
              */
             email: string;
+            /** Email Link Origin */
+            email_link_origin?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -5379,6 +5415,23 @@ export interface components {
          * @enum {string}
          */
         MutxStepType: "reasoning" | "tool_call" | "tool_result" | "message" | "error" | "handoff";
+        /** OAuthAuthorizeResponse */
+        OAuthAuthorizeResponse: {
+            /** Authorization Url */
+            authorization_url: string;
+        };
+        /** OAuthExchangeRequest */
+        OAuthExchangeRequest: {
+            /** Code */
+            code: string;
+            /** Redirect Uri */
+            redirect_uri: string;
+        };
+        /**
+         * OAuthProvider
+         * @enum {string}
+         */
+        OAuthProvider: "google" | "github" | "discord";
         /** OnboardingStateResponse */
         OnboardingStateResponse: {
             /**
@@ -5620,6 +5673,32 @@ export interface components {
             name: string;
             /** Password */
             password: string;
+            /** Verification Origin */
+            verification_origin?: string | null;
+        };
+        /** RegisterResponse */
+        RegisterResponse: {
+            /** Access Token */
+            access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
+            /** Expires In */
+            expires_in: number;
+            /**
+             * Verification Email Sent
+             * @default true
+             */
+            verification_email_sent: boolean;
+            /**
+             * Requires Email Verification
+             * @default false
+             */
+            requires_email_verification: boolean;
         };
         /** ResendVerificationRequest */
         ResendVerificationRequest: {
@@ -5628,6 +5707,8 @@ export interface components {
              * Format: email
              */
             email: string;
+            /** Verification Origin */
+            verification_origin?: string | null;
         };
         /** ResetPasswordRequest */
         ResetPasswordRequest: {
@@ -8117,7 +8198,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenResponse"];
+                    "application/json": components["schemas"]["RegisterResponse"];
                 };
             };
             /** @description Validation Error */
@@ -8415,6 +8496,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    authorize_oauth_v1_auth_oauth__provider__authorize_get: {
+        parameters: {
+            query: {
+                redirect_uri: string;
+                state: string;
+            };
+            header?: never;
+            path: {
+                provider: components["schemas"]["OAuthProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OAuthAuthorizeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exchange_oauth_code_v1_auth_oauth__provider__exchange_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: components["schemas"]["OAuthProvider"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OAuthExchangeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
                 };
             };
             /** @description Validation Error */

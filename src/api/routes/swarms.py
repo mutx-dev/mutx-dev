@@ -18,6 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import Agent, Deployment, Swarm, User
+from src.api.models.schemas import SwarmBlueprintResponse
+from src.api.services.assistant_control_plane import list_swarm_blueprints
 
 router = APIRouter(prefix="/swarms", tags=["swarms"])
 logger = logging.getLogger(__name__)
@@ -71,6 +73,14 @@ class SwarmResponse(BaseModel):
 class SwarmListResponse(BaseModel):
     items: list[SwarmResponse]
     total: int
+
+
+@router.get("/blueprints", response_model=list[SwarmBlueprintResponse])
+async def list_swarm_blueprint_catalog(
+    current_user: User = Depends(get_current_user),
+):
+    """List curated multi-agent orchestration blueprints sourced from Orchestra Research."""
+    return list_swarm_blueprints()
 
 
 # ------------------------------------------------------------------

@@ -31,8 +31,10 @@ class Settings(BaseSettings):
     cors_origins: list[str] | str = [
         "http://localhost:3000",
         "http://app.localhost:3000",
+        "http://pico.localhost:3000",
         "https://mutx.dev",
         "https://app.mutx.dev",
+        "https://pico.mutx.dev",
     ]
     allowed_hosts: list[str] | str = [
         "localhost",
@@ -94,6 +96,34 @@ class Settings(BaseSettings):
     smtp_from_name: str = Field(default="MUTX")
     # Frontend URL for email links
     frontend_url: str = Field(default="http://localhost:3000")
+    pico_tutor_model: str = Field(
+        default="gpt-5-mini",
+        validation_alias=AliasChoices("PICO_TUTOR_MODEL"),
+    )
+    google_client_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GOOGLE_CLIENT_ID"),
+    )
+    google_client_secret: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GOOGLE_CLIENT_SECRET"),
+    )
+    github_client_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GITHUB_CLIENT_ID"),
+    )
+    github_client_secret: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GITHUB_CLIENT_SECRET"),
+    )
+    discord_client_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("DISCORD_CLIENT_ID"),
+    )
+    discord_client_secret: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("DISCORD_CLIENT_SECRET"),
+    )
     database_required_on_startup: bool = Field(
         default=False,
         validation_alias=AliasChoices(
@@ -210,6 +240,59 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices(
             "ENABLE_RAG_API",
             "RAG_API_ENABLED",
+        ),
+    )
+    documents_enabled: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "MUTX_DOCUMENTS_ENABLED",
+            "DOCUMENTS_ENABLED",
+        ),
+    )
+    artifacts_dir: str = Field(
+        default_factory=lambda: os.path.join(os.getcwd(), ".mutx-artifacts"),
+        validation_alias=AliasChoices(
+            "MUTX_ARTIFACTS_DIR",
+            "ARTIFACTS_DIR",
+        ),
+    )
+    document_max_upload_mb: int = Field(
+        default=25,
+        ge=1,
+        validation_alias=AliasChoices(
+            "MUTX_DOCUMENT_MAX_UPLOAD_MB",
+            "DOCUMENT_MAX_UPLOAD_MB",
+        ),
+    )
+    document_worker_poll_seconds: int = Field(
+        default=5,
+        ge=1,
+        validation_alias=AliasChoices(
+            "MUTX_DOCUMENT_WORKER_POLL_SECONDS",
+            "DOCUMENT_WORKER_POLL_SECONDS",
+        ),
+    )
+    reasoning_enabled: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "MUTX_REASONING_ENABLED",
+            "REASONING_ENABLED",
+        ),
+    )
+    reasoning_max_upload_mb: int = Field(
+        default=25,
+        ge=1,
+        validation_alias=AliasChoices(
+            "MUTX_REASONING_MAX_UPLOAD_MB",
+            "REASONING_MAX_UPLOAD_MB",
+        ),
+    )
+    reasoning_worker_poll_seconds: int = Field(
+        default=5,
+        ge=1,
+        validation_alias=AliasChoices(
+            "MUTX_REASONING_WORKER_POLL_SECONDS",
+            "REASONING_WORKER_POLL_SECONDS",
         ),
     )
 

@@ -1,11 +1,6 @@
 import type { ReactNode } from "react";
 
-import {
-  marketingAccent,
-  marketingDisplay,
-  marketingMono,
-  marketingSans,
-} from "@/app/fonts/marketing";
+import { appFontVariables } from "@/app/fonts/app";
 import { cn } from "@/lib/utils";
 
 type PublicSurfaceProps = {
@@ -13,13 +8,6 @@ type PublicSurfaceProps = {
   className?: string;
 };
 
-const publicFontVariables = [
-  marketingSans.variable,
-  marketingDisplay.variable,
-  marketingMono.variable,
-  marketingAccent.variable,
-].join(" ");
-
 export function PublicSurface({ children, className }: PublicSurfaceProps) {
-  return <div className={cn(publicFontVariables, className)}>{children}</div>;
+  return <div className={cn(appFontVariables, className)}>{children}</div>;
 }

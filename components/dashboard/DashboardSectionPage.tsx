@@ -25,7 +25,7 @@ export function DashboardSectionPage({
 }: DashboardSectionPageProps) {
   return (
     <section
-      className="dashboard-entry overflow-hidden rounded-[28px] border"
+      className="dashboard-entry overflow-hidden rounded-[36px] border"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradientStrong,
@@ -40,83 +40,146 @@ export function DashboardSectionPage({
         className="border-b"
       />
 
-      <div className="grid gap-5 p-5 lg:p-6 xl:grid-cols-[minmax(0,1.65fr)_320px]">
+      <div className="grid gap-6 p-5 lg:p-7 xl:grid-cols-[minmax(0,1.8fr)_320px]">
         <div className="space-y-6">
           <div
-            className="rounded-[22px] border p-5"
+            className="rounded-[30px] border p-6"
             style={{
               borderColor: dashboardTokens.borderSubtle,
               background: dashboardTokens.panelGradient,
             }}
           >
-            <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(220px,0.5fr)] xl:items-end">
               <div>
                 <p
-                  className="text-[11px] font-semibold uppercase tracking-[0.22em]"
+                  className="text-[11px] font-semibold uppercase tracking-[0.24em]"
                   style={{ color: dashboardTokens.textMuted }}
                 >
                   {badge}
                 </p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-[1.75rem] leading-[1.02] tracking-[-0.07em] text-[#fff3e2]">
+                  Ground the route around one real operator capability at a time.
+                </h2>
                 <p
-                  className="mt-3 max-w-3xl text-sm leading-6"
+                  className="mt-4 max-w-3xl text-sm leading-7"
                   style={{ color: dashboardTokens.textSubtle }}
                 >
-                  The shell and route structure are live. The items below are the next verified integrations queued for this surface.
+                  The shell is stable. The next additions should read like an operating ledger,
+                  not placeholder product chrome: one live surface, one source of truth, one
+                  useful next action.
                 </p>
               </div>
+
               <div
-                className="rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em]"
+                className="space-y-3 rounded-[24px] border px-4 py-4"
                 style={{
-                  borderColor: dashboardTokens.borderStrong,
-                  backgroundColor: dashboardTokens.brandSoft,
-                  color: dashboardTokens.textPrimary,
+                  borderColor: dashboardTokens.borderSubtle,
+                  backgroundColor: dashboardTokens.bgInset,
                 }}
               >
-                Shell ready
+                <div
+                  className="inline-flex rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em]"
+                  style={{
+                    borderColor: dashboardTokens.borderStrong,
+                    backgroundColor: dashboardTokens.brandSoft,
+                    color: dashboardTokens.textPrimary,
+                  }}
+                >
+                  Shell ready
+                </div>
+                <p className="text-[12px] leading-6" style={{ color: dashboardTokens.textSecondary }}>
+                  Keep this page sparse until there is real signal, not speculative product
+                  furniture.
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {checks.map((item, index) => (
-              <article
-                key={item}
-                className="rounded-[20px] border p-4"
+          <section
+            className="rounded-[30px] border p-4 sm:p-5"
+            style={{
+              borderColor: dashboardTokens.borderSubtle,
+              background: dashboardTokens.panelGradient,
+            }}
+          >
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 border-b pb-4"
+              style={{ borderColor: dashboardTokens.borderSubtle }}
+            >
+              <div>
+                <p
+                  className="text-[11px] font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: dashboardTokens.textMuted }}
+                >
+                  Integration ledger
+                </p>
+                <p className="mt-2 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
+                  Each row should become a real contract, live panel, or machine action before the
+                  next one is added.
+                </p>
+              </div>
+              <span
+                className="rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
                 style={{
                   borderColor: dashboardTokens.borderSubtle,
-                  background: dashboardTokens.panelGradient,
+                  backgroundColor: dashboardTokens.bgInset,
+                  color: dashboardTokens.textSecondary,
                 }}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <p
-                    className="text-[11px] font-semibold uppercase tracking-[0.18em]"
-                    style={{ color: dashboardTokens.textMuted }}
-                  >
-                    Planned integration
-                  </p>
+                {checks.length} queued
+              </span>
+            </div>
+
+            <ol className="mt-4 space-y-3">
+              {checks.map((item, index) => (
+                <li
+                  key={item}
+                  className="grid gap-3 rounded-[24px] border px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-start"
+                  style={{
+                    borderColor: dashboardTokens.borderSubtle,
+                    backgroundColor: dashboardTokens.bgInset,
+                  }}
+                >
                   <span
-                    className="rounded-full px-2 py-0.5 text-[11px]"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border text-[11px] font-semibold uppercase tracking-[0.18em]"
                     style={{
-                      backgroundColor: dashboardTokens.bgSubtle,
-                      color: dashboardTokens.textSecondary,
+                      borderColor: dashboardTokens.borderStrong,
+                      backgroundColor: dashboardTokens.brandSoft,
+                      color: dashboardTokens.textPrimary,
                       fontFamily: dashboardTokens.fontMono,
                     }}
                   >
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                </div>
-                <p className="mt-3 text-sm leading-6" style={{ color: dashboardTokens.textPrimary }}>
-                  {item}
-                </p>
-              </article>
-            ))}
-          </div>
+
+                  <div className="min-w-0">
+                    <p
+                      className="text-[10px] font-semibold uppercase tracking-[0.18em]"
+                      style={{ color: dashboardTokens.textMuted }}
+                    >
+                      Planned integration
+                    </p>
+                    <p className="mt-2 text-sm leading-7" style={{ color: dashboardTokens.textPrimary }}>
+                      {item}
+                    </p>
+                  </div>
+
+                  <p
+                    className="text-[10px] font-semibold uppercase tracking-[0.18em] sm:justify-self-end"
+                    style={{ color: dashboardTokens.textSecondary }}
+                  >
+                    not shipped
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </section>
         </div>
 
         <aside className="space-y-4">
           {aside ?? (
             <div
-              className="rounded-[22px] border p-5"
+              className="rounded-[28px] border p-5"
               style={{
                 borderColor: dashboardTokens.borderSubtle,
                 background: dashboardTokens.panelGradient,
@@ -132,7 +195,7 @@ export function DashboardSectionPage({
                 Live data and controls should land here only when backed by a real MUTX route contract or runtime action.
               </p>
               <div
-                className="mt-4 rounded-[16px] border p-3 text-sm"
+                className="mt-4 rounded-[18px] border p-3 text-sm"
                 style={{
                   borderColor: dashboardTokens.borderSubtle,
                   backgroundColor: dashboardTokens.bgInset,
@@ -145,7 +208,7 @@ export function DashboardSectionPage({
           )}
 
           <div
-            className="rounded-[22px] border p-5"
+            className="rounded-[28px] border p-5"
             style={{
               borderColor: dashboardTokens.borderSubtle,
               background: dashboardTokens.panelGradient,

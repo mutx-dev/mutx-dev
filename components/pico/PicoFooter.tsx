@@ -11,13 +11,14 @@ export function PicoFooter({ className }: { className?: string }) {
 
   return (
     <footer
+      data-testid="pico-footer"
       className={cn(className)}
       style={{
-        borderTop: '1px solid rgba(238, 240, 246, 0.08)',
-        background: '#07080c',
-        color: 'rgba(238, 240, 246, 0.6)',
+        borderTop: '1px solid rgba(255, 233, 204, 0.08)',
+        background: '#09080b',
+        color: 'rgba(232, 221, 203, 0.6)',
         padding: 'clamp(2rem, 4vw, 3rem) 0',
-        fontFamily: 'var(--font-marketing-sans), sans-serif',
+        fontFamily: 'var(--font-site-body), sans-serif',
       }}
     >
       <div className={core.shell}>
@@ -51,12 +52,6 @@ export function PicoFooter({ className }: { className?: string }) {
             {t('links.download')}
           </a>
           <a
-            href={`${SITE}/dashboard`}
-            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
-          >
-            {t('links.dashboard')}
-          </a>
-          <a
             href={`${SITE}/contact`}
             style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
           >
@@ -69,7 +64,7 @@ export function PicoFooter({ className }: { className?: string }) {
             {t('links.privacy')}
           </a>
         </div>
-        <p style={{ margin: '1.2rem 0 0', fontSize: '0.82rem', lineHeight: 1.5, color: 'rgba(238, 240, 246, 0.35)' }}>
+        <p style={{ margin: '1.2rem 0 0', fontSize: '0.82rem', lineHeight: 1.5, color: 'rgba(188, 172, 149, 0.48)' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
             <span
               style={{
@@ -79,8 +74,8 @@ export function PicoFooter({ className }: { className?: string }) {
                 width: '1.6rem',
                 height: '1.6rem',
                 borderRadius: '0.4rem',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,248,236,0.04)',
+                border: '1px solid rgba(255,233,204,0.08)',
               }}
             >
               <Image src="/pico/logo.png" alt="PicoMUTX logo" width={18} height={18} />

@@ -33,6 +33,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             "/v1/auth/reset-password",
             "/v1/auth/verify-email",
             "/v1/auth/resend-verification",
+            "/v1/auth/oauth/google/exchange",
+            "/v1/auth/oauth/github/exchange",
+            "/v1/auth/oauth/discord/exchange",
         }
     )
 

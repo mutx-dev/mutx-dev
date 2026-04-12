@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import { PicoAcademyDashboard } from '@/components/pico/PicoAcademyDashboard'
 
 export default function PicoAcademyPage() {
-  redirect('/pico')
+  return <PicoAcademyDashboard />
 }

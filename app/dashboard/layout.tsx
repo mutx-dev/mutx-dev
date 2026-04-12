@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://app.mutx.dev"),
   robots: {
-    index: false,
-    follow: false,
-    nocache: true,
+    index: true,
+    follow: true,
+    nocache: false,
   },
   title: "Dashboard - MUTX",
   description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
@@ -50,7 +50,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${appFontVariables} h-full font-[family:var(--font-display)]`}>
+    <div className={`${appFontVariables} h-full font-[family:var(--font-site-body)]`}>
       <ErrorBoundary>
         <DesktopStatusProvider>
           <DesktopWindowProvider>

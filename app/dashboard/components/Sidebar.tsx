@@ -13,7 +13,8 @@ import {
   Zap, 
   Webhook, 
   Key, 
-  Activity 
+  Activity,
+  Brain 
 } from "lucide-react";
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/dashboard/agents", label: "Agent Registry", icon: Bot },
   { href: "/dashboard/deployments", label: "Deployments", icon: Cloud },
   { href: "/dashboard/runs", label: "Run History", icon: Play },
+  { href: "/dashboard/reasoning", label: "Reasoning", icon: Brain },
   { href: "/dashboard/traces", label: "Trace Explorer", icon: FileText },
   { href: "/dashboard/memory", label: "Memory Atlas", icon: Database },
   { href: "/dashboard/budgets", label: "Resource Budgets", icon: Wallet },
@@ -38,7 +40,7 @@ export function Sidebar() {
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-[rgba(255,255,255,0.06)] px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#22d3ee]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#d4ab73]">
             <Zap className="h-5 w-5 text-black" />
           </div>
           <span className="text-lg font-bold tracking-tight">MUTX</span>
@@ -58,14 +60,14 @@ export function Sidebar() {
                     href={item.href}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
                       isActive
-                        ? "bg-[rgba(34,211,238,0.1)] text-[#22d3ee]"
+                        ? "bg-[rgba(212,171,115,0.12)] text-[#d4ab73]"
                         : "text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
                     {isActive && (
-                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[#22d3ee]" />
+                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[#d4ab73]" />
                     )}
                   </Link>
                 </li>

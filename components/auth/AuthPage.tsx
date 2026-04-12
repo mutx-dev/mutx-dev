@@ -3,17 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, ArrowRight, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 
 import { extractApiErrorMessage } from "@/components/app/http";
 import { AuthSurface } from "@/components/site/AuthSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
+import { buildOAuthStartHref, oauthProviders } from "@/lib/auth/oauth";
+import { resolveRedirectPath } from "@/lib/auth/redirects";
 
 type AuthMode = "login" | "register";
 
 type AuthPageProps = {
   mode: AuthMode;
   nextPath?: string | null;
+  initialError?: string | null;
+  initialEmail?: string | null;
 };
 
 const authContent = {
@@ -31,12 +35,13 @@ const authContent = {
     mediaWidth: 1024,
     mediaHeight: 1536,
     highlights: [
-      "Hosted sign-in now routes into the live dashboard instead of a hold screen.",
-      "Session cookies stay scoped to the app host so auth does not leak across subdomains.",
+      "Social auth now lands on the same hosted session model as password auth.",
+      "Session cookies stay scoped to the current host instead of leaking across subdomains.",
       "If the API rejects the session, the form surfaces the upstream error instead of inventing one.",
     ],
     heading: "Welcome back",
-    subheading: "Sign in and continue into the operator dashboard.",
+    subheading:
+      "Use a provider or password and continue into the operator dashboard.",
     submitLabel: "Sign in",
     loadingLabel: "Signing in",
   },
@@ -44,55 +49,53 @@ const authContent = {
     eyebrow: "Operator access",
     title: "Create an operator account and enter the real dashboard.",
     description:
-      "Register with the hosted auth flow, confirm the password cleanly, and land in the same control surface used for live operator work.",
+      "Register with password or provider auth, confirm the identity cleanly, and land in the same control surface used for live operator work.",
     asideEyebrow: "Account rules",
     asideTitle: "Registration should be explicit, boring, and easy to verify.",
     asideBody:
-      "The registration lane now validates what matters, sends the request through the hosted auth API, and only moves forward once the session is established.",
+      "The registration lane now sends real verification mail, blocks the fake success path when email confirmation is required, and links provider identities onto the same MUTX account model.",
     mediaSrc: "/landing/webp/victory-core.webp",
     mediaAlt: "MUTX robot holding the MUTX mark after access is granted",
     mediaWidth: 1536,
     mediaHeight: 1024,
     highlights: [
-      "Passwords must match before the request leaves the browser.",
-      "Hosted registration uses the same auth cookies and redirect path as sign-in.",
-      "The dashboard route is now reachable directly after account creation.",
+      "Google, GitHub, and Discord all terminate on real MUTX sessions.",
+      "Password registration sends a verification email to the active host, not a hardcoded marketing domain.",
+      "If email confirmation is required, the UI moves into a verification state instead of pretending the dashboard is ready.",
     ],
     heading: "Create your account",
-    subheading: "Set up hosted access and continue into the dashboard.",
+    subheading:
+      "Choose the fastest safe lane into the hosted operator surface.",
     submitLabel: "Sign up",
     loadingLabel: "Creating account",
   },
 } as const;
 
-function resolveRedirectPath(nextPath?: string | null) {
-  if (!nextPath) {
-    return "/dashboard";
-  }
-
-  if (!nextPath.startsWith("/") || nextPath.startsWith("//")) {
-    return "/dashboard";
-  }
-
-  if (nextPath.startsWith("/login") || nextPath.startsWith("/register")) {
-    return "/dashboard";
-  }
-
-  return nextPath;
+function buildAuthHref(mode: AuthMode, nextPath: string) {
+  return `/${mode}?next=${encodeURIComponent(nextPath)}`;
 }
 
-export function AuthPage({ mode, nextPath }: AuthPageProps) {
+export function AuthPage({
+  mode,
+  nextPath,
+  initialError,
+  initialEmail,
+}: AuthPageProps) {
   const router = useRouter();
   const content = authContent[mode];
   const isRegister = mode === "register";
   const redirectPath = resolveRedirectPath(nextPath);
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail ?? "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError ?? "");
+  const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
+
+  const verificationError = /verification/i.test(error);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -109,12 +112,11 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
 
     setLoading(true);
     setError("");
+    setNotice("");
 
     try {
       const payload =
-        mode === "login"
-          ? { email, password }
-          : { email, password, name };
+        mode === "login" ? { email, password } : { email, password, name };
 
       const response = await fetch(
         mode === "login" ? "/api/auth/login" : "/api/auth/register",
@@ -126,7 +128,8 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
       );
 
       const responsePayload = await response.json().catch(() => ({
-        detail: mode === "login" ? "Failed to sign in" : "Failed to create account",
+        detail:
+          mode === "login" ? "Failed to sign in" : "Failed to create account",
       }));
 
       if (!response.ok) {
@@ -136,6 +139,16 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
             mode === "login" ? "Failed to sign in" : "Failed to create account",
           ),
         );
+      }
+
+      if (isRegister && responsePayload.requires_email_verification) {
+        const verificationParams = new URLSearchParams({
+          email,
+          next: redirectPath,
+        });
+        router.replace(`/verify-email?${verificationParams.toString()}`);
+        router.refresh();
+        return;
       }
 
       router.replace(redirectPath);
@@ -153,12 +166,73 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
     }
   }
 
+  async function handleResendVerification() {
+    if (!email) {
+      setError("Enter your email address first");
+      return;
+    }
+
+    setResendingVerification(true);
+    setNotice("");
+
+    try {
+      const response = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const payload = await response.json().catch(() => ({
+        detail: "Failed to resend verification email",
+      }));
+
+      if (!response.ok) {
+        throw new Error(
+          extractApiErrorMessage(
+            payload,
+            "Failed to resend verification email",
+          ),
+        );
+      }
+
+      setNotice(payload.message || "Verification email sent");
+    } catch (resendError) {
+      setError(
+        resendError instanceof Error
+          ? resendError.message
+          : "Failed to resend verification email",
+      );
+    } finally {
+      setResendingVerification(false);
+    }
+  }
+
   return (
-    <AuthSurface {...content}>
+    <AuthSurface {...content} variant="access">
       <div className={styles.formWrap}>
         <div>
           <h2 className={styles.sectionTitle}>{content.heading}</h2>
           <p className={styles.bodyText}>{content.subheading}</p>
+        </div>
+
+        <div className="grid gap-2">
+          {oauthProviders.map((provider) => (
+            <Link
+              key={provider.id}
+              href={buildOAuthStartHref(provider.id, mode, redirectPath)}
+              prefetch={false}
+              className={`${styles.buttonSecondary} w-full`}
+            >
+              {provider.buttonLabel}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(77,58,45,0.58)]">
+          <span className="h-px flex-1 bg-[rgba(58,38,25,0.16)]" />
+          Or use email
+          <span className="h-px flex-1 bg-[rgba(58,38,25,0.16)]" />
         </div>
 
         <form onSubmit={handleSubmit} className={styles.formWrap}>
@@ -219,14 +293,21 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
               </label>
               <input
                 id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              placeholder="••••••••"
-              required
-              autoComplete="new-password"
-              className={styles.input}
-            />
+                type="password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                placeholder="••••••••"
+                required
+                autoComplete="new-password"
+                className={styles.input}
+              />
+            </div>
+          ) : null}
+
+          {notice ? (
+            <div className={styles.success} role="status">
+              <CheckCircle2 className="h-4 w-4" />
+              {notice}
             </div>
           ) : null}
 
@@ -259,15 +340,27 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
         <div className={styles.utilityLinks}>
           {mode === "login" ? (
             <>
-              <Link
-                href="/forgot-password"
-                className={styles.inlineLink}
-              >
+              <Link href="/forgot-password" className={styles.inlineLink}>
                 Forgot password?
               </Link>
+              {verificationError ? (
+                <button
+                  type="button"
+                  onClick={() => void handleResendVerification()}
+                  disabled={resendingVerification}
+                  className={styles.inlineLink}
+                >
+                  {resendingVerification
+                    ? "Sending verification…"
+                    : "Resend verification"}
+                </button>
+              ) : null}
               <p className={styles.bodyText}>
                 Need access?{" "}
-                <Link href="/register" className={styles.inlineLink}>
+                <Link
+                  href={buildAuthHref("register", redirectPath)}
+                  className={styles.inlineLink}
+                >
                   Create one
                 </Link>
               </p>
@@ -275,7 +368,10 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
           ) : (
             <p className={styles.bodyText}>
               Already have an operator account?{" "}
-              <Link href="/login" className={styles.inlineLink}>
+              <Link
+                href={buildAuthHref("login", redirectPath)}
+                className={styles.inlineLink}
+              >
                 Sign in
               </Link>
             </p>

@@ -45,12 +45,12 @@ function getDocIcon(href: string): string | undefined {
   // e.g. "agents/README.md"     → agents/README.md
   const candidates: string[] = [];
   if (href.startsWith("docs/")) {
-    candidates.push(path.join(process.cwd(), href));
+    candidates.push(path.join(/* turbopackIgnore: true */ process.cwd(), href));
   } else if (href.startsWith("agents/") || href.startsWith("contributing/")) {
-    candidates.push(path.join(process.cwd(), href));
+    candidates.push(path.join(/* turbopackIgnore: true */ process.cwd(), href));
   } else {
-    candidates.push(path.join(process.cwd(), "docs", href));
-    candidates.push(path.join(process.cwd(), href)); // root-level fallback
+    candidates.push(path.join(/* turbopackIgnore: true */ process.cwd(), "docs", href));
+    candidates.push(path.join(/* turbopackIgnore: true */ process.cwd(), href)); // root-level fallback
   }
 
   for (const filePath of candidates) {
@@ -73,7 +73,7 @@ function parseLine(line: string): { title: string; href: string; slug: string } 
 }
 
 export function parseSummary(): DocNavItem[] {
-  const summaryPath = path.join(process.cwd(), "SUMMARY.md");
+  const summaryPath = path.join(/* turbopackIgnore: true */ process.cwd(), "SUMMARY.md");
   const content = fs.readFileSync(summaryPath, "utf-8");
   const lines = content.split("\n");
 

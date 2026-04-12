@@ -8,9 +8,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 
-from src.api.models.models import User
+from src.api.models.models import ExternalAuthIdentity, User
 from src.api.database import get_db
 from src.api.main import create_app
+from src.api.services.social_auth import OAuthProvider, OAuthUserProfile
 
 
 class TestAuthEndpoints:
@@ -31,6 +32,43 @@ class TestAuthEndpoints:
         data = response.json()
         assert "access_token" in data
         assert "refresh_token" in data
+
+    @pytest.mark.asyncio
+    async def test_register_uses_requested_verification_origin(
+        self, client_no_auth: AsyncClient, monkeypatch
+    ):
+        from src.api.routes import auth as auth_routes
+
+        captured: dict[str, str | None] = {}
+
+        def fake_send_verification_email(
+            to_email: str,
+            name: str,
+            token: str,
+            *,
+            frontend_url: str | None = None,
+        ) -> bool:
+            captured["to_email"] = to_email
+            captured["name"] = name
+            captured["token"] = token
+            captured["frontend_url"] = frontend_url
+            return True
+
+        monkeypatch.setattr(auth_routes, "send_verification_email", fake_send_verification_email)
+
+        response = await client_no_auth.post(
+            "/v1/auth/register",
+            json={
+                "email": "origin@example.com",
+                "password": "StrongPassword123!",
+                "name": "Origin User",
+                "verification_origin": "https://pico.mutx.dev",
+            },
+        )
+
+        assert response.status_code == 201
+        assert captured["to_email"] == "origin@example.com"
+        assert captured["frontend_url"] == "https://pico.mutx.dev"
 
     @pytest.mark.asyncio
     async def test_login_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
@@ -138,9 +176,7 @@ class TestAuthEndpoints:
         assert "localhost" in response.json()["detail"].lower()
 
     @pytest.mark.asyncio
-    async def test_local_bootstrap_rejects_forwarded_headers(
-        self, client_no_auth: AsyncClient
-    ):
+    async def test_local_bootstrap_rejects_forwarded_headers(self, client_no_auth: AsyncClient):
         response = await client_no_auth.post(
             "/v1/auth/local-bootstrap",
             json={"name": "Spoofed Operator"},
@@ -368,6 +404,52 @@ class TestAuthEndpoints:
         assert "If an account exists" in response.json()["message"]
 
     @pytest.mark.asyncio
+    async def test_forgot_password_uses_requested_origin(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession, monkeypatch
+    ):
+        from src.api.auth.password import hash_password
+        from src.api.routes import auth as auth_routes
+
+        user = User(
+            id=uuid.uuid4(),
+            email="reset-origin@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Reset Origin User",
+            is_active=True,
+        )
+        db_session.add(user)
+        await db_session.commit()
+
+        captured: dict[str, str | None] = {}
+
+        def fake_send_password_reset_email(
+            to_email: str,
+            name: str,
+            token: str,
+            *,
+            frontend_url: str | None = None,
+        ) -> bool:
+            captured["to_email"] = to_email
+            captured["frontend_url"] = frontend_url
+            return True
+
+        monkeypatch.setattr(
+            auth_routes, "send_password_reset_email", fake_send_password_reset_email
+        )
+
+        response = await client_no_auth.post(
+            "/v1/auth/forgot-password",
+            json={
+                "email": "reset-origin@example.com",
+                "email_link_origin": "https://pico.mutx.dev",
+            },
+        )
+
+        assert response.status_code == 200
+        assert captured["to_email"] == "reset-origin@example.com"
+        assert captured["frontend_url"] == "https://pico.mutx.dev"
+
+    @pytest.mark.asyncio
     async def test_forgot_password_nonexistent_user(self, client_no_auth: AsyncClient):
         """Test forgot password for nonexistent user returns same message."""
         response = await client_no_auth.post(
@@ -435,6 +517,146 @@ class TestAuthEndpoints:
             json={"email": "nonexistent@example.com"},
         )
         assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_oauth_authorize_returns_provider_redirect(
+        self, client_no_auth: AsyncClient, monkeypatch
+    ):
+        from src.api.routes import auth as auth_routes
+
+        monkeypatch.setattr(auth_routes.settings, "google_client_id", "google-client-id")
+        monkeypatch.setattr(
+            auth_routes,
+            "build_authorization_url",
+            lambda provider, **kwargs: f"https://accounts.google.com/test?state={kwargs['state']}",
+        )
+
+        response = await client_no_auth.get(
+            "/v1/auth/oauth/google/authorize",
+            params={
+                "redirect_uri": "https://app.mutx.dev/api/auth/oauth/google/callback",
+                "state": "oauth-state",
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "authorization_url": "https://accounts.google.com/test?state=oauth-state"
+        }
+
+    @pytest.mark.asyncio
+    async def test_oauth_exchange_creates_identity_and_verified_user(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession, monkeypatch
+    ):
+        from src.api.routes import auth as auth_routes
+
+        async def fake_exchange_code_for_user_profile(provider, *, code, redirect_uri):
+            assert provider == OAuthProvider.GOOGLE
+            assert code == "provider-code"
+            assert redirect_uri == "https://app.mutx.dev/api/auth/oauth/google/callback"
+            return OAuthUserProfile(
+                provider=OAuthProvider.GOOGLE,
+                provider_user_id="google-user-123",
+                email="oauth@example.com",
+                email_verified=True,
+                display_name="OAuth User",
+                username=None,
+                avatar_url="https://example.com/avatar.png",
+                profile={"sub": "google-user-123"},
+            )
+
+        monkeypatch.setattr(
+            auth_routes,
+            "exchange_code_for_user_profile",
+            fake_exchange_code_for_user_profile,
+        )
+
+        response = await client_no_auth.post(
+            "/v1/auth/oauth/google/exchange",
+            json={
+                "code": "provider-code",
+                "redirect_uri": "https://app.mutx.dev/api/auth/oauth/google/callback",
+            },
+        )
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert "access_token" in payload
+        assert "refresh_token" in payload
+
+        user_result = await db_session.execute(
+            select(User).where(User.email == "oauth@example.com")
+        )
+        user = user_result.scalar_one()
+        assert user.name == "OAuth User"
+        assert user.is_email_verified is True
+
+        identity_result = await db_session.execute(
+            select(ExternalAuthIdentity).where(
+                ExternalAuthIdentity.provider == "google",
+                ExternalAuthIdentity.provider_user_id == "google-user-123",
+            )
+        )
+        identity = identity_result.scalar_one()
+        assert identity.user_id == user.id
+
+    @pytest.mark.asyncio
+    async def test_oauth_exchange_links_existing_email_account(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession, monkeypatch
+    ):
+        from src.api.routes import auth as auth_routes
+        from src.api.auth.password import hash_password
+
+        user = User(
+            id=uuid.uuid4(),
+            email="linked@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Linked User",
+            is_active=True,
+            is_email_verified=False,
+        )
+        db_session.add(user)
+        await db_session.commit()
+
+        async def fake_exchange_code_for_user_profile(provider, *, code, redirect_uri):
+            return OAuthUserProfile(
+                provider=OAuthProvider.GITHUB,
+                provider_user_id="github-user-123",
+                email="linked@example.com",
+                email_verified=True,
+                display_name="Linked User",
+                username="linked-user",
+                avatar_url=None,
+                profile={"id": 123},
+            )
+
+        monkeypatch.setattr(
+            auth_routes,
+            "exchange_code_for_user_profile",
+            fake_exchange_code_for_user_profile,
+        )
+
+        response = await client_no_auth.post(
+            "/v1/auth/oauth/github/exchange",
+            json={
+                "code": "provider-code",
+                "redirect_uri": "https://app.mutx.dev/api/auth/oauth/github/callback",
+            },
+        )
+
+        assert response.status_code == 200
+
+        await db_session.refresh(user)
+        assert user.is_email_verified is True
+
+        identity_result = await db_session.execute(
+            select(ExternalAuthIdentity).where(
+                ExternalAuthIdentity.provider == "github",
+                ExternalAuthIdentity.provider_user_id == "github-user-123",
+            )
+        )
+        identity = identity_result.scalar_one()
+        assert identity.user_id == user.id
 
 
 class TestPasswordCompatibility:
@@ -569,7 +791,7 @@ class TestSSOAuth:
     async def test_sso_provider_enum_values(self):
         """Test SSOProvider enum has correct values."""
         from src.api.services.auth import PROVIDER_JWKS_URLS, SSOProvider
-        
+
         assert SSOProvider.OKTA.value == "okta"
         assert SSOProvider.AUTH0.value == "auth0"
         assert SSOProvider.KEYCLOAK.value == "keycloak"
@@ -580,7 +802,7 @@ class TestSSOAuth:
     async def test_role_enum_values(self):
         """Test Role enum has correct values."""
         from src.api.services.auth import Role
-        
+
         assert Role.ADMIN.value == "ADMIN"
         assert Role.DEVELOPER.value == "DEVELOPER"
         assert Role.VIEWER.value == "VIEWER"
@@ -591,14 +813,14 @@ class TestSSOAuth:
         """Test TokenPayload model works correctly."""
         from datetime import datetime, timezone
         from src.api.services.auth import TokenPayload
-        
+
         payload = TokenPayload(
             sub="user-123",
             email="test@example.com",
             roles=["ADMIN", "DEVELOPER"],
             exp=datetime.now(timezone.utc),
         )
-        
+
         assert payload.sub == "user-123"
         assert payload.email == "test@example.com"
         assert payload.roles == ["ADMIN", "DEVELOPER"]
@@ -608,20 +830,20 @@ class TestSSOAuth:
         """Test JWT access token creation and verification."""
         from datetime import datetime, timedelta, timezone
         from src.api.services.auth import TokenPayload, create_access_token, verify_access_token
-        
+
         payload = TokenPayload(
             sub="user-456",
             email="sso@example.com",
             roles=["DEVELOPER"],
             exp=datetime.now(timezone.utc) + timedelta(hours=1),
         )
-        
+
         secret = "test-secret-key-that-is-long-enough-32"
         token = create_access_token(payload, secret)
-        
+
         assert token is not None
         assert isinstance(token, str)
-        
+
         # Verify the token
         verified = verify_access_token(token, secret)
         assert verified.sub == "user-456"
@@ -634,19 +856,19 @@ class TestSSOAuth:
         from datetime import datetime, timedelta, timezone
         from fastapi import HTTPException
         from src.api.services.auth import TokenPayload, create_access_token, verify_access_token
-        
+
         payload = TokenPayload(
             sub="user-789",
             email="test@example.com",
             roles=["VIEWER"],
             exp=datetime.now(timezone.utc) + timedelta(hours=1),
         )
-        
+
         token = create_access_token(payload, "correct-secret")
-        
+
         with pytest.raises(HTTPException) as exc_info:
             verify_access_token(token, "wrong-secret")
-        
+
         assert exc_info.value.status_code == 401
 
     @pytest.mark.asyncio
@@ -656,7 +878,7 @@ class TestSSOAuth:
         from fastapi import HTTPException
         from jose import jwt
         from src.api.services.auth import verify_access_token
-        
+
         # Create an already-expired token manually using raw jose
         # (create_access_token always sets exp to future, so we need to bypass it)
         secret = "test-secret-key-that-is-long-enough-32"
@@ -668,10 +890,10 @@ class TestSSOAuth:
             "iat": datetime.now(timezone.utc) - timedelta(hours=2),
         }
         token = jwt.encode(expired_payload, secret, algorithm="HS256")
-        
+
         with pytest.raises(HTTPException) as exc_info:
             verify_access_token(token, secret)
-        
+
         assert exc_info.value.status_code == 401
         assert "expired" in exc_info.value.detail.lower()
 
@@ -679,7 +901,7 @@ class TestSSOAuth:
     async def test_check_role_admin_has_all_access(self):
         """Test that ADMIN role has access to everything."""
         from src.api.services.auth import Role, check_role
-        
+
         # ADMIN should have access to everything
         assert check_role(["ADMIN"], [Role.VIEWER]) is True
         assert check_role(["ADMIN"], [Role.DEVELOPER]) is True
@@ -690,7 +912,7 @@ class TestSSOAuth:
     async def test_check_role_developer(self):
         """Test DEVELOPER role access."""
         from src.api.services.auth import Role, check_role
-        
+
         # DEVELOPER should have access to DEVELOPER only (not inherited to VIEWER)
         assert check_role(["DEVELOPER"], [Role.DEVELOPER]) is True
         assert check_role(["DEVELOPER"], [Role.VIEWER]) is False  # DEVELOPER doesn't inherit VIEWER
@@ -701,7 +923,7 @@ class TestSSOAuth:
     async def test_check_role_viewer(self):
         """Test VIEWER role access."""
         from src.api.services.auth import Role, check_role
-        
+
         # VIEWER should only have access to VIEWER
         assert check_role(["VIEWER"], [Role.VIEWER]) is True
         assert check_role(["VIEWER"], [Role.DEVELOPER]) is False
@@ -711,7 +933,7 @@ class TestSSOAuth:
     async def test_check_role_audit_admin(self):
         """Test AUDIT_ADMIN role access."""
         from src.api.services.auth import Role, check_role
-        
+
         # AUDIT_ADMIN should only have access to AUDIT_ADMIN
         assert check_role(["AUDIT_ADMIN"], [Role.AUDIT_ADMIN]) is True
         assert check_role(["AUDIT_ADMIN"], [Role.ADMIN]) is False
@@ -721,7 +943,7 @@ class TestSSOAuth:
     async def test_check_role_multiple_user_roles(self):
         """Test user with multiple roles."""
         from src.api.services.auth import Role, check_role
-        
+
         # User with both DEVELOPER and VIEWER roles
         assert check_role(["DEVELOPER", "VIEWER"], [Role.DEVELOPER]) is True
         assert check_role(["DEVELOPER", "VIEWER"], [Role.VIEWER]) is True
@@ -733,7 +955,7 @@ class TestSSOAuth:
         from src.api.dependencies import SSOTokenUser
         from src.api.services.auth import TokenPayload
         from datetime import datetime, timezone
-        
+
         payload = TokenPayload(
             sub="role-test-user",
             email="roles@example.com",
@@ -741,7 +963,7 @@ class TestSSOAuth:
             exp=datetime.now(timezone.utc),
         )
         user = SSOTokenUser(payload)
-        
+
         # The user should have ADMIN role
         assert user.roles == ["ADMIN"]
 
@@ -751,7 +973,7 @@ class TestSSOAuth:
         from src.api.dependencies import SSOTokenUser
         from src.api.services.auth import TokenPayload
         from datetime import datetime, timezone
-        
+
         payload = TokenPayload(
             sub="role-test-user",
             email="roles@example.com",
@@ -759,7 +981,7 @@ class TestSSOAuth:
             exp=datetime.now(timezone.utc),
         )
         user = SSOTokenUser(payload)
-        
+
         # User with VIEWER should not have access to ADMIN-only routes
         assert "ADMIN" not in user.roles
 
@@ -773,16 +995,16 @@ class TestSSOTokenUser:
         from datetime import datetime, timezone, timedelta
         from src.api.services.auth import TokenPayload
         from src.api.dependencies import SSOTokenUser
-        
+
         payload = TokenPayload(
             sub="sso-user-123",
             email="sso.user@example.com",
             roles=["DEVELOPER", "VIEWER"],
             exp=datetime.now(timezone.utc) + timedelta(hours=1),
         )
-        
+
         user = SSOTokenUser(payload)
-        
+
         assert user.id == "sso-user-123"
         assert user.email == "sso.user@example.com"
         assert user.name == "sso.user"  # email.split("@")[0]
@@ -796,16 +1018,16 @@ class TestSSOTokenUser:
         from datetime import datetime, timezone, timedelta
         from src.api.services.auth import TokenPayload
         from src.api.dependencies import SSOTokenUser
-        
+
         payload = TokenPayload(
             sub="no-email-user",
             email="",  # Empty email
             roles=["VIEWER"],
             exp=datetime.now(timezone.utc) + timedelta(hours=1),
         )
-        
+
         user = SSOTokenUser(payload)
-        
+
         assert user.name == "SSO User"  # Default name when no email
 
     @pytest.mark.asyncio
@@ -814,17 +1036,17 @@ class TestSSOTokenUser:
         from datetime import datetime, timezone, timedelta
         from src.api.services.auth import TokenPayload
         from src.api.dependencies import SSOTokenUser
-        
+
         payload = TokenPayload(
             sub="repr-test-user",
             email="repr@example.com",
             roles=["ADMIN"],
             exp=datetime.now(timezone.utc) + timedelta(hours=1),
         )
-        
+
         user = SSOTokenUser(payload)
         repr_str = repr(user)
-        
+
         assert "repr-test-user" in repr_str
         assert "repr@example.com" in repr_str
         assert "ADMIN" in repr_str

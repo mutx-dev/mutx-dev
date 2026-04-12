@@ -1,0 +1,505 @@
+[
+  {
+    "slug": "install-hermes-locally",
+    "title": "Install Hermes locally",
+    "summary": "Install Hermes, prove the command works from a fresh shell, and leave this lesson with one working local runtime.",
+    "level": 0,
+    "track": "first-agent",
+    "estimatedMinutes": 8,
+    "difficulty": "setup",
+    "objective": "Get one clean local Hermes install working end to end.",
+    "prerequisites": [],
+    "outcome": "A local Hermes CLI that opens cleanly from a fresh shell.",
+    "expectedResult": "Running `command -v hermes && hermes` from a fresh shell succeeds.",
+    "validation": "Open a brand-new shell and run `command -v hermes && hermes`. If the command is missing or the CLI errors immediately, this lesson is not done.",
+    "xp": 60,
+    "milestoneEvents": [
+      "first_tutorial_started"
+    ],
+    "steps": [
+      {
+        "title": "Install Hermes",
+        "body": "Run the install command exactly once. Do not compare package managers. Do not branch into extra tooling.",
+        "command": "curl -fsSL https://hermes.nousresearch.com/install.sh | bash"
+      },
+      {
+        "title": "Verify the binary from a fresh shell",
+        "body": "Close the shell, open a new one, then prove the binary is actually on PATH.",
+        "command": "command -v hermes"
+      },
+      {
+        "title": "Open Hermes and finish one provider setup",
+        "body": "Launch the CLI and complete exactly one provider path until the CLI is usable. Do not leave this lesson with two half-configured providers.",
+        "command": "hermes"
+      }
+    ],
+    "troubleshooting": [
+      "If `command -v hermes` returns nothing, restart the shell and check that the install path was added to PATH.",
+      "If `hermes` opens and immediately errors on missing credentials, finish one provider setup before moving on.",
+      "If the install script fails on a locked-down machine, switch to a user-local install path and rerun the verification step."
+    ],
+    "nextLesson": "run-your-first-agent"
+  },
+  {
+    "slug": "run-your-first-agent",
+    "title": "Run your first agent",
+    "summary": "Run one real prompt, get one visible answer, and save the transcript as proof.",
+    "level": 0,
+    "track": "first-agent",
+    "estimatedMinutes": 6,
+    "difficulty": "setup",
+    "objective": "Prove the runtime can answer one bounded prompt with the provider you just configured.",
+    "prerequisites": [
+      "install-hermes-locally"
+    ],
+    "outcome": "One saved prompt-and-answer transcript.",
+    "expectedResult": "Hermes answers one small prompt and the transcript is saved in a file you can reopen.",
+    "validation": "Run one bounded prompt and save both the prompt and answer in a file such as `~/pico-first-run.txt`.",
+    "xp": 60,
+    "milestoneEvents": [
+      "first_tutorial_completed",
+      "first_agent_run"
+    ],
+    "steps": [
+      {
+        "title": "Start Hermes from a clean shell",
+        "body": "Launch the runtime from a new shell so you know you are testing the real install.",
+        "command": "hermes"
+      },
+      {
+        "title": "Send one bounded prompt",
+        "body": "Use a tiny prompt with an obvious answer. Do not test creativity. Test that the runtime works.",
+        "command": "Prompt: Give me exactly 3 next steps to test this runtime locally."
+      },
+      {
+        "title": "Save the transcript",
+        "body": "Write the prompt and the answer into one file so the artifact survives after the terminal closes.",
+        "command": "printf \"Prompt: Give me exactly 3 next steps to test this runtime locally.\nAnswer: <paste the actual answer here>\n\" > ~/pico-first-run.txt"
+      }
+    ],
+    "troubleshooting": [
+      "If the answer times out, switch to a faster model first and rerun the same bounded prompt.",
+      "If the answer is nonsense, confirm which provider and model Hermes is actually using before changing the prompt.",
+      "If the CLI will not start, go back to the install lesson. This lesson depends on a working binary."
+    ],
+    "nextLesson": "deploy-hermes-on-a-vps"
+  },
+  {
+    "slug": "deploy-hermes-on-a-vps",
+    "title": "Deploy Hermes on a VPS",
+    "summary": "Put Hermes on an always-on host and prove the remote runtime opens there too.",
+    "level": 1,
+    "track": "deployed-agent",
+    "estimatedMinutes": 30,
+    "difficulty": "operator",
+    "objective": "Move the runtime from your laptop to one persistent machine you control.",
+    "prerequisites": [
+      "run-your-first-agent"
+    ],
+    "outcome": "A remote box where Hermes opens cleanly over SSH.",
+    "expectedResult": "SSH into the host and run `hermes` successfully.",
+    "validation": "From your machine SSH into the host and run `command -v hermes && hermes`. If that fails, the deployment is not done.",
+    "xp": 60,
+    "milestoneEvents": [
+      "successful_deployment"
+    ],
+    "steps": [
+      {
+        "title": "Reach the host over SSH",
+        "body": "Use one box you control and prove SSH works before you touch Hermes.",
+        "command": "ssh user@your-box"
+      },
+      {
+        "title": "Install Hermes on the host",
+        "body": "Run the same install path on the remote box. Keep the environment boring.",
+        "command": "curl -fsSL https://hermes.nousresearch.com/install.sh | bash"
+      },
+      {
+        "title": "Verify the remote runtime",
+        "body": "From the SSH session prove the binary exists and the CLI opens.",
+        "command": "command -v hermes && hermes"
+      }
+    ],
+    "troubleshooting": [
+      "If SSH is unstable, fix the host first. Hermes is not the problem yet.",
+      "If the install works locally but not remotely, compare PATH and environment variables before changing commands.",
+      "If the remote host is missing provider credentials, add only the minimum config needed for the same provider you already proved locally."
+    ],
+    "nextLesson": "keep-your-agent-alive"
+  },
+  {
+    "slug": "keep-your-agent-alive",
+    "title": "Keep your agent alive between sessions",
+    "summary": "Create one real service definition so logout does not kill the runtime.",
+    "level": 1,
+    "track": "deployed-agent",
+    "estimatedMinutes": 25,
+    "difficulty": "operator",
+    "objective": "Turn the remote runtime into a process that survives disconnects and reboots.",
+    "prerequisites": [
+      "deploy-hermes-on-a-vps"
+    ],
+    "outcome": "A saved service definition or tmux command that keeps Hermes alive.",
+    "expectedResult": "You can disconnect, reconnect, and find the runtime still running.",
+    "validation": "Start the service, disconnect, reconnect, and verify the Hermes process still exists.",
+    "xp": 55,
+    "steps": [
+      {
+        "title": "Write the systemd unit file",
+        "body": "Create the service file now. If no file exists at the end of the lesson, you shipped nothing.",
+        "command": "sudo nano /etc/systemd/system/hermes.service",
+        "note": "[Unit]\nDescription=Hermes Runtime\nAfter=network.target\n\n[Service]\nUser=<your-user>\nWorkingDirectory=/home/<your-user>\nExecStart=/home/<your-user>/.local/bin/hermes\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target"
+      },
+      {
+        "title": "Enable and start the service",
+        "body": "Reload systemd, enable the unit, and start it once.",
+        "command": "sudo systemctl daemon-reload && sudo systemctl enable --now hermes"
+      },
+      {
+        "title": "Prove it survives without your shell",
+        "body": "Check status, disconnect, reconnect, then check again.",
+        "command": "sudo systemctl status hermes --no-pager"
+      }
+    ],
+    "troubleshooting": [
+      "If the unit fails under systemd but works manually, compare PATH, WorkingDirectory, and provider env vars.",
+      "If the service restarts forever, fix the Hermes command first instead of increasing restart counts.",
+      "If you cannot use systemd, use one named tmux session and document the exact session name before moving on."
+    ],
+    "nextLesson": "connect-a-messaging-layer"
+  },
+  {
+    "slug": "connect-a-messaging-layer",
+    "title": "Connect a messaging layer",
+    "summary": "Give the runtime one real ingress path so you can reach it without SSH.",
+    "level": 1,
+    "track": "deployed-agent",
+    "estimatedMinutes": 30,
+    "difficulty": "operator",
+    "objective": "Attach one real inbound channel to the running agent.",
+    "prerequisites": [
+      "keep-your-agent-alive"
+    ],
+    "outcome": "One tested ingress path into the runtime.",
+    "expectedResult": "A real input reaches the runtime from the chosen channel and produces one visible reply.",
+    "validation": "Send one real test input through the chosen ingress and record the exact reply.",
+    "xp": 55,
+    "steps": [
+      {
+        "title": "Pick the one channel you already have credentials for",
+        "body": "Use one ingress only. The goal is a working input path, not channel coverage.",
+        "command": "Example surfaces: Telegram bot token, Discord bot token, Slack app token, or one webhook endpoint."
+      },
+      {
+        "title": "Store the minimum credentials on the runtime host",
+        "body": "Put only the required secrets on the box and keep them out of chat logs.",
+        "command": "export CHANNEL_TOKEN=<your-token>"
+      },
+      {
+        "title": "Send one real inbound test",
+        "body": "Trigger the ingress once and verify the runtime replies exactly once in the expected place.",
+        "command": "Send one short real message through the selected channel, then record the reply text."
+      }
+    ],
+    "troubleshooting": [
+      "If the channel is silent, verify token validity and webhook reachability before changing agent logic.",
+      "If you get duplicate replies, stop the duplicate runtime or duplicate webhook before continuing.",
+      "If the channel reaches the runtime but no reply returns, inspect the running service logs first."
+    ],
+    "nextLesson": "add-your-first-skill"
+  },
+  {
+    "slug": "add-your-first-skill",
+    "title": "Add your first skill/tool",
+    "summary": "Install one narrow capability the agent can reuse without human hand-holding.",
+    "level": 2,
+    "track": "useful-workflow",
+    "estimatedMinutes": 25,
+    "difficulty": "builder",
+    "objective": "Teach Hermes one bounded task it can perform on demand.",
+    "prerequisites": [
+      "connect-a-messaging-layer"
+    ],
+    "outcome": "One working skill or tool the agent can call repeatedly.",
+    "expectedResult": "The agent uses the skill once on real input and returns a useful result.",
+    "validation": "Trigger the skill once and save the exact input and output it produced.",
+    "xp": 70,
+    "milestoneEvents": [
+      "first_skill_added"
+    ],
+    "steps": [
+      {
+        "title": "Pick one narrow job",
+        "body": "Choose one repeated task that is low-risk and obvious when it works.",
+        "command": "Example jobs: summarize one note, classify one lead, extract one field set, or rewrite one reply."
+      },
+      {
+        "title": "Install or create the skill",
+        "body": "Use the existing Hermes skill flow and keep the scope brutally small.",
+        "command": "Use the single Hermes skill path you already trust. Do not bundle multiple skills into this lesson."
+      },
+      {
+        "title": "Run the skill on real-shaped input",
+        "body": "Call the skill with input that looks like production, then save the result.",
+        "command": "Run the skill once and write the resulting artifact to ~/pico-first-skill.txt"
+      }
+    ],
+    "troubleshooting": [
+      "If the skill fails, test the underlying command or API outside Hermes first.",
+      "If the output is noisy, cut scope from the skill instead of adding more prompt text.",
+      "If the task can send or mutate something risky, keep the skill read-only until the approval lesson."
+    ],
+    "nextLesson": "create-a-scheduled-workflow"
+  },
+  {
+    "slug": "create-a-scheduled-workflow",
+    "title": "Create a scheduled workflow",
+    "summary": "Put the useful job on a clock and prove one scheduled execution leaves a visible trace.",
+    "level": 3,
+    "track": "useful-workflow",
+    "estimatedMinutes": 20,
+    "difficulty": "builder",
+    "objective": "Turn the working skill into one repeatable scheduled job.",
+    "prerequisites": [
+      "add-your-first-skill"
+    ],
+    "outcome": "One saved schedule that runs the job without manual kickoff.",
+    "expectedResult": "A scheduled execution fires and leaves a visible result you can point to later.",
+    "validation": "Trigger one schedule tick and capture the resulting log, output file, or run record.",
+    "xp": 75,
+    "milestoneEvents": [
+      "first_workflow_built"
+    ],
+    "steps": [
+      {
+        "title": "Pick one sane cadence",
+        "body": "Choose a schedule that matches the job. Daily is enough unless you can defend something tighter.",
+        "command": "Example cron: 0 9 * * *"
+      },
+      {
+        "title": "Save the scheduled command",
+        "body": "Create the exact cron or scheduler entry now. A schedule that only exists in your head is fake.",
+        "command": "(crontab -l 2>/dev/null; echo \"0 9 * * * /home/<your-user>/.local/bin/hermes\") | crontab -"
+      },
+      {
+        "title": "Force one execution and capture the result",
+        "body": "Do not wait all day. Trigger the workflow once and save the output location.",
+        "command": "/home/<your-user>/.local/bin/hermes"
+      }
+    ],
+    "troubleshooting": [
+      "If the schedule never fires, verify timezone and crontab ownership before touching Hermes.",
+      "If the job fires twice, remove the duplicate scheduler entry before continuing.",
+      "If the scheduler cannot see secrets, export them in the execution environment explicitly."
+    ],
+    "nextLesson": "see-your-agent-activity"
+  },
+  {
+    "slug": "see-your-agent-activity",
+    "title": "See your agent activity",
+    "summary": "Open the control surface, inspect one real run or empty-state truth, and record the first operator signal.",
+    "level": 4,
+    "track": "controlled-agent",
+    "estimatedMinutes": 20,
+    "difficulty": "operator",
+    "objective": "Leave the control layer with one concrete signal you can name later.",
+    "prerequisites": [
+      "create-a-scheduled-workflow"
+    ],
+    "outcome": "One recorded operator signal: a run id, an alert type, or an honest empty-state fact.",
+    "expectedResult": "You can point to a concrete runtime signal instead of saying \"it seems fine\".",
+    "validation": "Open Autopilot and write down one signal in a file such as `~/pico-operator-checkpoint.txt`.",
+    "xp": 70,
+    "milestoneEvents": [
+      "first_monitoring_event_seen"
+    ],
+    "steps": [
+      {
+        "title": "Open Autopilot",
+        "body": "Go to the control surface and start with runs. Do not browse the whole page yet.",
+        "command": "Open /pico/autopilot"
+      },
+      {
+        "title": "Inspect one signal",
+        "body": "Capture one run id, alert type, or empty-state fact. One is enough for this lesson.",
+        "command": "Example artifact line: run_id=<paste>, alert_type=<paste>, or empty_state=no_live_agent"
+      },
+      {
+        "title": "Save the checkpoint",
+        "body": "Store that signal in a file so you can compare later states against something concrete.",
+        "command": "printf \"checkpoint=<paste your first operator signal here>\n\" > ~/pico-operator-checkpoint.txt"
+      }
+    ],
+    "troubleshooting": [
+      "If no runs appear, verify the scheduled workflow really executed before blaming the control surface.",
+      "If auth blocks the view, sign in first. This lesson depends on the actual control plane.",
+      "If the page is empty, record the empty-state truth honestly. Empty is still signal."
+    ],
+    "nextLesson": "set-a-cost-threshold"
+  },
+  {
+    "slug": "set-a-cost-threshold",
+    "title": "Set a cost threshold",
+    "summary": "Store one budget line in the sand and verify it survives reload.",
+    "level": 5,
+    "track": "controlled-agent",
+    "estimatedMinutes": 15,
+    "difficulty": "operator",
+    "objective": "Define one cost threshold you are willing to tolerate before the runtime gets noisy.",
+    "prerequisites": [
+      "see-your-agent-activity"
+    ],
+    "outcome": "One saved threshold tied to the control surface.",
+    "expectedResult": "The saved threshold persists after reload and appears in the product state.",
+    "validation": "Save a threshold, reload the page, and confirm the same value is still there.",
+    "xp": 65,
+    "milestoneEvents": [
+      "first_alert_configured"
+    ],
+    "steps": [
+      {
+        "title": "Choose one threshold value",
+        "body": "Pick one number you can defend right now. Use 75 if you do not have a better reason.",
+        "command": "Threshold: 75"
+      },
+      {
+        "title": "Save it in Autopilot",
+        "body": "Enter the number and save it once. Do not keep tweaking it during the lesson.",
+        "command": "Open /pico/autopilot and click Save threshold"
+      },
+      {
+        "title": "Reload and verify persistence",
+        "body": "Reload the page and confirm the same threshold still appears.",
+        "command": "Reload /pico/autopilot and verify the threshold field still shows your saved value."
+      }
+    ],
+    "troubleshooting": [
+      "If the threshold disappears after reload, fix persistence before trusting any cost control.",
+      "If no live budget exists yet, still save the threshold but treat cost awareness as incomplete.",
+      "If you are guessing wildly, choose a lower threshold and move on."
+    ],
+    "nextLesson": "add-an-approval-gate"
+  },
+  {
+    "slug": "add-an-approval-gate",
+    "title": "Add an approval gate",
+    "summary": "Create one real approval checkpoint and resolve it on purpose.",
+    "level": 5,
+    "track": "controlled-agent",
+    "estimatedMinutes": 20,
+    "difficulty": "operator",
+    "objective": "Exercise the risky-action gate before you trust the runtime with anything consequential.",
+    "prerequisites": [
+      "set-a-cost-threshold"
+    ],
+    "outcome": "One working approval request and one deliberate resolution.",
+    "expectedResult": "A pending approval exists and you can approve or reject it intentionally.",
+    "validation": "Create one approval request and resolve it from the queue.",
+    "xp": 75,
+    "milestoneEvents": [
+      "first_approval_gate_enabled"
+    ],
+    "steps": [
+      {
+        "title": "Pick one risky action worth gating",
+        "body": "Use one outbound send, publish, or state-changing action. If the action is harmless, this lesson is fake.",
+        "command": "Example gated action: outbound_message_send"
+      },
+      {
+        "title": "Create the approval request",
+        "body": "Push the action into the approval queue instead of running it immediately.",
+        "command": "Open /pico/autopilot and create one approval request for the risky action."
+      },
+      {
+        "title": "Resolve the request intentionally",
+        "body": "Approve or reject the request once and record what the queue shows after the action.",
+        "command": "Use the Approve or Reject action in /pico/autopilot and record the final status."
+      }
+    ],
+    "troubleshooting": [
+      "If approvals are unavailable, say so plainly. The runtime is not governed yet.",
+      "If everybody can approve everything, the gate exists but the policy is weak. Record that gap and keep going.",
+      "If you gate trivial noise, the queue becomes spam and operators stop trusting it."
+    ],
+    "nextLesson": "build-a-lead-response-agent"
+  },
+  {
+    "slug": "build-a-lead-response-agent",
+    "title": "Build a lead-response agent",
+    "summary": "Turn one inbound lead into one draft reply and keep the send behind approval.",
+    "level": 6,
+    "track": "production-pattern",
+    "estimatedMinutes": 35,
+    "difficulty": "builder",
+    "objective": "Ship one workflow a founder would actually use this week.",
+    "prerequisites": [
+      "add-an-approval-gate"
+    ],
+    "outcome": "A lead-response workflow with a gated outbound step.",
+    "expectedResult": "Lead data becomes a draft reply or structured operator summary, and the risky send stays gated.",
+    "validation": "Run one lead through the workflow end to end and save the drafted result.",
+    "xp": 90,
+    "steps": [
+      {
+        "title": "Create one lead payload",
+        "body": "Use the smallest useful shape and keep it fixed for the whole lesson.",
+        "command": "printf \"name=Alex\nsource=website\nintent=book demo\nnext_step=send reply\n\" > ~/pico-lead.txt"
+      },
+      {
+        "title": "Generate one draft reply",
+        "body": "Run the workflow on that lead payload and produce one draft reply or one structured summary.",
+        "command": "Feed ~/pico-lead.txt into your Hermes lead workflow and save the result to ~/pico-lead-draft.txt"
+      },
+      {
+        "title": "Put the outbound action behind approval",
+        "body": "Do not send automatically. Force the workflow through the approval queue once.",
+        "command": "Create one approval request for the outbound send using the drafted reply as payload."
+      }
+    ],
+    "troubleshooting": [
+      "If the draft is generic, tighten the lead payload before touching the prompt.",
+      "If the workflow is slow, remove extra steps before you optimize models.",
+      "If you do not need outbound send yet, stop at a gated draft and call that the artifact."
+    ],
+    "nextLesson": "build-a-document-processing-agent"
+  },
+  {
+    "slug": "build-a-document-processing-agent",
+    "title": "Build a document-processing agent",
+    "summary": "Ingest one document, extract the few fields that matter, and surface one reviewed output artifact.",
+    "level": 6,
+    "track": "production-pattern",
+    "estimatedMinutes": 40,
+    "difficulty": "builder",
+    "objective": "Ship one stronger production pattern around unstructured input.",
+    "prerequisites": [
+      "add-an-approval-gate"
+    ],
+    "outcome": "One document-processing workflow with a saved structured output.",
+    "expectedResult": "A real document becomes a structured summary, checklist, or tagged record you can inspect.",
+    "validation": "Process one real document and save the extracted output artifact.",
+    "xp": 95,
+    "steps": [
+      {
+        "title": "Pick one document and freeze the schema",
+        "body": "Use one real file type and decide the exact fields you need before extraction starts.",
+        "command": "Example output schema: title, owner, due_date, summary, next_action"
+      },
+      {
+        "title": "Run extraction once",
+        "body": "Extract only the fields that matter downstream. Ignore every nice-to-have field.",
+        "command": "Run the workflow on one real document and save the structured output to ~/pico-document-output.txt"
+      },
+      {
+        "title": "Review the saved output",
+        "body": "Read the output and confirm it is usable without more cleanup.",
+        "command": "cat ~/pico-document-output.txt"
+      }
+    ],
+    "troubleshooting": [
+      "If extraction quality is weak, reduce document variety before adding more prompting.",
+      "If the output is hard to inspect, your schema is too wide. Cut fields.",
+      "If you cannot tell whether the result is usable, the workflow is not ready to automate further."
+    ]
+  }
+]

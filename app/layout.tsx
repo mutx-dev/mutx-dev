@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+import { appFontVariables } from "@/app/fonts/app";
 import {
   DEFAULT_OG_IMAGE_ALT,
   DEFAULT_X_HANDLE,
@@ -18,7 +19,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#060810',
+  themeColor: '#09080b',
 } as const
 
 export const metadata: Metadata = {
@@ -111,9 +112,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           as="image"
           type="image/webp"
         />
-        <meta name="theme-color" content="#060810" />
+        <meta name="theme-color" content="#09080b" />
       </head>
-      <body className="h-full min-h-screen antialiased">{children}</body>
+      <body className={`${appFontVariables} h-full min-h-screen antialiased`}>{children}</body>
     </html>
   );
 }

@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <AuthSurface {...authSurfaceProps}>
+    <AuthSurface {...authSurfaceProps} variant="recovery">
       {success ? (
         <div className={styles.formWrap}>
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">

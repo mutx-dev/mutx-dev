@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user
+from src.api.middleware.auth import get_current_user, get_current_user_optional
 from src.api.models import User
+from src.api.models.pico_tutor import PicoTutorRequest, PicoTutorResponse
 from src.api.services.pico_progress import get_pico_progress, upsert_pico_progress
+from src.api.services.pico_tutor import generate_pico_tutor_reply
 
 router = APIRouter(prefix="/pico", tags=["pico"])
 
@@ -37,4 +39,17 @@ async def pico_progress_update(
         user=current_user,
         payload=payload.model_dump(),
         replace=False,
+    )
+
+
+@router.post("/tutor", response_model=PicoTutorResponse)
+async def pico_tutor(
+    payload: PicoTutorRequest,
+    request: Request,
+    current_user: User | None = Depends(get_current_user_optional),
+):
+    return await generate_pico_tutor_reply(
+        payload,
+        current_user=current_user,
+        trace_id=getattr(request.state, "trace_id", None),
     )

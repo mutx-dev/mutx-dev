@@ -385,3 +385,39 @@ railway variables
 # Custom domain
 railway domain add yourdomain.com
 ```
+
+## Auth And Onboarding Checklist
+
+The hosted onboarding flow now depends on the backend email + OAuth contract, not just password auth.
+
+For the live Railway project `zooming-youth`, set these backend variables on the API service:
+
+```bash
+FRONTEND_URL=https://app.mutx.dev
+CORS_ORIGINS=https://mutx.dev,https://app.mutx.dev,https://pico.mutx.dev
+REQUIRE_EMAIL_VERIFICATION=true
+EMAIL_VERIFICATION_TOKEN_EXPIRE_HOURS=72
+
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
+DISCORD_CLIENT_ID=...
+DISCORD_CLIENT_SECRET=...
+```
+
+Set `FRONTEND_URL` to the host that should own email verification and password-reset links. `CORS_ORIGINS` should include every frontend host that can initiate auth or OAuth callbacks.
+
+### OAuth callback URIs
+
+Register the callback URIs on each provider app for every frontend host you plan to serve auth from. Current routes terminate at:
+
+- `https://app.mutx.dev/api/auth/oauth/google/callback`
+- `https://app.mutx.dev/api/auth/oauth/github/callback`
+- `https://app.mutx.dev/api/auth/oauth/discord/callback`
+
+If Pico moves onto its own authenticated host later, register the equivalent `https://pico.mutx.dev/api/auth/oauth/{provider}/callback` endpoints before switching traffic.
+
+### Database and migrations
+
+The backend Railway service already runs `alembic upgrade head` from [railway.json](/Users/fortune/MUTX/railway.json) before startup, so the external-auth identity table is deployed alongside the API. Keep that pre-start migration step in place for the `zooming-youth` backend service.

@@ -1,25 +1,25 @@
 .page {
-  --marketing-bg: #f8f6f3;
-  --marketing-bg-soft: #efebe4;
-  --marketing-bg-strong: #0a0a0a;
-  --marketing-surface: #ffffff;
-  --marketing-surface-soft: rgba(255, 255, 255, 0.8);
-  --marketing-text: #131a24;
-  --marketing-text-soft: rgba(19, 26, 36, 0.78);
-  --marketing-text-muted: rgba(19, 26, 36, 0.58);
-  --marketing-text-reverse: #f8f7f5;
-  --marketing-text-reverse-soft: rgba(248, 247, 245, 0.74);
-  --marketing-border: rgba(19, 26, 36, 0.12);
-  --marketing-border-strong: rgba(19, 26, 36, 0.22);
-  --marketing-border-reverse: rgba(248, 247, 245, 0.18);
-  --marketing-accent: #4b8dff;
-  --marketing-accent-soft: #8dcbff;
-  --marketing-shadow: 0 24px 60px rgba(10, 18, 38, 0.12);
+  --marketing-bg: #09080b;
+  --marketing-bg-soft: #131117;
+  --marketing-bg-strong: #07060a;
+  --marketing-surface: rgba(24, 21, 28, 0.94);
+  --marketing-surface-soft: rgba(255, 248, 236, 0.05);
+  --marketing-text: #f7f0e4;
+  --marketing-text-soft: rgba(232, 221, 203, 0.82);
+  --marketing-text-muted: rgba(188, 172, 149, 0.6);
+  --marketing-text-reverse: #fff5e8;
+  --marketing-text-reverse-soft: rgba(255, 241, 223, 0.72);
+  --marketing-border: rgba(255, 233, 204, 0.11);
+  --marketing-border-strong: rgba(212, 171, 115, 0.22);
+  --marketing-border-reverse: rgba(255, 241, 223, 0.14);
+  --marketing-accent: #d4ab73;
+  --marketing-accent-soft: #f0d0a1;
+  --marketing-shadow: 0 28px 80px rgba(2, 2, 5, 0.28);
   position: relative;
   min-height: 100vh;
   background: var(--marketing-bg);
   color: var(--marketing-text);
-  font-family: var(--font-marketing-sans), sans-serif;
+  font-family: var(--font-site-body), sans-serif;
 }
 
 .page *,
@@ -34,30 +34,30 @@
 
 .homePage {
   background:
-    radial-gradient(circle at 24% 0%, rgba(75, 141, 255, 0.14), transparent 28rem),
-    radial-gradient(circle at 80% 10%, rgba(104, 225, 255, 0.08), transparent 32rem),
-    linear-gradient(180deg, #050608 0%, #0a0c12 100%);
+    radial-gradient(circle at 14% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 86% 12%, rgba(137, 120, 184, 0.12), transparent 28rem),
+    linear-gradient(180deg, #111014 0%, #08070b 100%);
 }
 
 .publicPage {
   background:
-    radial-gradient(circle at 14% 0%, rgba(75, 141, 255, 0.18), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(104, 225, 255, 0.1), transparent 28rem),
-    linear-gradient(180deg, #06080d 0 28rem, #101621 28rem 38rem, var(--marketing-bg) 38rem 100%);
+    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.1), transparent 28rem),
+    linear-gradient(180deg, #111014 0 28rem, #0c0b10 28rem 38rem, var(--marketing-bg) 38rem 100%);
 }
 
 .downloadPage {
   background:
-    radial-gradient(circle at 14% 0%, rgba(75, 141, 255, 0.18), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(104, 225, 255, 0.14), transparent 30rem),
-    linear-gradient(180deg, #06080d 0%, #101621 46rem, #0c1119 100%);
+    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
+    linear-gradient(180deg, #111014 0%, #0c0b10 46rem, #08070b 100%);
 }
 
 .releasesPage {
   background:
-    radial-gradient(circle at 14% 0%, rgba(75, 141, 255, 0.18), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(104, 225, 255, 0.14), transparent 30rem),
-    linear-gradient(180deg, #06080d 0%, #101621 58rem, #0c1119 100%);
+    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
+    linear-gradient(180deg, #111014 0%, #0c0b10 58rem, #08070b 100%);
 }
 
 .shell {
@@ -86,7 +86,7 @@
   border-radius: 0.9rem;
   border: 1px solid rgba(248, 247, 245, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(75, 141, 255, 0.22), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.22), transparent 72%),
     linear-gradient(180deg, rgba(16, 20, 30, 0.92), rgba(5, 7, 11, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
@@ -96,7 +96,7 @@
 .brandLight .brandMarkWrap {
   border-color: rgba(19, 26, 36, 0.12);
   background:
-    radial-gradient(circle at 50% 0%, rgba(75, 141, 255, 0.16), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.16), transparent 72%),
     linear-gradient(180deg, rgba(19, 26, 36, 0.96), rgba(8, 10, 14, 0.98));
 }
 
@@ -114,7 +114,7 @@
 
 .brandOverline {
   margin: 0;
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: 0.78rem;
   font-weight: 800;
   line-height: 0.95;
@@ -124,7 +124,7 @@
 
 .brandTitle {
   margin: 0;
-  font-family: var(--font-marketing-display), sans-serif;
+  font-family: var(--font-site-display), sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1;
@@ -140,22 +140,25 @@
 }
 
 .publicRailInner {
-  display: inline-flex;
-  width: fit-content;
+  display: flex;
+  width: min(100%, 100%);
+  align-items: center;
+  justify-content: space-between;
   min-height: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  backdrop-filter: none;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 240, 221, 0.1);
+  border-radius: 1.4rem;
+  background: rgba(27, 19, 15, 0.5);
+  box-shadow: 0 20px 44px rgba(10, 6, 4, 0.18);
+  backdrop-filter: blur(18px);
   color: var(--marketing-text-reverse);
 }
 
 .publicRailBrand {
-  display: inline-grid;
+  display: inline-flex;
   min-width: 4.7rem;
-  justify-items: center;
-  gap: 0.45rem;
+  align-items: center;
+  gap: 0.8rem;
   text-decoration: none;
   pointer-events: auto;
 }
@@ -167,10 +170,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  border: 1px solid rgba(248, 247, 245, 0.14);
+  border: 1px solid rgba(255, 240, 221, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(75, 141, 255, 0.16), transparent 72%),
-    linear-gradient(180deg, rgba(17, 21, 29, 0.98), rgba(2, 3, 5, 1));
+    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.18), transparent 72%),
+    linear-gradient(180deg, rgba(49, 35, 28, 0.98), rgba(20, 14, 11, 1));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 18px 42px rgba(0, 7, 18, 0.28);
@@ -192,7 +195,7 @@
   display: block;
   width: 100%;
   color: rgba(248, 247, 245, 0.88);
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
   font-weight: 800;
   line-height: 1;
@@ -209,11 +212,11 @@
 }
 
 .publicRailTitle {
-  font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.76rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.86rem;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
@@ -237,13 +240,14 @@
   align-items: center;
   gap: 0.35rem;
   min-height: 2.4rem;
-  padding: 0 0.85rem;
+  padding: 0 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(248, 247, 245, 0.12);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 240, 221, 0.12);
+  background: rgba(255, 247, 235, 0.05);
   color: rgba(248, 247, 245, 0.92);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-weight: 600;
+  letter-spacing: 0.03em;
   line-height: 1;
   text-decoration: none;
   transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
@@ -251,8 +255,8 @@
 
 .publicRailLink:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(248, 247, 245, 0.22);
+  background: rgba(212, 171, 115, 0.16);
+  border-color: rgba(255, 240, 221, 0.22);
 }
 
 .section {
@@ -290,7 +294,7 @@
   margin: 0;
   border-radius: 999px;
   border: 1px solid currentColor;
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: clamp(1rem, 0.85rem + 0.3vw, 1.2rem);
   font-weight: 800;
   line-height: 0.96;
@@ -309,7 +313,7 @@
 
 .displayTitle {
   margin: 0;
-  font-family: var(--font-marketing-display), sans-serif;
+  font-family: var(--font-site-display), sans-serif;
   font-size: clamp(3.35rem, 8vw, 6.4rem);
   font-weight: 300;
   line-height: 0.98;
@@ -319,7 +323,7 @@
 .displayAccent {
   display: block;
   margin-top: 0.35rem;
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: clamp(1.85rem, 3vw, 3.2rem);
   font-weight: 800;
   line-height: 0.95;
@@ -378,7 +382,7 @@
   border-radius: 0.9rem;
   border: 1px solid transparent;
   text-decoration: none;
-  font-family: var(--font-marketing-sans), sans-serif;
+  font-family: var(--font-site-body), sans-serif;
   font-size: 0.96rem;
   font-weight: 600;
   line-height: 1;
@@ -423,18 +427,18 @@
 }
 
 .buttonPrimary {
-  background: linear-gradient(135deg, #92d1ff 0%, var(--marketing-accent) 100%);
-  color: #07111f;
+  background: linear-gradient(135deg, #edc492 0%, var(--marketing-accent) 100%);
+  color: #24160f;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 18px 42px rgba(75, 141, 255, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 18px 42px rgba(85, 44, 21, 0.18);
 }
 
 .buttonPrimary:hover {
-  background: linear-gradient(135deg, #a5dcff 0%, #5b96ff 100%);
+  background: linear-gradient(135deg, #f2d6af 0%, #d2683d 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    0 24px 50px rgba(75, 141, 255, 0.26);
+    0 24px 50px rgba(85, 44, 21, 0.22);
 }
 
 .buttonSecondary {
@@ -448,13 +452,13 @@
 }
 
 .buttonGhost {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 247, 235, 0.05);
   color: var(--marketing-text-reverse);
   border-color: var(--marketing-border-reverse);
 }
 
 .buttonGhost:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(212, 171, 115, 0.14);
 }
 
 .utilityLinks {
@@ -481,7 +485,7 @@
 
 .sectionTitle {
   margin: 0;
-  font-family: var(--font-marketing-sans), sans-serif;
+  font-family: var(--font-site-body), sans-serif;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 400;
   line-height: 1.02;
@@ -520,7 +524,7 @@
 }
 
 .panel {
-  border-radius: 1.25rem;
+  border-radius: 1.5rem;
   border: 1px solid var(--marketing-border);
   background: var(--marketing-surface-soft);
   box-shadow: var(--marketing-shadow);
@@ -545,9 +549,9 @@
 .surfaceListItem {
   margin: 0;
   padding: 0.95rem 1rem;
-  border-radius: 0.9rem;
+  border-radius: 1.05rem;
   border: 1px solid var(--marketing-border);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 251, 244, 0.72);
   color: var(--marketing-text-soft);
   font-size: 0.96rem;
   line-height: 1.45;
@@ -621,8 +625,8 @@
 .textarea:focus,
 .select:focus {
   outline: none;
-  border-color: rgba(75, 141, 255, 0.82);
-  box-shadow: 0 0 0 3px rgba(75, 141, 255, 0.14);
+  border-color: rgba(212, 171, 115, 0.82);
+  box-shadow: 0 0 0 3px rgba(212, 171, 115, 0.14);
 }
 
 .error,
@@ -677,9 +681,9 @@
 .routeDarkSection {
   padding: clamp(6rem, 9vw, 7.8rem) 0 clamp(3rem, 6vw, 4.5rem);
   background:
-    radial-gradient(circle at 16% 0%, rgba(75, 141, 255, 0.2), transparent 24rem),
-    radial-gradient(circle at 86% 10%, rgba(104, 225, 255, 0.11), transparent 28rem),
-    linear-gradient(180deg, #07080c 0%, #121722 100%);
+    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.22), transparent 24rem),
+    radial-gradient(circle at 86% 10%, rgba(212, 171, 115, 0.11), transparent 28rem),
+    linear-gradient(180deg, #18110d 0%, #2a1e17 100%);
   color: var(--marketing-text-reverse);
 }
 
@@ -688,8 +692,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 82% 24%, rgba(120, 189, 255, 0.12), transparent 26rem),
-    radial-gradient(circle at 22% 18%, rgba(75, 141, 255, 0.12), transparent 18rem);
+    radial-gradient(circle at 82% 24%, rgba(212, 171, 115, 0.12), transparent 26rem),
+    radial-gradient(circle at 22% 18%, rgba(212, 171, 115, 0.12), transparent 18rem);
   opacity: 0.9;
   animation: ambientShift 18s ease-in-out infinite;
   pointer-events: none;
@@ -711,7 +715,7 @@
 .routeLightSection {
   padding: clamp(1.5rem, 3vw, 2.3rem) 0 clamp(4rem, 8vw, 5.5rem);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(248, 246, 243, 0.96) 6rem),
+    linear-gradient(180deg, rgba(255, 247, 235, 0.62), rgba(245, 237, 225, 0.96) 6rem),
     var(--marketing-bg);
 }
 
@@ -835,7 +839,7 @@
   min-height: 100%;
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 16% 0%, rgba(75, 141, 255, 0.14), transparent 16rem),
+    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.14), transparent 16rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.96), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.24);
   min-height: 14.5rem;
@@ -852,7 +856,7 @@
 .routeDownloadCard .routeCardIcon {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 30% 20%, rgba(75, 141, 255, 0.18), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.18), transparent 70%),
     rgba(255, 255, 255, 0.04);
 }
 
@@ -865,7 +869,7 @@
 .routeArtifactPanel {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(75, 141, 255, 0.14), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.14), transparent 22rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.94), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.22);
 }
@@ -953,7 +957,7 @@
 .routeHeroPanel {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(75, 141, 255, 0.16), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.16), transparent 22rem),
     linear-gradient(180deg, rgba(14, 17, 26, 0.96), rgba(9, 11, 18, 0.98));
   color: var(--marketing-text-reverse);
   box-shadow: 0 30px 80px rgba(3, 8, 20, 0.24);
@@ -1009,7 +1013,7 @@
 
 .routeCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(75, 141, 255, 0.24);
+  border-color: rgba(212, 171, 115, 0.24);
   box-shadow: 0 28px 68px rgba(10, 18, 38, 0.14);
 }
 
@@ -1022,7 +1026,7 @@
   border-radius: 1rem;
   border: 1px solid rgba(7, 7, 7, 0.1);
   background:
-    radial-gradient(circle at 30% 20%, rgba(75, 141, 255, 0.14), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.14), transparent 70%),
     rgba(7, 7, 7, 0.04);
 }
 
@@ -1053,7 +1057,7 @@
   width: 16rem;
   height: 16rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(75, 141, 255, 0.24), transparent 64%);
+  background: radial-gradient(circle, rgba(212, 171, 115, 0.24), transparent 64%);
   filter: blur(4px);
   pointer-events: none;
   animation: glowPulse 10s ease-in-out infinite;
@@ -1085,7 +1089,7 @@
   gap: 1rem;
   align-content: start;
   background:
-    radial-gradient(circle at 20% 0%, rgba(75, 141, 255, 0.1), transparent 20rem),
+    radial-gradient(circle at 20% 0%, rgba(212, 171, 115, 0.1), transparent 20rem),
     rgba(255, 255, 255, 0.92);
 }
 
@@ -1104,7 +1108,7 @@
 .routeMetaLabel {
   margin: 0;
   color: var(--marketing-text-muted);
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: 0.76rem;
   font-weight: 800;
   line-height: 1;
@@ -1153,22 +1157,23 @@
   justify-items: center;
   text-align: center;
   padding: clamp(2.5rem, 6vw, 4rem);
-  border-radius: 1.4rem;
+  border-radius: 1.8rem;
   background:
-    radial-gradient(circle at 50% 0%, rgba(75, 141, 255, 0.14), transparent 24rem),
-    linear-gradient(180deg, rgba(248, 246, 243, 0.98), rgba(239, 235, 228, 0.94));
-  border: 1px solid rgba(7, 7, 7, 0.08);
-  box-shadow: 0 30px 80px rgba(12, 18, 34, 0.1);
+    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(236, 223, 205, 0.94));
+  border: 1px solid rgba(58, 38, 25, 0.08);
+  box-shadow: 0 30px 80px rgba(50, 28, 16, 0.12);
   animation: fadeUpIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .footerTitle {
   margin: 0;
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: clamp(3rem, 6vw, 7rem);
   font-weight: 700;
   line-height: 0.92;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .footerText {
@@ -1197,6 +1202,11 @@
   text-decoration: none;
   font-size: 0.96rem;
   font-weight: 600;
+  transition: color 160ms ease;
+}
+
+.footerLink:hover {
+  color: var(--marketing-accent);
 }
 
 .footerMeta {

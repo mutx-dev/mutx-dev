@@ -58,6 +58,7 @@ export type AutopilotApprovalSummary = {
   payload?: { summary?: string; [key: string]: unknown } | null
   status: string
   requester: string
+  approver?: string | null
   created_at: string
   resolved_at?: string | null
 }

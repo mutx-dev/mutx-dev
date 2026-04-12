@@ -31,7 +31,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "dashboard-entry flex flex-col items-center justify-center rounded-[22px] border px-6 py-12 text-center",
+        "dashboard-entry flex flex-col items-center justify-center rounded-[28px] border px-6 py-12 text-center",
         className,
       )}
       style={{
@@ -44,7 +44,7 @@ export function EmptyState({
       {...props}
     >
       <div
-        className="flex h-14 w-14 items-center justify-center rounded-[18px] border"
+        className="flex h-16 w-16 items-center justify-center rounded-[22px] border"
         style={{
           borderColor: dashboardTokens.borderStrong,
           backgroundColor: dashboardTokens.bgSurfaceStrong,
@@ -53,7 +53,7 @@ export function EmptyState({
       >
         {icon ?? <Inbox className="h-7 w-7" />}
       </div>
-      <h3 className="mt-4 text-lg font-semibold tracking-[-0.02em]">{title}</h3>
+      <h3 className="mt-4 font-[family:var(--font-site-display)] text-xl font-semibold tracking-[-0.04em]">{title}</h3>
       <p className="mt-2 max-w-md text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
         {message}
       </p>
@@ -62,7 +62,7 @@ export function EmptyState({
       {!cta && ctaLabel && ctaHref ? (
         <Link
           href={ctaHref}
-          className="mt-5 inline-flex h-10 items-center rounded-[12px] px-4 text-sm font-medium"
+          className="mt-5 inline-flex h-11 items-center rounded-[14px] px-5 text-sm font-medium"
           style={{
             backgroundColor: dashboardTokens.brand,
             color: dashboardTokens.bgCanvas,
@@ -75,7 +75,7 @@ export function EmptyState({
         <button
           type="button"
           onClick={onCtaClick}
-          className="mt-5 inline-flex h-10 items-center rounded-[12px] px-4 text-sm font-medium"
+          className="mt-5 inline-flex h-11 items-center rounded-[14px] px-5 text-sm font-medium"
           style={{
             backgroundColor: dashboardTokens.brand,
             color: dashboardTokens.bgCanvas,

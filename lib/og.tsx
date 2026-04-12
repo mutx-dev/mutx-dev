@@ -137,7 +137,6 @@ function OgCard({ title, description, tag, domain }: OgImageProps) {
           alignItems: 'center',
           padding: '48px 72px 0 72px',
           position: 'relative',
-          zIndex: 1,
         }}
       >
         {tag ? (
@@ -189,7 +188,6 @@ function OgCard({ title, description, tag, domain }: OgImageProps) {
           flex: 1,
           padding: '0 72px',
           position: 'relative',
-          zIndex: 1,
         }}
       >
         <h1
@@ -230,7 +228,6 @@ function OgCard({ title, description, tag, domain }: OgImageProps) {
           alignItems: 'center',
           padding: '0 72px 40px 72px',
           position: 'relative',
-          zIndex: 1,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>

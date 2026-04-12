@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import {
+  applyAuthCookies,
+  authenticatedFetch,
+  getApiBaseUrl,
+} from '@/app/api/_lib/controlPlane'
 import { badRequest, withErrorHandling } from '@/app/api/_lib/errors'
-import { answerTutorQuestion } from '@/lib/pico/tutor'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,11 +19,39 @@ export async function POST(request: NextRequest) {
       return badRequest('Question is required')
     }
 
-    const reply = answerTutorQuestion(question, {
-      lessonSlug,
-      progress: body.progress,
-    })
+    const apiBaseUrl = getApiBaseUrl()
+    const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
+      request,
+      `${apiBaseUrl}/v1/pico/tutor`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(request.headers.get('traceparent')
+            ? { TRACEPARENT: request.headers.get('traceparent') as string }
+            : {}),
+          ...(request.headers.get('tracestate')
+            ? { TRACESTATE: request.headers.get('tracestate') as string }
+            : {}),
+        },
+        body: JSON.stringify({
+          question,
+          lessonSlug,
+          progress: body.progress,
+          setupContext: body.setupContext,
+        }),
+      },
+    )
 
-    return NextResponse.json(reply)
+    const payload = await response.json().catch(() => ({
+      detail: 'Tutor request failed',
+    }))
+    const nextResponse = NextResponse.json(payload, { status: response.status })
+
+    if (tokenRefreshed && refreshedTokens) {
+      applyAuthCookies(nextResponse, request, refreshedTokens)
+    }
+
+    return nextResponse
   })(request)
 }

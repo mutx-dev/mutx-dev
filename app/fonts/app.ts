@@ -1,36 +1,56 @@
-import {
-  IBM_Plex_Mono,
-  IBM_Plex_Sans,
-  Space_Grotesk,
-  Syne,
-} from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
+const suisseNeueDisplay = localFont({
+  src: [
+    {
+      path: "./marketing/SuisseNeue-Light-WebS.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./marketing/SuisseNeue-Light-WebXL.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-display",
+  display: "swap",
+});
+
+const suisseNeueSiteDisplay = localFont({
+  src: [
+    {
+      path: "./marketing/SuisseNeue-Light-WebS.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./marketing/SuisseNeue-Light-WebXL.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-site-display",
+  display: "swap",
+});
+
+const syndicatGroteskBody = localFont({
+  src: "./marketing/SyndicatGrotesk-Regular.woff2",
+  variable: "--font-site-body",
+  display: "swap",
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-mono",
-});
-
-const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-site-body",
-});
-
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-site-display",
+  display: "swap",
 });
 
 export const appFontVariables = [
-  spaceGrotesk.variable,
+  suisseNeueDisplay.variable,
+  suisseNeueSiteDisplay.variable,
   ibmPlexMono.variable,
-  ibmPlexSans.variable,
-  syne.variable,
+  syndicatGroteskBody.variable,
 ].join(" ");

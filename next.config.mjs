@@ -18,14 +18,12 @@ const nextConfig = {
         new webpack.DefinePlugin({
           'process.env.__NEXT_DEVTOOL_SEGMENT_EXPLORER': JSON.stringify(''),
         })
-      );
+      )
     }
-    return config;
+    return config
   },
   async redirects() {
     return [
-      // GitBook maps docs/api/* → /docs/reference/*
-      // Keep old /docs/api/* links functional as a fallback
       {
         source: '/docs/api',
         destination: '/docs/reference',
@@ -36,24 +34,12 @@ const nextConfig = {
         destination: '/docs/reference/:slug*',
         permanent: true,
       },
-    ];
-  },
-  async headers() {
-    return [
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
-    ];
+    ]
   },
   async rewrites() {
-    // Prefer a server-only upstream when the frontend and API share a private network.
-    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || '';
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || ''
     return {
       beforeFiles: [
-        // Map /api/v1/* to /api/* for SDK/CLI backward compatibility
         {
           source: '/api/v1/:path*',
           destination: '/api/:path*',
@@ -61,13 +47,12 @@ const nextConfig = {
       ],
       afterFiles: [],
       fallback: [
-        // Proxy unmatched API calls to external backend
         {
           source: '/api/:path*',
           destination: `${apiUrl}/:path*`,
         },
       ],
-    };
+    }
   },
 }
 

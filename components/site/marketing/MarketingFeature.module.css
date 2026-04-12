@@ -22,8 +22,8 @@
   height: 120%;
   background: radial-gradient(
     ellipse at 30% 50%,
-    rgba(75, 141, 255, 0.13) 0%,
-    rgba(75, 141, 255, 0.04) 40%,
+    rgba(212, 171, 115, 0.13) 0%,
+    rgba(212, 171, 115, 0.04) 40%,
     transparent 70%
   );
   pointer-events: none;
@@ -57,9 +57,9 @@
   gap: 0.6rem;
   padding: 0.35rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(75, 141, 255, 0.4);
-  background: rgba(75, 141, 255, 0.1);
-  font-family: var(--font-marketing-accent), sans-serif;
+  border: 1px solid rgba(212, 171, 115, 0.4);
+  background: rgba(212, 171, 115, 0.1);
+  font-family: var(--font-mono), monospace;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -74,14 +74,14 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #4b8dff;
+  background: #d4ab73;
   flex-shrink: 0;
 }
 
 /* Display headline — tight, bold, editorial */
 .heroTitle {
   margin: 0 0 1.8rem;
-  font-family: var(--font-marketing-display), serif;
+  font-family: var(--font-site-display), serif;
   font-size: clamp(3rem, 6.5vw, 6.5rem);
   font-weight: 300;
   line-height: 0.9;
@@ -131,17 +131,17 @@
 
 .sectionEyebrow {
   margin: 0 0 1.1rem;
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #4b8dff;
+  color: #d4ab73;
 }
 
 .sectionTitle {
   margin: 0 0 1rem;
-  font-family: var(--font-marketing-display), serif;
+  font-family: var(--font-site-display), serif;
   font-size: clamp(1.75rem, 2.8vw, 2.75rem);
   font-weight: 300;
   line-height: 1.05;
@@ -181,7 +181,7 @@
 
 .featureCardTitle {
   margin: 0 0 0.75rem;
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -195,7 +195,7 @@
 }
 
 .featureCardTitle a:hover {
-  color: #4b8dff;
+  color: #d4ab73;
 }
 
 .featureCardBody {
@@ -225,7 +225,7 @@
   height: 160%;
   background: radial-gradient(
     ellipse at 70% 50%,
-    rgba(75, 141, 255, 0.1) 0%,
+    rgba(212, 171, 115, 0.1) 0%,
     transparent 65%
   );
   pointer-events: none;
@@ -239,7 +239,7 @@
 
 .finalEyebrow {
   margin: 0 0 1.2rem;
-  font-family: var(--font-marketing-accent), sans-serif;
+  font-family: var(--font-mono), monospace;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -249,7 +249,7 @@
 
 .finalTitle {
   margin: 0 0 1.2rem;
-  font-family: var(--font-marketing-display), serif;
+  font-family: var(--font-site-display), serif;
   font-size: clamp(2.2rem, 4vw, 3.8rem);
   font-weight: 300;
   line-height: 0.95;

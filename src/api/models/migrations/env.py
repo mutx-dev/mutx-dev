@@ -2,6 +2,8 @@ from logging.config import fileConfig
 
 from sqlalchemy import create_engine, pool
 from sqlalchemy.engine import Connection
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.sqltypes import UUID
 
 from alembic import context
 
@@ -18,6 +20,11 @@ sync_db_url = build_sync_database_url(settings.database_url)
 config.set_main_option("sqlalchemy.url", sync_db_url)
 
 target_metadata = Base.metadata
+
+
+@compiles(UUID, "sqlite")
+def _compile_uuid_sqlite(_type, _compiler, **_kwargs) -> str:
+    return "CHAR(36)"
 
 
 def run_migrations_offline() -> None:
