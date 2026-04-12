@@ -19,7 +19,13 @@ import { StatusBadge } from "@/components/dashboard/StatusBadge";
 
 import type { components } from "@/app/types/api";
 
-type Run = components["schemas"]["RunResponse"];
+type Run = components["schemas"]["RunResponse"] & {
+  agent_id?: string | null;
+  subject_label?: string | null;
+  subject_type?: string | null;
+  template_id?: string | null;
+  execution_mode?: string | null;
+};
 type RunHistory = components["schemas"]["RunHistoryResponse"];
 
 export function RunsPageClient() {
@@ -138,7 +144,12 @@ export function RunsPageClient() {
                 <div className="min-w-0">
                   <p className="truncate font-mono text-sm text-white">{run.id}</p>
                   <p className="mt-1 text-sm text-slate-400">
-                    Agent {run.agent_id.slice(0, 8)} · {run.trace_count} traces
+                    {run.subject_label
+                      ? `${run.subject_label} · ${run.execution_mode || "managed"}`
+                      : run.agent_id
+                        ? `Agent ${run.agent_id.slice(0, 8)}`
+                        : "No agent binding"}{" "}
+                    · {run.trace_count} traces
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
                     <span>started {formatRelativeTime(run.started_at)}</span>

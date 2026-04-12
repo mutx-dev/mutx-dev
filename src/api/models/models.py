@@ -160,6 +160,9 @@ class User(Base):
     runs: Mapped[list["AgentRun"]] = relationship(
         "AgentRun", back_populates="user", cascade="all, delete-orphan"
     )
+    document_jobs: Mapped[list["DocumentJob"]] = relationship(
+        "DocumentJob", back_populates="user", cascade="all, delete-orphan"
+    )
     swarms: Mapped[list["Swarm"]] = relationship(
         "Swarm", back_populates="user", cascade="all, delete-orphan"
     )
@@ -471,8 +474,8 @@ class AgentRun(Base):
     __tablename__ = "agent_runs"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    agent_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    agent_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True, index=True
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
@@ -490,8 +493,11 @@ class AgentRun(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
     )
 
-    agent: Mapped["Agent"] = relationship("Agent", back_populates="runs")
+    agent: Mapped[Optional["Agent"]] = relationship("Agent", back_populates="runs")
     user: Mapped["User"] = relationship("User", back_populates="runs")
+    document_job: Mapped[Optional["DocumentJob"]] = relationship(
+        "DocumentJob", back_populates="run", uselist=False
+    )
     traces: Mapped[list["AgentRunTrace"]] = relationship(
         "AgentRunTrace", back_populates="run", cascade="all, delete-orphan"
     )
@@ -513,6 +519,75 @@ class AgentRunTrace(Base):
     )
 
     run: Mapped["AgentRun"] = relationship("AgentRun", back_populates="traces")
+
+
+class DocumentJob(Base):
+    __tablename__ = "document_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agent_runs.id"), nullable=False, unique=True, index=True
+    )
+    template_id: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    execution_mode: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="draft", index=True)
+    parameters: Mapped[dict | None] = mapped_column(JSONText(), nullable=True)
+    result_summary: Mapped[dict | None] = mapped_column(JSONText(), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    claimed_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    claim_token: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        index=True,
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="document_jobs")
+    run: Mapped["AgentRun"] = relationship("AgentRun", back_populates="document_job")
+    artifacts: Mapped[list["DocumentArtifact"]] = relationship(
+        "DocumentArtifact", back_populates="job", cascade="all, delete-orphan"
+    )
+
+
+class DocumentArtifact(Base):
+    __tablename__ = "document_artifacts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("document_jobs.id"), nullable=False, index=True
+    )
+    role: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    storage_backend: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    storage_uri: Mapped[str | None] = mapped_column(Text, nullable=True)
+    local_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    size_bytes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    sha256: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    extra_metadata: Mapped[dict | None] = mapped_column(JSONText(), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    job: Mapped["DocumentJob"] = relationship("DocumentJob", back_populates="artifacts")
 
 
 class WebhookDeliveryLog(Base):

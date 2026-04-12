@@ -5,6 +5,7 @@ import {
   BellRing,
   Bot,
   Brain,
+  FileText,
   GitBranchPlus,
   History,
   KeyRound,
@@ -29,6 +30,7 @@ export type DesktopRouteKey =
   | "home"
   | "agents"
   | "deployments"
+  | "documents"
   | "runs"
   | "monitoring"
   | "traces"
@@ -99,6 +101,18 @@ export const DESKTOP_ROUTE_META: Record<DesktopRouteKey, DesktopRouteMeta> = {
     section: "core",
     icon: Layers,
     iconTone: "text-emerald-300 bg-emerald-400/10",
+    requiresAuth: true,
+  },
+  documents: {
+    key: "documents",
+    title: "Documents",
+    path: "/dashboard/documents",
+    publicHref: "/dashboard/documents",
+    description: "Document workflow templates, artifact handling, and hybrid managed or local execution.",
+    badge: "execution",
+    section: "execution",
+    icon: FileText,
+    iconTone: "text-amber-300 bg-amber-400/10",
     requiresAuth: true,
   },
   runs: {
@@ -353,6 +367,7 @@ export const DESKTOP_ROUTE_ORDER: DesktopRouteKey[] = [
   "deployments",
   "runs",
   "monitoring",
+  "documents",
   "traces",
   "observability",
   "sessions",

@@ -353,7 +353,7 @@ class RunResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
-    agent_id: uuid.UUID
+    agent_id: uuid.UUID | None = None
     status: str
     input_text: Optional[str]
     output_text: Optional[str]
@@ -363,6 +363,11 @@ class RunResponse(BaseModel):
     completed_at: Optional[datetime]
     created_at: datetime
     trace_count: int = 0
+    subject_type: str | None = None
+    subject_id: str | None = None
+    subject_label: str | None = None
+    template_id: str | None = None
+    execution_mode: str | None = None
 
 
 class RunDetailResponse(RunResponse):
@@ -385,6 +390,127 @@ class RunTraceHistoryResponse(BaseModel):
     skip: int
     limit: int
     event_type: Optional[str] = None
+
+
+class DocumentTemplateFieldResponse(BaseModel):
+    name: str
+    type: str
+    required: bool = True
+    accepts_multiple: bool = False
+    description: str
+
+
+class DocumentTemplateOutputResponse(BaseModel):
+    role: str
+    kind: str
+    description: str
+
+
+class DocumentTemplateResponse(BaseModel):
+    id: str
+    name: str
+    summary: str
+    description: str
+    supports_managed: bool = True
+    supports_local: bool = True
+    inputs: list[DocumentTemplateFieldResponse] = Field(default_factory=list)
+    outputs: list[DocumentTemplateOutputResponse] = Field(default_factory=list)
+
+
+class DocumentArtifactRegistrationCreate(BaseModel):
+    role: str = Field(..., min_length=1, max_length=120)
+    kind: str = Field(..., min_length=1, max_length=120)
+    storage_backend: str = Field(default="local_reference", min_length=1, max_length=64)
+    filename: str = Field(..., min_length=1, max_length=255)
+    local_path: str | None = None
+    storage_uri: str | None = None
+    content_type: str | None = Field(default=None, max_length=255)
+    size_bytes: int | None = Field(default=None, ge=0)
+    sha256: str | None = Field(default=None, max_length=64)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DocumentArtifactResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    job_id: uuid.UUID
+    role: str
+    kind: str
+    storage_backend: str
+    storage_uri: str | None = None
+    local_path: str | None = None
+    filename: str
+    content_type: str | None = None
+    size_bytes: int | None = None
+    sha256: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+    updated_at: datetime
+
+
+class DocumentJobCreate(BaseModel):
+    template_id: str = Field(..., min_length=1, max_length=120)
+    execution_mode: str = Field(default="managed", min_length=1, max_length=32)
+    parameters: dict[str, Any] = Field(default_factory=dict)
+
+
+class DocumentJobDispatchRequest(BaseModel):
+    mode: str = Field(default="managed", min_length=1, max_length=32)
+
+
+class DocumentJobLocalLaunchRequest(BaseModel):
+    output_dir: str | None = None
+
+
+class DocumentJobLocalLaunchResponse(BaseModel):
+    job_id: uuid.UUID
+    template_id: str
+    execution_mode: str
+    manifest: dict[str, Any] = Field(default_factory=dict)
+    artifacts: list[DocumentArtifactResponse] = Field(default_factory=list)
+
+
+class DocumentJobEventCreate(BaseModel):
+    event_type: str = Field(..., min_length=1, max_length=100)
+    message: str | None = Field(default=None, max_length=5000)
+    payload: dict[str, Any] = Field(default_factory=dict)
+    status: str | None = Field(default=None, max_length=50)
+    output_text: str | None = None
+    error_message: str | None = None
+    result_summary: dict[str, Any] | None = None
+    timestamp: datetime | None = None
+
+
+class DocumentJobResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    run_id: uuid.UUID
+    template_id: str
+    execution_mode: str
+    status: str
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    result_summary: dict[str, Any] = Field(default_factory=dict)
+    error_message: str | None = None
+    claimed_by: str | None = None
+    claimed_at: datetime | None = None
+    last_heartbeat_at: datetime | None = None
+    attempts: int = 0
+    dispatched_at: datetime | None = None
+    completed_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+    artifacts: list[DocumentArtifactResponse] = Field(default_factory=list)
+
+
+class DocumentJobHistoryResponse(BaseModel):
+    items: list[DocumentJobResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    status: str | None = None
+    template_id: str | None = None
 
 
 class AgentStatusUpdate(BaseModel):

@@ -541,6 +541,116 @@ describe('dashboard route proxies', () => {
     expect(response.status).toBe(200)
   })
 
+  it('proxies document template fetches', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify([{ id: 'document_analysis' }]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/documents/templates/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/documents/templates')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/documents/templates',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch document templates',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('proxies document job listing with a default page size', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ items: [], total: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/documents/jobs/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/documents/jobs')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/documents/jobs?limit=24',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch document jobs',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('forwards document job creation bodies to the backend', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'job_123', template_id: 'document_analysis' }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { POST } = await import('../../app/api/dashboard/documents/jobs/route')
+
+    const request = {
+      json: async () => ({
+        template_id: 'document_analysis',
+        execution_mode: 'managed',
+        parameters: { instructions: 'Summarize' },
+      }),
+    } as NextRequest
+    const response = await POST(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/documents/jobs',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template_id: 'document_analysis',
+          execution_mode: 'managed',
+          parameters: { instructions: 'Summarize' },
+        }),
+        fallbackMessage: 'Failed to create document job',
+      },
+    )
+    expect(response.status).toBe(201)
+  })
+
+  it('forwards document dispatch bodies to the backend', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'job_123', status: 'queued' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { POST } = await import('../../app/api/dashboard/documents/jobs/[jobId]/dispatch/route')
+
+    const request = {
+      json: async () => ({ mode: 'managed' }),
+    } as NextRequest
+    const response = await POST(request, {
+      params: Promise.resolve({ jobId: 'job_123' }),
+    })
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/documents/jobs/job_123/dispatch',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'managed' }),
+        fallbackMessage: 'Failed to dispatch document job',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
   it('proxies dashboard monitoring alerts with a default page size', async () => {
     proxyJson.mockResolvedValue(
       new Response(JSON.stringify({ items: [], total: 0, unresolved_count: 0 }), {

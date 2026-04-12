@@ -75,6 +75,29 @@ mutx_deployments_by_status = Gauge(
 
 # Queue metrics
 mutx_queue_size = Gauge("mutx_queue_size", "Current size of agent task queue")
+mutx_document_queue_depth = Gauge(
+    "mutx_document_queue_depth",
+    "Current size of the document workflow queue",
+)
+
+mutx_document_jobs_total = Counter(
+    "mutx_document_jobs_total",
+    "Total document workflow jobs by template and status",
+    ["template_id", "status"],
+)
+
+mutx_document_artifact_ops_total = Counter(
+    "mutx_document_artifact_ops_total",
+    "Document artifact operations by operation and storage backend",
+    ["operation", "storage_backend"],
+)
+
+mutx_document_execution_duration_seconds = Histogram(
+    "mutx_document_execution_duration_seconds",
+    "Document workflow execution duration in seconds",
+    ["template_id", "status"],
+    buckets=[0.1, 0.5, 1.0, 2.5, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0],
+)
 
 # API metrics
 mutx_api_calls_total = Counter("mutx_api_calls_total", "Total API calls", ["endpoint"])

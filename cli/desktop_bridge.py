@@ -48,10 +48,16 @@ from cli.services import (
     AssistantService,
     AuthService,
     CLIServiceError,
+    DocumentsService,
     RuntimeStateService,
     TemplatesService,
 )
 from cli.setup_wizard import prepare_runtime_state_sync, run_openclaw_setup_wizard
+
+try:
+    from src.api.services.document_engine import get_document_engine_readiness
+except Exception:  # noqa: BLE001
+    get_document_engine_readiness = None
 
 EXIT_COMMANDS = {"exit", "quit", "q"}
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -85,6 +91,10 @@ def get_templates_service() -> TemplatesService:
 
 def get_agents_service() -> AgentsService:
     return AgentsService(config=get_config())
+
+
+def get_documents_service() -> DocumentsService:
+    return DocumentsService(config=get_config())
 
 
 def _success(payload: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -140,6 +150,19 @@ def system_info() -> dict[str, Any]:
             "health": asdict(faramesh_health),
             "policy_path": get_default_policy_path(),
         },
+        "documents": (
+            get_document_engine_readiness().to_payload()
+            if callable(get_document_engine_readiness)
+            else {
+                "enabled": False,
+                "python_ok": False,
+                "predict_rlm_available": False,
+                "deno_available": False,
+                "ready": False,
+                "driver": "unavailable",
+                "artifacts_dir": None,
+            }
+        ),
         "cli_available": True,
     }
 
@@ -221,6 +244,19 @@ def doctor_run() -> dict[str, Any]:
         "openclaw": get_gateway_health().to_payload(),
         "runtime_snapshot": collect_openclaw_runtime_snapshot().to_payload(),
         "faramesh": asdict(collect_faramesh_snapshot()),
+        "documents": (
+            get_document_engine_readiness().to_payload()
+            if callable(get_document_engine_readiness)
+            else {
+                "enabled": False,
+                "python_ok": False,
+                "predict_rlm_available": False,
+                "deno_available": False,
+                "ready": False,
+                "driver": "unavailable",
+                "artifacts_dir": None,
+            }
+        ),
         "user": None,
         "assistant": None,
     }
@@ -573,6 +609,176 @@ POSIX path of theChoice
         return _failure(str(exc))
 
 
+def dialog_choose_files(allow_multiple: bool = True) -> dict[str, Any]:
+    multiple_clause = "with multiple selections allowed" if allow_multiple else ""
+    script = f"""
+set theChoice to choose file with prompt "Choose Document Files" {multiple_clause}
+if class of theChoice is list then
+  set outPaths to {{}}
+  repeat with itemRef in theChoice
+    set end of outPaths to POSIX path of itemRef
+  end repeat
+  return outPaths as string
+else
+  return POSIX path of theChoice
+end if
+"""
+    try:
+        result = subprocess.run(
+            ["osascript", "-e", script],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if result.returncode != 0 or not result.stdout.strip():
+            return _failure("No files selected")
+        raw = result.stdout.strip()
+        paths = [item.strip() for item in raw.split(",") if item.strip()]
+        return _success({"paths": paths})
+    except Exception as exc:  # noqa: BLE001
+        return _failure(str(exc))
+
+
+def documents_list_templates() -> dict[str, Any]:
+    try:
+        templates = get_documents_service().list_templates()
+        return _success({"items": [asdict(item) for item in templates]})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_list_jobs(limit: int = 20, status_filter: str | None = None) -> dict[str, Any]:
+    try:
+        history = get_documents_service().list_jobs(limit=limit, status_filter=status_filter)
+        return _success({"items": [asdict(item) for item in history.items], "total": history.total})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_get_job(job_id: str) -> dict[str, Any]:
+    try:
+        return _success({"job": asdict(get_documents_service().get_job(job_id))})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_create_job(
+    template_id: str,
+    execution_mode: str = "local",
+    parameters: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    try:
+        job = get_documents_service().create_job(
+            template_id=template_id,
+            execution_mode=execution_mode,
+            parameters=parameters,
+        )
+        return _success({"job": asdict(job)})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_register_local_artifact(
+    job_id: str,
+    role: str,
+    kind: str,
+    file_path: str,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    try:
+        artifact = get_documents_service().register_artifact_reference(
+            job_id=job_id,
+            role=role,
+            kind=kind,
+            file_path=file_path,
+            metadata=metadata,
+        )
+        return _success({"artifact": asdict(artifact)})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_launch_local(job_id: str, output_dir: str | None = None) -> dict[str, Any]:
+    try:
+        launch = get_documents_service().launch_local(job_id=job_id, output_dir=output_dir)
+        return _success({"launch": asdict(launch)})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_run_local(job_id: str, output_dir: str | None = None) -> dict[str, Any]:
+    try:
+        service = get_documents_service()
+        job = service.get_job(job_id)
+        result = service.run_local_job(job=job, output_dir=output_dir)
+        return _success({"job": asdict(result)})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_submit_event(
+    job_id: str,
+    event_type: str,
+    message: str | None = None,
+    payload: dict[str, Any] | None = None,
+    status_value: str | None = None,
+    output_text: str | None = None,
+    error_message: str | None = None,
+    result_summary: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    try:
+        job = get_documents_service().submit_event(
+            job_id=job_id,
+            event_type=event_type,
+            message=message,
+            payload=payload,
+            status_value=status_value,
+            output_text=output_text,
+            error_message=error_message,
+            result_summary=result_summary,
+        )
+        return _success({"job": asdict(job)})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_upload_artifact(
+    job_id: str,
+    role: str,
+    kind: str,
+    file_path: str,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    try:
+        artifact = get_documents_service().upload_artifact(
+            job_id=job_id,
+            role=role,
+            kind=kind,
+            file_path=file_path,
+            metadata=metadata,
+        )
+        return _success({"artifact": asdict(artifact)})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
+def documents_download_artifact(
+    job_id: str,
+    artifact_id: str,
+    destination: str | None = None,
+) -> dict[str, Any]:
+    try:
+        path = get_documents_service().download_artifact(
+            job_id=job_id,
+            artifact_id=artifact_id,
+            destination=destination,
+        )
+        return _success({"path": str(path)})
+    except CLIServiceError as exc:
+        return _failure(str(exc))
+
+
 METHODS = {
     "system.info": system_info,
     "auth.status": auth_status,
@@ -601,6 +807,17 @@ METHODS = {
     "finder.reveal": finder_reveal,
     "shell.openTerminal": shell_open_terminal,
     "dialog.chooseWorkspace": dialog_choose_workspace,
+    "dialog.chooseFiles": dialog_choose_files,
+    "documents.listTemplates": documents_list_templates,
+    "documents.listJobs": documents_list_jobs,
+    "documents.getJob": documents_get_job,
+    "documents.createJob": documents_create_job,
+    "documents.registerLocalArtifact": documents_register_local_artifact,
+    "documents.launchLocal": documents_launch_local,
+    "documents.runLocal": documents_run_local,
+    "documents.submitEvent": documents_submit_event,
+    "documents.uploadArtifact": documents_upload_artifact,
+    "documents.downloadArtifact": documents_download_artifact,
 }
 
 

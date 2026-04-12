@@ -17,7 +17,11 @@ import { StatusBadge } from "@/components/dashboard/StatusBadge";
 
 import type { components } from "@/app/types/api";
 
-type Run = components["schemas"]["RunResponse"];
+type Run = components["schemas"]["RunResponse"] & {
+  agent_id?: string | null;
+  subject_label?: string | null;
+  execution_mode?: string | null;
+};
 type RunHistory = components["schemas"]["RunHistoryResponse"];
 type RunTrace = components["schemas"]["RunTraceResponse"];
 type RunTraceHistory = components["schemas"]["RunTraceHistoryResponse"];
@@ -148,7 +152,13 @@ export function TracesPageClient() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-mono text-sm text-white">{run.id}</p>
-                    <p className="mt-1 text-sm text-slate-400">Agent {run.agent_id.slice(0, 8)}</p>
+                    <p className="mt-1 text-sm text-slate-400">
+                      {run.subject_label
+                        ? `${run.subject_label} · ${run.execution_mode || "managed"}`
+                        : run.agent_id
+                          ? `Agent ${run.agent_id.slice(0, 8)}`
+                          : "No agent binding"}
+                    </p>
                   </div>
                   <StatusBadge status={asDashboardStatus(run.status)} label={run.status} />
                 </div>
@@ -173,7 +183,12 @@ export function TracesPageClient() {
                 <div className="min-w-0">
                   <p className="truncate font-mono text-sm text-white">{selectedRun.id}</p>
                   <p className="mt-1 text-sm text-slate-400">
-                    Agent {selectedRun.agent_id.slice(0, 8)} · started {formatRelativeTime(selectedRun.started_at)}
+                    {selectedRun.subject_label
+                      ? `${selectedRun.subject_label} · ${selectedRun.execution_mode || "managed"}`
+                      : selectedRun.agent_id
+                        ? `Agent ${selectedRun.agent_id.slice(0, 8)}`
+                        : "No agent binding"}{" "}
+                    · started {formatRelativeTime(selectedRun.started_at)}
                   </p>
                 </div>
                 <StatusBadge status={asDashboardStatus(selectedRun.status)} label={selectedRun.status} />

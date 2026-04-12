@@ -413,3 +413,208 @@ class OnboardingStateRecord:
             ],
             payload=payload,
         )
+
+
+@dataclass(slots=True)
+class DocumentTemplateFieldRecord:
+    name: str
+    type: str
+    required: bool
+    accepts_multiple: bool
+    description: str
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DocumentTemplateFieldRecord":
+        return cls(
+            name=str(payload.get("name", "")),
+            type=str(payload.get("type", "")),
+            required=bool(payload.get("required", True)),
+            accepts_multiple=bool(payload.get("accepts_multiple", False)),
+            description=str(payload.get("description", "")),
+        )
+
+
+@dataclass(slots=True)
+class DocumentTemplateOutputRecord:
+    role: str
+    kind: str
+    description: str
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DocumentTemplateOutputRecord":
+        return cls(
+            role=str(payload.get("role", "")),
+            kind=str(payload.get("kind", "")),
+            description=str(payload.get("description", "")),
+        )
+
+
+@dataclass(slots=True)
+class DocumentTemplateRecord:
+    id: str
+    name: str
+    summary: str
+    description: str
+    supports_managed: bool
+    supports_local: bool
+    inputs: list[DocumentTemplateFieldRecord] = field(default_factory=list)
+    outputs: list[DocumentTemplateOutputRecord] = field(default_factory=list)
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DocumentTemplateRecord":
+        return cls(
+            id=str(payload.get("id", "")),
+            name=str(payload.get("name", "")),
+            summary=str(payload.get("summary", "")),
+            description=str(payload.get("description", "")),
+            supports_managed=bool(payload.get("supports_managed", True)),
+            supports_local=bool(payload.get("supports_local", True)),
+            inputs=[
+                DocumentTemplateFieldRecord.from_payload(item)
+                for item in (payload.get("inputs") or [])
+                if isinstance(item, dict)
+            ],
+            outputs=[
+                DocumentTemplateOutputRecord.from_payload(item)
+                for item in (payload.get("outputs") or [])
+                if isinstance(item, dict)
+            ],
+        )
+
+
+@dataclass(slots=True)
+class DocumentArtifactRecord:
+    id: str
+    job_id: str
+    role: str
+    kind: str
+    storage_backend: str
+    storage_uri: str | None
+    local_path: str | None
+    filename: str
+    content_type: str | None
+    size_bytes: int | None
+    sha256: str | None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    created_at: str | None = None
+    updated_at: str | None = None
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DocumentArtifactRecord":
+        raw_metadata = payload.get("metadata")
+        metadata = raw_metadata if isinstance(raw_metadata, dict) else {}
+        return cls(
+            id=str(payload.get("id", "")),
+            job_id=str(payload.get("job_id", "")),
+            role=str(payload.get("role", "")),
+            kind=str(payload.get("kind", "")),
+            storage_backend=str(payload.get("storage_backend", "")),
+            storage_uri=_as_optional_str(payload.get("storage_uri")),
+            local_path=_as_optional_str(payload.get("local_path")),
+            filename=str(payload.get("filename", "")),
+            content_type=_as_optional_str(payload.get("content_type")),
+            size_bytes=int(payload["size_bytes"]) if payload.get("size_bytes") is not None else None,
+            sha256=_as_optional_str(payload.get("sha256")),
+            metadata=metadata,
+            created_at=_as_optional_str(payload.get("created_at")),
+            updated_at=_as_optional_str(payload.get("updated_at")),
+        )
+
+
+@dataclass(slots=True)
+class DocumentJobRecord:
+    id: str
+    run_id: str
+    template_id: str
+    execution_mode: str
+    status: str
+    parameters: dict[str, Any] = field(default_factory=dict)
+    result_summary: dict[str, Any] = field(default_factory=dict)
+    error_message: str | None = None
+    claimed_by: str | None = None
+    claimed_at: str | None = None
+    last_heartbeat_at: str | None = None
+    attempts: int = 0
+    dispatched_at: str | None = None
+    completed_at: str | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
+    artifacts: list[DocumentArtifactRecord] = field(default_factory=list)
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DocumentJobRecord":
+        return cls(
+            id=str(payload.get("id", "")),
+            run_id=str(payload.get("run_id", "")),
+            template_id=str(payload.get("template_id", "")),
+            execution_mode=str(payload.get("execution_mode", "")),
+            status=str(payload.get("status", "unknown")),
+            parameters=payload.get("parameters") if isinstance(payload.get("parameters"), dict) else {},
+            result_summary=(
+                payload.get("result_summary")
+                if isinstance(payload.get("result_summary"), dict)
+                else {}
+            ),
+            error_message=_as_optional_str(payload.get("error_message")),
+            claimed_by=_as_optional_str(payload.get("claimed_by")),
+            claimed_at=_as_optional_str(payload.get("claimed_at")),
+            last_heartbeat_at=_as_optional_str(payload.get("last_heartbeat_at")),
+            attempts=int(payload.get("attempts", 0)),
+            dispatched_at=_as_optional_str(payload.get("dispatched_at")),
+            completed_at=_as_optional_str(payload.get("completed_at")),
+            created_at=_as_optional_str(payload.get("created_at")),
+            updated_at=_as_optional_str(payload.get("updated_at")),
+            artifacts=[
+                DocumentArtifactRecord.from_payload(item)
+                for item in (payload.get("artifacts") or [])
+                if isinstance(item, dict)
+            ],
+        )
+
+
+@dataclass(slots=True)
+class DocumentJobHistoryRecord:
+    items: list[DocumentJobRecord]
+    total: int
+    skip: int
+    limit: int
+    status: str | None
+    template_id: str | None
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DocumentJobHistoryRecord":
+        return cls(
+            items=[
+                DocumentJobRecord.from_payload(item)
+                for item in (payload.get("items") or [])
+                if isinstance(item, dict)
+            ],
+            total=int(payload.get("total", 0)),
+            skip=int(payload.get("skip", 0)),
+            limit=int(payload.get("limit", 0)),
+            status=_as_optional_str(payload.get("status")),
+            template_id=_as_optional_str(payload.get("template_id")),
+        )
+
+
+@dataclass(slots=True)
+class DocumentLocalLaunchRecord:
+    job_id: str
+    template_id: str
+    execution_mode: str
+    manifest: dict[str, Any] = field(default_factory=dict)
+    artifacts: list[DocumentArtifactRecord] = field(default_factory=list)
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DocumentLocalLaunchRecord":
+        return cls(
+            job_id=str(payload.get("job_id", "")),
+            template_id=str(payload.get("template_id", "")),
+            execution_mode=str(payload.get("execution_mode", "")),
+            manifest=payload.get("manifest") if isinstance(payload.get("manifest"), dict) else {},
+            artifacts=[
+                DocumentArtifactRecord.from_payload(item)
+                for item in (payload.get("artifacts") or [])
+                if isinstance(item, dict)
+            ],
+        )
