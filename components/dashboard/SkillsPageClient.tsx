@@ -226,7 +226,7 @@ export function SkillsPageClient() {
                       <p className='mt-1 text-sm text-slate-400'>{bundle.summary}</p>
                     </div>
                     <StatusBadge
-                      status={unavailable > 0 ? 'warning' : 'healthy'}
+                      status={unavailable > 0 ? 'warning' : 'success'}
                       label={`${bundle.available_skill_count}/${bundle.skill_count} ready`}
                     />
                   </div>
@@ -313,7 +313,7 @@ export function SkillsPageClient() {
                       <p className='mt-1 text-sm text-slate-400'>{skill.description}</p>
                     </div>
                     <StatusBadge
-                      status={installed ? 'healthy' : available ? 'idle' : 'warning'}
+                      status={installed ? 'success' : available ? 'idle' : 'warning'}
                       label={installed ? 'Installed' : available ? 'Ready' : 'Needs sync'}
                     />
                   </div>

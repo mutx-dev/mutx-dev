@@ -111,7 +111,7 @@ export function SwarmsPageClient() {
                     <p className='mt-1 text-sm text-slate-400'>{blueprint.summary}</p>
                   </div>
                   <StatusBadge
-                    status='healthy'
+                    status='success'
                     label={`${blueprint.recommended_min_agents}-${blueprint.recommended_max_agents} agents`}
                   />
                 </div>
