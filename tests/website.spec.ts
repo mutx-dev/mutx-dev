@@ -95,6 +95,15 @@ async function stubPicoProductApis(
   }: PicoProductStubOptions = {},
 ) {
   const progress = createDefaultPicoProgress();
+  let openAIConnection = {
+    provider: 'openai',
+    status: 'disconnected',
+    source: 'none',
+    connected: false,
+    model: 'gpt-5-mini',
+    maskedKey: null as string | null,
+    message: 'No OpenAI key is connected. Tutor will use platform access if available, or fall back to grounded local synthesis.',
+  };
 
   await page.route('**/api/auth/me', async (route) => {
     if (!authenticated) {
@@ -290,6 +299,49 @@ async function stubPicoProductApis(
         skillLevel: 'intermediate',
         usedOfficialFallback: false,
       }),
+    });
+  });
+
+  await page.route('**/api/pico/tutor/openai', async (route) => {
+    if (!authenticated) {
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          detail: 'Unauthorized',
+        }),
+      });
+      return;
+    }
+
+    if (route.request().method() === 'PUT') {
+      const payload = JSON.parse(route.request().postData() || '{}');
+      const apiKey = typeof payload.apiKey === 'string' ? payload.apiKey : '';
+      openAIConnection = {
+        provider: 'openai',
+        status: 'connected',
+        source: 'user',
+        connected: true,
+        model: 'gpt-5-mini',
+        maskedKey: apiKey ? `••••${apiKey.slice(-4)}` : '••••test',
+        message: `Your OpenAI key ${apiKey ? `••••${apiKey.slice(-4)}` : '••••test'} is active for live tutor answers.`,
+      };
+    } else if (route.request().method() === 'DELETE') {
+      openAIConnection = {
+        provider: 'openai',
+        status: 'disconnected',
+        source: 'none',
+        connected: false,
+        model: 'gpt-5-mini',
+        maskedKey: null,
+        message: 'No OpenAI key is connected. Tutor will use platform access if available, or fall back to grounded local synthesis.',
+      };
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(openAIConnection),
     });
   });
 
@@ -1005,6 +1057,23 @@ test.describe('mutx.dev QA', () => {
       'href',
       'https://github.com/nousresearch/hermes-agent',
     );
+  });
+
+  test('pico tutor lets an authenticated operator connect and disconnect an OpenAI key without leaving the flow', async ({ page }) => {
+    await stubPicoProductApis(page);
+    await page.goto('/pico/tutor?lesson=install-hermes-locally');
+
+    await expect(page.getByTestId('pico-openai-connect-panel')).toBeVisible();
+    await expect(page.getByTestId('pico-openai-connect-status')).toContainText(/no openai key is connected/i);
+
+    await page.getByPlaceholder('sk-proj-...').fill('sk-proj-test-openai-connection-1234');
+    await page.getByRole('button', { name: /connect openai/i }).click();
+
+    await expect(page.getByTestId('pico-openai-connect-status')).toContainText(/active for live tutor answers/i);
+    await expect(page.getByText(/connected as ••••1234/i)).toBeVisible();
+
+    await page.getByRole('button', { name: /disconnect openai/i }).click();
+    await expect(page.getByTestId('pico-openai-connect-status')).toContainText(/no openai key is connected/i);
   });
 
   test('pico lesson workspace persists execution context back into the academy', async ({ page }) => {

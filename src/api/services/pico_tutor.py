@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -13,6 +12,7 @@ from urllib.parse import urlparse
 import httpx
 from openai import AsyncOpenAI
 from opentelemetry.trace import Status, StatusCode
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.config import get_settings
 from src.api.models import User
@@ -29,6 +29,7 @@ from src.api.models.pico_tutor import (
     PicoTutorStructuredReply,
 )
 from src.api.telemetry.telemetry import get_tracer
+from src.api.services.pico_tutor_openai import resolve_pico_tutor_api_key
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -730,6 +731,8 @@ def _build_summary(
 async def _generate_with_model(
     *,
     request: PicoTutorRequest,
+    api_key: str | None,
+    api_key_source: str,
     intent: PicoTutorIntent,
     skill_level: PicoTutorSkillLevel,
     retrieved_lessons: list[RetrievalMatch],
@@ -737,7 +740,6 @@ async def _generate_with_model(
     official_evidence: list[OfficialEvidence],
     fallback_reply: PicoTutorResponse,
 ) -> PicoTutorResponse | None:
-    api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         return None
 
@@ -748,6 +750,7 @@ async def _generate_with_model(
         span.set_attribute("intent", intent)
         span.set_attribute("skill_level", skill_level)
         span.set_attribute("llm.model", settings.pico_tutor_model)
+        span.set_attribute("auth_source", api_key_source)
         try:
             client = AsyncOpenAI(api_key=api_key)
             prompt_payload = {
@@ -793,6 +796,7 @@ async def _generate_with_model(
 async def generate_pico_tutor_reply(
     request: PicoTutorRequest,
     *,
+    db: AsyncSession | None = None,
     current_user: User | None = None,
     trace_id: str | None = None,
 ) -> PicoTutorResponse:
@@ -815,6 +819,12 @@ async def generate_pico_tutor_reply(
         span.set_attribute("session.id", str(current_user.id) if current_user else "anonymous")
         if trace_id:
             span.set_attribute("trace.id", trace_id)
+
+        api_key, api_key_source = await resolve_pico_tutor_api_key(
+            db,
+            user=current_user,
+        )
+        span.set_attribute("model_auth_source", api_key_source)
 
         with tracer.start_as_current_span("mutx.pico.tutor.retrieve") as retrieve_span:
             lesson_matches = retrieve_lessons(question, request.lessonSlug)
@@ -953,6 +963,8 @@ async def generate_pico_tutor_reply(
 
         generated_reply = await _generate_with_model(
             request=request,
+            api_key=api_key,
+            api_key_source=api_key_source,
             intent=intent,
             skill_level=skill_level,
             retrieved_lessons=lesson_matches,

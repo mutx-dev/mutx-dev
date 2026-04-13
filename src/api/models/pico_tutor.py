@@ -17,6 +17,8 @@ PicoTutorIntent = Literal[
 ]
 PicoTutorSkillLevel = Literal["beginner", "intermediate", "advanced"]
 PicoTutorSourceKind = Literal["lesson", "knowledge_pack", "official"]
+PicoTutorOpenAIConnectionStatusValue = Literal["connected", "platform", "disconnected", "error"]
+PicoTutorOpenAIConnectionSource = Literal["user", "platform", "none"]
 
 
 class PicoTutorSetupContext(BaseModel):
@@ -32,6 +34,10 @@ class PicoTutorRequest(BaseModel):
     lessonSlug: str | None = Field(default=None, max_length=255)
     progress: dict[str, Any] | None = None
     setupContext: PicoTutorSetupContext | None = None
+
+
+class PicoTutorOpenAIConnectionRequest(BaseModel):
+    apiKey: str = Field(..., min_length=20, max_length=512)
 
 
 class PicoTutorLessonLink(BaseModel):
@@ -88,3 +94,15 @@ class PicoTutorResponse(BaseModel):
     intent: PicoTutorIntent
     skillLevel: PicoTutorSkillLevel
     usedOfficialFallback: bool = False
+
+
+class PicoTutorOpenAIConnectionStatus(BaseModel):
+    provider: str = "openai"
+    status: PicoTutorOpenAIConnectionStatusValue
+    source: PicoTutorOpenAIConnectionSource
+    connected: bool
+    model: str
+    maskedKey: str | None = None
+    connectedAt: str | None = None
+    validatedAt: str | None = None
+    message: str
