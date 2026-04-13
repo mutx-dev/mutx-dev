@@ -3,8 +3,8 @@
   inset: 0;
   overflow: hidden;
   --marketing-backdrop-position: 61% 48%;
-  --marketing-backdrop-scale: 1.18;
-  --marketing-backdrop-shift-x: 6%;
+  --marketing-backdrop-scale: 1.14;
+  --marketing-backdrop-shift-x: 4%;
 }
 
 .marketingBackdropImage {
@@ -14,13 +14,13 @@
   height: 118%;
   object-fit: cover;
   object-position: var(--marketing-backdrop-position);
-  opacity: 0.62;
-  filter: saturate(1.1) contrast(1.14) brightness(0.94);
+  opacity: 0.58;
+  filter: saturate(1.04) contrast(1.12) brightness(0.92);
   transform: translate3d(var(--marketing-backdrop-shift-x), 0, 0)
     scale(var(--marketing-backdrop-scale));
   transform-origin: 58% center;
   will-change: transform;
-  animation: backdropDrift 22s ease-in-out infinite alternate;
+  animation: backdropDrift 30s ease-in-out infinite alternate;
 }
 
 .marketingBackdropShade {
@@ -70,7 +70,7 @@
   background:
     radial-gradient(circle at 50% 44%, rgba(89, 162, 255, 0.1), transparent 14rem),
     linear-gradient(180deg, rgba(4, 6, 9, 0.5) 0%, rgba(4, 6, 9, 0.62) 100%);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
 }
 
 .loaderStageAnchor {
@@ -117,7 +117,7 @@
   background:
     radial-gradient(circle at 50% 0%, rgba(90, 151, 255, 0.18), transparent 72%),
     linear-gradient(180deg, rgba(8, 10, 15, 0.98), rgba(1, 2, 4, 1));
-  backdrop-filter: blur(22px);
+  backdrop-filter: blur(18px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 18px 46px rgba(0, 7, 20, 0.28);
@@ -181,6 +181,16 @@
   background: #05070c;
 }
 
+.heroSection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(4, 6, 9, 0.86) 0%, rgba(4, 6, 9, 0.76) 24%, rgba(4, 6, 9, 0.4) 46%, rgba(4, 6, 9, 0.12) 68%, rgba(4, 6, 9, 0) 100%),
+    linear-gradient(180deg, rgba(4, 6, 9, 0.04) 0%, rgba(4, 6, 9, 0.16) 100%);
+  pointer-events: none;
+}
+
 .heroMedia {
   position: absolute;
   inset: 0;
@@ -190,7 +200,7 @@
 .heroShell {
   position: relative;
   z-index: 1;
-  width: min(100% - 2rem, 128rem);
+  width: min(100% - 1.75rem, 126rem);
   min-height: var(--hero-stage-min-height);
   margin: 0 auto;
   display: flex;
@@ -269,20 +279,20 @@
 }
 
 .heroColumn {
-  width: min(100%, 52rem);
+  width: min(100%, 49rem);
   min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: clamp(1.8rem, 3vw, 2.6rem);
-  padding-block: clamp(1.8rem, 4vh, 2.8rem) clamp(5rem, 11vh, 7.5rem);
+  padding-block: clamp(1.8rem, 4vh, 2.8rem) clamp(4.2rem, 10vh, 6.8rem);
 }
 
 .heroContent {
-  max-width: 46rem;
+  max-width: 41rem;
   display: grid;
-  gap: 1.9rem;
+  gap: 1.55rem;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -325,39 +335,29 @@
 .heroTitle {
   margin: 0;
   font-family: var(--font-marketing-display), serif;
-  font-size: clamp(4.4rem, 7vw, 7.2rem);
+  max-width: 9ch;
+  font-size: clamp(4.2rem, 7vw, 7rem);
   font-weight: 300;
-  line-height: 0.9;
-  letter-spacing: -0.06em;
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
 }
 
 .heroSupport {
-  max-width: 32rem;
+  max-width: 27rem;
   margin: 0;
-  color: rgba(247, 244, 239, 0.8);
-  font-size: clamp(1.08rem, 1rem + 0.3vw, 1.28rem);
+  color: rgba(247, 244, 239, 0.74);
+  font-size: clamp(1rem, 0.98rem + 0.24vw, 1.15rem);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.58;
   letter-spacing: -0.015em;
 }
 
 .heroActions {
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.8rem 0.9rem;
   align-items: center;
-}
-
-.heroActions > :first-child {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.heroActions > :nth-child(2) {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
 }
 
 .finalActions {
@@ -379,8 +379,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(247, 244, 239, 0.55);
-  font-size: 0.88rem;
+  color: rgba(247, 244, 239, 0.58);
+  font-size: 0.84rem;
   font-weight: 600;
   text-decoration: none;
   transition: opacity 160ms ease, transform 160ms ease, color 160ms ease;
@@ -435,8 +435,8 @@
 
 .sectionBody {
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.58;
+  font-size: 0.98rem;
+  line-height: 1.56;
 }
 
 .demoSection,
@@ -532,12 +532,12 @@
 
 .demoLayout {
   display: grid;
-  gap: 2rem;
+  gap: 2.25rem;
 }
 
 .demoStage {
   display: grid;
-  gap: 1.15rem;
+  gap: 1rem;
 }
 
 .demoFrame,
@@ -558,6 +558,7 @@
   background:
     radial-gradient(circle at 22% 18%, rgba(75, 141, 255, 0.18), transparent 18rem),
     linear-gradient(180deg, rgba(12, 16, 24, 0.98), rgba(8, 10, 14, 1));
+  isolation: isolate;
 }
 
 .demoVideo,
@@ -579,7 +580,7 @@
 
 .demoTabs {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.78rem;
 }
 
 .demoTab {
@@ -592,7 +593,7 @@
   cursor: pointer;
   border-radius: 1.35rem;
   border: 1px solid rgba(247, 244, 239, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.025);
   transition:
     border-color 180ms ease,
     background 180ms ease,
@@ -605,6 +606,7 @@
   transform: translateY(-1px);
   border-color: rgba(109, 175, 255, 0.34);
   background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .demoTab:focus-visible,
@@ -671,12 +673,12 @@
 .proofGrid {
   display: grid;
   gap: 1.35rem;
-  margin-top: 2rem;
+  margin-top: 1.8rem;
 }
 
 .exampleCard {
   display: grid;
-  gap: 1rem;
+  gap: 0.9rem;
   padding: 1rem;
   border-radius: 1.7rem;
   border-color: rgba(247, 244, 239, 0.08);
@@ -696,6 +698,7 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 28px 60px rgba(6, 10, 18, 0.16);
+  transform: translateZ(0);
 }
 
 .terminalChrome {
@@ -792,8 +795,9 @@
 }
 
 .exampleOutcome {
-  color: rgba(247, 244, 239, 0.78);
+  color: rgba(247, 244, 239, 0.74);
   font-weight: 600;
+  max-width: 25ch;
 }
 
 .proofCard {
@@ -878,6 +882,9 @@
   background:
     radial-gradient(circle at 18% 18%, rgba(91, 162, 255, 0.18), transparent 18rem),
     linear-gradient(180deg, rgba(18, 23, 33, 0.98), rgba(6, 8, 12, 1));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 26px 64px rgba(0, 7, 18, 0.18);
 }
 
 .finalPreviewImage {
@@ -920,7 +927,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: clamp(2rem, 5vw, 4.5rem);
+  gap: clamp(1.6rem, 4vw, 3.8rem);
 }
 
 .socialProofMetric {
@@ -960,9 +967,14 @@
 
 @media (min-width: 760px) {
   .demoLayout {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
     align-items: start;
-    gap: 2rem;
+    gap: 2.4rem;
+  }
+
+  .demoStage {
+    grid-template-columns: minmax(0, 1.18fr) minmax(16rem, 0.82fr);
+    align-items: stretch;
   }
 
   .examplesGrid,
@@ -1000,12 +1012,16 @@
   }
 
   .heroContent {
-    max-width: 22.4rem;
+    max-width: 21.6rem;
   }
 
   .heroTitle {
-    font-size: clamp(3.7rem, 11.8vw, 5.3rem);
+    font-size: clamp(3.55rem, 11.2vw, 5.1rem);
     max-width: 12ch;
+  }
+
+  .demoStage {
+    grid-template-columns: 1fr;
   }
 
   .demoSection,
@@ -1077,20 +1093,20 @@
   }
 
   .heroContent {
-    max-width: 19rem;
+    max-width: 18.5rem;
     gap: 0.82rem;
     padding-bottom: 0;
   }
 
   .heroTitle {
-    font-size: clamp(3.28rem, 14.6vw, 4.12rem);
+    font-size: clamp(3.08rem, 14vw, 4rem);
     max-width: 12ch;
   }
 
   .heroSupport {
-    max-width: 17.4rem;
-    font-size: 0.98rem;
-    line-height: 1.16;
+    max-width: 17rem;
+    font-size: 0.95rem;
+    line-height: 1.3;
   }
 
   .heroActions,
@@ -1133,12 +1149,12 @@
 
 @keyframes backdropDrift {
   0% {
-    transform: translate3d(calc(var(--marketing-backdrop-shift-x) - 1%), 0, 0)
+    transform: translate3d(calc(var(--marketing-backdrop-shift-x) - 0.7%), 0, 0)
       scale(calc(var(--marketing-backdrop-scale) * 1));
   }
   100% {
-    transform: translate3d(calc(var(--marketing-backdrop-shift-x) + 1.6%), -1.2%, 0)
-      scale(calc(var(--marketing-backdrop-scale) * 1.03));
+    transform: translate3d(calc(var(--marketing-backdrop-shift-x) + 1%), -0.8%, 0)
+      scale(calc(var(--marketing-backdrop-scale) * 1.018));
   }
 }
 

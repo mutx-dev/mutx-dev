@@ -18,6 +18,7 @@ export function MarketingReveal({
 }: MarketingRevealProps) {
   const prefersReducedMotion = useReducedMotion();
   const offset = Math.min(distance, 20) * 0.38;
+  const blur = Math.min(Math.max(distance / 14, 0.8), 1.8);
 
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>;
@@ -30,9 +31,10 @@ export function MarketingReveal({
         opacity: 0.92,
         y: offset,
         scale: 0.992,
+        filter: `blur(${blur}px)`,
       }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.72, delay, ease: [0.22, 1, 0.36, 1] }}
+      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      transition={{ duration: 0.62, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>

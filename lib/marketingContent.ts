@@ -84,20 +84,19 @@ const homepageActions: MarketingActionLink[] = [
     tone: 'primary',
   },
   {
+    label: 'Download for Mac',
+    href: '/download',
+    tone: 'secondary',
+  },
+  {
     label: 'View GitHub',
     href: 'https://github.com/mutx-dev/mutx-dev',
     external: true,
-    tone: 'secondary',
+    tone: 'utility',
   },
   {
     label: 'Releases',
     href: '/releases',
-    tone: 'utility',
-  },
-  {
-    label: 'Docs',
-    href: 'https://docs.mutx.dev',
-    external: true,
     tone: 'utility',
   },
 ]
@@ -106,7 +105,7 @@ export const marketingHomepage: MarketingHomepage = {
   hero: {
     tagline: 'AI Agent Infrastructure',
     title: 'See it. Control it. Prove it.',
-    support: 'Your AI agents are already working. Do you know what they\'re doing? MUTX gives you full visibility, real guardrails, and audit trails for every agent you run.',
+    support: 'Live visibility, hard boundaries, and reviewable history for every agent run.',
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
@@ -114,14 +113,14 @@ export const marketingHomepage: MarketingHomepage = {
   salesSections: {
     demo: {
       eyebrow: 'See MUTX in action',
-      title: 'Watch what happens when you can actually see your agents work.',
-      body: 'MUTX gives you a clear view of every run, every decision, and every outcome. No more guessing.',
+      title: 'Watch the run, not the aftermath.',
+      body: 'One surface for steps, permissions, and the record that survives review.',
       tabs: [
         {
           id: 'runtime',
           label: 'Activity log',
-          title: 'Know exactly what your agent did.',
-          body: 'Every step, every tool call, every result — all in one place. No more digging through chat logs.',
+          title: 'Read every step as it lands.',
+          body: 'Tool calls, outputs, and state changes stay in one readable timeline.',
           mediaType: 'gif',
           mediaSrc: '/demo.gif',
           mediaAlt: 'MUTX showing agent activity in real time',
@@ -129,8 +128,8 @@ export const marketingHomepage: MarketingHomepage = {
         {
           id: 'governance',
           label: 'Permissions',
-          title: 'Decide what your agents can and cannot do.',
-          body: 'Set clear boundaries so agents stay productive without overstepping. Your rules, enforced automatically.',
+          title: 'Move the boundary forward.',
+          body: 'Approval edges and guardrails stay visible before the action settles.',
           mediaType: 'image',
           mediaSrc: '/landing/webp/docs-surface.webp',
           mediaAlt: 'MUTX permission settings for AI agents',
@@ -138,8 +137,8 @@ export const marketingHomepage: MarketingHomepage = {
         {
           id: 'operator',
           label: 'Peace of mind',
-          title: 'Sleep well knowing your agents are working as intended.',
-          body: 'Audit trails, run history, and clear logs mean you always know what happened and why.',
+          title: 'Keep proof that still reads clean later.',
+          body: 'The run history stays inspectable instead of collapsing into guesswork.',
           mediaType: 'image',
           mediaSrc: '/landing/webp/running-agent.webp',
           mediaAlt: 'MUTX agent run history and audit trail',
@@ -149,11 +148,11 @@ export const marketingHomepage: MarketingHomepage = {
     examples: {
       eyebrow: 'Why this matters',
       title: 'When AI agents go wrong, the damage is silent.',
-      body: 'Without oversight, a helpful agent can cause real harm. MUTX makes sure you catch it before it spreads.',
+      body: 'Helpful language can still hide the wrong move. MUTX pulls that edge into view.',
       items: [
         {
           eyebrow: 'File deletion',
-          title: 'Agent deleted important files',
+          title: 'Cleanup deleted work.',
           userPrompt: 'Clean up my Downloads folder',
           apology: [
             'I removed 847 files from ~/Downloads.',
@@ -161,11 +160,11 @@ export const marketingHomepage: MarketingHomepage = {
             'I noticed some files looked like work documents,',
             'but I assumed you wanted everything removed.',
           ],
-          fallout: 'With MUTX, you see every file action before it sticks. Set a boundary once, protect every run.',
+          fallout: 'See the file action before it sticks, then stop it at the boundary.',
         },
         {
           eyebrow: 'Data leak',
-          title: 'Agent sent data to the wrong person',
+          title: 'Sharing widened the audience.',
           userPrompt: 'Share the Q3 report with the team',
           apology: [
             'I sent the Q3 financials to your Slack workspace.',
@@ -173,11 +172,11 @@ export const marketingHomepage: MarketingHomepage = {
             'I also attached the raw database export',
             'because it was in the same folder.',
           ],
-          fallout: 'MUTX keeps sharing boundaries explicit. Agents only reach who you approve, nothing more.',
+          fallout: 'Keep destinations explicit so “helpful” never becomes “public.”',
         },
         {
           eyebrow: 'Production incident',
-          title: 'Agent made an outage worse',
+          title: 'Optimization widened the blast radius.',
           userPrompt: 'Fix the slow database query',
           apology: [
             'I restarted the database server to apply optimizations.',
@@ -185,14 +184,14 @@ export const marketingHomepage: MarketingHomepage = {
             'I also dropped the query cache to free memory.',
             'The cache rebuild will take approximately 4 hours.',
           ],
-          fallout: 'MUTX shows you what the agent plans to do. Review, approve, or stop it — before the damage hits.',
+          fallout: 'Review the move before execution, not after the outage report starts.',
         },
       ],
     },
     proof: {
       eyebrow: 'Why teams switch',
-      title: 'From "I hope it works" to "I know it works."',
-      body: 'Most teams are flying blind with AI agents. MUTX gives you the visibility and control you need to use AI confidently.',
+      title: 'From hoping to knowing.',
+      body: 'Runs stay legible, boundaries stay explicit, and the record still makes sense later.',
       items: [
         {
           title: 'Visibility',
@@ -214,7 +213,7 @@ export const marketingHomepage: MarketingHomepage = {
     cta: {
       eyebrow: 'Try it yourself',
       title: 'See it for yourself — in under two minutes.',
-      body: 'Download the Mac app, watch your first agent run, and decide from the product. No signup required.',
+      body: 'Download the app, watch one real run, and decide from the product.',
       mediaSrc: '/demo.gif',
       mediaAlt: 'MUTX agent control in action',
       actions: homepageActions,
@@ -241,7 +240,7 @@ export const marketingFooterLinks: MarketingFooterLink[] = [
 
 export const marketingFooterCallout: MarketingFooterCallout = {
   title: 'YOUR AI AGENTS, UNDER CONTROL.',
-  body: 'Start with the Mac app. See what your agents are really doing.',
+  body: 'Start with the Mac app and inspect one real run.',
   action: {
     label: 'Download for Mac',
     href: '/download',
