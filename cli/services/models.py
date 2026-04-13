@@ -513,7 +513,9 @@ class DocumentArtifactRecord:
             local_path=_as_optional_str(payload.get("local_path")),
             filename=str(payload.get("filename", "")),
             content_type=_as_optional_str(payload.get("content_type")),
-            size_bytes=int(payload["size_bytes"]) if payload.get("size_bytes") is not None else None,
+            size_bytes=int(payload["size_bytes"])
+            if payload.get("size_bytes") is not None
+            else None,
             sha256=_as_optional_str(payload.get("sha256")),
             metadata=metadata,
             created_at=_as_optional_str(payload.get("created_at")),
@@ -549,7 +551,9 @@ class DocumentJobRecord:
             template_id=str(payload.get("template_id", "")),
             execution_mode=str(payload.get("execution_mode", "")),
             status=str(payload.get("status", "unknown")),
-            parameters=payload.get("parameters") if isinstance(payload.get("parameters"), dict) else {},
+            parameters=payload.get("parameters")
+            if isinstance(payload.get("parameters"), dict)
+            else {},
             result_summary=(
                 payload.get("result_summary")
                 if isinstance(payload.get("result_summary"), dict)

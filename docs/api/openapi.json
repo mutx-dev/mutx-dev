@@ -10019,6 +10019,159 @@
         }
       }
     },
+    "/v1/pico/tutor/openai": {
+      "get": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Tutor Openai Status",
+        "operationId": "pico_tutor_openai_status_v1_pico_tutor_openai_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PicoTutorOpenAIConnectionStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Tutor Openai Connect",
+        "operationId": "pico_tutor_openai_connect_v1_pico_tutor_openai_put",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PicoTutorOpenAIConnectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PicoTutorOpenAIConnectionStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Tutor Openai Disconnect",
+        "operationId": "pico_tutor_openai_disconnect_v1_pico_tutor_openai_delete",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PicoTutorOpenAIConnectionStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/runtime/providers/{provider}": {
       "get": {
         "tags": [
@@ -20468,6 +20621,103 @@
           "href"
         ],
         "title": "PicoTutorLessonLink"
+      },
+      "PicoTutorOpenAIConnectionRequest": {
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 20,
+            "title": "Apikey"
+          }
+        },
+        "type": "object",
+        "required": [
+          "apiKey"
+        ],
+        "title": "PicoTutorOpenAIConnectionRequest"
+      },
+      "PicoTutorOpenAIConnectionStatus": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "default": "openai"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "connected",
+              "platform",
+              "disconnected",
+              "error"
+            ],
+            "title": "Status"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "user",
+              "platform",
+              "none"
+            ],
+            "title": "Source"
+          },
+          "connected": {
+            "type": "boolean",
+            "title": "Connected"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "maskedKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maskedkey"
+          },
+          "connectedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connectedat"
+          },
+          "validatedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validatedat"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "source",
+          "connected",
+          "model",
+          "message"
+        ],
+        "title": "PicoTutorOpenAIConnectionStatus"
       },
       "PicoTutorRequest": {
         "properties": {

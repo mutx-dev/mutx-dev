@@ -80,22 +80,14 @@ def upgrade() -> None:
 
     _create_index_if_missing("document_jobs", op.f("ix_document_jobs_user_id"), ["user_id"])
     _create_index_if_missing("document_jobs", op.f("ix_document_jobs_run_id"), ["run_id"])
-    _create_index_if_missing(
-        "document_jobs", op.f("ix_document_jobs_template_id"), ["template_id"]
-    )
+    _create_index_if_missing("document_jobs", op.f("ix_document_jobs_template_id"), ["template_id"])
     _create_index_if_missing(
         "document_jobs", op.f("ix_document_jobs_execution_mode"), ["execution_mode"]
     )
     _create_index_if_missing("document_jobs", op.f("ix_document_jobs_status"), ["status"])
-    _create_index_if_missing(
-        "document_jobs", op.f("ix_document_jobs_claim_token"), ["claim_token"]
-    )
-    _create_index_if_missing(
-        "document_jobs", op.f("ix_document_jobs_created_at"), ["created_at"]
-    )
-    _create_index_if_missing(
-        "document_jobs", op.f("ix_document_jobs_updated_at"), ["updated_at"]
-    )
+    _create_index_if_missing("document_jobs", op.f("ix_document_jobs_claim_token"), ["claim_token"])
+    _create_index_if_missing("document_jobs", op.f("ix_document_jobs_created_at"), ["created_at"])
+    _create_index_if_missing("document_jobs", op.f("ix_document_jobs_updated_at"), ["updated_at"])
 
     if not _has_table("document_artifacts"):
         op.create_table(

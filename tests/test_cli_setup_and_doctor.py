@@ -333,6 +333,20 @@ def test_doctor_json_reports_assistant_state(monkeypatch, tmp_path: Path) -> Non
         ),
     )
     monkeypatch.setattr(
+        "cli.commands.doctor.get_document_engine_readiness",
+        lambda: SimpleNamespace(
+            to_payload=lambda: {
+                "enabled": False,
+                "python_ok": True,
+                "predict_rlm_available": False,
+                "deno_available": False,
+                "ready": False,
+                "driver": "builtin_fallback",
+                "artifacts_dir": "/tmp/.mutx-artifacts",
+            }
+        ),
+    )
+    monkeypatch.setattr(
         "cli.commands.doctor.httpx.get",
         lambda url, timeout=2.0: DummyResponse(200, {"status": "healthy"}),
     )
@@ -367,6 +381,15 @@ def test_doctor_json_reports_assistant_state(monkeypatch, tmp_path: Path) -> Non
             "binding_count": 1,
             "home_path": "/tmp/.openclaw",
             "last_seen_at": "2026-03-21T10:00:00+00:00",
+        },
+        "documents": {
+            "enabled": False,
+            "python_ok": True,
+            "predict_rlm_available": False,
+            "deno_available": False,
+            "ready": False,
+            "driver": "builtin_fallback",
+            "artifacts_dir": "/tmp/.mutx-artifacts",
         },
         "user": {
             "email": "operator@example.com",

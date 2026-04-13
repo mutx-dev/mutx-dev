@@ -284,7 +284,11 @@ def validate_dispatch_mode_artifacts(*, mode: str, artifacts: list[DocumentArtif
     if mode != "managed":
         return
 
-    invalid = [artifact.filename for artifact in artifacts if artifact.storage_backend not in MANAGED_STORAGE_BACKENDS]
+    invalid = [
+        artifact.filename
+        for artifact in artifacts
+        if artifact.storage_backend not in MANAGED_STORAGE_BACKENDS
+    ]
     if invalid:
         raise HTTPException(
             status_code=400,

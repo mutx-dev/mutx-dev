@@ -243,7 +243,7 @@ def validate_reasoning_job_inputs(job: ReasoningJob, artifacts: list[ReasoningAr
     missing = [
         input_name
         for input_name in required_names
-        if not str(parameters.get(input_name) or '').strip()
+        if not str(parameters.get(input_name) or "").strip()
     ]
 
     if missing:
@@ -280,7 +280,11 @@ def validate_dispatch_mode_artifacts(*, mode: str, artifacts: list[ReasoningArti
     if mode != "managed":
         return
 
-    invalid = [artifact.filename for artifact in artifacts if artifact.storage_backend not in MANAGED_STORAGE_BACKENDS]
+    invalid = [
+        artifact.filename
+        for artifact in artifacts
+        if artifact.storage_backend not in MANAGED_STORAGE_BACKENDS
+    ]
     if invalid:
         raise HTTPException(
             status_code=400,
@@ -498,7 +502,11 @@ async def dispatch_reasoning_job(
         run=job.run,
         event_type="reasoning.job_dispatched",
         message="Reasoning job dispatched",
-        payload={"job_id": str(job.id), "execution_mode": job.execution_mode, "template_id": job.template_id},
+        payload={
+            "job_id": str(job.id),
+            "execution_mode": job.execution_mode,
+            "template_id": job.template_id,
+        },
     )
     await db.commit()
     mutx_reasoning_jobs_total.labels(template_id=job.template_id, status="queued").inc()
@@ -561,9 +569,9 @@ async def append_reasoning_job_event(
         job.completed_at = timestamp
         job.run.completed_at = timestamp
 
-    if event.event_type.endswith('failed'):
+    if event.event_type.endswith("failed"):
         mutx_reasoning_jobs_total.labels(template_id=job.template_id, status="failed").inc()
-    elif event.event_type.endswith('completed'):
+    elif event.event_type.endswith("completed"):
         mutx_reasoning_jobs_total.labels(template_id=job.template_id, status="completed").inc()
 
     await db.commit()

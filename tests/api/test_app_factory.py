@@ -57,6 +57,7 @@ def test_app_factory_mounts_expected_public_routes():
         "/v1/monitoring",
         "/v1/observability",
         "/v1/rag",
+        "/v1/reasoning",
         "/v1/runtime",
         "/v1/runs",
         "/v1/security",

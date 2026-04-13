@@ -2451,6 +2451,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/pico/tutor/openai": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pico Tutor Openai Status */
+        get: operations["pico_tutor_openai_status_v1_pico_tutor_openai_get"];
+        /** Pico Tutor Openai Connect */
+        put: operations["pico_tutor_openai_connect_v1_pico_tutor_openai_put"];
+        post?: never;
+        /** Pico Tutor Openai Disconnect */
+        delete: operations["pico_tutor_openai_disconnect_v1_pico_tutor_openai_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runtime/providers/{provider}": {
         parameters: {
             query?: never;
@@ -6306,6 +6325,41 @@ export interface components {
             title: string;
             /** Href */
             href: string;
+        };
+        /** PicoTutorOpenAIConnectionRequest */
+        PicoTutorOpenAIConnectionRequest: {
+            /** Apikey */
+            apiKey: string;
+        };
+        /** PicoTutorOpenAIConnectionStatus */
+        PicoTutorOpenAIConnectionStatus: {
+            /**
+             * Provider
+             * @default openai
+             */
+            provider: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "connected" | "platform" | "disconnected" | "error";
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "user" | "platform" | "none";
+            /** Connected */
+            connected: boolean;
+            /** Model */
+            model: string;
+            /** Maskedkey */
+            maskedKey?: string | null;
+            /** Connectedat */
+            connectedAt?: string | null;
+            /** Validatedat */
+            validatedAt?: string | null;
+            /** Message */
+            message: string;
         };
         /** PicoTutorRequest */
         PicoTutorRequest: {
@@ -13006,6 +13060,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PicoTutorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pico_tutor_openai_status_v1_pico_tutor_openai_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PicoTutorOpenAIConnectionStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pico_tutor_openai_connect_v1_pico_tutor_openai_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PicoTutorOpenAIConnectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PicoTutorOpenAIConnectionStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pico_tutor_openai_disconnect_v1_pico_tutor_openai_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PicoTutorOpenAIConnectionStatus"];
                 };
             };
             /** @description Validation Error */
