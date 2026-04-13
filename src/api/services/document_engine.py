@@ -45,10 +45,12 @@ class EngineReadiness:
     python_ok: bool
     predict_rlm_available: bool
     deno_available: bool
+    credentials_ok: bool
     ready: bool
     driver: str
     artifacts_dir: str
     missing_requirements: tuple[str, ...] = ()
+    configured_model_providers: tuple[str, ...] = ()
 
     def to_payload(self) -> dict[str, Any]:
         return {
@@ -56,10 +58,12 @@ class EngineReadiness:
             "python_ok": self.python_ok,
             "predict_rlm_available": self.predict_rlm_available,
             "deno_available": self.deno_available,
+            "credentials_ok": self.credentials_ok,
             "ready": self.ready,
             "driver": self.driver,
             "artifacts_dir": self.artifacts_dir,
             "missing_requirements": list(self.missing_requirements),
+            "configured_model_providers": list(self.configured_model_providers),
         }
 
 
@@ -103,11 +107,31 @@ class EngineExecutionResult:
     events: list[EngineEvent]
 
 
+PROVIDER_CREDENTIAL_ENV_VARS = {
+    "anthropic": "ANTHROPIC_API_KEY",
+    "openai": "OPENAI_API_KEY",
+    "openrouter": "OPENROUTER_API_KEY",
+}
+
+
+def _configured_document_model_providers() -> tuple[str, ...]:
+    providers: list[str] = []
+    for model_name in (
+        os.getenv("MUTX_DOCUMENTS_LM", "openai/gpt-5.4"),
+        os.getenv("MUTX_DOCUMENTS_SUB_LM", "openai/gpt-5.1"),
+    ):
+        provider = str(model_name).split("/", 1)[0].strip().lower()
+        if provider and provider not in providers:
+            providers.append(provider)
+    return tuple(providers)
+
+
 def get_document_engine_readiness() -> EngineReadiness:
     settings = get_settings()
     python_ok = sys.version_info >= (3, 11)
     predict_rlm_available = importlib.util.find_spec("predict_rlm") is not None
     deno_available = shutil.which("deno") is not None
+    configured_model_providers = _configured_document_model_providers()
     missing_requirements: list[str] = []
     if not settings.documents_enabled:
         missing_requirements.append("documents_enabled")
@@ -117,6 +141,16 @@ def get_document_engine_readiness() -> EngineReadiness:
         missing_requirements.append("deno")
     if not predict_rlm_available:
         missing_requirements.append("predict_rlm")
+    for provider in configured_model_providers:
+        env_var = PROVIDER_CREDENTIAL_ENV_VARS.get(provider)
+        if env_var is None:
+            missing_requirements.append(f"{provider}_credentials")
+            continue
+        if not os.getenv(env_var):
+            missing_requirements.append(env_var)
+    credentials_ok = all(
+        item not in missing_requirements for item in PROVIDER_CREDENTIAL_ENV_VARS.values()
+    ) and not any(item.endswith("_credentials") for item in missing_requirements)
     ready = not missing_requirements
     driver = "predict_rlm" if ready else "unavailable"
     return EngineReadiness(
@@ -124,10 +158,12 @@ def get_document_engine_readiness() -> EngineReadiness:
         python_ok=python_ok,
         predict_rlm_available=predict_rlm_available,
         deno_available=deno_available,
+        credentials_ok=credentials_ok,
         ready=ready,
         driver=driver,
         artifacts_dir=str(Path(settings.artifacts_dir).expanduser()),
         missing_requirements=tuple(missing_requirements),
+        configured_model_providers=configured_model_providers,
     )
 
 

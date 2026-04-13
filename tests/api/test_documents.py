@@ -32,10 +32,12 @@ def _ready_readiness(tmp_path: Path) -> EngineReadiness:
         python_ok=True,
         predict_rlm_available=True,
         deno_available=True,
+        credentials_ok=True,
         ready=True,
         driver="predict_rlm",
         artifacts_dir=str(tmp_path / "artifacts"),
         missing_requirements=(),
+        configured_model_providers=("openai",),
     )
 
 
@@ -150,10 +152,12 @@ def _not_ready_readiness(tmp_path: Path) -> EngineReadiness:
         python_ok=True,
         predict_rlm_available=False,
         deno_available=False,
+        credentials_ok=False,
         ready=False,
         driver="unavailable",
         artifacts_dir=str(tmp_path / "artifacts"),
         missing_requirements=("deno", "predict_rlm"),
+        configured_model_providers=("openai",),
     )
 
 
@@ -169,6 +173,25 @@ async def test_document_template_catalog_returns_expected_templates(client):
         "invoice_extraction",
         "document_redaction",
     ]
+
+
+def test_document_engine_readiness_reports_missing_model_credentials(monkeypatch, tmp_path):
+    from src.api.services import document_engine
+
+    monkeypatch.setattr(document_engine.importlib.util, "find_spec", lambda name: object())
+    monkeypatch.setattr(document_engine.shutil, "which", lambda name: "/usr/bin/deno")
+    monkeypatch.setenv("MUTX_DOCUMENTS_LM", "openai/gpt-5.4")
+    monkeypatch.setenv("MUTX_DOCUMENTS_SUB_LM", "openai/gpt-5.1")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    readiness = document_engine.get_document_engine_readiness()
+
+    assert readiness.enabled is True
+    assert readiness.predict_rlm_available is True
+    assert readiness.deno_available is True
+    assert readiness.credentials_ok is False
+    assert readiness.configured_model_providers == ("openai",)
+    assert "OPENAI_API_KEY" in readiness.missing_requirements
 
 
 @pytest.mark.asyncio
