@@ -161,6 +161,12 @@ def system_info() -> dict[str, Any]:
                 "ready": False,
                 "driver": "unavailable",
                 "artifacts_dir": None,
+                "missing_requirements": [
+                    "documents_enabled",
+                    "python>=3.11",
+                    "deno",
+                    "predict_rlm",
+                ],
             }
         ),
         "cli_available": True,
@@ -255,6 +261,12 @@ def doctor_run() -> dict[str, Any]:
                 "ready": False,
                 "driver": "unavailable",
                 "artifacts_dir": None,
+                "missing_requirements": [
+                    "documents_enabled",
+                    "python>=3.11",
+                    "deno",
+                    "predict_rlm",
+                ],
             }
         ),
         "user": None,

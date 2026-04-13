@@ -41,6 +41,12 @@ def doctor_command(output: str):
                 "ready": False,
                 "driver": "unavailable",
                 "artifacts_dir": None,
+                "missing_requirements": [
+                    "documents_enabled",
+                    "python>=3.11",
+                    "deno",
+                    "predict_rlm",
+                ],
             }
         ),
         "user": None,
@@ -112,6 +118,11 @@ def doctor_command(output: str):
         f"deno={'yes' if payload['documents']['deno_available'] else 'no'} | "
         f"predict_rlm={'yes' if payload['documents']['predict_rlm_available'] else 'no'}"
     )
+    if payload["documents"].get("missing_requirements"):
+        click.echo(
+            "Documents Missing: "
+            + ", ".join(str(item) for item in payload["documents"]["missing_requirements"])
+        )
     if payload["user"]:
         click.echo(
             f"User: {payload['user']['email']} | {payload['user']['name']} | {payload['user']['plan']}"

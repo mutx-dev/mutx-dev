@@ -91,6 +91,18 @@ def ensure_documents_enabled() -> None:
         raise HTTPException(status_code=404, detail="Document workflows are disabled")
 
 
+def ensure_document_engine_ready() -> None:
+    readiness = get_document_engine_readiness()
+    if readiness.ready:
+        return
+
+    missing = ", ".join(readiness.missing_requirements) or "predict_rlm runtime"
+    raise HTTPException(
+        status_code=503,
+        detail=f"predict-rlm document execution is unavailable. Missing prerequisites: {missing}.",
+    )
+
+
 def _subject_metadata(job_id: uuid.UUID, template_id: str, execution_mode: str) -> dict[str, Any]:
     template = get_document_template(template_id)
     subject_label = template.name if template is not None else template_id
@@ -497,6 +509,7 @@ async def dispatch_document_job(
     job.execution_mode = mode
     _update_run_metadata(job.run, job)
     validate_job_inputs(job, job.artifacts)
+    ensure_document_engine_ready()
     job.status = "queued"
     job.dispatched_at = _utcnow()
     job.error_message = None
@@ -523,6 +536,7 @@ async def build_local_launch_response(
     job.execution_mode = "local"
     _update_run_metadata(job.run, job)
     validate_job_inputs(job, job.artifacts)
+    ensure_document_engine_ready()
     manifest = build_document_manifest(job, job.artifacts, output_dir=output_dir)
     await db.commit()
     return DocumentJobLocalLaunchResponse(
