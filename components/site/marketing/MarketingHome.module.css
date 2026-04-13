@@ -584,6 +584,7 @@
 }
 
 .demoTab {
+  position: relative;
   width: 100%;
   display: grid;
   gap: 0.6rem;
@@ -594,6 +595,7 @@
   border-radius: 1.35rem;
   border: 1px solid rgba(247, 244, 239, 0.08);
   background: rgba(255, 255, 255, 0.025);
+  overflow: hidden;
   transition:
     border-color 180ms ease,
     background 180ms ease,
@@ -607,6 +609,29 @@
   border-color: rgba(109, 175, 255, 0.34);
   background: rgba(255, 255, 255, 0.05);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.demoTab::after {
+  content: '';
+  position: absolute;
+  left: 1.05rem;
+  right: 1.05rem;
+  bottom: 0.82rem;
+  height: 0.16rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(109, 175, 255, 0.92), rgba(176, 224, 255, 0.9));
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+}
+
+.demoTab[data-active='1']::after {
+  opacity: 0.76;
+  transform: scaleX(1);
+}
+
+.demoTabs[data-autoplaying='1'] .demoTab[data-active='1']::after {
+  animation: demoTabProgress 2.6s linear both;
 }
 
 .demoTab:focus-visible,
@@ -690,6 +715,7 @@
 }
 
 .terminalWindow {
+  position: relative;
   overflow: hidden;
   border-radius: 1.35rem;
   border: 1px solid rgba(21, 30, 44, 0.14);
@@ -699,6 +725,35 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 28px 60px rgba(6, 10, 18, 0.16);
   transform: translateZ(0);
+  transition:
+    border-color 220ms ease,
+    box-shadow 260ms ease,
+    transform 220ms ease;
+}
+
+.terminalWindow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 85% 14%, rgba(117, 191, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.terminalWindow[data-streaming='1'] {
+  border-color: rgba(109, 175, 255, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 28px 60px rgba(6, 10, 18, 0.16),
+    0 0 0 1px rgba(109, 175, 255, 0.08);
+}
+
+.terminalWindow[data-streaming='1']::after,
+.terminalWindow[data-stream-state='complete']::after {
+  opacity: 1;
 }
 
 .terminalChrome {
@@ -780,12 +835,25 @@
 }
 
 .terminalCommand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.12rem;
   color: rgba(247, 244, 239, 0.9);
+}
+
+.terminalCursor {
+  width: 0.58rem;
+  height: 1.08em;
+  border-radius: 0.14rem;
+  background: rgba(125, 211, 252, 0.92);
+  box-shadow: 0 0 14px rgba(125, 211, 252, 0.2);
+  animation: terminalCursorBlink 0.9s steps(1, end) infinite;
 }
 
 .terminalReplyBlock {
   display: grid;
   gap: 0.72rem;
+  min-height: calc(var(--terminal-line-count, 4) * 1.78rem);
   padding-top: 0.9rem;
   border-top: 1px solid rgba(247, 244, 239, 0.08);
 }
@@ -1158,8 +1226,33 @@
   }
 }
 
+@keyframes demoTabProgress {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes terminalCursorBlink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  52%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marketingBackdropImage {
+    animation: none;
+  }
+
+  .demoTabs[data-autoplaying='1'] .demoTab[data-active='1']::after,
+  .terminalCursor {
     animation: none;
   }
 }

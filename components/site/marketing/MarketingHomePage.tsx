@@ -2,13 +2,14 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useInView, useReducedMotion } from 'framer-motion'
 
 import {
   marketingHomepage,
   type MarketingActionLink,
+  type MarketingHomepage,
 } from '@/lib/marketingContent'
 
 import core from './MarketingCore.module.css'
@@ -28,6 +29,18 @@ type HoverCardProps = {
   delay?: number
   distance?: number
 }
+
+type MarketingExampleItem = MarketingHomepage['salesSections']['examples']['items'][number]
+
+type TerminalPlaybackCardProps = {
+  item: MarketingExampleItem
+  delay?: number
+}
+
+const DEMO_AUTOPLAY_INTERVAL_MS = 2600
+const TERMINAL_PROMPT_DELAY_MS = 160
+const TERMINAL_TYPING_STEP_MS = 18
+const TERMINAL_REPLY_STAGGER_MS = 240
 
 function ActionLink({ action, className }: ActionLinkProps) {
   const icon = action.tone === 'primary' ? (
@@ -81,15 +94,168 @@ function HoverCard({ className, children, delay = 0, distance = 18 }: HoverCardP
   )
 }
 
+function TerminalPlaybackCard({ item, delay = 0 }: TerminalPlaybackCardProps) {
+  const prefersReducedMotion = useReducedMotion()
+  const terminalRef = useRef<HTMLDivElement | null>(null)
+  const isInView = useInView(terminalRef, {
+    once: true,
+    amount: 0.52,
+  })
+  const [typedPromptLength, setTypedPromptLength] = useState(
+    prefersReducedMotion ? item.userPrompt.length : 0
+  )
+  const [visibleReplyCount, setVisibleReplyCount] = useState(
+    prefersReducedMotion ? item.apology.length : 0
+  )
+  const [streamState, setStreamState] = useState<'idle' | 'typing' | 'replying' | 'complete'>(
+    prefersReducedMotion ? 'complete' : 'idle'
+  )
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setTypedPromptLength(item.userPrompt.length)
+      setVisibleReplyCount(item.apology.length)
+      setStreamState('complete')
+      return
+    }
+
+    if (!isInView) {
+      return
+    }
+
+    const startDelay = Math.round(delay * 1000)
+    const timers: number[] = []
+
+    setTypedPromptLength(0)
+    setVisibleReplyCount(0)
+    setStreamState('typing')
+
+    for (let index = 0; index < item.userPrompt.length; index += 1) {
+      timers.push(
+        window.setTimeout(() => {
+          setTypedPromptLength(index + 1)
+
+          if (index === item.userPrompt.length - 1) {
+            setStreamState('replying')
+          }
+        }, startDelay + TERMINAL_PROMPT_DELAY_MS + index * TERMINAL_TYPING_STEP_MS)
+      )
+    }
+
+    const replyStartDelay =
+      startDelay +
+      TERMINAL_PROMPT_DELAY_MS +
+      item.userPrompt.length * TERMINAL_TYPING_STEP_MS +
+      120
+
+    item.apology.forEach((_, lineIndex) => {
+      timers.push(
+        window.setTimeout(() => {
+          setVisibleReplyCount(lineIndex + 1)
+
+          if (lineIndex === item.apology.length - 1) {
+            setStreamState('complete')
+          }
+        }, replyStartDelay + lineIndex * TERMINAL_REPLY_STAGGER_MS)
+      )
+    })
+
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer))
+    }
+  }, [delay, isInView, item.apology, item.userPrompt, prefersReducedMotion])
+
+  const visiblePrompt =
+    prefersReducedMotion || streamState === 'complete'
+      ? item.userPrompt
+      : item.userPrompt.slice(0, typedPromptLength)
+  const isStreaming = streamState === 'typing' || streamState === 'replying'
+
+  return (
+    <motion.div
+      ref={terminalRef}
+      className={home.terminalWindow}
+      data-streaming={isStreaming ? '1' : '0'}
+      data-stream-state={streamState}
+      whileHover={
+        prefersReducedMotion
+          ? undefined
+          : {
+              y: -2,
+            }
+      }
+      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className={home.terminalChrome}>
+        <span className={home.terminalDot} data-tone="red" />
+        <span className={home.terminalDot} data-tone="yellow" />
+        <span className={home.terminalDot} data-tone="green" />
+        <span className={home.terminalTitle}>{item.eyebrow}</span>
+      </div>
+      <div className={home.terminalBody}>
+        <p className={home.terminalPromptLine}>
+          <span className={home.terminalPrompt}>{'>'}</span>
+          <span className={home.terminalCommand}>
+            {visiblePrompt}
+            {!prefersReducedMotion && streamState !== 'complete' ? (
+              <span className={home.terminalCursor} aria-hidden="true" />
+            ) : null}
+          </span>
+        </p>
+        <div
+          className={home.terminalReplyBlock}
+          style={{ '--terminal-line-count': item.apology.length } as CSSProperties}
+        >
+          {item.apology.slice(0, visibleReplyCount).map((line, lineIndex) => (
+            <motion.p
+              key={`${item.title}-${lineIndex}`}
+              className={home.terminalReplyLine}
+              initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span className={home.terminalAgent}>agent</span>
+              <span>{line}</span>
+            </motion.p>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
 export function MarketingHomePage() {
   const prefersReducedMotion = useReducedMotion()
+  const demoSectionRef = useRef<HTMLElement | null>(null)
+  const isDemoSectionInView = useInView(demoSectionRef, {
+    amount: 0.46,
+  })
   const [activeDemoId, setActiveDemoId] = useState(marketingHomepage.salesSections.demo.tabs[0]?.id)
+  const [demoAutoplayArmed, setDemoAutoplayArmed] = useState(true)
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
   const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.salesSections.cta.actions
 
   const activeDemo =
     marketingHomepage.salesSections.demo.tabs.find((tab) => tab.id === activeDemoId) ??
     marketingHomepage.salesSections.demo.tabs[0]
+
+  useEffect(() => {
+    if (prefersReducedMotion || !isDemoSectionInView || !demoAutoplayArmed) {
+      return
+    }
+
+    const interval = window.setInterval(() => {
+      setActiveDemoId((currentId) => {
+        const tabIds = marketingHomepage.salesSections.demo.tabs.map((tab) => tab.id)
+        const currentIndex = Math.max(tabIds.indexOf(currentId ?? tabIds[0]), 0)
+        return tabIds[(currentIndex + 1) % tabIds.length]
+      })
+    }, DEMO_AUTOPLAY_INTERVAL_MS)
+
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [demoAutoplayArmed, isDemoSectionInView, prefersReducedMotion])
 
   return (
     <div className={`${core.page} ${core.homePage}`}>
@@ -186,7 +352,11 @@ export function MarketingHomePage() {
           </div>
         </section>
 
-        <section className={home.demoSection} data-testid="homepage-demo-section">
+        <section
+          ref={demoSectionRef}
+          className={home.demoSection}
+          data-testid="homepage-demo-section"
+        >
           <div className={core.shell}>
             <div className={home.demoLayout}>
               <MarketingReveal className={home.demoIntro}>
@@ -235,7 +405,13 @@ export function MarketingHomePage() {
                   )}
                 </motion.div>
 
-                <div className={home.demoTabs} data-testid="homepage-demo-tabs">
+                <div
+                  className={home.demoTabs}
+                  data-testid="homepage-demo-tabs"
+                  data-autoplaying={
+                    isDemoSectionInView && demoAutoplayArmed && !prefersReducedMotion ? '1' : '0'
+                  }
+                >
                   {marketingHomepage.salesSections.demo.tabs.map((tab) => {
                     const isActive = tab.id === activeDemo.id
 
@@ -246,7 +422,10 @@ export function MarketingHomePage() {
                         type="button"
                         className={home.demoTab}
                         data-active={isActive ? '1' : '0'}
-                        onClick={() => setActiveDemoId(tab.id)}
+                        onClick={() => {
+                          setDemoAutoplayArmed(false)
+                          setActiveDemoId(tab.id)
+                        }}
                         aria-controls={`demo-panel-${tab.id}`}
                         aria-selected={isActive}
                       >
@@ -278,28 +457,7 @@ export function MarketingHomePage() {
                   delay={index * 0.07}
                   distance={18}
                 >
-                  <div className={home.terminalWindow}>
-                    <div className={home.terminalChrome}>
-                      <span className={home.terminalDot} data-tone="red" />
-                      <span className={home.terminalDot} data-tone="yellow" />
-                      <span className={home.terminalDot} data-tone="green" />
-                      <span className={home.terminalTitle}>{item.eyebrow}</span>
-                    </div>
-                    <div className={home.terminalBody}>
-                      <p className={home.terminalPromptLine}>
-                        <span className={home.terminalPrompt}>{'>'}</span>
-                        <span className={home.terminalCommand}>{item.userPrompt}</span>
-                      </p>
-                      <div className={home.terminalReplyBlock}>
-                        {item.apology.map((line, lineIndex) => (
-                          <p key={lineIndex} className={home.terminalReplyLine}>
-                            <span className={home.terminalAgent}>agent</span>
-                            <span>{line}</span>
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  <TerminalPlaybackCard item={item} delay={index * 0.12} />
 
                   <div className={home.exampleCopy}>
                     <h3 className={home.exampleTitle}>{item.title}</h3>
