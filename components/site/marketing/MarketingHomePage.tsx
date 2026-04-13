@@ -130,6 +130,9 @@ export function MarketingHomePage() {
           <MarketingHeroBackdrop
             className={home.heroMedia}
             src={marketingHomepage.hero.backgroundSrc}
+            position={marketingHomepage.hero.backdropPosition}
+            scale={marketingHomepage.hero.backdropScale}
+            shiftX={marketingHomepage.hero.backdropShiftX}
             fetchPriority="high"
           />
 
@@ -234,86 +237,19 @@ export function MarketingHomePage() {
                         <p className={home.sceneKicker}>{item.kicker}</p>
                       </div>
 
-                      <div className={home.sceneGrid}>
-                        <div className={home.sceneCopy}>
-                          <h3 className={home.sceneTitle}>{item.title}</h3>
-                          <p className={home.sceneBody}>{item.body}</p>
-                          <blockquote className={home.sceneQuote}>{item.quote}</blockquote>
-                          <ul className={home.sceneBeats}>
-                            {item.beats.map((beat) => (
-                              <li key={beat}>{beat}</li>
-                            ))}
-                          </ul>
-                          <p className={home.sceneNote}>{item.note}</p>
-                        </div>
-
-                        <motion.div
-                          className={home.sceneMediaCard}
-                          whileHover={
-                            prefersReducedMotion
-                              ? undefined
-                              : {
-                                  y: -5,
-                                  rotate: -0.35,
-                                }
-                          }
-                          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                        >
-                          <div className={home.sceneMediaFrame}>
-                            <Image
-                              src={item.imageSrc}
-                              alt={item.imageAlt}
-                              fill
-                              sizes="(max-width: 1024px) 100vw, 38rem"
-                              className={home.sceneMediaImage}
-                            />
-                          </div>
-                        </motion.div>
+                      <div className={home.sceneCopy}>
+                        <h3 className={home.sceneTitle}>{item.title}</h3>
+                        <p className={home.sceneBody}>{item.body}</p>
+                        <ul className={home.sceneBeats}>
+                          {item.beats.map((beat) => (
+                            <li key={beat}>{beat}</li>
+                          ))}
+                        </ul>
                       </div>
                     </article>
                   </MarketingReveal>
                 ))}
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className={home.incidentSection} data-testid="homepage-incident-section">
-          <div className={core.shell}>
-            <MarketingReveal className={home.incidentIntro} distance={18}>
-              <p className={home.sectionEyebrow}>{marketingHomepage.incidents.eyebrow}</p>
-              <h2 className={home.sectionTitle}>{marketingHomepage.incidents.title}</h2>
-              <p className={home.sectionBody}>{marketingHomepage.incidents.body}</p>
-            </MarketingReveal>
-
-            <div className={home.incidentList}>
-              {marketingHomepage.incidents.items.map((item, index) => (
-                <HoverCard
-                  key={item.id}
-                  className={home.incidentCard}
-                  delay={index * 0.07}
-                  distance={20}
-                >
-                  <article className={home.incidentArticle}>
-                    <div className={home.incidentHeader}>
-                      <p className={home.incidentLabel}>{item.label}</p>
-                      <h3 className={home.incidentTitle}>{item.title}</h3>
-                      <p className={home.incidentTrigger}>{item.trigger}</p>
-                    </div>
-
-                    <div className={home.incidentTranscript}>
-                      {item.log.map((line) => (
-                        <p key={line} className={home.incidentLogLine}>
-                          <span className={home.incidentPrompt}>{'>'}</span>
-                          <span>{line}</span>
-                        </p>
-                      ))}
-                    </div>
-
-                    <p className={home.incidentResolution}>{item.resolution}</p>
-                  </article>
-                </HoverCard>
-              ))}
             </div>
           </div>
         </section>
@@ -340,13 +276,20 @@ export function MarketingHomePage() {
                 }
                 transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className={home.controlPreviewFrame}>
+                <div
+                  className={home.controlPreviewFrame}
+                  data-media-fit={marketingHomepage.controlRoom.mediaFit ?? 'cover'}
+                >
                   <Image
                     src={marketingHomepage.controlRoom.mediaSrc}
                     alt={marketingHomepage.controlRoom.mediaAlt}
                     fill
                     sizes="(max-width: 1024px) 100vw, 54rem"
-                    className={home.controlPreviewImage}
+                    className={
+                      marketingHomepage.controlRoom.mediaFit === 'contain'
+                        ? home.controlPreviewImageContain
+                        : home.controlPreviewImage
+                    }
                   />
                 </div>
                 <div className={home.controlPreviewBands}>
@@ -357,21 +300,6 @@ export function MarketingHomePage() {
                   ))}
                 </div>
               </motion.div>
-
-              <div className={home.controlPillars}>
-                {marketingHomepage.controlRoom.pillars.map((pillar, index) => (
-                  <MarketingReveal
-                    key={pillar.label}
-                    className={home.controlPillar}
-                    delay={index * 0.06}
-                    distance={18}
-                  >
-                    <p className={home.controlPillarLabel}>{pillar.label}</p>
-                    <h3 className={home.controlPillarTitle}>{pillar.title}</h3>
-                    <p className={home.controlPillarBody}>{pillar.body}</p>
-                  </MarketingReveal>
-                ))}
-              </div>
             </div>
           </div>
         </section>
@@ -411,7 +339,6 @@ export function MarketingHomePage() {
                 <p className={home.sectionEyebrow}>{marketingHomepage.cta.eyebrow}</p>
                 <h2 className={home.sectionTitle}>{marketingHomepage.cta.title}</h2>
                 <p className={home.sectionBody}>{marketingHomepage.cta.body}</p>
-                <blockquote className={home.finalQuote}>{marketingHomepage.cta.quote}</blockquote>
                 <div className={home.finalActions}>
                   {finalPrimaryAction ? (
                     <ActionLink action={finalPrimaryAction} className={core.buttonPrimary} />

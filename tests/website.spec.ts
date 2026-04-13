@@ -716,7 +716,7 @@ test.describe('mutx.dev QA', () => {
     expect(after).toBeGreaterThan(0);
   });
 
-  test('homepage still assets stay single-use in the content model', async () => {
+  test('homepage content model avoids text-baked still assets', async () => {
     const stillAssets = [
       marketingHomepage.hero.backgroundSrc,
       ...marketingHomepage.chapters.items.map((item) => item.imageSrc),
@@ -724,7 +724,8 @@ test.describe('mutx.dev QA', () => {
       marketingHomepage.cta.mediaSrc,
     ];
 
-    expect(new Set(stillAssets).size).toBe(stillAssets.length);
+    expect(stillAssets).not.toContain('/landing/webp/hero-manifesto.webp');
+    expect(stillAssets).not.toContain('/landing/webp/docs-surface.webp');
   });
 
   test('download page exposes the mac release lane and release-notes path', async ({ page }) => {

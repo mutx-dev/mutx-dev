@@ -7,7 +7,7 @@ import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterIma
 
 const homeTitle = "MUTX | A Field Novel For Deployed Agents";
 const homeDescription =
-  "MUTX turns agent operations into a readable system with boundaries, proof, and calm operator surfaces. Start with the product, the release lane, or the repo.";
+  "MUTX gives deployed agents a readable control plane with live posture, guardrails, and proof.";
 
 export const metadata: Metadata = {
   title: homeTitle,

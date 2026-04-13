@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { cn } from "@/lib/utils";
 
 import styles from "./MarketingHome.module.css";
@@ -7,6 +9,9 @@ type MarketingHeroBackdropProps = {
   imageClassName?: string;
   fetchPriority?: "auto" | "high" | "low";
   src?: string;
+  position?: string;
+  scale?: number;
+  shiftX?: string;
 };
 
 export function MarketingHeroBackdrop({
@@ -14,9 +19,18 @@ export function MarketingHeroBackdrop({
   imageClassName,
   fetchPriority = "auto",
   src = "/landing/webp/victory-core.webp",
+  position,
+  scale,
+  shiftX,
 }: MarketingHeroBackdropProps) {
+  const backdropStyle = {
+    "--marketing-backdrop-position": position,
+    "--marketing-backdrop-scale": scale ? String(scale) : undefined,
+    "--marketing-backdrop-shift-x": shiftX,
+  } as CSSProperties;
+
   return (
-    <div className={cn(styles.marketingBackdrop, className)} aria-hidden="true">
+    <div className={cn(styles.marketingBackdrop, className)} aria-hidden="true" style={backdropStyle}>
       <img
         src={src}
         alt=""
