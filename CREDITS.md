@@ -206,6 +206,55 @@ This is an integration and attribution layer, not a claim of authorship over the
 
 ---
 
+### predict-rlm
+
+**Repository:** https://github.com/Trampoline-AI/predict-rlm
+
+**License:** MIT
+
+**Contribution:** MUTX uses `predict-rlm` as the document workflow engine for managed and local document analysis, contract comparison, invoice extraction, and document redaction. The MUTX document workflow surface intentionally aligns its template ids and output contracts with the upstream `predict-rlm` example families, while adding MUTX-specific job records, artifact storage, worker execution, and run/trace observability.
+
+**Upstream ref used for attribution:** `Trampoline-AI/predict-rlm` @ `5c7387afa1980b62b21a34ad0261256a95d8caa1`
+
+Tracked local surface:
+
+- `src/api/services/document_engine.py` - `predict-rlm` execution adapter and readiness contract
+- `src/api/services/document_jobs.py` - document job lifecycle and run/trace linkage
+- `src/api/routes/documents.py` - `/v1/documents/*` API surface
+- `src/api/document_worker.py` - managed execution worker loop
+- `cli/commands/documents.py` and `cli/services/documents.py` - CLI operator path
+- `app/dashboard/documents/page.tsx` and `components/dashboard/DocumentsPageClient.tsx` - dashboard operator path
+- `docs/document-workflows.md` - operator-facing documentation and runtime contract
+
+MUTX does not claim authorship over `predict-rlm`, its examples, or Trampoline AI's upstream design work. Upstream attribution for the adapted workflow surface is also tracked in `docs/legal/oss-attribution-ledger.md`.
+
+**MIT License Text:**
+```
+MIT License
+
+Copyright (c) 2026 Trampoline AI
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
 ## Full License Texts
 
 The incorporated projects listed above currently use the MIT License. See their repositories for full license texts:
@@ -214,6 +263,7 @@ The incorporated projects listed above currently use the MIT License. See their 
 - AARM: https://github.com/aarm-dev/docs/blob/main/LICENSE.txt
 - Faramesh: https://github.com/faramesh/faramesh-core/blob/main/LICENSE
 - Mission Control: https://github.com/builderz-labs/mission-control/blob/main/LICENSE
+- predict-rlm: https://github.com/Trampoline-AI/predict-rlm/blob/main/LICENSE
 
 ---
 
