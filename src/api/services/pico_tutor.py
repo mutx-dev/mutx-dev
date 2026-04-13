@@ -825,7 +825,6 @@ async def generate_pico_tutor_reply(
             user=current_user,
         )
         span.set_attribute("model_auth_source", api_key_source)
-
         with tracer.start_as_current_span("mutx.pico.tutor.retrieve") as retrieve_span:
             lesson_matches = retrieve_lessons(question, request.lessonSlug)
             knowledge_matches = retrieve_knowledge_docs(

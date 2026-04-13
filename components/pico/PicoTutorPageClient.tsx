@@ -60,7 +60,6 @@ type TutorOpenAIConnectionApiResponse = Partial<TutorOpenAIConnection> & {
     message?: string
   }
 }
-
 function resolveTutorHref(toHref: ReturnType<typeof usePicoHref>, href: string) {
   if (
     href.startsWith('/pico') ||
@@ -128,7 +127,6 @@ function readApiErrorMessage(payload: TutorApiResponse | TutorOpenAIConnectionAp
 
   return null
 }
-
 export function PicoTutorPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
@@ -247,7 +245,6 @@ export function PicoTutorPageClient() {
       cancelled = true
     }
   }, [session.status])
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!question.trim()) return

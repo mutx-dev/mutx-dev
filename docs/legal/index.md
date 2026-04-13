@@ -52,6 +52,7 @@ MUTX incorporates MIT-licensed components:
 - **AARM** (aarm-dev) — Security layer specification
 - **Faramesh** (Faramesh Technologies) — Governance engine
 - **Mission Control** (builderz-labs) — Dashboard inspiration and tracked direct dashboard-pattern reuse
+- **Orchestra Research AI-Research-SKILLs** — Imported skill catalog metadata, curated bundles, and runtime sync path for research/operator workflows
 
 All third-party code remains under its original license. See [CREDITS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/CREDITS.md) for full attribution and license texts.
 

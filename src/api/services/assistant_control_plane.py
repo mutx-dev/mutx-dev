@@ -459,7 +459,9 @@ def discover_workspace_skills() -> list[SkillCatalogItem]:
     return sorted(discovered.values(), key=lambda item: item.name.lower())
 
 
-def _merge_catalog_item(existing: SkillCatalogItem, discovered: SkillCatalogItem) -> SkillCatalogItem:
+def _merge_catalog_item(
+    existing: SkillCatalogItem, discovered: SkillCatalogItem
+) -> SkillCatalogItem:
     return SkillCatalogItem(
         id=existing.id,
         name=existing.name,
@@ -483,7 +485,9 @@ def _orchestra_skill_catalog_items(
     workspace_skill_map: dict[str, SkillCatalogItem],
 ) -> list[SkillCatalogItem]:
     source = orchestra_source()
-    repo_url = str(source.get("repo_url") or "https://github.com/Orchestra-Research/AI-Research-SKILLs")
+    repo_url = str(
+        source.get("repo_url") or "https://github.com/Orchestra-Research/AI-Research-SKILLs"
+    )
     commit = str(source.get("commit") or "") or None
     license_name = str(source.get("license") or "MIT")
 
@@ -499,7 +503,9 @@ def _orchestra_skill_catalog_items(
                 name=str(raw.get("name") or skill_id.replace("-", " ").title()),
                 description=str(raw.get("description") or ""),
                 author=str(raw.get("author") or "Orchestra Research"),
-                category=str(raw.get("category_name") or raw.get("category_id") or "Orchestra Research"),
+                category=str(
+                    raw.get("category_name") or raw.get("category_id") or "Orchestra Research"
+                ),
                 source="orchestra-research",
                 is_official=False,
                 tags=tuple(str(tag) for tag in (raw.get("tags") or []) if tag),
@@ -542,7 +548,11 @@ def list_skill_bundles() -> list[dict[str, Any]]:
     bundles: list[dict[str, Any]] = []
     for raw in orchestra_bundles():
         skill_ids = [str(item) for item in (raw.get("skill_ids") or []) if str(item)]
-        available = [skill_id for skill_id in skill_ids if catalog.get(skill_id) and catalog[skill_id].available]
+        available = [
+            skill_id
+            for skill_id in skill_ids
+            if catalog.get(skill_id) and catalog[skill_id].available
+        ]
         unavailable = [skill_id for skill_id in skill_ids if skill_id not in available]
         bundles.append(
             {
@@ -630,7 +640,10 @@ def list_assistant_skills(agent: Agent) -> list[dict[str, Any]]:
                 "available": item.available,
             }
         )
-    return sorted(entries, key=lambda entry: (not entry["installed"], not entry["available"], entry["name"].lower()))
+    return sorted(
+        entries,
+        key=lambda entry: (not entry["installed"], not entry["available"], entry["name"].lower()),
+    )
 
 
 def update_assistant_skills(agent: Agent, *, skill_id: str, install: bool) -> dict[str, Any]:
