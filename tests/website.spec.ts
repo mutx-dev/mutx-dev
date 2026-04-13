@@ -344,7 +344,6 @@ async function stubPicoProductApis(
       body: JSON.stringify(openAIConnection),
     });
   });
-
   await page.route('**/api/dashboard/runs?**', async (route) => {
     await route.fulfill({
       status: 200,
@@ -1075,7 +1074,6 @@ test.describe('mutx.dev QA', () => {
     await page.getByRole('button', { name: /disconnect openai/i }).click();
     await expect(page.getByTestId('pico-openai-connect-status')).toContainText(/no openai key is connected/i);
   });
-
   test('pico lesson workspace persists execution context back into the academy', async ({ page }) => {
     await stubPicoProductApis(page);
 
