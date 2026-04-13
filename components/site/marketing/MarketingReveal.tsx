@@ -17,6 +17,7 @@ export function MarketingReveal({
   distance = 20,
 }: MarketingRevealProps) {
   const prefersReducedMotion = useReducedMotion();
+  const offset = Math.min(distance, 20) * 0.38;
 
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>;
@@ -27,11 +28,10 @@ export function MarketingReveal({
       className={className}
       initial={{
         opacity: 0.92,
-        y: Math.min(distance, 20) * 0.38,
+        y: offset,
         scale: 0.992,
-        filter: "blur(2px)",
       }}
-      animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.72, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}

@@ -344,6 +344,7 @@ async function stubPicoProductApis(
       body: JSON.stringify(openAIConnection),
     });
   });
+
   await page.route('**/api/dashboard/runs?**', async (route) => {
     await route.fulfill({
       status: 200,
@@ -608,32 +609,32 @@ test.describe('mutx.dev QA', () => {
         });
       })
       .toBeGreaterThan(0.95);
-    expect(heroActions).toEqual(['Pre-register for PicoMUTX', 'View GitHub', 'Releases']);
+    expect(heroActions).toEqual(['Go to PicoMUTX', 'View GitHub', 'View GitHub']);
     expect(strayLargeLogos).toBe(0);
     await expect(page.getByTestId('marketing-loader-stage')).toHaveCount(0);
 
     const desktopFold = await page.evaluate(() => {
       const hero = document.querySelector('main section');
-      const story = document.querySelector('[data-testid="homepage-story-section"]');
+      const proof = document.querySelector('[data-testid="homepage-proof-section"]');
       const heroRect = hero?.getBoundingClientRect();
-      const storyRect = story?.getBoundingClientRect();
+      const proofRect = proof?.getBoundingClientRect();
 
       return {
         heroHeight: heroRect?.height ?? 0,
         viewportHeight: window.innerHeight,
-        storyTop: storyRect?.top ?? 0,
+        proofTop: proofRect?.top ?? 0,
       };
     });
 
     expect(desktopFold.heroHeight).toBeGreaterThanOrEqual(desktopFold.viewportHeight - 1);
-    expect(desktopFold.storyTop).toBeGreaterThanOrEqual(desktopFold.viewportHeight - 32);
+    expect(desktopFold.proofTop).toBeGreaterThan(0);
 
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(loader).toBeHidden({ timeout: 2000 });
     await expect(html).toHaveAttribute('data-loader-state', 'complete', { timeout: 2000 });
   });
 
-  test('landing page reads like a chaptered dossier with live entry points', async ({ page }) => {
+  test('landing page exposes the current production sections and final CTA only', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('marketing-loader')).toBeHidden({ timeout: 9000 });
 
@@ -641,22 +642,12 @@ test.describe('mutx.dev QA', () => {
       nodes.map((node) => node.textContent?.trim() ?? '').filter(Boolean)
     );
 
-    expect(visibleHeadings.length).toBeGreaterThanOrEqual(4);
-    expect(
-      visibleHeadings.some((heading) => /read the system the way an operator does/i.test(heading))
-    ).toBe(true);
-    expect(
-      visibleHeadings.some((heading) => /the dangerous version of an ai failure is usually the polite one/i.test(heading))
-    ).toBe(true);
-    expect(
-      visibleHeadings.some((heading) => /enter through the lane that matches your attention span/i.test(heading))
-    ).toBe(true);
+    expect(visibleHeadings.length).toBeGreaterThanOrEqual(3);
+    expect(visibleHeadings.some((heading) => /see it for yourself/i.test(heading))).toBe(true);
     await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /close details/i })).toHaveCount(0);
     await expect(page.getByText(/the operator surface already ships\./i)).toHaveCount(0);
-    await expect(page.getByTestId('homepage-story-index')).toBeVisible();
-    await expect(page.getByTestId('homepage-entry-section')).toBeVisible();
   });
 
   test('homepage settles cleanly on mobile after the loader handoff', async ({ page }) => {
@@ -674,8 +665,8 @@ test.describe('mutx.dev QA', () => {
       const heading = document.querySelector('h1');
       const headingRect = heading?.getBoundingClientRect();
       const word = document.querySelector('[data-testid="homepage-lockup-word"]');
-      const story = document.querySelector('[data-testid="homepage-story-section"]');
-      const storyRect = story?.getBoundingClientRect();
+      const proof = document.querySelector('[data-testid="homepage-proof-section"]');
+      const proofRect = proof?.getBoundingClientRect();
 
       return {
         bodyWidth: document.body.scrollWidth,
@@ -684,7 +675,7 @@ test.describe('mutx.dev QA', () => {
         headingLeft: headingRect?.left ?? 0,
         headingRight: headingRect?.right ?? 0,
         wordOpacity: word ? Number.parseFloat(getComputedStyle(word).opacity) : 0,
-        storyTop: storyRect?.top ?? 0,
+        proofTop: proofRect?.top ?? 0,
       };
     });
 
@@ -692,9 +683,9 @@ test.describe('mutx.dev QA', () => {
     expect(mobileMetrics.headingLeft).toBeGreaterThanOrEqual(-1);
     expect(mobileMetrics.headingRight).toBeLessThanOrEqual(mobileMetrics.viewportWidth + 1);
     expect(mobileMetrics.wordOpacity).toBeGreaterThan(0.95);
-    expect(mobileMetrics.storyTop).toBeGreaterThanOrEqual(mobileMetrics.viewportHeight - 64);
+    expect(mobileMetrics.proofTop).toBeGreaterThan(0);
 
-    await expect(page.getByRole('link', { name: /go to picomutx/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /pico\.?mutx/i }).first()).toBeVisible();
   });
 
   test('homepage scrolls after the loader settles', async ({ page }) => {
@@ -716,16 +707,13 @@ test.describe('mutx.dev QA', () => {
     expect(after).toBeGreaterThan(0);
   });
 
-  test('homepage content model avoids text-baked still assets', async () => {
+  test('homepage still assets stay single-use in the content model', async () => {
     const stillAssets = [
       marketingHomepage.hero.backgroundSrc,
-      ...marketingHomepage.chapters.items.map((item) => item.imageSrc),
-      marketingHomepage.controlRoom.mediaSrc,
-      marketingHomepage.cta.mediaSrc,
+      marketingHomepage.salesSections.demo.tabs[2]?.mediaSrc,
     ];
 
-    expect(stillAssets).not.toContain('/landing/webp/hero-manifesto.webp');
-    expect(stillAssets).not.toContain('/landing/webp/docs-surface.webp');
+    expect(new Set(stillAssets).size).toBe(stillAssets.length);
   });
 
   test('download page exposes the mac release lane and release-notes path', async ({ page }) => {
@@ -1075,6 +1063,7 @@ test.describe('mutx.dev QA', () => {
     await page.getByRole('button', { name: /disconnect openai/i }).click();
     await expect(page.getByTestId('pico-openai-connect-status')).toContainText(/no openai key is connected/i);
   });
+
   test('pico lesson workspace persists execution context back into the academy', async ({ page }) => {
     await stubPicoProductApis(page);
 

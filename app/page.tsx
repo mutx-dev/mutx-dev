@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { MarketingHomePage } from "@/components/site/marketing/MarketingHomePage";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl, getSiteUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
 
-const homeTitle = "MUTX | A Field Novel For Deployed Agents";
+const homeTitle = "MUTX | See What Your AI Agents Are Doing";
 const homeDescription =
-  "MUTX gives deployed agents a readable control plane with live posture, guardrails, and proof.";
+  "MUTX gives you clear visibility, real control, and full audit trails for every AI agent you run. Download the Mac app.";
 
 export const metadata: Metadata = {
   title: homeTitle,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     creator: DEFAULT_X_HANDLE,
     title: homeTitle,
     description: homeDescription,
-    images: [getPageTwitterImageUrl(homeTitle, homeDescription, { path: "/" })],
+    images: [getPageOgImageUrl(homeTitle, homeDescription, { path: "/" })],
   },
 };
 

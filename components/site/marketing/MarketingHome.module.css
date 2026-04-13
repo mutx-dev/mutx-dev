@@ -14,8 +14,8 @@
   height: 118%;
   object-fit: cover;
   object-position: var(--marketing-backdrop-position);
-  opacity: 0.58;
-  filter: saturate(0.92) contrast(1.08) brightness(0.82);
+  opacity: 0.62;
+  filter: saturate(1.1) contrast(1.14) brightness(0.94);
   transform: translate3d(var(--marketing-backdrop-shift-x), 0, 0)
     scale(var(--marketing-backdrop-scale));
   transform-origin: 58% center;
@@ -27,10 +27,10 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 78% 20%, rgba(212, 171, 115, 0.18), transparent 28rem),
-    radial-gradient(circle at 94% 30%, rgba(137, 120, 184, 0.16), transparent 36rem),
-    linear-gradient(90deg, rgba(12, 10, 14, 0.92) 0%, rgba(12, 10, 14, 0.76) 18%, rgba(12, 10, 14, 0.48) 44%, rgba(12, 10, 14, 0.24) 68%, rgba(12, 10, 14, 0.1) 100%),
-    linear-gradient(180deg, rgba(12, 10, 14, 0.12) 0%, rgba(12, 10, 14, 0.04) 28%, rgba(12, 10, 14, 0.22) 100%);
+    radial-gradient(circle at 80% 22%, rgba(118, 188, 255, 0.18), transparent 28rem),
+    radial-gradient(circle at 94% 28%, rgba(36, 70, 124, 0.24), transparent 36rem),
+    linear-gradient(90deg, rgba(4, 6, 9, 0.88) 0%, rgba(4, 6, 9, 0.72) 14%, rgba(4, 6, 9, 0.44) 38%, rgba(4, 6, 9, 0.24) 62%, rgba(4, 6, 9, 0.14) 82%, rgba(4, 6, 9, 0.08) 100%),
+    linear-gradient(180deg, rgba(4, 6, 9, 0.1) 0%, rgba(4, 6, 9, 0.04) 28%, rgba(4, 6, 9, 0.2) 100%);
 }
 
 .marketingBackdropGrid {
@@ -68,8 +68,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 44%, rgba(212, 171, 115, 0.12), transparent 14rem),
-    linear-gradient(180deg, rgba(7, 7, 10, 0.56) 0%, rgba(7, 7, 10, 0.7) 100%);
+    radial-gradient(circle at 50% 44%, rgba(89, 162, 255, 0.1), transparent 14rem),
+    linear-gradient(180deg, rgba(4, 6, 9, 0.5) 0%, rgba(4, 6, 9, 0.62) 100%);
   backdrop-filter: blur(8px);
 }
 
@@ -99,7 +99,7 @@
   inset: -34%;
   border-radius: 999px;
   background:
-    radial-gradient(circle, rgba(241, 214, 174, 0.28) 0%, rgba(212, 171, 115, 0.18) 34%, rgba(10, 10, 13, 0) 72%);
+    radial-gradient(circle, rgba(132, 204, 255, 0.34) 0%, rgba(88, 154, 255, 0.2) 34%, rgba(10, 20, 33, 0) 72%);
   filter: blur(30px);
 }
 
@@ -115,12 +115,12 @@
   border-radius: 1rem;
   border: 1px solid rgba(247, 244, 239, 0.18);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.18), transparent 72%),
-    linear-gradient(180deg, rgba(16, 14, 20, 0.98), rgba(8, 7, 11, 1));
+    radial-gradient(circle at 50% 0%, rgba(90, 151, 255, 0.18), transparent 72%),
+    linear-gradient(180deg, rgba(8, 10, 15, 0.98), rgba(1, 2, 4, 1));
   backdrop-filter: blur(22px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 18px 46px rgba(2, 2, 6, 0.3);
+    0 18px 46px rgba(0, 7, 20, 0.28);
 }
 
 .loaderMarkShell::after {
@@ -143,8 +143,8 @@
   object-fit: contain;
   display: block;
   filter:
-    drop-shadow(0 0 18px rgba(241, 214, 174, 0.14))
-    drop-shadow(0 12px 24px rgba(2, 2, 6, 0.24));
+    drop-shadow(0 0 18px rgba(118, 196, 255, 0.18))
+    drop-shadow(0 12px 24px rgba(0, 5, 14, 0.24));
 }
 
 .loaderMarkVideo {
@@ -177,8 +177,8 @@
   --hero-stage-min-height: max(100dvh, 48rem);
   min-height: var(--hero-stage-min-height);
   overflow: clip;
-  color: #fff5e8;
-  background: #100f13;
+  color: #f7f4ef;
+  background: #05070c;
 }
 
 .heroMedia {
@@ -190,14 +190,14 @@
 .heroShell {
   position: relative;
   z-index: 1;
-  width: min(100% - 1.5rem, 132rem);
+  width: min(100% - 2rem, 128rem);
   min-height: var(--hero-stage-min-height);
   margin: 0 auto;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   padding:
     clamp(2rem, 3.2vw, 2.8rem)
-    clamp(0.8rem, 2vw, 1.8rem)
+    clamp(1rem, 2vw, 1.8rem)
     clamp(3.8rem, 7.5vw, 6rem);
 }
 
@@ -250,7 +250,7 @@
 }
 
 .heroLockupWord {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-marketing-accent), sans-serif;
   font-size: clamp(0.95rem, 0.88rem + 0.38vw, 1.18rem);
   font-weight: 800;
   line-height: 1;
@@ -269,21 +269,14 @@
 }
 
 .heroColumn {
-  width: min(100%, 58rem);
+  width: min(100%, 52rem);
   min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: clamp(1.8rem, 3vw, 2.6rem);
-  padding: clamp(2rem, 3vw, 2.6rem);
-  margin-top: clamp(2rem, 7vh, 5rem);
-  border: 1px solid rgba(255, 240, 221, 0.1);
-  border-radius: 2rem;
-  background:
-    linear-gradient(180deg, rgba(28, 20, 15, 0.7), rgba(28, 20, 15, 0.38));
-  backdrop-filter: blur(14px);
-  box-shadow: 0 28px 80px rgba(10, 6, 4, 0.22);
+  padding-block: clamp(1.8rem, 4vh, 2.8rem) clamp(5rem, 11vh, 7.5rem);
 }
 
 .heroContent {
@@ -314,7 +307,7 @@
   border-radius: 999px;
   border: 1px solid rgba(247, 244, 239, 0.14);
   background: rgba(255, 255, 255, 0.04);
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-marketing-accent), sans-serif;
   font-size: 0.76rem;
   font-weight: 800;
   line-height: 1;
@@ -323,26 +316,25 @@
 }
 
 .heroEyebrow {
-  border-color: rgba(212, 171, 115, 0.3);
-  background: rgba(212, 171, 115, 0.12);
-  color: rgba(255, 205, 170, 0.96);
+  border-color: rgba(118, 196, 255, 0.28);
+  background: rgba(118, 196, 255, 0.07);
+  color: rgba(118, 196, 255, 0.92);
   margin-bottom: 0.12rem;
 }
 
 .heroTitle {
   margin: 0;
-  font-family: var(--font-site-display), serif;
-  font-size: clamp(4rem, 7vw, 7.6rem);
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(4.4rem, 7vw, 7.2rem);
   font-weight: 300;
-  line-height: 0.88;
-  letter-spacing: -0.07em;
-  text-wrap: balance;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
 }
 
 .heroSupport {
-  max-width: 36rem;
+  max-width: 32rem;
   margin: 0;
-  color: rgba(255, 239, 218, 0.78);
+  color: rgba(247, 244, 239, 0.8);
   font-size: clamp(1.08rem, 1rem + 0.3vw, 1.28rem);
   font-weight: 400;
   line-height: 1.5;
@@ -387,7 +379,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(255, 223, 189, 0.62);
+  color: rgba(247, 244, 239, 0.55);
   font-size: 0.88rem;
   font-weight: 600;
   text-decoration: none;
@@ -396,7 +388,7 @@
 
 .secondaryAction:hover {
   opacity: 1;
-  color: rgba(255, 242, 226, 0.92);
+  color: rgba(247, 244, 239, 0.85);
   transform: translateY(-1px);
 }
 
@@ -434,11 +426,11 @@
 
 .sectionTitle {
   margin: 0;
-  font-family: var(--font-site-body), sans-serif;
-  font-size: clamp(2.3rem, 4.2vw, 3.8rem);
+  font-family: var(--font-marketing-sans), sans-serif;
+  font-size: clamp(2.1rem, 4.2vw, 3.5rem);
   font-weight: 500;
-  line-height: 0.96;
-  letter-spacing: -0.065em;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
 }
 
 .sectionBody {
@@ -465,27 +457,27 @@
 
 .demoSection {
   background:
-    radial-gradient(circle at 80% 18%, rgba(212, 171, 115, 0.16), transparent 22rem),
-    linear-gradient(180deg, rgba(23, 17, 14, 0.98), rgba(17, 13, 11, 1));
+    radial-gradient(circle at 80% 18%, rgba(91, 162, 255, 0.16), transparent 22rem),
+    linear-gradient(180deg, rgba(8, 10, 14, 0.98), rgba(6, 8, 12, 1));
 }
 
 .examplesSection {
   color: #f7f4ef;
   background:
-    radial-gradient(circle at 28% 12%, rgba(212, 171, 115, 0.1), transparent 24rem),
-    linear-gradient(180deg, rgba(24, 18, 15, 0.98), rgba(16, 12, 10, 1));
+    radial-gradient(circle at 28% 12%, rgba(75, 141, 255, 0.1), transparent 24rem),
+    linear-gradient(180deg, rgba(7, 9, 14, 0.98), rgba(5, 7, 11, 1));
 }
 
 .proofSection {
   background:
-    radial-gradient(circle at 16% 18%, rgba(212, 171, 115, 0.12), transparent 18rem),
-    linear-gradient(180deg, rgba(22, 16, 14, 1), rgba(15, 11, 10, 1));
+    radial-gradient(circle at 16% 18%, rgba(91, 162, 255, 0.12), transparent 18rem),
+    linear-gradient(180deg, rgba(9, 11, 16, 1), rgba(5, 6, 9, 1));
 }
 
 .finalSection {
   background:
-    radial-gradient(circle at 78% 26%, rgba(212, 171, 115, 0.18), transparent 20rem),
-    linear-gradient(180deg, rgba(20, 15, 12, 1), rgba(13, 10, 8, 1));
+    radial-gradient(circle at 78% 26%, rgba(90, 151, 255, 0.18), transparent 20rem),
+    linear-gradient(180deg, rgba(7, 9, 13, 1), rgba(5, 6, 9, 1));
 }
 
 .demoIntro,
@@ -562,10 +554,10 @@
   position: relative;
   overflow: hidden;
   min-height: clamp(22rem, 56vw, 40rem);
-  border-radius: 2.2rem;
+  border-radius: 1.9rem;
   background:
-    radial-gradient(circle at 22% 18%, rgba(212, 171, 115, 0.14), transparent 18rem),
-    linear-gradient(180deg, rgba(35, 27, 22, 0.98), rgba(18, 14, 12, 1));
+    radial-gradient(circle at 22% 18%, rgba(75, 141, 255, 0.18), transparent 18rem),
+    linear-gradient(180deg, rgba(12, 16, 24, 0.98), rgba(8, 10, 14, 1));
 }
 
 .demoVideo,
@@ -625,7 +617,7 @@
 .exampleEyebrow,
 .proofLaneLabel {
   margin: 0;
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-marketing-accent), sans-serif;
   font-size: 0.76rem;
   font-weight: 800;
   line-height: 1;
@@ -686,10 +678,10 @@
   display: grid;
   gap: 1rem;
   padding: 1rem;
-  border-radius: 1.85rem;
-  border-color: rgba(255, 240, 221, 0.08);
+  border-radius: 1.7rem;
+  border-color: rgba(247, 244, 239, 0.08);
   background:
-    linear-gradient(180deg, rgba(255, 241, 224, 0.06), rgba(255, 241, 224, 0.02));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 24px 60px rgba(0, 7, 18, 0.18);
@@ -698,9 +690,9 @@
 .terminalWindow {
   overflow: hidden;
   border-radius: 1.35rem;
-  border: 1px solid rgba(255, 224, 186, 0.12);
+  border: 1px solid rgba(21, 30, 44, 0.14);
   background:
-    linear-gradient(180deg, rgba(34, 27, 22, 0.98), rgba(17, 13, 11, 1));
+    linear-gradient(180deg, rgba(12, 16, 24, 0.98), rgba(6, 9, 14, 1));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 28px 60px rgba(6, 10, 18, 0.16);
@@ -712,8 +704,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0 0.9rem;
-  border-bottom: 1px solid rgba(255, 224, 186, 0.08);
-  background: linear-gradient(180deg, rgba(52, 39, 31, 1), rgba(31, 23, 19, 1));
+  border-bottom: 1px solid rgba(247, 244, 239, 0.08);
+  background: linear-gradient(180deg, rgba(23, 28, 39, 1), rgba(16, 20, 29, 1));
 }
 
 .terminalDot {
@@ -730,7 +722,7 @@
 .terminalTitle {
   margin-left: 0.35rem;
   color: rgba(247, 244, 239, 0.5);
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-marketing-accent), sans-serif;
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -777,11 +769,11 @@
 }
 
 .terminalPrompt {
-  color: #ffb25b;
+  color: #7dd3fc;
 }
 
 .terminalAgent {
-  color: #e98b6d;
+  color: #fca5a5;
 }
 
 .terminalCommand {
@@ -808,10 +800,10 @@
   display: grid;
   gap: 1rem;
   padding: 1.15rem;
-  border-radius: 1.9rem;
+  border-radius: 1.75rem;
   border: 1px solid rgba(247, 244, 239, 0.08);
   background:
-    linear-gradient(180deg, rgba(255, 241, 224, 0.04), rgba(255, 241, 224, 0.01));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 18px 50px rgba(0, 7, 18, 0.14);
@@ -821,20 +813,20 @@
   position: relative;
   padding: 0.8rem 0.9rem;
   border-radius: 0.9rem;
-  background: rgba(118, 58, 38, 0.18);
-  border: 1px solid rgba(233, 139, 109, 0.12);
+  background: rgba(255, 87, 87, 0.04);
+  border: 1px solid rgba(255, 87, 87, 0.08);
 }
 
 .proofLane:first-child .proofLaneLabel {
-  color: rgba(248, 180, 154, 0.82);
+  color: rgba(255, 120, 120, 0.8);
 }
 
 .proofLane:last-child {
   position: relative;
   padding: 0.8rem 0.9rem;
   border-radius: 0.9rem;
-  background: rgba(212, 171, 115, 0.12);
-  border: 1px solid rgba(255, 178, 91, 0.16);
+  background: rgba(75, 141, 255, 0.06);
+  border: 1px solid rgba(75, 141, 255, 0.12);
 }
 
 .proofCompare {
@@ -904,7 +896,7 @@
   border-top: 1px solid rgba(247, 244, 239, 0.06);
   border-bottom: 1px solid rgba(247, 244, 239, 0.06);
   background:
-    linear-gradient(180deg, rgba(18, 14, 11, 0.98), rgba(13, 10, 8, 1));
+    linear-gradient(180deg, rgba(6, 8, 12, 0.98), rgba(5, 7, 10, 1));
   color: #f7f4ef;
   overflow: hidden;
 }
@@ -915,7 +907,7 @@
   inset: 0;
   opacity: 0.6;
   background:
-    radial-gradient(circle at 50% 50%, rgba(212, 171, 115, 0.08), transparent 40rem);
+    radial-gradient(circle at 50% 50%, rgba(75, 141, 255, 0.06), transparent 40rem);
   pointer-events: none;
 }
 
@@ -939,12 +931,12 @@
 
 .socialProofValue {
   margin: 0;
-  font-family: var(--font-site-display), serif;
+  font-family: var(--font-marketing-display), serif;
   font-size: clamp(2.2rem, 3.5vw, 3rem);
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.06em;
-  color: #fff3e0;
+  color: #f7f4ef;
 }
 
 .socialProofLabel {
@@ -954,7 +946,7 @@
   line-height: 1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 222, 186, 0.46);
+  color: rgba(247, 244, 239, 0.48);
 }
 
 .socialProofTagline {
@@ -962,7 +954,7 @@
   text-align: center;
   font-size: 0.92rem;
   font-weight: 500;
-  color: rgba(255, 222, 186, 0.54);
+  color: rgba(247, 244, 239, 0.52);
   margin-bottom: 1.2rem;
 }
 
@@ -1153,629 +1145,5 @@
 @media (prefers-reduced-motion: reduce) {
   .marketingBackdropImage {
     animation: none;
-  }
-}
-
-.heroSection {
-  --hero-stage-min-height: max(100dvh, 54rem);
-  background:
-    radial-gradient(circle at 80% 22%, rgba(93, 143, 255, 0.22), transparent 22rem),
-    radial-gradient(circle at 18% 16%, rgba(212, 171, 115, 0.12), transparent 18rem),
-    linear-gradient(180deg, #111216 0%, #090a0d 100%);
-}
-
-.heroSection::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(7, 9, 12, 0.96) 0%, rgba(7, 9, 12, 0.82) 34%, rgba(7, 9, 12, 0.38) 62%, rgba(7, 9, 12, 0.14) 100%),
-    linear-gradient(180deg, rgba(9, 11, 15, 0.08) 0%, rgba(9, 11, 15, 0.18) 100%);
-  pointer-events: none;
-}
-
-.heroShell {
-  width: min(100% - 1.5rem, 130rem);
-  padding:
-    clamp(1.6rem, 2vw, 2.2rem)
-    clamp(0.8rem, 2vw, 1.6rem)
-    clamp(3.2rem, 8vw, 6.5rem);
-  align-items: flex-end;
-}
-
-.heroColumn {
-  width: min(100%, 72rem);
-  gap: clamp(1.75rem, 2.8vw, 2.5rem);
-  padding: clamp(1.8rem, 3.1vw, 2.8rem);
-  margin-top: clamp(2.6rem, 9vh, 6rem);
-  border: 1px solid rgba(255, 236, 214, 0.11);
-  border-radius: 2.4rem;
-  background:
-    linear-gradient(180deg, rgba(16, 18, 24, 0.82), rgba(10, 12, 17, 0.58));
-  backdrop-filter: blur(18px);
-  box-shadow:
-    0 30px 90px rgba(6, 4, 3, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.heroContent {
-  max-width: 52rem;
-  gap: 1.65rem;
-}
-
-.heroEyebrow,
-.sectionEyebrow {
-  min-height: 2.1rem;
-  padding: 0 0.92rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 214, 175, 0.16);
-  background: rgba(255, 228, 197, 0.05);
-  color: rgba(255, 219, 178, 0.86);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-}
-
-.heroEyebrow {
-  background: rgba(212, 171, 115, 0.14);
-  border-color: rgba(212, 171, 115, 0.34);
-  color: rgba(255, 214, 173, 0.98);
-}
-
-.heroTitle {
-  max-width: 10ch;
-  font-size: clamp(4.5rem, 8vw, 8.2rem);
-  font-weight: 300;
-  line-height: 0.84;
-  letter-spacing: -0.082em;
-}
-
-.heroSupport {
-  max-width: 39rem;
-  color: rgba(255, 238, 219, 0.8);
-  font-size: clamp(1.06rem, 1.02rem + 0.25vw, 1.28rem);
-  line-height: 1.58;
-}
-
-.heroActions,
-.finalActions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.85rem 1rem;
-}
-
-.heroSecondaryActions,
-.finalSecondaryActions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.85rem 1.1rem;
-}
-
-.secondaryAction {
-  color: rgba(255, 226, 194, 0.72);
-}
-
-.secondaryAction:hover {
-  color: rgba(255, 244, 230, 0.96);
-}
-
-.heroLedger {
-  width: min(100%, 54rem);
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.9rem;
-}
-
-.heroLedgerLine {
-  display: grid;
-  gap: 0.75rem;
-  padding: 1rem 1rem 0;
-  border-top: 1px solid rgba(255, 236, 214, 0.12);
-}
-
-.heroLedgerIndex {
-  color: rgba(255, 184, 109, 0.82);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.heroLedgerText {
-  margin: 0;
-  color: rgba(255, 234, 210, 0.76);
-  font-size: 0.92rem;
-  line-height: 1.45;
-}
-
-.sectionTitle {
-  max-width: 11ch;
-  font-family: var(--font-site-display), serif;
-  font-size: clamp(2.7rem, 5vw, 5.2rem);
-  font-weight: 300;
-  line-height: 0.92;
-  letter-spacing: -0.075em;
-}
-
-.sectionBody {
-  max-width: 42rem;
-  color: rgba(255, 232, 208, 0.76);
-  font-size: 1.03rem;
-  line-height: 1.66;
-}
-
-.storySection,
-.incidentSection,
-.controlSection,
-.entrySection,
-.finalSection {
-  position: relative;
-  padding: clamp(4.4rem, 8vw, 7.2rem) 0;
-  border-top: 1px solid rgba(255, 238, 218, 0.08);
-  color: #f7f1e7;
-}
-
-.storySection {
-  background:
-    radial-gradient(circle at 12% 12%, rgba(212, 171, 115, 0.1), transparent 22rem),
-    linear-gradient(180deg, rgba(22, 16, 13, 1), rgba(14, 11, 9, 1));
-}
-
-.storyShell {
-  display: grid;
-  grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
-  gap: clamp(1.5rem, 3vw, 2.4rem);
-  align-items: start;
-}
-
-.storyRail {
-  position: sticky;
-  top: 4.5rem;
-  display: grid;
-  gap: 1rem;
-  align-content: start;
-}
-
-.storyIndex {
-  display: grid;
-  gap: 0.7rem;
-  margin-top: 0.4rem;
-}
-
-.storyIndexLink {
-  display: grid;
-  gap: 0.18rem;
-  padding: 0.95rem 1rem;
-  border: 1px solid rgba(255, 227, 193, 0.1);
-  border-radius: 1.15rem;
-  background: rgba(255, 248, 238, 0.03);
-  text-decoration: none;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
-}
-
-.storyIndexLink:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 178, 91, 0.24);
-  background: rgba(255, 248, 238, 0.06);
-}
-
-.storyIndexChapter,
-.sceneChapter,
-.incidentLabel,
-.controlPillarLabel,
-.entryLabel {
-  color: rgba(255, 184, 109, 0.86);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.storyIndexTitle,
-.sceneKicker {
-  color: rgba(255, 236, 214, 0.9);
-  font-size: 0.95rem;
-  line-height: 1.35;
-}
-
-.storyScenes {
-  display: grid;
-  gap: 1.4rem;
-}
-
-.sceneArticle,
-.incidentArticle,
-.entryArticle,
-.controlPillar {
-  border: 1px solid rgba(255, 227, 193, 0.1);
-  border-radius: 2rem;
-  background:
-    linear-gradient(180deg, rgba(34, 25, 20, 0.94), rgba(18, 14, 11, 0.98));
-  box-shadow: 0 22px 56px rgba(10, 6, 4, 0.18);
-}
-
-.sceneArticle {
-  display: grid;
-  gap: 1rem;
-  padding: clamp(1.3rem, 2vw, 1.8rem);
-}
-
-.sceneMeta {
-  display: grid;
-  gap: 0.25rem;
-}
-
-.sceneGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(19rem, 0.85fr);
-  gap: clamp(1.2rem, 2vw, 1.9rem);
-  align-items: start;
-}
-
-.sceneCopy {
-  display: grid;
-  gap: 0.9rem;
-  max-width: 40rem;
-}
-
-.sceneTitle,
-.incidentTitle,
-.entryTitle,
-.controlPillarTitle {
-  margin: 0;
-  font-family: var(--font-site-display), serif;
-  font-size: clamp(1.7rem, 2.8vw, 2.75rem);
-  font-weight: 300;
-  line-height: 0.95;
-  letter-spacing: -0.05em;
-}
-
-.sceneBody,
-.incidentTrigger,
-.incidentResolution,
-.entryBody,
-.controlPillarBody,
-.sceneNote {
-  margin: 0;
-  color: rgba(255, 232, 208, 0.72);
-  font-size: 0.98rem;
-  line-height: 1.6;
-}
-
-.sceneQuote,
-.finalQuote {
-  margin: 0;
-  padding-left: 1rem;
-  border-left: 1px solid rgba(255, 178, 91, 0.42);
-  color: rgba(255, 243, 226, 0.94);
-  font-family: var(--font-site-display), serif;
-  font-size: clamp(1.2rem, 2vw, 1.7rem);
-  line-height: 1.2;
-  letter-spacing: -0.04em;
-}
-
-.sceneBeats {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.75rem;
-}
-
-.sceneBeats li {
-  position: relative;
-  padding-left: 1rem;
-  color: rgba(255, 232, 208, 0.76);
-  font-size: 0.95rem;
-  line-height: 1.52;
-}
-
-.sceneBeats li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: rgba(255, 178, 91, 0.9);
-}
-
-.sceneMediaCard,
-.controlPreview,
-.finalPoster {
-  position: relative;
-}
-
-.sceneMediaFrame,
-.controlPreviewFrame,
-.finalPosterFrame {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.6rem;
-  border: 1px solid rgba(255, 227, 193, 0.12);
-  background: rgba(255, 247, 235, 0.04);
-}
-
-.sceneMediaFrame {
-  min-height: 24rem;
-}
-
-.sceneMediaImage,
-.controlPreviewImage,
-.finalPosterImage {
-  object-fit: cover;
-}
-
-.incidentSection {
-  background:
-    radial-gradient(circle at 82% 16%, rgba(255, 178, 91, 0.1), transparent 20rem),
-    linear-gradient(180deg, rgba(20, 15, 12, 1), rgba(12, 9, 8, 1));
-}
-
-.incidentIntro,
-.entryIntro,
-.controlIntro {
-  display: grid;
-  gap: 0.95rem;
-  margin-bottom: 1.8rem;
-}
-
-.incidentList {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.incidentArticle,
-.entryArticle,
-.controlPillar {
-  height: 100%;
-  display: grid;
-  gap: 1rem;
-  padding: 1.25rem;
-}
-
-.incidentHeader {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.incidentTranscript {
-  display: grid;
-  gap: 0.55rem;
-  padding: 1rem;
-  border-radius: 1.1rem;
-  border: 1px solid rgba(255, 227, 193, 0.08);
-  background: rgba(8, 6, 5, 0.42);
-}
-
-.incidentLogLine {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.7rem;
-  margin: 0;
-  color: rgba(255, 234, 213, 0.72);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.88rem;
-  line-height: 1.55;
-}
-
-.incidentPrompt {
-  color: rgba(255, 178, 91, 0.88);
-}
-
-.controlSection {
-  background:
-    radial-gradient(circle at 18% 18%, rgba(212, 171, 115, 0.12), transparent 22rem),
-    linear-gradient(180deg, rgba(17, 13, 11, 1), rgba(12, 9, 8, 1));
-}
-
-.controlShell {
-  display: grid;
-  gap: 1.45rem;
-}
-
-.controlPreviewFrame {
-  min-height: 30rem;
-  background:
-    radial-gradient(circle at 50% 38%, rgba(78, 131, 255, 0.18), transparent 22rem),
-    radial-gradient(circle at 18% 18%, rgba(212, 171, 115, 0.12), transparent 20rem),
-    linear-gradient(180deg, rgba(10, 14, 19, 0.98), rgba(6, 9, 14, 1));
-}
-
-.controlPreviewFrame::before {
-  content: "";
-  position: absolute;
-  inset: 1rem;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(255, 227, 193, 0.08);
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 3.4rem 3.4rem;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.95), transparent 92%);
-  pointer-events: none;
-}
-
-.controlPreviewFrame::after {
-  content: "";
-  position: absolute;
-  inset: auto 8% 14%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(125, 211, 252, 0.45) 48%, transparent 100%);
-  box-shadow:
-    0 -4.8rem 0 rgba(125, 211, 252, 0.1),
-    0 -9.6rem 0 rgba(125, 211, 252, 0.08);
-  pointer-events: none;
-}
-
-.controlPreviewFrame[data-media-fit='contain'] {
-  background:
-    radial-gradient(circle at 50% 36%, rgba(78, 131, 255, 0.2), transparent 22rem),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05), transparent 18rem),
-    linear-gradient(180deg, rgba(10, 14, 19, 0.98), rgba(6, 9, 14, 1));
-}
-
-.controlPreviewBands {
-  position: absolute;
-  inset: auto 1rem 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-.controlPreviewBand {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 227, 193, 0.18);
-  background: rgba(16, 11, 9, 0.72);
-  color: rgba(255, 236, 214, 0.92);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  backdrop-filter: blur(12px);
-}
-
-.controlPreviewImageContain {
-  object-fit: contain;
-  object-position: center;
-  box-sizing: border-box;
-  padding: clamp(3rem, 6vw, 5rem);
-  filter:
-    drop-shadow(0 0 22px rgba(107, 180, 255, 0.16))
-    drop-shadow(0 22px 44px rgba(3, 6, 10, 0.26));
-}
-
-.controlPillars {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.entrySection {
-  background:
-    radial-gradient(circle at 84% 18%, rgba(212, 171, 115, 0.1), transparent 22rem),
-    linear-gradient(180deg, rgba(18, 13, 11, 1), rgba(11, 8, 7, 1));
-}
-
-.entryGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.entryLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: rgba(255, 228, 197, 0.94);
-  font-size: 0.92rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.entryLink:hover {
-  color: rgba(255, 245, 232, 1);
-}
-
-.finalSection {
-  background:
-    radial-gradient(circle at 78% 24%, rgba(212, 171, 115, 0.18), transparent 18rem),
-    linear-gradient(180deg, rgba(16, 12, 10, 1), rgba(10, 7, 6, 1));
-}
-
-.finalShell {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
-  gap: clamp(1.3rem, 2vw, 2rem);
-  align-items: center;
-  padding: clamp(1.35rem, 2vw, 1.8rem);
-  border: 1px solid rgba(255, 227, 193, 0.1);
-  border-radius: 2.2rem;
-  background:
-    linear-gradient(180deg, rgba(29, 22, 18, 0.96), rgba(15, 11, 9, 0.98));
-  box-shadow: 0 28px 70px rgba(7, 4, 3, 0.24);
-}
-
-.finalCopy {
-  display: grid;
-  gap: 1rem;
-}
-
-.finalPosterFrame {
-  min-height: 26rem;
-}
-
-@media (max-width: 1100px) {
-  .heroLedger {
-    grid-template-columns: 1fr;
-  }
-
-  .storyShell,
-  .sceneGrid,
-  .finalShell {
-    grid-template-columns: 1fr;
-  }
-
-  .storyRail {
-    position: static;
-  }
-
-  .incidentList,
-  .controlPillars,
-  .entryGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .controlPreviewFrame {
-    min-height: 24rem;
-  }
-}
-
-@media (max-width: 720px) {
-  .heroColumn {
-    border-radius: 1.7rem;
-    padding: 1.2rem;
-  }
-
-  .heroTitle {
-    font-size: clamp(3.35rem, 14vw, 4.6rem);
-  }
-
-  .heroSupport,
-  .sectionBody,
-  .sceneBody,
-  .incidentTrigger,
-  .incidentResolution,
-  .entryBody,
-  .controlPillarBody,
-  .sceneNote {
-    font-size: 0.95rem;
-  }
-
-  .sceneArticle,
-  .incidentArticle,
-  .entryArticle,
-  .controlPillar,
-  .finalShell {
-    border-radius: 1.45rem;
-  }
-
-  .sceneMediaFrame,
-  .controlPreviewFrame,
-  .finalPosterFrame {
-    min-height: 18rem;
-  }
-
-  .controlPreviewBands {
-    inset-inline: 0.8rem;
-    bottom: 0.8rem;
   }
 }
