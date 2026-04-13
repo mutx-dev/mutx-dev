@@ -46,6 +46,7 @@ dev = [
 
 [project.scripts]
 mutx = "cli.main:cli"
+mutx-reasoning-worker = "src.api.reasoning_worker:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
