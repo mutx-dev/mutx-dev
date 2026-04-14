@@ -9,7 +9,7 @@ import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
-REPO_ROOT = Path('/Users/fortune/MUTX')
+REPO_ROOT = Path(__file__).resolve().parents[1]
 LOG_CSV = REPO_ROOT / 'docs/pico-gtm/x-post-log.csv'
 QUEUE_CSV = REPO_ROOT / 'docs/pico-gtm/x-post-queue.csv'
 CONTACT_LOG_CSV = REPO_ROOT / 'docs/pico-gtm/contact-log.csv'
