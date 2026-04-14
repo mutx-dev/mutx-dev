@@ -154,11 +154,11 @@ export function PicoWelcomeTour({
       data-testid="pico-welcome-tour"
     >
       <section className={picoCodexFrame('pointer-events-auto flex max-h-full w-full max-w-[26rem] flex-col overflow-hidden p-0')}>
-        <div className="border-b border-[#5d412d] px-5 py-4 sm:px-6">
+        <div className="border-b border-[color:var(--pico-border)] px-5 py-4 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className={picoClasses.label}>Quick help</p>
-              <h2 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[#fff4e6]">
+              <h2 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                 Learn the codex once, then close it.
               </h2>
             </div>
@@ -176,17 +176,17 @@ export function PicoWelcomeTour({
         <div className="grid min-h-0 gap-5 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
           <div className={picoCodexNote('p-4')}>
             <p className={picoClasses.label}>{step.eyebrow}</p>
-            <h3 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+            <h3 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
               {step.title}
             </h3>
-            <p className="mt-3 text-sm leading-6 text-[#f0deca]">{step.body}</p>
+            <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{step.body}</p>
           </div>
 
           <div className="grid gap-3">
             {step.bullets.map((bullet) => (
               <div key={bullet} className={picoCodexInset('grid grid-cols-[0.8rem,1fr] items-start gap-3 px-4 py-4')}>
-                <span className="mt-1.5 h-2.5 w-2.5 rounded-full bg-[#e2904f]" />
-                <p className="text-sm leading-6 text-[#d5c0a8]">{bullet}</p>
+                <span className="mt-1.5 h-2.5 w-2.5 rounded-full bg-[color:var(--pico-accent)]" />
+                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{bullet}</p>
               </div>
             ))}
           </div>
@@ -198,7 +198,9 @@ export function PicoWelcomeTour({
                   key={tourStep.eyebrow}
                   className={cn(
                     'h-2.5 rounded-full transition',
-                    stepIndex === index ? 'w-7 bg-[#e2904f]' : 'w-2.5 bg-[#5a3f2a]',
+                    stepIndex === index
+                      ? 'w-7 bg-[color:var(--pico-accent)]'
+                      : 'w-2.5 bg-[color:var(--pico-border)]',
                   )}
                 />
               ))}
