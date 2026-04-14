@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import json
 import logging
 import os
@@ -587,7 +587,6 @@ async def claim_next_reasoning_job(
     ensure_reasoning_enabled()
     worker_identity = worker_name or f"{socket.gethostname()}:{os.getpid()}"
     now = _utcnow()
-    stale_cutoff = now - timedelta(seconds=stale_after_seconds)
 
     result = await db.execute(
         select(ReasoningJob)
@@ -595,20 +594,11 @@ async def claim_next_reasoning_job(
             selectinload(ReasoningJob.artifacts),
             selectinload(ReasoningJob.run).selectinload(AgentRun.traces),
         )
-        .where(
-            ReasoningJob.status.in_(["queued", "running"]),
-        )
+        .where(ReasoningJob.status == "queued")
         .order_by(ReasoningJob.dispatched_at.asc().nullsfirst(), ReasoningJob.created_at.asc())
     )
     candidates = result.scalars().all()
     for job in candidates:
-        if (
-            job.status == "running"
-            and job.last_heartbeat_at
-            and job.last_heartbeat_at > stale_cutoff
-        ):
-            continue
-
         claim_token = uuid.uuid4().hex
         job.status = "running"
         job.claimed_by = worker_identity

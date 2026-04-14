@@ -8,9 +8,6 @@ from pathlib import Path
 import tempfile
 from typing import Any
 
-from anthropic import AsyncAnthropic
-from openai import AsyncOpenAI
-
 from src.api.config import get_settings
 from src.api.services.reasoning_templates import get_reasoning_template
 
@@ -27,6 +24,9 @@ REASONING_TRACE_EVENT_TYPES = {
     "reasoning.incumbent_retained",
     "reasoning.incumbent_replaced",
     "reasoning.converged",
+    "reasoning.artifact_registered",
+    "reasoning.artifact_uploaded",
+    "reasoning.artifact_synced",
     "reasoning.completed",
     "reasoning.failed",
 }
@@ -261,6 +261,8 @@ async def _invoke_model(
     if normalized_model.startswith("openrouter/"):
         if not openrouter_key:
             raise ReasoningEngineError("OPENROUTER_API_KEY is required for openrouter/* models")
+        from openai import AsyncOpenAI
+
         client = AsyncOpenAI(api_key=openrouter_key, base_url="https://openrouter.ai/api/v1")
         response = await client.chat.completions.create(
             model=normalized_model.removeprefix("openrouter/"),
@@ -279,6 +281,8 @@ async def _invoke_model(
 
     if normalized_model.startswith("anthropic/"):
         if anthropic_key:
+            from anthropic import AsyncAnthropic
+
             client = AsyncAnthropic(api_key=anthropic_key)
             response = await client.messages.create(
                 model=normalized_model.removeprefix("anthropic/"),
@@ -293,6 +297,8 @@ async def _invoke_model(
                 "provider": "anthropic",
             }
         if openrouter_key:
+            from openai import AsyncOpenAI
+
             client = AsyncOpenAI(api_key=openrouter_key, base_url="https://openrouter.ai/api/v1")
             response = await client.chat.completions.create(
                 model=normalized_model,
@@ -314,6 +320,8 @@ async def _invoke_model(
         ("gpt-", "o1", "o3", "o4")
     ):
         if openai_key:
+            from openai import AsyncOpenAI
+
             client = AsyncOpenAI(api_key=openai_key)
             response = await client.chat.completions.create(
                 model=normalized_model.removeprefix("openai/"),
@@ -330,6 +338,8 @@ async def _invoke_model(
                 "provider": "openai",
             }
         if openrouter_key:
+            from openai import AsyncOpenAI
+
             client = AsyncOpenAI(api_key=openrouter_key, base_url="https://openrouter.ai/api/v1")
             response = await client.chat.completions.create(
                 model=normalized_model.removeprefix("openai/"),
@@ -348,6 +358,8 @@ async def _invoke_model(
         raise ReasoningEngineError("No provider credentials available for openai model")
 
     if openrouter_key:
+        from openai import AsyncOpenAI
+
         client = AsyncOpenAI(api_key=openrouter_key, base_url="https://openrouter.ai/api/v1")
         response = await client.chat.completions.create(
             model=normalized_model,
@@ -394,6 +406,7 @@ async def _run_builtin_reasoning(manifest: dict[str, Any]) -> ReasoningExecution
 
     current_a = incumbent
     incumbent_wins = 0
+    last_winner = "A"
     pass_log: list[dict[str, Any]] = []
     judge_ballots: list[dict[str, Any]] = []
     events: list[EngineEvent] = []
@@ -428,6 +441,7 @@ async def _run_builtin_reasoning(manifest: dict[str, Any]) -> ReasoningExecution
             )
         ]
         winner = ranking[0]
+        last_winner = winner
 
         for judge_index in range(judge_count):
             ballot = {
@@ -530,7 +544,7 @@ async def _run_builtin_reasoning(manifest: dict[str, Any]) -> ReasoningExecution
     judge_ballots_path.write_text(_json_dump(judge_ballots), encoding="utf-8")
 
     summary = {
-        "winner": "A",
+        "winner": last_winner,
         "pass_count": len(pass_log),
         "judge_count": judge_count,
         "driver": "builtin_fallback",
@@ -761,7 +775,7 @@ async def _run_llm_reasoning(manifest: dict[str, Any]) -> ReasoningExecutionResu
                     "Blind judge the candidates against the task and optional rubric."
                 ),
                 user_prompt=(
-                    f"TASK:\n{base_user_prompt}\n\nRUBRIC:\n{rubric or 'No rubric provided.'}\n\n"
+                    f'TASK:\n{base_user_prompt}\n\nRUBRIC:\n{rubric or "No rubric provided."}\n\n'
                     f"CANDIDATE A:\n{current_a}\n\nCANDIDATE B:\n{version_b}\n\nCANDIDATE AB:\n{version_ab}"
                 ),
                 temperature=judge_temperature,
