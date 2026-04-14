@@ -1,11 +1,35 @@
 ---
+title: MUTX Deployment Quickstart
 description: Canonical assistant-first onboarding for hosted operators and local contributors.
+keywords:
+  - MUTX deployment quickstart
+  - AI agent deployment quickstart
+  - install MUTX
+  - self-hosted AI agent control plane
+  - hosted AI agent control plane
 icon: bolt
 ---
 
-# Quickstart
+# Deployment Quickstart
 
-This is the canonical operator quickstart for MUTX.
+This is the canonical quickstart for installing MUTX and reaching a working AI agent control plane in the shortest supported path.
+
+Use this guide if you want to:
+
+* authenticate an operator account
+* deploy the `Personal Assistant` starter template
+* track an OpenClaw runtime under `~/.mutx/providers/openclaw`
+* inspect the assistant from the CLI, TUI, or browser control plane
+
+If you only need the short decision guide first, start with [MUTX Quickstart](/docs/quickstart).
+
+## At a glance
+
+| Lane | Use it when | Primary command |
+| --- | --- | --- |
+| Hosted operator | You want the fastest validated path and do not need a private localhost control plane | `mutx setup hosted --install-openclaw --open-tui` |
+| Local operator | You want the control plane running on your own machine with Docker | `mutx setup local --install-openclaw --open-tui` |
+| Repo contributor | You are working on MUTX itself and want the repo-backed local stack | `make dev-up` then `mutx setup local --install-openclaw --open-tui` |
 
 Every supported lane ends in the same success state:
 
@@ -14,9 +38,9 @@ Every supported lane ends in the same success state:
 3. MUTX is tracking that provider runtime under `~/.mutx/providers/openclaw`.
 4. You can inspect that assistant from the CLI, TUI, or browser control plane.
 
-For full repo setup details, see [Local Developer Bootstrap](./local-developer-bootstrap.md).
+For full repo setup details, see [Local Developer Bootstrap](/docs/deployment/local-developer-bootstrap).
 
-## Recommended path
+## Fastest path
 
 For most users, the whole quickstart is:
 
@@ -48,7 +72,17 @@ pip install -r requirements.txt
 pip install -e ".[dev,tui]"
 ```
 
-## Advanced direct commands
+## What the installer does
+
+The quickstart wizard is opinionated on purpose. It removes the manual setup work that usually slows down AI agent onboarding:
+
+* authenticates the operator session
+* installs or imports OpenClaw
+* writes the tracked provider manifest and bindings under `~/.mutx/providers/openclaw`
+* deploys the `Personal Assistant` starter template
+* opens an operator surface so you can verify the runtime immediately
+
+## Direct command paths
 
 ### Hosted operator
 
@@ -92,7 +126,7 @@ Expected result:
 
 ## Local operator
 
-Use this only when you want a private localhost MUTX control plane on your own machine.
+Use this lane when you want a private localhost MUTX control plane on your own machine.
 
 ```bash
 mutx setup local --install-openclaw --open-tui
@@ -142,6 +176,15 @@ make dev-up
 mutx setup local --install-openclaw --open-tui
 ```
 
+## What to read next
+
+Once the starter assistant is deployed, these pages usually come next:
+
+* [Architecture Overview](/docs/architecture/overview) for the system map behind the app, API, CLI, SDK, and infrastructure
+* [API Reference](/docs/reference) for the public `/v1/*` contract
+* [AI Agent Cost Management](/ai-agent-cost) for spend attribution and budget controls
+* [AI Agent Approvals](/ai-agent-approvals) for human approval gates on risky operations
+
 ## API contract
 
 The public contract remains mounted under `/v1/*`.
@@ -189,3 +232,17 @@ Frontend verification:
 npm run lint
 npm run build
 ```
+
+## FAQ
+
+### Should I choose hosted or local?
+
+Choose `Hosted` unless you specifically need the MUTX control plane running on your own machine. It is the shortest path to a working operator session and starter assistant.
+
+### Does the quickstart install OpenClaw for me?
+
+Yes. The installer can either import an existing OpenClaw runtime or install one when it is missing.
+
+### Where does MUTX track the provider runtime?
+
+The tracked OpenClaw provider state lives under `~/.mutx/providers/openclaw`.

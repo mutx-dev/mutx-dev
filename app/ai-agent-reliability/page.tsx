@@ -234,12 +234,9 @@ export default function AIAgentReliabilityPage() {
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <a
-                    href="https://github.com/mutx-dev/mutx-dev"
-                    className={feat.secondaryAction}
-                  >
-                    View on GitHub
-                  </a>
+                  <Link href="/docs/quickstart" className={feat.secondaryAction}>
+                    Read quickstart
+                  </Link>
                 </div>
               </div>
             </div>

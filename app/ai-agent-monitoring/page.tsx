@@ -232,12 +232,9 @@ export default function AIAgentMonitoringPage() {
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <a
-                    href="https://github.com/mutx-dev/mutx-dev"
-                    className={feat.secondaryAction}
-                  >
-                    View on GitHub
-                  </a>
+                  <Link href="/ai-agent-cost" className={feat.secondaryAction}>
+                    Cost management
+                  </Link>
                 </div>
               </div>
             </div>

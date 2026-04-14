@@ -237,12 +237,9 @@ export default function AIAgentGovernancePage() {
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <a
-                    href="https://github.com/mutx-dev/mutx-dev"
-                    className={feat.secondaryAction}
-                  >
-                    View on GitHub
-                  </a>
+                  <Link href="/ai-agent-approvals" className={feat.secondaryAction}>
+                    Approval workflows
+                  </Link>
                 </div>
               </div>
             </div>

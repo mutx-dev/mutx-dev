@@ -236,12 +236,9 @@ export default function AIAgentDeploymentPage() {
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <a
-                    href="https://github.com/mutx-dev/mutx-dev"
-                    className={feat.secondaryAction}
-                  >
-                    View on GitHub
-                  </a>
+                  <Link href="/docs/deployment/quickstart" className={feat.secondaryAction}>
+                    Deployment quickstart
+                  </Link>
                 </div>
               </div>
             </div>
