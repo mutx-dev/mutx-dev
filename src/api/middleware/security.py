@@ -31,14 +31,35 @@ def add_security_middleware(app: FastAPI, allowed_origins: Iterable[str]) -> Non
 
     @app.middleware("http")
     async def _security_middleware(request: Request, call_next):
-        request_origin = request.headers.get("origin")
-        if request.method.upper() not in SAFE_HTTP_METHODS and request_origin:
-            if _normalize_origin(request_origin) not in normalized_allowed_origins:
-                csrf_rejection = JSONResponse(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    content={"detail": CSRF_FAILURE_DETAIL},
-                )
-                return _apply_security_headers(csrf_rejection)
+        # CSRF check for state-changing methods
+        if request.method.upper() not in SAFE_HTTP_METHODS:
+            request_origin = request.headers.get("origin")
+            referer = request.headers.get("referer")
+
+            if request_origin:
+                # Origin present: validate against allowlist
+                if _normalize_origin(request_origin) not in normalized_allowed_origins:
+                    csrf_rejection = JSONResponse(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        content={"detail": CSRF_FAILURE_DETAIL},
+                    )
+                    return _apply_security_headers(csrf_rejection)
+            elif referer:
+                # No Origin but Referer present: extract origin from Referer URL
+                from urllib.parse import urlparse
+
+                try:
+                    referer_origin = urlparse(referer).scheme + "://" + urlparse(referer).netloc
+                    if _normalize_origin(referer_origin) not in normalized_allowed_origins:
+                        csrf_rejection = JSONResponse(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            content={"detail": CSRF_FAILURE_DETAIL},
+                        )
+                        return _apply_security_headers(csrf_rejection)
+                except Exception:
+                    pass  # Malformed Referer — let it through, don't block
+            # No Origin and no Referer: allow (API clients, curl, etc.)
+            # Token-based auth (Bearer JWT) provides protection here.
 
         response = await call_next(request)
         return _apply_security_headers(response)

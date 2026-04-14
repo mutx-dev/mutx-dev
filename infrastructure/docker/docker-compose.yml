@@ -6,9 +6,9 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: mutx
-      POSTGRES_PASSWORD: mutx_password
-      POSTGRES_DB: mutx
+      POSTGRES_USER: ${POSTGRES_USER:-mutx}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      POSTGRES_DB: ${POSTGRES_DB:-mutx}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -43,7 +43,7 @@ services:
       dockerfile: infrastructure/docker/Dockerfile.api
       target: development
     environment:
-      DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mutx}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mutx}
       DATABASE_SSL_MODE: disable
       DATABASE_REQUIRED_ON_STARTUP: "true"
       API_HOST: 0.0.0.0
@@ -84,7 +84,7 @@ services:
       target: development
     restart: "no"
     environment:
-      DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mutx}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mutx}
       DATABASE_SSL_MODE: disable
       DATABASE_REQUIRED_ON_STARTUP: "true"
       BACKGROUND_MONITOR_ENABLED: "false"
@@ -103,7 +103,7 @@ services:
       dockerfile: infrastructure/docker/Dockerfile.frontend
       target: development
     environment:
-      DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mutx}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mutx}
       DATABASE_SSL_MODE: disable
       NEXT_PUBLIC_API_URL: http://localhost:8000
       NEXT_PUBLIC_SITE_URL: http://localhost:3000

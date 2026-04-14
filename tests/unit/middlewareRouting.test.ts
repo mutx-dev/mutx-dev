@@ -68,14 +68,13 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('x-content-type-options')).toBe('nosniff')
   })
 
-  it('allows direct /control routes on the app host to pass through unchanged', () => {
+  it('redirects /control paths to /dashboard on the app host', () => {
     const response = proxy(
       mockRequest('https://app.mutx.dev/control/agents', { host: 'app.mutx.dev' }),
     )
 
-    expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
-    expect(response.headers.get('location')).toBeNull()
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://app.mutx.dev/dashboard/agents')
   })
 
   it('redirects app host legacy /app pages to canonical dashboard routes', () => {
@@ -152,13 +151,14 @@ describe('host-aware UI routing proxy', () => {
     )
   })
 
-  it('redirects anonymous pico host traffic into the login lane', () => {
+  it('serves the pico landing page to anonymous visitors without redirecting to login', () => {
     const response = proxy(
       mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }),
     )
 
-    expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2F')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico')
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
   it('maps pico geolocation headers to supported locales on first authenticated visit', () => {

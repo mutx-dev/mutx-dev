@@ -3,7 +3,7 @@
 MUTX Autonomous Coding Loop
 Reads queue → MiniMax generates code → git commits → gh PRs → loops
 """
-import json, os, time, subprocess, urllib.request, urllib.error, shlex
+import json, os, time, subprocess, urllib.request, urllib.error, shlex, re
 from datetime import datetime
 from pathlib import Path
 _REPO = None
@@ -16,6 +16,12 @@ def _get_repo():
         return _REPO
     _REPO = str(Path(__file__).resolve().parents[2])
     return _REPO
+
+def validate_branch_name(name: str) -> str:
+    """Sanitize branch names: only allow alphanumeric, dashes, underscores, slashes."""
+    if not re.match(r'^[a-zA-Z0-9/_\-]+$', name):
+        raise ValueError(f"Invalid branch name: {name!r}")
+    return name
 REPO = _get_repo()
 WT_BACKEND = "/Users/fortune/mutx-worktrees/factory/backend"
 WT_FRONTEND = "/Users/fortune/mutx-worktrees/factory/frontend"
@@ -51,8 +57,12 @@ def api(prompt, max_tokens=3000):
         return None
 
 def run(cmd, cwd=None, timeout=60):
+    """Execute a command. Accepts either a string (split into args) or a list of args.
+    Never uses shell=True to prevent injection."""
     try:
-        r = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd, timeout=timeout)
+        if isinstance(cmd, str):
+            cmd = shlex.split(cmd)
+        r = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd, timeout=timeout)
         return r.returncode, r.stdout, r.stderr
     except subprocess.TimeoutExpired:
         return -1, "", "timeout"
@@ -95,7 +105,7 @@ def implement(item):
     area = item.get("area", "area:api")
     desc = item.get("description", "")
     wt = worktree_for(area)
-    branch = f"autonomy/{id_}"
+    branch = f"autonomy/{validate_branch_name(id_)}"
     
     log(f"Branch: {branch} in {wt}")
     make_branch(wt, branch)

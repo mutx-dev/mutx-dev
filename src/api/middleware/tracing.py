@@ -9,7 +9,6 @@ from typing import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
-from opentelemetry import trace
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 
@@ -30,8 +29,8 @@ class TracingMiddleware(BaseHTTPMiddleware):
         if tracestate:
             carrier["tracestate"] = tracestate
 
-        # Extract trace context and use as parent for request span
-        extracted_context = propagator.extract(carrier)
+        # Extract trace context
+        propagator.extract(carrier)
 
         # Parse trace_id and span_id from TRACEPARENT if available
         # Format: 00-<trace_id>-<span_id>-<trace_flags>
@@ -50,18 +49,7 @@ class TracingMiddleware(BaseHTTPMiddleware):
         request.state.traceparent = traceparent
         request.state.tracestate = tracestate
 
-        # Create request span as child of extracted trace context
-        tracer = trace.get_tracer(__name__)
-        with tracer.start_as_current_span(
-            f"{request.method} {request.url.path}",
-            context=extracted_context,
-        ) as request_span:
-            request_span.set_attribute("http.method", request.method)
-            request_span.set_attribute("http.url", str(request.url))
-            response = await call_next(request)
-            request_span.set_attribute("http.status_code", response.status_code)
-
-        return response
+        return await call_next(request)
 
 
 def add_tracing_middleware(app):

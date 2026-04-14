@@ -77,7 +77,8 @@ def test_supervised_profiles_accepts_json_object_env(monkeypatch):
 def test_production_warns_when_forwarded_allow_ips_trusts_all(monkeypatch, caplog):
     monkeypatch.setenv("ENVIRONMENT", "production")
     monkeypatch.setenv("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
-    monkeypatch.setenv("DATABASE_URL", "postgresql://prod:secret@db.example.com:5432/mutx")
+    monkeypatch.setenv("SECRET_ENCRYPTION_KEY", "test-secret-key-that-is-32-bytes-long!")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://prod:***@db.example.com:5432/mutx")
     monkeypatch.setenv("CORS_ORIGINS", "https://app.example.com")
     monkeypatch.setenv("FORWARDED_ALLOW_IPS", "*")
 
@@ -90,7 +91,8 @@ def test_production_warns_when_forwarded_allow_ips_trusts_all(monkeypatch, caplo
 def test_api_docs_are_disabled_in_production_by_default(monkeypatch):
     monkeypatch.setenv("ENVIRONMENT", "production")
     monkeypatch.setenv("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
-    monkeypatch.setenv("DATABASE_URL", "postgresql://prod:secret@db.example.com:5432/mutx")
+    monkeypatch.setenv("SECRET_ENCRYPTION_KEY", "test-secret-key-that-is-32-bytes-long!")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://prod:***@db.example.com:5432/mutx")
 
     settings = Settings(_env_file=None)
 

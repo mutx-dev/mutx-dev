@@ -323,7 +323,7 @@ export function ObservabilityPageClient() {
           </LivePanel>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-4">
           <LivePanel title="Agent Runs" meta={`${runs.length} records`}>
             {runs.length === 0 ? (
               <LiveEmptyState
