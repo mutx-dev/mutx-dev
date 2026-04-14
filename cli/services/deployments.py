@@ -3,7 +3,13 @@ from __future__ import annotations
 from typing import Any
 
 from cli.services.base import APIService
-from cli.services.models import DeploymentEventHistory, DeploymentRecord, LogEntry, MetricPoint
+from cli.services.models import (
+    DeploymentEventHistory,
+    DeploymentRecord,
+    DeploymentVersionHistory,
+    LogEntry,
+    MetricPoint,
+)
 
 
 class DeploymentsService(APIService):
@@ -70,6 +76,25 @@ class DeploymentsService(APIService):
             {200},
             not_found_message="Deployment not found",
             invalid_message="Cannot restart deployment",
+        )
+        return DeploymentRecord.from_payload(response.json())
+
+    def get_versions(self, deployment_id: str) -> DeploymentVersionHistory:
+        response = self._request("get", f"/v1/deployments/{deployment_id}/versions")
+        self._expect_status(response, {200}, not_found_message="Deployment not found")
+        return DeploymentVersionHistory.from_payload(response.json())
+
+    def rollback_deployment(self, deployment_id: str, *, version: int) -> DeploymentRecord:
+        response = self._request(
+            "post",
+            f"/v1/deployments/{deployment_id}/rollback",
+            json={"version": version},
+        )
+        self._expect_status(
+            response,
+            {200},
+            not_found_message="Deployment not found",
+            invalid_message="Cannot rollback deployment",
         )
         return DeploymentRecord.from_payload(response.json())
 

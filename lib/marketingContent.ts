@@ -115,6 +115,11 @@ const homepageActions: MarketingActionLink[] = [
     href: '/releases',
     tone: 'utility',
   },
+  {
+    label: 'Docs',
+    href: '/docs',
+    tone: 'utility',
+  },
 ]
 
 export const marketingHomepage: MarketingHomepage = {
@@ -274,7 +279,34 @@ export const marketingHomepage: MarketingHomepage = {
       body: 'Download the app, watch one real run, and decide from the product.',
       mediaSrc: '/demo.gif',
       mediaAlt: 'MUTX agent control in action',
-      actions: homepageActions,
+      actions: [
+        {
+          label: 'Download for Mac',
+          href: '/download',
+          tone: 'primary',
+        },
+        {
+          label: 'Read quickstart',
+          href: '/docs/quickstart',
+          tone: 'secondary',
+        },
+        {
+          label: 'Cost management',
+          href: '/ai-agent-cost',
+          tone: 'utility',
+        },
+        {
+          label: 'Approval workflows',
+          href: '/ai-agent-approvals',
+          tone: 'utility',
+        },
+        {
+          label: 'View GitHub',
+          href: 'https://github.com/mutx-dev/mutx-dev',
+          external: true,
+          tone: 'utility',
+        },
+      ],
     },
   },
 }
@@ -282,13 +314,13 @@ export const marketingHomepage: MarketingHomepage = {
 export const marketingPublicRailLinks: MarketingActionLink[] = [
   { label: 'Download', href: '/download' },
   { label: 'Releases', href: '/releases' },
-  { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
+  { label: 'Docs', href: '/docs' },
   { label: 'GitHub', href: 'https://github.com/mutx-dev/mutx-dev', external: true },
 ]
 
 export const marketingFooterLinks: MarketingFooterLink[] = [
   { label: 'Releases', href: '/releases' },
-  { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
+  { label: 'Docs', href: '/docs' },
   { label: 'GitHub', href: 'https://github.com/mutx-dev/mutx-dev', external: true },
   { label: 'Download', href: '/download' },
   { label: 'Dashboard', href: '/dashboard' },

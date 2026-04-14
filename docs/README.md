@@ -1,5 +1,12 @@
 ---
 description: Best entry point for setup, platform references, and operator docs.
+title: MUTX Documentation Hub
+keywords:
+  - MUTX docs
+  - AI agent documentation
+  - AI agent quickstart
+  - AI agent approvals
+  - AI agent cost management
 icon: book
 ---
 
@@ -32,19 +39,25 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
     <tr>
       <td><strong>Platform architecture</strong></td>
       <td>Understand the shape behind the app, backend, CLI, SDK, and infrastructure.</td>
-      <td><a href="architecture/">architecture</a></td>
+      <td><a href="architecture/overview.md">overview.md</a></td>
       <td><a href="../public/landing/running-agent.png">running-agent.png</a></td>
     </tr>
     <tr>
-      <td><strong>v1.3 release notes</strong></td>
-      <td>Read the current public release posture, supported surfaces, and download path.</td>
-      <td><a href="releases/v1.3.md">v1.3.md</a></td>
+      <td><strong>Autonomous agent team</strong></td>
+      <td>See the specialist roles, ownership boundaries, and review-safe autonomous shipping model.</td>
+      <td><a href="../agents/README.md">README.md</a></td>
       <td><a href="../public/landing/docs-surface.png">docs-surface.png</a></td>
     </tr>
     <tr>
-      <td><strong>Troubleshooting and support</strong></td>
-      <td>Recover quickly when local setup, auth, or route assumptions drift.</td>
-      <td><a href="troubleshooting/">troubleshooting</a></td>
+      <td><strong>AI agent cost management</strong></td>
+      <td>Read the MUTX page on LLM spend tracking, attribution, and budget enforcement.</td>
+      <td><a href="https://mutx.dev/ai-agent-cost">mutx.dev/ai-agent-cost</a></td>
+      <td><a href="../public/landing/docs-surface.png">docs-surface.png</a></td>
+    </tr>
+    <tr>
+      <td><strong>AI agent approvals</strong></td>
+      <td>Read the MUTX page on human-in-the-loop approval workflows and authorization gates.</td>
+      <td><a href="https://mutx.dev/ai-agent-approvals">mutx.dev/ai-agent-approvals</a></td>
       <td><a href="../public/landing/docs-surface.png">docs-surface.png</a></td>
     </tr>
   </tbody>
@@ -59,7 +72,12 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 ## Start Here
 
 - [Overview](https://github.com/mutx-dev/mutx-dev/blob/main/README.md)
+- [MUTX Quickstart](./quickstart.md)
 - [Quickstart](./deployment/quickstart.md)
+- [Architecture Overview](./architecture/overview.md)
+- [Autonomous Agent Team](../agents/README.md)
+- [AI Agent Cost Management](https://mutx.dev/ai-agent-cost)
+- [AI Agent Approvals](https://mutx.dev/ai-agent-approvals)
 - [v1.4 Release Notes](./releases/v1.4.md)
 - [v1.5 Release Checklist](./releases/v1.5-checklist.md)
 - [Project Status](./project-status.md)

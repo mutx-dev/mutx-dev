@@ -1,283 +1,172 @@
 ---
-description: High-level map of the platform, control plane, and target system design.
+title: AI Agent Control Plane Architecture Overview
+description: Code-accurate map of the MUTX architecture across the Next.js operator surface, FastAPI control plane, CLI, SDK, docs, and deployment tooling.
+keywords:
+  - AI agent architecture
+  - AI agent control plane architecture
+  - MUTX architecture
+  - FastAPI control plane
+  - Next.js operator dashboard
 icon: sitemap
 ---
 
-# Architecture Overview
+# AI Agent Control Plane Architecture Overview
 
-> Note: this document mixes current implementation details with target architecture. For the most code-accurate view of local routes and workflows, prefer `README.md`, `docs/README.md`, and `src/api/routes/`.
+This page describes the architecture that is visible in the MUTX repo today.
 
-**mutx.dev** is "The Vercel for production AI agents" — a platform that deploys autonomous agents to dedicated VPCs with zero-trust security and zero token markup.
+When docs and code disagree, trust the executable system:
 
-***
+* `app/` for the Next.js website, docs, and operator surfaces
+* `app/api/` for browser-facing route handlers and proxies
+* `src/api/` for the FastAPI control plane, services, middleware, and integrations
+* `cli/` for terminal workflows
+* `sdk/mutx/` for the Python SDK
+* `infrastructure/` for Terraform, Ansible, monitoring, and Helm
 
-## High-Level Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                    CLIENTS                                      │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────────────────┐ │
-│  │   Web Dashboard │    │   Mobile App    │    │   API Clients (SDK/CLI)     │ │
-│  │    (Next.js)    │    │   (React)       │    │                             │ │
-│  └────────┬────────┘    └────────┬────────┘    └──────────────┬──────────────┘ │
-└───────────┼──────────────────────┼──────────────────────────────┼───────────────┘
-            │                      │                              │
-            │  HTTPS/WSS          │  HTTPS                       │  HTTPS
-            │                      │                              │
-            ▼                      ▼                              ▼
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│                              EDGE LAYER                                           │
-│  ┌──────────────────────────────────────────────────────────────────────────────┐ │
-│  │  Vercel CDN + Railway Load Balancer                                         │ │
-│  │  - TLS termination                                                         │ │
-│  │  - Rate limiting                                                            │ │
-│  │  - DDoS protection                                                          │ │
-│  └──────────────────────────────────────────────────────────────────────────────┘ │
-└───────────────────────────────────────────────────────────────────────────────────┘
-            │
-            ▼
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│                              CONTROL PLANE (mutx API)                            │
-│  ┌──────────────────────────────────────────────────────────────────────────────┐ │
-│  │  FastAPI Backend (Python)                                                   │ │
-│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌──────────────────────┐│ │
-│  │  │  Auth      │  │  Agents    │  │ Deployments│  │   Webhooks           ││ │
-│  │  │  Service   │  │  Service   │  │  Service   │  │   Handler            ││ │
-│  │  └────────────┘  └────────────┘  └────────────┘  └──────────────────────┘│ │
-│  │                                                                              │ │
-│  │  ┌────────────────────────────────────────────────────────────────────────┐  │ │
-│  │  │                    Core Services                                      │  │ │
-│  │  │  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────┐ │  │ │
-│  │  │  │ Agent Runtime  │  │  Self-Healing  │  │    Monitoring          │ │  │ │
-│  │  │  │   Service      │  │    Service     │  │      Service           │ │  │ │
-│  │  │  └────────────────┘  └────────────────┘  └────────────────────────┘ │  │ │
-│  │  └────────────────────────────────────────────────────────────────────────┘  │ │
-│  └──────────────────────────────────────────────────────────────────────────────┘ │
-│            │                                                                        │
-│  ┌─────────┴─────────┐                                                           │
-│  │   PostgreSQL      │   Redis Cache                                              │
-│  │   (Metadata)      │   (Sessions, Queue)                                       │
-│  └───────────────────┘   └─────────────────┘                                      │
-└───────────────────────────────────────────────────────────────────────────────────┘
-            │
-            │ Terraform Provisioning
-            ▼
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│                         TENANT VPCs (Per-Customer)                                │
-│  ┌──────────────────────────────────────────────────────────────────────────────┐ │
-│  │  10.0.1.0/24 - Agent Subnet                                                   │ │
-│  │  ┌─────────────────────────────────────────────────────────────────────────┐  │ │
-│  │  │                    Dedicated Agent 10 Cluster                         │  │ │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │  │ │
-│  │  │  │  Agent 01   │  │  Agent 02   │  │  Agent 03   │  │  Agent N    │   │  │ │
-│  │  │  │ (LangChain)│  │ (OpenClaw)  │  │    (n8n)    │  │             │   │  │ │
-│  │  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │  │ │
-│  │  │         │                │                │                │           │  │ │
-│  │  │         └────────────────┴────────────────┴────────────────┘           │  │ │
-│  │  │                           │                                            │  │ │
-│  │  │                    ┌──────┴──────┐                                     │  │ │
-│  │  │                    │ EvalView    │ ─── Local LLM Judge               │  │ │
-│  │  │                    │  Guardrail  │    (Hypervisor-level security)    │  │ │
-│  │  │                    └─────────────┘                                     │  │ │
-│  │  └─────────────────────────────────────────────────────────────────────────┘  │ │
-│  │                                                                              │ │
-│  │  ┌────────────────────┐  ┌────────────────────┐  ┌────────────────────────┐ │ │
-│  │  │   PostgreSQL      │  │   Redis           │  │   Tailscale            │ │ │
-│  │  │   (pgvector)     │  │   Cache           │  │   ZTNA Mesh            │ │ │
-│  │  └────────────────────┘  └────────────────────┘  └────────────────────────┘ │ │
-│  └──────────────────────────────────────────────────────────────────────────────┘ │
-└───────────────────────────────────────────────────────────────────────────────────┘
-```
-
-***
-
-## Core Components
-
-### 1. Control Plane (mutx API)
-
-| Component                | Technology     | Purpose                                          |
-| ------------------------ | -------------- | ------------------------------------------------ |
-| **API Gateway**          | FastAPI        | REST/WS endpoints, auth, rate limiting           |
-| **Agent Runtime**        | Python/AsyncIO | Agent lifecycle, execution, tool routing         |
-| **Self-Healing Service** | Python         | Auto-recovery, health checks, version management |
-| **Monitoring Service**   | Python         | Metrics, alerting, uptime tracking               |
-| **Auth Service**         | JWT + bcrypt   | Token management, OAuth2                         |
-
-### Autonomous Dev Lane
-
-MUTX v1.4 ships an autonomous dev lane for agentic workflows. This enables coding agents to operate against the MUTX platform with role-scoped credentials, RBAC-enforced boundaries, and OIDC-validated identity — allowing safe autonomous execution, PR creation, and deployment workflows.
-
-### 2. Agent Runtime
-
-The `AgentRuntime` class (`src/api/services/agent_runtime.py:98`) manages:
-
-* **Agent Creation**: Factory pattern for LangChain, OpenClaw, n8n agents
-* **Execution**: Async/sync execution with timeout control
-* **Tool Routing**: Dynamic tool registration and execution
-* **State Management**: Runtime state, execution context, metrics
-
-### 3. Agent Types
-
-| Type                | Framework             | Use Case                   |
-| ------------------- | --------------------- | -------------------------- |
-| **LangChain Agent** | LangChain + LangGraph | General-purpose LLM agents |
-| **OpenClaw Agent**  | OpenClaw              | Multi-agent orchestration  |
-| **n8n Agent**       | n8n                   | Workflow automation        |
-
-### 4. Data Layer
-
-* **PostgreSQL**: Metadata, agent configs, pgvector for semantic search
-* **Redis**: Caching, session storage, message queue
-* **Vector Store**: pgvector embeddings for RAG
-
-***
-
-## Data Flow
-
-### Agent Execution Flow
+## System map
 
 ```
-┌──────────┐     ┌──────────┐     ┌───────────────┐     ┌─────────────────┐
-│  Client  │────▶│   API    │────▶│ Agent Runtime │────▶│   Tool Handler │
-│ Request  │     │  Gateway │     │  (AsyncIO)    │     │  (Tools/RAG)   │
-└──────────┘     └──────────┘     └───────┬───────┘     └────────┬────────┘
-                                          │                      │
-                                          ▼                      ▼
-                                   ┌───────────────┐     ┌─────────────────┐
-                                   │ EvalView      │◀────│  LLM Provider   │
-                                   │ Guardrail     │     │ (OpenAI/Anthropic/
-                                   │ (Local Judge) │     │  Ollama)        │
-                                   └───────────────┘     └─────────────────┘
-                                          │
-                                          ▼
-                                   ┌───────────────┐
-                                   │ Response to   │
-                                   │ Client        │
-                                   └───────────────┘
+Browser and docs users
+        |
+        v
+Next.js 16 app router (`app/`)
+  - marketing pages
+  - documentation pages
+  - dashboard surfaces
+  - same-origin route handlers in `app/api/`
+        |
+        +------------------------------+
+        |                              |
+        v                              v
+CLI (`cli/`) and SDK (`sdk/mutx/`)   FastAPI control plane (`src/api/`)
+call the public `/v1/*` contract      - routes in `src/api/routes/`
+                                       - auth, RBAC, OIDC, tracing middleware
+                                       - services for agents, deployments,
+                                         approvals, observability, budgets,
+                                         sessions, templates, and more
+                                                |
+                                                v
+                                   Postgres, Redis, telemetry, and external runtimes
 ```
 
-### Deployment Flow
+## Current shipped surfaces
 
-```
-┌──────────┐     ┌──────────────┐     ┌───────────────┐     ┌─────────────────┐
-│  User    │────▶│  API Request │────▶│ Terraform     │────▶│  Ansible        │
-│ Deploy   │     │  (Create VPC)│     │  Provisioner  │     │  (Configure)   │
-└──────────┘     └──────────────┘     └───────┬───────┘     └─────────────────┘
-                                               │                    │
-                                               ▼                    ▼
-                                        ┌──────────────┐   ┌─────────────────┐
-                                        │  VPC Created │   │ Agent Deployed  │
-                                        │  (DigitalOC) │   │ (Docker + ZTNA) │
-                                        └──────────────┘   └─────────────────┘
-```
+MUTX is split into a small number of visible surfaces:
 
-### Kubernetes/Helm Deployment
+| Surface | Code location | Responsibility |
+| --- | --- | --- |
+| Website and docs | `app/`, `components/`, `lib/` | Marketing pages, docs rendering, metadata, public download and narrative surfaces |
+| Browser-facing route handlers | `app/api/` | Same-origin request handling and proxy behavior for the web app |
+| Control plane API | `src/api/` | FastAPI routes, services, models, middleware, integrations, auth, and policy enforcement |
+| CLI | `cli/` | Click-based operator commands for setup, inspection, and workflow automation |
+| Python SDK | `sdk/mutx/` | Thin typed wrappers around the public API contract |
+| Infrastructure | `infrastructure/` | Terraform, Ansible, monitoring validation, and Helm deployment assets |
 
-For Kubernetes environments, MUTX ships a Helm chart in `infrastructure/helm/mutx/`:
+## Public API shape
 
-```bash
-helm install mutx infrastructure/helm/mutx \
-  --set secrets.databaseUrl=$DATABASE_URL \
-  --set secrets.oidcIssuer=$OIDC_ISSUER
-```
+The public control-plane contract is mounted under `/v1/*`.
 
-See `infrastructure/helm/mutx/README.md` for full configuration options.
+Root probes stay at:
 
-***
+* `/`
+* `/health`
+* `/ready`
+* `/metrics`
 
-## Security Model
+Route registration is centralized in `src/api/main.py`. Route-level access control is enforced through dependencies under `src/api/routes/`, with the security layer implemented in `src/api/security.py`.
 
-### Zero-Trust Architecture
+## Request flow
 
-1. **ZTNA Mesh**: Tailscale-based zero-trust networking
-   * No exposed ports to public internet
-   * WireGuard encrypted tunnels
-   * mTLS for service-to-service auth
-2. **EvalView Guardrails**: Hypervisor-level security
-   * Local LLM judge evaluates all inputs/outputs
-   * Prompt injection detection
-   * Output sanitization
-   * Behavioral anomaly detection
-3. **BYOK (Bring Your Own Keys)**
-   * Customer provides their own API keys
-   * Zero token markup
-   * Keys never stored in plaintext (HashiCorp Vault)
-4. **Network Isolation**
-   * Single-tenant VPCs
-   * Firewall rules (UFW)
-   * Security groups per subnet
-   * No cross-tenant communication
+The highest-level request paths look like this:
 
-### Security Layers
+### Browser path
 
-| Layer           | Technology                | Protection                          |
-| --------------- | ------------------------- | ----------------------------------- |
-| **Network**     | Tailscale, UFW, VPC       | Port isolation, encrypted tunnels   |
-| **Application** | JWT, OAuth2, RBAC, OIDC   | Authentication, authorization       |
-| **Data**        | Vault, encryption at rest | Secret management, key protection   |
-| **Runtime**     | EvalView, containers      | Input/output validation, sandboxing |
-| **Monitoring**  | Auditd, fail2ban          | Intrusion detection, logging        |
+1. A user lands on a Next.js surface in `app/`.
+2. The page renders marketing, docs, or operator UI.
+3. When browser-specific proxy behavior is needed, the request goes through `app/api/`.
+4. Control-plane state ultimately resolves through the FastAPI backend or other configured integrations.
 
-***
+### CLI and SDK path
 
-## Infrastructure Provisioning
+1. A CLI command or SDK method issues a request against the public `/v1/*` API.
+2. FastAPI route handlers validate input, check auth and role boundaries, and dispatch into service code.
+3. Services talk to the database, runtime integrations, monitoring systems, or approval and policy layers.
+4. Responses are wrapped back into CLI output or SDK objects.
 
-### Terraform + Ansible Pipeline
+## Control plane layers
 
-1. **Terraform**: Creates VPC, networking, compute
-2. **Ansible**: Configures OS, Docker, services
+The backend is organized so route handlers stay relatively thin and most behavior lives in services, middleware, and models.
 
-```
-┌─────────────────┐
-│  Terraform      │
-│  ┌───────────┐  │
-│  │ VPC       │  │
-│  │ Subnets   │  │
-│  │ Security  │  │
-│  │ Groups    │  │
-│  └───────────┘  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Ansible        │
-│  ┌───────────┐  │
-│  │ Docker    │  │
-│  │ PostgreSQL│  │
-│  │ Redis    │  │
-│  │ Tailscale│  │
-│  │ UFW      │  │
-│  └───────────┘  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Agent 10       │
-│  Swarm Ready    │
-└─────────────────┘
-```
+### Identity and access
 
-***
+MUTX enforces RBAC on all routes. OIDC token validation lives in `src/api/auth/oidc.py` and is configured through:
 
-## Technology Stack
+* `OIDC_ISSUER`
+* `OIDC_CLIENT_ID`
+* `OIDC_JWKS_URI`
 
-| Layer          | Technology                                     |
-| -------------- | ---------------------------------------------- |
-| **Frontend**   | Next.js 16, React 18, TypeScript, Tailwind CSS |
-| **Backend**    | FastAPI, Python, SQLAlchemy, AsyncIO           |
-| **Database**   | PostgreSQL 15, Redis, pgvector                 |
-| **Agents**     | LangChain, OpenClaw, n8n, LangGraph            |
-| **IaC**        | Terraform, Ansible                             |
-| **Cloud**      | DigitalOcean                                   |
-| **Orchestration** | Kubernetes, Helm                            |
-| **Networking** | Tailscale ZTNA                                 |
-| **Security**   | HashiCorp Vault, UFW, fail2ban                 |
-| **Deploy**     | Railway, Vercel                                |
+This matters architecturally because authorization is not an afterthought at the edge. It is part of the route and dependency layer.
 
-***
+### Routing and services
 
-## Next Steps
+The route registry in `src/api/main.py` exposes the main control-plane modules, including:
 
-* [Infrastructure](infrastructure.md)
-* [Agent Runtime](agent-runtime.md)
-* [Security](security.md)
+* agents
+* deployments
+* templates
+* approvals
+* budgets
+* sessions
+* observability
+* telemetry
+* monitoring
+* runtime
+* security
+
+### Data and state
+
+The repo uses Postgres-backed application state and Redis-backed runtime or queue support where configured. The exact data model lives in `src/api/models/` and the async database patterns live under `src/api/database.py` and the service layer.
+
+## Observability and trace propagation
+
+Distributed tracing is a first-class concern in the codebase.
+
+Current observability touchpoints include:
+
+* OpenTelemetry span naming under the `mutx.*` namespace
+* trace propagation through middleware in `src/api/middleware/tracing.py`
+* a public telemetry config route at `GET /v1/telemetry/config`
+* dashboard and docs surfaces that explain runtime history, traces, and monitoring
+
+That gives the architecture a useful property: web UI, API clients, and runtime operators can speak about the same run, session, and trace identifiers.
+
+## Deployment shapes
+
+Deployment tooling exists in several layers:
+
+* Terraform targets under `infrastructure/terraform`
+* Ansible targets under `infrastructure/ansible`
+* monitoring validation targets under `infrastructure/`
+* a Helm chart for Kubernetes deployment under `infrastructure/helm/`
+
+This is why the architecture spans more than the FastAPI app. MUTX includes the operator surface, the public API, client tooling, and the deployment assets that move the control plane into real environments.
+
+## Related control surfaces
+
+Some architecture questions are easier to answer from adjacent pages:
+
+* [Deployment Quickstart](/docs/deployment/quickstart) for the shortest supported install and setup path
+* [API Reference](/docs/reference) for the public `/v1/*` contract
+* [AI Agent Approvals](/ai-agent-approvals) for human approval gates in the control plane
+* [AI Agent Cost Management](/ai-agent-cost) for spend visibility and budget controls
+* [Autonomous Agent Team](/docs/agents) for the specialist roles used in autonomous shipping workflows
+
+## Summary
+
+The simplest accurate mental model is:
+
+* Next.js serves the public and operator-facing web surfaces.
+* FastAPI owns the public control-plane contract under `/v1/*`.
+* CLI and SDK clients ride that same contract.
+* Auth, RBAC, tracing, approvals, budgets, and runtime services live in the backend.
+* Terraform, Ansible, and Helm carry the system into real environments.

@@ -53,6 +53,13 @@ export function shouldSyncHydratedProgress(
   return JSON.stringify(normalizePicoProgress(remoteValue)) !== JSON.stringify(normalizePicoProgress(mergedValue))
 }
 
+export function resolveHydratedPicoProgress(
+  remoteValue: PicoProgressState,
+  currentLocalValue: PicoProgressState
+) {
+  return mergePicoProgress(currentLocalValue, remoteValue)
+}
+
 export function usePicoProgress() {
   const [progress, setProgress] = useState<PicoProgressState>(() => createDefaultPicoProgress())
   const [ready, setReady] = useState(false)
@@ -103,7 +110,8 @@ export function usePicoProgress() {
         }
 
         const remote = normalizePicoProgress(await response.json())
-        const merged = mergePicoProgress(local, remote)
+        const currentLocal = readLocalProgress()
+        const merged = resolveHydratedPicoProgress(remote, currentLocal)
         writeLocalProgress(merged)
         setProgress(merged)
         setSyncState('synced')

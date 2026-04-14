@@ -14,26 +14,56 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX",
+  title: "AI Agent Approval Workflows — Human-in-the-Loop Controls | MUTX",
   description:
-    "Human oversight where it matters. MUTX lets you define approval gates for high-stakes agent operations — so critical actions always pass through a human, and everything is on the record.",
+    "Add human-in-the-loop approval workflows to AI agents. MUTX lets operators require authorization for risky actions, route decisions to the right people, and keep every approval on the record.",
+  keywords: [
+    "ai agent approvals",
+    "human in the loop ai agents",
+    "ai agent approval workflow",
+    "operator authorization",
+    "approval gates for ai agents",
+  ],
   alternates: { canonical: getCanonicalUrl("/ai-agent-approvals") },
   openGraph: {
-    title: "AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX",
+    title: "AI Agent Approval Workflows — Human-in-the-Loop Controls | MUTX",
     description:
-      "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
+      "Add human-in-the-loop approval workflows to AI agents with enforced gates, operator routing, and searchable audit records.",
     url: getCanonicalUrl("/ai-agent-approvals"),
-    images: [getPageOgImageUrl("AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX", "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.", { path: "/ai-agent-approvals" })],
+    images: [getPageOgImageUrl("AI Agent Approval Workflows — Human-in-the-Loop Controls | MUTX", "Add human-in-the-loop approval workflows to AI agents with enforced gates, operator routing, and searchable audit records.", { path: "/ai-agent-approvals" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Approvals | MUTX",
+    title: "AI Agent Approval Workflows | MUTX",
     description:
-      "Human oversight where it matters. Approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
-    images: [getPageTwitterImageUrl("AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX", "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.", { path: "/ai-agent-approvals" })],
+      "Human-in-the-loop controls for AI agents with enforced approval gates and operator authorization records.",
+    images: [getPageTwitterImageUrl("AI Agent Approval Workflows — Human-in-the-Loop Controls | MUTX", "Add human-in-the-loop approval workflows to AI agents with enforced gates, operator routing, and searchable audit records.", { path: "/ai-agent-approvals" })],
   },
 };
+
+const faqItems = [
+  {
+    question: "What is an AI agent approval workflow?",
+    answer:
+      "It is a human-in-the-loop control that blocks selected agent actions until an authorized operator approves, rejects, or escalates the request with full execution context.",
+  },
+  {
+    question: "Do approvals actually block the agent?",
+    answer:
+      "That is the point. MUTX approvals are designed as control plane gates rather than advisory notifications, so high-risk actions can wait for a decision instead of racing ahead.",
+  },
+  {
+    question: "Which actions usually need human approval?",
+    answer:
+      "Teams usually start with destructive actions, production changes, credential access, policy exceptions, or high-cost operations that should not run fully autonomously.",
+  },
+  {
+    question: "Can operators tell which actions were autonomous and which were approved?",
+    answer:
+      "Yes. MUTX keeps approval state visible next to traces, audit logs, and governance records so operators can distinguish autonomous behavior from human-authorized behavior during investigations.",
+  },
+];
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -56,31 +86,78 @@ const structuredData = {
     },
     {
       "@type": "WebPage",
-      name: "AI Agent Approvals | MUTX",
+      name: "AI Agent Approval Workflows | MUTX",
       url: getCanonicalUrl("/ai-agent-approvals"),
       description:
-        "Human oversight where it matters. Approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
+        "Add human-in-the-loop approval workflows to AI agents with enforced approval gates, operator routing, and searchable audit records.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "MUTX",
+          item: getSiteUrl(),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "AI Agent Approvals",
+          item: getCanonicalUrl("/ai-agent-approvals"),
+        },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
     },
   ],
 };
 
 const featureCards = [
   {
-    title: "Approval workflows",
-    body: "Define which operations require a human to sign off before the agent proceeds. Approval gates are control plane records — not a Slack message that may or may not get answered.",
+    title: "Human-in-the-loop workflows",
+    body: "Define which AI agent operations require a human to sign off before the agent proceeds. Approval gates are control plane records, not a chat message that may or may not get answered.",
   },
   {
-    title: "Authorization tracking",
-    body: "Who approved what, when, and why — recorded in the audit log with the full execution context. Not just &ldquo;approved by jane@&rdquo; but the full chain from request to approval to outcome.",
+    title: "Operator authorization records",
+    body: "Who approved what, when, and why is recorded with the execution context. You get the chain from request to approval to outcome, not a vague note that someone clicked approve.",
   },
   {
     title: "Escalation paths",
-    body: "When an approval is pending, the right operator gets notified through the control plane — not through whatever notification channel happens to be monitored that day.",
+    body: "When an approval is pending, the right operator can be routed into the workflow instead of hoping the request appears in whichever notification channel happens to be watched that day.",
   },
   {
-    title: "Automatic vs. approved",
-    body: "Distinguish between what the agent did autonomously and what required human sign-off. This distinction is a first-class property in MUTX — visible in traces, cost attribution, and audit logs.",
+    title: "Autonomous vs. approved",
+    body: "Distinguish between what the agent did autonomously and what required human sign-off. That distinction stays visible in traces, cost attribution, and audit logs.",
+  },
+];
+
+const approvalCards = [
+  {
+    title: "Production changes",
+    body: "Deployments, config mutations, or other production-facing actions are often the first place teams add approval gates because the risk is obvious and the operator path is clear.",
+  },
+  {
+    title: "Credential and access changes",
+    body: "Requests that touch secrets, credentials, or privileged scopes are easier to reason about when the authorization event is explicit and recorded in the same system as the action itself.",
+  },
+  {
+    title: "High-cost actions",
+    body: "Some actions are not dangerous because they are destructive. They are dangerous because they are expensive. Approval workflows can be used to slow down high-cost runs before they burn budget.",
+  },
+  {
+    title: "Policy exceptions",
+    body: "When an agent hits a guardrail or policy boundary, the next step should be a deliberate operator workflow, not a silent fallback or a buried log line.",
   },
 ];
 
@@ -100,16 +177,16 @@ export default function AIAgentApprovalsPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Approvals</p>
                   <h1 className={feat.heroTitle}>
-                    Human oversight
+                    Human-in-the-loop
                     <br />
-                    where it matters.
+                    approval controls.
                   </h1>
                   <p className={feat.heroSupport}>
-                    You can&rsquo;t review every agent action — but you can make
-                    sure the ones that matter pass through a human. MUTX lets
-                    you define approval gates, track authorization decisions,
-                    and keep a complete record of what required oversight and
-                    what didn&rsquo;t.
+                    You cannot review every agent action, but you can require a
+                    human on the ones that matter. MUTX lets operators define
+                    approval workflows for risky AI agent actions, route those
+                    decisions to the right people, and keep the record attached
+                    to the runtime history.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -134,18 +211,44 @@ export default function AIAgentApprovalsPage() {
                 <h2 className={feat.sectionTitle}>
                   Approvals that
                   <br />
-                  actually block.
+                  actually gate execution.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most approval systems are advisory — they suggest a human
-                  review but don&rsquo;t actually prevent the agent from proceeding.
-                  MUTX approvals are control plane gates — the agent waits until
-                  the approval is recorded, and the approval record travels with
-                  the trace.
+                  Most approval systems are advisory. They suggest a review but
+                  do not actually prevent the agent from proceeding. MUTX
+                  approvals are control plane gates, so the agent waits for the
+                  recorded decision and that decision travels with the trace.
                 </p>
               </div>
               <div className={feat.featureGrid}>
                 {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className={feat.contentSection}>
+            <div className={core.shell}>
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Common approval gates</p>
+                <h2 className={feat.sectionTitle}>
+                  Where teams usually
+                  <br />
+                  add a human.
+                </h2>
+                <p className={feat.sectionBody}>
+                  The first approval workflows are usually obvious: destructive
+                  operations, privileged access, policy exceptions, or actions
+                  expensive enough that they should not run without a second set
+                  of eyes.
+                </p>
+              </div>
+              <div className={feat.featureGrid}>
+                {approvalCards.map((card) => (
                   <div key={card.title} className={feat.featureCard}>
                     <h3 className={feat.featureCardTitle}>{card.title}</h3>
                     <p className={feat.featureCardBody}>{card.body}</p>
@@ -219,6 +322,31 @@ export default function AIAgentApprovalsPage() {
             </div>
           </section>
 
+          <section className={feat.contentSection}>
+            <div className={core.shell}>
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>FAQ</p>
+                <h2 className={feat.sectionTitle}>
+                  Questions teams ask
+                  <br />
+                  about approvals.
+                </h2>
+                <p className={feat.sectionBody}>
+                  Approval systems only help if operators understand when to use
+                  them and how they connect to the rest of the runtime.
+                </p>
+              </div>
+              <div className={feat.featureGrid}>
+                {faqItems.map((item) => (
+                  <div key={item.question} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{item.question}</h3>
+                    <p className={feat.featureCardBody}>{item.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
           <section className={feat.finalSection}>
             <div className={core.shell}>
               <div className={feat.finalInner}>
@@ -230,9 +358,9 @@ export default function AIAgentApprovalsPage() {
                 </h2>
                 <p className={feat.finalBody}>
                   Download the Mac app, define an approval workflow for a
-                  high-stakes agent operation, and trigger it. See the gate
+                  high-stakes AI agent operation, and trigger it. See the gate
                   block the operation, notify the right operator, and record
-                  the approval — on the record, in the control plane.
+                  the decision in the control plane.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

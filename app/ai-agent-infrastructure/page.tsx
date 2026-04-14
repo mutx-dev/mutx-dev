@@ -238,12 +238,9 @@ export default function AIAgentInfrastructurePage() {
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <a
-                    href="https://github.com/mutx-dev/mutx-dev"
-                    className={feat.secondaryAction}
-                  >
-                    View on GitHub
-                  </a>
+                  <Link href="/docs/architecture/overview" className={feat.secondaryAction}>
+                    Architecture overview
+                  </Link>
                 </div>
               </div>
             </div>

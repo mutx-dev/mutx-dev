@@ -8,8 +8,14 @@ import { DocsRenderer, extractHeadings } from "@/components/site/docs/DocsRender
 import { TableOfContents } from "@/components/site/docs/TableOfContents";
 import { SectionLanding } from "@/components/site/docs/SectionLanding";
 import { PrevNextNav } from "@/components/site/docs/PrevNextNav";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
-import { parseSummary } from "@/lib/docs";
+import {
+  DEFAULT_X_HANDLE,
+  getCanonicalUrl,
+  getPageOgImageUrl,
+  getPageTwitterImageUrl,
+  getSiteUrl,
+} from "@/lib/seo";
+import { type DocNavItem, parseSummary } from "@/lib/docs";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
@@ -126,6 +132,178 @@ function hasUnsafeSlugSegment(slugSegments: string[]): boolean {
   );
 }
 
+function extractPrimaryHeading(source: string): string | null {
+  const match = source.match(/^#\s+(.+)$/m);
+  return match ? match[1].trim() : null;
+}
+
+function extractLeadParagraph(source: string): string | null {
+  const paragraphs = source
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  for (const paragraph of paragraphs) {
+    if (
+      paragraph.startsWith("#") ||
+      paragraph.startsWith(">") ||
+      paragraph.startsWith("```") ||
+      paragraph.startsWith("|") ||
+      /^[-*]\s/.test(paragraph) ||
+      /^\d+\.\s/.test(paragraph)
+    ) {
+      continue;
+    }
+
+    return paragraph
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/`([^`]+)`/g, "$1")
+      .replace(/[*_]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  return null;
+}
+
+function normalizeKeywords(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((keyword): keyword is string => typeof keyword === "string");
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((keyword) => keyword.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function getDocSeoFields(data: Record<string, unknown>, content: string) {
+  const title =
+    (typeof data.title === "string" && data.title.trim()) ||
+    extractPrimaryHeading(content) ||
+    "MUTX Docs";
+  const description =
+    (typeof data.description === "string" && data.description.trim()) ||
+    extractLeadParagraph(content) ||
+    "Documentation for MUTX operators and builders.";
+  const keywords = Array.from(
+    new Set([
+      "mutx docs",
+      "ai agent control plane",
+      "agent operations",
+      ...normalizeKeywords(data.keywords),
+    ]),
+  );
+
+  return {
+    title,
+    metaTitle: title.endsWith("MUTX Docs") ? title : `${title} — MUTX Docs`,
+    description,
+    keywords,
+  };
+}
+
+function findNavTrail(
+  items: DocNavItem[],
+  route: string,
+  trail: DocNavItem[] = [],
+): DocNavItem[] | null {
+  for (const item of items) {
+    const nextTrail = [...trail, item];
+    if (item.route === route) {
+      return nextTrail;
+    }
+
+    const childTrail = findNavTrail(item.children, route, nextTrail);
+    if (childTrail) {
+      return childTrail;
+    }
+  }
+
+  return null;
+}
+
+function getDocBreadcrumbs(route: string, fallbackTitle: string) {
+  const navTrail = findNavTrail(parseSummary(), route) ?? [];
+  const breadcrumbs = [{ name: "Docs", path: "/docs" }];
+
+  for (const item of navTrail) {
+    if (item.route === "/docs") {
+      continue;
+    }
+
+    if (breadcrumbs.some((breadcrumb) => breadcrumb.path === item.route)) {
+      continue;
+    }
+
+    breadcrumbs.push({ name: item.title, path: item.route });
+  }
+
+  if (breadcrumbs[breadcrumbs.length - 1]?.path !== route) {
+    breadcrumbs.push({ name: fallbackTitle, path: route });
+  }
+
+  return breadcrumbs;
+}
+
+function buildDocStructuredData(options: {
+  title: string;
+  path: string;
+  description: string;
+  breadcrumbs: Array<{ name: string; path: string }>;
+  dateModified?: string;
+}) {
+  const siteUrl = getSiteUrl();
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}/#organization`,
+        name: "MUTX",
+        url: siteUrl,
+        sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "MUTX",
+        applicationCategory: "DeveloperApplication",
+        description:
+          "Source-available control plane for AI agent governance, deployment, and observability.",
+        downloadUrl: `${siteUrl}/download`,
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      },
+      {
+        "@type": "WebPage",
+        "@id": `${getCanonicalUrl(options.path)}#webpage`,
+        name: options.title,
+        url: getCanonicalUrl(options.path),
+        description: options.description,
+        isPartOf: {
+          "@type": "WebSite",
+          name: "MUTX Docs",
+          url: getCanonicalUrl("/docs"),
+        },
+        ...(options.dateModified ? { dateModified: options.dateModified } : {}),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: options.breadcrumbs.map((breadcrumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: breadcrumb.name,
+          item: getCanonicalUrl(breadcrumb.path),
+        })),
+      },
+    ],
+  };
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -136,62 +314,66 @@ export async function generateMetadata({
   if (!filePath) return { title: "Not Found" };
 
   const source = fs.readFileSync(filePath, "utf-8");
-  const { data } = matter(source);
-  const title =
-    (data.title as string) || (data.description as string) || "MUTX Docs";
+  const { data, content } = matter(source);
   const normalizedPath =
     slug.length === 0 ? "/docs" : `/docs/${slug.join("/")}`;
-  const description =
-    (data.description as string) ||
-    "Documentation for MUTX operators and builders.";
+  const seo = getDocSeoFields(data, content);
 
   return {
-    title: `${title} — MUTX Docs`,
-    description,
+    title: seo.metaTitle,
+    description: seo.description,
+    category: "documentation",
+    keywords: seo.keywords,
     alternates: {
       canonical: getCanonicalUrl(normalizedPath),
     },
     openGraph: {
-      title: `${title} — MUTX Docs`,
-      description,
+      title: seo.metaTitle,
+      description: seo.description,
       url: getCanonicalUrl(normalizedPath),
-      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description, { path: normalizedPath })],
+      siteName: "MUTX Docs",
+      images: [getPageOgImageUrl(seo.metaTitle, seo.description, { path: normalizedPath })],
     },
     twitter: {
       card: "summary_large_image",
       creator: DEFAULT_X_HANDLE,
-      title: `${title} — MUTX Docs`,
-      description,
-      images: [getPageTwitterImageUrl(`${title} — MUTX Docs`, description, { path: normalizedPath })],
+      title: seo.metaTitle,
+      description: seo.description,
+      images: [getPageTwitterImageUrl(seo.metaTitle, seo.description, { path: normalizedPath })],
     },
   };
 }
 
 const FEATURED = [
   {
-    title: "Quickstart",
+    title: "MUTX Quickstart",
+    href: "/docs/quickstart",
+    desc: "Read the shortest setup guide before you choose the full hosted or local path.",
+  },
+  {
+    title: "Deployment Quickstart",
     href: "/docs/deployment/quickstart",
     desc: "Get from clone to a working stack with the shortest validated path.",
   },
   {
-    title: "API Reference",
-    href: "/docs/reference",
-    desc: "Read the live /v1/* contract, auth model, and public resource docs.",
+    title: "Architecture Overview",
+    href: "/docs/architecture/overview",
+    desc: "See the code-accurate map behind the app, backend, CLI, SDK, and infrastructure.",
   },
   {
-    title: "Platform Architecture",
-    href: "/docs/architecture",
-    desc: "Understand the shape behind app, backend, CLI, SDK, and infra.",
+    title: "Autonomous Agent Team",
+    href: "/docs/agents",
+    desc: "Understand the specialist agent roles, ownership boundaries, and review-safe shipping model.",
   },
   {
-    title: "v1.4 Release Notes",
-    href: "/docs/v1.4",
-    desc: "Current public release posture, supported surfaces, and download path.",
+    title: "AI Agent Cost Management",
+    href: "/ai-agent-cost",
+    desc: "Learn how MUTX handles LLM spend tracking, attribution, and budget enforcement.",
   },
   {
-    title: "Troubleshooting",
-    href: "/docs/troubleshooting",
-    desc: "Recover quickly when local setup, auth, or route assumptions drift.",
+    title: "AI Agent Approvals",
+    href: "/ai-agent-approvals",
+    desc: "See how human-in-the-loop approval workflows and authorization gates work in the control plane.",
   },
 ];
 
@@ -248,8 +430,8 @@ function DocsHomePage() {
 
         <section className="docs-home-featured">
           <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">Entry points</p>
-            <h2 className="docs-home-section-title">Start from the shortest meaningful route.</h2>
+            <p className="docs-home-kicker">High-signal routes</p>
+            <h2 className="docs-home-section-title">Start from the pages people actually need first.</h2>
           </div>
           <div className="docs-home-featured-list">
             {FEATURED.map((card) => (
@@ -324,30 +506,46 @@ export default async function DocPage({
   const { data, content } = matter(source);
   const headings = extractHeadings(content);
   const currentRoute = `/docs/${slug.join("/")}`;
+  const seo = getDocSeoFields(data, content);
+  const breadcrumbs = getDocBreadcrumbs(currentRoute, seo.title);
+  const lastModified = fs.statSync(filePath).mtime.toISOString();
+  const structuredData = buildDocStructuredData({
+    title: seo.title,
+    path: currentRoute,
+    description: seo.description,
+    breadcrumbs,
+    dateModified: lastModified,
+  });
 
   return (
-    <div className="docs-article-layout">
-      <div className="docs-article-main">
-        <DocsRenderer source={content} currentSlug={slug} />
-        <PrevNextNav currentRoute={currentRoute} />
-        {data.icon && (
-          <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
-            Last updated via GitBook sync — source at{" "}
-            <a
-              href={`https://github.com/mutx-dev/mutx-dev/blob/main/${path.relative(
-                process.cwd(),
-                filePath
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-gray-600"
-            >
-              GitHub
-            </a>
-          </p>
-        )}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="docs-article-layout">
+        <div className="docs-article-main">
+          <DocsRenderer source={content} currentSlug={slug} />
+          <PrevNextNav currentRoute={currentRoute} />
+          {data.icon && (
+            <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
+              Last updated via GitBook sync — source at{" "}
+              <a
+                href={`https://github.com/mutx-dev/mutx-dev/blob/main/${path.relative(
+                  process.cwd(),
+                  filePath
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-gray-600"
+              >
+                GitHub
+              </a>
+            </p>
+          )}
+        </div>
+        <TableOfContents sourceHeadings={headings} />
       </div>
-      <TableOfContents sourceHeadings={headings} />
-    </div>
+    </>
   );
 }

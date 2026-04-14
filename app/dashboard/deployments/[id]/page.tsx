@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { ApiRequestError, readJson, writeJson } from "@/components/app/http";
+import { DeploymentHistory } from "@/components/app/DeploymentHistory";
 import { DashboardDialog } from "@/components/dashboard/DashboardDialog";
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { RouteHeader } from "@/components/dashboard/RouteHeader";
@@ -310,6 +311,29 @@ export default function DeploymentDetailPage() {
               icon={Calendar}
             />
           </LiveMiniStatGrid>
+        </LivePanel>
+
+        <LivePanel title="Version posture" meta="rollback ready">
+          <div className="rounded-[16px] border border-[#24303d] bg-[#0a1017] p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              Current rollout revision
+            </p>
+            <p className="mt-2 text-sm font-medium text-slate-100">
+              {deployment.version || "Unknown"}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Inspect recorded deployment snapshots and roll back to a known-good version
+              without leaving this deployment record.
+            </p>
+            <div className="mt-4">
+              <DeploymentHistory
+                deploymentId={deployment.id}
+                buttonLabel="Inspect version history"
+                buttonClassName="inline-flex items-center gap-2 rounded-[12px] border border-[#2f3c49] bg-[#10161d] px-3.5 py-2 text-sm font-medium text-[#dce3ec] transition hover:border-sky-300/18"
+                onRollbackComplete={() => loadDeployment({ preserveLoading: true })}
+              />
+            </div>
+          </div>
         </LivePanel>
       </div>
 

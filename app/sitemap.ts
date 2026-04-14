@@ -8,6 +8,12 @@ const routePriorities: Record<string, number> = {
   '/download': 0.95,
   '/releases': 0.9,
   '/docs': 0.85,
+  '/docs/deployment/quickstart': 0.82,
+  '/docs/quickstart': 0.8,
+  '/ai-agent-cost': 0.8,
+  '/ai-agent-approvals': 0.8,
+  '/docs/architecture/overview': 0.76,
+  '/docs/agents': 0.74,
   '/contact': 0.8,
 }
 
