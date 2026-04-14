@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
+from datetime import timedelta
 import json
 import logging
 import os
@@ -595,9 +596,7 @@ async def claim_next_reasoning_job(
             selectinload(ReasoningJob.artifacts),
             selectinload(ReasoningJob.run).selectinload(AgentRun.traces),
         )
-        .where(
-            ReasoningJob.status.in_(["queued", "running"]),
-        )
+        .where(ReasoningJob.status.in_(["queued", "running"]))
         .order_by(ReasoningJob.dispatched_at.asc().nullsfirst(), ReasoningJob.created_at.asc())
     )
     candidates = result.scalars().all()
