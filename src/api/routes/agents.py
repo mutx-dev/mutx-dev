@@ -539,7 +539,9 @@ async def get_agent_metrics(
         forbidden_detail="Not authorized to access this agent's metrics",
     )
 
-    count_query = select(func.count()).select_from(AgentMetric).where(AgentMetric.agent_id == agent_id)
+    count_query = (
+        select(func.count()).select_from(AgentMetric).where(AgentMetric.agent_id == agent_id)
+    )
     count_result = await db.execute(count_query)
     total = count_result.scalar_one()
 

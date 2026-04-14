@@ -789,7 +789,9 @@ class CredentialBroker:
                 return True
             return False
 
-    async def get_credential(self, backend_name: str, secret_path: str, requester_id: str | None = None) -> Optional[Credential]:
+    async def get_credential(
+        self, backend_name: str, secret_path: str, requester_id: str | None = None
+    ) -> Optional[Credential]:
         """Retrieve a credential from a specific backend."""
         if backend_name not in self._providers:
             logger.warning(f"Unknown credential backend: {backend_name}")
@@ -810,7 +812,9 @@ class CredentialBroker:
         )
         return await provider.get_secret(secret_path)
 
-    async def get_credential_by_path(self, full_path: str, requester_id: str | None = None) -> Optional[Credential]:
+    async def get_credential_by_path(
+        self, full_path: str, requester_id: str | None = None
+    ) -> Optional[Credential]:
         """
         Retrieve a credential using a path format: backend:/path/to/secret
 

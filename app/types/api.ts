@@ -3538,6 +3538,23 @@ export interface components {
             /** Deployments */
             deployments?: components["schemas"]["DeploymentResponse"][];
         };
+        /**
+         * AgentLogHistoryResponse
+         * @description Paginated response for agent logs.
+         */
+        AgentLogHistoryResponse: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Items */
+            items: components["schemas"]["AgentLogResponse"][];
+            /** Total */
+            total: number;
+            /** Has More */
+            has_more: boolean;
+        };
         /** AgentLogResponse */
         AgentLogResponse: {
             /**
@@ -3561,6 +3578,23 @@ export interface components {
              * Format: date-time
              */
             timestamp: string;
+        };
+        /**
+         * AgentMetricHistoryResponse
+         * @description Paginated response for agent metrics.
+         */
+        AgentMetricHistoryResponse: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Items */
+            items: components["schemas"]["AgentMetricResponse"][];
+            /** Total */
+            total: number;
+            /** Has More */
+            has_more: boolean;
         };
         /** AgentMetricResponse */
         AgentMetricResponse: {
@@ -8181,7 +8215,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AgentLogResponse"][];
+                    "application/json": components["schemas"]["AgentLogHistoryResponse"];
                 };
             };
             /** @description Validation Error */
@@ -8217,7 +8251,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AgentMetricResponse"][];
+                    "application/json": components["schemas"]["AgentMetricHistoryResponse"];
                 };
             };
             /** @description Validation Error */
