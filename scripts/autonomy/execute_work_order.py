@@ -169,15 +169,18 @@ def pr_has_codex_review_comment(pr_ref: str) -> bool:
 
 
 def maybe_comment_codex_review(pr_ref: str) -> None:
-    if not os.environ.get("GH_TOKEN"):
-        return
     resolved_pr = resolve_open_pr_ref(pr_ref)
-    if pr_has_codex_review_comment(resolved_pr):
-        print("Codex review handoff already present.")
-        return
-    result = run(["gh", "pr", "comment", resolved_pr, "--body", CODEX_REVIEW_COMMENT], check=False)
-    if result.returncode != 0:
-        print("Failed to post Codex review handoff comment.")
+    queue_dir = Path(os.environ.get("AUTONOMY_GITHUB_COMMENT_QUEUE_DIR", ".autonomy/github-comment-queue"))
+    queue_dir.mkdir(parents=True, exist_ok=True)
+    queue_path = queue_dir / f"{resolved_pr.replace('/', '_')}.json"
+    payload = {
+        "repo": DEFAULT_REPO,
+        "pr": resolved_pr,
+        "body": CODEX_REVIEW_COMMENT,
+        "created_at": __import__("datetime").datetime.utcnow().isoformat() + "Z",
+    }
+    queue_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"Queued Codex review handoff comment at {queue_path}")
 
 
 def run_agent_command(
