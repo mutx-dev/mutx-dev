@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import uuid
 from types import SimpleNamespace
 from typing import Any
@@ -36,18 +37,23 @@ def test_api_keys_list_hits_canonical_route_and_renders_keys(monkeypatch) -> Non
                 {
                     "id": key_id,
                     "name": "test-key-1",
+                    "created_at": "2026-03-14T10:00:00",
                     "is_active": True,
                     "expires_at": "2026-04-14T10:00:00",
                 },
                 {
                     "id": str(uuid.uuid4()),
                     "name": "test-key-2",
+                    "created_at": "2026-03-14T10:00:00",
                     "is_active": False,
                     "expires_at": None,
                 },
             ],
         )
 
+    monkeypatch.setattr(
+        "cli.operator_readiness.utc_now", lambda: datetime(2026, 4, 10, 10, 0, tzinfo=timezone.utc)
+    )
     monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.api_keys.get_client", lambda config: SimpleNamespace(get=fake_get)
@@ -60,9 +66,10 @@ def test_api_keys_list_hits_canonical_route_and_renders_keys(monkeypatch) -> Non
     assert captured["path"] == "/v1/api-keys"
     assert key_id in result.output
     assert "test-key-1" in result.output
-    assert "active" in result.output
+    assert "state=active" in result.output
+    assert "health=expires-soon" in result.output
     assert "test-key-2" in result.output
-    assert "revoked" in result.output
+    assert "state=revoked" in result.output
 
 
 def test_api_keys_list_empty(monkeypatch) -> None:

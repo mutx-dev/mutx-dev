@@ -2,6 +2,11 @@ import click
 from typing import Optional
 
 from cli.config import current_config, get_client
+from cli.operator_readiness import (
+    api_key_last_used,
+    describe_api_key_lifecycle,
+    describe_api_key_readiness,
+)
 
 
 @click.group(name="api-keys")
@@ -29,15 +34,21 @@ def list_api_keys():
         click.echo(f"Error: {response.text}", err=True)
         return
 
-    keys = response.json()
+    payload = response.json()
+    keys = payload.get("items", payload) if isinstance(payload, dict) else payload
     if not keys:
         click.echo("No API keys found.")
         return
 
     for key in keys:
-        active = "active" if key.get("is_active") else "revoked"
+        lifecycle = describe_api_key_lifecycle(key)
+        readiness = describe_api_key_readiness(key) or lifecycle
         expires = key.get("expires_at") or "never"
-        click.echo(f"{key['id']} | {key['name']} | {active} | expires: {expires}")
+        last_used = api_key_last_used(key) or "never"
+        click.echo(
+            f"{key['id']} | {key['name']} | state={lifecycle} | health={readiness} | "
+            f"last used: {last_used} | expires: {expires}"
+        )
 
 
 @api_keys_group.command(name="create")
