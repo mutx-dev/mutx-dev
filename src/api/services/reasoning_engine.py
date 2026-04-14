@@ -775,7 +775,7 @@ async def _run_llm_reasoning(manifest: dict[str, Any]) -> ReasoningExecutionResu
                     "Blind judge the candidates against the task and optional rubric."
                 ),
                 user_prompt=(
-                    f'TASK:\n{base_user_prompt}\n\nRUBRIC:\n{rubric or "No rubric provided."}\n\n'
+                    f"TASK:\n{base_user_prompt}\n\nRUBRIC:\n{rubric or 'No rubric provided.'}\n\n"
                     f"CANDIDATE A:\n{current_a}\n\nCANDIDATE B:\n{version_b}\n\nCANDIDATE AB:\n{version_ab}"
                 ),
                 temperature=judge_temperature,
