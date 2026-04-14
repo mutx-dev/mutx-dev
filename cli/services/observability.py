@@ -46,9 +46,17 @@ class ObservabilityService(APIService):
         self._expect_status(response, {201})
         return response.json()
 
-    def add_step(self, run_id: str, step_data: dict[str, Any]) -> dict[str, Any]:
-        """Add a step to an existing run."""
-        response = self._request("POST", f"/v1/observability/runs/{run_id}/steps", json=step_data)
+    def add_steps(self, run_id: str, steps: list[dict[str, Any]]) -> dict[str, Any]:
+        """Add steps to an existing run.
+
+        Args:
+            run_id: The run ID to add steps to.
+            steps: List of step dicts. Each dict must have a "type" field.
+
+        Returns:
+            Dict with 'total' (total steps in run) and 'added' (steps in this batch).
+        """
+        response = self._request("POST", f"/v1/observability/runs/{run_id}/steps", json=steps)
         self._expect_status(response, {201})
         return response.json()
 
