@@ -46,10 +46,11 @@ dev = [
 
 [project.scripts]
 mutx = "cli.main:cli"
+mutx-reasoning-worker = "src.api.reasoning_worker:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["cli*"]
+include = ["cli*", "src*"]
 
 [tool.setuptools.package-data]
 cli = ["policies/*.fpl"]

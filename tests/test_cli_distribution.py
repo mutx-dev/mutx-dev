@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import os
 from pathlib import Path
 
 
@@ -61,3 +62,18 @@ def test_installed_cli_entrypoint_exposes_setup_commands_without_repo_on_sys_pat
     assert metadata_name.stdout.strip() == "mutx-cli"
     assert result.returncode == 0
     assert "Guided assistant-first onboarding." in result.stdout
+
+    worker_result = subprocess.run(
+        [str(venv_dir / "bin" / "mutx-reasoning-worker")],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+        env={
+            **os.environ,
+            "MUTX_REASONING_ENABLED": "false",
+            "REASONING_ENABLED": "false",
+        },
+    )
+
+    assert worker_result.returncode == 0
