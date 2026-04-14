@@ -58,11 +58,11 @@ export function PicoLangSwitcher() {
         aria-haspopup="listbox"
         aria-expanded={open}
         style={{
-          minHeight: '2.2rem',
-          padding: '0 0.85rem',
+          minHeight: '2.5rem',
+          padding: '0 0.95rem',
           borderRadius: '999px',
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--pico-bg-surface)',
+          border: '1px solid var(--pico-border)',
           cursor: 'pointer',
           fontSize: '0.82rem',
           fontWeight: 600,
@@ -71,9 +71,10 @@ export function PicoLangSwitcher() {
           alignItems: 'center',
           justifyContent: 'center',
           gap: '0.35rem',
-          color: 'rgba(238,240,246,0.92)',
+          color: 'var(--pico-text)',
           boxSizing: 'border-box',
-          transition: 'transform 160ms ease, background 160ms ease, border-color 160ms ease',
+          transition: 'transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease',
+          boxShadow: '0 10px 24px rgba(0,0,0,0.16)',
         }}
       >
         <span aria-hidden="true">{current.flag}</span>
@@ -88,8 +89,8 @@ export function PicoLangSwitcher() {
             position: 'absolute',
             top: 'calc(100% + 6px)',
             right: 0,
-            background: '#0d0f18',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(9, 16, 8, 0.98)',
+            border: '1px solid var(--pico-border)',
             borderRadius: '10px',
             padding: '6px',
             display: 'flex',
@@ -108,7 +109,7 @@ export function PicoLangSwitcher() {
               aria-selected={l.code === locale}
               onClick={() => handleSelect(l.code)}
               style={{
-                background: l.code === locale ? 'rgba(212,171,115,0.12)' : 'transparent',
+                background: l.code === locale ? 'rgba(var(--pico-accent-rgb),0.14)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 padding: '7px 10px',
@@ -117,13 +118,13 @@ export function PicoLangSwitcher() {
                 alignItems: 'center',
                 gap: '8px',
                 fontSize: '0.85rem',
-                color: l.code === locale ? '#d4ab73' : 'rgba(238,240,246,0.75)',
+                color: l.code === locale ? 'var(--pico-accent)' : 'var(--pico-text-secondary)',
                 textAlign: 'left',
                 transition: 'background 0.15s',
               }}
               onMouseEnter={(e) => {
                 if (l.code !== locale) {
-                  ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'
+                  ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(var(--pico-accent-rgb),0.08)'
                 }
               }}
               onMouseLeave={(e) => {

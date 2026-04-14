@@ -150,8 +150,8 @@
 
 .input:focus,
 .textarea:focus {
-  border-color: rgba(212, 171, 115, 0.4);
-  box-shadow: 0 0 0 3px rgba(212, 171, 115, 0.08);
+  border-color: rgba(var(--pico-accent-rgb), 0.42);
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
 }
 
 /* --- Radix Select ------------------------------------------------- */
@@ -180,8 +180,8 @@
 
 .selectTrigger[data-state="open"],
 .selectTrigger:focus {
-  border-color: rgba(212, 171, 115, 0.4);
-  box-shadow: 0 0 0 3px rgba(212, 171, 115, 0.08);
+  border-color: rgba(var(--pico-accent-rgb), 0.42);
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
 }
 
 .selectIcon {
@@ -230,7 +230,7 @@
 }
 
 .selectItem[data-highlighted] {
-  background: rgba(212, 171, 115, 0.08);
+  background: rgba(var(--pico-accent-rgb), 0.1);
   color: var(--pico-text);
 }
 
@@ -290,8 +290,8 @@
   min-height: 2.8rem;
   padding: 0 1.4rem;
   border-radius: var(--pico-radius-sm);
-  background: linear-gradient(135deg, #d4ab73, #c89b62);
-  color: #052e16;
+  background: linear-gradient(135deg, var(--pico-accent-bright), var(--pico-accent-deep));
+  color: var(--pico-accent-contrast);
   font-family: var(--pico-font-body);
   font-size: 0.92rem;
   font-weight: 700;
@@ -299,12 +299,12 @@
   border: none;
   cursor: pointer;
   transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
-  box-shadow: 0 8px 24px rgba(212, 171, 115, 0.16);
+  box-shadow: 0 8px 24px rgba(var(--pico-accent-rgb), 0.16);
 }
 
 .submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 12px 32px rgba(212, 171, 115, 0.22);
+  box-shadow: 0 12px 32px rgba(var(--pico-accent-rgb), 0.22);
 }
 
 .submit:disabled {
@@ -339,7 +339,7 @@
   border-radius: 50%;
   background: var(--pico-accent-soft);
   color: var(--pico-accent);
-  border: 1px solid rgba(212, 171, 115, 0.2);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.2);
 }
 
 .successTitle {

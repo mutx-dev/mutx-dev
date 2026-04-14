@@ -72,7 +72,7 @@ export function PicoLandingPage() {
         <div className={s.navInner}>
           <Link href="/pico" className={s.navBrand}>
             <span className={s.navLogo}>
-              <Image src="/pico/logo.png" alt="PicoMUTX logo" width={20} height={20} priority />
+              <Image src="/pico/logo.png" alt="PicoMUTX logo" width={32} height={32} priority />
             </span>
             <span className={s.navName}>
               {t('nav.brand')}

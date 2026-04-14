@@ -4,24 +4,29 @@
 
 /* --- Design tokens ------------------------------------------------ */
 :root {
-  --pico-bg: #09080b;
-  --pico-bg-raised: #121116;
-  --pico-bg-surface: rgba(255, 248, 236, 0.04);
-  --pico-bg-surface-hover: rgba(255, 248, 236, 0.08);
-  --pico-text: #f7f0e4;
-  --pico-text-secondary: rgba(232, 221, 203, 0.72);
-  --pico-text-muted: rgba(188, 172, 149, 0.46);
-  --pico-border: rgba(255, 233, 204, 0.1);
-  --pico-border-hover: rgba(212, 171, 115, 0.2);
-  --pico-accent: #d4ab73;
-  --pico-accent-soft: rgba(212, 171, 115, 0.12);
-  --pico-accent-glow: rgba(212, 171, 115, 0.08);
-  --pico-blue: #8e79c4;
-  --pico-blue-soft: rgba(142, 121, 196, 0.12);
-  --pico-blue-glow: rgba(142, 121, 196, 0.08);
-  --pico-red: #d77d63;
-  --pico-red-soft: rgba(215, 125, 99, 0.1);
-  --pico-yellow: #d9bd82;
+  --pico-bg: #050904;
+  --pico-bg-raised: #0b1209;
+  --pico-bg-surface: rgba(159, 255, 78, 0.045);
+  --pico-bg-surface-hover: rgba(159, 255, 78, 0.085);
+  --pico-text: #f3faee;
+  --pico-text-secondary: rgba(221, 234, 214, 0.76);
+  --pico-text-muted: rgba(166, 186, 156, 0.5);
+  --pico-border: rgba(159, 255, 78, 0.14);
+  --pico-border-hover: rgba(159, 255, 78, 0.28);
+  --pico-accent-rgb: 159, 255, 78;
+  --pico-accent: #9fff4e;
+  --pico-accent-bright: #dfff9a;
+  --pico-accent-deep: #52c51c;
+  --pico-accent-contrast: #071404;
+  --pico-accent-soft: rgba(159, 255, 78, 0.12);
+  --pico-accent-glow: rgba(159, 255, 78, 0.1);
+  --pico-blue: #73efbe;
+  --pico-blue-soft: rgba(115, 239, 190, 0.12);
+  --pico-blue-glow: rgba(115, 239, 190, 0.08);
+  --pico-red: #ff8c72;
+  --pico-red-soft: rgba(255, 140, 114, 0.1);
+  --pico-yellow-rgb: 195, 255, 91;
+  --pico-yellow: #c3ff5b;
   --pico-font-accent: var(--font-mono), monospace;
   --pico-font-display: var(--font-site-display), serif;
   --pico-font-body: var(--font-site-body), sans-serif;
@@ -70,7 +75,7 @@
   right: 0;
   z-index: 40;
   padding: 0;
-  background: rgba(9, 8, 11, 0.78);
+  background: rgba(5, 9, 4, 0.82);
   backdrop-filter: blur(20px) saturate(1.6);
   border-bottom: 1px solid var(--pico-border);
 }
@@ -81,13 +86,13 @@
   justify-content: space-between;
   width: var(--pico-shell);
   margin: 0 auto;
-  min-height: 3.6rem;
+  min-height: 4.35rem;
 }
 
 .navBrand {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.85rem;
   text-decoration: none;
 }
 
@@ -95,22 +100,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
-  background: linear-gradient(135deg, rgba(212, 171, 115, 0.18), rgba(142, 121, 196, 0.16));
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(var(--pico-accent-rgb), 0.22), transparent 62%),
+    linear-gradient(135deg, rgba(8, 32, 10, 0.96), rgba(20, 65, 14, 0.9));
   border: 1px solid var(--pico-border);
+  box-shadow:
+    0 0 0 1px rgba(var(--pico-accent-rgb), 0.04),
+    0 16px 32px rgba(0, 0, 0, 0.25),
+    0 0 28px rgba(var(--pico-accent-rgb), 0.12);
 }
 
 .navLogo img {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.8rem;
+  height: 1.8rem;
   object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(var(--pico-accent-rgb), 0.22));
 }
 
 .navName {
   font-family: var(--pico-font-accent);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -125,7 +137,7 @@
   .navTag {
     display: inline;
     font-family: var(--pico-font-body);
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     color: var(--pico-text-muted);
     font-weight: 400;
     letter-spacing: 0;
@@ -169,11 +181,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  min-height: 2.2rem;
-  padding: 0 1rem;
+  min-height: 2.5rem;
+  padding: 0 1.15rem;
   border-radius: var(--pico-radius-full);
-  background: linear-gradient(135deg, #f2dfc4, #c89b62);
-  color: #0e0c10;
+  background: linear-gradient(135deg, var(--pico-accent-bright), var(--pico-accent-deep));
+  color: var(--pico-accent-contrast);
   font-family: var(--pico-font-body);
   font-size: 0.82rem;
   font-weight: 700;
@@ -182,12 +194,16 @@
   border: none;
   cursor: pointer;
   transition: transform 160ms ease, box-shadow 160ms ease;
-  box-shadow: 0 12px 32px rgba(200, 155, 98, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(var(--pico-accent-rgb), 0.16),
+    0 12px 32px rgba(var(--pico-accent-rgb), 0.18);
 }
 
 .navCta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 40px rgba(200, 155, 98, 0.24);
+  box-shadow:
+    0 0 0 1px rgba(var(--pico-accent-rgb), 0.22),
+    0 16px 40px rgba(var(--pico-accent-rgb), 0.24);
 }
 
 /* --- Hero --------------------------------------------------------- */
@@ -208,9 +224,9 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 50% at 50% 10%, rgba(212, 171, 115, 0.1), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 70% 5%, rgba(142, 121, 196, 0.07), transparent 60%),
-    radial-gradient(ellipse 40% 30% at 30% 80%, rgba(212, 171, 115, 0.03), transparent 50%);
+    radial-gradient(ellipse 80% 50% at 50% 10%, rgba(var(--pico-accent-rgb), 0.14), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 5%, var(--pico-blue-glow), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 30% 80%, rgba(var(--pico-accent-rgb), 0.04), transparent 50%);
   animation: ambientPulse 8s ease-in-out infinite alternate;
 }
 
@@ -219,7 +235,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 30% 20% at 50% 50%, rgba(212, 171, 115, 0.04), transparent 60%);
+    radial-gradient(ellipse 30% 20% at 50% 50%, rgba(var(--pico-accent-rgb), 0.06), transparent 60%);
 }
 
 .heroGrid {
@@ -242,8 +258,9 @@
   min-height: 2.2rem;
   padding: 0 1.1rem;
   border-radius: var(--pico-radius-full);
-  border: 1px solid rgba(212, 171, 115, 0.18);
-  background: rgba(212, 171, 115, 0.06);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.2);
+  background:
+    linear-gradient(135deg, rgba(var(--pico-accent-rgb), 0.09), rgba(18, 44, 13, 0.42));
   font-family: var(--pico-font-accent);
   font-size: 0.7rem;
   font-weight: 800;
@@ -258,7 +275,7 @@
   height: 0.4rem;
   border-radius: 50%;
   background: var(--pico-accent);
-  box-shadow: 0 0 8px rgba(212, 171, 115, 0.6);
+  box-shadow: 0 0 10px rgba(var(--pico-accent-rgb), 0.6);
   animation: pulseDot 2s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -274,7 +291,7 @@
 }
 
 .heroTitleAccent {
-  background: linear-gradient(135deg, #d4ab73 0%, #f0d0a1 100%);
+  background: linear-gradient(135deg, var(--pico-accent) 0%, var(--pico-accent-bright) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -321,7 +338,7 @@
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.03),
     0 40px 80px rgba(0, 0, 0, 0.5),
-    0 0 120px rgba(212, 171, 115, 0.04);
+    0 0 120px rgba(var(--pico-accent-rgb), 0.06);
   overflow: hidden;
   backdrop-filter: blur(8px);
 }
@@ -440,8 +457,8 @@
   min-height: 3.1rem;
   padding: 0 1.6rem;
   border-radius: var(--pico-radius-sm);
-  background: linear-gradient(135deg, #d4ab73, #c89b62);
-  color: #052e16;
+  background: linear-gradient(135deg, var(--pico-accent-bright), var(--pico-accent-deep));
+  color: var(--pico-accent-contrast);
   font-family: var(--pico-font-body);
   font-size: 0.95rem;
   font-weight: 700;
@@ -451,15 +468,15 @@
   cursor: pointer;
   transition: transform 160ms ease, box-shadow 160ms ease;
   box-shadow:
-    0 0 0 1px rgba(212, 171, 115, 0.2),
-    0 12px 32px rgba(212, 171, 115, 0.18);
+    0 0 0 1px rgba(var(--pico-accent-rgb), 0.2),
+    0 12px 32px rgba(var(--pico-accent-rgb), 0.18);
 }
 
 .btnPrimary:hover {
   transform: translateY(-1px);
   box-shadow:
-    0 0 0 1px rgba(212, 171, 115, 0.3),
-    0 18px 42px rgba(212, 171, 115, 0.24);
+    0 0 0 1px rgba(var(--pico-accent-rgb), 0.3),
+    0 18px 42px rgba(var(--pico-accent-rgb), 0.24);
 }
 
 .btnSecondary {
@@ -496,7 +513,7 @@
 
 .sectionDark {
   background:
-    radial-gradient(ellipse 50% 40% at 20% 30%, rgba(212, 171, 115, 0.04), transparent),
+    radial-gradient(ellipse 50% 40% at 20% 30%, rgba(var(--pico-accent-rgb), 0.05), transparent),
     var(--pico-bg);
 }
 
@@ -673,7 +690,7 @@
   border-radius: 0.65rem;
   background: var(--pico-accent-soft);
   color: var(--pico-accent);
-  border: 1px solid rgba(212, 171, 115, 0.1);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
   margin-bottom: 0.2rem;
 }
 
@@ -726,12 +743,12 @@
 }
 
 .pricingCardRecommended {
-  border-color: rgba(212, 171, 115, 0.25);
+  border-color: rgba(var(--pico-accent-rgb), 0.25);
   background:
-    linear-gradient(180deg, rgba(212, 171, 115, 0.05), var(--pico-bg-surface));
+    linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.06), var(--pico-bg-surface));
   box-shadow:
-    0 0 0 1px rgba(212, 171, 115, 0.08),
-    0 24px 60px rgba(212, 171, 115, 0.06);
+    0 0 0 1px rgba(var(--pico-accent-rgb), 0.08),
+    0 24px 60px rgba(var(--pico-accent-rgb), 0.06);
   transform: scale(1.02);
 }
 
@@ -749,14 +766,14 @@
   min-height: 1.5rem;
   padding: 0 0.8rem;
   border-radius: var(--pico-radius-full);
-  background: linear-gradient(135deg, #d4ab73, #c89b62);
-  color: #052e16;
+  background: linear-gradient(135deg, var(--pico-accent-bright), var(--pico-accent-deep));
+  color: var(--pico-accent-contrast);
   font-family: var(--pico-font-accent);
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  box-shadow: 0 4px 12px rgba(212, 171, 115, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--pico-accent-rgb), 0.3);
 }
 
 .pricingName {
@@ -854,14 +871,14 @@
 }
 
 .pricingCtaPrimary {
-  background: linear-gradient(135deg, #d4ab73, #c89b62);
-  color: #052e16;
+  background: linear-gradient(135deg, var(--pico-accent-bright), var(--pico-accent-deep));
+  color: var(--pico-accent-contrast);
   border-color: transparent;
-  box-shadow: 0 8px 24px rgba(212, 171, 115, 0.16);
+  box-shadow: 0 8px 24px rgba(var(--pico-accent-rgb), 0.16);
 }
 
 .pricingCtaPrimary:hover {
-  box-shadow: 0 12px 32px rgba(212, 171, 115, 0.22);
+  box-shadow: 0 12px 32px rgba(var(--pico-accent-rgb), 0.22);
 }
 
 .pricingUpsell {
@@ -973,7 +990,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212, 171, 115, 0.07), transparent 65%);
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(var(--pico-accent-rgb), 0.08), transparent 65%);
   pointer-events: none;
 }
 
@@ -985,7 +1002,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(212, 171, 115, 0.2),
+    rgba(var(--pico-accent-rgb), 0.22),
     transparent
   );
 }
@@ -993,14 +1010,14 @@
 .ctaPanel {
   position: relative;
   border-radius: var(--pico-radius-xl);
-  border: 1px solid rgba(212, 171, 115, 0.14);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.14);
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212, 171, 115, 0.08), transparent 60%),
-    linear-gradient(180deg, rgba(13, 15, 21, 0.92), rgba(9, 12, 18, 0.96));
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(var(--pico-accent-rgb), 0.1), transparent 60%),
+    linear-gradient(180deg, rgba(9, 18, 8, 0.94), rgba(6, 10, 5, 0.97));
   box-shadow:
-    0 0 0 1px rgba(212, 171, 115, 0.04),
+    0 0 0 1px rgba(var(--pico-accent-rgb), 0.04),
     0 40px 80px rgba(0, 0, 0, 0.4),
-    0 0 100px rgba(212, 171, 115, 0.06);
+    0 0 100px rgba(var(--pico-accent-rgb), 0.08);
   padding: clamp(2.5rem, 5vw, 4rem);
   overflow: hidden;
 }
@@ -1012,7 +1029,7 @@
   transform: translateX(-50%);
   width: 60%;
   height: 60%;
-  background: radial-gradient(ellipse, rgba(212, 171, 115, 0.08), transparent 70%);
+  background: radial-gradient(ellipse, rgba(var(--pico-accent-rgb), 0.1), transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -1047,7 +1064,7 @@
   height: 0.35rem;
   border-radius: 50%;
   background: var(--pico-accent);
-  box-shadow: 0 0 6px rgba(212, 171, 115, 0.5);
+  box-shadow: 0 0 6px rgba(var(--pico-accent-rgb), 0.5);
   animation: pulseDot 2s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -1168,10 +1185,10 @@
 }
 
 .problemCard:hover {
-  border-color: rgba(234, 179, 8, 0.35);
+  border-color: rgba(var(--pico-yellow-rgb), 0.35);
   border-left-color: var(--pico-yellow);
-  background: rgba(234, 179, 8, 0.04);
-  box-shadow: -4px 0 20px rgba(234, 179, 8, 0.06);
+  background: rgba(var(--pico-yellow-rgb), 0.05);
+  box-shadow: -4px 0 20px rgba(var(--pico-yellow-rgb), 0.08);
 }
 
 @media (hover: hover) {
@@ -1231,10 +1248,10 @@
 }
 
 .howCard:hover {
-  border-color: rgba(212, 171, 115, 0.3);
+  border-color: rgba(var(--pico-accent-rgb), 0.3);
   border-left-color: var(--pico-accent);
-  background: rgba(212, 171, 115, 0.04);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), -3px 0 20px rgba(212, 171, 115, 0.06);
+  background: rgba(var(--pico-accent-rgb), 0.05);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), -3px 0 20px rgba(var(--pico-accent-rgb), 0.08);
 }
 
 @media (hover: hover) {
@@ -1252,7 +1269,7 @@
   border-radius: 0.65rem;
   background: var(--pico-accent-soft);
   color: var(--pico-accent);
-  border: 1px solid rgba(212, 171, 115, 0.1);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
   margin-bottom: 0.2rem;
 }
 
@@ -1408,8 +1425,8 @@
   margin-top: clamp(2.5rem, 5vw, 4rem);
   padding: clamp(1.4rem, 3vw, 2rem);
   border-radius: var(--pico-radius-lg);
-  border: 1px solid rgba(212, 171, 115, 0.15);
-  background: rgba(212, 171, 115, 0.04);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.15);
+  background: rgba(var(--pico-accent-rgb), 0.05);
   display: grid;
   gap: 0.75rem;
   max-width: 36rem;
@@ -1533,8 +1550,8 @@
 
 .formInput:focus {
   border-color: var(--pico-accent);
-  background: rgba(212, 171, 115, 0.04);
-  box-shadow: 0 0 0 3px rgba(212, 171, 115, 0.08);
+  background: rgba(var(--pico-accent-rgb), 0.05);
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.1);
 }
 
 .formInput:disabled {
@@ -1570,8 +1587,8 @@
   min-height: 3rem;
   padding: 0 1.6rem;
   border-radius: var(--pico-radius-sm);
-  background: linear-gradient(135deg, #d4ab73, #c89b62);
-  color: #052e16;
+  background: linear-gradient(135deg, var(--pico-accent-bright), var(--pico-accent-deep));
+  color: var(--pico-accent-contrast);
   font-family: var(--pico-font-body);
   font-size: 0.95rem;
   font-weight: 700;
@@ -1580,13 +1597,13 @@
   border: none;
   cursor: pointer;
   transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
-  box-shadow: 0 0 0 1px rgba(212, 171, 115, 0.2), 0 8px 24px rgba(212, 171, 115, 0.18);
+  box-shadow: 0 0 0 1px rgba(var(--pico-accent-rgb), 0.2), 0 8px 24px rgba(var(--pico-accent-rgb), 0.18);
   width: 100%;
 }
 
 .formButton:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(212, 171, 115, 0.3), 0 14px 36px rgba(212, 171, 115, 0.22);
+  box-shadow: 0 0 0 1px rgba(var(--pico-accent-rgb), 0.3), 0 14px 36px rgba(var(--pico-accent-rgb), 0.22);
 }
 
 .formButton:disabled {
@@ -1654,8 +1671,8 @@
   gap: 0.75rem;
   padding: 1.2rem 1.4rem;
   border-radius: var(--pico-radius);
-  border: 1px solid rgba(212, 171, 115, 0.2);
-  background: rgba(212, 171, 115, 0.06);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.2);
+  background: rgba(var(--pico-accent-rgb), 0.07);
   text-align: left;
 }
 

@@ -14,9 +14,9 @@ export function PicoFooter({ className }: { className?: string }) {
       data-testid="pico-footer"
       className={cn(className)}
       style={{
-        borderTop: '1px solid rgba(255, 233, 204, 0.08)',
-        background: '#09080b',
-        color: 'rgba(232, 221, 203, 0.6)',
+        borderTop: '1px solid var(--pico-border)',
+        background: 'var(--pico-bg)',
+        color: 'var(--pico-text-secondary)',
         padding: 'clamp(2rem, 4vw, 3rem) 0',
         fontFamily: 'var(--font-site-body), sans-serif',
       }}
@@ -64,21 +64,21 @@ export function PicoFooter({ className }: { className?: string }) {
             {t('links.privacy')}
           </a>
         </div>
-        <p style={{ margin: '1.2rem 0 0', fontSize: '0.82rem', lineHeight: 1.5, color: 'rgba(188, 172, 149, 0.48)' }}>
+        <p style={{ margin: '1.2rem 0 0', fontSize: '0.82rem', lineHeight: 1.5, color: 'var(--pico-text-muted)' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
             <span
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '1.6rem',
-                height: '1.6rem',
-                borderRadius: '0.4rem',
-                background: 'rgba(255,248,236,0.04)',
-                border: '1px solid rgba(255,233,204,0.08)',
+                width: '1.9rem',
+                height: '1.9rem',
+                borderRadius: '0.55rem',
+                background: 'linear-gradient(135deg, rgba(var(--pico-accent-rgb), 0.1), rgba(15, 42, 11, 0.72))',
+                border: '1px solid var(--pico-border)',
               }}
             >
-              <Image src="/pico/logo.png" alt="PicoMUTX logo" width={18} height={18} />
+              <Image src="/pico/logo.png" alt="PicoMUTX logo" width={22} height={22} />
             </span>
             {t('copyright')}
           </span>
