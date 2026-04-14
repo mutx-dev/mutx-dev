@@ -134,14 +134,6 @@ function getRequestScheme(request: NextRequest): string {
   return request.nextUrl.protocol.replace(':', '').toLowerCase()
 }
 
-function hasAuthSession(request: NextRequest): boolean {
-  return Boolean(
-    request.cookies.get('access_token')?.value ||
-    request.cookies.get('refresh_token')?.value ||
-    request.headers.get('authorization'),
-  )
-}
-
 function normalizeOrigin(origin: string | null): string | null {
   if (!origin) {
     return null
@@ -198,35 +190,35 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
   return normalized
 }
 
-function internalDemoPathToPublicPath(pathname: string): string {
+function internalDashboardPathToPublicPath(pathname: string): string {
   const normalized = normalizePathname(pathname)
 
-  if (normalized === '/control') {
+  if (normalized === '/dashboard') {
     return '/'
   }
 
-  if (normalized.startsWith('/control/')) {
-    return normalized.slice('/control'.length) || '/'
+  if (normalized.startsWith('/dashboard/')) {
+    return normalized.slice('/dashboard'.length) || '/'
   }
 
   return normalized
 }
 
-function appHostPathToInternalDemoPath(pathname: string): string {
+function appHostPathToInternalDashboardPath(pathname: string): string {
   const normalized = normalizePathname(pathname)
 
   const directMap: Record<string, string> = {
     '/': '/dashboard',
     '/overview': '/dashboard',
-    '/agents': '/control/agents',
-    '/deployments': '/control/deployments',
-    '/runs': '/control/runs',
-    '/environments': '/control/environments',
-    '/access': '/control/access',
-    '/connectors': '/control/connectors',
-    '/audit': '/control/audit',
-    '/usage': '/control/usage',
-    '/settings': '/control/settings',
+    '/agents': '/dashboard/agents',
+    '/deployments': '/dashboard/deployments',
+    '/runs': '/dashboard/runs',
+    '/environments': '/dashboard/monitoring',
+    '/access': '/dashboard/security',
+    '/connectors': '/dashboard/webhooks',
+    '/audit': '/dashboard/logs',
+    '/usage': '/dashboard/budgets',
+    '/settings': '/dashboard/orchestration',
   }
 
   if (directMap[normalized]) {
@@ -249,14 +241,6 @@ function redirectWithinHost(request: NextRequest, pathname: string) {
   const url = new URL(request.url)
   url.pathname = pathname
   url.search = request.nextUrl.search
-  return NextResponse.redirect(url)
-}
-
-function redirectToLogin(request: NextRequest, nextPath: string) {
-  const url = new URL(request.url)
-  url.pathname = '/login'
-  url.search = ''
-  url.searchParams.set('next', nextPath)
   return NextResponse.redirect(url)
 }
 
@@ -396,18 +380,18 @@ export function proxy(request: NextRequest) {
     if (PICO_AUTH_PATHS.has(normalizedPath)) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
-    if (!hasAuthSession(request)) {
-      return finalizeResponse(
-        redirectToLogin(request, `${normalizedPath}${request.nextUrl.search}`),
-        host,
-        normalizedPath,
-      )
-    }
-    // pico.mutx.dev/* -> /pico/* with locale detection
+
     const locale = getLocaleFromRequest(request)
-    const picoPath = `/pico${normalizedPath === '/' ? '' : normalizedPath}`
-    const rewrite = rewriteWithinHost(request, picoPath)
-    // Pass locale to the app via cookie so next-intl can read it server-side
+
+    if (normalizedPath === '/') {
+      // Root -> landing page (public, no auth required)
+      const rewrite = rewriteWithinHost(request, '/pico')
+      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
+      return finalizeResponse(rewrite, host, normalizedPath)
+    }
+
+    // Non-root paths -> WIP animation page
+    const rewrite = rewriteWithinHost(request, '/pico/wip')
     rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
     return finalizeResponse(rewrite, host, normalizedPath)
   }
@@ -422,10 +406,10 @@ export function proxy(request: NextRequest) {
       )
     }
 
-    const publicDemoPath = internalDemoPathToPublicPath(normalizedPath)
-    if (publicDemoPath !== normalizedPath) {
+    const publicDashboardPath = internalDashboardPathToPublicPath(normalizedPath)
+    if (publicDashboardPath !== normalizedPath) {
       return finalizeResponse(
-        redirectToHost(request, APP_HOST, publicDemoPath),
+        redirectToHost(request, APP_HOST, publicDashboardPath),
         host,
         normalizedPath,
       )
@@ -469,8 +453,15 @@ export function proxy(request: NextRequest) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
-    if (normalizedPath === '/control' || normalizedPath.startsWith('/control/')) {
-      return finalizeResponse(NextResponse.next(), host, normalizedPath)
+    if (normalizedPath === '/control') {
+      return finalizeResponse(redirectWithinHost(request, '/dashboard'), host, normalizedPath)
+    }
+    if (normalizedPath.startsWith('/control/')) {
+      return finalizeResponse(
+        redirectWithinHost(request, `/dashboard${normalizedPath.slice('/control'.length)}`),
+        host,
+        normalizedPath,
+      )
     }
 
     if (normalizedPath === '/app' || normalizedPath.startsWith('/app/')) {
@@ -481,7 +472,7 @@ export function proxy(request: NextRequest) {
       )
     }
 
-    const internalPath = appHostPathToInternalDemoPath(normalizedPath)
+    const internalPath = appHostPathToInternalDashboardPath(normalizedPath)
     if (internalPath !== normalizedPath) {
       return finalizeResponse(
         rewriteWithinHost(request, internalPath),

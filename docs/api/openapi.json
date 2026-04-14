@@ -22,8 +22,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/agents": {
@@ -2970,8 +2969,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/login": {
@@ -3012,8 +3010,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/local-bootstrap": {
@@ -3250,8 +3247,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/reset-password": {
@@ -3293,8 +3289,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/verify-email": {
@@ -3336,8 +3331,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/resend-verification": {
@@ -3379,8 +3373,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/oauth/{provider}/authorize": {
@@ -13177,8 +13170,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/ready": {
@@ -13194,8 +13186,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/": {
@@ -24849,19 +24840,6 @@
         "type": "object",
         "title": "WebhookUpdate"
       }
-    },
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "JWT bearer token or API key. Example: 'Bearer eyJ...'"
-      }
     }
-  },
-  "security": [
-    {
-      "BearerAuth": []
-    }
-  ]
+  }
 }

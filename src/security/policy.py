@@ -288,6 +288,21 @@ class PolicyEngine:
                 action_id=action.id,
             )
 
+        # Pre-check: reject dangerous command patterns before rule evaluation
+        if action.tool_args:
+            is_safe, violations = self.validate_command_constraints(
+                action.tool_name, action.tool_args
+            )
+            if not is_safe:
+                return PolicyDecisionResult(
+                    decision=PolicyDecision.DENY,
+                    rule_id=None,
+                    rule_name=None,
+                    reason=f"Dangerous command pattern blocked: {'; '.join(violations)}",
+                    session_id=action.session_id,
+                    action_id=action.id,
+                )
+
         for rule in policy.rules:
             if rule.matches(action, context):
                 rule.record_hit()
@@ -407,6 +422,47 @@ class PolicyEngine:
             elif param_type == "object":
                 if not isinstance(value, dict):
                     errors.append(f"Parameter '{param_name}' must be an object")
+
+        return len(errors) == 0, errors
+
+    def validate_command_constraints(
+        self,
+        tool_name: str,
+        params: dict[str, Any],
+    ) -> tuple[bool, list[str]]:
+        """
+        Validate command content for shell/exec-type tools.
+
+        Inspects the actual command arguments for dangerous patterns.
+        Returns (is_safe, list of violation descriptions).
+        """
+        DANGEROUS_PATTERNS = [
+            (r";\s*(rm|rmdir)\s", "chained destructive command"),
+            (r"\|\s*(rm|rmdir)\s", "piped destructive command"),
+            (r"&&\s*(rm|rmdir)\s", "chained destructive command"),
+            (r">\s*/dev/sd", "direct device write"),
+            (r"curl\s+.*\|\s*sh", "remote code execution via pipe"),
+            (r"wget\s+.*\|\s*sh", "remote code execution via pipe"),
+            (r"eval\s+", "eval usage"),
+            (r"exec\s+", "exec usage"),
+            (r"/etc/(passwd|shadow|sudoers)", "sensitive system file access"),
+            (r"chmod\s+[0-7]*777", "overly permissive chmod"),
+            (r"dd\s+if=.*of=/dev/", "raw device manipulation"),
+        ]
+
+        import re as _re
+
+        errors = []
+        command_fields = ("command", "cmd", "script", "shell_command", "args")
+
+        for field_name in command_fields:
+            value = params.get(field_name)
+            if not isinstance(value, str):
+                continue
+
+            for pattern, description in DANGEROUS_PATTERNS:
+                if _re.search(pattern, value, _re.IGNORECASE):
+                    errors.append(f"Potentially dangerous command in '{field_name}': {description}")
 
         return len(errors) == 0, errors
 

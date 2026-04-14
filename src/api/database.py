@@ -61,7 +61,7 @@ def _build_engine_config(database_url: str, override_ssl_mode: str | None = None
         if url.drivername != "sqlite+aiosqlite":
             async_url = url.set(drivername="sqlite+aiosqlite")
         return EngineConfig(
-            url=async_url.render_as_string(hide_password=False),
+            url=async_url.render_as_string(hide_password=True),
             connect_args={"check_same_thread": False},
             ssl_mode_explicitly_set=False,
         )
@@ -84,7 +84,7 @@ def _build_engine_config(database_url: str, override_ssl_mode: str | None = None
 
     asyncpg_url = url.set(drivername="postgresql+asyncpg", query=query)
     return EngineConfig(
-        url=asyncpg_url.render_as_string(hide_password=False),
+        url=asyncpg_url.render_as_string(hide_password=True),
         connect_args=connect_args,
         ssl_mode_explicitly_set=ssl_setting is not None,
     )
@@ -106,12 +106,12 @@ def build_sync_database_url(database_url: str) -> str:
 
     if base_drivername == "postgres":
         return url.set(drivername="postgresql+psycopg", query=query).render_as_string(
-            hide_password=False
+            hide_password=True
         )
 
     if base_drivername == "postgresql":
         return url.set(drivername="postgresql+psycopg", query=query).render_as_string(
-            hide_password=False
+            hide_password=True
         )
 
     return database_url

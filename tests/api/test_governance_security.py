@@ -28,7 +28,7 @@ async def test_governance_credentials_require_internal_user_and_redact_secret(
                 }
             ]
 
-        async def get_credential_by_path(self, full_path: str):
+        async def get_credential_by_path(self, full_path: str, requester_id: str | None = None):
             return Credential(
                 name="api-key",
                 backend="vault",

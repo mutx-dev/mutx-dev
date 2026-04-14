@@ -38,7 +38,7 @@ class FakeBroker:
     async def health_check(self):
         return {"healthy": all(b["is_healthy"] for b in self._backends)}
 
-    async def get_credential_by_path(self, full_path: str):
+    async def get_credential_by_path(self, full_path: str, requester_id: str | None = None):
         from src.api.services.credential_broker import Credential
         from datetime import datetime, timezone
 

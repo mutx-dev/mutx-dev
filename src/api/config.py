@@ -440,6 +440,19 @@ class Settings(BaseSettings):
                 f"JWT_SECRET must be at least 32 characters long, got {len(self.jwt_secret)}"
             )
 
+        # Validate SECRET_ENCRYPTION_KEY (required in production for credential encryption)
+        if not self.secret_encryption_key:
+            if is_production:
+                errors.append(
+                    "SECRET_ENCRYPTION_KEY environment variable must be set in production. "
+                    'Generate one with: python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"'
+                )
+            else:
+                warnings.append(
+                    "SECRET_ENCRYPTION_KEY is not set; falling back to JWT secret for encryption. "
+                    "This is not recommended — set a dedicated encryption key for production."
+                )
+
         # Validate DATABASE_URL when database is required on startup
         if self.database_required_on_startup:
             db_env_value = os.environ.get("DATABASE_URL") or os.environ.get("DB_URL")
@@ -463,10 +476,22 @@ class Settings(BaseSettings):
                     f"got: {self.database_url[:50]}..."
                 )
 
+        # Enforce SSL for database connections in production
+        if is_production and self.database_url:
+            db_url_lower = self.database_url.lower()
+            if db_url_lower.startswith(("postgresql://", "postgres://")):
+                has_ssl_in_url = "sslmode=" in db_url_lower or "ssl=" in db_url_lower
+                if not self.database_ssl_mode and not has_ssl_in_url:
+                    warnings.append(
+                        "DATABASE_SSL_MODE is not set in production. "
+                        "Database connections may be unencrypted. "
+                        "Set DATABASE_SSL_MODE=require for production."
+                    )
+
         # Production-specific validations
         if is_production:
             # Check for default/insecure values
-            if self.database_url == "postgresql://user:password@localhost:5432/mutx":
+            if self.database_url == "postgresql://user:***@localhost:5432/mutx":
                 errors.append(
                     "DATABASE_URL appears to be using default values. "
                     "Please configure a production database."
@@ -477,6 +502,19 @@ class Settings(BaseSettings):
                 warnings.append(
                     "CORS_ORIGINS contains localhost origins. "
                     "This may not be suitable for production."
+                )
+
+            # Check allowed hosts for overly permissive patterns
+            hosts_list = (
+                self.allowed_hosts if isinstance(self.allowed_hosts, list) else [self.allowed_hosts]
+            )
+            wildcard_hosts = [
+                h for h in hosts_list if h.startswith("*") or h == "test" or h == "testserver"
+            ]
+            if wildcard_hosts:
+                warnings.append(
+                    f"ALLOWED_HOSTS contains permissive entries: {wildcard_hosts}. "
+                    "Review and restrict for production."
                 )
 
             if "*" in self.forwarded_allow_ips:
