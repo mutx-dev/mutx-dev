@@ -99,6 +99,26 @@ Current typed config families:
 
 Unknown keys are rejected for typed configs. Successful config patches increment `config_version`.
 
+## Config Response
+
+`GET /v1/agents/{agent_id}/config` returns the agent's normalized config with its current version:
+
+```json
+{
+  "agent_id": "uuid",
+  "type": "openai",
+  "config": {
+    "model": "openai/gpt-5",
+    "safety_mode": "pairing",
+    "version": 1
+  },
+  "config_version": 1,
+  "updated_at": "2026-03-22T12:00:00Z"
+}
+```
+
+The `type` field reflects the agent type (`openai`, `anthropic`, `langchain`, `custom`, or `openclaw`) and is always present regardless of how the agent was created.
+
 ## List And Inspect Agents
 
 ```bash

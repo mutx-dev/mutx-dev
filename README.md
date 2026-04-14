@@ -51,12 +51,13 @@ npm run dev                                    # frontend only
 ### Validation
 
 ```bash
-./scripts/test.sh          # full suite
-npm run build              # frontend build
-npm run typecheck          # TS gate
-ruff check src/api cli sdk # Python lint
-pytest                     # API tests
-npx playwright test        # e2e
+./scripts/test.sh                        # full suite
+npm run build                            # frontend build
+npm run typecheck                        # TS gate
+npm run test:app                         # frontend unit tests
+ruff check src/api cli sdk src/security  # Python lint
+.venv/bin/python -m pytest               # API tests (from repo venv)
+npx playwright test                       # e2e
 ```
 
 Playwright starts a fresh local standalone server by default so worktree runs fail closed instead of silently reusing a stale build. Set `PLAYWRIGHT_REUSE_EXISTING_SERVER=1` only when you intentionally want to target an already running local standalone server.
