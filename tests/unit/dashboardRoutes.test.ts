@@ -920,6 +920,89 @@ describe('dashboard route proxies', () => {
     })
   })
 
+  it('reuses the refreshed access token for follow-up observability summary calls', async () => {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          items: [],
+          total: 0,
+          skip: 0,
+          limit: 50,
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: true,
+        refreshedTokens: {
+          access_token: 'fresh_access_token',
+          refresh_token: 'fresh_refresh_token',
+          expires_in: 1800,
+        },
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          otel_enabled: true,
+          exporter_type: 'otlp',
+          endpoint: 'http://collector:4318',
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          configured: true,
+          endpoint_reachable: true,
+          using_grpc: false,
+          endpoint: 'http://collector:4318',
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({ sessions: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+
+    const { GET } = await import('../../app/api/dashboard/observability/route')
+    const request = mockRequest('http://localhost:3000/api/dashboard/observability')
+
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    expect(authenticatedFetch).toHaveBeenCalledTimes(4)
+    expect(authenticatedFetch.mock.calls[0][0]).toBe(request)
+
+    const followupRequest = authenticatedFetch.mock.calls[1][0] as NextRequest
+    expect(followupRequest).not.toBe(request)
+    expect(followupRequest.headers.get('authorization')).toBe('Bearer fresh_access_token')
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      2,
+      followupRequest,
+      'http://localhost:8000/v1/telemetry/config',
+      { cache: 'no-store' },
+    )
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      3,
+      followupRequest,
+      'http://localhost:8000/v1/telemetry/health',
+      { cache: 'no-store' },
+    )
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      4,
+      followupRequest,
+      'http://localhost:8000/v1/sessions?limit=100',
+      { cache: 'no-store' },
+    )
+  })
+
   it('keeps observability runs available when telemetry summary calls fail', async () => {
     hasAuthSession.mockReturnValue(true)
     authenticatedFetch
