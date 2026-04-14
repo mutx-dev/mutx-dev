@@ -114,6 +114,40 @@ function summarizeSessions(payload: unknown) {
   };
 }
 
+function cloneCookiesWithTokens(cookieHeader: string | null, tokens: AuthTokens) {
+  const cookies = new Map<string, string>();
+
+  for (const entry of cookieHeader?.split(";") ?? []) {
+    const [rawName, ...rawValue] = entry.split("=");
+    const name = rawName?.trim();
+    const value = rawValue.join("=").trim();
+    if (name && value) {
+      cookies.set(name, value);
+    }
+  }
+
+  cookies.set("access_token", tokens.access_token);
+
+  if (tokens.refresh_token) {
+    cookies.set("refresh_token", tokens.refresh_token);
+  }
+
+  return Array.from(cookies.entries())
+    .map(([name, value]) => `${name}=${value}`)
+    .join("; ");
+}
+
+function cloneRequestWithAccessToken(request: NextRequest, tokens: AuthTokens) {
+  const headers = new Headers("headers" in request ? request.headers : undefined);
+  headers.set("authorization", `Bearer ${tokens.access_token}`);
+  headers.set("cookie", cloneCookiesWithTokens(headers.get("cookie"), tokens));
+
+  return new NextRequest(request.url, {
+    method: request.method || "GET",
+    headers,
+  });
+}
+
 function extractErrorMessage(payload: unknown, fallback: string) {
   if (typeof payload === "string" && payload.trim().length > 0) {
     return payload;
@@ -171,19 +205,30 @@ export async function GET(request: NextRequest) {
     }
 
     const apiBaseUrl = getApiBaseUrl();
-    const [runsResult, telemetryConfigResult, telemetryHealthResult, sessionsResult] = await Promise.all([
-      fetchResource(request, targetUrl.toString(), "Failed to fetch observability runs"),
+    const runsResult = await fetchResource(
+      request,
+      targetUrl.toString(),
+      "Failed to fetch observability runs",
+    );
+    const followupRequest = runsResult.refreshedTokens
+      ? cloneRequestWithAccessToken(request, runsResult.refreshedTokens)
+      : request;
+    const [telemetryConfigResult, telemetryHealthResult, sessionsResult] = await Promise.all([
       fetchResource(
-        request,
+        followupRequest,
         `${apiBaseUrl}/v1/telemetry/config`,
         "Failed to fetch telemetry configuration",
       ),
       fetchResource(
-        request,
+        followupRequest,
         `${apiBaseUrl}/v1/telemetry/health`,
         "Failed to fetch telemetry health",
       ),
-      fetchResource(request, `${apiBaseUrl}/v1/sessions?limit=100`, "Failed to fetch session summary"),
+      fetchResource(
+        followupRequest,
+        `${apiBaseUrl}/v1/sessions?limit=100`,
+        "Failed to fetch session summary",
+      ),
     ]);
 
     const refreshedTokens =
@@ -216,6 +261,10 @@ export async function GET(request: NextRequest) {
       telemetryErrors.health = telemetryHealthResult.error;
     }
 
+    if (sessionsResult.error) {
+      telemetryErrors.sessions = sessionsResult.error;
+    }
+
     const nextResponse = NextResponse.json(
       {
         ...runsPayload,
@@ -226,7 +275,7 @@ export async function GET(request: NextRequest) {
           errors: Object.keys(telemetryErrors).length > 0 ? telemetryErrors : null,
         },
         sessionSummary: sessionsResult.response.ok ? summarizeSessions(sessionsResult.payload) : null,
-        sessionSummaryError: sessionsResult.error,
+        sessionSummaryError: sessionsResult.error ?? null,
       },
       { status: runsResult.response.status },
     );

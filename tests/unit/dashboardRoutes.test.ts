@@ -1,4 +1,4 @@
-import type { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 
 const applyAuthCookies = jest.fn()
 const authenticatedFetch = jest.fn()
@@ -918,6 +918,96 @@ describe('dashboard route proxies', () => {
       },
       sessionSummaryError: null,
     })
+  })
+
+  it('reuses the refreshed access token for follow-up observability summary calls', async () => {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          items: [],
+          total: 0,
+          skip: 0,
+          limit: 50,
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: true,
+        refreshedTokens: {
+          access_token: 'fresh_access_token',
+          refresh_token: 'fresh_refresh_token',
+          expires_in: 1800,
+        },
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          otel_enabled: true,
+          exporter_type: 'otlp',
+          endpoint: 'http://collector:4318',
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          configured: true,
+          endpoint_reachable: true,
+          using_grpc: false,
+          endpoint: 'http://collector:4318',
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({ sessions: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+
+    const { GET } = await import('../../app/api/dashboard/observability/route')
+    const request = new NextRequest('http://localhost:3000/api/dashboard/observability', {
+      headers: {
+        cookie: 'access_token=stale_access_token; refresh_token=stale_refresh_token; theme=dark',
+      },
+    })
+
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    expect(authenticatedFetch).toHaveBeenCalledTimes(4)
+    expect(authenticatedFetch.mock.calls[0][0]).toBe(request)
+
+    const followupRequest = authenticatedFetch.mock.calls[1][0] as NextRequest
+    expect(followupRequest).not.toBe(request)
+    expect(followupRequest.headers.get('authorization')).toBe('Bearer fresh_access_token')
+    expect(followupRequest.cookies.get('access_token')?.value).toBe('fresh_access_token')
+    expect(followupRequest.cookies.get('refresh_token')?.value).toBe('fresh_refresh_token')
+    expect(followupRequest.cookies.get('theme')?.value).toBe('dark')
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      2,
+      followupRequest,
+      'http://localhost:8000/v1/telemetry/config',
+      { cache: 'no-store' },
+    )
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      3,
+      followupRequest,
+      'http://localhost:8000/v1/telemetry/health',
+      { cache: 'no-store' },
+    )
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      4,
+      followupRequest,
+      'http://localhost:8000/v1/sessions?limit=100',
+      { cache: 'no-store' },
+    )
   })
 
   it('keeps observability runs available when telemetry summary calls fail', async () => {
