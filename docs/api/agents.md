@@ -98,8 +98,12 @@ Unknown keys are rejected for typed configs. Successful config patches increment
 ```json
 {
   "agent_id": "uuid",
-  "type": "openai",
+  "type": "openclaw",
   "config": {
+    "runtime": "personal_assistant",
+    "template": "personal_assistant",
+    "assistant_id": null,
+    "workspace": "default",
     "model": "openai/gpt-5",
     "safety_mode": "pairing",
     "version": 1
@@ -109,7 +113,7 @@ Unknown keys are rejected for typed configs. Successful config patches increment
 }
 ```
 
-The `type` field reflects the agent type (`openai`, `anthropic`, `langchain`, `custom`, or `openclaw`) and is always present regardless of how the agent was created.
+The config shape matches the agent's `type`. An `openclaw` config always includes `runtime`, `template`, `assistant_id`, `workspace`, `model`, and `safety_mode`.
 
 ## List And Inspect Agents
 
