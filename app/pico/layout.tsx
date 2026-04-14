@@ -1,3 +1,5 @@
+import './pico.css'
+
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
@@ -38,7 +40,7 @@ export default async function PicoLayout({ children }: Props) {
   const direction = getDirection(locale)
 
   return (
-    <div lang={locale} dir={direction}>
+    <div lang={locale} dir={direction} className="pico-root">
       <NextIntlClientProvider locale={locale} messages={messages}>
         {children}
       </NextIntlClientProvider>

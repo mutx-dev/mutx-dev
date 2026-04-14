@@ -14,7 +14,10 @@ import {
 
 import { AuthSurface } from "@/components/site/AuthSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
-import { resolveRedirectPath } from "@/lib/auth/redirects";
+import {
+  getDefaultRedirectPathForHost,
+  resolveRedirectPath,
+} from "@/lib/auth/redirects";
 
 const authSurfaceProps = {
   eyebrow: "Verify email",
@@ -40,7 +43,11 @@ function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-  const nextPath = resolveRedirectPath(searchParams.get("next"));
+  const fallbackPath =
+    typeof window === "undefined"
+      ? "/dashboard"
+      : getDefaultRedirectPathForHost(window.location.hostname);
+  const nextPath = resolveRedirectPath(searchParams.get("next"), fallbackPath);
 
   const [status, setStatus] = useState<
     "pending" | "loading" | "success" | "error"

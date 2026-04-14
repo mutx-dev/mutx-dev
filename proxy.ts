@@ -17,7 +17,7 @@ const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.mutxx.dev', 'pico.localhost'])
-const PICO_AUTH_PATHS = new Set(['/login', '/register', '/forgot-password', '/reset-password'])
+const PICO_AUTH_PATHS = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'])
 const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, (typeof PICO_LOCALES)[number]>> = {
   JP: 'ja',
@@ -134,6 +134,14 @@ function getRequestScheme(request: NextRequest): string {
   return request.nextUrl.protocol.replace(':', '').toLowerCase()
 }
 
+function hasAuthSession(request: NextRequest): boolean {
+  return Boolean(
+    request.cookies.get('access_token')?.value ||
+    request.cookies.get('refresh_token')?.value ||
+    request.headers.get('authorization'),
+  )
+}
+
 function normalizeOrigin(origin: string | null): string | null {
   if (!origin) {
     return null
@@ -241,6 +249,14 @@ function redirectWithinHost(request: NextRequest, pathname: string) {
   const url = new URL(request.url)
   url.pathname = pathname
   url.search = request.nextUrl.search
+  return NextResponse.redirect(url)
+}
+
+function redirectToLogin(request: NextRequest, nextPath: string) {
+  const url = new URL(request.url)
+  url.pathname = '/login'
+  url.search = ''
+  url.searchParams.set('next', nextPath)
   return NextResponse.redirect(url)
 }
 
@@ -379,6 +395,13 @@ export function proxy(request: NextRequest) {
     }
     if (PICO_AUTH_PATHS.has(normalizedPath)) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
+    }
+    if (!hasAuthSession(request)) {
+      return finalizeResponse(
+        redirectToLogin(request, `${normalizedPath}${request.nextUrl.search}`),
+        host,
+        normalizedPath,
+      )
     }
     // pico.mutx.dev/* -> /pico/* with locale detection
     const locale = getLocaleFromRequest(request)

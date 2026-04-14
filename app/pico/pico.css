@@ -1,0 +1,54 @@
+.pico-root {
+  --pico-bg: #050904;
+  --pico-bg-raised: #0b1209;
+  --pico-bg-surface: rgba(159, 255, 78, 0.045);
+  --pico-bg-surface-hover: rgba(159, 255, 78, 0.085);
+  --pico-text: #f3faee;
+  --pico-text-secondary: rgba(221, 234, 214, 0.76);
+  --pico-text-muted: rgba(166, 186, 156, 0.5);
+  --pico-border: rgba(159, 255, 78, 0.14);
+  --pico-border-hover: rgba(159, 255, 78, 0.28);
+  --pico-accent-rgb: 159, 255, 78;
+  --pico-accent: #9fff4e;
+  --pico-accent-bright: #dfff9a;
+  --pico-accent-deep: #52c51c;
+  --pico-accent-contrast: #071404;
+  --pico-accent-soft: rgba(159, 255, 78, 0.12);
+  --pico-accent-glow: rgba(159, 255, 78, 0.1);
+  --pico-blue: #73efbe;
+  --pico-blue-soft: rgba(115, 239, 190, 0.12);
+  --pico-blue-glow: rgba(115, 239, 190, 0.08);
+  --pico-red: #ff8c72;
+  --pico-red-soft: rgba(255, 140, 114, 0.1);
+  --pico-yellow-rgb: 195, 255, 91;
+  --pico-yellow: #c3ff5b;
+  --pico-font-accent: var(--font-mono), monospace;
+  --pico-font-display: var(--font-site-display), serif;
+  --pico-font-body: var(--font-site-body), sans-serif;
+  --pico-radius-sm: 0.75rem;
+  --pico-radius: 1.2rem;
+  --pico-radius-lg: 1.6rem;
+  --pico-radius-full: 999px;
+  --pico-shell: min(100% - 2.5rem, 72rem);
+  min-height: 100vh;
+  color: var(--pico-text);
+}
+
+body:has(.pico-root) {
+  background: #050904;
+  color: var(--pico-text);
+}
+
+.pico-root ::selection {
+  background: rgba(var(--pico-accent-rgb), 0.28);
+  color: #071404;
+}
+
+.pico-root a:focus-visible,
+.pico-root button:focus-visible,
+.pico-root input:focus-visible,
+.pico-root textarea:focus-visible,
+.pico-root select:focus-visible {
+  outline: 2px solid rgba(var(--pico-accent-rgb), 0.68);
+  outline-offset: 3px;
+}

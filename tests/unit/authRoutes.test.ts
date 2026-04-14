@@ -354,6 +354,46 @@ describe("auth route handlers", () => {
       expect(setCookieHeader).toContain("refresh_token=");
     });
 
+    it("uses the active pico host as the verification origin", async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 201,
+        json: async () => ({
+          requires_email_verification: true,
+          message: "Verification email sent",
+        }),
+      });
+      const { POST } = await import("../../app/api/auth/register/route");
+
+      const response = await POST(
+        mockJsonRequest(
+          {
+            email: "newuser@mutx.dev",
+            password: "securepassword123",
+            name: "New User",
+          },
+          "https://pico.mutx.dev/api/auth/register",
+        ),
+      );
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:8000/v1/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: "newuser@mutx.dev",
+            password: "securepassword123",
+            name: "New User",
+            verification_origin: "https://pico.mutx.dev",
+          }),
+          cache: "no-store",
+        },
+      );
+      expect(response.status).toBe(200);
+      expect(applyAuthCookies).not.toHaveBeenCalled();
+    });
+
     it("skips auth cookies when registration requires email verification", async () => {
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
@@ -933,6 +973,34 @@ describe("auth route handlers", () => {
       expect(response.headers.get("location")).toBe(
         "https://app.mutx.dev/login?next=%2Fdashboard&error=OAuth+session+expired.+Start+sign-in+again.",
       );
+    });
+
+    it("falls back to the pico root when oauth callback has no stored next target", async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          access_token: "oauth_access_token",
+          refresh_token: "oauth_refresh_token",
+          expires_in: 1800,
+        }),
+      });
+      const { GET } =
+        await import("../../app/api/auth/oauth/[provider]/callback/route");
+
+      const response = await GET(
+        mockRequest(
+          {
+            mutx_oauth_state: "state-123",
+            mutx_oauth_intent: "login",
+          },
+          "https://pico.mutx.dev/api/auth/oauth/google/callback?code=provider-code&state=state-123",
+        ),
+        { params: Promise.resolve({ provider: "google" }) },
+      );
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe("https://pico.mutx.dev/");
     });
   });
 
