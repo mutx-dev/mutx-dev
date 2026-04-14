@@ -170,6 +170,58 @@ class DeploymentEventHistory:
 
 
 @dataclass(slots=True)
+class DeploymentVersionRecord:
+    id: str
+    deployment_id: str
+    version: int
+    config_snapshot: dict[str, Any] | str | None
+    status: str
+    created_at: str | None
+    rolled_back_at: str | None
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DeploymentVersionRecord":
+        raw_config_snapshot = payload.get("config_snapshot")
+        config_snapshot: dict[str, Any] | str | None
+        if isinstance(raw_config_snapshot, dict):
+            config_snapshot = raw_config_snapshot
+        elif raw_config_snapshot is None:
+            config_snapshot = None
+        else:
+            config_snapshot = str(raw_config_snapshot)
+
+        return cls(
+            id=str(payload.get("id", "")),
+            deployment_id=str(payload.get("deployment_id", "")),
+            version=int(payload.get("version", 0)),
+            config_snapshot=config_snapshot,
+            status=str(payload.get("status", "unknown")),
+            created_at=_as_optional_str(payload.get("created_at")),
+            rolled_back_at=_as_optional_str(payload.get("rolled_back_at")),
+        )
+
+
+@dataclass(slots=True)
+class DeploymentVersionHistory:
+    deployment_id: str
+    items: list[DeploymentVersionRecord]
+    total: int
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "DeploymentVersionHistory":
+        raw_items = payload.get("items") or []
+        return cls(
+            deployment_id=str(payload.get("deployment_id", "")),
+            items=[
+                DeploymentVersionRecord.from_payload(item)
+                for item in raw_items
+                if isinstance(item, dict)
+            ],
+            total=int(payload.get("total", 0)),
+        )
+
+
+@dataclass(slots=True)
 class AgentRecord:
     id: str
     name: str

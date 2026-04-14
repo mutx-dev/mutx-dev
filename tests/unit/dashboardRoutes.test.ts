@@ -279,6 +279,66 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ id: 'dep_123', status: 'pending' })
   })
 
+  it('proxies deployment version history requests', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ deployment_id: 'dep_123', items: [], total: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
+    const { GET } = await import('../../app/api/dashboard/deployments/[id]/route')
+
+    const request = {
+      url: 'http://localhost:3000/api/dashboard/deployments/dep_123?path=versions',
+    } as NextRequest
+    const response = await GET(
+      request,
+      { params: Promise.resolve({ id: 'dep_123' }) }
+    )
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/deployments/dep_123/versions',
+      {
+        fallbackMessage: 'Failed to fetch deployment versions',
+      }
+    )
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({ deployment_id: 'dep_123', items: [], total: 0 })
+  })
+
+  it('proxies deployment rollback actions', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'dep_123', status: 'running', version: 'v1.1.0' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
+    const { POST } = await import('../../app/api/dashboard/deployments/[id]/route')
+
+    const request = {
+      url: 'http://localhost:3000/api/dashboard/deployments/dep_123?action=rollback',
+      json: async () => ({ version: 1 }),
+    } as NextRequest
+    const response = await POST(
+      request,
+      { params: Promise.resolve({ id: 'dep_123' }) }
+    )
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/deployments/dep_123/rollback',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version: 1 }),
+        fallbackMessage: 'Failed to rollback deployment',
+      }
+    )
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({ id: 'dep_123', status: 'running', version: 'v1.1.0' })
+  })
+
   it('proxies deployment delete actions', async () => {
     proxyJson.mockResolvedValue(new Response(null, { status: 204 }))
     const { DELETE } = await import('../../app/api/dashboard/deployments/[id]/route')

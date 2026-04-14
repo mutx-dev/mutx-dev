@@ -1,5 +1,7 @@
-import click
+import json
 from typing import Optional
+
+import click
 
 from cli.config import current_config, get_client
 from cli.services import CLIServiceError, DeploymentsService
@@ -17,6 +19,18 @@ def _echo_service_error(error: CLIServiceError) -> None:
 
 def _deployments_service() -> DeploymentsService:
     return DeploymentsService(config=current_config(), client_factory=get_client)
+
+
+def _parse_config_snapshot(snapshot: object) -> dict[str, object]:
+    if isinstance(snapshot, dict):
+        return snapshot
+    if not isinstance(snapshot, str):
+        return {}
+    try:
+        parsed = json.loads(snapshot)
+    except json.JSONDecodeError:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
 
 
 @deploy_group.command(name="list")
@@ -128,6 +142,58 @@ def restart_deployment(deployment_id: str):
         deployment = _deployments_service().restart_deployment(deployment_id)
         click.echo(f"Restarted deployment: {deployment.id or deployment_id}")
         click.echo(f"Status: {deployment.status}")
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
+
+
+@deploy_group.command(name="versions")
+@click.argument("deployment_id")
+def deployment_versions(deployment_id: str):
+    """Get deployment version history"""
+    try:
+        payload = _deployments_service().get_versions(deployment_id)
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
+        return
+
+    if not payload.items:
+        click.echo("No deployment versions found.")
+        return
+
+    click.echo(f"Deployment: {payload.deployment_id} | versions: {payload.total}")
+    for item in payload.items:
+        snapshot = _parse_config_snapshot(item.config_snapshot)
+        fragments = [
+            f"v{item.version}",
+            item.status,
+            f"created: {item.created_at or 'n/a'}",
+        ]
+        runtime_version = snapshot.get("version")
+        if isinstance(runtime_version, str) and runtime_version:
+            fragments.append(f"runtime version: {runtime_version}")
+        replicas = snapshot.get("replicas")
+        if isinstance(replicas, int):
+            fragments.append(f"replicas: {replicas}")
+        if item.rolled_back_at:
+            fragments.append(f"rolled back: {item.rolled_back_at}")
+        click.echo(" | ".join(fragments))
+
+
+@deploy_group.command(name="rollback")
+@click.argument("deployment_id")
+@click.option("--version", "target_version", required=True, type=int, help="Version number to restore")
+def rollback_deployment_command(deployment_id: str, target_version: int):
+    """Rollback a deployment to a recorded version"""
+    try:
+        deployment = _deployments_service().rollback_deployment(
+            deployment_id,
+            version=target_version,
+        )
+        click.echo(f"Rolled back deployment: {deployment.id or deployment_id}")
+        click.echo(f"Status: {deployment.status}")
+        if deployment.version:
+            click.echo(f"Version: {deployment.version}")
+        click.echo(f"Replicas: {deployment.replicas}")
     except CLIServiceError as exc:
         _echo_service_error(exc)
 
