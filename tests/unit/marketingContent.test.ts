@@ -42,11 +42,15 @@ describe('marketingHomepage', () => {
     expect(marketingHomepage.salesSections.cta).toBeDefined()
   })
 
-  it('demo section uses unique real dashboard demo videos', () => {
+  it('demo section uses real dashboard story media and supporting videos', () => {
     const tabs = marketingHomepage.salesSections.demo.tabs
+    const story = marketingHomepage.salesSections.demo.story
     expect(Array.isArray(tabs)).toBe(true)
     expect(tabs.length).toBeGreaterThan(0)
     expect(new Set(tabs.map((tab) => tab.mediaSrc)).size).toBe(tabs.length)
+    expect(story.mediaSrc.startsWith('/marketing/dashboard/')).toBe(true)
+    expect(story.mediaSrc.endsWith('.mp4')).toBe(true)
+    expect(story.mediaPosterSrc?.startsWith('/marketing/dashboard/')).toBe(true)
     for (const tab of tabs) {
       expect(tab.mediaType).toBe('video')
       expect(tab.mediaSrc.startsWith('/marketing/dashboard/')).toBe(true)

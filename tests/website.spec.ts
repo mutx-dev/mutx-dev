@@ -708,13 +708,16 @@ test.describe('mutx.dev QA', () => {
     expect(after).toBeGreaterThan(0);
   });
 
-  test('homepage demo section uses unique real dashboard videos', async () => {
+  test('homepage demo section uses real dashboard story media and supporting clips', async () => {
     const demoAssets = marketingHomepage.salesSections.demo.tabs.map((tab) => tab.mediaSrc);
+    const storyAsset = marketingHomepage.salesSections.demo.story.mediaSrc;
 
     expect(demoAssets.length).toBeGreaterThan(0);
     expect(new Set(demoAssets).size).toBe(demoAssets.length);
     expect(demoAssets.every((src) => src.startsWith('/marketing/dashboard/'))).toBe(true);
     expect(demoAssets.every((src) => src.endsWith('.mp4'))).toBe(true);
+    expect(storyAsset.startsWith('/marketing/dashboard/')).toBe(true);
+    expect(storyAsset.endsWith('.mp4')).toBe(true);
   });
 
   test('download page exposes the mac release lane and release-notes path', async ({ page }) => {

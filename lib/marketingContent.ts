@@ -43,6 +43,11 @@ export type MarketingHomepage = {
       eyebrow: string
       title: string
       body: string
+      story: {
+        mediaSrc: string
+        mediaPosterSrc?: string
+        mediaAlt: string
+      }
       tabs: Array<{
         id: string
         label: string
@@ -163,6 +168,11 @@ export const marketingHomepage: MarketingHomepage = {
       eyebrow: 'See MUTX in action',
       title: 'Watch the run, not the aftermath.',
       body: 'One surface for steps, permissions, and the record that survives review.',
+      story: {
+        mediaSrc: '/marketing/dashboard/story-demo.mp4',
+        mediaPosterSrc: '/marketing/dashboard/story-poster.jpg',
+        mediaAlt: 'MUTX product walkthrough showing an operator moving through overview, traces, and webhooks',
+      },
       tabs: [
         {
           id: 'overview',
