@@ -627,7 +627,12 @@ class TestAgentsLogs:
     def test_logs_success(self):
         returned = [_agent_log_payload(), _agent_log_payload(id="990e8400-e29b-41d4-a716-446655440099", level="ERROR")]
         mock_response = MagicMock()
-        mock_response.json.return_value = returned
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": returned,
+            "total": 2,
+            "has_more": False,
+        }
         mock_client = MagicMock(spec=httpx.Client)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -644,7 +649,12 @@ class TestAgentsLogs:
 
     def test_logs_defaults(self):
         mock_response = MagicMock()
-        mock_response.json.return_value = []
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": [],
+            "total": 0,
+            "has_more": False,
+        }
         mock_client = MagicMock(spec=httpx.Client)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -677,7 +687,12 @@ class TestAgentsMetrics:
     def test_metrics_success(self):
         returned = [_agent_metric_payload(), _agent_metric_payload(id="aa0e8400-e29b-41d4-a716-4466554400aa")]
         mock_response = MagicMock()
-        mock_response.json.return_value = returned
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": returned,
+            "total": 2,
+            "has_more": False,
+        }
         mock_client = MagicMock(spec=httpx.Client)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -694,7 +709,12 @@ class TestAgentsMetrics:
 
     def test_metrics_defaults(self):
         mock_response = MagicMock()
-        mock_response.json.return_value = []
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": [],
+            "total": 0,
+            "has_more": False,
+        }
         mock_client = MagicMock(spec=httpx.Client)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -775,7 +795,12 @@ class TestAgentsStreamLogs:
     def test_stream_logs_yields_logs(self):
         returned = [_agent_log_payload(), _agent_log_payload(id="bb0e8400-e29b-41d4-a716-4466554400bb")]
         mock_response = MagicMock()
-        mock_response.json.return_value = returned
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": returned,
+            "total": 2,
+            "has_more": False,
+        }
         mock_client = MagicMock(spec=httpx.Client)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -790,7 +815,12 @@ class TestAgentsStreamLogs:
     def test_stream_logs_calls_callback(self):
         returned = [_agent_log_payload(), _agent_log_payload(id="cc0e8400-e29b-41d4-a716-4466554400cc")]
         mock_response = MagicMock()
-        mock_response.json.return_value = returned
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": returned,
+            "total": 2,
+            "has_more": False,
+        }
         mock_client = MagicMock(spec=httpx.Client)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -907,7 +937,12 @@ class TestAgentsAsyncMethods:
     async def test_alogs_success(self):
         returned = [_agent_log_payload()]
         mock_response = MagicMock()
-        mock_response.json.return_value = returned
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": returned,
+            "total": 1,
+            "has_more": False,
+        }
         mock_client = AsyncMock(spec=httpx.AsyncClient)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -922,7 +957,12 @@ class TestAgentsAsyncMethods:
     async def test_ametrics_success(self):
         returned = [_agent_metric_payload()]
         mock_response = MagicMock()
-        mock_response.json.return_value = returned
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": returned,
+            "total": 1,
+            "has_more": False,
+        }
         mock_client = AsyncMock(spec=httpx.AsyncClient)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
@@ -952,7 +992,12 @@ class TestAgentsAsyncMethods:
     async def test_astream_logs(self):
         returned = [_agent_log_payload(), _agent_log_payload(id="dd0e8400-e29b-41d4-a716-4466554400dd")]
         mock_response = MagicMock()
-        mock_response.json.return_value = returned
+        mock_response.json.return_value = {
+            "agent_id": "550e8400-e29b-41d4-a716-446655440000",
+            "items": returned,
+            "total": 2,
+            "has_more": False,
+        }
         mock_client = AsyncMock(spec=httpx.AsyncClient)
         mock_client.get.return_value = mock_response
         agents = Agents(mock_client)
