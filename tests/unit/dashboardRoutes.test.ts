@@ -1,4 +1,4 @@
-import type { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 
 const applyAuthCookies = jest.fn()
 const authenticatedFetch = jest.fn()
@@ -972,7 +972,11 @@ describe('dashboard route proxies', () => {
       })
 
     const { GET } = await import('../../app/api/dashboard/observability/route')
-    const request = mockRequest('http://localhost:3000/api/dashboard/observability')
+    const request = new NextRequest('http://localhost:3000/api/dashboard/observability', {
+      headers: {
+        cookie: 'access_token=stale_access_token; refresh_token=stale_refresh_token; theme=dark',
+      },
+    })
 
     const response = await GET(request)
 
@@ -983,6 +987,9 @@ describe('dashboard route proxies', () => {
     const followupRequest = authenticatedFetch.mock.calls[1][0] as NextRequest
     expect(followupRequest).not.toBe(request)
     expect(followupRequest.headers.get('authorization')).toBe('Bearer fresh_access_token')
+    expect(followupRequest.cookies.get('access_token')?.value).toBe('fresh_access_token')
+    expect(followupRequest.cookies.get('refresh_token')?.value).toBe('fresh_refresh_token')
+    expect(followupRequest.cookies.get('theme')?.value).toBe('dark')
     expect(authenticatedFetch).toHaveBeenNthCalledWith(
       2,
       followupRequest,

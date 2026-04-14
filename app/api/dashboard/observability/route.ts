@@ -114,9 +114,33 @@ function summarizeSessions(payload: unknown) {
   };
 }
 
+function cloneCookiesWithTokens(cookieHeader: string | null, tokens: AuthTokens) {
+  const cookies = new Map<string, string>();
+
+  for (const entry of cookieHeader?.split(";") ?? []) {
+    const [rawName, ...rawValue] = entry.split("=");
+    const name = rawName?.trim();
+    const value = rawValue.join("=").trim();
+    if (name && value) {
+      cookies.set(name, value);
+    }
+  }
+
+  cookies.set("access_token", tokens.access_token);
+
+  if (tokens.refresh_token) {
+    cookies.set("refresh_token", tokens.refresh_token);
+  }
+
+  return Array.from(cookies.entries())
+    .map(([name, value]) => `${name}=${value}`)
+    .join("; ");
+}
+
 function cloneRequestWithAccessToken(request: NextRequest, tokens: AuthTokens) {
   const headers = new Headers("headers" in request ? request.headers : undefined);
   headers.set("authorization", `Bearer ${tokens.access_token}`);
+  headers.set("cookie", cloneCookiesWithTokens(headers.get("cookie"), tokens));
 
   return new NextRequest(request.url, {
     method: request.method || "GET",
