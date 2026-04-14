@@ -29,6 +29,91 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+function normalizeCollection(
+  payload: unknown,
+  keys: string[] = ["items", "sessions", "data"],
+) {
+  if (Array.isArray(payload)) return payload;
+  if (!isRecord(payload)) return [];
+
+  for (const key of keys) {
+    const value = payload[key];
+    if (Array.isArray(value)) return value;
+  }
+
+  return [];
+}
+
+function pickString(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function pickBoolean(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "boolean") {
+      return value;
+    }
+  }
+
+  return false;
+}
+
+function toTimestamp(value: unknown) {
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value > 1_000_000_000_000 ? value : value * 1000;
+  }
+
+  return null;
+}
+
+function summarizeSessions(payload: unknown) {
+  const sessions = normalizeCollection(payload, ["sessions", "items", "data"]).filter(isRecord);
+  const channels = new Set<string>();
+  const sources = new Set<string>();
+  let active = 0;
+  let latestActivityAt: string | null = null;
+  let latestTimestamp = 0;
+
+  for (const session of sessions) {
+    const channel = pickString(session, ["channel"]);
+    if (channel) channels.add(channel);
+
+    const source = pickString(session, ["source"]);
+    if (source) sources.add(source);
+
+    if (pickBoolean(session, ["active"])) {
+      active += 1;
+    }
+
+    const timestamp = toTimestamp(session.last_activity ?? session.lastActivity);
+    if (timestamp && timestamp > latestTimestamp) {
+      latestTimestamp = timestamp;
+      latestActivityAt = new Date(timestamp).toISOString();
+    }
+  }
+
+  return {
+    total: sessions.length,
+    active,
+    channels: channels.size,
+    sources: sources.size,
+    latestActivityAt,
+  };
+}
+
 function extractErrorMessage(payload: unknown, fallback: string) {
   if (typeof payload === "string" && payload.trim().length > 0) {
     return payload;
@@ -86,7 +171,7 @@ export async function GET(request: NextRequest) {
     }
 
     const apiBaseUrl = getApiBaseUrl();
-    const [runsResult, telemetryConfigResult, telemetryHealthResult] = await Promise.all([
+    const [runsResult, telemetryConfigResult, telemetryHealthResult, sessionsResult] = await Promise.all([
       fetchResource(request, targetUrl.toString(), "Failed to fetch observability runs"),
       fetchResource(
         request,
@@ -98,12 +183,14 @@ export async function GET(request: NextRequest) {
         `${apiBaseUrl}/v1/telemetry/health`,
         "Failed to fetch telemetry health",
       ),
+      fetchResource(request, `${apiBaseUrl}/v1/sessions?limit=100`, "Failed to fetch session summary"),
     ]);
 
     const refreshedTokens =
       runsResult.refreshedTokens ||
       telemetryConfigResult.refreshedTokens ||
-      telemetryHealthResult.refreshedTokens;
+      telemetryHealthResult.refreshedTokens ||
+      sessionsResult.refreshedTokens;
 
     if (!runsResult.response.ok) {
       const nextResponse = NextResponse.json(
@@ -138,6 +225,8 @@ export async function GET(request: NextRequest) {
           health: telemetryHealthResult.response.ok ? telemetryHealthResult.payload : null,
           errors: Object.keys(telemetryErrors).length > 0 ? telemetryErrors : null,
         },
+        sessionSummary: sessionsResult.response.ok ? summarizeSessions(sessionsResult.payload) : null,
+        sessionSummaryError: sessionsResult.error,
       },
       { status: runsResult.response.status },
     );

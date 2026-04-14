@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 import { ApiRequestError, readJson } from "@/components/app/http";
 import {
@@ -9,9 +11,12 @@ import {
   LiveErrorState,
   LiveKpiGrid,
   LiveLoading,
+  LiveMiniStat,
+  LiveMiniStatGrid,
   LivePanel,
   LiveStatCard,
   asDashboardStatus,
+  formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 
@@ -52,11 +57,39 @@ interface MutxRun {
   run_metadata?: Record<string, unknown>;
 }
 
+interface TelemetryConfig {
+  otel_enabled?: boolean;
+  exporter_type?: string;
+  endpoint?: string | null;
+}
+
+interface TelemetryHealth {
+  configured?: boolean;
+  endpoint_reachable?: boolean;
+  using_grpc?: boolean;
+  endpoint?: string | null;
+}
+
+interface SessionSummary {
+  total: number;
+  active: number;
+  channels: number;
+  sources: number;
+  latestActivityAt: string | null;
+}
+
 interface ObservabilityResponse {
   items: MutxRun[];
   total: number;
   skip: number;
   limit: number;
+  telemetry?: {
+    config: TelemetryConfig | null;
+    health: TelemetryHealth | null;
+    errors: Record<string, string> | null;
+  } | null;
+  sessionSummary?: SessionSummary | null;
+  sessionSummaryError?: string | null;
 }
 
 export function ObservabilityPageClient() {
@@ -65,6 +98,9 @@ export function ObservabilityPageClient() {
   const [error, setError] = useState<string | null>(null);
   const [runs, setRuns] = useState<MutxRun[]>([]);
   const [selectedRun, setSelectedRun] = useState<MutxRun | null>(null);
+  const [telemetry, setTelemetry] = useState<ObservabilityResponse["telemetry"]>(null);
+  const [sessionSummary, setSessionSummary] = useState<SessionSummary | null>(null);
+  const [sessionSummaryError, setSessionSummaryError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,6 +114,9 @@ export function ObservabilityPageClient() {
         const response = await readJson<ObservabilityResponse>("/api/dashboard/observability?limit=50");
         if (!cancelled) {
           setRuns(response.items ?? []);
+          setTelemetry(response.telemetry ?? null);
+          setSessionSummary(response.sessionSummary ?? null);
+          setSessionSummaryError(response.sessionSummaryError ?? null);
           if (response.items?.length > 0 && !selectedRun) {
             setSelectedRun(response.items[0]);
           }
@@ -108,9 +147,27 @@ export function ObservabilityPageClient() {
     const completed = runs.filter((run) => run.status === "completed").length;
     const failed = runs.filter((run) => run.status === "failed").length;
     const running = runs.filter((run) => run.status === "running").length;
-    const totalCost = runs.reduce((sum, run) => sum + (run.cost?.cost_usd || 0), 0);
-    return { completed, failed, running, totalCost };
+    return { completed, failed, running };
   }, [runs]);
+
+  const telemetryStatus = useMemo(() => {
+    if (telemetry?.errors) return "degraded";
+    if (!telemetry?.health?.configured) return "not configured";
+    if (telemetry.health.endpoint_reachable) return "healthy";
+    return "unreachable";
+  }, [telemetry]);
+
+  const telemetryDetail = useMemo(() => {
+    if (!telemetry?.health?.configured) {
+      return "Telemetry exporter has not been configured yet.";
+    }
+
+    if (telemetry?.config?.endpoint) {
+      return `${telemetry.config.exporter_type || "otlp"} · ${telemetry.config.endpoint}`;
+    }
+
+    return telemetry?.config?.exporter_type || "Configured without an endpoint summary.";
+  }, [telemetry]);
 
   if (loading) return <LiveLoading title="Observability" />;
   if (authRequired) {
@@ -145,149 +202,269 @@ export function ObservabilityPageClient() {
           detail="Runs that encountered errors."
           status={totals.failed > 0 ? "error" : undefined}
         />
+        <LiveStatCard
+          label="Telemetry"
+          value={telemetryStatus}
+          detail={telemetryDetail}
+          status={asDashboardStatus(telemetryStatus)}
+        />
+        <LiveStatCard
+          label="Sessions"
+          value={String(sessionSummary?.total ?? 0)}
+          detail={
+            sessionSummary
+              ? `${sessionSummary.active} active · ${sessionSummary.channels} channels · ${sessionSummary.sources} sources`
+              : "Session summary is not available from the current dashboard feed."
+          }
+          status={asDashboardStatus((sessionSummary?.active ?? 0) > 0 ? "running" : "idle")}
+        />
       </LiveKpiGrid>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <LivePanel title="Agent Runs" meta={`${runs.length} records`}>
-          {runs.length === 0 ? (
-            <LiveEmptyState
-              title="No runs yet"
-              message="Agent run observability data will appear here once agents emit runs."
-            />
-          ) : (
-            <div className="space-y-2">
-              {runs.map((run) => (
-                <button
-                  key={run.id}
-                  onClick={() => setSelectedRun(run)}
-                  className={`w-full rounded-lg border p-3 text-left transition-colors ${
-                    selectedRun?.id === run.id
-                      ? "border-cyan-500/50 bg-cyan-500/10"
-                      : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
-                  }`}
+      <div className="grid gap-4 xl:grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)]">
+        <div className="space-y-4">
+          <LivePanel title="Telemetry rail" meta={telemetry?.config?.exporter_type || "operator summary"}>
+            <LiveMiniStatGrid>
+              <LiveMiniStat
+                label="Exporter"
+                value={telemetry?.config?.exporter_type || "not configured"}
+                detail={telemetry?.config?.endpoint || "No OTLP endpoint has been configured yet."}
+              />
+              <LiveMiniStat
+                label="Reachability"
+                value={
+                  !telemetry?.health?.configured
+                    ? "not configured"
+                    : telemetry.health.endpoint_reachable
+                      ? "reachable"
+                      : "degraded"
+                }
+                detail={
+                  telemetry?.health?.endpoint
+                    ? `Health check via ${telemetry.health.endpoint}`
+                    : "Health follows the configured telemetry backend."
+                }
+              />
+              <LiveMiniStat
+                label="Live sessions"
+                value={String(sessionSummary?.total ?? 0)}
+                detail={
+                  sessionSummary
+                    ? `${sessionSummary.active} active across ${sessionSummary.channels} channels and ${sessionSummary.sources} sources.`
+                    : "Session summary is unavailable."
+                }
+              />
+              <LiveMiniStat
+                label="Last activity"
+                value={
+                  sessionSummary?.latestActivityAt
+                    ? formatRelativeTime(sessionSummary.latestActivityAt)
+                    : "Not recorded"
+                }
+                detail={
+                  sessionSummary?.latestActivityAt
+                    ? `Latest session activity ${sessionSummary.latestActivityAt}`
+                    : "No recent session activity has been returned yet."
+                }
+              />
+            </LiveMiniStatGrid>
+
+            {telemetry?.errors ? (
+              <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-100">
+                {Object.entries(telemetry.errors).map(([scope, message]) => (
+                  <div key={scope}>
+                    <span className="font-medium capitalize">{scope}</span>
+                    {" "}
+                    {message}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {sessionSummaryError ? (
+              <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-100">
+                <span className="font-medium">Sessions</span>{" "}
+                {sessionSummaryError}
+              </div>
+            ) : null}
+          </LivePanel>
+
+          <LivePanel title="Next routes" meta="follow the signal">
+            <div className="space-y-3">
+              {[
+                {
+                  href: "/dashboard/traces",
+                  label: "Trace stream",
+                  detail: "Inspect per-run trace events and sequence details.",
+                },
+                {
+                  href: "/dashboard/sessions",
+                  label: "Sessions",
+                  detail: "Review channel activity, active sessions, and gateway posture.",
+                },
+                {
+                  href: "/dashboard/security",
+                  label: "Security",
+                  detail: "Check auth and operator posture when observability degrades unexpectedly.",
+                },
+              ].map((destination) => (
+                <Link
+                  key={destination.href}
+                  href={destination.href}
+                  className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:text-white"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="truncate font-mono text-sm text-white">{run.id.slice(0, 16)}...</span>
-                    <StatusBadge
-                      status={asDashboardStatus(run.status)}
-                      label={run.status}
-                    />
+                  <div>
+                    <div className="font-medium text-white">{destination.label}</div>
+                    <div className="mt-1 text-xs text-slate-500">{destination.detail}</div>
                   </div>
-                  <div className="mt-1 text-xs text-slate-400">
-                    {run.agent_id.slice(0, 12)} · {run.model || "no model"}
-                  </div>
-                  {run.cost && (
-                    <div className="mt-1 text-xs text-slate-500">
-                      ${run.cost.cost_usd?.toFixed(4)} · {run.cost.input_tokens + run.cost.output_tokens} tokens
-                    </div>
-                  )}
-                </button>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-cyan-300" />
+                </Link>
               ))}
             </div>
-          )}
-        </LivePanel>
+          </LivePanel>
+        </div>
 
-        <LivePanel title="Run Detail" meta={selectedRun ? selectedRun.id.slice(0, 16) : "-"}>
-          {selectedRun ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-xs text-slate-500">Status</div>
-                  <div className="text-sm text-white">{selectedRun.status}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500">Agent</div>
-                  <div className="truncate text-sm text-white">{selectedRun.agent_id}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500">Model</div>
-                  <div className="text-sm text-white">{selectedRun.model || "-"}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500">Provider</div>
-                  <div className="text-sm text-white">{selectedRun.provider || "-"}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500">Duration</div>
-                  <div className="text-sm text-white">
-                    {selectedRun.duration_ms ? `${(selectedRun.duration_ms / 1000).toFixed(2)}s` : "-"}
+        <div className="grid gap-4 md:grid-cols-2">
+          <LivePanel title="Agent Runs" meta={`${runs.length} records`}>
+            {runs.length === 0 ? (
+              <LiveEmptyState
+                title="No runs yet"
+                message="Agent run observability data will appear here once agents emit runs."
+              />
+            ) : (
+              <div className="space-y-2">
+                {runs.map((run) => (
+                  <button
+                    key={run.id}
+                    onClick={() => setSelectedRun(run)}
+                    className={`w-full rounded-lg border p-3 text-left transition-colors ${
+                      selectedRun?.id === run.id
+                        ? "border-cyan-500/50 bg-cyan-500/10"
+                        : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="truncate font-mono text-sm text-white">{run.id.slice(0, 16)}...</span>
+                      <StatusBadge
+                        status={asDashboardStatus(run.status)}
+                        label={run.status}
+                      />
+                    </div>
+                    <div className="mt-1 text-xs text-slate-400">
+                      {run.agent_id.slice(0, 12)} · {run.model || "no model"}
+                    </div>
+                    {run.cost && (
+                      <div className="mt-1 text-xs text-slate-500">
+                        ${run.cost.cost_usd?.toFixed(4)} · {run.cost.input_tokens + run.cost.output_tokens} tokens
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </LivePanel>
+
+          <LivePanel title="Run Detail" meta={selectedRun ? selectedRun.id.slice(0, 16) : "-"}>
+            {selectedRun ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs text-slate-500">Status</div>
+                    <div className="text-sm text-white">{selectedRun.status}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-500">Agent</div>
+                    <div className="truncate text-sm text-white">{selectedRun.agent_id}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-500">Model</div>
+                    <div className="text-sm text-white">{selectedRun.model || "-"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-500">Provider</div>
+                    <div className="text-sm text-white">{selectedRun.provider || "-"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-500">Duration</div>
+                    <div className="text-sm text-white">
+                      {selectedRun.duration_ms ? `${(selectedRun.duration_ms / 1000).toFixed(2)}s` : "-"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-500">Steps</div>
+                    <div className="text-sm text-white">{selectedRun.steps?.length || 0}</div>
                   </div>
                 </div>
-                <div>
-                  <div className="text-xs text-slate-500">Steps</div>
-                  <div className="text-sm text-white">{selectedRun.steps?.length || 0}</div>
-                </div>
-              </div>
 
-              {selectedRun.cost && (
-                <div>
-                  <div className="mb-2 text-xs text-slate-500">Cost Breakdown</div>
-                  <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div>
-                        <div className="text-lg text-white">{selectedRun.cost.input_tokens.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500">Input</div>
-                      </div>
-                      <div>
-                        <div className="text-lg text-white">{selectedRun.cost.output_tokens.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500">Output</div>
-                      </div>
-                      <div>
-                        <div className="text-lg text-cyan-400">${selectedRun.cost.cost_usd?.toFixed(4) || "0"}</div>
-                        <div className="text-xs text-slate-500">Cost</div>
+                {selectedRun.cost && (
+                  <div>
+                    <div className="mb-2 text-xs text-slate-500">Cost Breakdown</div>
+                    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                          <div className="text-lg text-white">{selectedRun.cost.input_tokens.toLocaleString()}</div>
+                          <div className="text-xs text-slate-500">Input</div>
+                        </div>
+                        <div>
+                          <div className="text-lg text-white">{selectedRun.cost.output_tokens.toLocaleString()}</div>
+                          <div className="text-xs text-slate-500">Output</div>
+                        </div>
+                        <div>
+                          <div className="text-lg text-cyan-400">${selectedRun.cost.cost_usd?.toFixed(4) || "0"}</div>
+                          <div className="text-xs text-slate-500">Cost</div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {selectedRun.steps && selectedRun.steps.length > 0 && (
-                <div>
-                  <div className="mb-2 text-xs text-slate-500">Steps ({selectedRun.steps.length})</div>
-                  <div className="max-h-64 space-y-1 overflow-y-auto">
-                    {selectedRun.steps.slice(0, 20).map((step, i) => (
-                      <div
-                        key={step.id}
-                        className="flex items-center gap-2 rounded border border-white/5 bg-white/[0.02] p-2 text-xs"
-                      >
-                        <span className="w-6 text-slate-500">{i + 1}</span>
-                        <span
-                          className={`rounded px-1.5 py-0.5 text-[10px] ${
-                            step.type === "tool_call"
-                              ? "bg-blue-500/20 text-blue-300"
-                              : step.type === "reasoning"
-                                ? "bg-purple-500/20 text-purple-300"
-                                : "bg-slate-500/20 text-slate-300"
-                          }`}
+                {selectedRun.steps && selectedRun.steps.length > 0 && (
+                  <div>
+                    <div className="mb-2 text-xs text-slate-500">Steps ({selectedRun.steps.length})</div>
+                    <div className="max-h-64 space-y-1 overflow-y-auto">
+                      {selectedRun.steps.slice(0, 20).map((step, i) => (
+                        <div
+                          key={step.id}
+                          className="flex items-center gap-2 rounded border border-white/5 bg-white/[0.02] p-2 text-xs"
                         >
-                          {step.type}
-                        </span>
-                        <span className="flex-1 truncate text-slate-300">{step.tool_name || "-"}</span>
-                        {step.success !== undefined && (
-                          <span className={step.success ? "text-green-400" : "text-red-400"}>
-                            {step.success ? "✓" : "✗"}
+                          <span className="w-6 text-slate-500">{i + 1}</span>
+                          <span
+                            className={`rounded px-1.5 py-0.5 text-[10px] ${
+                              step.type === "tool_call"
+                                ? "bg-blue-500/20 text-blue-300"
+                                : step.type === "reasoning"
+                                  ? "bg-purple-500/20 text-purple-300"
+                                  : "bg-slate-500/20 text-slate-300"
+                            }`}
+                          >
+                            {step.type}
                           </span>
-                        )}
-                        {step.duration_ms && <span className="text-slate-500">{step.duration_ms}ms</span>}
-                      </div>
-                    ))}
+                          <span className="flex-1 truncate text-slate-300">{step.tool_name || "-"}</span>
+                          {step.success !== undefined && (
+                            <span className={step.success ? "text-green-400" : "text-red-400"}>
+                              {step.success ? "✓" : "✗"}
+                            </span>
+                          )}
+                          {step.duration_ms && <span className="text-slate-500">{step.duration_ms}ms</span>}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {selectedRun.error && (
-                <div>
-                  <div className="mb-2 text-xs text-slate-500">Error</div>
-                  <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
-                    {selectedRun.error}
+                {selectedRun.error && (
+                  <div>
+                    <div className="mb-2 text-xs text-slate-500">Error</div>
+                    <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
+                      {selectedRun.error}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <LiveEmptyState title="No run selected" message="Select a run from the list to view details." />
-          )}
-        </LivePanel>
+                )}
+              </div>
+            ) : (
+              <LiveEmptyState title="No run selected" message="Select a run from the list to view details." />
+            )}
+          </LivePanel>
+        </div>
       </div>
     </div>
   );
