@@ -4,7 +4,10 @@ import {
   updateLessonWorkspace,
   updatePlatformPreferences,
 } from '../../lib/pico/academy'
-import { shouldSyncHydratedProgress } from '../../components/pico/usePicoProgress'
+import {
+  resolveHydratedPicoProgress,
+  shouldSyncHydratedProgress,
+} from '../../components/pico/usePicoProgress'
 
 describe('pico progress hydration sync', () => {
   it('syncs merged local progress back to the backend when remote progress is stale', () => {
@@ -37,5 +40,19 @@ describe('pico progress hydration sync', () => {
     })
 
     expect(shouldSyncHydratedProgress(remote, withWorkspace)).toBe(true)
+  })
+
+  it('keeps fast local platform toggles when remote hydration arrives later', () => {
+    const remote = createDefaultPicoProgress()
+    const currentLocal = updatePlatformPreferences(createDefaultPicoProgress(), {
+      activeSurface: 'academy',
+      railCollapsed: true,
+      helpLaneOpen: false,
+    })
+
+    const merged = resolveHydratedPicoProgress(remote, currentLocal)
+
+    expect(merged.platform.activeSurface).toBe('academy')
+    expect(merged.platform.railCollapsed).toBe(true)
   })
 })

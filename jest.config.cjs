@@ -1,10 +1,14 @@
 module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/tests/unit'],
+  setupFilesAfterEnv: ['<rootDir>/tests/unit/setupJestMocks.ts'],
   transform: {
     '^.+\\.(t|j)sx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
   },
   moduleNameMapper: {
+    '^@/components/site/marketing/(.+)\\.module\\.css$':
+      '<rootDir>/tests/unit/__mocks__/styleMock.js',
+    '^.+\\.module\\.css$': '<rootDir>/tests/unit/__mocks__/styleMock.js',
     '^@/(.*)$': '<rootDir>/$1',
   },
   modulePathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
