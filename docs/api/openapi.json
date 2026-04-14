@@ -24857,6 +24857,14 @@
         "bearerFormat": "JWT",
         "description": "JWT bearer token or API key. Example: 'Bearer eyJ...'"
       }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT bearer token or API key. Example: 'Bearer eyJ...'"
+      }
     }
   },
   "security": [
