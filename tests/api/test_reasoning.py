@@ -12,7 +12,8 @@ def enable_reasoning_workflows(monkeypatch, tmp_path):
     settings = get_settings()
     monkeypatch.setattr(settings, "reasoning_enabled", True)
     monkeypatch.setattr(settings, "artifacts_dir", str(tmp_path / "artifacts"))
-    monkeypatch.setattr(settings, "document_max_upload_mb", 10)
+    monkeypatch.setattr(settings, "reasoning_max_upload_mb", 10)
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-openrouter-key")
     yield
 
 
@@ -281,3 +282,31 @@ async def test_reasoning_jobs_appear_in_runs_listing(client):
     assert reasoning_run["agent_id"] is None
     assert reasoning_run["subject_label"] == "Autoreason Refine"
     assert reasoning_run["template_id"] == "autoreason_refine"
+
+
+@pytest.mark.asyncio
+async def test_builtin_reasoning_summary_reports_actual_winner(monkeypatch):
+    from src.api.services.reasoning_engine import execute_reasoning_manifest
+
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    manifest = {
+        "template_id": "autoreason_refine",
+        "parameters": {
+            "task_prompt": "Turn this into a concrete operator plan.",
+            "incumbent": "A vague answer.",
+            "max_passes": 1,
+            "judge_count": 1,
+            "convergence_wins": 2,
+            "rubric": "Concrete, structured, no filler.",
+        },
+        "artifacts": [],
+        "output_dir": None,
+    }
+
+    result = await execute_reasoning_manifest(manifest)
+
+    assert result.output_text != "A vague answer."
+    assert result.summary["winner"] != "A"
