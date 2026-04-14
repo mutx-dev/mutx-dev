@@ -587,6 +587,7 @@ async def claim_next_reasoning_job(
     ensure_reasoning_enabled()
     worker_identity = worker_name or f"{socket.gethostname()}:{os.getpid()}"
     now = _utcnow()
+    stale_cutoff = now - timedelta(seconds=stale_after_seconds)
 
     result = await db.execute(
         select(ReasoningJob)
@@ -599,6 +600,13 @@ async def claim_next_reasoning_job(
     )
     candidates = result.scalars().all()
     for job in candidates:
+        if (
+            job.status == "running"
+            and job.last_heartbeat_at
+            and job.last_heartbeat_at > stale_cutoff
+        ):
+            continue
+
         claim_token = uuid.uuid4().hex
         job.status = "running"
         job.claimed_by = worker_identity
