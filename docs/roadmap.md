@@ -41,13 +41,8 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Next
 
-- Webhook and API-key product depth
-  - make browser and CLI flows equally trustworthy for outbound webhooks and service credentials
-- Better app-side observability
-  - roll up telemetry config, runs, traces, session health, and alert posture into `/dashboard/observability`
-  - keep `components/dashboard/ObservabilityPageClient.tsx` as a thin consumer of aggregated dashboard API data
-  - start from the existing `/api/dashboard/observability` proxy and `src/api/routes/telemetry.py` route family
 - Runtime-backed lifecycle semantics
+  - surface deployment version history and rollback posture consistently across dashboard and CLI
   - keep deployment versions, rollback, and restart behavior tied to real execution posture
 - Local operator ergonomics
   - keep the hosted and local setup lanes recoverable when installs, migrations, or stale local state drift
@@ -61,7 +56,8 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Shipped (Last 30 Days)
 
-- `2026-04-14` Merge wave: closed the open PR queue and seeded the next roadmap lanes for observability and webhook/API-key depth
+- `2026-04-14` Dashboard observability aggregates telemetry config, traces, and session health into `/dashboard/observability`
+- `2026-04-14` Webhook and API-key lifecycle status is unified across dashboard and CLI operator surfaces
 - `2026-04-11` Pico progress API mounted at `/v1/pico/progress` with GET/POST progress persistence
 - `2026-04-10` Swarms real DB persistence with PATCH/DELETE endpoints
 - `2026-04-10` RAG `/v1/rag/ingest` for document ingestion into vector store

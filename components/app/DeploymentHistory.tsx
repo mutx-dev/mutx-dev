@@ -4,16 +4,9 @@ import { History, RotateCcw, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { extractApiErrorMessage, normalizeCollection } from "@/components/app/http";
+import { type components } from "@/app/types/api";
 
-interface DeploymentVersion {
-  id: string;
-  deployment_id: string;
-  version: number;
-  config_snapshot: string;
-  status: string;
-  created_at: string;
-  rolled_back_at: string | null;
-}
+type DeploymentVersion = components["schemas"]["DeploymentVersionResponse"];
 
 interface VersionHistoryResponse {
   deployment_id: string;
@@ -39,6 +32,18 @@ function parseConfigSnapshot(snapshot: string | Record<string, unknown> | null |
 function VersionItem({ version, onRollback }: { version: DeploymentVersion; onRollback: () => void }) {
   const isCurrent = version.status === "current";
   const config = parseConfigSnapshot(version.config_snapshot);
+  const runtimeVersion = typeof config.version === "string" ? config.version : null;
+  const replicas = typeof config.replicas === "number" ? config.replicas : null;
+  const metadata = [formatDate(version.created_at)];
+  if (runtimeVersion) {
+    metadata.push(`runtime ${runtimeVersion}`);
+  }
+  if (replicas !== null) {
+    metadata.push(`${replicas} replica${replicas === 1 ? "" : "s"}`);
+  }
+  if (version.rolled_back_at) {
+    metadata.push(`rolled back ${formatDate(version.rolled_back_at)}`);
+  }
 
   return (
     <div className={`flex items-center justify-between rounded-lg border p-3 ${isCurrent ? "border-emerald-400/30 bg-emerald-400/5" : "border-white/5 bg-white/[0.02]"}`}>
@@ -50,13 +55,10 @@ function VersionItem({ version, onRollback }: { version: DeploymentVersion; onRo
           <p className="text-sm font-medium text-white">
             {isCurrent ? "Current Version" : `Version ${version.version}`}
           </p>
-          <p className="text-xs text-slate-500">
-            {formatDate(version.created_at)}
-            {(config.replicas as number) > 0 && ` • ${config.replicas} replica${(config.replicas as number) > 1 ? 's' : ''}`}
-          </p>
+          <p className="text-xs text-slate-500">{metadata.join(" • ")}</p>
         </div>
       </div>
-      {!isCurrent && version.status !== "superseded" && (
+      {!isCurrent && (
         <button
           onClick={onRollback}
           className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-white/10"
@@ -69,7 +71,22 @@ function VersionItem({ version, onRollback }: { version: DeploymentVersion; onRo
   );
 }
 
-export function DeploymentHistory({ deploymentId }: { deploymentId: string }) {
+interface DeploymentHistoryProps {
+  deploymentId: string;
+  buttonLabel?: string;
+  buttonClassName?: string;
+  onRollbackComplete?: () => void | Promise<void>;
+}
+
+const defaultButtonClassName =
+  "inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10";
+
+export function DeploymentHistory({
+  deploymentId,
+  buttonLabel = "Versions",
+  buttonClassName = defaultButtonClassName,
+  onRollbackComplete,
+}: DeploymentHistoryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [versions, setVersions] = useState<DeploymentVersion[]>([]);
   const [loading, setLoading] = useState(false);
@@ -120,6 +137,9 @@ export function DeploymentHistory({ deploymentId }: { deploymentId: string }) {
         throw new Error(extractApiErrorMessage(data, "Rollback failed"));
       }
 
+      if (onRollbackComplete) {
+        await onRollbackComplete();
+      }
       setVersions([]);
       setIsOpen(false);
     } catch (err) {
@@ -133,10 +153,10 @@ export function DeploymentHistory({ deploymentId }: { deploymentId: string }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10"
+        className={buttonClassName}
       >
         <History className="h-3.5 w-3.5" />
-        Versions
+        {buttonLabel}
       </button>
 
       {isOpen && (
