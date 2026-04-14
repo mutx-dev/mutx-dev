@@ -400,7 +400,6 @@ export function MarketingLoader() {
             className={styles.loaderMarkVideo}
             muted
             playsInline
-            autoPlay
             preload="auto"
           >
             <source src={LOADER_VIDEO_WEBM_SRC} type="video/webm" />

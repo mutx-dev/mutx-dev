@@ -1359,7 +1359,7 @@
 
 .storyIndexLink:hover {
   transform: translateY(-1px);
-  border-color: rgba(255, 178, 91, 0.24);
+  border-color: rgba(59, 130, 246, 0.24);
   background: rgba(255, 248, 238, 0.06);
 }
 
@@ -1368,7 +1368,7 @@
 .incidentLabel,
 .controlPillarLabel,
 .entryLabel {
-  color: rgba(255, 184, 109, 0.86);
+  color: rgba(96, 165, 250, 0.9);
   font-family: var(--font-mono), monospace;
   font-size: 0.72rem;
   font-weight: 800;
@@ -1539,6 +1539,9 @@
 .incidentHeader {
   display: grid;
   gap: 0.55rem;
+  padding: 0.25rem 0 0.75rem;
+  border-bottom: 1px solid rgba(255, 227, 193, 0.08);
+  margin-bottom: 0.25rem;
 }
 
 .incidentTranscript {
@@ -1562,12 +1565,12 @@
 }
 
 .incidentPrompt {
-  color: rgba(255, 178, 91, 0.88);
+  color: rgba(96, 165, 250, 0.9);
 }
 
 .controlSection {
   background:
-    radial-gradient(circle at 18% 18%, rgba(212, 171, 115, 0.12), transparent 22rem),
+    radial-gradient(circle at 18% 18%, rgba(59, 130, 246, 0.1), transparent 22rem),
     linear-gradient(180deg, rgba(17, 13, 11, 1), rgba(12, 9, 8, 1));
 }
 
