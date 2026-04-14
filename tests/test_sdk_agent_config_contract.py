@@ -130,7 +130,7 @@ def test_agent_logs_maps_backend_extra_data_field_to_sdk_aliases() -> None:
 
     client = httpx.Client(
         base_url="https://api.test",
-        transport=httpx.MockTransport(lambda request: httpx.Response(200, json=log_payload)),
+        transport=httpx.MockTransport(lambda request: httpx.Response(200, json={"items": log_payload})),
     )
     logs = Agents(client).logs(agent_id)
 
