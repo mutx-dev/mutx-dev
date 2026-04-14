@@ -10,10 +10,12 @@ def test_production_accepts_jwt_secret_from_env_file(tmp_path, monkeypatch):
         "ENVIRONMENT=production\n"
         "JWT_SECRET=abcdefghijklmnopqrstuvwxyz123456\n"
         "DATABASE_URL=postgresql://postgres:postgres@db:5432/mutx\n"
+        "SECRET_ENCRYPTION_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n"
     )
 
     monkeypatch.delenv("JWT_SECRET", raising=False)
     monkeypatch.delenv("jwt_secret", raising=False)
+    monkeypatch.delenv("SECRET_ENCRYPTION_KEY", raising=False)
 
     settings = Settings(_env_file=env_file)
 
