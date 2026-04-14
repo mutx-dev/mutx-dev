@@ -6,7 +6,7 @@ export function PicoLandingSurface() {
   return (
     <PublicSurface>
       <PicoLandingPage />
-      <PicoFooter showAtlasLinks={false} />
+      <PicoFooter />
     </PublicSurface>
   )
 }
