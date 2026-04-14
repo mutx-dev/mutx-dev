@@ -907,45 +907,53 @@
 
 .proofCard {
   display: grid;
-  align-content: center;
-  gap: 1.1rem;
+  grid-template-rows: auto 1fr;
+  gap: 1.35rem;
   min-height: 100%;
-  padding: 1.5rem;
-  border-radius: 1.75rem;
-  border: 1px solid rgba(247, 244, 239, 0.08);
+  padding: 1.85rem;
+  border-radius: 1.9rem;
+  border: 1px solid rgba(125, 211, 252, 0.12);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+    linear-gradient(180deg, rgba(11, 15, 22, 0.98), rgba(7, 10, 15, 1));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 18px 50px rgba(0, 7, 18, 0.14);
 }
 
+.proofCardHeader {
+  display: flex;
+  align-items: center;
+  min-height: 3.25rem;
+  padding: 0 0.1rem;
+}
+
 .proofLane:first-child {
   position: relative;
-  padding: 0.8rem 0.9rem;
-  border-radius: 0.9rem;
-  background: rgba(255, 87, 87, 0.04);
-  border: 1px solid rgba(255, 87, 87, 0.08);
+  padding: 1rem 1.05rem 1.1rem;
+  border-radius: 1.1rem;
+  background: rgba(120, 22, 22, 0.2);
+  border: 1px solid rgba(248, 113, 113, 0.12);
 }
 
 .proofLane:first-child .proofLaneLabel {
-  color: rgba(255, 120, 120, 0.8);
+  color: rgba(252, 165, 165, 0.86);
 }
 
 .proofLane:last-child {
   position: relative;
-  padding: 0.8rem 0.9rem;
-  border-radius: 0.9rem;
-  background: rgba(75, 141, 255, 0.06);
-  border: 1px solid rgba(75, 141, 255, 0.12);
+  padding: 1rem 1.05rem 1.1rem;
+  border-radius: 1.1rem;
+  background: rgba(30, 58, 138, 0.18);
+  border: 1px solid rgba(96, 165, 250, 0.16);
 }
 
 .proofCompare {
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
 .proofLane {
-  padding-top: 0;
+  align-content: start;
+  gap: 0.9rem;
   border-top: none;
 }
 
@@ -1325,6 +1333,20 @@
   .exampleCard,
   .proofCard {
     padding: 0.95rem;
+  }
+
+  .proofCard {
+    gap: 1.05rem;
+    padding: 1.25rem;
+  }
+
+  .proofCardHeader {
+    min-height: 2.6rem;
+  }
+
+  .proofLane:first-child,
+  .proofLane:last-child {
+    padding: 0.9rem;
   }
 
   .socialProofMetric {

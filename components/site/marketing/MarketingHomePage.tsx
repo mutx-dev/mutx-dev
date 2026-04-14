@@ -17,7 +17,6 @@ import { MarketingHeroBackdrop } from './MarketingHeroBackdrop'
 import home from './MarketingHome.module.css'
 import { MarketingLoader } from './MarketingLoader'
 import { MarketingReveal } from './MarketingReveal'
-import { ViewportVideo } from './ViewportVideo'
 
 type ActionLinkProps = {
   action: MarketingActionLink
@@ -239,18 +238,6 @@ function TerminalPlaybackCard({ item, delay = 0 }: TerminalPlaybackCardProps) {
 }
 
 function ActiveDemoMedia({ activeDemo }: { activeDemo: MarketingDemoItem }) {
-  if (activeDemo.mediaType === 'video') {
-    return (
-      <ViewportVideo
-        src={activeDemo.mediaSrc}
-        poster={activeDemo.mediaPosterSrc}
-        ariaLabel={activeDemo.mediaAlt}
-        className={home.demoVideo}
-        preload="auto"
-      />
-    )
-  }
-
   return (
     <img
       src={activeDemo.mediaSrc}
@@ -284,13 +271,8 @@ export function MarketingHomePage() {
 
     for (const tab of demoTabs) {
       if (!prefetchedDemoMedia.has(tab.mediaSrc)) {
-        if (tab.mediaType === 'video') {
-          const video = document.createElement('video')
-          video.preload = 'auto'
-          video.src = tab.mediaSrc
-          video.load()
-        }
-
+        const image = new Image()
+        image.src = tab.mediaSrc
         prefetchedDemoMedia.add(tab.mediaSrc)
       }
 
@@ -589,7 +571,9 @@ export function MarketingHomePage() {
                   delay={index * 0.07}
                   distance={20}
                 >
-                  <h3 className={home.proofCardTitle}>{item.title}</h3>
+                  <div className={home.proofCardHeader}>
+                    <h3 className={home.proofCardTitle}>{item.title}</h3>
+                  </div>
                   <div className={home.proofCompare}>
                     <div className={home.proofLane}>
                       <p className={home.proofLaneLabel}>Before</p>
