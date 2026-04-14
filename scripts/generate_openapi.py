@@ -40,9 +40,50 @@ def build_openapi_document() -> dict[str, Any]:
 
     from src.api.main import app  # noqa: E402
 
-    return normalize_openapi_document(
-        get_openapi(title=app.title, version=app.version, routes=app.routes)
-    )
+    spec = get_openapi(title=app.title, version=app.version, routes=app.routes)
+
+    # Add Bearer token security scheme so the spec accurately reflects
+    # that auth-guarded routes require an Authorization header.
+    # Routes using get_current_agent / get_current_user via Depends()
+    # are not detected by FastAPI's automatic security inference.
+    spec["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+            "description": "JWT bearer token or API key. Example: 'Bearer eyJ...'",
+        }
+    }
+
+    # Apply Bearer auth globally — all routes require auth by default.
+    # Routes that are genuinely public (health probes, docs, etc.) should
+    # declare `security: []` (no auth) explicitly in their route file.
+    spec["security"] = [{"BearerAuth": []}]
+
+    # Override global security for genuinely public paths so they show
+    # "lock icon = none" in Swagger UI even though they have no explicit
+    # security key in the route definition.
+    public_paths = {
+        "/health",
+        "/ready",
+        "/metrics",
+        # Auth routes — intentionally public (no get_current_user dependency)
+        "/v1/auth/login",
+        "/v1/auth/register",
+        "/v1/auth/forgot-password",
+        "/v1/auth/reset-password",
+        "/v1/auth/verify-email",
+        "/v1/auth/resend-verification",
+        "/v1/auth/oauth",
+        "/v1/auth/sso",
+    }
+    for path, path_item in spec.get("paths", {}).items():
+        if path in public_paths:
+            for method, operation in path_item.items():
+                if method in ("get", "post", "put", "patch", "delete"):
+                    operation["security"] = []
+
+    return normalize_openapi_document(spec)
 
 
 def main() -> None:
