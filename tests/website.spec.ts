@@ -563,13 +563,14 @@ test.describe('mutx.dev QA', () => {
 
     await expect(page.getByTestId('homepage-lockup')).toBeVisible();
     await expect(page.getByTestId('homepage-lockup-mark')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /most agent failures do not announce themselves\./i })).toBeVisible({
+    await expect(page.getByRole('heading', { name: /see it\. control it\. prove it\./i })).toBeVisible({
       timeout: 10000,
     });
     await expect(
-      page.getByText(/they look like a helpful run/i)
+      page.getByText(/live visibility, hard boundaries, and reviewable history for every agent run\./i)
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /pre-register for picomutx/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /go to picomutx/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /view github/i }).first()).toBeVisible();
