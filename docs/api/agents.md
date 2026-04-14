@@ -93,7 +93,7 @@ Unknown keys are rejected for typed configs. Successful config patches increment
 
 ## Config Response
 
-`GET /v1/agents/{agent_id}/config` returns the agent's normalized config with its current version:
+`GET /v1/agents/{agent_id}/config` returns the agent's normalized config with its current version. The `config` shape matches the agent's `type`:
 
 ```json
 {
