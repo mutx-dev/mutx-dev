@@ -70,9 +70,9 @@ function LessonStateStamp({ state }: { state: LessonState }) {
       className={cn(
         picoCodex.stamp,
         state === 'done' && 'border-emerald-500/35 bg-emerald-500/10 text-emerald-100',
-        state === 'current' && 'border-[#e2904f] bg-[rgba(226,144,79,0.16)] text-[#fff1df]',
+        state === 'current' && 'border-[color:var(--pico-accent)] bg-[rgba(var(--pico-accent-rgb),0.16)] text-[color:var(--pico-text)]',
         state === 'ready' && 'border-cyan-500/30 bg-cyan-500/10 text-cyan-100',
-        state === 'locked' && 'border-[#5a3d28] bg-transparent text-[#9f8063]',
+        state === 'locked' && 'border-[color:var(--pico-border)] bg-transparent text-[color:var(--pico-text-muted)]',
       )}
     >
       {copy}
@@ -276,7 +276,42 @@ export function PicoAcademyDashboard() {
     },
   ]
 
-  const visibleTracks = progress.platform.railCollapsed ? [activeTrack] : PICO_TRACKS
+  const studioMethod = [
+    {
+      label: '01 • Brief',
+      title: 'Read the mission like a client brief',
+      body: currentMissionSummary,
+    },
+    {
+      label: '02 • Deliverable',
+      title: 'Make one artifact worth keeping',
+      body: activationLesson?.expectedResult ?? currentMissionValidation,
+    },
+    {
+      label: '03 • Critique',
+      title: 'Use the validation like studio review',
+      body: currentMissionValidation,
+    },
+  ]
+
+  const academyStandards = [
+    {
+      label: 'Track outcome',
+      value: activeTrack.outcome,
+    },
+    {
+      label: 'Level reward',
+      value: currentLevel?.projectOutcome ?? 'Ship one real operator outcome.',
+    },
+    {
+      label: 'Next standard',
+      value: currentLevel?.recommendedNextStep ?? 'Keep the chapter narrow and honest.',
+    },
+  ]
+
+  const chapterPreviewTracks = progress.platform.railCollapsed
+    ? []
+    : PICO_TRACKS.filter((track) => track.slug !== activeTrack.slug)
 
   useEffect(() => {
     if (progress.platform.activeSurface !== 'academy') {
@@ -305,20 +340,20 @@ export function PicoAcademyDashboard() {
           data-testid="pico-academy-mission-billboard"
         >
           <div className="grid gap-8 lg:grid-cols-[8rem,minmax(0,1fr)]">
-            <div className="grid content-between gap-6 border-b border-[#5d412d] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
+            <div className="grid content-between gap-6 border-b border-[color:var(--pico-border)] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
               <div className="grid gap-2">
                 <p className={picoClasses.label}>Codex chapter</p>
-                <p className="font-[family:var(--font-site-display)] text-7xl leading-none tracking-[-0.08em] text-[#f0bb83] sm:text-8xl">
+                <p className="font-[family:var(--font-site-display)] text-7xl leading-none tracking-[-0.08em] text-[color:var(--pico-accent)] sm:text-8xl">
                   {activeTrackChapter}
                 </p>
               </div>
 
               <div className="grid gap-2">
                 <p className={picoClasses.label}>Track</p>
-                <p className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                <p className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {activeTrack.title}
                 </p>
-                <p className="text-sm leading-6 text-[#d8c0a4]">
+                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Stop {String(missionIndex).padStart(2, '0')} of {activeTrackLessons.length}
                 </p>
               </div>
@@ -337,18 +372,18 @@ export function PicoAcademyDashboard() {
               </div>
 
               <div className="grid gap-4">
-                <h1 className="max-w-4xl font-[family:var(--font-site-display)] text-5xl leading-[0.92] tracking-[-0.08em] text-[#fff4e6] sm:text-7xl">
+                <h1 className="max-w-4xl font-[family:var(--font-site-display)] text-5xl leading-[0.92] tracking-[-0.08em] text-[color:var(--pico-text)] sm:text-7xl">
                   {currentMissionTitle}
                 </h1>
-                <p className="max-w-3xl text-lg leading-8 text-[#e2ccb3]">
+                <p className="max-w-3xl text-lg leading-8 text-[color:var(--pico-text-secondary)]">
                   {currentMissionSummary}
                 </p>
-                <p className="max-w-3xl text-sm leading-6 text-[#b99879]">
+                <p className="max-w-3xl text-sm leading-6 text-[color:var(--pico-text-muted)]">
                   Validation: {currentMissionValidation}
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="grid gap-3 sm:flex sm:flex-wrap">
                 <Link href={currentMissionPrimaryHref} className={picoClasses.primaryButton}>
                   {currentMissionPrimaryLabel}
                 </Link>
@@ -358,16 +393,16 @@ export function PicoAcademyDashboard() {
               </div>
 
               <div
-                className="grid gap-3 border-t border-[#5d412d] pt-5 sm:grid-cols-2 xl:grid-cols-4"
+                className="grid gap-3 border-t border-[color:var(--pico-border)] pt-5 sm:grid-cols-2 xl:grid-cols-4"
                 data-testid="pico-academy-progress-strip"
               >
                 {missionStrip.map((item) => (
                   <div key={item.label} className="grid gap-1">
                     <p className={picoClasses.label}>{item.label}</p>
-                    <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
+                    <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                       {item.value}
                     </p>
-                    <p className="text-sm leading-6 text-[#bfa78c]">{item.detail}</p>
+                    <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item.detail}</p>
                   </div>
                 ))}
               </div>
@@ -388,7 +423,7 @@ export function PicoAcademyDashboard() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className={picoClasses.label}>Active proof lane</p>
-                    <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[#fff4e6]">
+                    <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                       {focusedActivationStep?.title ?? activationLesson.title}
                     </h2>
                   </div>
@@ -399,18 +434,18 @@ export function PicoAcademyDashboard() {
 
                 <div className={picoCodexSheet('p-5')}>
                   <p className={picoClasses.label}>Resume from here</p>
-                  <p className="mt-4 text-base leading-8 text-[#f0deca]">
+                  <p className="mt-4 text-base leading-8 text-[color:var(--pico-text-secondary)]">
                     {focusedActivationStep?.body ??
                       'Open the lesson route and keep the proof lane short.'}
                   </p>
                   {focusedActivationStep?.command ? (
-                    <pre className="mt-5 overflow-x-auto rounded-[22px] border border-[#6a452a] bg-[#16100d] p-4 text-sm text-[#ffc88f]">
+                    <pre className="mt-5 overflow-x-auto rounded-[22px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] p-4 text-sm text-[color:var(--pico-accent-bright)]">
                       <code>{focusedActivationStep.command}</code>
                     </pre>
                   ) : null}
-                  <div className="mt-5 overflow-hidden rounded-full bg-[#1b120d]">
+                  <div className="mt-5 overflow-hidden rounded-full bg-[color:var(--pico-bg-input)]">
                     <div
-                      className="h-2 rounded-full bg-[linear-gradient(90deg,#e2904f,#ffd0a4)]"
+                      className="h-2 rounded-full bg-[linear-gradient(90deg,var(--pico-accent),var(--pico-accent-bright))]"
                       style={{ width: `${activationLessonWorkspace.progressPercent}%` }}
                     />
                   </div>
@@ -428,17 +463,17 @@ export function PicoAcademyDashboard() {
               <div className="grid gap-4">
                 <div className={picoCodexInset('p-5')}>
                   <p className={picoClasses.label}>Proof state</p>
-                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {workspaceCaptured ? 'captured' : 'missing'}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     Updated {workspaceUpdatedAt}
                   </p>
                 </div>
 
                 <div className={picoCodexNote('p-5')}>
                   <p className={picoClasses.label}>Captured proof</p>
-                  <p className="mt-3 text-sm leading-6 text-[#f0deca]">
+                  <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     {workspaceCaptured
                       ? activationLessonWorkspace.workspace.evidence
                       : 'No proof has been logged yet. Save the single artifact that proves the mission actually worked.'}
@@ -447,7 +482,7 @@ export function PicoAcademyDashboard() {
 
                 <div className={picoCodexInset('p-5')}>
                   <p className={picoClasses.label}>Hosted note</p>
-                  <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                  <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     {hostedDetail}
                   </p>
                 </div>
@@ -457,180 +492,309 @@ export function PicoAcademyDashboard() {
         </FadeIn>
       ) : null}
 
-      <FadeIn delay={0.12} reduceMotion={reduceMotion}>
+      <FadeIn delay={0.1} reduceMotion={reduceMotion}>
         <section
-          className={picoCodexFrame('overflow-hidden')}
-          data-testid="pico-academy-campaign-map"
+          className={picoCodexFrame('px-6 py-6 sm:px-8 sm:py-8')}
+          data-testid="pico-academy-studio-method"
         >
-          <div className="border-b border-[#5d412d] px-6 py-6 sm:px-8 lg:px-10">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className={picoClasses.label}>Chapter ledger</p>
-                <h2 className="mt-3 max-w-4xl font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[#fff4e6] sm:text-5xl">
-                  Follow the route in order. Let the appendix stay quiet.
-                </h2>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr),20rem]">
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className={picoClasses.label}>Studio method</p>
+                  <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
+                    Learn like a boutique studio ships
+                  </h2>
+                </div>
+                <span className={picoCodex.stamp}>brief • deliverable • critique</span>
               </div>
-              <span className={picoCodex.stamp}>
-                {progress.platform.railCollapsed ? 'focus mode' : 'all chapters'}
-              </span>
+
+              <div className="mt-6 grid gap-4 xl:grid-cols-3">
+                {studioMethod.map((item) => (
+                  <article key={item.label} className={picoCodexInset('flex h-full flex-col p-5')}>
+                    <p className={picoClasses.label}>{item.label}</p>
+                    <h3 className="mt-5 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+                      {item.body}
+                    </p>
+                  </article>
+                ))}
+              </div>
             </div>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#c8b296]">
-              {progress.platform.railCollapsed
-                ? 'Map is narrowed to the current track. Open Map to see every chapter.'
-                : 'The ledger should explain sequence without feeling like a dashboard of equal choices.'}
-            </p>
-          </div>
 
-          <div className="px-6 py-6 sm:px-8 lg:px-10 lg:py-8">
-            <div className="grid gap-10">
-              {visibleTracks.map((track, trackIndex) => {
-                const trackLessons = track.lessons
-                  .map((slug) => getLessonBySlug(slug))
-                  .filter((lesson): lesson is PicoLesson => Boolean(lesson))
-                const completedCount = trackLessons.filter((lesson) =>
-                  progress.completedLessons.includes(lesson.slug),
-                ).length
-                const unlocked = derived.unlockedTrackSlugs.includes(track.slug)
-                const active = track.slug === activeTrack.slug
-                const chapterIndex = Math.max(
-                  PICO_TRACKS.findIndex((entry) => entry.slug === track.slug),
-                  trackIndex,
-                )
+            <div className="grid gap-4">
+              <div className={picoCodexNote('p-5')}>
+                <p className={picoClasses.label}>Track standards</p>
+                <div className="mt-4 grid gap-4">
+                  {academyStandards.map((item) => (
+                    <div
+                      key={item.label}
+                      className="grid gap-2 border-t border-[color:var(--pico-border)] pt-4 first:border-t-0 first:pt-0"
+                    >
+                      <p className={picoClasses.label}>{item.label}</p>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        {item.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-                return (
-                  <motion.article
-                    key={track.slug}
-                    initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={reduceMotion ? { duration: 0 } : { duration: 0.45, delay: trackIndex * 0.05 }}
-                    className="grid gap-5 lg:grid-cols-[15rem,minmax(0,1fr)]"
-                  >
-                    <div className="grid gap-3">
-                      <span className={picoCodex.stamp}>
-                        Track {String(chapterIndex + 1).padStart(2, '0')}
+              <div className={picoCodexInset('p-5')}>
+                <p className={picoClasses.label}>Chapter checklist</p>
+                <div className="mt-4 grid gap-3">
+                  {activeTrack.checklist.map((item) => (
+                    <div key={item} className="flex items-start gap-3">
+                      <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-accent)]">
+                        ok
                       </span>
-                      <h3 className="font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[#fff4e6]">
-                        {track.title}
-                      </h3>
-                      <p className="text-sm leading-6 text-[#e0c9b0]">{track.outcome}</p>
-                      <p className="text-sm leading-6 text-[#b99879]">{track.intro}</p>
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-[#c7af93]">
-                        <span>{completedCount}/{trackLessons.length} cleared</span>
-                        <span>•</span>
-                        <span>{unlocked ? 'route open' : 'route locked'}</span>
-                        {active ? <span>•</span> : null}
-                        {active ? <span>current track</span> : null}
-                      </div>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item}</p>
                     </div>
-
-                    <div className="relative pl-6">
-                      <div className="absolute left-2 top-1 bottom-1 w-px bg-[#5d412d]" />
-
-                      <div className={cn('grid gap-5', !unlocked && 'opacity-55')}>
-                        {trackLessons.map((lesson, lessonIndex) => {
-                          const state = getLessonState(
-                            lesson,
-                            progress.completedLessons,
-                            derived.unlockedLessonSlugs,
-                            activationLessonSlug,
-                          )
-                          const dominant =
-                            active &&
-                            (lesson.slug === activationLessonSlug ||
-                              state === 'current' ||
-                              (state === 'ready' && lessonIndex === 0))
-
-                          return (
-                            <Link
-                              key={lesson.slug}
-                              href={toHref(`/academy/${lesson.slug}`)}
-                              className={cn(
-                                'relative block border-l pl-5 pr-2 py-1 transition',
-                                state === 'locked'
-                                  ? 'border-[#4c3424] text-[#8f7157]'
-                                  : dominant
-                                    ? 'border-[#e2904f] text-[#fff4e6]'
-                                    : state === 'done'
-                                      ? 'border-[#5f7457] text-[#d8c3a8]'
-                                      : 'border-[#6a4a33] text-[#d5c0a8] hover:border-[#a1714b] hover:text-[#fff4e6]',
-                              )}
-                            >
-                              <span
-                                className={cn(
-                                  'absolute -left-[0.42rem] top-4 h-3.5 w-3.5 rounded-full border bg-[#120a07]',
-                                  state === 'done' && 'border-emerald-400 bg-emerald-500/20',
-                                  state === 'current' && 'border-[#e2904f] bg-[#e2904f]/20',
-                                  state === 'ready' && 'border-cyan-400 bg-cyan-400/15',
-                                  state === 'locked' && 'border-[#4a3423]',
-                                )}
-                              />
-
-                              <div className="flex flex-wrap items-start justify-between gap-3">
-                                <div className="min-w-0">
-                                  <p className="font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.22em] text-[#b58d65]">
-                                    Stop {String(lessonIndex + 1).padStart(2, '0')} • level {lesson.level}
-                                  </p>
-                                  <p className="mt-1 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-inherit">
-                                    {lesson.title}
-                                  </p>
-                                </div>
-                                <LessonStateStamp state={state} />
-                              </div>
-
-                              {dominant ? (
-                                <div className={picoCodexNote('mt-3 p-4')}>
-                                  <p className={picoClasses.label}>Dominant stop</p>
-                                  <p className="mt-3 text-sm leading-6 text-[#f0deca]">
-                                    {lesson.expectedResult}
-                                  </p>
-                                </div>
-                              ) : (
-                                <p className="mt-2 text-sm leading-6 text-[#bfa78c]">{lesson.summary}</p>
-                              )}
-                            </Link>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  </motion.article>
-                )
-              })}
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
       </FadeIn>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.04fr),minmax(0,0.96fr)]">
-        <FadeIn delay={0.18} reduceMotion={reduceMotion}>
-          <section className={picoCodexFrame('px-6 py-6 sm:px-8')}>
-            <div className="flex flex-wrap items-center justify-between gap-4">
+      <FadeIn delay={0.12} reduceMotion={reduceMotion}>
+        <section
+          className={picoCodexFrame('overflow-hidden')}
+          data-testid="pico-academy-campaign-map"
+        >
+          <div className="border-b border-[color:var(--pico-border)] px-6 py-6 sm:px-8 lg:px-10">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Codex appendix</p>
-                <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
-                  The capabilities and patterns that matter after the mission is real
+                <p className={picoClasses.label}>Chapter ledger</p>
+                <h2 className="mt-3 max-w-4xl font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+                  One dominant chapter, with the rest of the map kept quiet.
                 </h2>
               </div>
               <span className={picoCodex.stamp}>
-                {currentLevel ? currentLevel.title : 'Setup'}
+                {progress.platform.railCollapsed ? 'focus mode' : 'guided atlas'}
               </span>
             </div>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+              The current track gets the full editorial treatment. The rest of the atlas stays visible, but compressed, so the route still feels authored instead of equally loud everywhere.
+            </p>
+          </div>
 
-            <div className="mt-6 grid gap-5">
+          <div className="grid gap-0 xl:grid-cols-[minmax(0,1.08fr),22rem]">
+            <div className="px-6 py-6 sm:px-8 lg:px-10 lg:py-8">
+              <motion.article
+                initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={reduceMotion ? { duration: 0 } : { duration: 0.45, delay: 0.04 }}
+                className="grid gap-6"
+              >
+                <div className="grid gap-5 lg:grid-cols-[16rem,minmax(0,1fr)]">
+                  <div className="grid gap-3">
+                    <span className={picoCodex.stamp}>
+                      Track {String(activeTrackIndex + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="font-[family:var(--font-site-display)] text-5xl tracking-[-0.06em] text-[color:var(--pico-text)]">
+                      {activeTrack.title}
+                    </h3>
+                    <p className="text-sm leading-6 text-[#e0c9b0]">{activeTrack.outcome}</p>
+                    <p className="text-sm leading-6 text-[color:var(--pico-text-muted)]">{activeTrack.intro}</p>
+                    <div className="grid gap-3 pt-2">
+                      <div className={picoCodexInset('p-4')}>
+                        <p className={picoClasses.label}>Route state</p>
+                        <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
+                          {activeTrackCompletedCount}/{activeTrackLessons.length} cleared
+                        </p>
+                      </div>
+                      <div className={picoCodexInset('p-4')}>
+                        <p className={picoClasses.label}>Next dominant stop</p>
+                        <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
+                          {activationLesson?.title ?? 'Open Autopilot'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative pl-6">
+                    <div className="absolute left-2 top-1 bottom-1 w-px bg-[color:var(--pico-border)]" />
+
+                    <div className="grid gap-5">
+                      {activeTrackLessons.map((lesson, lessonIndex) => {
+                        const state = getLessonState(
+                          lesson,
+                          progress.completedLessons,
+                          derived.unlockedLessonSlugs,
+                          activationLessonSlug,
+                        )
+                        const dominant =
+                          lesson.slug === activationLessonSlug ||
+                          state === 'current' ||
+                          (state === 'ready' && lessonIndex === 0)
+
+                        return (
+                          <Link
+                            key={lesson.slug}
+                            href={toHref(`/academy/${lesson.slug}`)}
+                            className={cn(
+                              'relative block border-l pl-5 pr-2 py-1 transition',
+                              state === 'locked'
+                                ? 'border-[color:var(--pico-border)] text-[color:var(--pico-text-muted)]'
+                                : dominant
+                                  ? 'border-[color:var(--pico-accent)] text-[color:var(--pico-text)]'
+                                  : state === 'done'
+                                    ? 'border-[color:var(--pico-border-hover)] text-[color:var(--pico-text-secondary)]'
+                                    : 'border-[color:var(--pico-border)] text-[color:var(--pico-text-secondary)] hover:border-[color:var(--pico-border-hover)] hover:text-[color:var(--pico-text)]',
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                'absolute -left-[0.42rem] top-4 h-3.5 w-3.5 rounded-full border bg-[color:var(--pico-bg)]',
+                                state === 'done' && 'border-emerald-400 bg-emerald-500/20',
+                                state === 'current' &&
+                                  'border-[color:var(--pico-accent)] bg-[rgba(var(--pico-accent-rgb),0.2)]',
+                                state === 'ready' && 'border-cyan-400 bg-cyan-400/15',
+                                state === 'locked' && 'border-[color:var(--pico-border)]',
+                              )}
+                            />
+
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <p className="font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.22em] text-[color:var(--pico-text-muted)]">
+                                  Stop {String(lessonIndex + 1).padStart(2, '0')} • level {lesson.level}
+                                </p>
+                                <p className="mt-1 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-inherit">
+                                  {lesson.title}
+                                </p>
+                              </div>
+                              <LessonStateStamp state={state} />
+                            </div>
+
+                            {dominant ? (
+                              <div className={picoCodexNote('mt-3 p-4')}>
+                                <p className={picoClasses.label}>Dominant stop</p>
+                                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                                  {lesson.expectedResult}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                                {lesson.summary}
+                              </p>
+                            )}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </motion.article>
+            </div>
+
+            <aside className="border-t border-[color:var(--pico-border)] bg-[rgba(5,14,8,0.62)] px-6 py-6 sm:px-8 xl:border-l xl:border-t-0">
+              <div className="grid gap-4">
+                <div className={picoCodexInset('p-5')}>
+                  <p className={picoClasses.label}>Mission correction</p>
+                  <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    The atlas stays useful only if it keeps pushing you back into the current mission.
+                  </p>
+                  <div className="mt-4 grid gap-3">
+                    <Link href={currentMissionPrimaryHref} className={picoClasses.primaryButton}>
+                      {currentMissionPrimaryLabel}
+                    </Link>
+                    <Link href={currentMissionSecondaryHref} className={picoClasses.tertiaryButton}>
+                      {currentMissionSecondaryLabel}
+                    </Link>
+                  </div>
+                </div>
+
+                {!progress.platform.railCollapsed && chapterPreviewTracks.length > 0 ? (
+                  <div className={picoCodexNote('p-5')}>
+                    <p className={picoClasses.label}>Other chapters</p>
+                    <div className="mt-4 grid gap-3">
+                      {chapterPreviewTracks.map((track, trackIndex) => {
+                        const trackLessons = track.lessons
+                          .map((slug) => getLessonBySlug(slug))
+                          .filter((lesson): lesson is PicoLesson => Boolean(lesson))
+                        const completedCount = trackLessons.filter((lesson) =>
+                          progress.completedLessons.includes(lesson.slug),
+                        ).length
+                        const unlocked = derived.unlockedTrackSlugs.includes(track.slug)
+
+                        return (
+                          <article key={track.slug} className={picoCodexInset('grid gap-3 p-4')}>
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className={picoClasses.label}>
+                                  Track {String(trackIndex + 2).padStart(2, '0')}
+                                </p>
+                                <h3 className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                                  {track.title}
+                                </h3>
+                              </div>
+                              <span className={picoCodex.stamp}>{unlocked ? 'open' : 'locked'}</span>
+                            </div>
+                            <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                              {track.outcome}
+                            </p>
+                            <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
+                              {completedCount}/{trackLessons.length} cleared
+                            </p>
+                          </article>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </aside>
+          </div>
+        </section>
+      </FadeIn>
+
+      <FadeIn delay={0.18} reduceMotion={reduceMotion}>
+        <section className={picoCodexFrame('px-6 py-6 sm:px-8')}>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className={picoClasses.label}>Reference annex</p>
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                Capability, archive, and platform memory stay below the route on purpose
+              </h2>
+            </div>
+            <span className={picoCodex.stamp}>
+              {currentLevel ? currentLevel.title : 'Setup'} • {lockedLessonCount} locked
+            </span>
+          </div>
+
+          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.04fr),minmax(0,0.96fr)]">
+            <div className="grid gap-5">
               <div className={picoCodexInset('p-5')}>
-                <p className={picoClasses.label}>Unlocked capabilities</p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className={picoClasses.label}>Unlocked capabilities</p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      The pieces that matter after the mission is already real.
+                    </p>
+                  </div>
+                  <span className={picoCodex.stamp}>
+                    {derived.unlockedCapabilities.length} live
+                  </span>
+                </div>
                 <div className="mt-4 grid gap-4">
-                  {derived.unlockedCapabilities.slice(0, 3).map((capability) => (
+                  {derived.unlockedCapabilities.slice(0, 2).map((capability) => (
                     <div
                       key={capability.id}
-                      className="grid gap-2 border-t border-[#5d412d] pt-4 first:border-t-0 first:pt-0"
+                      className="grid gap-2 border-t border-[color:var(--pico-border)] pt-4 first:border-t-0 first:pt-0"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <h3 className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
+                        <h3 className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                           {capability.title}
                         </h3>
                         <span className={picoCodex.stamp}>live</span>
                       </div>
-                      <p className="text-sm leading-6 text-[#d5c0a8]">{capability.description}</p>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        {capability.description}
+                      </p>
                       <Link href={toHref(capability.href)} className={picoClasses.secondaryButton}>
                         {capability.actionLabel}
                       </Link>
@@ -638,32 +802,78 @@ export function PicoAcademyDashboard() {
                   ))}
 
                   {derived.unlockedCapabilities.length === 0 ? (
-                    <p className="text-sm leading-6 text-[#d5c0a8]">
+                    <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                       The first capability unlock lands only after the first lessons are cleared for real.
                     </p>
                   ) : null}
                 </div>
               </div>
 
-              {derived.nextCapability ? (
-                <div className={picoCodexNote('p-5')}>
-                  <p className={picoClasses.label}>Next unlock</p>
-                  <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
-                    {derived.nextCapability.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-[#f0deca]">
-                    {derived.nextCapability.description}
-                  </p>
-                  <Link href={toHref(derived.nextCapability.href)} className={cn(picoClasses.primaryButton, 'mt-4')}>
-                    {derived.nextCapability.actionLabel}
-                  </Link>
+              <div className="grid gap-5 lg:grid-cols-2">
+                {derived.nextCapability ? (
+                  <div className={picoCodexNote('p-5')}>
+                    <p className={picoClasses.label}>Next unlock</p>
+                    <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {derived.nextCapability.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {derived.nextCapability.description}
+                    </p>
+                    <Link href={toHref(derived.nextCapability.href)} className={cn(picoClasses.primaryButton, 'mt-4')}>
+                      {derived.nextCapability.actionLabel}
+                    </Link>
+                  </div>
+                ) : null}
+
+                <div className={picoCodexInset('p-5')}>
+                  <p className={picoClasses.label}>Pattern archive</p>
+                  <div className="mt-4 grid gap-4">
+                    {PICO_SHOWCASE_PATTERNS.slice(0, 2).map((pattern) => (
+                      <div
+                        key={pattern.lessonSlug}
+                        className="grid gap-2 border-t border-[color:var(--pico-border)] pt-4 first:border-t-0 first:pt-0"
+                      >
+                        <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                          {pattern.title}
+                        </p>
+                        <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                          {pattern.summary}
+                        </p>
+                        <Link href={toHref(`/academy/${pattern.lessonSlug}`)} className={picoClasses.tertiaryButton}>
+                          Open pattern lesson
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ) : null}
+              </div>
+            </div>
+
+            <div className="grid gap-5">
+              <div className={picoCodexInset('p-5')}>
+                <p className={picoClasses.label}>Field notes</p>
+                <div className="mt-4 grid gap-4">
+                  {PICO_RELEASE_NOTES.slice(0, 2).map((note) => (
+                    <div
+                      key={`${note.date}-${note.title}`}
+                      className="grid gap-2 border-t border-[color:var(--pico-border)] pt-4 first:border-t-0 first:pt-0"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                          {note.title}
+                        </p>
+                        <span className={picoCodex.stamp}>{note.date}</span>
+                      </div>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{note.body}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               <div className={picoCodexSheet('p-5')}>
                 <p className={picoClasses.label}>Control annex</p>
-                <p className="mt-3 text-sm leading-6 text-[#dbc6ae]">
-                  Platform memory stays available, but it sits below the codex on purpose. The Academy should lead with route and proof, not settings.
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  Platform memory stays available, but it sits under the codex on purpose. The Academy leads with route and proof, then exposes configuration only when you need it.
                 </p>
                 <div className="mt-5">
                   <PicoPlatformSurface
@@ -686,69 +896,9 @@ export function PicoAcademyDashboard() {
                 </div>
               </div>
             </div>
-          </section>
-        </FadeIn>
-
-        <FadeIn delay={0.22} reduceMotion={reduceMotion}>
-          <section className={picoCodexFrame('px-6 py-6 sm:px-8')}>
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className={picoClasses.label}>Field archive</p>
-                <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
-                  Patterns, release notes, and the material that should never outrun the mission
-                </h2>
-              </div>
-              <span className={picoCodex.stamp}>{lockedLessonCount} locked</span>
-            </div>
-
-            <div className="mt-6 grid gap-5">
-              <div className={picoCodexInset('p-5')}>
-                <p className={picoClasses.label}>Pattern archive</p>
-                <div className="mt-4 grid gap-4">
-                  {PICO_SHOWCASE_PATTERNS.slice(0, 3).map((pattern) => (
-                    <div
-                      key={pattern.lessonSlug}
-                      className="grid gap-2 border-t border-[#5d412d] pt-4 first:border-t-0 first:pt-0"
-                    >
-                      <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
-                        {pattern.title}
-                      </p>
-                      <p className="text-sm leading-6 text-[#d5c0a8]">{pattern.summary}</p>
-                      <Link href={toHref(`/academy/${pattern.lessonSlug}`)} className={picoClasses.tertiaryButton}>
-                        Open pattern lesson
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className={picoCodexInset('p-5')}>
-                <p className={picoClasses.label}>Recent field notes</p>
-                <div className="mt-4 grid gap-4">
-                  {PICO_RELEASE_NOTES.slice(0, 3).map((note) => (
-                    <div
-                      key={`${note.date}-${note.title}`}
-                      className="grid gap-2 border-t border-[#5d412d] pt-4 first:border-t-0 first:pt-0"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
-                          {note.title}
-                        </p>
-                        <span className={picoCodex.stamp}>{note.date}</span>
-                      </div>
-                      <p className="text-sm leading-6 text-[#d5c0a8]">{note.body}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className={picoCodexSheet('p-5 text-sm leading-6 text-[#d5c0a8]')}>
-                Locked lessons: <span className="text-[#fff4e6]">{lockedLessonCount}</span>. The Academy should stay narrower than the work it protects.
-              </div>
-            </div>
-          </section>
-        </FadeIn>
-      </div>
+          </div>
+        </section>
+      </FadeIn>
     </PicoShell>
   )
 }

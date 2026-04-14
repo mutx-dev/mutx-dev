@@ -101,7 +101,40 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
         ? 'local only'
         : session.status === 'error'
           ? 'auth error'
-          : 'checking'
+        : 'checking'
+
+  const studioReviewBoard = [
+    {
+      label: '01 • Brief',
+      title: 'The outcome the studio is chasing',
+      body: lesson.objective,
+    },
+    {
+      label: '02 • Deliverable',
+      title: 'What the finished artifact should prove',
+      body: lesson.expectedResult,
+    },
+    {
+      label: '03 • Critique',
+      title: 'The review line before you move on',
+      body: lesson.validation,
+    },
+  ]
+
+  const studioContext = [
+    {
+      label: 'Track arc',
+      value: track?.outcome ?? 'Build one real operator outcome.',
+    },
+    {
+      label: 'Lesson outcome',
+      value: lesson.outcome,
+    },
+    {
+      label: 'Time and weight',
+      value: `${lesson.estimatedMinutes}m • ${lesson.xp} xp • ${formatDifficulty(lesson.difficulty)}`,
+    },
+  ]
 
   useEffect(() => {
     if (!missingPrerequisiteLesson && !started && !completed) {
@@ -151,7 +184,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
 
     if (approvalLesson) {
       return (
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-3 sm:flex sm:flex-wrap">
           <Link href={approvalSetupHref} className={buttonClassName}>
             Open live approval setup
           </Link>
@@ -200,20 +233,20 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
         data-testid="pico-lesson-campaign-hero"
       >
         <div className="grid gap-8 lg:grid-cols-[8rem,minmax(0,1fr)]">
-          <div className="grid content-between gap-6 border-b border-[#5d412d] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
+          <div className="grid content-between gap-6 border-b border-[color:var(--pico-border)] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
             <div className="grid gap-2">
               <p className={picoClasses.label}>Lesson</p>
-              <p className="font-[family:var(--font-site-display)] text-7xl leading-none tracking-[-0.08em] text-[#f0bb83] sm:text-8xl">
+              <p className="font-[family:var(--font-site-display)] text-7xl leading-none tracking-[-0.08em] text-[color:var(--pico-accent)] sm:text-8xl">
                 {String(Math.max(lessonIndex, 0) + 1).padStart(2, '0')}
               </p>
             </div>
 
             <div className="grid gap-2">
               <p className={picoClasses.label}>Track</p>
-              <p className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+              <p className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                 {track?.title ?? 'Unmapped'}
               </p>
-              <p className="text-sm leading-6 text-[#d8c0a4]">
+              <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 {track && lessonIndex >= 0 ? `${lessonIndex + 1}/${trackLessons.length}` : 'not mapped'}
               </p>
             </div>
@@ -229,18 +262,18 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
             </div>
 
             <div className="grid gap-4">
-              <h1 className="max-w-4xl font-[family:var(--font-site-display)] text-5xl leading-[0.92] tracking-[-0.08em] text-[#fff4e6] sm:text-7xl">
+              <h1 className="max-w-4xl font-[family:var(--font-site-display)] text-5xl leading-[0.92] tracking-[-0.08em] text-[color:var(--pico-text)] sm:text-7xl">
                 {lesson.title}
               </h1>
-              <p className="max-w-3xl text-lg leading-8 text-[#e2ccb3]">
+              <p className="max-w-3xl text-lg leading-8 text-[color:var(--pico-text-secondary)]">
                 {lesson.objective}
               </p>
-              <p className="max-w-3xl text-sm leading-6 text-[#b99879]">
+              <p className="max-w-3xl text-sm leading-6 text-[color:var(--pico-text-muted)]">
                 Expected result: {lesson.expectedResult}
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="grid gap-3 sm:flex sm:flex-wrap">
               {renderPrimaryLessonAction(picoClasses.primaryButton)}
               <Link
                 href={toHref(`/tutor?lesson=${lesson.slug}`)}
@@ -250,41 +283,103 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
               </Link>
             </div>
 
-            <div className="grid gap-3 border-t border-[#5d412d] pt-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-3 border-t border-[color:var(--pico-border)] pt-5 sm:grid-cols-2 xl:grid-cols-4">
               <div className="grid gap-1">
                 <p className={picoClasses.label}>State</p>
-                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
+                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {missingPrerequisiteLesson ? 'blocked' : completed ? 'sealed' : 'active'}
                 </p>
-                <p className="text-sm leading-6 text-[#bfa78c]">
+                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   {missingPrerequisiteLesson ? 'finish the prerequisite first' : 'one route lane'}
                 </p>
               </div>
               <div className="grid gap-1">
                 <p className={picoClasses.label}>Proof</p>
-                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
+                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {evidenceReady ? 'captured' : 'pending'}
                 </p>
-                <p className="text-sm leading-6 text-[#bfa78c]">
+                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   {activeWorkspaceStep?.title ?? 'Choose a step'}
                 </p>
               </div>
               <div className="grid gap-1">
                 <p className={picoClasses.label}>Progress</p>
-                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
+                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {completedStepCount}/{lesson.steps.length}
                 </p>
-                <p className="text-sm leading-6 text-[#bfa78c]">steps cleared</p>
+                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">steps cleared</p>
               </div>
               <div className="grid gap-1">
                 <p className={picoClasses.label}>Telemetry</p>
-                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
+                <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {lesson.estimatedMinutes}m
                 </p>
-                <p className="text-sm leading-6 text-[#bfa78c]">
+                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   {lesson.xp} xp • {formatDifficulty(lesson.difficulty)}
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      <motion.section
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...revealTransition, delay: 0.04 }}
+        className={picoCodexFrame('px-6 py-6 sm:px-8 sm:py-8')}
+        data-testid="pico-lesson-studio-review"
+      >
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr),20rem]">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className={picoClasses.label}>Studio review board</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
+                  Brief, deliverable, critique
+                </h2>
+              </div>
+              <span className={picoCodex.stamp}>one real lesson at a time</span>
+            </div>
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-3">
+              {studioReviewBoard.map((item) => (
+                <article key={item.label} className={picoCodexInset('flex h-full flex-col p-5')}>
+                  <p className={picoClasses.label}>{item.label}</p>
+                  <h3 className="mt-5 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+                    {item.body}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            <div className={picoCodexNote('p-5')}>
+              <p className={picoClasses.label}>Chapter context</p>
+              <div className="mt-4 grid gap-4">
+                {studioContext.map((item) => (
+                  <div
+                    key={item.label}
+                    className="grid gap-2 border-t border-[color:var(--pico-border)] pt-4 first:border-t-0 first:pt-0"
+                  >
+                    <p className={picoClasses.label}>{item.label}</p>
+                    <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {item.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={picoCodexInset('p-5')}>
+              <p className={picoClasses.label}>Studio posture</p>
+              <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                Keep this chapter narrow. The goal is not to feel busy or advanced. The goal is to produce one artifact a sharp operator would still trust tomorrow.
+              </p>
             </div>
           </div>
         </div>
@@ -305,8 +400,8 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                   className={cn(
                     'grid min-w-[13rem] gap-2 rounded-[24px] border px-4 py-4 text-left transition',
                     active
-                      ? 'border-[#e2904f] bg-[linear-gradient(180deg,rgba(103,57,29,0.28),rgba(43,24,15,0.28))] text-[#fff4e6]'
-                      : 'border-[#4a3423] bg-[rgba(255,247,235,0.03)] text-[#d5c0a8]',
+                      ? 'border-[color:var(--pico-accent)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.22),rgba(8,16,10,0.32))] text-[color:var(--pico-text)]'
+                      : 'border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] text-[color:var(--pico-text-secondary)]',
                   )}
                 >
                   <div className="flex flex-wrap items-center gap-2">
@@ -355,8 +450,8 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                       className={cn(
                         'grid gap-2 border-l pl-4 text-left transition',
                         active
-                          ? 'border-[#e2904f] text-[#fff4e6]'
-                          : 'border-[#4a3423] text-[#d5c0a8] hover:border-[#8a623d] hover:text-[#fff4e6]',
+                          ? 'border-[color:var(--pico-accent)] text-[color:var(--pico-text)]'
+                          : 'border-[color:var(--pico-border)] text-[color:var(--pico-text-secondary)] hover:border-[color:var(--pico-border-hover)] hover:text-[color:var(--pico-text)]',
                       )}
                     >
                       <div className="flex flex-wrap items-center gap-2">
@@ -378,12 +473,12 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
         <section className={picoCodexFrame('p-6 sm:p-7')} data-testid="pico-lesson-workspace">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className={picoClasses.label}>Active route lane</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[#fff4e6]">
+              <p className={picoClasses.label}>Studio workspace</p>
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                 {activeWorkspaceStep?.title ?? 'Select a step'}
               </h2>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid gap-3 sm:flex sm:flex-wrap">
               <button
                 type="button"
                 onClick={() => workspaceActions.reset()}
@@ -410,53 +505,53 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
 
           <div className="mt-6 grid gap-5">
             <article className={picoCodexSheet('p-5')}>
-              <p className={picoClasses.label}>Command brief</p>
-              <p className="mt-4 text-base leading-8 text-[#f0deca]">
+              <p className={picoClasses.label}>Studio brief</p>
+              <p className="mt-4 text-base leading-8 text-[color:var(--pico-text-secondary)]">
                 {activeWorkspaceStep?.body ??
                   'Choose a step from the chapter spine to start the lane.'}
               </p>
               {activeWorkspaceStep?.command ? (
-                <pre className="mt-5 overflow-x-auto rounded-[22px] border border-[#6a452a] bg-[#16100d] p-4 text-sm text-[#ffc88f]">
+                <pre className="mt-5 overflow-x-auto rounded-[22px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] p-4 text-sm text-[color:var(--pico-accent-bright)]">
                   <code>{activeWorkspaceStep.command}</code>
                 </pre>
               ) : null}
               {activeWorkspaceStep?.note ? (
                 <div className={picoCodexNote('mt-5 p-4')}>
-                  <p className="text-sm leading-6 text-[#f0deca]">{activeWorkspaceStep.note}</p>
+                  <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{activeWorkspaceStep.note}</p>
                 </div>
               ) : null}
             </article>
 
             <div id="pico-proof-composer" className="grid gap-4 lg:grid-cols-2">
               <label className={picoCodexInset('grid gap-3 p-4')}>
-                <span className={picoClasses.label}>Proof captured</span>
+                <span className={picoClasses.label}>Deliverable artifact</span>
                 <textarea
                   value={workspace.evidence}
                   onChange={(event) => workspaceActions.setEvidence(event.target.value)}
                   placeholder="Paste the output, transcript note, or artifact that proves this chapter worked."
-                  className="min-h-40 rounded-[18px] border border-[#4a3423] bg-[#120d0a] px-4 py-3 text-sm text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
+                  className="min-h-40 rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-sm text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
                   data-testid="pico-lesson-proof"
                 />
               </label>
 
               <label className={picoCodexInset('grid gap-3 p-4')}>
-                <span className={picoClasses.label}>Working notes</span>
+                <span className={picoClasses.label}>Bench notes</span>
                 <textarea
                   value={workspace.notes}
                   onChange={(event) => workspaceActions.setNotes(event.target.value)}
                   placeholder="Capture the blocker, file path, or command variation that mattered."
-                  className="min-h-40 rounded-[18px] border border-[#4a3423] bg-[#120d0a] px-4 py-3 text-sm text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
+                  className="min-h-40 rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-sm text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
                 />
               </label>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr),18rem]">
               <div className={picoCodexNote('p-5')}>
-                <p className={picoClasses.label}>Seal state</p>
-                <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                <p className={picoClasses.label}>Review state</p>
+                <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {completed ? 'sealed' : evidenceReady ? 'ready' : 'pending'}
                 </p>
-                <p className="mt-3 text-sm leading-6 text-[#f0deca]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   {completed
                     ? 'The chapter is sealed. Move on while the route is still fresh.'
                     : evidenceReady
@@ -468,21 +563,21 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
 
               <div className="grid gap-4">
                 <div className={picoCodexInset('p-4')}>
-                  <p className={picoClasses.label}>Progress meter</p>
-                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                  <p className={picoClasses.label}>Chapter completion</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {completedStepCount}/{lesson.steps.length}
                   </p>
-                  <div className="mt-4 overflow-hidden rounded-full bg-[#1b120d]">
+                  <div className="mt-4 overflow-hidden rounded-full bg-[color:var(--pico-bg-input)]">
                     <div
-                      className="h-2 rounded-full bg-[linear-gradient(90deg,#e2904f,#ffd0a4)]"
+                      className="h-2 rounded-full bg-[linear-gradient(90deg,var(--pico-accent),var(--pico-accent-bright))]"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
                 </div>
 
                 <div className={picoCodexInset('p-4')}>
-                  <p className={picoClasses.label}>Next move</p>
-                  <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                  <p className={picoClasses.label}>Creative direction</p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     Finish the live step, log one proof artifact, then either seal the chapter or hand off to the next surface.
                   </p>
                 </div>
@@ -498,32 +593,32 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
               <div className="mt-4 grid gap-3">
                 <div className={picoCodexInset('p-4')}>
                   <p className={picoClasses.label}>Stay here when</p>
-                  <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     the current step still contains the answer and the route does not need escalation yet.
                   </p>
                 </div>
                 <Link
                   href={toHref(`/tutor?lesson=${lesson.slug}`)}
-                  className={picoCodexNote('p-4 transition hover:border-[#a1714b]')}
+                  className={picoCodexNote('p-4 transition hover:border-[color:var(--pico-border-hover)]')}
                 >
                   <p className={picoClasses.label}>Exact blocker</p>
-                  <p className="mt-2 text-lg font-medium text-[#fff4e6]">Ask tutor</p>
+                  <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">Ask tutor</p>
                 </Link>
                 <Link
                   href={approvalLesson ? approvalSetupHref : toHref('/autopilot')}
-                  className={picoCodexInset('p-4 transition hover:border-[#8a623d] hover:text-[#fff4e6]')}
+                  className={picoCodexInset('p-4 transition hover:border-[color:var(--pico-border-hover)] hover:text-[color:var(--pico-text)]')}
                 >
                   <p className={picoClasses.label}>Runtime truth</p>
-                  <p className="mt-2 text-lg font-medium text-[#fff4e6]">
+                  <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
                     {approvalLesson ? 'Open live approval setup' : 'Inspect Autopilot'}
                   </p>
                 </Link>
                 <Link
                   href={toHref('/support')}
-                  className={picoCodexInset('p-4 transition hover:border-[#8a623d] hover:text-[#fff4e6]')}
+                  className={picoCodexInset('p-4 transition hover:border-[color:var(--pico-border-hover)] hover:text-[color:var(--pico-text)]')}
                 >
                   <p className={picoClasses.label}>Messy edge</p>
-                  <p className="mt-2 text-lg font-medium text-[#fff4e6]">Open support lane</p>
+                  <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">Open support lane</p>
                 </Link>
               </div>
             </section>
@@ -590,7 +685,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className={picoClasses.label}>Troubleshooting appendix</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[#fff4e6]">
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                 The smaller notes you only read when the route goes crooked
               </h2>
             </div>
@@ -599,7 +694,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
 
           <div className="mt-6 grid gap-4">
             {lesson.troubleshooting.map((item) => (
-              <div key={item} className={picoCodexInset('px-4 py-4 text-sm leading-6 text-[#d5c0a8]')}>
+              <div key={item} className={picoCodexInset('px-4 py-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]')}>
                 {item}
               </div>
             ))}
@@ -611,10 +706,10 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
             <section className={picoCodexFrame('p-5')}>
               <p className={picoClasses.label}>Next capability</p>
               <div className={picoCodexNote('mt-4 p-5')}>
-                <h3 className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">
+                <h3 className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {derived.nextCapability.title}
                 </h3>
-                <p className="mt-3 text-sm leading-6 text-[#f0deca]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   {derived.nextCapability.description}
                 </p>
                 <Link

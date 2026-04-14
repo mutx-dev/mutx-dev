@@ -40,6 +40,30 @@ import {
 
 type LoadState = 'loading' | 'ready' | 'partial' | 'offline'
 
+const controlProtocol = [
+  {
+    id: '01',
+    title: 'Start with the last run',
+    body: 'If the latest execution does not make sense, the rest of this surface is just decoration.',
+    href: '#recent-runs',
+    action: 'Open recent runs',
+  },
+  {
+    id: '02',
+    title: 'Budget tells you when to stop',
+    body: 'Thresholds are useful only when they are anchored to live spend rather than gut feel.',
+    href: '#budget-section',
+    action: 'Tune spend guardrail',
+  },
+  {
+    id: '03',
+    title: 'Risky actions stay visible',
+    body: 'Approvals should survive restarts, stay reviewable, and read like real decisions.',
+    href: '#approvals-section',
+    action: 'Open approval queue',
+  },
+] as const
+
 function extractErrorMessage(payload: unknown, fallbackMessage: string) {
   if (!payload || typeof payload !== 'object') {
     return fallbackMessage
@@ -102,9 +126,9 @@ function severityClasses(severity: AutopilotTimelineItem['severity']) {
     case 'warn':
       return 'border-amber-400/20 bg-amber-400/10 text-amber-50'
     case 'good':
-      return 'border-[#7d5232] bg-[linear-gradient(180deg,rgba(103,57,29,0.22),rgba(45,27,16,0.18))] text-[#f7e2c8]'
+      return 'border-[color:var(--pico-border-hover)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.16),rgba(8,15,9,0.2))] text-[color:var(--pico-text)]'
     default:
-      return 'border-[#4a3423] bg-[rgba(255,247,235,0.04)] text-[#efe1cf]'
+      return 'border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] text-[color:var(--pico-text-secondary)]'
   }
 }
 
@@ -117,7 +141,7 @@ function StatCard({ label, value, hint }: { label: string; value: string; hint: 
     <div className={picoClasses.metric}>
       <p className={picoClasses.label}>{label}</p>
       <p className={picoClasses.metricValue}>{value}</p>
-      <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">{hint}</p>
+      <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{hint}</p>
     </div>
   )
 }
@@ -129,9 +153,9 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
         <span>{item.sourceLabel}</span>
         <span>{formatTimestamp(item.occurredAt)} • {formatRelativeTime(item.occurredAt)}</span>
       </div>
-      <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[#fff4e6]">{item.title}</h3>
+      <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">{item.title}</h3>
       <p className="mt-2 text-sm leading-6">{item.detail}</p>
-      <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">Why it matters: {item.impact}</p>
+      <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">Why it matters: {item.impact}</p>
       <Link href={item.href} className={cn(picoClasses.link, 'mt-4 inline-flex')}>
         Jump to detail section
       </Link>
@@ -142,7 +166,7 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
 function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
   return (
     <div className={picoSoft('p-5')}>
-      <p className="font-medium text-[#fff4e6]">{state.title}</p>
+      <p className="font-medium text-[color:var(--pico-text)]">{state.title}</p>
       <p className="mt-2">{state.body}</p>
       <Link
         href={state.nextStep.href}
@@ -177,6 +201,8 @@ export function PicoAutopilotPageClient() {
     actionType: 'OUTBOUND_SEND',
     summary: 'Outbound send requires a human decision before the runtime crosses the line.',
   })
+  const storyRailClass =
+    'mt-6 grid grid-flow-col auto-cols-[minmax(16rem,82vw)] gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid-flow-row md:auto-cols-auto md:overflow-visible xl:grid-cols-3'
 
   const pendingApprovals = useMemo(
     () => approvals.filter((approval) => approval.status === 'PENDING'),
@@ -343,6 +369,11 @@ export function PicoAutopilotPageClient() {
       }).slice(0, 10),
     [alerts, approvals, budget, progress.autopilot.costThresholdPercent, runs, tracesByRunId],
   )
+  const visibleTimeline = timeline.slice(0, 4)
+  const visibleRuns = runs.slice(0, 3)
+  const visibleAlerts = alerts.slice(0, 4)
+  const visiblePendingApprovals = pendingApprovals.slice(0, 3)
+  const visibleResolvedApprovals = resolvedApprovals.slice(0, 3)
 
   const integrationStatus = useMemo(
     () =>
@@ -531,6 +562,36 @@ export function PicoAutopilotPageClient() {
     : `Inspect run ${latestRun.id.slice(0, 8)}`
   const latestRunTimestamp = latestRun?.completed_at ?? latestRun?.started_at ?? latestRun?.created_at ?? null
   const latestRunTraces = latestRun ? tracesByRunId[latestRun.id] ?? [] : []
+  const operatorDoctrine = [
+    {
+      label: '01 • Read',
+      title: 'Start with the strongest live signal',
+      body: authRequired
+        ? 'Without a hosted session this room should refuse to improvise. Attach the live feed first.'
+        : latestRun
+          ? `Run ${latestRun.id.slice(0, 8)} is the first thing to read. ${describeRunDetail(latestRun, latestRunTraces)}`
+          : 'No live run exists yet. The honest move is to trigger one real task before tuning anything else.',
+    },
+    {
+      label: '02 • Judge',
+      title: 'Make the decision line explicit',
+      body: authRequired
+        ? 'Budget review is unavailable until the live account is attached.'
+        : budget
+          ? `${formatPercent(budget.usage_percentage)} usage against a ${formatPercent(progress.autopilot.costThresholdPercent)} threshold. That line should tell you when a human steps in.`
+          : 'No live budget snapshot yet. Do not pretend a threshold matters until it meets real spend.',
+    },
+    {
+      label: '03 • Intervene',
+      title: 'Keep risky actions reviewable',
+      body:
+        pendingApprovals.length > 0
+          ? `${pendingApprovals.length} approval item${pendingApprovals.length === 1 ? '' : 's'} is waiting. Good. The dangerous work is still visible.`
+          : progress.autopilot.approvalGateEnabled
+            ? 'The gate is configured, but nothing is waiting right now. Keep it reviewable and boring.'
+            : 'The gate is still off. Turn it on before a risky action becomes an invisible side effect.',
+    },
+  ]
   const recoveryWorkspace = usePicoLessonWorkspace(derived.nextLesson?.slug ?? 'autopilot', derived.nextLesson?.steps.length ?? 0, {
     progress,
     persistRemote: derived.nextLesson
@@ -558,7 +619,7 @@ export function PicoAutopilotPageClient() {
       actions={
         <Link
           href={primaryAutopilotHref}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2904f] px-5 py-3 text-sm font-semibold text-[#21130c] transition hover:bg-[#eca265]"
+          className={picoClasses.primaryButton}
         >
           {primaryAutopilotLabel}
         </Link>
@@ -618,15 +679,61 @@ export function PicoAutopilotPageClient() {
         </div>
       ) : null}
 
+      <section className={picoPanel('mb-6 p-6 sm:p-7')} data-testid="pico-autopilot-operator-doctrine">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr),20rem]">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className={picoClasses.label}>Operator doctrine</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
+                  Read, judge, then intervene
+                </h2>
+              </div>
+              <span className={picoClasses.chip}>signal • line • gate</span>
+            </div>
+
+            <div className={storyRailClass}>
+              {operatorDoctrine.map((item) => (
+                <article key={item.label} className={picoInset('snap-start flex h-full flex-col p-5')}>
+                  <p className={picoClasses.label}>{item.label}</p>
+                  <h3 className="mt-5 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+                    {item.body}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            <div className={picoEmber('p-5')}>
+              <p className={picoClasses.label}>Control room posture</p>
+              <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                This surface should feel like an operator review room, not a dashboard that celebrates motion for its own sake.
+              </p>
+            </div>
+
+            <div className={picoInset('p-5')}>
+              <p className={picoClasses.label}>Decision line</p>
+              <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                Start with the last run, compare it against the budget line, then decide whether the gate needs a human call. That order matters.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
         <div className={picoPanel('overflow-hidden p-0')}>
-          <div className="grid gap-0 border-b border-[#3a291d] lg:grid-cols-[minmax(0,1fr),18rem]">
+          <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
             <div className="p-6 sm:p-7">
-              <p className={picoClasses.label}>Command brief</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[#fff4e6] sm:text-5xl">
+              <p className={picoClasses.label}>Control brief</p>
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
                 Read the runtime before you trust the automation
               </h2>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-[#d5c0a8] sm:text-base">
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
                 Autopilot only earns trust when the last run, the live spend, and the risky actions are visible in one surface. This page should feel like a control room, not a dashboard collage.
               </p>
 
@@ -640,7 +747,7 @@ export function PicoAutopilotPageClient() {
                     {progress.autopilot.approvalGateEnabled ? 'Gate configured in Pico' : 'Gate still off in Pico'}
                   </span>
                 </div>
-                <p className="mt-4 text-sm leading-7 text-[#f0deca]">
+                <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
                   {authRequired
                     ? 'Until a MUTX session is attached, this surface should refuse to invent truth. Use the academy to finish the setup path, then come back to read the real runtime.'
                     : latestRun
@@ -649,88 +756,42 @@ export function PicoAutopilotPageClient() {
                 </p>
               </div>
 
-              <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                <div className={picoInset('p-5')}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
-                    01 Inspect first
-                  </p>
-                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
-                    Start with the last run
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
-                    If the latest execution does not make sense, the rest of this surface is just decoration.
-                  </p>
-                  <Link href="#recent-runs" className={cn(picoClasses.link, 'mt-4 inline-flex')}>
-                    Open recent runs
-                  </Link>
-                </div>
-
-                <div className={picoInset('p-5')}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
-                    02 Hold the line
-                  </p>
-                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
-                    Budget tells you when to stop
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
-                    Thresholds are useful only when they are anchored to live spend rather than gut feel.
-                  </p>
-                  <Link href="#budget-section" className={cn(picoClasses.link, 'mt-4 inline-flex')}>
-                    Tune spend guardrail
-                  </Link>
-                </div>
-
-                <div className={picoInset('p-5')}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
-                    03 Gate risk
-                  </p>
-                  <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
-                    Risky actions stay visible
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
-                    Approvals should survive restarts, stay reviewable, and read like real decisions.
-                  </p>
-                  <Link href="#approvals-section" className={cn(picoClasses.link, 'mt-4 inline-flex')}>
-                    Open approval queue
-                  </Link>
-                </div>
-              </div>
             </div>
 
-            <div className="border-t border-[#3a291d] bg-[rgba(255,247,235,0.03)] p-6 lg:border-l lg:border-t-0">
+            <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">
               <p className={picoClasses.label}>Operator rail</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Session status</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Session status</p>
+                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {authRequired ? 'auth required' : 'attached'}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Progress sync</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">{syncState}</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Progress sync</p>
+                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{syncState}</p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Budget line</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Budget line</p>
+                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {formatPercent(progress.autopilot.costThresholdPercent)}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Gate state</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Gate state</p>
+                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {progress.autopilot.approvalGateEnabled ? 'enabled' : 'off'}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Active surface</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Active surface</p>
+                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {progress.platform.activeSurface ?? 'none'}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Help lane</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Help lane</p>
+                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {progress.platform.helpLaneOpen ? 'open' : 'closed'}
                   </p>
                 </div>
@@ -756,7 +817,7 @@ export function PicoAutopilotPageClient() {
 
               <div className={picoInset('mt-4 p-4')}>
                 <p className={picoClasses.label}>If the feed is empty</p>
-                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Do not dress up missing runtime data. Finish the academy path, trigger one real action, and come back only when MUTX has something to report.
                 </p>
                 <Link
@@ -769,7 +830,7 @@ export function PicoAutopilotPageClient() {
             </div>
           </div>
 
-          <div className="grid gap-4 border-t border-[#3a291d] p-6 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-4 border-t border-[color:var(--pico-border)] p-6 md:grid-cols-2 xl:grid-cols-5">
             <StatCard
               label="Runs"
               value={liveValue(String(runs.length))}
@@ -833,35 +894,11 @@ export function PicoAutopilotPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Control rules</p>
-            <div className="mt-4 grid gap-3">
-              <div className={picoInset('p-4')}>
-                <p className="font-medium text-[#fff4e6]">Runs before rules</p>
-                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
-                  Do not configure alerts and approvals around a workflow you have not inspected live.
-                </p>
-              </div>
-              <div className={picoInset('p-4')}>
-                <p className="font-medium text-[#fff4e6]">Thresholds before panic</p>
-                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
-                  Budget lines should explain what cost you are willing to tolerate before a human gets involved.
-                </p>
-              </div>
-              <div className={picoInset('p-4')}>
-                <p className="font-medium text-[#fff4e6]">Gates before damage</p>
-                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
-                  The approval queue exists so risky actions stay reversible and reviewable.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Current posture</p>
+            <p className={picoClasses.label}>Control brief</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Latest run</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Latest run</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                   {authRequired
                     ? 'unavailable'
                     : latestRun
@@ -870,55 +907,29 @@ export function PicoAutopilotPageClient() {
                 </p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Threshold breach</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Threshold line</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                   {thresholdBreached ? 'breached' : 'clear'}
                 </p>
               </div>
-              <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Last breach marker</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
-                  {progress.autopilot.lastThresholdBreachAt
-                    ? formatTimestamp(progress.autopilot.lastThresholdBreachAt)
-                    : 'not recorded'}
-                </p>
-              </div>
+              {derived.nextLesson ? (
+                <>
+                  <div className={picoInset('p-4')} data-testid="pico-autopilot-academy-context">
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">Recovery lesson</p>
+                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{derived.nextLesson.title}</p>
+                  </div>
+                  <div className={picoInset('p-4')}>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">Workspace proof</p>
+                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                      {recoveryWorkspace.workspace.evidence.trim() ? 'captured' : 'missing'}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {recoveryWorkspace.completedStepCount}/{derived.nextLesson.steps.length} steps • {recoveryFocusedStep}
+                    </p>
+                  </div>
+                </>
+              ) : null}
             </div>
-          </section>
-
-          {derived.nextLesson ? (
-            <section className={picoPanel('p-5')} data-testid="pico-autopilot-academy-context">
-              <p className={picoClasses.label}>Academy context</p>
-              <div className="mt-4 grid gap-3">
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Recovery lesson</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">{derived.nextLesson.title}</p>
-                </div>
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Workspace progress</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
-                    {recoveryWorkspace.completedStepCount}/{derived.nextLesson.steps.length}
-                  </p>
-                </div>
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Focused step</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">{recoveryFocusedStep}</p>
-                </div>
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Proof state</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
-                    {recoveryWorkspace.workspace.evidence.trim() ? 'captured' : 'missing'}
-                  </p>
-                </div>
-              </div>
-              <p className="mt-4 text-sm leading-6 text-[#d5c0a8]">
-                If this academy context is still incomplete, the lesson lane probably remains the real source of truth. Stay in Autopilot only when the live runtime is what actually broke next.
-              </p>
-            </section>
-          ) : null}
-
-          <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Route correction</p>
             <div className="mt-4 grid gap-3">
               <Link
                 href={derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy')}
@@ -938,11 +949,46 @@ export function PicoAutopilotPageClient() {
             </div>
             <div className={picoSoft('mt-4 p-4')}>
               <p className={picoClasses.body}>
-                Stay here when the runtime is the source of truth. Go back to the academy when setup or the lesson workspace is still incomplete, use tutor when the next action is still probably documented, and escalate only when the live state stops being operable.
+                Stay here when the runtime is the source of truth. If the lesson workspace is still incomplete, the academy remains the cleaner route back to a real answer.
               </p>
             </div>
           </section>
         </aside>
+      </section>
+
+      <section className={picoPanel('mt-6 p-6 sm:p-7')} data-testid="pico-autopilot-control-protocol">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className={picoClasses.label}>Control protocol</p>
+            <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+              Three operator checks before automation earns trust
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+              The control room should stage the first decisions in plain sight. Read the last run, read the spend line, and keep risky actions exposed before you touch anything more abstract.
+            </p>
+          </div>
+          <span className={picoClasses.chip}>live operator checklist</span>
+        </div>
+
+        <div className={storyRailClass}>
+          {controlProtocol.map((item) => (
+            <article key={item.id} className={picoInset('snap-start flex h-full flex-col p-5 sm:p-6')}>
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-accent)]">
+                  {item.id}
+                </span>
+                <span className={picoClasses.label}>Operator check</span>
+              </div>
+              <h3 className="mt-6 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                {item.title}
+              </h3>
+              <p className="mt-4 flex-1 text-sm leading-7 text-[color:var(--pico-text-secondary)]">{item.body}</p>
+              <Link href={item.href} className={cn(picoClasses.link, 'mt-6 inline-flex')}>
+                {item.action}
+              </Link>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
@@ -950,11 +996,11 @@ export function PicoAutopilotPageClient() {
           <div id="timeline-section" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Activity timeline</p>
-                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
-                  What happened, when, and why it matters
+                <p className={picoClasses.label}>Signal narrative</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  Read the live story before you touch settings
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   This is the operator narrative. If the timeline is empty, the correct answer is that nothing meaningful has happened yet.
                 </p>
               </div>
@@ -962,13 +1008,22 @@ export function PicoAutopilotPageClient() {
             </div>
             <div className="mt-5 space-y-4">
               {authRequired ? (
-                <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
+                <div className="rounded-[24px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-5 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   No timeline without live control-plane access. That is the honest answer.
                 </div>
               ) : timeline.length === 0 ? (
                 <EmptyStatePanel state={runEmptyState} />
               ) : (
-                timeline.map((item) => <TimelineItemCard key={item.id} item={item} />)
+                <>
+                  {visibleTimeline.map((item) => <TimelineItemCard key={item.id} item={item} />)}
+                  {timeline.length > visibleTimeline.length ? (
+                    <div className={picoSoft('p-4')}>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        {timeline.length - visibleTimeline.length} older signal{timeline.length - visibleTimeline.length === 1 ? '' : 's'} stayed out of view on purpose. Start with the strongest four.
+                      </p>
+                    </div>
+                  ) : null}
+                </>
               )}
             </div>
           </div>
@@ -976,11 +1031,11 @@ export function PicoAutopilotPageClient() {
           <div id="recent-runs" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Runs</p>
-                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
-                  Recent execution history
+                <p className={picoClasses.label}>Run review</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  Recent execution review
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Start here. Read the latest run before you touch thresholds or approvals.
                 </p>
               </div>
@@ -994,13 +1049,14 @@ export function PicoAutopilotPageClient() {
             </div>
             <div className="mt-5 space-y-4">
               {authRequired ? (
-                <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
+                <div className="rounded-[24px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-5 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Sign in, then come back here to inspect the first real run.
                 </div>
               ) : runs.length === 0 ? (
                 <EmptyStatePanel state={runEmptyState} />
               ) : (
-                runs.map((run) => {
+                <>
+                  {visibleRuns.map((run) => {
                   const severity = getRunSeverity(run.status)
                   const traces = tracesByRunId[run.id] ?? []
                   const runTimestamp = run.completed_at ?? run.started_at ?? run.created_at
@@ -1010,11 +1066,11 @@ export function PicoAutopilotPageClient() {
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <p className="text-xs uppercase tracking-[0.18em]">{humanizeRunStatus(run.status)}</p>
-                          <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[#fff4e6]">
+                          <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                             Run {run.id.slice(0, 8)}
                           </h3>
                         </div>
-                        <div className="text-right text-xs uppercase tracking-[0.18em] text-[#d5c0a8]">
+                        <div className="text-right text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                           <p>{formatTimestamp(runTimestamp)}</p>
                           <p className="mt-1">{formatRelativeTime(runTimestamp)}</p>
                         </div>
@@ -1025,7 +1081,7 @@ export function PicoAutopilotPageClient() {
                       <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr),18rem]">
                         <div className={picoInset('p-4')}>
                           <p className={picoClasses.label}>Operator read</p>
-                          <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                          <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                             {['FAILED', 'ERROR', 'CANCELLED'].includes(run.status.toUpperCase())
                               ? 'This job failed. If the agent is still trusted, it should be because you understand this failure.'
                               : ['RUNNING', 'QUEUED', 'PENDING'].includes(run.status.toUpperCase())
@@ -1036,7 +1092,7 @@ export function PicoAutopilotPageClient() {
 
                         <div className={picoInset('p-4')}>
                           <p className={picoClasses.label}>Run facts</p>
-                          <div className="mt-3 grid gap-2 text-sm text-[#d5c0a8]">
+                          <div className="mt-3 grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
                             <p>Agent: {run.agent_id ?? 'unknown'}</p>
                             <p>Trace count: {run.trace_count ?? traces.length}</p>
                             <p>
@@ -1051,7 +1107,7 @@ export function PicoAutopilotPageClient() {
                       <div className={picoInset('mt-4 p-4')}>
                         <p className={picoClasses.label}>Trace signals</p>
                         {traces.length === 0 ? (
-                          <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                          <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                             No run traces were returned for this run.
                           </p>
                         ) : (
@@ -1064,7 +1120,7 @@ export function PicoAutopilotPageClient() {
                                 <p className="text-xs uppercase tracking-[0.16em] text-[#b09376]">
                                   {trace.event_type}
                                 </p>
-                                <p className="mt-1 text-sm leading-6 text-[#d5c0a8]">{trace.message}</p>
+                                <p className="mt-1 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{trace.message}</p>
                               </div>
                             ))}
                           </div>
@@ -1072,7 +1128,15 @@ export function PicoAutopilotPageClient() {
                       </div>
                     </article>
                   )
-                })
+                  })}
+                  {runs.length > visibleRuns.length ? (
+                    <div className={picoSoft('p-4')}>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        {runs.length - visibleRuns.length} older run{runs.length - visibleRuns.length === 1 ? '' : 's'} are hidden so the review stays on the latest decisions first.
+                      </p>
+                    </div>
+                  ) : null}
+                </>
               )}
             </div>
           </div>
@@ -1080,8 +1144,8 @@ export function PicoAutopilotPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <div id="budget-section" className={sectionClasses()}>
-            <p className={picoClasses.label}>Budget</p>
-            <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+            <p className={picoClasses.label}>Spend review</p>
+            <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[color:var(--pico-text)]">
               Live spend and your line in the sand
             </h2>
 
@@ -1090,7 +1154,7 @@ export function PicoAutopilotPageClient() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className={picoClasses.label}>Usage</p>
-                    <p className="mt-3 font-[family:var(--font-site-display)] text-5xl tracking-[-0.06em] text-[#fff4e6]">
+                    <p className="mt-3 font-[family:var(--font-site-display)] text-5xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                       {authRequired ? '--' : budget ? formatPercent(budget.usage_percentage) : '--'}
                     </p>
                   </div>
@@ -1098,7 +1162,7 @@ export function PicoAutopilotPageClient() {
                     {thresholdBreached ? 'above threshold' : 'within threshold'}
                   </span>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   {authRequired
                     ? 'Live budget requires authentication.'
                     : budget
@@ -1109,12 +1173,12 @@ export function PicoAutopilotPageClient() {
 
               <div className={picoSoft('p-5')}>
                 <p className={picoClasses.label}>Threshold</p>
-                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Pico stores the local budget line here. Real alert delivery still follows the live MUTX monitoring setup, so this surface refuses to pretend email or webhook routing is active when it is not.
                 </p>
 
-                <label className="mt-4 block text-sm text-[#d5c0a8]">
-                  <span className="block text-xs uppercase tracking-[0.24em] text-[#a8896e]">
+                <label className="mt-4 block text-sm text-[color:var(--pico-text-secondary)]">
+                  <span className="block text-xs uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
                     Cost threshold percent
                   </span>
                   <input
@@ -1126,7 +1190,7 @@ export function PicoAutopilotPageClient() {
                       setError(null)
                       setThresholdDraft(Number(event.target.value))
                     }}
-                    className="mt-3 w-full rounded-2xl border border-[#4a3423] bg-[rgba(255,247,235,0.04)] px-4 py-3 text-sm text-[#fff4e6] outline-none"
+                    className="mt-3 w-full rounded-2xl border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-sm text-[color:var(--pico-text)] outline-none"
                   />
                 </label>
 
@@ -1135,7 +1199,7 @@ export function PicoAutopilotPageClient() {
                     type="button"
                     onClick={saveThreshold}
                     disabled={Boolean(thresholdValidationError)}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2904f] px-4 py-2 text-sm font-semibold text-[#21130c] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[color:var(--pico-accent)] px-4 py-2 text-sm font-semibold text-[color:var(--pico-accent-contrast)] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Save threshold
                   </button>
@@ -1159,12 +1223,12 @@ export function PicoAutopilotPageClient() {
                   <p className={picoClasses.label}>Top spenders</p>
                   <div className="mt-3 grid gap-2">
                     {authRequired ? (
-                      <p className="text-sm leading-6 text-[#d5c0a8]">Sign in to read the usage breakdown.</p>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">Sign in to read the usage breakdown.</p>
                     ) : usage?.usage_by_agent.length ? (
                       usage.usage_by_agent.slice(0, 3).map((item) => (
                         <div key={`${item.agent_id}-${item.agent_name}`} className={picoSoft('px-4 py-3')}>
-                          <p className="font-medium text-[#fff4e6]">{item.agent_name}</p>
-                          <p className="mt-1 text-sm leading-6 text-[#d5c0a8]">
+                          <p className="font-medium text-[color:var(--pico-text)]">{item.agent_name}</p>
+                          <p className="mt-1 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                             {item.credits_used} credits across {item.event_count} events
                           </p>
                         </div>
@@ -1179,12 +1243,12 @@ export function PicoAutopilotPageClient() {
                   <p className={picoClasses.label}>Usage drivers</p>
                   <div className="mt-3 grid gap-2">
                     {authRequired ? (
-                      <p className="text-sm leading-6 text-[#d5c0a8]">Sign in to read the usage breakdown.</p>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">Sign in to read the usage breakdown.</p>
                     ) : usage?.usage_by_type.length ? (
                       usage.usage_by_type.slice(0, 3).map((item) => (
                         <div key={item.event_type} className={picoSoft('px-4 py-3')}>
-                          <p className="font-medium text-[#fff4e6]">{item.event_type}</p>
-                          <p className="mt-1 text-sm leading-6 text-[#d5c0a8]">
+                          <p className="font-medium text-[color:var(--pico-text)]">{item.event_type}</p>
+                          <p className="mt-1 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                             {item.credits_used} credits across {item.event_count} events
                           </p>
                         </div>
@@ -1200,48 +1264,57 @@ export function PicoAutopilotPageClient() {
 
           <div id="alerts-section" className={sectionClasses()}>
             <p className={picoClasses.label}>Alerts</p>
-            <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+            <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[color:var(--pico-text)]">
               Meaningful monitoring events
             </h2>
-            <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+            <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
               This is the live alert feed. No fake warning badges, no synthetic incidents.
             </p>
 
             <div className="mt-5 space-y-4">
               {authRequired ? (
-                <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
+                <div className="rounded-[24px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-5 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Sign in to load live alerts.
                 </div>
               ) : alerts.length === 0 ? (
                 <EmptyStatePanel state={alertsEmptyState} />
               ) : (
-                alerts.map((alert) => (
-                  <article
-                    key={alert.id}
-                    className={`rounded-[24px] border p-5 ${severityClasses(alert.resolved ? 'good' : 'critical')}`}
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.18em]">{alert.type}</p>
-                        <h3 className="mt-2 text-lg font-semibold text-[#fff4e6]">
-                          {alert.resolved ? 'Resolved alert' : 'Active alert'}
-                        </h3>
+                <>
+                  {visibleAlerts.map((alert) => (
+                    <article
+                      key={alert.id}
+                      className={`rounded-[24px] border p-5 ${severityClasses(alert.resolved ? 'good' : 'critical')}`}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.18em]">{alert.type}</p>
+                          <h3 className="mt-2 text-lg font-semibold text-[color:var(--pico-text)]">
+                            {alert.resolved ? 'Resolved alert' : 'Active alert'}
+                          </h3>
+                        </div>
+                        <div className="text-right text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
+                          <p>{formatTimestamp(alert.resolved_at ?? alert.created_at)}</p>
+                          <p className="mt-1">{formatRelativeTime(alert.resolved_at ?? alert.created_at)}</p>
+                        </div>
                       </div>
-                      <div className="text-right text-xs uppercase tracking-[0.18em] text-[#d5c0a8]">
-                        <p>{formatTimestamp(alert.resolved_at ?? alert.created_at)}</p>
-                        <p className="mt-1">{formatRelativeTime(alert.resolved_at ?? alert.created_at)}</p>
+                      <p className="mt-4 text-sm leading-6">{alert.message}</p>
+                      <div className="mt-3 flex flex-wrap gap-4 text-sm text-[color:var(--pico-text-secondary)]">
+                        <span>Agent: {alert.agent_id}</span>
+                        <span>{alert.resolved ? 'Resolved' : 'Still active'}</span>
                       </div>
+                      <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        Why it matters: {explainAlertImpact(alert)}
+                      </p>
+                    </article>
+                  ))}
+                  {alerts.length > visibleAlerts.length ? (
+                    <div className={picoSoft('p-4')}>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        {alerts.length - visibleAlerts.length} additional alert{alerts.length - visibleAlerts.length === 1 ? '' : 's'} are suppressed so the feed stays editorial instead of turning into a wall of badges.
+                      </p>
                     </div>
-                    <p className="mt-4 text-sm leading-6">{alert.message}</p>
-                    <div className="mt-3 flex flex-wrap gap-4 text-sm text-[#d5c0a8]">
-                      <span>Agent: {alert.agent_id}</span>
-                      <span>{alert.resolved ? 'Resolved' : 'Still active'}</span>
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
-                      Why it matters: {explainAlertImpact(alert)}
-                    </p>
-                  </article>
-                ))
+                  ) : null}
+                </>
               )}
             </div>
           </div>
@@ -1251,109 +1324,20 @@ export function PicoAutopilotPageClient() {
       <section id="approvals-section" className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
         <div className={sectionClasses()}>
           <p className={picoClasses.label}>Approvals</p>
-          <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[#fff4e6]">
+          <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[color:var(--pico-text)]">
             Risky actions and their decisions
           </h2>
-          <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+          <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
             This queue is now the approval source of truth for Pico. It should not disappear because a process restarted.
           </p>
 
           <div className="mt-5 space-y-4">
             {authRequired ? (
-              <div className="rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.04)] p-5 text-sm leading-6 text-[#d5c0a8]">
+              <div className="rounded-[24px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-5 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 Sign in to load live approval requests.
               </div>
             ) : (
               <>
-                <div className={picoInset('grid gap-4 p-5')}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className={picoClasses.label}>Create a gated action</p>
-                      <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
-                        Use this to exercise the live approval queue from Pico instead of waiting for another surface to create the request first.
-                      </p>
-                    </div>
-                    <span className={picoClasses.chip}>live queue write</span>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <label className="grid gap-2 text-sm text-[#d5c0a8]">
-                      <span className={picoClasses.label}>Agent ID</span>
-                      <input
-                        value={approvalDraft.agentId}
-                        onChange={(event) =>
-                          setApprovalDraft((current) => ({ ...current, agentId: event.target.value }))
-                        }
-                        className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
-                        placeholder="agent-founder-lab"
-                      />
-                    </label>
-
-                    <label className="grid gap-2 text-sm text-[#d5c0a8]">
-                      <span className={picoClasses.label}>Session or run ID</span>
-                      <input
-                        value={approvalDraft.sessionId}
-                        onChange={(event) =>
-                          setApprovalDraft((current) => ({ ...current, sessionId: event.target.value }))
-                        }
-                        className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
-                        placeholder="ses-pico-approval"
-                      />
-                    </label>
-                  </div>
-
-                  <label className="grid gap-2 text-sm text-[#d5c0a8]">
-                    <span className={picoClasses.label}>Action type</span>
-                    <input
-                      value={approvalDraft.actionType}
-                      onChange={(event) =>
-                        setApprovalDraft((current) => ({ ...current, actionType: event.target.value }))
-                      }
-                      className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
-                      placeholder="OUTBOUND_SEND"
-                    />
-                  </label>
-
-                  <label className="grid gap-2 text-sm text-[#d5c0a8]">
-                    <span className={picoClasses.label}>Why this action needs a gate</span>
-                    <textarea
-                      value={approvalDraft.summary}
-                      onChange={(event) =>
-                        setApprovalDraft((current) => ({ ...current, summary: event.target.value }))
-                      }
-                      rows={4}
-                      className="rounded-[20px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-[#fff4e6] outline-none placeholder:text-[#8f7157]"
-                      placeholder="Describe the risky action clearly."
-                    />
-                  </label>
-
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => void createApprovalRequest()}
-                      disabled={creatingApproval}
-                      className={picoClasses.primaryButton}
-                    >
-                      {creatingApproval ? 'Creating request...' : 'Create approval request'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setApprovalDraft({
-                          agentId: latestRun?.agent_id || 'agent-founder-lab',
-                          sessionId: latestRun?.id || 'ses-pico-approval',
-                          actionType: 'OUTBOUND_SEND',
-                          summary:
-                            'Outbound send requires a human decision before the runtime crosses the line.',
-                        })
-                      }
-                      className={picoClasses.secondaryButton}
-                    >
-                      Reset draft
-                    </button>
-                  </div>
-                </div>
-
                 {pendingApprovals.length === 0 && resolvedApprovals.length === 0 ? (
                   <EmptyStatePanel state={approvalsEmptyState} />
                 ) : null}
@@ -1364,14 +1348,14 @@ export function PicoAutopilotPageClient() {
                   </div>
                 ) : null}
 
-                {pendingApprovals.map((approval) => (
+                {visiblePendingApprovals.map((approval) => (
                   <article key={approval.id} className={`rounded-[24px] border p-5 ${severityClasses('warn')}`}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="text-xs uppercase tracking-[0.18em]">Pending</p>
-                        <h3 className="mt-2 text-lg font-semibold text-[#fff4e6]">{approval.action_type}</h3>
+                        <h3 className="mt-2 text-lg font-semibold text-[color:var(--pico-text)]">{approval.action_type}</h3>
                       </div>
-                      <div className="text-right text-xs uppercase tracking-[0.18em] text-[#d5c0a8]">
+                      <div className="text-right text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                         <p>{formatTimestamp(approval.created_at)}</p>
                         <p className="mt-1">{formatRelativeTime(approval.created_at)}</p>
                       </div>
@@ -1381,7 +1365,7 @@ export function PicoAutopilotPageClient() {
                         ? approval.payload.summary
                         : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
                     </p>
-                    <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                       Why it matters: {explainApprovalImpact(approval)}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
@@ -1389,7 +1373,7 @@ export function PicoAutopilotPageClient() {
                         type="button"
                         onClick={() => void resolveApproval(approval.id, 'approve')}
                         disabled={resolvingApprovalId === approval.id}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e2904f] px-4 py-2 text-sm font-semibold text-[#21130c] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-[color:var(--pico-accent)] px-4 py-2 text-sm font-semibold text-[color:var(--pico-accent-contrast)] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {resolvingApprovalId === approval.id ? 'Working...' : 'Approve'}
                       </button>
@@ -1397,13 +1381,20 @@ export function PicoAutopilotPageClient() {
                         type="button"
                         onClick={() => void resolveApproval(approval.id, 'reject')}
                         disabled={resolvingApprovalId === approval.id}
-                        className="rounded-full border border-[#4a3423] px-4 py-2 text-sm font-medium text-[#efe1cf] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-full border border-[color:var(--pico-border)] px-4 py-2 text-sm font-medium text-[color:var(--pico-text-secondary)] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {resolvingApprovalId === approval.id ? 'Working...' : 'Reject'}
                       </button>
                     </div>
                   </article>
                 ))}
+                {pendingApprovals.length > visiblePendingApprovals.length ? (
+                  <div className={picoSoft('p-4')}>
+                    <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {pendingApprovals.length - visiblePendingApprovals.length} more pending approval{pendingApprovals.length - visiblePendingApprovals.length === 1 ? '' : 's'} stayed out of view so the queue keeps the sharpest decisions on top.
+                    </p>
+                  </div>
+                ) : null}
               </>
             )}
           </div>
@@ -1411,19 +1402,110 @@ export function PicoAutopilotPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className={picoPanel('p-5')}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className={picoClasses.label}>Create a gated action</p>
+                <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  Exercise the live approval queue here instead of waiting for another surface to create the request first.
+                </p>
+              </div>
+              <span className={picoClasses.chip}>live queue write</span>
+            </div>
+
+            <div className="mt-4 grid gap-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                  <span className={picoClasses.label}>Agent ID</span>
+                  <input
+                    value={approvalDraft.agentId}
+                    onChange={(event) =>
+                      setApprovalDraft((current) => ({ ...current, agentId: event.target.value }))
+                    }
+                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                    placeholder="agent-founder-lab"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                  <span className={picoClasses.label}>Session or run ID</span>
+                  <input
+                    value={approvalDraft.sessionId}
+                    onChange={(event) =>
+                      setApprovalDraft((current) => ({ ...current, sessionId: event.target.value }))
+                    }
+                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                    placeholder="ses-pico-approval"
+                  />
+                </label>
+              </div>
+
+              <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <span className={picoClasses.label}>Action type</span>
+                <input
+                  value={approvalDraft.actionType}
+                  onChange={(event) =>
+                    setApprovalDraft((current) => ({ ...current, actionType: event.target.value }))
+                  }
+                  className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                  placeholder="OUTBOUND_SEND"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <span className={picoClasses.label}>Why this action needs a gate</span>
+                <textarea
+                  value={approvalDraft.summary}
+                  onChange={(event) =>
+                    setApprovalDraft((current) => ({ ...current, summary: event.target.value }))
+                  }
+                  rows={4}
+                  className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                  placeholder="Describe the risky action clearly."
+                />
+              </label>
+
+              <div className="grid gap-3">
+                <button
+                  type="button"
+                  onClick={() => void createApprovalRequest()}
+                  disabled={creatingApproval}
+                  className={picoClasses.primaryButton}
+                >
+                  {creatingApproval ? 'Creating request...' : 'Create approval request'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setApprovalDraft({
+                      agentId: latestRun?.agent_id || 'agent-founder-lab',
+                      sessionId: latestRun?.id || 'ses-pico-approval',
+                      actionType: 'OUTBOUND_SEND',
+                      summary:
+                        'Outbound send requires a human decision before the runtime crosses the line.',
+                    })
+                  }
+                  className={picoClasses.secondaryButton}
+                >
+                  Reset draft
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section className={picoPanel('p-5')}>
             <p className={picoClasses.label}>Gate status</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Pending actions</p>
-                <p className="mt-1 text-2xl font-semibold text-[#fff4e6]">{liveValue(String(pendingApprovals.length))}</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Pending actions</p>
+                <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">{liveValue(String(pendingApprovals.length))}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Decision history</p>
-                <p className="mt-1 text-2xl font-semibold text-[#fff4e6]">{liveValue(String(resolvedApprovals.length))}</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Decision history</p>
+                <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">{liveValue(String(resolvedApprovals.length))}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Configured locally</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Configured locally</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                   {progress.autopilot.approvalGateEnabled ? 'yes' : 'no'}
                 </p>
               </div>
@@ -1434,7 +1516,7 @@ export function PicoAutopilotPageClient() {
             <section className={picoPanel('p-5')}>
               <p className={picoClasses.label}>Recent decisions</p>
               <div className="mt-4 grid gap-3">
-                {resolvedApprovals.map((approval) => (
+                {visibleResolvedApprovals.map((approval) => (
                   <article
                     key={approval.id}
                     className={`rounded-[24px] border p-4 ${severityClasses(approval.status === 'APPROVED' ? 'good' : 'critical')}`}
@@ -1442,7 +1524,7 @@ export function PicoAutopilotPageClient() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-xs uppercase tracking-[0.18em]">{approval.status}</p>
-                        <h3 className="mt-2 text-base font-semibold text-[#fff4e6]">{approval.action_type}</h3>
+                        <h3 className="mt-2 text-base font-semibold text-[color:var(--pico-text)]">{approval.action_type}</h3>
                       </div>
                       <span className={picoClasses.chip}>
                         {formatRelativeTime(approval.resolved_at ?? approval.created_at)}
@@ -1453,11 +1535,18 @@ export function PicoAutopilotPageClient() {
                         ? approval.payload.summary
                         : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
                     </p>
-                    <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                       Why it matters: {explainApprovalImpact(approval)}
                     </p>
                   </article>
                 ))}
+                {resolvedApprovals.length > visibleResolvedApprovals.length ? (
+                  <div className={picoSoft('p-4')}>
+                    <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {resolvedApprovals.length - visibleResolvedApprovals.length} older decision{resolvedApprovals.length - visibleResolvedApprovals.length === 1 ? '' : 's'} are hidden so the recent record stays readable.
+                    </p>
+                  </div>
+                ) : null}
               </div>
             </section>
           ) : null}

@@ -11,6 +11,7 @@ import {
 import { usePicoHref } from '@/lib/pico/navigation'
 import { type PicoSessionState } from '@/components/pico/usePicoSession'
 import { picoClasses, picoEmber, picoInset, picoPanel, picoSoft } from '@/components/pico/picoTheme'
+import { cn } from '@/lib/utils'
 
 type PicoPlatformSurfaceProps = {
   session: PicoSessionState
@@ -119,10 +120,10 @@ export function PicoPlatformSurface({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className={picoClasses.label}>Platform desk</p>
-          <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[#fff4e6] sm:text-4xl">
+          <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-4xl">
             Identity, route memory, and limits in one place
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#d5c0a8]">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
             This is the operator-facing control desk for the Pico account. It should tell the truth
             about plan limits, where the operator was last working, and whether the product chrome
             is tuned for focus or recovery.
@@ -136,12 +137,12 @@ export function PicoPlatformSurface({
           <div className={picoInset('grid gap-4 p-5')}>
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
-                <p className="text-sm text-[#a8896e]">Plan</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">{plan.toUpperCase()}</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Plan</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{plan.toUpperCase()}</p>
               </div>
               <div>
-                <p className="text-sm text-[#a8896e]">Verification</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Verification</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                   {session.status === 'authenticated'
                     ? session.user.isEmailVerified === false
                       ? 'pending'
@@ -152,8 +153,8 @@ export function PicoPlatformSurface({
                 </p>
               </div>
               <div>
-                <p className="text-sm text-[#a8896e]">Workspace saves</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Workspace saves</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                   {Object.keys(progress.lessonWorkspaces).length}
                 </p>
               </div>
@@ -163,7 +164,7 @@ export function PicoPlatformSurface({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className={picoClasses.label}>Route memory</p>
-                  <p className="mt-1 text-sm leading-6 text-[#d5c0a8]">
+                  <p className="mt-1 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     The current surface should match what the operator is actually doing. Keep this
                     updated when the product shifts lanes.
                   </p>
@@ -173,10 +174,7 @@ export function PicoPlatformSurface({
                 </span>
               </div>
 
-              <div
-                className="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
-                data-testid="pico-platform-surface-memory"
-              >
+              <div className="grid gap-3" data-testid="pico-platform-surface-memory">
                 {surfaceOptions.map((option) => {
                   const selected = activeSurface === option.surface
                   return (
@@ -186,15 +184,22 @@ export function PicoPlatformSurface({
                       onClick={() => setActiveSurface(option.surface)}
                       aria-pressed={selected}
                       className={picoSoft(
-                        `grid gap-2 rounded-[24px] px-4 py-4 text-left transition hover:border-[#7d5232] hover:bg-[rgba(255,247,235,0.06)] ${
-                          selected ? 'border-[#e2904f] bg-[rgba(226,144,79,0.1)]' : ''
+                        `grid gap-3 rounded-[24px] px-4 py-4 text-left transition sm:grid-cols-[minmax(0,1fr),auto] sm:items-center hover:border-[color:var(--pico-border-hover)] hover:bg-[color:var(--pico-bg-surface-hover)] ${
+                          selected
+                            ? 'border-[color:var(--pico-accent)] bg-[rgba(var(--pico-accent-rgb),0.1)]'
+                            : ''
                         }`,
                       )}
                     >
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
-                        {option.note}
-                      </p>
-                      <p className="text-lg font-medium text-[#fff4e6]">{option.label}</p>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
+                          {option.note}
+                        </p>
+                        <p className="mt-2 text-xl font-medium text-[color:var(--pico-text)]">{option.label}</p>
+                      </div>
+                      <span className={cn(picoClasses.chip, selected && 'text-[color:var(--pico-text)]')}>
+                        {selected ? 'active now' : 'set route'}
+                      </span>
                     </button>
                   )
                 })}
@@ -204,10 +209,10 @@ export function PicoPlatformSurface({
             <div className="grid gap-4 md:grid-cols-2">
               <div className={picoSoft('p-4')}>
                 <p className={picoClasses.label}>Current surface</p>
-                <p className="mt-2 text-lg font-medium text-[#fff4e6]">
+                <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
                   {activeSurface ?? 'not recorded'}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Route memory should follow the operator through Pico instead of resetting every
                   time the page changes.
                 </p>
@@ -215,42 +220,42 @@ export function PicoPlatformSurface({
 
               <div className={picoSoft('p-4')}>
                 <p className={picoClasses.label}>Last lesson context</p>
-                <p className="mt-2 text-lg font-medium text-[#fff4e6]">
+                <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
                   {lastOpenedLesson ?? 'not recorded'}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   This is the recovery point when the operator needs to re-enter the lesson spine.
                 </p>
               </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="flex items-start gap-3 rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-4 text-sm leading-6 text-[#d5c0a8]">
+              <label className="flex items-start gap-3 rounded-[24px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 <input
                   type="checkbox"
                   checked={progress.platform.railCollapsed}
                   onChange={(event) => onSave({ railCollapsed: event.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-[#6e4d31] bg-transparent text-[#e2904f] accent-[#e2904f]"
+                  className="mt-1 h-4 w-4 rounded border-[color:var(--pico-border)] bg-transparent text-[color:var(--pico-accent)] accent-[color:var(--pico-accent)]"
                 />
                 <span>
-                  <span className="block font-medium text-[#fff4e6]">Collapse rail</span>
-                  <span className="block text-[#c7af93]">
+                  <span className="block font-medium text-[color:var(--pico-text)]">Collapse rail</span>
+                  <span className="block text-[color:var(--pico-text-secondary)]">
                     Use a tighter chrome when the operator already knows the route and needs more
                     room for the live surface.
                   </span>
                 </span>
               </label>
 
-              <label className="flex items-start gap-3 rounded-[24px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-4 text-sm leading-6 text-[#d5c0a8]">
+              <label className="flex items-start gap-3 rounded-[24px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 <input
                   type="checkbox"
                   checked={progress.platform.helpLaneOpen}
                   onChange={(event) => onSave({ helpLaneOpen: event.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-[#6e4d31] bg-transparent text-[#e2904f] accent-[#e2904f]"
+                  className="mt-1 h-4 w-4 rounded border-[color:var(--pico-border)] bg-transparent text-[color:var(--pico-accent)] accent-[color:var(--pico-accent)]"
                 />
                 <span>
-                  <span className="block font-medium text-[#fff4e6]">Keep help lane open</span>
-                  <span className="block text-[#c7af93]">
+                  <span className="block font-medium text-[color:var(--pico-text)]">Keep help lane open</span>
+                  <span className="block text-[color:var(--pico-text-secondary)]">
                     Keep recovery guidance visible when the operator is still learning the product
                     routes.
                   </span>
@@ -292,12 +297,12 @@ export function PicoPlatformSurface({
               {(Object.entries(planMatrix) as Array<[keyof typeof planMatrix, string]>).map(([feature, value]) => (
                 <div
                   key={feature}
-                  className="flex items-start justify-between gap-4 border-b border-[#4a3423] pb-3 last:border-b-0 last:pb-0"
+                  className="flex items-start justify-between gap-4 border-b border-[color:var(--pico-border)] pb-3 last:border-b-0 last:pb-0"
                 >
-                  <span className="text-sm uppercase tracking-[0.18em] text-[#b58d65]">
+                  <span className="text-sm uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
                     {feature.replace('_', ' ')}
                   </span>
-                  <span className="max-w-[14rem] text-right text-sm leading-6 text-[#fff4e6]">
+                  <span className="max-w-[14rem] text-right text-sm leading-6 text-[color:var(--pico-text)]">
                     {value}
                   </span>
                 </div>
@@ -311,18 +316,18 @@ export function PicoPlatformSurface({
             <p className={picoClasses.label}>Route ledger</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Current path</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">{currentPath}</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Current path</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{currentPath}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Platform state updated</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Platform state updated</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                   {formatTimestamp(progress.platform.updatedAt)}
                 </p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[#a8896e]">Sync confidence</p>
-                <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Sync confidence</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                   {formatSyncState(syncState, ready)}
                 </p>
               </div>
@@ -331,7 +336,7 @@ export function PicoPlatformSurface({
 
           <div className={picoInset('p-5')}>
             <p className={picoClasses.label}>Operator truth</p>
-            <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+            <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
               The product should remember the route and lesson context without pretending it knows
               more than it does. `activeSurface`, `lastOpenedLessonSlug`, the rail state, and the
               help lane are the minimum persisted memory needed to make Pico feel like one platform.

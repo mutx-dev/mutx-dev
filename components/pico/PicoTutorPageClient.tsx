@@ -166,6 +166,41 @@ export function PicoTutorPageClient() {
       ? (lessonSlug, workspace) => actions.setLessonWorkspace(lessonSlug, workspace)
       : undefined,
   })
+  const tutorMethod = [
+    {
+      label: '01 • Frame',
+      title: 'Bring one blocked step',
+      body: selectedLesson
+        ? `Tie the question to ${selectedLesson.title}. The desk works best when the lesson route is already attached.`
+        : 'Name the exact step, command, or approval state that broke. Broad anxiety is not enough.',
+    },
+    {
+      label: '02 • Evidence',
+      title: 'Bring what actually happened',
+      body: 'Paste the command, transcript, error, or runtime signal. This desk reviews evidence, not vibes.',
+    },
+    {
+      label: '03 • Exit',
+      title: 'Leave with one move',
+      body: 'A good tutor answer gives one next action, one verification line, and a clean handoff if the evidence stays thin.',
+    },
+  ]
+  const lessonReviewBoard = selectedLesson
+    ? [
+        {
+          label: 'Lesson brief',
+          value: selectedLesson.objective,
+        },
+        {
+          label: 'Deliverable',
+          value: selectedLesson.expectedResult,
+        },
+        {
+          label: 'Critique line',
+          value: selectedLesson.validation,
+        },
+      ]
+    : []
 
   useEffect(() => {
     setLessonSlug(defaultLessonSlug)
@@ -392,7 +427,7 @@ export function PicoTutorPageClient() {
         actions.setPlatform({ helpLaneOpen: !progress.platform.helpLaneOpen })
       }
       actions={
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-3 sm:flex sm:flex-wrap">
           <Link
             href={selectedLesson ? toHref(`/academy/${selectedLesson.slug}`) : toHref('/academy')}
             className={picoClasses.secondaryButton}
@@ -449,18 +484,65 @@ export function PicoTutorPageClient() {
         ]}
       />
 
+      <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-tutor-crit-desk">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr),20rem]">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className={picoClasses.label}>Crit desk method</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
+                  Treat each question like a studio critique
+                </h2>
+              </div>
+              <span className={picoClasses.chip}>frame • evidence • exit</span>
+            </div>
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-3">
+              {tutorMethod.map((item) => (
+                <article key={item.label} className={picoInset('flex h-full flex-col p-5')}>
+                  <p className={picoClasses.label}>{item.label}</p>
+                  <h3 className="mt-5 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+                    {item.body}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            <div className={picoEmber('p-5')}>
+              <p className={picoClasses.label}>Desk posture</p>
+              <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                The premium version of this page is not a friendly chatbot. It is a sharp review desk that narrows ambiguity into one next move.
+              </p>
+            </div>
+            <div className={picoInset('p-5')}>
+              <p className={picoClasses.label}>Attached lane</p>
+              <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                {selectedLesson
+                  ? `${selectedLesson.title} is attached, so the tutor can answer against the real lesson brief instead of guessing.`
+                  : 'No lesson is attached yet. Connect the blocked lesson if you want the tutor to stay grounded in the actual route.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
         <div className={picoPanel('overflow-hidden p-0')}>
-          <div className="grid gap-0 border-b border-[#3a291d] lg:grid-cols-[minmax(0,1fr),18rem]">
+          <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
             <form onSubmit={submit} className="p-6 sm:p-7">
-              <p className={picoClasses.label}>Question desk</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[#fff4e6] sm:text-5xl">
-                Ground the next move before you escalate
+              <p className={picoClasses.label}>Crit desk</p>
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+                Bring one blocker to the desk
               </h2>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-[#d5c0a8] sm:text-base">
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
                 Ask only when the lesson path is blocked. The answer should send you back into action, not into another loop of reading.
               </p>
-              <p className="mt-3 text-xs uppercase tracking-[0.18em] text-[#a8896e]">
+              <p className="mt-3 text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
                 {session.status === 'authenticated'
                   ? 'Hosted identity and runtime context attached'
                   : 'Read-only tutor mode. Hosted session context is missing until you sign in.'}
@@ -468,20 +550,30 @@ export function PicoTutorPageClient() {
 
               {selectedLesson ? (
                 <div className={picoEmber('mt-6 p-5')}>
-                  <p className="font-medium text-[#fff4e6]">Where you are</p>
+                  <p className="font-medium text-[color:var(--pico-text)]">Where you are</p>
                   <p className="mt-2 text-sm leading-6">
                     You are asking about {selectedLesson.title}. Keep the question tied to the step that is actually blocked.
                   </p>
+                  <div className="mt-4 grid gap-3 xl:grid-cols-5">
+                    {lessonReviewBoard.map((item) => (
+                      <div key={item.label} className={picoInset('p-4')}>
+                        <p className={picoClasses.label}>{item.label}</p>
+                        <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                          {item.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className={picoInset('p-4')}>
-                      <p className="text-sm text-[#d6b695]">Lesson steps</p>
-                      <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                      <p className="text-sm text-[color:var(--pico-text-muted)]">Lesson steps</p>
+                      <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                         {lessonWorkspace.completedStepCount}/{selectedLesson.steps.length}
                       </p>
                     </div>
                     <div className={picoInset('p-4')}>
-                      <p className="text-sm text-[#d6b695]">Focused step</p>
-                      <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                      <p className="text-sm text-[color:var(--pico-text-muted)]">Focused step</p>
+                      <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                         {lessonWorkspace.workspace.activeStepIndex >= 0
                           ? selectedLesson.steps[lessonWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
                           : 'not set'}
@@ -490,49 +582,60 @@ export function PicoTutorPageClient() {
                   </div>
                   <Link
                     href={toHref(`/academy/${selectedLesson.slug}`)}
-                    className="mt-4 inline-flex text-sm font-medium text-[#fff4e6] underline decoration-[#e2904f]/40 underline-offset-4"
+                    className="mt-4 inline-flex text-sm font-medium text-[color:var(--pico-text)] underline decoration-[color:rgba(var(--pico-accent-rgb),0.38)] underline-offset-4"
                   >
                     Back to lesson
                   </Link>
                 </div>
               ) : null}
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Current track</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
-                    {progress.selectedTrack ?? 'not chosen yet'}
-                  </p>
+              <div className={picoInset('mt-6 grid gap-4 p-5')}>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className={picoClasses.label}>Crit packet</p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      Bring just enough context for a sharp answer: route, failure, and exact expectation.
+                    </p>
+                  </div>
+                  <span className={picoClasses.chip}>route • failure • expectation</span>
                 </div>
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Next lesson</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
-                    {derived.nextLesson?.title ?? 'none'}
-                  </p>
-                </div>
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Hosted onboarding step</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
-                    {setup.onboarding?.current_step ?? 'session required'}
-                  </p>
-                </div>
-                <div className={picoInset('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Runtime status</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
-                    {setup.runtime?.status ?? 'not synced'}
-                  </p>
-                </div>
-              </div>
 
-              <div className={picoInset('mt-6 p-5')}>
-                <p className={picoClasses.label}>Question protocol</p>
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  <div className={picoSoft('p-4')}>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">Current track</p>
+                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                      {progress.selectedTrack ?? 'not chosen yet'}
+                    </p>
+                  </div>
+                  <div className={picoSoft('p-4')}>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">Next lesson</p>
+                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                      {derived.nextLesson?.title ?? 'none'}
+                    </p>
+                  </div>
+                  <div className={picoSoft('p-4')}>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">Hosted onboarding step</p>
+                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                      {setup.onboarding?.current_step ?? 'session required'}
+                    </p>
+                  </div>
+                  <div className={picoSoft('p-4')}>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">Runtime status</p>
+                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                      {setup.runtime?.status ?? 'not synced'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 lg:grid-cols-3">
                   {questionProtocol.map((item, index) => (
                     <div key={item} className={picoSoft('p-4')}>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
-                        {String(index + 1).padStart(2, '0')}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">{item}</p>
+                      <div className="flex items-start gap-3">
+                        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-accent)]">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <p className="pt-1 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -542,16 +645,16 @@ export function PicoTutorPageClient() {
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
                 placeholder="Describe the blocker, the exact step, and what you expected to happen."
-                className="mt-6 min-h-[240px] w-full rounded-[28px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-5 py-5 text-sm leading-7 text-[#f6e7d4] outline-none placeholder:text-[#8f7157]"
+                className="mt-6 min-h-[240px] w-full rounded-[28px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-5 py-5 text-sm leading-7 text-[color:var(--pico-text-secondary)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
               />
 
               <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr),auto] lg:items-end">
-                <label className="block text-sm text-[#d5c0a8]">
+                <label className="block text-sm text-[color:var(--pico-text-secondary)]">
                   <span className={picoClasses.label}>Blocked lesson</span>
                   <select
                     value={lessonSlug}
                     onChange={(event) => setLessonSlug(event.target.value)}
-                    className="mt-3 w-full rounded-[22px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-sm text-[#f6e7d4] outline-none"
+                    className="mt-3 w-full rounded-[22px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-sm text-[color:var(--pico-text-secondary)] outline-none"
                   >
                     <option value="">No lesson selected</option>
                     {availableLessons.map((lesson) => (
@@ -566,7 +669,7 @@ export function PicoTutorPageClient() {
                 </button>
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap">
                 {examplePrompts.map((prompt) => (
                   <button
                     key={prompt}
@@ -580,16 +683,16 @@ export function PicoTutorPageClient() {
               </div>
             </form>
 
-            <div className="border-t border-[#3a291d] bg-[rgba(255,247,235,0.03)] p-6 lg:border-l lg:border-t-0">
+            <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">
               <p className={picoClasses.label}>Operator rail</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Questions asked</p>
-                  <p className="mt-1 text-2xl font-semibold text-[#fff4e6]">{progress.tutorQuestions}</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Questions asked</p>
+                  <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">{progress.tutorQuestions}</p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[#a8896e]">Live answer state</p>
-                  <p className="mt-1 text-lg font-medium text-[#fff4e6]">
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Live answer state</p>
+                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {reply ? reply.confidence : loading ? 'thinking' : 'waiting'}
                   </p>
                 </div>
@@ -619,9 +722,9 @@ export function PicoTutorPageClient() {
               <div className={picoInset('mt-4 p-4')}>
                 <div data-testid="pico-openai-connect-panel">
                   <p className={picoClasses.label}>OpenAI connection</p>
-                  <div className="mt-3 rounded-[18px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] p-4">
+                  <div className="mt-3 rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-4">
                     <p
-                      className="text-sm leading-6 text-[#d5c0a8]"
+                      className="text-sm leading-6 text-[color:var(--pico-text-secondary)]"
                       data-testid="pico-openai-connect-status"
                     >
                       {session.status !== 'authenticated'
@@ -635,10 +738,10 @@ export function PicoTutorPageClient() {
                       <div className="mt-4 grid gap-3">
                         {openAIConnection?.status === 'connected' ? (
                           <div className={picoSoft('p-4')}>
-                            <p className="font-medium text-[#fff4e6]">
+                            <p className="font-medium text-[color:var(--pico-text)]">
                               Connected {openAIConnection.maskedKey ? `as ${openAIConnection.maskedKey}` : 'key'}
                             </p>
-                            <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                            <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                               Live Tutor answers now prefer your own OpenAI access before any platform fallback.
                             </p>
                             <div className="mt-3 flex flex-wrap gap-2">
@@ -656,14 +759,14 @@ export function PicoTutorPageClient() {
                           </div>
                         ) : (
                           <>
-                            <label className="block text-sm text-[#d5c0a8]">
+                            <label className="block text-sm text-[color:var(--pico-text-secondary)]">
                               <span className={picoClasses.label}>Bring your own OpenAI key</span>
                               <input
                                 type="password"
                                 value={openAIApiKey}
                                 onChange={(event) => setOpenAIApiKey(event.target.value)}
                                 placeholder="sk-proj-..."
-                                className="mt-3 w-full rounded-[18px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-sm text-[#f6e7d4] outline-none placeholder:text-[#8f7157]"
+                                className="mt-3 w-full rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-sm text-[color:var(--pico-text-secondary)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
                               />
                             </label>
                             <button
@@ -677,7 +780,7 @@ export function PicoTutorPageClient() {
                           </>
                         )}
                         {openAIConnection?.status === 'platform' ? (
-                          <p className="text-xs leading-6 text-[#a8896e]">
+                          <p className="text-xs leading-6 text-[color:var(--pico-text-muted)]">
                             Platform access is already available. Connecting your own key simply overrides the Tutor model budget and ownership path for this account.
                           </p>
                         ) : null}
@@ -692,7 +795,7 @@ export function PicoTutorPageClient() {
 
               <div className={picoInset('mt-4 p-4')}>
                 <p className={picoClasses.label}>Escalation rule</p>
-                <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   If the answer still does not give you one concrete move, stop looping and open support with the lesson context attached.
                 </p>
                 <Link href={toHref('/support')} className={cn(picoClasses.secondaryButton, 'mt-4')}>
@@ -705,7 +808,7 @@ export function PicoTutorPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Answer</p>
+            <p className={picoClasses.label}>Studio critique</p>
             {error ? (
               <div className="mt-4 rounded-[24px] border border-rose-400/20 bg-rose-400/10 p-5 text-sm leading-6 text-rose-50">
                 {error}
@@ -723,24 +826,30 @@ export function PicoTutorPageClient() {
                     {reply.usedOfficialFallback ? <span className={picoClasses.chip}>official fallback</span> : null}
                     {reply.escalate ? <span className={picoClasses.chip}>human escalation likely</span> : null}
                   </div>
+                  <div className={picoInset('mt-4 p-4')}>
+                    <p className={picoClasses.label}>Single next move</p>
+                    <p className="mt-3 font-[family:var(--font-site-display)] text-2xl leading-8 tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {reply.structured.steps[0] ?? reply.title}
+                    </p>
+                  </div>
                   <div className="mt-4 grid gap-4">
                     <div>
                       <p className={picoClasses.label}>Situation</p>
-                      <p className="mt-2 text-sm leading-7 text-[#f0deca]">{reply.structured.situation}</p>
+                      <p className="mt-2 text-sm leading-7 text-[color:var(--pico-text-secondary)]">{reply.structured.situation}</p>
                     </div>
                     <div>
                       <p className={picoClasses.label}>Diagnosis</p>
-                      <p className="mt-2 text-sm leading-7 text-[#f0deca]">{reply.structured.diagnosis}</p>
+                      <p className="mt-2 text-sm leading-7 text-[color:var(--pico-text-secondary)]">{reply.structured.diagnosis}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className={picoSoft('p-5')}>
-                  <p className="font-medium text-[#fff4e6]">Steps</p>
+                  <p className="font-medium text-[color:var(--pico-text)]">Steps</p>
                   <div className="mt-3 grid gap-3">
                     {reply.structured.steps.map((item, index) => (
-                      <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[#d5c0a8]')}>
-                        <span className="mr-3 text-[#f0bb83]">{String(index + 1).padStart(2, '0')}</span>
+                      <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]')}>
+                        <span className="mr-3 text-[color:var(--pico-accent)]">{String(index + 1).padStart(2, '0')}</span>
                         {item}
                       </div>
                     ))}
@@ -749,18 +858,18 @@ export function PicoTutorPageClient() {
 
                 {reply.structured.commands.length ? (
                   <div className={picoSoft('p-5')}>
-                    <p className="font-medium text-[#fff4e6]">Commands</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Operator commands</p>
                     <div className="mt-3 grid gap-3">
                       {reply.structured.commands.map((command) => (
                         <div key={`${command.label}-${command.code}`} className={picoInset('p-4')}>
-                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#a8896e]">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
                             {command.label}
                           </p>
-                          <pre className="mt-3 overflow-x-auto rounded-[18px] border border-[#4a3423] bg-[#1f140d] p-4 text-xs leading-6 text-[#f6e7d4]">
+                          <pre className="mt-3 overflow-x-auto rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] p-4 text-xs leading-6 text-[color:var(--pico-text-secondary)]">
                             <code>{command.code}</code>
                           </pre>
                           {command.note ? (
-                            <p className="mt-3 text-sm leading-6 text-[#d5c0a8]">{command.note}</p>
+                            <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{command.note}</p>
                           ) : null}
                         </div>
                       ))}
@@ -770,10 +879,10 @@ export function PicoTutorPageClient() {
 
                 {reply.structured.verify.length ? (
                   <div className={picoSoft('p-5')}>
-                    <p className="font-medium text-[#fff4e6]">Verify</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Review line</p>
                     <div className="mt-3 grid gap-3">
                       {reply.structured.verify.map((item) => (
-                        <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[#d5c0a8]')}>
+                        <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]')}>
                           {item}
                         </div>
                       ))}
@@ -783,10 +892,10 @@ export function PicoTutorPageClient() {
 
                 {reply.structured.ifThisFails.length ? (
                   <div className={picoSoft('p-5')}>
-                    <p className="font-medium text-[#fff4e6]">If this fails</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Fallback route</p>
                     <div className="mt-3 grid gap-3">
                       {reply.structured.ifThisFails.map((item) => (
-                        <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[#d5c0a8]')}>
+                        <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]')}>
                           {item}
                         </div>
                       ))}
@@ -799,7 +908,7 @@ export function PicoTutorPageClient() {
                 <p className={picoClasses.body}>
                   Ask one blocker, not a whole story. Pico Tutor will ground the answer in lessons, the curated operator pack, and official docs when the question is version-sensitive.
                 </p>
-                <p className="mt-4 text-sm leading-6 text-[#d5c0a8]">
+                <p className="mt-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   How this works: state the failing step, the expected result, and the exact failure. The answer should give you a concrete move, one verification step, and a clean escalation path if the evidence is still thin.
                 </p>
               </div>
@@ -816,7 +925,7 @@ export function PicoTutorPageClient() {
                     href={resolveTutorHref(toHref, lesson.href)}
                     className={cn(
                       picoInset('flex items-center justify-between gap-4 px-4 py-3 text-sm text-[#f2e0cb]'),
-                      index === 0 && 'border-[#7d5232] bg-[rgba(226,144,79,0.08)]',
+                      index === 0 && 'border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)]',
                     )}
                   >
                     <span>{lesson.title}</span>
@@ -829,7 +938,7 @@ export function PicoTutorPageClient() {
 
           {reply?.structured.sources.length ? (
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Evidence rail</p>
+              <p className={picoClasses.label}>Critique evidence</p>
               <div className="mt-4 grid gap-3">
                 {reply.structured.sources.map((source) => (
                   <div
@@ -838,18 +947,18 @@ export function PicoTutorPageClient() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span>{source.title}</span>
-                      <span className="text-xs uppercase tracking-[0.18em] text-[#a8896e]">
+                      <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
                         {source.kind.replace('_', ' ')}
                       </span>
                     </div>
                     <p className="mt-2 text-xs leading-6 text-[#bfa58c]">{source.sourcePath}</p>
                     {source.excerpt ? (
-                      <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">{source.excerpt}</p>
+                      <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{source.excerpt}</p>
                     ) : null}
                     {source.href ? (
                       <Link
                         href={resolveTutorHref(toHref, source.href)}
-                        className="mt-3 inline-flex text-sm font-medium text-[#fff4e6] underline decoration-[#e2904f]/40 underline-offset-4"
+                        className="mt-3 inline-flex text-sm font-medium text-[color:var(--pico-text)] underline decoration-[color:rgba(var(--pico-accent-rgb),0.38)] underline-offset-4"
                       >
                         Open source
                       </Link>
@@ -874,7 +983,7 @@ export function PicoTutorPageClient() {
                     )}
                   >
                     <span>{doc.label}</span>
-                    <span className="text-xs uppercase tracking-[0.18em] text-[#a8896e]">
+                    <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
                       {doc.sourcePath}
                     </span>
                   </Link>
@@ -884,7 +993,7 @@ export function PicoTutorPageClient() {
           ) : null}
 
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Route correction</p>
+            <p className={picoClasses.label}>Exit route</p>
             <div className="mt-4 grid gap-3">
               <Link
                 href={
@@ -932,7 +1041,7 @@ export function PicoTutorPageClient() {
 
           {reply?.structured.nextQuestion ? (
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Next question</p>
+              <p className={picoClasses.label}>If the answer is still fuzzy</p>
               <div className={picoSoft('mt-4 p-4')}>
                 <p className={picoClasses.body}>{reply.structured.nextQuestion}</p>
               </div>
