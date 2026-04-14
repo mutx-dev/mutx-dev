@@ -3,14 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
-import {
-  motion,
-  useInView,
-  useMotionValue,
-  useMotionValueEvent,
-  useReducedMotion,
-  type MotionValue,
-} from 'framer-motion'
+import { motion, useInView, useReducedMotion } from 'framer-motion'
 
 import {
   marketingHomepage,
@@ -24,7 +17,6 @@ import { MarketingHeroBackdrop } from './MarketingHeroBackdrop'
 import home from './MarketingHome.module.css'
 import { MarketingLoader } from './MarketingLoader'
 import { MarketingReveal } from './MarketingReveal'
-import { ViewportVideo } from './ViewportVideo'
 
 type ActionLinkProps = {
   action: MarketingActionLink
@@ -39,7 +31,7 @@ type HoverCardProps = {
 }
 
 type MarketingExampleItem = MarketingHomepage['salesSections']['examples']['items'][number]
-type MarketingDemoStory = MarketingHomepage['salesSections']['demo']['story']
+type MarketingDemoItem = MarketingHomepage['salesSections']['demo']['tabs'][number]
 
 type TerminalPlaybackCardProps = {
   item: MarketingExampleItem
@@ -50,10 +42,6 @@ const prefetchedDemoMedia = new Set<string>()
 const TERMINAL_PROMPT_DELAY_MS = 160
 const TERMINAL_TYPING_STEP_MS = 18
 const TERMINAL_REPLY_STAGGER_MS = 240
-
-function clampNumber(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max)
-}
 
 function ActionLink({ action, className }: ActionLinkProps) {
   const icon = action.tone === 'primary' ? (
@@ -249,120 +237,24 @@ function TerminalPlaybackCard({ item, delay = 0 }: TerminalPlaybackCardProps) {
   )
 }
 
-function ScrollScrubVideo({
-  story,
-  className,
-  progress,
-  shouldLoad,
-}: {
-  story: MarketingDemoStory
-  className: string
-  progress: MotionValue<number>
-  shouldLoad: boolean
-}) {
-  const prefersReducedMotion = useReducedMotion()
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const durationRef = useRef(0)
-  const targetTimeRef = useRef(0)
-
-  useMotionValueEvent(progress, 'change', (latest) => {
-    const video = videoRef.current
-
-    if (!video || durationRef.current <= 0) {
-      return
-    }
-
-    targetTimeRef.current = clampNumber(latest, 0, 1) * durationRef.current
-
-    if (prefersReducedMotion) {
-      video.currentTime = targetTimeRef.current
-    }
-  })
-
-  useEffect(() => {
-    const video = videoRef.current
-
-    if (!video) {
-      return
-    }
-
-    const syncDuration = () => {
-      durationRef.current = Math.max(video.duration - 0.06, 0)
-      video.pause()
-      video.currentTime = targetTimeRef.current
-    }
-
-    video.addEventListener('loadedmetadata', syncDuration)
-
-    if (video.readyState >= 1) {
-      syncDuration()
-    }
-
-    return () => {
-      video.removeEventListener('loadedmetadata', syncDuration)
-    }
-  }, [story.mediaSrc])
-
-  useEffect(() => {
-    const video = videoRef.current
-
-    if (!video || prefersReducedMotion) {
-      return
-    }
-
-    let frameId = 0
-
-    const tick = () => {
-      const delta = targetTimeRef.current - video.currentTime
-
-      if (Math.abs(delta) > 0.001) {
-        video.currentTime = clampNumber(video.currentTime + delta * 0.18, 0, durationRef.current)
-      }
-
-      frameId = window.requestAnimationFrame(tick)
-    }
-
-    frameId = window.requestAnimationFrame(tick)
-
-    return () => {
-      window.cancelAnimationFrame(frameId)
-    }
-  }, [prefersReducedMotion])
-
-  if (prefersReducedMotion) {
-    return (
-      <ViewportVideo
-        src={story.mediaSrc}
-        poster={story.mediaPosterSrc}
-        ariaLabel={story.mediaAlt}
-        className={className}
-        preload="auto"
-      />
-    )
-  }
-
+function ActiveDemoMedia({ activeDemo }: { activeDemo: MarketingDemoItem }) {
   return (
-    <video
-      ref={videoRef}
-      className={className}
-      src={shouldLoad ? story.mediaSrc : undefined}
-      poster={story.mediaPosterSrc}
-      aria-label={story.mediaAlt}
-      muted
-      playsInline
-      preload={shouldLoad ? 'auto' : 'metadata'}
+    <img
+      src={activeDemo.mediaSrc}
+      alt={activeDemo.mediaAlt}
+      className={home.demoVideo}
+      decoding="async"
+      loading="lazy"
     />
   )
 }
 
 export function MarketingHomePage() {
   const demoTabs = marketingHomepage.salesSections.demo.tabs
-  const demoStory = marketingHomepage.salesSections.demo.story
   const prefersReducedMotion = useReducedMotion()
   const [activeDemoId, setActiveDemoId] = useState(demoTabs[0]?.id)
   const demoSectionRef = useRef<HTMLElement | null>(null)
-  const demoScrollerRef = useRef<HTMLDivElement | null>(null)
-  const demoStoryProgress = useMotionValue(0)
+  const demoStateRefs = useRef<Array<HTMLDivElement | null>>([])
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
   const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.salesSections.cta.actions
   const isDemoSectionNear = useInView(demoSectionRef, {
@@ -377,20 +269,20 @@ export function MarketingHomePage() {
       return
     }
 
-    if (!prefetchedDemoMedia.has(demoStory.mediaSrc)) {
-      const video = document.createElement('video')
-      video.preload = 'auto'
-      video.src = demoStory.mediaSrc
-      video.load()
-      prefetchedDemoMedia.add(demoStory.mediaSrc)
-    }
+    for (const tab of demoTabs) {
+      if (!prefetchedDemoMedia.has(tab.mediaSrc)) {
+        const image = new Image()
+        image.src = tab.mediaSrc
+        prefetchedDemoMedia.add(tab.mediaSrc)
+      }
 
-    if (demoStory.mediaPosterSrc && !prefetchedDemoMedia.has(demoStory.mediaPosterSrc)) {
-      const image = new Image()
-      image.src = demoStory.mediaPosterSrc
-      prefetchedDemoMedia.add(demoStory.mediaPosterSrc)
+      if (tab.mediaPosterSrc && !prefetchedDemoMedia.has(tab.mediaPosterSrc)) {
+        const image = new Image()
+        image.src = tab.mediaPosterSrc
+        prefetchedDemoMedia.add(tab.mediaPosterSrc)
+      }
     }
-  }, [demoStory.mediaPosterSrc, demoStory.mediaSrc, isDemoSectionNear])
+  }, [demoTabs, isDemoSectionNear])
 
   useEffect(() => {
     let frameId = 0
@@ -398,29 +290,25 @@ export function MarketingHomePage() {
     const syncActiveDemoToScroll = () => {
       frameId = 0
 
-      const scrollerNode = demoScrollerRef.current
+      const beatNodes = demoStateRefs.current.filter((node): node is HTMLDivElement => Boolean(node))
 
-      if (scrollerNode) {
-        const totalScrollableDistance = Math.max(scrollerNode.offsetHeight - window.innerHeight, 1)
-        const nextProgress = clampNumber(
-          (-scrollerNode.getBoundingClientRect().top + window.innerHeight * 0.12) /
-            totalScrollableDistance,
-          0,
-          1
-        )
-        demoStoryProgress.set(nextProgress)
-
-        const nextDemoIndex = nextProgress >= 0.82 ? 2 : nextProgress >= 0.42 ? 1 : 0
-        const nextDemoId = demoTabs[nextDemoIndex]?.id
-
-        if (!nextDemoId) {
-          return
-        }
-
-        setActiveDemoId((currentDemoId) =>
-          currentDemoId === nextDemoId ? currentDemoId : nextDemoId
-        )
+      if (beatNodes.length === 0) {
+        return
       }
+
+      const focusLine = window.innerHeight * 0.52
+      const nextDemoId = beatNodes
+        .map((node) => ({
+          id: node.getAttribute('data-demo-id'),
+          distance: Math.abs(node.getBoundingClientRect().top - focusLine),
+        }))
+        .sort((left, right) => left.distance - right.distance)[0]?.id
+
+      if (!nextDemoId) {
+        return
+      }
+
+      setActiveDemoId((currentDemoId) => (currentDemoId === nextDemoId ? currentDemoId : nextDemoId))
     }
 
     const queueSync = () => {
@@ -443,7 +331,25 @@ export function MarketingHomePage() {
       window.removeEventListener('scroll', queueSync)
       window.removeEventListener('resize', queueSync)
     }
-  }, [demoStoryProgress])
+  }, [])
+
+  const scrollToDemoState = (index: number) => {
+    const nextNode = demoStateRefs.current[index]
+    const nextDemo = demoTabs[index]
+
+    if (nextDemo) {
+      setActiveDemoId(nextDemo.id)
+    }
+
+    if (!nextNode) {
+      return
+    }
+
+    nextNode.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 
   return (
     <div className={`${core.page} ${core.homePage}`}>
@@ -554,30 +460,26 @@ export function MarketingHomePage() {
                 <p className={home.sectionBody}>{marketingHomepage.salesSections.demo.body}</p>
               </MarketingReveal>
 
-              <div ref={demoScrollerRef} className={home.demoScroller}>
+              <div className={home.demoScroller}>
                 <div className={home.demoStickyStage}>
                   <div className={home.demoStickyInner}>
                     <div className={home.demoNarrative}>
-                      <div className={home.demoProgressTrack} aria-hidden="true">
-                        <motion.span
-                          className={home.demoProgressFill}
-                          style={{ scaleX: demoStoryProgress }}
-                        />
-                      </div>
-
                       <div className={home.demoStateNav} aria-label="Operator walkthrough states">
                         {demoTabs.map((tab, index) => {
                           const isActive = tab.id === activeDemo.id
 
                           return (
-                            <div
+                            <button
                               key={tab.id}
+                              type="button"
                               className={home.demoStateButton}
                               data-active={isActive ? '1' : '0'}
+                              onClick={() => scrollToDemoState(index)}
+                              aria-pressed={isActive}
                             >
                               <span className={home.demoStateNumber}>{`0${index + 1}`}</span>
                               <span className={home.demoStateName}>{tab.label}</span>
-                            </div>
+                            </button>
                           )
                         })}
                       </div>
@@ -595,20 +497,29 @@ export function MarketingHomePage() {
                       </motion.div>
                     </div>
 
-                    <div className={home.demoFrame} data-testid="homepage-demo-panel">
-                      <ScrollScrubVideo
-                        story={demoStory}
-                        progress={demoStoryProgress}
-                        shouldLoad={isDemoSectionNear}
-                        className={home.demoVideo}
-                      />
-                    </div>
+                    <motion.div
+                      key={activeDemo.id}
+                      className={home.demoFrame}
+                      data-testid="homepage-demo-panel"
+                      initial={prefersReducedMotion ? false : { opacity: 0.88, y: 16, scale: 0.994 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <ActiveDemoMedia activeDemo={activeDemo} />
+                    </motion.div>
                   </div>
                 </div>
 
                 <div className={home.demoStateRail} aria-hidden="true">
-                  {demoTabs.map((tab) => (
-                    <div key={tab.id} className={home.demoStateStep} />
+                  {demoTabs.map((tab, index) => (
+                    <div
+                      key={tab.id}
+                      ref={(node) => {
+                        demoStateRefs.current[index] = node
+                      }}
+                      className={home.demoStateStep}
+                      data-demo-id={tab.id}
+                    />
                   ))}
                 </div>
               </div>
@@ -660,7 +571,9 @@ export function MarketingHomePage() {
                   delay={index * 0.07}
                   distance={20}
                 >
-                  <h3 className={home.proofCardTitle}>{item.title}</h3>
+                  <div className={home.proofCardHeader}>
+                    <h3 className={home.proofCardTitle}>{item.title}</h3>
+                  </div>
                   <div className={home.proofCompare}>
                     <div className={home.proofLane}>
                       <p className={home.proofLaneLabel}>Before</p>
