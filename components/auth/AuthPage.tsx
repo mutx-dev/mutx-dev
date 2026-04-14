@@ -267,7 +267,7 @@ export function AuthPage({
   }
 
   return (
-    <AuthSurface {...content} variant="access">
+    <AuthSurface {...content} variant="access" hostVariant={hostVariant}>
       {isPicoPreview ? <PicoAuthPreviewIntro nextPath={redirectPath} /> : null}
       <div className={styles.formWrap}>
         {isPicoPreview ? (

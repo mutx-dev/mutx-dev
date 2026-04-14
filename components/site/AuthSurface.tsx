@@ -19,6 +19,7 @@ type AuthSurfaceProps = {
   highlights: readonly string[];
   children: ReactNode;
   variant?: "access" | "recovery";
+  hostVariant?: "default" | "pico";
 };
 
 export function AuthSurface({
@@ -35,12 +36,14 @@ export function AuthSurface({
   highlights,
   children,
   variant = "access",
+  hostVariant = "default",
 }: AuthSurfaceProps) {
   const isRecovery = variant === "recovery";
+  const isPicoPreview = hostVariant === "pico";
 
   return (
     <PublicSurface className="site-page">
-      <AuthNav />
+      <AuthNav hostVariant={hostVariant} />
 
       <main className="site-main">
         <section
@@ -127,7 +130,7 @@ export function AuthSurface({
 
               <div className="rounded-[32px] border border-[rgba(73,46,26,0.12)] bg-[linear-gradient(180deg,rgba(244,233,214,0.96),rgba(229,212,187,0.9))] p-5 text-[#392416] shadow-[0_24px_64px_rgba(10,8,10,0.18)] sm:p-6">
                 <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8b633b]">
-                  {isRecovery ? "Recovery checklist" : "Operator checklist"}
+                  {isRecovery ? "Recovery checklist" : isPicoPreview ? "Preview notes" : "Operator checklist"}
                 </p>
                 <div className="mt-4 grid gap-3">
                   {highlights.map((item) => (
