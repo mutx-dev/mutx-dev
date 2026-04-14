@@ -75,6 +75,26 @@ wait_for_command() {
   return 1
 }
 
+wait_for_postgres_auth() {
+  local host="$1"
+  local user="$2"
+  local db="$3"
+  local password="$4"
+
+  echo "Waiting for postgres to accept user '${user}' authentication..."
+  for _ in $(seq 1 60); do
+    # pg_isready only checks TCP availability; use psql to verify auth works
+    if docker compose -f "$COMPOSE_FILE" exec -T postgres \
+      psql -h localhost -U "${user}" -d "${db}" -c "SELECT 1" -w >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 2
+  done
+
+  echo "Timed out waiting for postgres user '${user}' to authenticate."
+  return 1
+}
+
 ensure_ssl_material() {
   if [ -f "$SSL_DIR/cert.pem" ] && [ -f "$SSL_DIR/key.pem" ]; then
     return 0
@@ -109,6 +129,15 @@ trap cleanup EXIT
 
 echo "Starting production compose smoke core services..."
 docker compose -f "$COMPOSE_FILE" up -d --build postgres redis migrate api monitor
+
+# Wait for postgres to fully initialize — pg_isready in the healthcheck confirms
+# TCP availability but does NOT verify that init scripts have created the mutx user.
+# Without this wait, the migrate container races ahead and hits auth failure.
+wait_for_postgres_auth \
+  "postgres" \
+  "${POSTGRES_USER:-mutx}" \
+  "${POSTGRES_DB:-mutx}" \
+  "${POSTGRES_PASSWORD}"
 
 wait_for_command \
   "API health endpoint" \
