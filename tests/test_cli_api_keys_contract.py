@@ -38,7 +38,7 @@ def test_api_keys_list_hits_canonical_route_and_renders_keys(monkeypatch) -> Non
                         "id": key_id,
                         "name": "test-key-1",
                         "is_active": True,
-                        "expires_at": "2026-04-20T10:00:00",
+                        "expires_at": "2099-04-20T10:00:00Z",
                         "last_used": "2026-04-14T09:30:00",
                     },
                     {
