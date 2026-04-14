@@ -2,6 +2,7 @@ from cli.services.agents import AgentsService
 from cli.services.assistant import AssistantService, TemplatesService
 from cli.services.auth import AuthService
 from cli.services.documents import DocumentsService
+from cli.services.reasoning import ReasoningService
 from cli.errors import (
     APIRequestError,
     AuthenticationExpiredError,
@@ -30,6 +31,11 @@ from cli.services.models import (
     DocumentTemplateFieldRecord,
     DocumentTemplateOutputRecord,
     DocumentTemplateRecord,
+    ReasoningArtifactRecord,
+    ReasoningJobHistoryRecord,
+    ReasoningJobRecord,
+    ReasoningLocalLaunchRecord,
+    ReasoningTemplateRecord,
     LogEntry,
     MetricPoint,
     OnboardingStateRecord,
@@ -67,6 +73,12 @@ __all__ = [
     "DocumentTemplateOutputRecord",
     "DocumentTemplateRecord",
     "DocumentsService",
+    "ReasoningArtifactRecord",
+    "ReasoningJobHistoryRecord",
+    "ReasoningJobRecord",
+    "ReasoningLocalLaunchRecord",
+    "ReasoningTemplateRecord",
+    "ReasoningService",
     "InvalidCredentialsError",
     "LogEntry",
     "MetricPoint",
