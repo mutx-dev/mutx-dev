@@ -4,12 +4,12 @@
 
 module.exports = {
   useTranslations: jest.fn(() => ({
-    t: (key, params) => key,
+    t: (key, _params) => key,
   })),
   useFormatter: jest.fn(() => ({
-    dateTime: (value, options) => String(value),
-    number: (value, options) => String(value),
-    relativeTime: (value, unit, options) => `${value} ${unit}`,
+    dateTime: (value, _options) => String(value),
+    number: (value, _options) => String(value),
+    relativeTime: (value, unit, _options) => `${value} ${unit}`,
   })),
   useLocale: jest.fn(() => 'en'),
   useMessages: jest.fn(() => ({})),
