@@ -7426,7 +7426,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MutxRunHistoryResponse"
+                  "$ref": "#/components/schemas/MutxStepBatchResponse"
                 }
               }
             }
@@ -19892,6 +19892,27 @@
         ],
         "title": "MutxStep",
         "description": "A single step within an agent run - a reasoning block, tool call, or error.\n\nPorted from agent-run/step.json schema."
+      },
+      "MutxStepBatchResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of steps in the run after this batch"
+          },
+          "added": {
+            "type": "integer",
+            "title": "Added",
+            "description": "Number of steps added in this request"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "added"
+        ],
+        "title": "MutxStepBatchResponse",
+        "description": "Response after adding steps to a run."
       },
       "MutxStepCreate": {
         "properties": {

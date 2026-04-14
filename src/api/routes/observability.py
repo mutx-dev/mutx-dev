@@ -45,6 +45,7 @@ from src.api.models.observability import (
     MutxEvalCreate,
     MutxRunStatus,
     MutxStepType,
+    MutxStepBatchResponse,
     generate_run_id,
     compute_run_hash,
 )
@@ -399,7 +400,7 @@ async def get_run(
 
 @router.post(
     "/runs/{run_id}/steps",
-    response_model=MutxRunHistoryResponse,
+    response_model=MutxStepBatchResponse,
     status_code=status.HTTP_201_CREATED,
 )
 async def add_steps(
@@ -409,7 +410,7 @@ async def add_steps(
     current_user: User = Depends(get_current_user),
 ):
     """Add steps to an existing run."""
-    run = await _get_user_run(run_id, current_user, db)
+    await _get_user_run(run_id, current_user, db)
 
     max_seq_result = await db.execute(
         select(func.max(MutxStep.sequence)).where(MutxStep.run_id == run_id)
@@ -422,6 +423,7 @@ async def add_steps(
         new_step = MutxStep(
             id=step.id or f"{run_id}-step-{current_max_seq + 1 + idx}",
             run_id=run_id,
+            user_id=current_user.id,
             type=step.type.value if isinstance(step.type, Enum) else step.type,
             tool_name=step.tool_name,
             mcp_server=step.mcp_server,
@@ -447,12 +449,9 @@ async def add_steps(
     total_stmt = select(func.count()).select_from(MutxStep).where(MutxStep.run_id == run_id)
     total = (await db.execute(total_stmt)).scalar_one()
 
-    return MutxRunHistoryResponse(
-        items=[],  # Steps don't have their own list endpoint
+    return MutxStepBatchResponse(
         total=total,
-        skip=0,
-        limit=100,
-        agent_id=run.agent_id,
+        added=len(new_steps),
     )
 
 

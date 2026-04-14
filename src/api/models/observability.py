@@ -471,6 +471,13 @@ class MutxRunDetailResponse(MutxRunResponse):
     steps: list[MutxStep] = []
 
 
+class MutxStepBatchResponse(BaseModel):
+    """Response after adding steps to a run."""
+
+    total: int = Field(..., description="Total number of steps in the run after this batch")
+    added: int = Field(..., description="Number of steps added in this request")
+
+
 class MutxEvalCreate(BaseModel):
     """Schema for submitting an evaluation result."""
 
