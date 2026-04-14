@@ -42,7 +42,7 @@ describe('marketingHomepage', () => {
     expect(marketingHomepage.salesSections.cta).toBeDefined()
   })
 
-  it('demo section uses real dashboard story media and supporting videos', () => {
+  it('demo section uses real dashboard story media and supporting proof assets', () => {
     const tabs = marketingHomepage.salesSections.demo.tabs
     const story = marketingHomepage.salesSections.demo.story
     expect(Array.isArray(tabs)).toBe(true)
@@ -52,10 +52,15 @@ describe('marketingHomepage', () => {
     expect(story.mediaSrc.endsWith('.mp4')).toBe(true)
     expect(story.mediaPosterSrc?.startsWith('/marketing/dashboard/')).toBe(true)
     for (const tab of tabs) {
-      expect(tab.mediaType).toBe('video')
+      expect(['image', 'video']).toContain(tab.mediaType)
       expect(tab.mediaSrc.startsWith('/marketing/dashboard/')).toBe(true)
-      expect(tab.mediaSrc.endsWith('.mp4')).toBe(true)
-      expect(tab.mediaPosterSrc?.startsWith('/marketing/dashboard/')).toBe(true)
+      if (tab.mediaType === 'image') {
+        expect(tab.mediaSrc.endsWith('.jpg')).toBe(true)
+        expect(tab.mediaPosterSrc).toBeUndefined()
+      } else {
+        expect(tab.mediaSrc.endsWith('.mp4')).toBe(true)
+        expect(tab.mediaPosterSrc?.startsWith('/marketing/dashboard/')).toBe(true)
+      }
       expect(typeof tab.label).toBe('string')
     }
   })
