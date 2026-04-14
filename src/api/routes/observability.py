@@ -423,7 +423,6 @@ async def add_steps(
         new_step = MutxStep(
             id=step.id or f"{run_id}-step-{current_max_seq + 1 + idx}",
             run_id=run_id,
-            user_id=current_user.id,
             type=step.type.value if isinstance(step.type, Enum) else step.type,
             tool_name=step.tool_name,
             mcp_server=step.mcp_server,
