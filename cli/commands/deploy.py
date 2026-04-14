@@ -181,7 +181,9 @@ def deployment_versions(deployment_id: str):
 
 @deploy_group.command(name="rollback")
 @click.argument("deployment_id")
-@click.option("--version", "target_version", required=True, type=int, help="Version number to restore")
+@click.option(
+    "--version", "target_version", required=True, type=int, help="Version number to restore"
+)
 def rollback_deployment_command(deployment_id: str, target_version: int):
     """Rollback a deployment to a recorded version"""
     try:
