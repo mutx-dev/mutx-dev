@@ -141,7 +141,6 @@ def stub_predict_rlm_document_engine(monkeypatch, tmp_path):
         )
 
     monkeypatch.setattr("src.api.services.document_engine.get_document_engine_readiness", readiness)
-    monkeypatch.setattr("src.api.services.document_jobs.get_document_engine_readiness", readiness)
     monkeypatch.setattr("src.api.services.document_jobs.execute_document_manifest", execute)
     yield
 
@@ -315,9 +314,9 @@ async def test_managed_dispatch_rejects_local_reference_artifacts(client):
 
 
 @pytest.mark.asyncio
-async def test_managed_dispatch_requires_predict_rlm_readiness(client, monkeypatch, tmp_path):
+async def test_managed_dispatch_allows_split_deployments(client, monkeypatch, tmp_path):
     monkeypatch.setattr(
-        "src.api.services.document_jobs.get_document_engine_readiness",
+        "src.api.services.document_engine.get_document_engine_readiness",
         lambda: _not_ready_readiness(tmp_path),
     )
 
@@ -343,8 +342,8 @@ async def test_managed_dispatch_requires_predict_rlm_readiness(client, monkeypat
         f"/v1/documents/jobs/{job['id']}/dispatch",
         json={"mode": "managed"},
     )
-    assert dispatch_response.status_code == 503
-    assert "predict-rlm document execution is unavailable" in dispatch_response.json()["detail"]
+    assert dispatch_response.status_code == 200
+    assert dispatch_response.json()["status"] == "queued"
 
 
 def test_execute_document_manifest_requires_predict_rlm(monkeypatch, tmp_path):
@@ -409,9 +408,9 @@ async def test_managed_document_lifecycle_executes_through_worker(
 
 
 @pytest.mark.asyncio
-async def test_local_launch_requires_predict_rlm_readiness(client, monkeypatch, tmp_path):
+async def test_local_launch_allows_split_deployments(client, monkeypatch, tmp_path):
     monkeypatch.setattr(
-        "src.api.services.document_jobs.get_document_engine_readiness",
+        "src.api.services.document_engine.get_document_engine_readiness",
         lambda: _not_ready_readiness(tmp_path),
     )
 
@@ -443,8 +442,10 @@ async def test_local_launch_requires_predict_rlm_readiness(client, monkeypatch, 
         f"/v1/documents/jobs/{job['id']}/launch-local",
         json={"output_dir": "/tmp/mutx-local-docs"},
     )
-    assert launch_response.status_code == 503
-    assert "predict-rlm document execution is unavailable" in launch_response.json()["detail"]
+    assert launch_response.status_code == 200
+    payload = launch_response.json()
+    assert payload["manifest"]["engine"]["ready"] is False
+    assert payload["manifest"]["engine"]["missing_requirements"]
 
 
 @pytest.mark.asyncio

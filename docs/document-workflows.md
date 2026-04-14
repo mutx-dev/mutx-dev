@@ -60,7 +60,7 @@ With the defaults above, `OPENAI_API_KEY` is required. If you point either model
 - `openrouter/...` -> `OPENROUTER_API_KEY`
 - `anthropic/...` -> `ANTHROPIC_API_KEY`
 
-If prerequisites are missing, managed dispatch and local launch fail with `503` and the exact missing requirements.
+If prerequisites are missing, the document worker still fails fast when it tries to execute `predict-rlm`; managed dispatch and local launch can still queue and build manifests in split deployments.
 
 ## Configuration
 
