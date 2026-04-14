@@ -2,7 +2,6 @@
 """Add missing 401/403/400/404/500 error responses to authenticated routes in openapi.json."""
 
 import json
-import sys
 from pathlib import Path
 
 SPEC_PATH = Path("docs/api/openapi.json")
