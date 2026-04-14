@@ -91,6 +91,49 @@ class AgentMetric:
         self._data = data
 
 
+class AgentConfig:
+    """The normalized config returned by GET /v1/agents/{id}/config."""
+
+    def __init__(self, data: dict[str, Any]):
+        self.agent_id = UUID(data["agent_id"])
+        self.type = data.get("type")
+        self.config = data.get("config", {})
+        self.config_version = data.get("config_version")
+        self.updated_at = datetime.fromisoformat(data["updated_at"])
+        self._data = data
+
+
+class AgentVersion:
+    """A single snapshot from the agent version history."""
+
+    def __init__(self, data: dict[str, Any]):
+        self.id = UUID(data["id"])
+        self.agent_id = UUID(data["agent_id"])
+        self.version = data["version"]
+        self.config_snapshot = data.get("config_snapshot")
+        self.status = data.get("status")
+        self.created_at = datetime.fromisoformat(data["created_at"])
+        self._data = data
+
+
+class AgentResourceUsage:
+    """A single resource-usage record for an agent."""
+
+    def __init__(self, data: dict[str, Any]):
+        self.id = UUID(data["id"])
+        self.agent_id = UUID(data["agent_id"])
+        self.prompt_tokens = data.get("prompt_tokens")
+        self.completion_tokens = data.get("completion_tokens")
+        self.total_tokens = data.get("total_tokens")
+        self.api_calls = data.get("api_calls")
+        self.cost_usd = data.get("cost_usd")
+        self.model = data.get("model")
+        self.extra_metadata = data.get("extra_metadata")
+        self.period_start = data.get("period_start")
+        self.period_end = data.get("period_end")
+        self._data = data
+
+
 class Agents:
     def __init__(self, client: httpx.Client | httpx.AsyncClient):
         self._client = client
@@ -324,6 +367,229 @@ class Agents:
         )
         response.raise_for_status()
         return AgentDetail(response.json())
+
+    def get_config(self, agent_id: UUID | str) -> AgentConfig:
+        """Read the normalized config and version for an agent.
+
+        Args:
+            agent_id: The agent UUID
+        """
+        self._require_sync_client()
+        response = self._client.get(f"/v1/agents/{agent_id}/config")
+        response.raise_for_status()
+        return AgentConfig(response.json())
+
+    async def aget_config(self, agent_id: UUID | str) -> AgentConfig:
+        """Read the normalized config and version for an agent (async).
+
+        Args:
+            agent_id: The agent UUID
+        """
+        self._require_async_client()
+        response = await self._client.get(f"/v1/agents/{agent_id}/config")
+        response.raise_for_status()
+        return AgentConfig(response.json())
+
+    def versions(
+        self,
+        agent_id: UUID | str,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[AgentVersion]:
+        """List version history for an agent.
+
+        Args:
+            agent_id: The agent UUID
+            skip: Number of records to skip (for pagination)
+            limit: Maximum number of versions to return (default 50)
+        """
+        self._require_sync_client()
+        response = self._client.get(
+            f"/v1/agents/{agent_id}/versions",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return [AgentVersion(v) for v in response.json()["items"]]
+
+    async def aversions(
+        self,
+        agent_id: UUID | str,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[AgentVersion]:
+        """List version history for an agent (async).
+
+        Args:
+            agent_id: The agent UUID
+            skip: Number of records to skip (for pagination)
+            limit: Maximum number of versions to return (default 50)
+        """
+        self._require_async_client()
+        response = await self._client.get(
+            f"/v1/agents/{agent_id}/versions",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return [AgentVersion(v) for v in response.json()["items"]]
+
+    def rollback(self, agent_id: UUID | str, version: int) -> Agent:
+        """Roll back an agent to a specific config version.
+
+        Args:
+            agent_id: The agent UUID
+            version: The config version number to roll back to
+        """
+        self._require_sync_client()
+        response = self._client.post(
+            f"/v1/agents/{agent_id}/rollback",
+            json={"version": version},
+        )
+        response.raise_for_status()
+        return Agent(response.json())
+
+    async def arollback(self, agent_id: UUID | str, version: int) -> Agent:
+        """Roll back an agent to a specific config version (async).
+
+        Args:
+            agent_id: The agent UUID
+            version: The config version number to roll back to
+        """
+        self._require_async_client()
+        response = await self._client.post(
+            f"/v1/agents/{agent_id}/rollback",
+            json={"version": version},
+        )
+        response.raise_for_status()
+        return Agent(response.json())
+
+    def record_resource_usage(
+        self,
+        agent_id: UUID | str,
+        prompt_tokens: int = 0,
+        completion_tokens: int = 0,
+        total_tokens: int = 0,
+        api_calls: int = 0,
+        cost_usd: float = 0.0,
+        model: Optional[str] = None,
+        extra_metadata: Optional[dict[str, Any]] = None,
+        period_start: Optional[str] = None,
+        period_end: Optional[str] = None,
+    ) -> AgentResourceUsage:
+        """Record resource usage (tokens, cost, API calls) for an agent.
+
+        Args:
+            agent_id: The agent UUID
+            prompt_tokens: Number of prompt tokens used
+            completion_tokens: Number of completion tokens generated
+            total_tokens: Total tokens used (prompt + completion)
+            api_calls: Number of API calls made
+            cost_usd: Cost in USD
+            model: Model name used
+            extra_metadata: Arbitrary key/value metadata
+            period_start: ISO-8601 start of the billing period
+            period_end: ISO-8601 end of the billing period
+        """
+        self._require_sync_client()
+        payload: dict[str, Any] = {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "api_calls": api_calls,
+            "cost_usd": cost_usd,
+        }
+        if model is not None:
+            payload["model"] = model
+        if extra_metadata is not None:
+            payload["extra_metadata"] = extra_metadata
+        if period_start is not None:
+            payload["period_start"] = period_start
+        if period_end is not None:
+            payload["period_end"] = period_end
+        response = self._client.post(
+            f"/v1/agents/{agent_id}/resource-usage",
+            json=payload,
+        )
+        response.raise_for_status()
+        return AgentResourceUsage(response.json())
+
+    async def arecord_resource_usage(
+        self,
+        agent_id: UUID | str,
+        prompt_tokens: int = 0,
+        completion_tokens: int = 0,
+        total_tokens: int = 0,
+        api_calls: int = 0,
+        cost_usd: float = 0.0,
+        model: Optional[str] = None,
+        extra_metadata: Optional[dict[str, Any]] = None,
+        period_start: Optional[str] = None,
+        period_end: Optional[str] = None,
+    ) -> AgentResourceUsage:
+        """Record resource usage for an agent (async). See sync docstring."""
+        self._require_async_client()
+        payload: dict[str, Any] = {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "api_calls": api_calls,
+            "cost_usd": cost_usd,
+        }
+        if model is not None:
+            payload["model"] = model
+        if extra_metadata is not None:
+            payload["extra_metadata"] = extra_metadata
+        if period_start is not None:
+            payload["period_start"] = period_start
+        if period_end is not None:
+            payload["period_end"] = period_end
+        response = await self._client.post(
+            f"/v1/agents/{agent_id}/resource-usage",
+            json=payload,
+        )
+        response.raise_for_status()
+        return AgentResourceUsage(response.json())
+
+    def list_resource_usage(
+        self,
+        agent_id: UUID | str,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[AgentResourceUsage]:
+        """List recorded resource usage for an agent.
+
+        Args:
+            agent_id: The agent UUID
+            skip: Number of records to skip (for pagination)
+            limit: Maximum number of records to return (default 50, max 100)
+        """
+        self._require_sync_client()
+        response = self._client.get(
+            f"/v1/agents/{agent_id}/resource-usage",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return [AgentResourceUsage(r) for r in response.json()]
+
+    async def alist_resource_usage(
+        self,
+        agent_id: UUID | str,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[AgentResourceUsage]:
+        """List recorded resource usage for an agent (async).
+
+        Args:
+            agent_id: The agent UUID
+            skip: Number of records to skip (for pagination)
+            limit: Maximum number of records to return (default 50, max 100)
+        """
+        self._require_async_client()
+        response = await self._client.get(
+            f"/v1/agents/{agent_id}/resource-usage",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return [AgentResourceUsage(r) for r in response.json()]
 
     def stream_logs(
         self,
