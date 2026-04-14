@@ -14,6 +14,7 @@ import {
   asDashboardStatus,
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
+import { FeatureHint } from "@/components/dashboard/FeatureHint";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 
 type ReasoningTemplate = {
@@ -237,7 +238,16 @@ export function ReasoningPageClient() {
       {error ? <LiveErrorState title="Reasoning update failed" message={error} /> : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(380px,0.95fr)]">
-        <LivePanel title="Launch autoreason" meta={selectedTemplate?.name || "Select template"}>
+        <LivePanel
+          title="Launch autoreason"
+          meta={selectedTemplate?.name || "Select template"}
+          action={
+            <FeatureHint
+              tone="beta"
+              detail="Autoreason launch is live, but judging, artifact review, and operator follow-up are still a first-pass workflow."
+            />
+          }
+        >
           <div className="space-y-4">
             <label className="block space-y-2">
               <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
@@ -306,6 +316,7 @@ export function ReasoningPageClient() {
               <input
                 type="file"
                 multiple
+                accept=".txt,.md,.pdf,.json,.yaml,.yml,.xml,.csv,.py,.js,.ts,.tsx,.html,.css,.log,.sh,.bash"
                 onChange={(event) => setContextFiles(Array.from(event.target.files ?? []))}
                 className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-300"
               />
@@ -322,7 +333,7 @@ export function ReasoningPageClient() {
               type="button"
               onClick={() => void submitManagedJob()}
               disabled={submitting}
-              className="inline-flex items-center justify-center rounded-full border border-[#d4ab73]/30 bg-[#d4ab73]/12 px-5 py-2.5 text-sm font-medium text-[#fff1df] transition hover:bg-[#d4ab73]/18 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center rounded-full border border-sky-400/30 bg-sky-500/12 px-5 py-2.5 text-sm font-medium text-slate-50 transition hover:bg-sky-500/18 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? "Queueing..." : "Queue managed job"}
             </button>
@@ -348,7 +359,7 @@ export function ReasoningPageClient() {
                       type="button"
                       onClick={() => setSelectedJobId(job.id)}
                       className={`w-full rounded-2xl border p-4 text-left transition ${
-                        isSelected ? "border-[#d4ab73]/40 bg-[#d4ab73]/10" : "border-white/10 bg-white/[0.02]"
+                        isSelected ? "border-sky-400/40 bg-sky-500/10" : "border-white/10 bg-white/[0.02]"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -419,7 +430,7 @@ export function ReasoningPageClient() {
                         <a
                           key={artifact.id}
                           href={`/api/dashboard/reasoning/jobs/${encodeURIComponent(selectedJob.id)}/artifacts/${encodeURIComponent(artifact.id)}`}
-                          className="flex items-center justify-between rounded-xl border border-white/10 bg-black/10 px-3 py-2 text-sm text-slate-200 transition hover:border-[#d4ab73]/40 hover:text-white"
+                          className="flex items-center justify-between rounded-xl border border-white/10 bg-black/10 px-3 py-2 text-sm text-slate-200 transition hover:border-sky-400/40 hover:text-white"
                         >
                           <span>{artifact.filename}</span>
                           <span className="text-xs text-slate-500">
