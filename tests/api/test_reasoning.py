@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+from datetime import timedelta
 
 import pytest
 
@@ -186,6 +187,54 @@ async def test_managed_reasoning_lifecycle_executes_through_worker(
     assert run_payload["template_id"] == "autoreason_refine"
     assert run_payload["execution_mode"] == "managed"
     assert any(trace["event_type"] == "reasoning.completed" for trace in run_payload["traces"])
+
+
+@pytest.mark.asyncio
+async def test_stale_running_reasoning_job_is_reclaimed(client, db_session):
+    from src.api.services.reasoning_jobs import claim_next_reasoning_job
+
+    create_response = await client.post(
+        "/v1/reasoning/jobs",
+        json={
+            "template_id": "autoreason_refine",
+            "execution_mode": "managed",
+            "parameters": {
+                "task_prompt": "Write a tighter launch memo for MUTX.",
+                "incumbent": "Initial answer with loose structure.",
+            },
+        },
+    )
+    assert create_response.status_code == 201
+    job_id = create_response.json()["id"]
+
+    dispatch_response = await client.post(
+        f"/v1/reasoning/jobs/{job_id}/dispatch",
+        json={"mode": "managed"},
+    )
+    assert dispatch_response.status_code == 200
+
+    first_claim = await claim_next_reasoning_job(db_session, worker_name="worker-one")
+    assert first_claim is not None
+
+    stale_heartbeat = first_claim.job.last_heartbeat_at - timedelta(seconds=600)
+    first_claim.job.claimed_by = "worker-one"
+    first_claim.job.claimed_at = stale_heartbeat
+    first_claim.job.last_heartbeat_at = stale_heartbeat
+    first_claim.job.run.status = "running"
+    await db_session.commit()
+
+    reclaimed = await claim_next_reasoning_job(
+        db_session,
+        worker_name="worker-two",
+        stale_after_seconds=60,
+    )
+
+    assert reclaimed is not None
+    assert reclaimed.job.id == first_claim.job.id
+    assert reclaimed.worker_name == "worker-two"
+    assert reclaimed.claim_token != first_claim.claim_token
+    assert reclaimed.job.claimed_by == "worker-two"
+    assert reclaimed.job.attempts == 2
 
 
 @pytest.mark.asyncio
