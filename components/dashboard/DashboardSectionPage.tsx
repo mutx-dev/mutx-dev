@@ -37,6 +37,11 @@ export function DashboardSectionPage({
         title={title}
         subtitle={description}
         actions={actions}
+        hint={{
+          tone: "comingSoon",
+          detail:
+            "This route is still being wired to real operator contracts. The shell is ready, but write controls stay gated until the underlying data and actions are live.",
+        }}
         className="border-b"
       />
 
@@ -57,7 +62,10 @@ export function DashboardSectionPage({
                 >
                   {badge}
                 </p>
-                <h2 className="mt-3 font-[family:var(--font-site-display)] text-[1.75rem] leading-[1.02] tracking-[-0.07em] text-[#fff3e2]">
+                <h2
+                  className="mt-3 font-[family:var(--font-site-display)] text-[1.75rem] leading-[1.02] tracking-[-0.07em]"
+                  style={{ color: dashboardTokens.textPrimary }}
+                >
                   Ground the route around one real operator capability at a time.
                 </h2>
                 <p

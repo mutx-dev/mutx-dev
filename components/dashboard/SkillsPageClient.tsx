@@ -10,6 +10,7 @@ import {
   LiveLoading,
   LivePanel,
 } from '@/components/dashboard/livePrimitives'
+import { FeatureHint } from '@/components/dashboard/FeatureHint'
 import { StatusBadge } from '@/components/dashboard/StatusBadge'
 
 type SkillRecord = {
@@ -208,6 +209,12 @@ export function SkillsPageClient() {
       <LivePanel
         title='Curated bundles'
         meta={`${bundles.length} packs · ${assistantId ? `bound to ${assistantName || 'assistant'}` : 'no assistant bound'}`}
+        action={
+          <FeatureHint
+            tone='beta'
+            detail='Bundle install flows are active, but assistant binding and runtime availability checks are still being tightened.'
+          />
+        }
       >
         {bundles.length === 0 ? (
           <LiveEmptyState
@@ -277,7 +284,16 @@ export function SkillsPageClient() {
         )}
       </LivePanel>
 
-      <LivePanel title='Skill catalog' meta={`${filteredSkills.length} visible`}> 
+      <LivePanel
+        title='Skill catalog'
+        meta={`${filteredSkills.length} visible`}
+        action={
+          <FeatureHint
+            tone='beta'
+            detail='Skill installs and removals are usable, but this catalog is still an operator beta while sync semantics settle.'
+          />
+        }
+      >
         <div className='mb-4 flex flex-wrap items-center gap-3'>
           <input
             value={search}

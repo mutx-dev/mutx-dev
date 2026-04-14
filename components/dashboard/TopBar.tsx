@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { FeatureHint, type FeatureHintProps } from "@/components/dashboard/FeatureHint";
 
 import { dashboardTokens } from "./tokens";
 
@@ -32,6 +33,7 @@ export interface TopBarProps {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  hint?: FeatureHintProps;
   user?: TopBarUser;
   userActions?: TopBarUserAction[];
   className?: string;
@@ -47,6 +49,7 @@ export function TopBar({
   title,
   subtitle,
   actions,
+  hint,
   user,
   userActions = [],
   className,
@@ -101,6 +104,7 @@ export function TopBar({
           <h1 className="truncate font-[family:var(--font-site-display)] text-[1.5rem] font-semibold tracking-[-0.06em] sm:text-[1.6rem]">
             {title}
           </h1>
+          {hint ? <FeatureHint {...hint} align="left" className="pt-0.5" /> : null}
           {subtitle ? (
             <p className="max-w-3xl text-[13px] leading-6" style={{ color: dashboardTokens.textSubtle }}>
               {subtitle}

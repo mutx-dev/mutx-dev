@@ -40,7 +40,7 @@ export function Sidebar() {
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-[rgba(255,255,255,0.06)] px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#d4ab73]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3b82f6]">
             <Zap className="h-5 w-5 text-black" />
           </div>
           <span className="text-lg font-bold tracking-tight">MUTX</span>
@@ -60,14 +60,14 @@ export function Sidebar() {
                     href={item.href}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
                       isActive
-                        ? "bg-[rgba(212,171,115,0.12)] text-[#d4ab73]"
+                        ? "bg-[rgba(59,130,246,0.12)] text-[#60a5fa]"
                         : "text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
                     {isActive && (
-                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[#d4ab73]" />
+                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[#60a5fa]" />
                     )}
                   </Link>
                 </li>

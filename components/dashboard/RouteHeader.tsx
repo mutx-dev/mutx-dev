@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { dashboardTokens } from "@/components/dashboard/tokens";
+import { FeatureHint, type FeatureHintProps } from "@/components/dashboard/FeatureHint";
 
 interface RouteHeaderStat {
   label: string;
@@ -17,18 +18,19 @@ interface RouteHeaderProps {
   badge?: string;
   stats?: RouteHeaderStat[];
   className?: string;
+  hint?: FeatureHintProps;
 }
 
 function getStatToneClass(tone: RouteHeaderStat["tone"]) {
   switch (tone) {
     case "success":
-      return "border-[#7d6a42] bg-[#31251a] text-[#f3d39b]";
+      return "border-[#2563eb]/40 bg-[#0f1f3c] text-[#dbeafe]";
     case "warning":
-      return "border-[#8a6439] bg-[#352515] text-[#ffd59a]";
+      return "border-amber-400/30 bg-amber-500/10 text-amber-200";
     case "danger":
-      return "border-[#7f4333] bg-[#351d18] text-[#ffc6b5]";
+      return "border-rose-400/30 bg-rose-500/10 text-rose-200";
     default:
-      return "border-[#4d3829] bg-[#1a1411] text-[#f2dfc4]";
+      return "border-[#2b436e] bg-[#0d1728] text-[#dbeafe]";
   }
 }
 
@@ -36,10 +38,11 @@ export function RouteHeader({
   title,
   description,
   icon: Icon,
-  iconTone = "text-[#ffddb1] bg-[#3a2a1e] border-[#6c4b34]",
+  iconTone = "text-[#dbeafe] bg-[#16233a] border-[#315487]",
   badge,
   stats = [],
   className,
+  hint,
 }: RouteHeaderProps) {
   return (
     <section
@@ -50,7 +53,7 @@ export function RouteHeader({
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background:
-          "radial-gradient(circle at top right, rgba(212,171,115,0.12), transparent 22%), linear-gradient(180deg, rgba(25,23,30,0.98) 0%, rgba(13,12,16,0.98) 100%)",
+          "radial-gradient(circle at top right, rgba(96,165,250,0.14), transparent 22%), linear-gradient(180deg, rgba(20,29,45,0.98) 0%, rgba(8,12,20,0.98) 100%)",
       }}
     >
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1.4fr)_minmax(260px,0.6fr)]">
@@ -66,14 +69,20 @@ export function RouteHeader({
             </div>
             <div className="min-w-0 space-y-3">
               {badge ? (
-                <p
-                  className="text-[10px] font-semibold uppercase tracking-[0.22em]"
-                  style={{ color: dashboardTokens.textMuted }}
-                >
-                  {badge}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p
+                    className="text-[10px] font-semibold uppercase tracking-[0.22em]"
+                    style={{ color: dashboardTokens.textMuted }}
+                  >
+                    {badge}
+                  </p>
+                  {hint ? <FeatureHint {...hint} align="left" /> : null}
+                </div>
               ) : null}
-              <h1 className="font-[family:var(--font-site-display)] text-[1.5rem] font-semibold tracking-[-0.06em] text-[#fff3e2] sm:text-[1.8rem]">
+              <h1
+                className="font-[family:var(--font-site-display)] text-[1.5rem] font-semibold tracking-[-0.06em] sm:text-[1.8rem]"
+                style={{ color: dashboardTokens.textPrimary }}
+              >
                 {title}
               </h1>
               <p

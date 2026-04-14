@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { FeatureHint } from "@/components/dashboard/FeatureHint";
 import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { dashboardTokens } from "@/components/dashboard/tokens";
 
@@ -563,6 +564,11 @@ export function TemplateCatalogPageClient() {
         description="Live starter-template catalog plus a deploy workbench for agent launch, workspace naming, and runtime presets."
         icon={Sparkles}
         badge="starter templates"
+        hint={{
+          tone: "beta",
+          detail:
+            "Spawn Lab is functional, but template deployment and custom-template editing are still being hardened. Expect a working operator workbench, not a frozen product contract.",
+        }}
         stats={[
           { label: "Catalog", value: String(templates.length) },
           { label: "Imported", value: String(importedCount), tone: "success" },
@@ -587,6 +593,10 @@ export function TemplateCatalogPageClient() {
             />
           </div>
           <div className="flex flex-wrap gap-2">
+            <FeatureHint
+              tone="beta"
+              detail="Spawn Lab actions are active, but template deployment, cloning, and custom editing are still an operator beta."
+            />
             {(["all", "official", "imported"] as TemplateSourceFilter[]).map((filter) => {
               const active = sourceFilter === filter;
               return (

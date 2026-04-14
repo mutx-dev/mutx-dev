@@ -124,13 +124,19 @@ export function LivePanel({
         }}
       >
         <div className="min-w-0">
-          <h2 className="truncate text-[13px] font-semibold uppercase tracking-[0.14em] text-[#fff1df]">
+          <h2
+            className="truncate text-[13px] font-semibold uppercase tracking-[0.14em]"
+            style={{ color: dashboardTokens.textPrimary }}
+          >
             {title}
           </h2>
         </div>
         <div className="flex items-center gap-3">
           {meta ? (
-            <span className="hidden text-[10px] font-medium uppercase tracking-[0.18em] text-[#b09376] sm:inline">
+            <span
+              className="hidden text-[10px] font-medium uppercase tracking-[0.18em] sm:inline"
+              style={{ color: dashboardTokens.textLabel }}
+            >
               {meta}
             </span>
           ) : null}
@@ -165,13 +171,18 @@ export function LiveStatCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: dashboardTokens.textMuted }}>{label}</p>
-          <p className="mt-2 truncate font-[family:var(--font-site-display)] text-[1.28rem] font-semibold tracking-[-0.05em] text-[#fff3e2]">
+          <p
+            className="mt-2 truncate font-[family:var(--font-site-display)] text-[1.28rem] font-semibold tracking-[-0.05em]"
+            style={{ color: dashboardTokens.textPrimary }}
+          >
             {value}
           </p>
         </div>
         {status ? <StatusBadge status={status} /> : null}
       </div>
-      <p className="mt-3 text-[12px] leading-5 text-[#c0ab90]">{detail}</p>
+      <p className="mt-3 text-[12px] leading-5" style={{ color: dashboardTokens.textSubtle }}>
+        {detail}
+      </p>
     </article>
   );
 }
@@ -262,11 +273,21 @@ export function LiveAuthRequired({
               <Lock className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#b09376]">
+              <p
+                className="text-[11px] font-semibold uppercase tracking-[0.2em]"
+                style={{ color: dashboardTokens.textLabel }}
+              >
                 Sign-in gate
               </p>
-              <p className="mt-2 font-[family:var(--font-site-display)] text-lg font-semibold text-[#fff3e2]">{title}</p>
-              <p className="mt-2 text-sm leading-6 text-[#c0ab90]">{message}</p>
+              <p
+                className="mt-2 font-[family:var(--font-site-display)] text-lg font-semibold"
+                style={{ color: dashboardTokens.textPrimary }}
+              >
+                {title}
+              </p>
+              <p className="mt-2 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
+                {message}
+              </p>
             </div>
           </div>
         </div>

@@ -22,6 +22,11 @@ export function DemoRoutePage({
         icon={FlaskConical}
         iconTone="text-cyan-300 bg-cyan-400/10"
         badge={badge}
+        hint={{
+          tone: "comingSoon",
+          detail:
+            "This route is intentionally staged. The layout is real, but operator actions stay hidden until the backend contract ships end to end.",
+        }}
         stats={[
           { label: "State", value: "Integration pending", tone: "warning" },
           { label: "Data", value: "Shell only" },

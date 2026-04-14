@@ -18,6 +18,11 @@ export default function DashboardSkillsPage() {
             icon={BrainCircuit}
             iconTone='text-cyan-300 bg-cyan-400/10'
             badge='skillpack control'
+            hint={{
+              tone: 'beta',
+              detail:
+                'Skill installs are active, but runtime sync and assistant binding still have sharp edges. Treat this as an operator beta, not a final marketplace surface.',
+            }}
             stats={[
               { label: 'Catalog', value: 'ClawHub + Orchestra' },
               { label: 'Mode', value: 'Live install', tone: 'success' },

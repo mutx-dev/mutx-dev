@@ -33,6 +33,7 @@
     "test": "npm run test:app",
     "test:app": "jest --runInBand tests/unit",
     "test:e2e:dashboard": "playwright test tests/dashboardAgents.spec.ts tests/dashboardOpenClaw.spec.ts tests/dashboardRouteMatrix.spec.ts --project=chromium --workers=1",
+    "smoke:dashboard": "node scripts/dashboard-interactions-smoke.mjs",
     "test:e2e:release": "bash scripts/run-release-web-smoke.sh",
     "demo:validate": "bash scripts/demo-validate.sh",
     "release:promote:railway": "bash scripts/promote-railway-production.sh",

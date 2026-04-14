@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Copy, ExternalLink, RefreshCcw } from "lucide-react";
+import { Check, Copy, ExternalLink, RefreshCcw } from "lucide-react";
 
 import { TopBar } from "@/components/dashboard/TopBar";
 import { dashboardTokens } from "@/components/dashboard/tokens";
@@ -112,6 +112,8 @@ export function OpenclawSetupSurface() {
   const [runtime, setRuntime] = useState<RuntimeSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   const commands = useMemo(
     () => [
@@ -155,6 +157,25 @@ export function OpenclawSetupSurface() {
 
   const currentBinding = runtime?.bindings?.[0];
 
+  const copyCommand = async (command: string) => {
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard is unavailable in this browser.");
+      }
+
+      await navigator.clipboard.writeText(command);
+      setCopiedCommand(command);
+      setCopyError(null);
+      window.setTimeout(() => {
+        setCopiedCommand((current) => (current === command ? null : current));
+      }, 2000);
+    } catch (copyFailure) {
+      setCopyError(
+        copyFailure instanceof Error ? copyFailure.message : "Failed to copy command.",
+      );
+    }
+  };
+
   return (
     <section
       className="overflow-hidden rounded-[28px] border"
@@ -172,6 +193,11 @@ export function OpenclawSetupSurface() {
         ]}
         title="Setup"
         subtitle="MUTX owns the onboarding shell. OpenClaw is the first tracked runtime provider and the dashboard shows the last synced local truth."
+        hint={{
+          tone: "beta",
+          detail:
+            "Setup on the web is still a guided operator surface. The dashboard reflects synced state truthfully, but installation and machine-local runtime actions still complete in the CLI or TUI.",
+        }}
         actions={(
           <button
             type="button"
@@ -386,15 +412,25 @@ export function OpenclawSetupSurface() {
                     backgroundColor: dashboardTokens.bgCanvas,
                     color: dashboardTokens.textPrimary,
                   }}
-                  onClick={async () => {
-                    await navigator.clipboard.writeText(command);
-                  }}
+                  onClick={() => void copyCommand(command)}
                 >
                   <code className="text-xs text-slate-200">{command}</code>
-                  <Copy className="h-4 w-4 text-slate-500" />
+                  <span className="ml-3 inline-flex items-center gap-2 text-xs text-slate-400">
+                    {copiedCommand === command ? (
+                      <>
+                        <span className="text-emerald-300">Copied</span>
+                        <Check className="h-4 w-4 text-emerald-300" />
+                      </>
+                    ) : (
+                      <Copy className="h-4 w-4 text-slate-500" />
+                    )}
+                  </span>
                 </button>
               ))}
             </div>
+            {copyError ? (
+              <p className="mt-3 text-xs text-rose-300">{copyError}</p>
+            ) : null}
           </section>
 
           <section

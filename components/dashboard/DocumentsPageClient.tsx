@@ -15,6 +15,7 @@ import {
   asDashboardStatus,
   formatRelativeTime,
 } from '@/components/dashboard/livePrimitives'
+import { FeatureHint } from '@/components/dashboard/FeatureHint'
 import { StatusBadge } from '@/components/dashboard/StatusBadge'
 
 type DocumentTemplate = {
@@ -331,7 +332,16 @@ export function DocumentsPageClient() {
       </LiveKpiGrid>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
-        <LivePanel title="Launch workflow" meta={selectedTemplate?.name || 'Select template'}>
+        <LivePanel
+          title="Launch workflow"
+          meta={selectedTemplate?.name || 'Select template'}
+          action={
+            <FeatureHint
+              tone="beta"
+              detail="This hybrid workflow is active, but managed uploads, local execution, and artifact recovery are still being hardened together."
+            />
+          }
+        >
           <div className="space-y-4">
             <label className="block space-y-2">
               <span className="text-xs uppercase tracking-[0.18em] text-slate-500">Template</span>
