@@ -45,7 +45,7 @@ def test_deploy_events_hits_contract_route_and_renders_items(monkeypatch) -> Non
             },
         )
 
-    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
+    monkeypatch.setattr("cli.commands.deploy.current_config", DummyConfig)
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -100,7 +100,7 @@ def test_deploy_list_passes_agent_and_status_filters(monkeypatch) -> None:
             ],
         )
 
-    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
+    monkeypatch.setattr("cli.commands.deploy.current_config", DummyConfig)
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
