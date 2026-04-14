@@ -16,6 +16,7 @@ Prototype an agent in an afternoon. Run one in production for a year — that's 
 | **macOS App** | Signed & notarized desktop app via `mutx.dev/download/macos` |
 | **CLI + TUI** | `mutx` CLI and `mutx tui` — terminal-first workflows |
 | **Python SDK** | `pip install mutx` — full control plane access |
+| **Document Workflows** | `predict-rlm`-backed document analysis, comparison, extraction, and redaction across API, dashboard, CLI, and worker |
 | **Infrastructure** | Docker Compose (local), Terraform + Ansible (cloud), Helm (k8s) |
 
 ## Quick Start
@@ -79,6 +80,7 @@ Governance via [Faramesh](https://faramesh.dev) — policy enforcement, session 
 - [Roadmap](docs/roadmap.md) — what's next
 - [API Reference](docs/api/reference.md) — `/v1/*` contract
 - [CLI Guide](docs/cli.md) — terminal workflows
+- [Document Workflows](docs/document-workflows.md) — `predict-rlm` requirements, API, CLI, dashboard, and worker
 - [Python SDK](docs/sdk.md) — programmatic access
 - [v1.4 Release Notes](docs/releases/v1.4.md) — latest release
 - [v1.3 Release Notes](docs/releases/v1.3.md) — previous release
@@ -91,6 +93,7 @@ Governance via [Faramesh](https://faramesh.dev) — policy enforcement, session 
 - [AARM](https://github.com/aarm-dev/docs) — Autonomous Action Runtime Management
 - [Faramesh](https://github.com/faramesh/faramesh-core) — governance engine
 - [Mission Control](https://github.com/builderz-labs/mission-control) — fleet management
+- [predict-rlm](https://github.com/Trampoline-AI/predict-rlm) — document workflow engine and upstream example surface for analysis, comparison, invoice extraction, and redaction
 
 Full attribution in [CREDITS.md](CREDITS.md).
 

@@ -53,10 +53,11 @@ MUTX incorporates MIT-licensed components:
 - **Faramesh** (Faramesh Technologies) — Governance engine
 - **Mission Control** (builderz-labs) — Dashboard inspiration and tracked direct dashboard-pattern reuse
 - **Orchestra Research AI-Research-SKILLs** — Imported skill catalog metadata, curated bundles, and runtime sync path for research/operator workflows
+- **predict-rlm** (Trampoline AI) — Document workflow engine integration plus adapted template contracts and operator docs aligned to the upstream document analysis, contract comparison, invoice processing, and document redaction examples
 
 All third-party code remains under its original license. See [CREDITS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/CREDITS.md) for full attribution and license texts.
 
-Direct feature ports from Mission Control (MIT), LACP (MIT), and Guild AI (Apache-2.0) are tracked in the [OSS Attribution Ledger](oss-attribution-ledger.md). The ledger records the upstream source, local MUTX scope, and whether the reuse was direct or still pending.
+Direct feature ports and materially adapted upstream workflow surfaces from Mission Control (MIT), LACP (MIT), Guild AI (Apache-2.0), and predict-rlm (MIT) are tracked in the [OSS Attribution Ledger](oss-attribution-ledger.md). The ledger records the upstream source, local MUTX scope, and whether the reuse was direct or still pending.
 
 ## Trademark Policy
 

@@ -70,6 +70,7 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 ### Setup And Workflow
 
 - [CLI Guide](./cli.md)
+- [Document Workflows](./document-workflows.md)
 - [Deployment](./deployment/README.md)
 - [Local Developer Bootstrap](./deployment/local-developer-bootstrap.md)
 

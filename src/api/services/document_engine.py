@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import importlib.util
 import json
 import logging
@@ -11,7 +10,6 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import zipfile
 from typing import Any
 
 from src.api.config import get_settings
@@ -47,9 +45,12 @@ class EngineReadiness:
     python_ok: bool
     predict_rlm_available: bool
     deno_available: bool
+    credentials_ok: bool
     ready: bool
     driver: str
     artifacts_dir: str
+    missing_requirements: tuple[str, ...] = ()
+    configured_model_providers: tuple[str, ...] = ()
 
     def to_payload(self) -> dict[str, Any]:
         return {
@@ -57,9 +58,12 @@ class EngineReadiness:
             "python_ok": self.python_ok,
             "predict_rlm_available": self.predict_rlm_available,
             "deno_available": self.deno_available,
+            "credentials_ok": self.credentials_ok,
             "ready": self.ready,
             "driver": self.driver,
             "artifacts_dir": self.artifacts_dir,
+            "missing_requirements": list(self.missing_requirements),
+            "configured_model_providers": list(self.configured_model_providers),
         }
 
 
@@ -103,21 +107,63 @@ class EngineExecutionResult:
     events: list[EngineEvent]
 
 
+PROVIDER_CREDENTIAL_ENV_VARS = {
+    "anthropic": "ANTHROPIC_API_KEY",
+    "openai": "OPENAI_API_KEY",
+    "openrouter": "OPENROUTER_API_KEY",
+}
+
+
+def _configured_document_model_providers() -> tuple[str, ...]:
+    providers: list[str] = []
+    for model_name in (
+        os.getenv("MUTX_DOCUMENTS_LM", "openai/gpt-5.4"),
+        os.getenv("MUTX_DOCUMENTS_SUB_LM", "openai/gpt-5.1"),
+    ):
+        provider = str(model_name).split("/", 1)[0].strip().lower()
+        if provider and provider not in providers:
+            providers.append(provider)
+    return tuple(providers)
+
+
 def get_document_engine_readiness() -> EngineReadiness:
     settings = get_settings()
     python_ok = sys.version_info >= (3, 11)
     predict_rlm_available = importlib.util.find_spec("predict_rlm") is not None
     deno_available = shutil.which("deno") is not None
-    ready = settings.documents_enabled and python_ok and deno_available and predict_rlm_available
-    driver = "predict_rlm" if ready else "builtin_fallback"
+    configured_model_providers = _configured_document_model_providers()
+    missing_requirements: list[str] = []
+    if not settings.documents_enabled:
+        missing_requirements.append("documents_enabled")
+    if not python_ok:
+        missing_requirements.append("python>=3.11")
+    if not deno_available:
+        missing_requirements.append("deno")
+    if not predict_rlm_available:
+        missing_requirements.append("predict_rlm")
+    for provider in configured_model_providers:
+        env_var = PROVIDER_CREDENTIAL_ENV_VARS.get(provider)
+        if env_var is None:
+            missing_requirements.append(f"{provider}_credentials")
+            continue
+        if not os.getenv(env_var):
+            missing_requirements.append(env_var)
+    credentials_ok = all(
+        item not in missing_requirements for item in PROVIDER_CREDENTIAL_ENV_VARS.values()
+    ) and not any(item.endswith("_credentials") for item in missing_requirements)
+    ready = not missing_requirements
+    driver = "predict_rlm" if ready else "unavailable"
     return EngineReadiness(
         enabled=settings.documents_enabled,
         python_ok=python_ok,
         predict_rlm_available=predict_rlm_available,
         deno_available=deno_available,
+        credentials_ok=credentials_ok,
         ready=ready,
         driver=driver,
         artifacts_dir=str(Path(settings.artifacts_dir).expanduser()),
+        missing_requirements=tuple(missing_requirements),
+        configured_model_providers=configured_model_providers,
     )
 
 
@@ -146,6 +192,8 @@ def build_document_manifest(
         for artifact in artifacts
     ]
 
+    readiness = get_document_engine_readiness()
+
     return {
         "job_id": str(job.id),
         "run_id": str(job.run_id),
@@ -163,30 +211,12 @@ def build_document_manifest(
             "execution_mode": job.execution_mode,
         },
         "engine": {
-            "ready": get_document_engine_readiness().ready,
-            "driver": get_document_engine_readiness().driver,
+            "ready": readiness.ready,
+            "driver": readiness.driver,
+            "missing_requirements": list(readiness.missing_requirements),
         },
         "output_dir": output_dir,
     }
-
-
-def _read_text_preview(path: Path) -> str:
-    suffix = path.suffix.lower()
-    try:
-        if suffix in {".txt", ".md", ".json", ".csv", ".yaml", ".yml"}:
-            return path.read_text(encoding="utf-8", errors="ignore")[:4000]
-        return f"Binary or unsupported text extraction for {path.name}"
-    except Exception as exc:  # noqa: BLE001
-        return f"Could not read {path.name}: {exc}"
-
-
-def _group_artifacts_by_role(
-    artifacts: list[EngineArtifactInput],
-) -> dict[str, list[EngineArtifactInput]]:
-    grouped: dict[str, list[EngineArtifactInput]] = {}
-    for artifact in artifacts:
-        grouped.setdefault(artifact.role, []).append(artifact)
-    return grouped
 
 
 def _ensure_output_dir(manifest: dict[str, Any]) -> Path:
@@ -215,290 +245,21 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
 
-def _write_minimal_xlsx(path: Path, rows: list[list[str]]) -> None:
-    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr(
-            "[Content_Types].xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-</Types>""",
-        )
-        archive.writestr(
-            "_rels/.rels",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
-  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
-</Relationships>""",
-        )
-        archive.writestr(
-            "docProps/core.xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
- xmlns:dc="http://purl.org/dc/elements/1.1/"
- xmlns:dcterms="http://purl.org/dc/terms/"
- xmlns:dcmitype="http://purl.org/dc/dcmitype/"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <dc:title>MUTX Invoice Extraction</dc:title>
-</cp:coreProperties>""",
-        )
-        archive.writestr(
-            "docProps/app.xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
- xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-  <Application>MUTX</Application>
-</Properties>""",
-        )
-        archive.writestr(
-            "xl/workbook.xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
- xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <sheets>
-    <sheet name="Invoices" sheetId="1" r:id="rId1"/>
-  </sheets>
-</workbook>""",
-        )
-        archive.writestr(
-            "xl/_rels/workbook.xml.rels",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-</Relationships>""",
-        )
+def _raise_if_not_ready() -> None:
+    readiness = get_document_engine_readiness()
+    if readiness.ready:
+        return
 
-        cell_rows: list[str] = []
-        for row_index, row in enumerate(rows, start=1):
-            cells: list[str] = []
-            for column_index, value in enumerate(row, start=1):
-                column_name = ""
-                current = column_index
-                while current:
-                    current, remainder = divmod(current - 1, 26)
-                    column_name = chr(65 + remainder) + column_name
-                cell_ref = f"{column_name}{row_index}"
-                escaped = value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                cells.append(f'<c r="{cell_ref}" t="inlineStr"><is><t>{escaped}</t></is></c>')
-            cell_rows.append(f'<row r="{row_index}">{"".join(cells)}</row>')
-
-        archive.writestr(
-            "xl/worksheets/sheet1.xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <sheetData>"""
-            + "".join(cell_rows)
-            + """</sheetData>
-</worksheet>""",
-        )
-
-
-def _builtin_execute(manifest: dict[str, Any]) -> EngineExecutionResult:
-    output_dir = _ensure_output_dir(manifest)
-    artifacts = [
-        EngineArtifactInput(**item)
-        for item in manifest.get("artifacts", [])
-        if isinstance(item, dict)
-    ]
-    grouped = _group_artifacts_by_role(artifacts)
-    template_id = str(manifest["template_id"])
-    parameters = manifest.get("parameters") or {}
-
-    previews: list[dict[str, Any]] = []
-    for artifact in artifacts:
-        source_path = _artifact_path(artifact)
-        previews.append(
-            {
-                "artifact_id": artifact.id,
-                "role": artifact.role,
-                "filename": artifact.filename,
-                "preview": (
-                    _read_text_preview(source_path) if source_path else "Source file unavailable"
-                ),
-            }
-        )
-
-    base_summary: dict[str, Any] = {
-        "template_id": template_id,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "artifact_count": len(artifacts),
-        "parameters": parameters,
-        "artifacts": [
-            {
-                "artifact_id": artifact.id,
-                "role": artifact.role,
-                "filename": artifact.filename,
-                "storage_backend": artifact.storage_backend,
-            }
-            for artifact in artifacts
-        ],
-    }
-
-    events = [
-        EngineEvent(
-            event_type="rlm_iteration",
-            message="Built manifest and staged artifact context for document execution.",
-            payload={"template_id": template_id, "artifact_count": len(artifacts)},
-        ),
-        EngineEvent(
-            event_type="tool_call",
-            message="Executed built-in fallback document engine.",
-            payload={"driver": "builtin_fallback"},
-        ),
-    ]
-    outputs: list[EngineManagedOutput] = []
-
-    if template_id == "document_analysis":
-        report_path = output_dir / "document-analysis-report.md"
-        report_path.write_text(
-            "# Document Analysis\n\n"
-            f"Instructions: {parameters.get('instructions', 'No additional instructions.')}\n\n"
-            "## Source artifacts\n"
-            + "\n".join(f"- {item['filename']} ({item['role']})" for item in previews)
-            + "\n\n## Extracted previews\n"
-            + "\n\n".join(
-                f"### {item['filename']}\n\n```\n{item['preview'][:1200]}\n```" for item in previews
-            ),
-            encoding="utf-8",
-        )
-        summary_path = output_dir / "document-analysis-summary.json"
-        base_summary["report_sections"] = ["Source artifacts", "Extracted previews"]
-        base_summary["previews"] = previews
-        _write_json(summary_path, base_summary)
-        outputs.extend(
-            [
-                EngineManagedOutput(
-                    report_path, role="report", kind="markdown", content_type="text/markdown"
-                ),
-                EngineManagedOutput(
-                    summary_path, role="summary", kind="json", content_type="application/json"
-                ),
-            ]
-        )
-        output_text = "Document analysis completed."
-    elif template_id == "contract_comparison":
-        base_document = (grouped.get("base_document") or [None])[0]
-        comparison_document = (grouped.get("comparison_document") or [None])[0]
-        report_path = output_dir / "contract-comparison-report.md"
-        report_path.write_text(
-            "# Contract Comparison\n\n"
-            f"- Base: {base_document.filename if base_document else 'missing'}\n"
-            f"- Comparison: {comparison_document.filename if comparison_document else 'missing'}\n\n"
-            f"Focus: {parameters.get('instructions', 'General material differences')}\n",
-            encoding="utf-8",
-        )
-        summary_path = output_dir / "contract-comparison-summary.json"
-        base_summary["base_document"] = base_document.filename if base_document else None
-        base_summary["comparison_document"] = (
-            comparison_document.filename if comparison_document else None
-        )
-        _write_json(summary_path, base_summary)
-        outputs.extend(
-            [
-                EngineManagedOutput(
-                    report_path, role="report", kind="markdown", content_type="text/markdown"
-                ),
-                EngineManagedOutput(
-                    summary_path, role="summary", kind="json", content_type="application/json"
-                ),
-            ]
-        )
-        output_text = "Contract comparison completed."
-    elif template_id == "invoice_extraction":
-        workbook_path = output_dir / "invoice-extraction.xlsx"
-        rows = [["filename", "role", "storage_backend"]]
-        rows.extend(
-            [[artifact.filename, artifact.role, artifact.storage_backend] for artifact in artifacts]
-        )
-        _write_minimal_xlsx(workbook_path, rows)
-        summary_path = output_dir / "invoice-extraction-summary.json"
-        base_summary["rows_written"] = max(len(rows) - 1, 0)
-        _write_json(summary_path, base_summary)
-        outputs.extend(
-            [
-                EngineManagedOutput(
-                    workbook_path,
-                    role="workbook",
-                    kind="xlsx",
-                    content_type=(
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    ),
-                ),
-                EngineManagedOutput(
-                    summary_path, role="summary", kind="json", content_type="application/json"
-                ),
-            ]
-        )
-        output_text = "Invoice extraction completed."
-    elif template_id == "document_redaction":
-        policy = str(parameters.get("redaction_policy") or "No policy provided.")
-        created = 0
-        for artifact in grouped.get("documents", []):
-            source_path = _artifact_path(artifact)
-            if source_path is None:
-                continue
-            redacted_name = f"redacted-{artifact.filename}"
-            destination = output_dir / redacted_name
-            shutil.copy2(source_path, destination)
-            outputs.append(
-                EngineManagedOutput(
-                    destination,
-                    role="redacted_document",
-                    kind="file",
-                    content_type="application/octet-stream",
-                    metadata={"source_artifact_id": artifact.id},
-                )
-            )
-            created += 1
-        report_path = output_dir / "redaction-verification-report.md"
-        report_path.write_text(
-            "# Redaction Verification\n\n"
-            f"Policy: {policy}\n\n"
-            f"Redacted outputs created: {created}\n",
-            encoding="utf-8",
-        )
-        summary_path = output_dir / "document-redaction-summary.json"
-        base_summary["redaction_policy"] = policy
-        base_summary["redacted_outputs"] = created
-        _write_json(summary_path, base_summary)
-        outputs.extend(
-            [
-                EngineManagedOutput(
-                    report_path,
-                    role="verification_report",
-                    kind="markdown",
-                    content_type="text/markdown",
-                ),
-                EngineManagedOutput(
-                    summary_path, role="summary", kind="json", content_type="application/json"
-                ),
-            ]
-        )
-        output_text = "Document redaction completed."
-    else:
-        raise DocumentEngineError(f"Unsupported document template: {template_id}")
-
-    return EngineExecutionResult(
-        driver="builtin_fallback",
-        status="completed",
-        output_text=output_text,
-        summary=base_summary,
-        artifacts=outputs,
-        events=events,
+    missing = ", ".join(readiness.missing_requirements) or "predict_rlm runtime"
+    raise DocumentEnginePrerequisiteError(
+        f"predict-rlm document execution is unavailable. Missing prerequisites: {missing}."
     )
 
 
-def _maybe_execute_predict_rlm(manifest: dict[str, Any]) -> EngineExecutionResult | None:
+def _execute_predict_rlm(manifest: dict[str, Any]) -> EngineExecutionResult:
     readiness = get_document_engine_readiness()
     if not readiness.ready:
-        return None
+        _raise_if_not_ready()
 
     try:
         import dspy
@@ -507,8 +268,7 @@ def _maybe_execute_predict_rlm(manifest: dict[str, Any]) -> EngineExecutionResul
 
         subprocess.run(["deno", "--version"], check=True, capture_output=True, text=True)
     except Exception as exc:  # noqa: BLE001
-        logger.warning("predict-rlm prerequisites failed; using fallback engine: %s", exc)
-        return None
+        raise DocumentEnginePrerequisiteError(f"predict-rlm prerequisites failed: {exc}") from exc
 
     output_dir = _ensure_output_dir(manifest)
     lm = os.getenv("MUTX_DOCUMENTS_LM", "openai/gpt-5.4")
@@ -698,7 +458,7 @@ def _maybe_execute_predict_rlm(manifest: dict[str, Any]) -> EngineExecutionResul
             else dict(result.summary)
         )
     else:
-        return None
+        raise DocumentEngineError(f"Unsupported document template: {manifest['template_id']}")
 
     summary_path = output_dir / f"{manifest['template_id']}-summary.json"
     _write_json(summary_path, summary)
@@ -733,11 +493,5 @@ def _maybe_execute_predict_rlm(manifest: dict[str, Any]) -> EngineExecutionResul
 
 
 def execute_document_manifest(manifest: dict[str, Any]) -> EngineExecutionResult:
-    try:
-        result = _maybe_execute_predict_rlm(manifest)
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("predict-rlm execution failed; using fallback engine: %s", exc)
-        result = None
-    if result is not None:
-        return result
-    return _builtin_execute(manifest)
+    _raise_if_not_ready()
+    return _execute_predict_rlm(manifest)

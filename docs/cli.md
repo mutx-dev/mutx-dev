@@ -176,6 +176,18 @@ Both lanes now:
 | `mutx deployment list` | List deployments |
 | `mutx deployment create --agent-id <id>` | Create a deployment |
 
+### Document workflows
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx documents templates` | List available `predict-rlm` document templates |
+| `mutx documents list` | List document jobs |
+| `mutx documents get <job-id>` | Inspect a specific document job |
+| `mutx documents run --template-id <id> --mode managed|local` | Create a document job, register or upload inputs, and dispatch it |
+| `mutx documents download-artifact <job-id> <artifact-id>` | Download a managed output artifact |
+
+Document workflows require `MUTX_DOCUMENTS_ENABLED=true`, `predict-rlm`, `deno`, and valid model credentials. See [Document Workflows](./document-workflows.md) for the full runtime contract and credit trail.
+
 ### Compatibility commands
 
 The older flat commands remain available for compatibility:

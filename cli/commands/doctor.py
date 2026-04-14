@@ -38,9 +38,18 @@ def doctor_command(output: str):
                 "python_ok": False,
                 "predict_rlm_available": False,
                 "deno_available": False,
+                "credentials_ok": False,
                 "ready": False,
                 "driver": "unavailable",
                 "artifacts_dir": None,
+                "missing_requirements": [
+                    "documents_enabled",
+                    "python>=3.11",
+                    "deno",
+                    "predict_rlm",
+                    "OPENAI_API_KEY",
+                ],
+                "configured_model_providers": [],
             }
         ),
         "user": None,
@@ -110,8 +119,14 @@ def doctor_command(output: str):
         f"ready={'yes' if payload['documents']['ready'] else 'no'} | "
         f"driver={payload['documents']['driver']} | "
         f"deno={'yes' if payload['documents']['deno_available'] else 'no'} | "
-        f"predict_rlm={'yes' if payload['documents']['predict_rlm_available'] else 'no'}"
+        f"predict_rlm={'yes' if payload['documents']['predict_rlm_available'] else 'no'} | "
+        f"credentials={'yes' if payload['documents']['credentials_ok'] else 'no'}"
     )
+    if payload["documents"].get("missing_requirements"):
+        click.echo(
+            "Documents Missing: "
+            + ", ".join(str(item) for item in payload["documents"]["missing_requirements"])
+        )
     if payload["user"]:
         click.echo(
             f"User: {payload['user']['email']} | {payload['user']['name']} | {payload['user']['plan']}"
