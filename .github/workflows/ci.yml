@@ -57,6 +57,7 @@ jobs:
               - 'components/**'
               - 'lib/**'
               - 'public/**'
+              - 'src/api/**'
               - 'tests/unit/**'
               - 'tests/website.spec.ts'
               - 'package.json'
