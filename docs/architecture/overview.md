@@ -23,31 +23,20 @@ When docs and code disagree, trust the executable system:
 * `sdk/mutx/` for the Python SDK
 * `infrastructure/` for Terraform, Ansible, monitoring, and Helm
 
-## System map
+## High-level architecture
 
-```
-Browser and docs users
-        |
-        v
-Next.js 16 app router (`app/`)
-  - marketing pages
-  - documentation pages
-  - dashboard surfaces
-  - same-origin route handlers in `app/api/`
-        |
-        +------------------------------+
-        |                              |
-        v                              v
-CLI (`cli/`) and SDK (`sdk/mutx/`)   FastAPI control plane (`src/api/`)
-call the public `/v1/*` contract      - routes in `src/api/routes/`
-                                       - auth, RBAC, OIDC, tracing middleware
-                                       - services for agents, deployments,
-                                         approvals, observability, budgets,
-                                         sessions, templates, and more
-                                                |
-                                                v
-                                   Postgres, Redis, telemetry, and external runtimes
-```
+| Layer | Entry point | Code location | What it owns |
+| --- | --- | --- | --- |
+| Public web surface | Browser and docs users | `app/`, `components/`, `lib/` | marketing pages, docs rendering, download flows, and dashboard shells |
+| Same-origin browser API | Web UI requests that need server-side handling | `app/api/` | browser-facing route handlers and proxy behavior |
+| Public control plane | Browser proxies, CLI, and SDK clients | `src/api/` | `/v1/*` routes, auth, RBAC, OIDC, tracing, and service orchestration |
+| Operator tooling | Terminal users and Python integrations | `cli/`, `sdk/mutx/` | command workflows and typed access to the public API contract |
+| Runtime dependencies | Control-plane services | Postgres, Redis, telemetry, and external runtimes | state, queues or cache support, traces, and downstream execution |
+
+The shortest accurate flow is:
+
+* Browser or docs user -> Next.js surface -> `app/api/` when same-origin behavior is needed -> FastAPI control plane -> Postgres, Redis, telemetry, and external runtimes
+* CLI or SDK client -> public `/v1/*` API -> FastAPI control plane -> the same service and data layers
 
 ## Current shipped surfaces
 
