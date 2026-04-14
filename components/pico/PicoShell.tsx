@@ -114,7 +114,7 @@ function ShellHelpLane({
       >
         <p className={picoClasses.label}>Recovery route</p>
         <p className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-          Open help lane
+          Open support lane
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
           Use this when the product route is no longer honest about the blocker.

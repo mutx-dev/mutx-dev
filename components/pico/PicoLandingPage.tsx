@@ -180,10 +180,14 @@ export function PicoLandingPage() {
 
               <SiteReveal delay={0.22}>
                 <div className={s.heroActions}>
-                  <Link href="/pico/onboarding" className={s.btnPrimary}>
+                  <button
+                    onClick={() => openForm('guided atlas preview')}
+                    className={s.btnPrimary}
+                    type="button"
+                  >
                     Enter the atlas
                     <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  </button>
                   <button onClick={() => openForm()} className={s.btnSecondary} type="button">
                     {t('hero.cta')}
                   </button>
@@ -249,14 +253,19 @@ export function PicoLandingPage() {
                     </div>
                     <div className={s.heroRouteList}>
                       {ATLAS_ROUTES.map((route) => (
-                        <Link key={route.href} href={route.href} className={s.heroRouteRow}>
+                        <button
+                          key={route.href}
+                          className={s.heroRouteRow}
+                          onClick={() => openForm(route.title)}
+                          type="button"
+                        >
                           <span className={s.heroRouteChapter}>{route.chapter}</span>
                           <div className={s.heroRouteMeta}>
                             <p className={s.heroRouteTitle}>{route.title}</p>
                             <p className={s.heroRouteNote}>{route.note}</p>
                           </div>
                           <ArrowRight className="h-4 w-4" />
-                        </Link>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -328,7 +337,11 @@ export function PicoLandingPage() {
             <div className={s.atlasGrid}>
               {ATLAS_ROUTES.map((route, index) => (
                 <SiteReveal key={route.href} delay={0.04 * index}>
-                  <Link href={route.href} className={s.atlasCard}>
+                  <button
+                    className={s.atlasCard}
+                    onClick={() => openForm(route.title)}
+                    type="button"
+                  >
                     <div className={s.atlasMeta}>
                       <span className={s.atlasChapter}>{route.chapter}</span>
                       <span className={s.atlasNote}>{route.note}</span>
@@ -339,7 +352,7 @@ export function PicoLandingPage() {
                       Open route
                       <ArrowRight className="h-4 w-4" />
                     </span>
-                  </Link>
+                  </button>
                 </SiteReveal>
               ))}
             </div>

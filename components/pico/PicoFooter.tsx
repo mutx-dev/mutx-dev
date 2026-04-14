@@ -28,7 +28,13 @@ const mutxLinks: Array<{
   { href: `${SITE}/privacy-policy`, labelKey: 'links.privacy' },
 ] as const
 
-export function PicoFooter({ className }: { className?: string }) {
+export function PicoFooter({
+  className,
+  showAtlasLinks = true,
+}: {
+  className?: string
+  showAtlasLinks?: boolean
+}) {
   const t = useTranslations('pico.footer')
 
   return (
@@ -73,23 +79,25 @@ export function PicoFooter({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className="grid gap-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
-            Atlas routes
-          </p>
-          <div className="grid gap-2">
-            {atlasLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="grid gap-1 rounded-[20px] border border-[color:rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.015)] px-4 py-3 no-underline transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(var(--pico-accent-rgb),0.08)]"
-              >
-                <span className="font-medium text-[color:var(--pico-text)]">{item.label}</span>
-                <span className="text-xs text-[color:var(--pico-text-muted)]">{item.note}</span>
-              </Link>
-            ))}
+        {showAtlasLinks ? (
+          <div className="grid gap-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
+              Atlas routes
+            </p>
+            <div className="grid gap-2">
+              {atlasLinks.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="grid gap-1 rounded-[20px] border border-[color:rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.015)] px-4 py-3 no-underline transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(var(--pico-accent-rgb),0.08)]"
+                >
+                  <span className="font-medium text-[color:var(--pico-text)]">{item.label}</span>
+                  <span className="text-xs text-[color:var(--pico-text-muted)]">{item.note}</span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="grid gap-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">

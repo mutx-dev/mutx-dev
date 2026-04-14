@@ -917,6 +917,12 @@ export function PicoAutopilotPageClient() {
                   <div className={picoInset('p-4')} data-testid="pico-autopilot-academy-context">
                     <p className="text-sm text-[color:var(--pico-text-muted)]">Recovery lesson</p>
                     <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{derived.nextLesson.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {recoveryWorkspace.completedStepCount}/{derived.nextLesson.steps.length} steps
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-[color:var(--pico-text)]">
+                      {recoveryWorkspace.workspace.evidence.trim() ? 'captured' : 'missing'}
+                    </p>
                   </div>
                   <div className={picoInset('p-4')}>
                     <p className="text-sm text-[color:var(--pico-text-muted)]">Workspace proof</p>

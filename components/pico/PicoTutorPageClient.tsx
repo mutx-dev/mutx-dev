@@ -855,7 +855,7 @@ export function PicoTutorPageClient() {
 
                 {reply.structured.commands.length ? (
                   <div className={picoSoft('p-5')}>
-                    <p className="font-medium text-[color:var(--pico-text)]">Operator commands</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Commands</p>
                     <div className="mt-3 grid gap-3">
                       {reply.structured.commands.map((command) => (
                         <div key={`${command.label}-${command.code}`} className={picoInset('p-4')}>
