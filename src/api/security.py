@@ -24,7 +24,22 @@ def _derive_fernet_key(secret_material: str) -> bytes:
 @lru_cache()
 def _get_fernet() -> Fernet:
     settings = get_settings()
-    key_material = settings.secret_encryption_key or settings.jwt_secret
+    if not settings.secret_encryption_key:
+        if settings.is_production:
+            raise RuntimeError(
+                "SECRET_ENCRYPTION_KEY is required in production. "
+                "Refusing to fall back to JWT secret for encryption."
+            )
+        # Dev only: fall back to JWT secret with explicit warning
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "SECRET_ENCRYPTION_KEY not set — using JWT secret as encryption key. "
+            "Set SECRET_ENCRYPTION_KEY for proper key separation."
+        )
+        key_material = settings.jwt_secret
+    else:
+        key_material = settings.secret_encryption_key
     return Fernet(_derive_fernet_key(key_material))
 
 
@@ -41,6 +56,12 @@ def decrypt_secret_value(value: str | None) -> str | None:
         return None
 
     if not value.startswith("enc:"):
+        settings = get_settings()
+        if settings.is_production:
+            raise ValueError(
+                "Plaintext secret value detected in production. "
+                "All secrets must be encrypted with the enc: prefix."
+            )
         return value
 
     token = value[4:]

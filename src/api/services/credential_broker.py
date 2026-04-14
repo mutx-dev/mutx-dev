@@ -789,16 +789,28 @@ class CredentialBroker:
                 return True
             return False
 
-    async def get_credential(self, backend_name: str, secret_path: str) -> Optional[Credential]:
+    async def get_credential(self, backend_name: str, secret_path: str, requester_id: str | None = None) -> Optional[Credential]:
         """Retrieve a credential from a specific backend."""
         if backend_name not in self._providers:
             logger.warning(f"Unknown credential backend: {backend_name}")
             return None
 
+        # Validate path to prevent traversal attacks
+        if ".." in secret_path or secret_path.startswith("/"):
+            logger.warning(
+                f"Suspicious credential path rejected: backend={backend_name} path={secret_path} "
+                f"requester={requester_id or 'unknown'}"
+            )
+            return None
+
         provider = self._providers[backend_name]
+        logger.info(
+            f"Credential access: backend={backend_name} path={secret_path} "
+            f"requester={requester_id or 'unknown'} namespace={self.namespace}"
+        )
         return await provider.get_secret(secret_path)
 
-    async def get_credential_by_path(self, full_path: str) -> Optional[Credential]:
+    async def get_credential_by_path(self, full_path: str, requester_id: str | None = None) -> Optional[Credential]:
         """
         Retrieve a credential using a path format: backend:/path/to/secret
 
@@ -811,7 +823,7 @@ class CredentialBroker:
             return None
 
         backend_name, path = full_path.split(":", 1)
-        return await self.get_credential(backend_name, path.lstrip("/"))
+        return await self.get_credential(backend_name, path.lstrip("/"), requester_id=requester_id)
 
     async def list_backends(self) -> list[dict]:
         """List all registered credential backends."""

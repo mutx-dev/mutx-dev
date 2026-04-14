@@ -22,7 +22,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/agents": {
@@ -913,11 +914,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AgentLogResponse"
-                  },
-                  "title": "Response Get Agent Logs V1 Agents  Agent Id  Logs Get"
+                  "$ref": "#/components/schemas/AgentLogHistoryResponse"
                 }
               }
             }
@@ -1039,11 +1036,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AgentMetricResponse"
-                  },
-                  "title": "Response Get Agent Metrics V1 Agents  Agent Id  Metrics Get"
+                  "$ref": "#/components/schemas/AgentMetricHistoryResponse"
                 }
               }
             }
@@ -4417,7 +4410,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/auth/login": {
@@ -4468,7 +4462,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/auth/local-bootstrap": {
@@ -4805,7 +4800,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/auth/reset-password": {
@@ -4857,7 +4853,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/auth/verify-email": {
@@ -4909,7 +4906,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/auth/resend-verification": {
@@ -4961,7 +4959,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/auth/oauth/{provider}/authorize": {
@@ -19838,7 +19837,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/ready": {
@@ -19854,7 +19854,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/": {
@@ -20363,6 +20364,39 @@
         ],
         "title": "AgentDetailResponse"
       },
+      "AgentLogHistoryResponse": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentLogResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "items",
+          "total",
+          "has_more"
+        ],
+        "title": "AgentLogHistoryResponse",
+        "description": "Paginated response for agent logs."
+      },
       "AgentLogResponse": {
         "properties": {
           "id": {
@@ -20410,6 +20444,39 @@
           "timestamp"
         ],
         "title": "AgentLogResponse"
+      },
+      "AgentMetricHistoryResponse": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentMetricResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "items",
+          "total",
+          "has_more"
+        ],
+        "title": "AgentMetricHistoryResponse",
+        "description": "Paginated response for agent metrics."
       },
       "AgentMetricResponse": {
         "properties": {
@@ -31455,6 +31522,19 @@
         ],
         "title": "ErrorResponse"
       }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT bearer token or API key. Example: 'Bearer eyJ...'"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
 }

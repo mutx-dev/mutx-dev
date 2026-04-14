@@ -5,7 +5,7 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ValidationError
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.ownership import get_owned_agent
@@ -504,11 +504,11 @@ async def get_agent_logs(
         forbidden_detail="Not authorized to access this agent's logs",
     )
 
-    count_query = select(AgentLog).where(AgentLog.agent_id == agent_id)
+    count_query = select(func.count()).select_from(AgentLog).where(AgentLog.agent_id == agent_id)
     if level:
         count_query = count_query.where(AgentLog.level == level)
     count_result = await db.execute(count_query)
-    total = len(count_result.scalars().all())
+    total = count_result.scalar_one()
 
     query = select(AgentLog).where(AgentLog.agent_id == agent_id).offset(skip).limit(limit)
     if level:
@@ -539,9 +539,9 @@ async def get_agent_metrics(
         forbidden_detail="Not authorized to access this agent's metrics",
     )
 
-    count_query = select(AgentMetric).where(AgentMetric.agent_id == agent_id)
+    count_query = select(func.count()).select_from(AgentMetric).where(AgentMetric.agent_id == agent_id)
     count_result = await db.execute(count_query)
-    total = len(count_result.scalars().all())
+    total = count_result.scalar_one()
 
     query = (
         select(AgentMetric)
