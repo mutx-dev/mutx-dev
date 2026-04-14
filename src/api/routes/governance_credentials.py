@@ -158,7 +158,7 @@ async def get_credential(
         gcpsm:/my-project/my-secret
     """
     broker = _broker_for_user(current_user)
-    credential = await broker.get_credential_by_path(full_path)
+    credential = await broker.get_credential_by_path(full_path, requester_id=str(current_user.id))
 
     if not credential:
         raise HTTPException(status_code=404, detail=f"Credential not found: {full_path}")
