@@ -55,7 +55,7 @@ npm run dev                                    # frontend only
 npm run build                            # frontend build
 npm run typecheck                        # TS gate
 npm run test:app                         # frontend unit tests
-ruff check src/api cli sdk src/security  # Python lint
+ruff check src/api cli sdk  # Python lint
 .venv/bin/python -m pytest               # API tests (from repo venv)
 npx playwright test                       # e2e
 ```
