@@ -93,13 +93,17 @@ Unknown keys are rejected for typed configs. Successful config patches increment
 
 ## Config Response
 
-`GET /v1/agents/{agent_id}/config` returns the agent's normalized config with its current version:
+`GET /v1/agents/{agent_id}/config` returns the agent's normalized config with its current version. The `config` shape matches the agent's `type`:
 
 ```json
 {
   "agent_id": "uuid",
-  "type": "openai",
+  "type": "openclaw",
   "config": {
+    "runtime": "personal_assistant",
+    "template": "personal_assistant",
+    "assistant_id": null,
+    "workspace": "default",
     "model": "openai/gpt-5",
     "safety_mode": "pairing",
     "version": 1
