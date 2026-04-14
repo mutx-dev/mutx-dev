@@ -1,24 +1,29 @@
 #!/usr/bin/env python3
 import csv
+import importlib.util
 import json
-import time
+import os
+import subprocess
+import sys
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import browser_cookie3
-from playwright.sync_api import sync_playwright
-
-LOG_CSV = Path('/Users/fortune/MUTX/docs/pico-gtm/x-post-log.csv')
-QUEUE_CSV = Path('/Users/fortune/MUTX/docs/pico-gtm/x-post-queue.csv')
-CONTACT_LOG_CSV = Path('/Users/fortune/MUTX/docs/pico-gtm/contact-log.csv')
-CONTACT_QUEUE_CSV = Path('/Users/fortune/MUTX/docs/pico-gtm/contact-queue.csv')
-LEAD_TRACKER_CSV = Path('/Users/fortune/MUTX/docs/pico-gtm/lead-tracker.csv')
+REPO_ROOT = Path('/Users/fortune/MUTX')
+LOG_CSV = REPO_ROOT / 'docs/pico-gtm/x-post-log.csv'
+QUEUE_CSV = REPO_ROOT / 'docs/pico-gtm/x-post-queue.csv'
+CONTACT_LOG_CSV = REPO_ROOT / 'docs/pico-gtm/contact-log.csv'
+CONTACT_QUEUE_CSV = REPO_ROOT / 'docs/pico-gtm/contact-queue.csv'
+LEAD_TRACKER_CSV = REPO_ROOT / 'docs/pico-gtm/lead-tracker.csv'
+X_BROWSER_LOGIN_ENV = Path('/Users/fortune/.hermes/profiles/mutx/.x-browser-login.env')
+X_BROWSER_AUTH_FILE = Path('/Users/fortune/.hermes/profiles/mutx/.x-browser-auth.json')
+HELPER_SCRIPT = REPO_ROOT / 'scripts/pico_x_browser_post_helper.mjs'
 DEFAULT_ACCOUNT = 'mutxdev'
 CHROME_EXECUTABLE = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 COOKIE_SOURCES = [
+    Path('/Users/fortune/.hermes/x-browser-profile/Default/Cookies'),
     Path('/Users/fortune/Library/Application Support/Google/Chrome/Profile 6/Cookies'),
     Path('/Users/fortune/Library/Application Support/Google/Chrome/Profile 5/Cookies'),
-    Path('/Users/fortune/.hermes/x-browser-profile/Default/Cookies'),
 ]
 
 
@@ -26,16 +31,33 @@ def now_local() -> datetime:
     return datetime.now().astimezone()
 
 
+def default_headless() -> bool:
+    return os.getenv('X_BROWSER_HEADLESS', '1').strip().lower() not in {'0', 'false', 'no'}
+
+
+def load_browser_login_creds():
+    if not X_BROWSER_LOGIN_ENV.exists():
+        return {}
+    creds = {}
+    for line in X_BROWSER_LOGIN_ENV.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        creds[key] = value
+    return creds
+
+
 def read_csv(path: Path):
     if not path.exists():
         return [], []
-    with path.open(newline='') as f:
-        reader = csv.DictReader(f)
+    with path.open(newline='') as handle:
+        reader = csv.DictReader(handle)
         headers = reader.fieldnames or []
         rows = []
         for row in reader:
-            row = {k: v for k, v in row.items() if k is not None}
-            if not any((v or '').strip() for v in row.values()):
+            row = {key: value for key, value in row.items() if key is not None}
+            if not any((value or '').strip() for value in row.values()):
                 continue
             rows.append(row)
     return headers, rows
@@ -43,8 +65,8 @@ def read_csv(path: Path):
 
 def write_csv(path: Path, headers, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open('w', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=headers)
+    with path.open('w', newline='') as handle:
+        writer = csv.DictWriter(handle, fieldnames=headers)
         writer.writeheader()
         writer.writerows(rows)
 
@@ -52,8 +74,8 @@ def write_csv(path: Path, headers, rows):
 def append_csv_row(path: Path, headers, row):
     path.parent.mkdir(parents=True, exist_ok=True)
     exists = path.exists()
-    with path.open('a', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=headers)
+    with path.open('a', newline='') as handle:
+        writer = csv.DictWriter(handle, fieldnames=headers)
         if not exists:
             writer.writeheader()
         writer.writerow(row)
@@ -75,39 +97,169 @@ def log_post(target_url: str, action_type: str, account: str, post_text: str, ou
     )
 
 
-def load_cookiejar():
-    errors = []
-    for cookie_file in COOKIE_SOURCES:
-        if not cookie_file.exists():
-            errors.append(f'{cookie_file}: missing')
+def parse_cookie_header(cookie_header: str):
+    cookies = []
+    for part in cookie_header.split(';'):
+        item = part.strip()
+        if not item or '=' not in item:
             continue
-        try:
-            jar = browser_cookie3.chrome(cookie_file=str(cookie_file), domain_name='x.com')
-            names = {cookie.name for cookie in jar}
-            if 'auth_token' in names and 'ct0' in names:
-                return jar, str(cookie_file)
-            errors.append(f'{cookie_file}: missing auth_token/ct0')
-        except Exception as exc:
-            errors.append(f'{cookie_file}: {exc}')
-    raise RuntimeError('no usable X cookies: ' + ' | '.join(errors))
+        name, value = item.split('=', 1)
+        cookies.append({'name': name.strip(), 'value': value.strip(), 'url': 'https://x.com'})
+    return cookies
 
 
 def to_playwright_cookies(jar):
     cookies = []
     for cookie in jar:
-        cookies.append(
-            {
-                'name': cookie.name,
-                'value': cookie.value,
-                'domain': cookie.domain,
-                'path': cookie.path or '/',
-                'expires': float(cookie.expires) if cookie.expires and cookie.expires > 0 else -1,
-                'httpOnly': bool(cookie._rest.get('HttpOnly') is not None or cookie.has_nonstandard_attr('HttpOnly')),
-                'secure': bool(cookie.secure),
-                'sameSite': 'Lax',
-            }
-        )
+        payload = {
+            'name': cookie.name,
+            'value': cookie.value,
+            'domain': cookie.domain or '.x.com',
+            'path': cookie.path or '/',
+            'secure': bool(cookie.secure),
+        }
+        if cookie.expires and cookie.expires > 0:
+            payload['expires'] = float(cookie.expires)
+        if cookie._rest.get('HttpOnly') is not None or cookie.has_nonstandard_attr('HttpOnly'):
+            payload['httpOnly'] = True
+        cookies.append(payload)
     return cookies
+
+
+def normalize_auth_bundle(raw_bundle: dict, bundle_name: str):
+    cookie_header = (raw_bundle.get('cookie_header') or raw_bundle.get('Cookie') or '').strip()
+    cookies = []
+    if cookie_header:
+        cookies = parse_cookie_header(cookie_header)
+    elif isinstance(raw_bundle.get('cookies'), dict):
+        cookies = [{'name': key, 'value': value, 'url': 'https://x.com'} for key, value in raw_bundle['cookies'].items()]
+    elif isinstance(raw_bundle.get('cookies'), list):
+        for cookie in raw_bundle.get('cookies', []):
+            if not isinstance(cookie, dict) or not cookie.get('name') or not cookie.get('value'):
+                continue
+            normalized = dict(cookie)
+            if 'url' not in normalized and 'domain' not in normalized:
+                normalized['url'] = 'https://x.com'
+            cookies.append(normalized)
+
+    names = {cookie.get('name') for cookie in cookies}
+    if 'auth_token' not in names or 'ct0' not in names:
+        return None
+
+    source_name = raw_bundle.get('name') or bundle_name
+    return {
+        'name': source_name,
+        'auth_source': raw_bundle.get('auth_source') or 'cookie_bundle',
+        'cookie_source': raw_bundle.get('cookie_source') or f'{X_BROWSER_AUTH_FILE}:{source_name}',
+        'cookies': cookies,
+    }
+
+
+def load_auth_sources():
+    sources = []
+    diagnostics = []
+
+    if X_BROWSER_AUTH_FILE.exists():
+        try:
+            raw = json.loads(X_BROWSER_AUTH_FILE.read_text())
+        except json.JSONDecodeError as exc:
+            diagnostics.append(f'{X_BROWSER_AUTH_FILE}: invalid json ({exc})')
+        else:
+            bundles = raw.get('bundles', []) if isinstance(raw, dict) else raw if isinstance(raw, list) else []
+            if not bundles:
+                diagnostics.append(f'{X_BROWSER_AUTH_FILE}: no bundles found')
+            for index, bundle in enumerate(bundles, start=1):
+                if not isinstance(bundle, dict):
+                    diagnostics.append(f'{X_BROWSER_AUTH_FILE}: bundle_{index} is not an object')
+                    continue
+                normalized = normalize_auth_bundle(bundle, f'bundle_{index}')
+                if normalized is None:
+                    diagnostics.append(f'{X_BROWSER_AUTH_FILE}: {bundle.get("name") or f"bundle_{index}"} missing auth_token/ct0')
+                    continue
+                sources.append(normalized)
+    else:
+        diagnostics.append(f'{X_BROWSER_AUTH_FILE}: missing')
+
+    if importlib.util.find_spec('browser_cookie3') is not None:
+        import browser_cookie3
+
+        for cookie_file in COOKIE_SOURCES:
+            if not cookie_file.exists():
+                diagnostics.append(f'{cookie_file}: missing')
+                continue
+            try:
+                jar = browser_cookie3.chrome(cookie_file=str(cookie_file), domain_name='x.com')
+                cookies = to_playwright_cookies(jar)
+            except Exception as exc:  # pragma: no cover - live machine integration
+                diagnostics.append(f'{cookie_file}: {exc}')
+                continue
+            names = {cookie.get('name') for cookie in cookies}
+            if 'auth_token' in names and 'ct0' in names:
+                sources.append(
+                    {
+                        'name': cookie_file.name,
+                        'auth_source': 'cookie_db',
+                        'cookie_source': str(cookie_file),
+                        'cookies': cookies,
+                    }
+                )
+            else:
+                diagnostics.append(f'{cookie_file}: missing auth_token/ct0')
+    else:
+        diagnostics.append('browser_cookie3 unavailable')
+
+    return sources, diagnostics
+
+
+def run_helper(action: str, *, target_url: str = '', reply_text: str = '', headless=None):
+    if not HELPER_SCRIPT.exists():
+        raise RuntimeError(f'helper script missing: {HELPER_SCRIPT}')
+
+    auth_sources, diagnostics = load_auth_sources()
+    creds = load_browser_login_creds()
+    login_credentials = None
+    if creds.get('X_USERNAME') and creds.get('X_PASSWORD'):
+        login_credentials = {
+            'username': creds['X_USERNAME'].strip(),
+            'password': creds['X_PASSWORD'].strip(),
+        }
+
+    if not auth_sources and not login_credentials:
+        raise RuntimeError('no usable X auth sources configured: ' + ' | '.join(diagnostics))
+
+    payload = {
+        'action': action,
+        'chrome_executable': CHROME_EXECUTABLE,
+        'expected_account': DEFAULT_ACCOUNT,
+        'auth_sources': auth_sources,
+        'login_credentials': login_credentials,
+        'target_url': target_url,
+        'reply_text': reply_text,
+        'headless': default_headless() if headless is None else headless,
+    }
+
+    with tempfile.NamedTemporaryFile('w', delete=False, suffix='.json') as handle:
+        json.dump(payload, handle)
+        input_path = Path(handle.name)
+
+    try:
+        result = subprocess.run(
+            ['node', str(HELPER_SCRIPT), str(input_path)],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        input_path.unlink(missing_ok=True)
+
+    if result.returncode != 0:
+        detail = result.stderr.strip() or result.stdout.strip() or 'unknown helper failure'
+        raise RuntimeError(detail)
+
+    try:
+        return json.loads(result.stdout.strip())
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f'helper returned invalid json: {exc}: {result.stdout.strip()}') from exc
 
 
 def dig_rest_ids(obj):
@@ -197,86 +349,39 @@ def update_lead_tracker(lead_id: str, target_url: str, account: str, reply_url: 
 
 
 def post_reply(target_url: str, reply_text: str):
-    cookie_jar, cookie_source = load_cookiejar()
-    cookies = to_playwright_cookies(cookie_jar)
-    account = DEFAULT_ACCOUNT
-    reply_url = 'none'
-    mutation_url = None
-    mutation_status = None
+    return run_helper('reply', target_url=target_url, reply_text=reply_text)
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=CHROME_EXECUTABLE, headless=False)
-        context = browser.new_context(viewport={'width': 1400, 'height': 1000})
-        context.add_cookies(cookies)
-        page = context.new_page()
-        page.goto(target_url, wait_until='domcontentloaded', timeout=60000)
-        page.wait_for_timeout(6000)
 
-        if page.locator('text=Accept all cookies').count():
-            page.locator('text=Accept all cookies').click()
-            page.wait_for_timeout(1500)
+def probe_reply(target_url: str, reply_text: str):
+    return run_helper('probe', target_url=target_url, reply_text=reply_text, headless=True)
 
-        profile_link = page.locator('[data-testid="AppTabBar_Profile_Link"]').first
-        if profile_link.count():
-            href = profile_link.get_attribute('href') or ''
-            if href.strip('/'):
-                account = href.strip('/').split('/')[-1]
 
-        if 'Log in' in page.locator('body').inner_text()[:2000]:
-            raise RuntimeError('cookie session still landed on login wall')
+def locate_reply(reply_text: str):
+    return run_helper('locate', reply_text=reply_text, headless=True)
 
-        page.locator('[data-testid="reply"]').first.click(force=True)
-        page.wait_for_url('**/compose/post', timeout=15000)
-        page.wait_for_timeout(1500)
 
-        textarea = page.locator('[data-testid="tweetTextarea_0"]').first
-        textarea.click(force=True)
-        page.keyboard.type(reply_text, delay=20)
-        page.wait_for_timeout(1200)
-
-        submit = page.locator('[data-testid="tweetButton"]').first
-        if not submit.is_enabled():
-            raise RuntimeError('reply submit button disabled after typing text')
-
-        with page.expect_response(lambda r: r.request.method == 'POST' and ('CreateTweet' in r.url or 'CreateNoteTweet' in r.url), timeout=30000) as response_info:
-            submit.click()
-
-        response = response_info.value
-        mutation_url = response.url
-        mutation_status = response.status
-        payload = response.json()
-        page.wait_for_timeout(6000)
-
-        for candidate in dict.fromkeys(dig_rest_ids(payload)):
-            if candidate not in target_url:
-                reply_url = f'https://x.com/{account}/status/{candidate}'
-                break
-
-        with_replies = context.new_page()
-        with_replies.goto(f'https://x.com/{account}/with_replies', wait_until='domcontentloaded', timeout=60000)
-        with_replies.wait_for_timeout(6000)
-        visible = reply_text[:80] in with_replies.locator('body').inner_text()[:12000]
-        with_replies.close()
-        browser.close()
-
-    if mutation_status != 200:
-        raise RuntimeError(f'create-tweet mutation failed http={mutation_status} url={mutation_url}')
-
-    if reply_url == 'none' and not visible:
-        raise RuntimeError('mutation returned 200 but reply could not be verified in with_replies view')
-
-    return {
-        'account': account,
-        'reply_url': reply_url,
-        'cookie_source': cookie_source,
-        'mutation_status': mutation_status,
-        'mutation_url': mutation_url,
-    }
+def check_session():
+    return run_helper('check', headless=True)
 
 
 def main():
-    if len(__import__('sys').argv) < 3:
-        print('Usage: pico_x_browser_post.py <target_url> <reply_text> [action_type]', file=sys.stderr)
+    if len(sys.argv) == 2 and sys.argv[1] == '--check':
+        print(json.dumps(check_session()))
+        return
+
+    if len(sys.argv) >= 3 and sys.argv[1] == '--probe':
+        target_url = sys.argv[2]
+        reply_text = sys.argv[3] if len(sys.argv) > 3 else 'Probe only. Do not send.'
+        print(json.dumps(probe_reply(target_url, reply_text)))
+        return
+
+    if len(sys.argv) >= 3 and sys.argv[1] == '--locate':
+        reply_text = sys.argv[2]
+        print(json.dumps(locate_reply(reply_text)))
+        return
+
+    if len(sys.argv) < 3:
+        print('Usage: pico_x_browser_post.py <target_url> <reply_text> [action_type] | --check | --probe <target_url> [reply_text] | --locate <reply_text>', file=sys.stderr)
         sys.exit(2)
 
     target_url = sys.argv[1]
@@ -289,7 +394,8 @@ def main():
         account = result['account']
         reply_url = result['reply_url']
         note = (
-            'posted_verified via playwright cookie session; '
+            'posted_verified via playwright; '
+            f'auth_source={result["auth_source"]}; '
             f'cookie_source={result["cookie_source"]}; '
             f'reply_url={reply_url}'
         )
@@ -300,7 +406,7 @@ def main():
             update_contact_queue(lead_id, target_url, account, reply_url)
             update_lead_tracker(lead_id, target_url, account, reply_url)
         print('POSTED_VERIFIED')
-        print(json.dumps({'target_url': target_url, 'reply_url': reply_url, 'account': account}, ensure_ascii=False))
+        print(json.dumps({'target_url': target_url, 'reply_url': reply_url, 'account': account}))
     except Exception as exc:
         log_post(target_url, action_type, DEFAULT_ACCOUNT, reply_text, 'failed', str(exc))
         update_queue_status(target_url, reply_text, 'failed', str(exc))
