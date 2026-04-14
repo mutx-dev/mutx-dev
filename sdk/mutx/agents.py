@@ -240,7 +240,7 @@ class Agents:
             params={"skip": skip, "limit": limit, "level": level},
         )
         response.raise_for_status()
-        return [AgentLog(data) for data in response.json()]
+        return [AgentLog(data) for data in response.json()["items"]]
 
     async def alogs(
         self,
@@ -255,7 +255,7 @@ class Agents:
             params={"skip": skip, "limit": limit, "level": level},
         )
         response.raise_for_status()
-        return [AgentLog(data) for data in response.json()]
+        return [AgentLog(data) for data in response.json()["items"]]
 
     def metrics(
         self,
@@ -269,7 +269,7 @@ class Agents:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [AgentMetric(data) for data in response.json()]
+        return [AgentMetric(data) for data in response.json()["items"]]
 
     async def ametrics(
         self,
@@ -283,7 +283,7 @@ class Agents:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [AgentMetric(data) for data in response.json()]
+        return [AgentMetric(data) for data in response.json()["items"]]
 
     def update_config(
         self,

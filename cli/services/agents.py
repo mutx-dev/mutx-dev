@@ -106,7 +106,7 @@ class AgentsService(APIService):
 
         response = self._request("get", f"/v1/agents/{agent_id}/logs", params=params)
         self._expect_status(response, {200}, not_found_message="Agent not found")
-        return [LogEntry.from_payload(item) for item in response.json()]
+        return [LogEntry.from_payload(item) for item in response.json()["items"]]
 
     def stop_agent(self, agent_id: str) -> str | None:
         response = self._request("post", f"/v1/agents/{agent_id}/stop")
