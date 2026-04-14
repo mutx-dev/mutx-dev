@@ -1,11 +1,8 @@
 # Agents
 
-The `/v1/agents*` surface has two overlapping responsibilities:
+The `/v1/agents*` surface covers control-plane CRUD for user-owned agents and runtime-compatible endpoints for agent registration, heartbeats, metrics, logs, commands, status, and version history.
 
-- control-plane CRUD for user-owned agents
-- runtime-compatible endpoints for agent registration, heartbeats, metrics, logs, commands, status, and version history
-
-## Control-Plane Routes
+## Routes
 
 | Route | Purpose |
 | --- | --- |
@@ -23,16 +20,11 @@ The `/v1/agents*` surface has two overlapping responsibilities:
 | `GET /v1/agents/{agent_id}/resource-usage` | List recorded resource usage |
 | `GET /v1/agents/{agent_id}/versions` | List agent config versions |
 | `POST /v1/agents/{agent_id}/rollback` | Roll back to a prior agent version |
-
-## Runtime-Compatible Routes
-
-| Route | Purpose |
-| --- | --- |
-| `POST /v1/agents/register` | Create a runtime-style agent and issue an agent API key |
-| `POST /v1/agents/heartbeat` | Report status |
+| `POST /v1/agents/register` | Runtime-style agent registration + API key issuance |
+| `POST /v1/agents/heartbeat` | Report runtime status |
 | `POST /v1/agents/metrics` | Report metrics |
-| `POST /v1/agents/logs` | Send logs |
-| `GET /v1/agents/commands` | Poll pending commands |
+| `POST /v1/agents/logs` | Send runtime logs |
+| `GET /v1/agents/commands` | Poll pending commands for the authenticated agent |
 | `POST /v1/agents/commands/acknowledge` | Acknowledge command completion |
 | `GET /v1/agents/{agent_id}/status` | Return runtime status for the authenticated agent |
 
