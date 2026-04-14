@@ -16,6 +16,7 @@ import { MarketingHeroBackdrop } from './MarketingHeroBackdrop'
 import home from './MarketingHome.module.css'
 import { MarketingLoader } from './MarketingLoader'
 import { MarketingReveal } from './MarketingReveal'
+import { ViewportVideo } from './ViewportVideo'
 
 type ActionLinkProps = {
   action: MarketingActionLink
@@ -30,6 +31,7 @@ type HoverCardProps = {
 }
 
 type MarketingExampleItem = MarketingHomepage['salesSections']['examples']['items'][number]
+type MarketingDemoItem = MarketingHomepage['salesSections']['demo']['tabs'][number]
 
 type TerminalPlaybackCardProps = {
   item: MarketingExampleItem
@@ -222,11 +224,88 @@ function TerminalPlaybackCard({ item, delay = 0 }: TerminalPlaybackCardProps) {
   )
 }
 
+function ActiveDemoMedia({ activeDemo }: { activeDemo: MarketingDemoItem }) {
+  if (activeDemo.mediaType === 'video') {
+    return (
+      <ViewportVideo
+        src={activeDemo.mediaSrc}
+        poster={activeDemo.mediaPosterSrc}
+        ariaLabel={activeDemo.mediaAlt}
+        className={home.demoVideo}
+        preload="metadata"
+      />
+    )
+  }
+
+  return (
+    <img
+      src={activeDemo.mediaSrc}
+      alt={activeDemo.mediaAlt}
+      className={home.demoVideo}
+      decoding="async"
+      loading="lazy"
+    />
+  )
+}
+
 export function MarketingHomePage() {
   const prefersReducedMotion = useReducedMotion()
+  const [activeDemoId, setActiveDemoId] = useState(marketingHomepage.salesSections.demo.tabs[0]?.id)
+  const demoBeatRefs = useRef<Array<HTMLButtonElement | null>>([])
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
   const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.salesSections.cta.actions
-  const demoMedia = marketingHomepage.salesSections.demo.tabs[0]
+  const activeDemo =
+    marketingHomepage.salesSections.demo.tabs.find((tab) => tab.id === activeDemoId) ??
+    marketingHomepage.salesSections.demo.tabs[0]
+
+  useEffect(() => {
+    let frameId = 0
+
+    const syncActiveDemoToScroll = () => {
+      frameId = 0
+
+      const beatNodes = demoBeatRefs.current.filter((node): node is HTMLButtonElement => Boolean(node))
+
+      if (beatNodes.length === 0) {
+        return
+      }
+
+      const focusLine = window.innerHeight * 0.36
+      const nextDemoId = beatNodes
+        .map((node) => ({
+          id: node.getAttribute('data-demo-id'),
+          distance: Math.abs(node.getBoundingClientRect().top - focusLine),
+        }))
+        .sort((left, right) => left.distance - right.distance)[0]?.id
+
+      if (!nextDemoId) {
+        return
+      }
+
+      setActiveDemoId((currentDemoId) => (currentDemoId === nextDemoId ? currentDemoId : nextDemoId))
+    }
+
+    const queueSync = () => {
+      if (frameId !== 0) {
+        return
+      }
+
+      frameId = window.requestAnimationFrame(syncActiveDemoToScroll)
+    }
+
+    queueSync()
+    window.addEventListener('scroll', queueSync, { passive: true })
+    window.addEventListener('resize', queueSync)
+
+    return () => {
+      if (frameId !== 0) {
+        window.cancelAnimationFrame(frameId)
+      }
+
+      window.removeEventListener('scroll', queueSync)
+      window.removeEventListener('resize', queueSync)
+    }
+  }, [])
 
   return (
     <div className={`${core.page} ${core.homePage}`}>
@@ -326,44 +405,66 @@ export function MarketingHomePage() {
         <section className={home.demoSection} data-testid="homepage-demo-section">
           <div className={core.shell}>
             <div className={home.demoLayout}>
-              <MarketingReveal className={home.demoIntro}>
+              <MarketingReveal className={home.demoIntro} distance={22}>
                 <p className={home.sectionEyebrow}>{marketingHomepage.salesSections.demo.eyebrow}</p>
                 <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.demo.title}</h2>
                 <p className={home.sectionBody}>{marketingHomepage.salesSections.demo.body}</p>
               </MarketingReveal>
 
-              <div className={home.demoStage}>
-                <motion.div
-                  className={home.demoFrame}
-                  data-testid="homepage-demo-panel"
-                  initial={prefersReducedMotion ? false : { opacity: 0.86, y: 14, scale: 0.992 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  whileHover={
-                    prefersReducedMotion
-                      ? undefined
-                      : {
-                          y: -4,
-                          scale: 1.005,
-                        }
-                  }
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <img
-                    src={demoMedia.mediaSrc}
-                    alt={demoMedia.mediaAlt}
-                    className={home.demoVideo}
-                    decoding="async"
-                  />
-                </motion.div>
+              <div className={home.demoStory}>
+                <div className={home.demoBeats} data-testid="homepage-demo-beats">
+                  {marketingHomepage.salesSections.demo.tabs.map((tab, index) => {
+                    const isActive = tab.id === activeDemo.id
 
-                <div className={home.demoTabs} data-testid="homepage-demo-tabs">
-                  {marketingHomepage.salesSections.demo.tabs.map((tab) => (
-                    <article key={tab.id} className={home.demoTab}>
-                      <p className={home.demoTabLabel}>{tab.label}</p>
-                      <h3 className={home.demoTabTitle}>{tab.title}</h3>
-                      <p className={home.demoTabBody}>{tab.body}</p>
-                    </article>
-                  ))}
+                    return (
+                      <motion.button
+                        key={tab.id}
+                        ref={(node) => {
+                          demoBeatRefs.current[index] = node
+                        }}
+                        type="button"
+                        className={home.demoBeat}
+                        data-active={isActive ? '1' : '0'}
+                        data-demo-id={tab.id}
+                        onClick={() => setActiveDemoId(tab.id)}
+                        aria-pressed={isActive}
+                        initial={prefersReducedMotion ? false : { opacity: 0.72, y: 14 }}
+                        whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.45 }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <span className={home.demoBeatMarker} aria-hidden="true">
+                          <span className={home.demoBeatIndex}>{`0${index + 1}`}</span>
+                          <span className={home.demoBeatLine} />
+                        </span>
+                        <span className={home.demoBeatCopy}>
+                          <span className={home.demoTabLabel}>{tab.label}</span>
+                          <span className={home.demoTabTitle}>{tab.title}</span>
+                          <span className={home.demoTabBody}>{tab.body}</span>
+                        </span>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+
+                <div className={home.demoStickyStage}>
+                  <div className={home.demoStickyInner}>
+                    <motion.div
+                      key={activeDemo.id}
+                      className={home.demoFrame}
+                      data-testid="homepage-demo-panel"
+                      initial={prefersReducedMotion ? false : { opacity: 0.88, y: 16, scale: 0.994 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <ActiveDemoMedia activeDemo={activeDemo} />
+                    </motion.div>
+
+                    <div className={home.demoMeta}>
+                      <p className={home.demoMetaLabel}>{activeDemo.label}</p>
+                      <p className={home.demoMetaBody}>{activeDemo.body}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

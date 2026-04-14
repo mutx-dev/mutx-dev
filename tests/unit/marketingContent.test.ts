@@ -42,13 +42,16 @@ describe('marketingHomepage', () => {
     expect(marketingHomepage.salesSections.cta).toBeDefined()
   })
 
-  it('demo section keeps every feature pinned to the real product demo gif', () => {
+  it('demo section uses unique real dashboard demo videos', () => {
     const tabs = marketingHomepage.salesSections.demo.tabs
     expect(Array.isArray(tabs)).toBe(true)
     expect(tabs.length).toBeGreaterThan(0)
+    expect(new Set(tabs.map((tab) => tab.mediaSrc)).size).toBe(tabs.length)
     for (const tab of tabs) {
-      expect(tab.mediaType).toBe('gif')
-      expect(tab.mediaSrc).toBe('/demo.gif')
+      expect(tab.mediaType).toBe('video')
+      expect(tab.mediaSrc.startsWith('/marketing/dashboard/')).toBe(true)
+      expect(tab.mediaSrc.endsWith('.mp4')).toBe(true)
+      expect(tab.mediaPosterSrc?.startsWith('/marketing/dashboard/')).toBe(true)
       expect(typeof tab.label).toBe('string')
     }
   })

@@ -7,6 +7,7 @@ type ViewportVideoProps = {
   src: string;
   className?: string;
   poster?: string;
+  ariaLabel?: string;
   rootMargin?: string;
   autoPlay?: boolean;
   loop?: boolean;
@@ -19,6 +20,7 @@ export function ViewportVideo({
   src,
   className,
   poster,
+  ariaLabel,
   rootMargin = "320px 0px",
   autoPlay = true,
   loop = true,
@@ -55,6 +57,7 @@ export function ViewportVideo({
         className={className}
         src={inView ? src : undefined}
         poster={poster}
+        aria-label={ariaLabel}
         autoPlay={autoPlay}
         muted={muted}
         loop={loop}

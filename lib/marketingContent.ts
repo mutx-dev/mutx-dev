@@ -38,8 +38,9 @@ export type MarketingHomepage = {
         label: string
         title: string
         body: string
-        mediaType: 'image' | 'gif'
+        mediaType: 'image' | 'video'
         mediaSrc: string
+        mediaPosterSrc?: string
         mediaAlt: string
       }>
     }
@@ -117,31 +118,34 @@ export const marketingHomepage: MarketingHomepage = {
       body: 'One surface for steps, permissions, and the record that survives review.',
       tabs: [
         {
-          id: 'runtime',
-          label: 'Activity log',
-          title: 'Read every step as it lands.',
-          body: 'Tool calls, outputs, and state changes stay in one readable timeline.',
-          mediaType: 'gif',
-          mediaSrc: '/demo.gif',
-          mediaAlt: 'MUTX showing agent activity in real time',
+          id: 'overview',
+          label: 'Overview',
+          title: 'Watch fleet state refresh live.',
+          body: 'Runtime posture, recent execution, and operator context stay in one control surface.',
+          mediaType: 'video',
+          mediaSrc: '/marketing/dashboard/overview-demo.mp4',
+          mediaPosterSrc: '/marketing/dashboard/overview-poster.jpg',
+          mediaAlt: 'MUTX dashboard overview showing live fleet state and operator context',
         },
         {
-          id: 'governance',
-          label: 'Permissions',
-          title: 'Move the boundary forward.',
-          body: 'Approval edges and guardrails stay visible before the action settles.',
-          mediaType: 'gif',
-          mediaSrc: '/demo.gif',
-          mediaAlt: 'MUTX demo showing permission boundaries and approvals',
+          id: 'traces',
+          label: 'Trace Drilldown',
+          title: 'Open the run trail, not the recap.',
+          body: 'Select a run and inspect the exact event stream while it is still attributable.',
+          mediaType: 'video',
+          mediaSrc: '/marketing/dashboard/traces-demo.mp4',
+          mediaPosterSrc: '/marketing/dashboard/traces-poster.jpg',
+          mediaAlt: 'MUTX trace explorer showing run selection and event stream drilldown',
         },
         {
-          id: 'operator',
-          label: 'Peace of mind',
-          title: 'Keep proof that still reads clean later.',
-          body: 'The run history stays inspectable instead of collapsing into guesswork.',
-          mediaType: 'gif',
-          mediaSrc: '/demo.gif',
-          mediaAlt: 'MUTX demo showing readable run history and audit trails',
+          id: 'webhooks',
+          label: 'Delivery Receipts',
+          title: 'Keep downstream proof inside the product.',
+          body: 'Webhook history, failures, and payload receipts stay readable without leaving the dashboard.',
+          mediaType: 'video',
+          mediaSrc: '/marketing/dashboard/webhooks-demo.mp4',
+          mediaPosterSrc: '/marketing/dashboard/webhooks-poster.jpg',
+          mediaAlt: 'MUTX webhook dashboard showing delivery history and payload receipts',
         },
       ],
     },
