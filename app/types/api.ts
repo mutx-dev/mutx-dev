@@ -6049,6 +6049,22 @@ export interface components {
             step_metadata?: Record<string, never>;
         };
         /**
+         * MutxStepBatchResponse
+         * @description Response after adding steps to a run.
+         */
+        MutxStepBatchResponse: {
+            /**
+             * Total
+             * @description Total number of steps in the run after this batch
+             */
+            total: number;
+            /**
+             * Added
+             * @description Number of steps added in this request
+             */
+            added: number;
+        };
+        /**
          * MutxStepCreate
          * @description Schema for adding a step to an existing run.
          */
@@ -11766,7 +11782,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MutxRunHistoryResponse"];
+                    "application/json": components["schemas"]["MutxStepBatchResponse"];
                 };
             };
             /** @description Validation Error */
