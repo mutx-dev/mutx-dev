@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { appFontVariables } from "@/app/fonts/app";
+import { AppDomainDemoIntro } from "@/components/app/AppDomainDemoIntro";
 import {
   DEFAULT_OG_IMAGE_ALT,
   DEFAULT_X_HANDLE,
@@ -103,6 +104,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "(function(){try{if(window.sessionStorage.getItem('mutx-home-loader-played')==='1'){document.documentElement.setAttribute('data-home-loader-played','1');}}catch(_error){}})();",
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var host=window.location.hostname.toLowerCase();if(host==='app.mutx.dev'||host==='app.localhost'){if(window.sessionStorage.getItem('mutx-app-demo-intro-played')==='1'){document.documentElement.setAttribute('data-app-demo-intro-played','1');}else{document.documentElement.setAttribute('data-app-demo-intro-active','1');}}}catch(_error){}})();",
+          }}
+        />
         <link rel="preconnect" href="https://calendly.com" />
         <link rel="dns-prefetch" href="https://calendly.com" />
         <link rel="preconnect" href="https://challenges.cloudflare.com" />
@@ -114,7 +121,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <meta name="theme-color" content="#09080b" />
       </head>
-      <body className={`${appFontVariables} h-full min-h-screen antialiased`}>{children}</body>
+      <body className={`${appFontVariables} h-full min-h-screen antialiased`}>
+        {children}
+        <AppDomainDemoIntro />
+      </body>
     </html>
   );
 }

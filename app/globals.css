@@ -124,6 +124,31 @@
     overflow: hidden;
   }
 
+  html[data-app-demo-intro-active='1'],
+  html[data-app-demo-intro-active='1'] body {
+    overflow: hidden;
+  }
+
+  html[data-app-demo-intro-active='1'] {
+    scroll-behavior: auto;
+  }
+
+  html[data-app-demo-intro-active='1'] body {
+    overscroll-behavior: none;
+  }
+
+  .mutx-app-demo-intro {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  html[data-app-demo-intro-active='1'] .mutx-app-demo-intro {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+
   html.mutx-demo-shell {
     scroll-behavior: auto;
   }
