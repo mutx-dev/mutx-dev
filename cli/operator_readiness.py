@@ -100,9 +100,9 @@ def describe_webhook_delivery_health(
         return "not-exercised"
 
     def delivery_time(delivery: Mapping[str, Any]) -> datetime:
-        return parse_datetime(delivery.get("created_at") or delivery.get("delivered_at")) or datetime.min.replace(
-            tzinfo=timezone.utc
-        )
+        return parse_datetime(
+            delivery.get("created_at") or delivery.get("delivered_at")
+        ) or datetime.min.replace(tzinfo=timezone.utc)
 
     sorted_deliveries = sorted(deliveries, key=delivery_time, reverse=True)
     latest = sorted_deliveries[0]
