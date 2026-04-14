@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Plus,
   Search,
@@ -21,88 +22,33 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { readJson, writeJson } from "@/components/app/http";
-import { LiveAuthRequired } from "@/components/dashboard/livePrimitives";
+import {
+  LiveAuthRequired,
+  LiveKpiGrid,
+  LivePanel,
+  LiveStatCard,
+  formatDateTime,
+  formatRelativeTime,
+} from "@/components/dashboard/livePrimitives";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import {
+  describeWebhookHealth,
+  normalizeWebhookCollection,
+  normalizeWebhookDeliveryCollection,
+  summarizeWebhookFleet,
+  type WebhookDeliveryRecord,
+  type WebhookLifecycleRecord,
+} from "@/lib/operatorLifecycle";
 
-type WebhookDelivery = {
-  id: string;
-  event: string;
-  payload: string;
-  status_code: number | null;
-  success: boolean;
-  error_message: string | null;
-  attempts: number;
-  created_at: string;
-  delivered_at: string | null;
-};
-
-type Webhook = {
-  id: string;
-  url: string;
-  events: string[];
-  is_active: boolean;
-  created_at: string;
-};
-
-function normalizeStringList(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
-}
-
-function normalizeWebhooks(payload: unknown): Webhook[] {
-  const container = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
-  const rawWebhooks = Array.isArray(payload) ? payload : container?.webhooks ?? container?.items ?? container?.data ?? [];
-
-  if (!Array.isArray(rawWebhooks)) return [];
-
-  return rawWebhooks
-    .map((entry) => {
-      if (!entry || typeof entry !== "object") return null;
-      const record = entry as Record<string, unknown>;
-      const id = typeof record.id === "string" ? record.id : "";
-      const url = typeof record.url === "string" ? record.url : "";
-      if (!id || !url) return null;
-      return {
-        id,
-        url,
-        events: normalizeStringList(record.events),
-        is_active: Boolean(record.is_active),
-        created_at: typeof record.created_at === "string" ? record.created_at : "",
-      } satisfies Webhook;
-    })
-    .filter((webhook): webhook is Webhook => Boolean(webhook));
-}
-
-function normalizeDeliveries(payload: unknown): WebhookDelivery[] {
-  const container = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
-  const rawDeliveries = Array.isArray(payload) ? payload : container?.deliveries ?? container?.items ?? container?.data ?? [];
-
-  if (!Array.isArray(rawDeliveries)) return [];
-
-  return rawDeliveries
-    .map((entry) => {
-      if (!entry || typeof entry !== "object") return null;
-      const record = entry as Record<string, unknown>;
-      const id = typeof record.id === "string" ? record.id : "";
-      if (!id) return null;
-      return {
-        id,
-        event: typeof record.event === "string" ? record.event : "unknown",
-        payload: typeof record.payload === "string" ? record.payload : JSON.stringify(record.payload ?? {}, null, 2),
-        status_code: typeof record.status_code === "number" ? record.status_code : null,
-        success: Boolean(record.success),
-        error_message: typeof record.error_message === "string" ? record.error_message : null,
-        attempts: typeof record.attempts === "number" ? record.attempts : 0,
-        created_at: typeof record.created_at === "string" ? record.created_at : new Date(0).toISOString(),
-        delivered_at: typeof record.delivered_at === "string" ? record.delivered_at : null,
-      } satisfies WebhookDelivery;
-    })
-    .filter((delivery): delivery is WebhookDelivery => Boolean(delivery));
-}
+type Webhook = WebhookLifecycleRecord;
+type WebhookDelivery = WebhookDeliveryRecord;
 
 export default function WebhooksPageClient() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
+  const [deliverySnapshots, setDeliverySnapshots] = useState<Record<string, WebhookDelivery[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deliverySummaryError, setDeliverySummaryError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingWebhook, setEditingWebhook] = useState<Webhook | null>(null);
   const [viewingDeliveries, setViewingDeliveries] = useState<Webhook | null>(null);
@@ -153,17 +99,50 @@ export default function WebhooksPageClient() {
         w.events.some(e => e.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : webhooks;
+  const fleetSummary = useMemo(
+    () => summarizeWebhookFleet(webhooks, deliverySnapshots),
+    [deliverySnapshots, webhooks],
+  );
 
   const hasAuthError = Boolean(error && /unauthorized|forbidden|auth|token|sign in|login/i.test(error));
+
+  async function loadDeliverySnapshots(nextWebhooks: Webhook[]) {
+    if (nextWebhooks.length === 0) {
+      setDeliverySnapshots({});
+      setDeliverySummaryError(null);
+      return;
+    }
+
+    let failed = 0;
+    const pairs = await Promise.all(
+      nextWebhooks.map(async (webhook) => {
+        try {
+          const payload = await readJson<unknown>(`/api/webhooks/${webhook.id}/deliveries?limit=3`);
+          return [webhook.id, normalizeWebhookDeliveryCollection(payload)] as const;
+        } catch {
+          failed += 1;
+          return [webhook.id, []] as const;
+        }
+      }),
+    );
+
+    setDeliverySnapshots(Object.fromEntries(pairs));
+    setDeliverySummaryError(
+      failed > 0 ? "Some delivery health snapshots could not be loaded from the live route." : null,
+    );
+  }
 
   async function fetchWebhooks() {
     try {
       setLoading(true);
       setError(null);
       const data = await readJson<unknown>("/api/webhooks");
-      setWebhooks(normalizeWebhooks(data));
+      const nextWebhooks = normalizeWebhookCollection(data);
+      setWebhooks(nextWebhooks);
+      await loadDeliverySnapshots(nextWebhooks);
     } catch (err) {
       setWebhooks([]);
+      setDeliverySnapshots({});
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
@@ -175,7 +154,7 @@ export default function WebhooksPageClient() {
       setLoadingDeliveries(true);
       setError(null);
       const data = await readJson<unknown>(`/api/webhooks/${webhookId}/deliveries`);
-      setDeliveries(normalizeDeliveries(data));
+      setDeliveries(normalizeWebhookDeliveryCollection(data));
     } catch (err) {
       setDeliveries([]);
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -274,6 +253,85 @@ export default function WebhooksPageClient() {
 
   return (
     <div className="space-y-6">
+      {!viewingDeliveries && !hasAuthError && !error ? (
+        <>
+          <LiveKpiGrid>
+            <LiveStatCard
+              label="Active routes"
+              value={String(fleetSummary.active)}
+              detail={`${webhooks.length} total webhook endpoints are visible in the operator surface.`}
+              status={fleetSummary.active > 0 ? "success" : "idle"}
+            />
+            <LiveStatCard
+              label="Healthy latest delivery"
+              value={String(fleetSummary.healthy)}
+              detail="Active webhook routes whose latest recorded delivery completed successfully."
+              status={fleetSummary.healthy > 0 ? "success" : "idle"}
+            />
+            <LiveStatCard
+              label="Needs attention"
+              value={String(fleetSummary.attention)}
+              detail="Active routes whose latest recorded delivery failed and need operator follow-through."
+              status={fleetSummary.attention > 0 ? "error" : "success"}
+            />
+            <LiveStatCard
+              label="No deliveries yet"
+              value={String(fleetSummary.noDeliveries)}
+              detail="Active routes without a recorded delivery attempt in the current history lane."
+              status={fleetSummary.noDeliveries > 0 ? "warning" : "success"}
+            />
+          </LiveKpiGrid>
+
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(340px,0.92fr)]">
+            <LivePanel title="Delivery posture" meta="live health">
+              {deliverySummaryError ? (
+                <div className="rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-3 text-sm text-amber-100">
+                  {deliverySummaryError}
+                </div>
+              ) : null}
+              <div className="space-y-3">
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <p className="text-sm font-medium text-white">Latest-delivery health only</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">
+                    This surface does not invent uptime scores. It classifies each route from the latest recorded delivery,
+                    plus the route&apos;s current active or inactive state.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <p className="text-sm font-medium text-white">Delivery history stays drill-down first</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">
+                    Summary badges stay compact here, while the full payload, error, and retry details remain inside each
+                    webhook&apos;s delivery history drawer.
+                  </p>
+                </div>
+              </div>
+            </LivePanel>
+
+            <LivePanel title="Lifecycle parity" meta="dashboard + CLI">
+              <div className="space-y-3">
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <p className="text-sm font-medium text-white">Same live routes, different operator shells</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">
+                    The dashboard health badges map to the same live delivery and route-state data you can inspect with
+                    `mutx webhooks get`, `mutx webhooks deliveries`, and `mutx webhooks list`.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <p className="text-sm font-medium text-white">Compare route health with key readiness</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">
+                    Use the{" "}
+                    <Link href="/dashboard/api-keys" className="text-cyan-300 underline decoration-cyan-400/40 underline-offset-4">
+                      API key registry
+                    </Link>{" "}
+                    to correlate expiring or stale credentials with outbound delivery behavior before rotating or revoking access.
+                  </p>
+                </div>
+              </div>
+            </LivePanel>
+          </div>
+        </>
+      ) : null}
+
       {error && (
         <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-md">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -509,19 +567,22 @@ export default function WebhooksPageClient() {
       ) : (
         !viewingDeliveries && (
           <div className="space-y-4">
-            {filteredWebhooks.map((webhook) => (
-              <Card key={webhook.id} className="p-4">
+            {filteredWebhooks.map((webhook) => {
+              const health = describeWebhookHealth(webhook, deliverySnapshots[webhook.id] ?? [])
+
+              return (
+                <Card key={webhook.id} className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <code className="text-sm bg-muted px-2 py-1 rounded">
                         {webhook.url}
                       </code>
-                      {webhook.is_active ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4 text-amber-500" />
-                      )}
+                      <StatusBadge
+                        status={webhook.is_active ? "success" : "idle"}
+                        label={webhook.is_active ? "active" : "inactive"}
+                      />
+                      <StatusBadge status={health.tone} label={health.label} />
                       <button
                         onClick={() => handleCopyId(webhook.id)}
                         className="flex items-center gap-1 rounded p-1 text-slate-500 hover:text-cyan-400 transition-colors"
@@ -541,8 +602,22 @@ export default function WebhooksPageClient() {
                       ))}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Created {new Date(webhook.created_at).toLocaleString()}
+                      Created {formatDateTime(webhook.created_at)}
                     </p>
+                    <p className="text-xs text-muted-foreground">
+                      Latest attempt {health.latestAttemptAt ? formatRelativeTime(health.latestAttemptAt) : "not recorded"}
+                    </p>
+                    {health.statusCode ? (
+                      <p className="text-xs text-muted-foreground">
+                        Last status {health.statusCode}
+                        {health.attempts && health.attempts > 1 ? ` · attempts ${health.attempts}` : ""}
+                      </p>
+                    ) : null}
+                    {health.errorMessage ? (
+                      <p className="text-xs text-red-400">
+                        {health.errorMessage}
+                      </p>
+                    ) : null}
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -580,8 +655,9 @@ export default function WebhooksPageClient() {
                     </button>
                   </div>
                 </div>
-              </Card>
-            ))}
+                </Card>
+              )
+            })}
           </div>
         )
       )}

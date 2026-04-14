@@ -32,20 +32,24 @@ def test_api_keys_list_hits_canonical_route_and_renders_keys(monkeypatch) -> Non
         captured["path"] = path
         return DummyResponse(
             200,
-            [
-                {
-                    "id": key_id,
-                    "name": "test-key-1",
-                    "is_active": True,
-                    "expires_at": "2026-04-14T10:00:00",
-                },
-                {
-                    "id": str(uuid.uuid4()),
-                    "name": "test-key-2",
-                    "is_active": False,
-                    "expires_at": None,
-                },
-            ],
+            {
+                "items": [
+                    {
+                        "id": key_id,
+                        "name": "test-key-1",
+                        "is_active": True,
+                        "expires_at": "2026-04-20T10:00:00",
+                        "last_used": "2026-04-14T09:30:00",
+                    },
+                    {
+                        "id": str(uuid.uuid4()),
+                        "name": "test-key-2",
+                        "is_active": False,
+                        "expires_at": None,
+                        "last_used": None,
+                    },
+                ]
+            },
         )
 
     monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
@@ -61,13 +65,14 @@ def test_api_keys_list_hits_canonical_route_and_renders_keys(monkeypatch) -> Non
     assert key_id in result.output
     assert "test-key-1" in result.output
     assert "active" in result.output
+    assert "last used: 2026-04-14T09:30:00" in result.output
     assert "test-key-2" in result.output
     assert "revoked" in result.output
 
 
 def test_api_keys_list_empty(monkeypatch) -> None:
     def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
-        return DummyResponse(200, [])
+        return DummyResponse(200, {"items": []})
 
     monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(

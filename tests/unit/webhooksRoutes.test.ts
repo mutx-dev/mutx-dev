@@ -74,6 +74,32 @@ describe('Webhooks route proxies', () => {
       })
     })
 
+    it('normalizes wrapped webhook collections from alternate keys', async () => {
+      hasAuthSession.mockReturnValue(true)
+      authenticatedFetch.mockResolvedValue({
+        response: {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            items: [
+              { id: 'wh_789', url: 'https://example.com/alt', events: ['agent.started'], is_active: true },
+            ],
+          }),
+        },
+        tokenRefreshed: false,
+      })
+
+      const { GET } = await import('../../app/api/webhooks/route')
+      const response = await GET(mockRequest())
+
+      expect(response.status).toBe(200)
+      await expect(response.json()).resolves.toEqual({
+        webhooks: [
+          { id: 'wh_789', url: 'https://example.com/alt', events: ['agent.started'], is_active: true },
+        ],
+      })
+    })
+
     it('preserves backend error responses', async () => {
       hasAuthSession.mockReturnValue(true)
       authenticatedFetch.mockResolvedValue({

@@ -118,11 +118,25 @@ def test_webhooks_deliveries_hits_live_delivery_route_and_query_contract(monkeyp
 
 
 def test_webhooks_get_hits_contract_route_and_prints_created_timestamp(monkeypatch) -> None:
-    captured: dict[str, Any] = {}
+    captured: list[dict[str, Any]] = []
 
     def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
-        captured["path"] = path
-        captured["params"] = params
+        captured.append({"path": path, "params": params})
+        if path.endswith("/deliveries"):
+            return DummyResponse(
+                200,
+                [
+                    {
+                        "id": "delivery-1",
+                        "event": "deployment.failed",
+                        "success": False,
+                        "attempts": 2,
+                        "status_code": 502,
+                        "created_at": "2026-03-12T15:05:00",
+                    }
+                ],
+            )
+
         return DummyResponse(
             200,
             {
@@ -143,9 +157,16 @@ def test_webhooks_get_hits_contract_route_and_prints_created_timestamp(monkeypat
     result = runner.invoke(cli, ["webhooks", "get", "wh-456"])
 
     assert result.exit_code == 0
-    assert captured == {
-        "path": "/v1/webhooks/wh-456",
-        "params": None,
-    }
+    assert captured == [
+        {
+            "path": "/v1/webhooks/wh-456",
+            "params": None,
+        },
+        {
+            "path": "/v1/webhooks/wh-456/deliveries",
+            "params": {"skip": 0, "limit": 1},
+        },
+    ]
     assert "wh-456 | https://example.com/hook | inactive" in result.output
     assert "Created: 2026-03-12T15:00:00" in result.output
+    assert "Latest delivery: failed | status=502 | attempts=2 | created=2026-03-12T15:05:00" in result.output

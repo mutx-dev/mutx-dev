@@ -60,7 +60,7 @@ describe('API key route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
 
-  it('preserves successful list responses', async () => {
+  it('normalizes array list responses into the dashboard collection envelope', async () => {
     hasAuthSession.mockReturnValue(true)
     authenticatedFetch.mockResolvedValue({
       response: {
@@ -74,9 +74,39 @@ describe('API key route proxies', () => {
     const response = await GET(mockRequest())
 
     expect(response.status).toBe(200)
-    await expect(response.json()).resolves.toEqual([
-      { id: 'key_111', name: 'deploy-key', is_active: true },
-    ])
+    await expect(response.json()).resolves.toEqual({
+      items: [{ id: 'key_111', name: 'deploy-key', is_active: true }],
+      total: 1,
+      skip: 0,
+      limit: 1,
+    })
+  })
+
+  it('preserves paginated API key list responses', async () => {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 200,
+        json: async () => ({
+          items: [{ id: 'key_111', name: 'deploy-key', is_active: true }],
+          total: 3,
+          skip: 0,
+          limit: 50,
+        }),
+      },
+      tokenRefreshed: false,
+    })
+
+    const { GET } = await import('../../app/api/api-keys/route')
+    const response = await GET(mockRequest())
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      items: [{ id: 'key_111', name: 'deploy-key', is_active: true }],
+      total: 3,
+      skip: 0,
+      limit: 50,
+    })
   })
 
   it('preserves upstream create conflicts', async () => {

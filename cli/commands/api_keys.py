@@ -1,4 +1,5 @@
 import click
+from datetime import datetime, timezone
 from typing import Optional
 
 from cli.config import current_config, get_client
@@ -8,6 +9,40 @@ from cli.config import current_config, get_client
 def api_keys_group():
     """Manage API keys"""
     pass
+
+
+def _normalize_key_collection(payload):
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict):
+        for key in ("items", "keys", "api_keys", "data"):
+            value = payload.get(key)
+            if isinstance(value, list):
+                return value
+    return []
+
+
+def _parse_timestamp(value: str | None):
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=timezone.utc)
+        return parsed
+    except ValueError:
+        return None
+
+
+def _render_key_state(key: dict) -> str:
+    if key.get("is_active") is False:
+        return "revoked"
+
+    expires_at = _parse_timestamp(key.get("expires_at"))
+    if expires_at and expires_at <= datetime.now(timezone.utc):
+        return "expired"
+
+    return "active"
 
 
 @api_keys_group.command(name="list")
@@ -29,15 +64,17 @@ def list_api_keys():
         click.echo(f"Error: {response.text}", err=True)
         return
 
-    keys = response.json()
+    keys = _normalize_key_collection(response.json())
     if not keys:
         click.echo("No API keys found.")
         return
 
     for key in keys:
-        active = "active" if key.get("is_active") else "revoked"
         expires = key.get("expires_at") or "never"
-        click.echo(f"{key['id']} | {key['name']} | {active} | expires: {expires}")
+        last_used = key.get("last_used_at") or key.get("last_used") or "never"
+        click.echo(
+            f"{key['id']} | {key['name']} | {_render_key_state(key)} | expires: {expires} | last used: {last_used}"
+        )
 
 
 @api_keys_group.command(name="create")

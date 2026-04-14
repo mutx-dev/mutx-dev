@@ -29,7 +29,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const payload = await response.json().catch(() => ({}));
     const nextResponse = response.ok
       ? NextResponse.json({
-          webhooks: Array.isArray(payload) ? payload : payload?.webhooks ?? [],
+          webhooks: Array.isArray(payload)
+            ? payload
+            : Array.isArray(payload?.webhooks)
+              ? payload.webhooks
+              : Array.isArray(payload?.items)
+                ? payload.items
+                : Array.isArray(payload?.data)
+                  ? payload.data
+                  : [],
         })
       : NextResponse.json(
           { error: payload.detail || "Failed to fetch webhooks" },

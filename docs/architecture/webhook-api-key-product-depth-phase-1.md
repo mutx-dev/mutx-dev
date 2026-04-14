@@ -16,6 +16,24 @@ Make the dashboard the shared operator summary layer for webhook and API-key dep
 
 That means phase 1 should add truthful summary and status structure in the dashboard, not a new backend abstraction. The goal is to make the current lifecycle data easier to understand and compare, then leave deeper unification for later phases.
 
+## Parity Contract
+
+- API keys:
+  - `active` means the key is still marked active and has not passed `expires_at`.
+  - `revoked` means `is_active` is false.
+  - `expired` means the key is still visible for audit, but `expires_at` is already in the past.
+  - `expires soon` is a warning layer on top of an otherwise active key, based on the live `expires_at` timestamp.
+  - `last used` comes from `last_used` or `last_used_at`; missing data stays `never` instead of being guessed.
+- Webhooks:
+  - Route state stays `active` or `inactive` from `is_active`.
+  - Delivery health comes from the latest recorded delivery attempt, not an invented aggregate score.
+  - `healthy` means the latest delivery succeeded.
+  - `failing` means the latest delivery failed and should surface its real status code and retry count.
+  - `no deliveries` means the route exists but the current history lane has no delivery attempts yet.
+- CLI and dashboard:
+  - The dashboard may summarize these states visually, but the CLI should expose the same underlying labels where possible.
+  - No new backend fields are introduced for phase 1; the parity story is built from current live endpoints only.
+
 ## File-Level Map
 
 - `components/dashboard/ApiKeysPageClient.tsx`

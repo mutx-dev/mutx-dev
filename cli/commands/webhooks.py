@@ -10,6 +10,17 @@ def webhooks_group():
     pass
 
 
+def _normalize_collection(payload: Any, *keys: str) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict):
+        for key in keys:
+            value = payload.get(key)
+            if isinstance(value, list):
+                return value
+    return []
+
+
 @webhooks_group.command(name="list")
 @click.option("--limit", "-l", default=50, help="Number of webhooks to fetch")
 @click.option("--skip", "-s", default=0, help="Number of webhooks to skip")
@@ -31,7 +42,7 @@ def list_webhooks(limit: int, skip: int):
         click.echo(f"Error: {response.text}", err=True)
         return
 
-    webhooks = response.json()
+    webhooks = _normalize_collection(response.json(), "webhooks", "items", "data")
     if not webhooks:
         click.echo("No webhooks found.")
         return
@@ -78,7 +89,7 @@ def webhook_deliveries(
         click.echo(f"Error: {response.text}", err=True)
         return
 
-    deliveries = response.json()
+    deliveries = _normalize_collection(response.json(), "deliveries", "items", "data")
     if not deliveries:
         click.echo("No webhook deliveries found.")
         return
@@ -118,3 +129,23 @@ def get_webhook(webhook_id: str):
     click.echo(f"{webhook['id']} | {webhook['url']} | {active}")
     click.echo(f"Events: {','.join(webhook.get('events', [])) or '*'}")
     click.echo(f"Created: {webhook.get('created_at')}")
+
+    latest_delivery_response = client.get(
+        f"/v1/webhooks/{webhook_id}/deliveries",
+        params={"skip": 0, "limit": 1},
+    )
+    if latest_delivery_response.status_code == 200:
+        latest_deliveries = _normalize_collection(
+            latest_delivery_response.json(), "deliveries", "items", "data"
+        )
+        if latest_deliveries:
+            latest = latest_deliveries[0]
+            click.echo(
+                "Latest delivery: "
+                f"{'success' if latest.get('success') else 'failed'}"
+                f" | status={latest.get('status_code') or 'n/a'}"
+                f" | attempts={latest.get('attempts', 0)}"
+                f" | created={latest.get('created_at')}"
+            )
+        else:
+            click.echo("Latest delivery: none")

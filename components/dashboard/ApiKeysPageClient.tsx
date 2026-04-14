@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Copy, KeyRound, RefreshCcw, Trash2 } from "lucide-react";
 
-import { ApiRequestError, normalizeCollection, readJson } from "@/components/app/http";
+import { ApiRequestError, readJson } from "@/components/app/http";
 import {
   LiveAuthRequired,
   LiveEmptyState,
@@ -17,6 +18,14 @@ import {
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import {
+  apiKeyExpiryMeta,
+  apiKeyLastUsed,
+  apiKeyLifecycleMeta,
+  isApiKeyStale,
+  normalizeApiKeyCollection,
+  summarizeApiKeys,
+} from "@/lib/operatorLifecycle";
 
 import type { components } from "@/app/types/api";
 
@@ -48,51 +57,9 @@ function isApiKeyCreateResponse(value: unknown): value is ApiKeyCreateResponse {
   );
 }
 
-function keyLastUsed(key: ApiKeyRecord) {
-  return key.last_used_at ?? key.last_used ?? null;
-}
-
-function isKeyActive(key: ApiKeyRecord) {
-  if (typeof key.is_active === "boolean") {
-    return key.is_active;
-  }
-
-  const normalizedStatus = (key.status ?? "").toLowerCase();
-  if (normalizedStatus.includes("revoked") || normalizedStatus.includes("inactive")) {
-    return false;
-  }
-
-  if (key.expires_at) {
-    const expiresAt = new Date(key.expires_at).getTime();
-    if (!Number.isNaN(expiresAt) && expiresAt <= Date.now()) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 function maskKeyId(id: string) {
   if (id.length <= 10) return id;
   return `${id.slice(0, 6)}...${id.slice(-4)}`;
-}
-
-function getExpiryLabel(expiresAt?: string | null) {
-  if (!expiresAt) return null;
-
-  const millis = new Date(expiresAt).getTime();
-  if (Number.isNaN(millis)) return null;
-
-  if (millis <= Date.now()) {
-    return { label: "expired", status: "error" as const };
-  }
-
-  const daysUntilExpiry = Math.ceil((millis - Date.now()) / 86_400_000);
-  if (daysUntilExpiry <= 7) {
-    return { label: `expires in ${daysUntilExpiry}d`, status: "warning" as const };
-  }
-
-  return null;
 }
 
 function sortKeys(keys: ApiKeyRecord[]) {
@@ -116,9 +83,7 @@ export function ApiKeysPageClient() {
 
   async function fetchKeys() {
     const payload = await readJson<unknown>("/api/api-keys");
-    return sortKeys(
-      normalizeCollection<ApiKeyRecord>(payload, ["items", "keys", "api_keys", "data"]),
-    );
+    return sortKeys(normalizeApiKeyCollection(payload) as ApiKeyRecord[]);
   }
 
   useEffect(() => {
@@ -153,24 +118,7 @@ export function ApiKeysPageClient() {
     };
   }, []);
 
-  const activeKeys = useMemo(
-    () => keys.filter((key) => isKeyActive(key)),
-    [keys],
-  );
-  const recentlyUsedKeys = useMemo(
-    () =>
-      keys.filter((key) => {
-        const lastUsed = keyLastUsed(key);
-        if (!lastUsed) return false;
-        const millis = new Date(lastUsed).getTime();
-        return !Number.isNaN(millis) && millis >= Date.now() - 7 * 86_400_000;
-      }),
-    [keys],
-  );
-  const expiringSoon = useMemo(
-    () => activeKeys.filter((key) => getExpiryLabel(key.expires_at)?.status === "warning"),
-    [activeKeys],
-  );
+  const summary = useMemo(() => summarizeApiKeys(keys), [keys]);
 
   async function refreshKeys() {
     const nextKeys = await fetchKeys();
@@ -286,30 +234,26 @@ export function ApiKeysPageClient() {
       <LiveKpiGrid>
         <LiveStatCard
           label="Active keys"
-          value={String(activeKeys.length)}
+          value={String(summary.active)}
           detail={`${keys.length} total keys are visible in the operator ledger.`}
-          status={asDashboardStatus(activeKeys.length > 0 ? "healthy" : "idle")}
+          status={asDashboardStatus(summary.active > 0 ? "healthy" : "idle")}
         />
         <LiveStatCard
           label="Seen this week"
-          value={String(recentlyUsedKeys.length)}
+          value={String(summary.recentlyUsed)}
           detail="Keys with a recent `last used` signal in the last 7 days."
         />
         <LiveStatCard
           label="Expiring soon"
-          value={String(expiringSoon.length)}
+          value={String(summary.expiringSoon)}
           detail="Active keys expiring within the next 7 days."
-          status={asDashboardStatus(expiringSoon.length > 0 ? "warning" : "healthy")}
+          status={asDashboardStatus(summary.expiringSoon > 0 ? "warning" : "healthy")}
         />
         <LiveStatCard
-          label="One-time reveal"
-          value={revealedKey ? "ready" : "idle"}
-          detail={
-            revealedKey
-              ? "A newly created or rotated secret is available to copy once."
-              : "New secrets appear here immediately after create or rotate."
-          }
-          status={asDashboardStatus(revealedKey ? "running" : "idle")}
+          label="Stale keys"
+          value={String(summary.stale)}
+          detail="Active keys without a recent use signal in the last 30 days."
+          status={asDashboardStatus(summary.stale > 0 ? "warning" : "healthy")}
         />
       </LiveKpiGrid>
 
@@ -388,9 +332,10 @@ export function ApiKeysPageClient() {
             ) : (
               <div className="space-y-3">
                 {keys.map((key) => {
-                  const lastUsed = keyLastUsed(key);
-                  const active = isKeyActive(key);
-                  const expiry = getExpiryLabel(key.expires_at);
+                  const lastUsed = apiKeyLastUsed(key);
+                  const lifecycle = apiKeyLifecycleMeta(key);
+                  const expiry = apiKeyExpiryMeta(key);
+                  const stale = isApiKeyStale(key);
 
                   return (
                     <div key={key.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
@@ -399,12 +344,13 @@ export function ApiKeysPageClient() {
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="truncate text-sm font-medium text-white">{key.name}</p>
                             <StatusBadge
-                              status={active ? "success" : "idle"}
-                              label={active ? "active" : "inactive"}
+                              status={lifecycle.tone}
+                              label={lifecycle.label}
                             />
                             {expiry ? (
-                              <StatusBadge status={expiry.status} label={expiry.label} />
+                              <StatusBadge status={expiry.tone} label={expiry.label} />
                             ) : null}
+                            {stale ? <StatusBadge status="warning" label="stale" /> : null}
                           </div>
                           <p className="mt-2 font-mono text-xs text-slate-500">{maskKeyId(key.id)}</p>
                           <div className="mt-3 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
@@ -417,7 +363,7 @@ export function ApiKeysPageClient() {
                           </div>
                         </div>
 
-                        {active ? (
+                        {lifecycle.label === "active" ? (
                           <div className="flex flex-wrap items-center gap-2">
                             <button
                               type="button"
@@ -454,6 +400,20 @@ export function ApiKeysPageClient() {
               <p className="text-sm font-medium text-white">Creation and rotation are live</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 This route now owns create, rotate, and revoke actions directly instead of bouncing into the broader security page.
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <p className="text-sm font-medium text-white">Dashboard and CLI use the same lifecycle story</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                `active`, `revoked`, `expired`, and `expires soon` are derived from the same live API fields surfaced by
+                `mutx api-keys list`, `mutx api-keys rotate`, and the dashboard registry.
+              </p>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
+                Pair this with the{" "}
+                <Link href="/dashboard/webhooks" className="text-cyan-300 underline decoration-cyan-400/40 underline-offset-4">
+                  webhook delivery surface
+                </Link>{" "}
+                when you need to compare credential readiness against outbound event health.
               </p>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
