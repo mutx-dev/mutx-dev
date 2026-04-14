@@ -261,18 +261,23 @@ def test_agents_logs_hits_canonical_route_and_renders_logs(monkeypatch) -> None:
         captured["params"] = params
         return DummyResponse(
             200,
-            [
-                {
-                    "timestamp": "2026-03-14T10:00:00",
-                    "level": "INFO",
-                    "message": "Agent started",
-                },
-                {
-                    "timestamp": "2026-03-14T10:01:00",
-                    "level": "WARNING",
-                    "message": "High memory usage",
-                },
-            ],
+            {
+                "agent_id": agent_id,
+                "items": [
+                    {
+                        "timestamp": "2026-03-14T10:00:00",
+                        "level": "INFO",
+                        "message": "Agent started",
+                    },
+                    {
+                        "timestamp": "2026-03-14T10:01:00",
+                        "level": "WARNING",
+                        "message": "High memory usage",
+                    },
+                ],
+                "total": 2,
+                "has_more": False,
+            },
         )
 
     monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
@@ -296,7 +301,7 @@ def test_agents_logs_with_level_filter(monkeypatch) -> None:
     def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
         captured["path"] = path
         captured["params"] = params
-        return DummyResponse(200, [])
+        return DummyResponse(200, {"agent_id": "agent-id", "items": [], "total": 0, "has_more": False})
 
     monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
