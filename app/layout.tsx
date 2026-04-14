@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 
 import { appFontVariables } from "@/app/fonts/app";
@@ -15,6 +16,7 @@ import {
 const siteUrl = getSiteUrl();
 const ogImageUrl = getOgImageUrl();
 const twitterImageUrl = getTwitterImageUrl();
+const APP_DEMO_HOSTS = new Set(["app.mutx.dev", "app.localhost"]);
 
 export const viewport = {
   width: 'device-width',
@@ -94,7 +96,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers();
+  const forwardedHost = requestHeaders.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = (forwardedHost || requestHeaders.get("host") || "")
+    .split(":")[0]
+    .toLowerCase();
+  const shouldRenderAppDemoIntro = APP_DEMO_HOSTS.has(host);
+
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
@@ -104,12 +113,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "(function(){try{if(window.sessionStorage.getItem('mutx-home-loader-played')==='1'){document.documentElement.setAttribute('data-home-loader-played','1');}}catch(_error){}})();",
           }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){try{var host=window.location.hostname.toLowerCase();if(host==='app.mutx.dev'||host==='app.localhost'){if(window.sessionStorage.getItem('mutx-app-demo-intro-played')==='1'){document.documentElement.setAttribute('data-app-demo-intro-played','1');}else{document.documentElement.setAttribute('data-app-demo-intro-active','1');}}}catch(_error){}})();",
-          }}
-        />
+        {shouldRenderAppDemoIntro ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html:
+                "(function(){try{if(window.sessionStorage.getItem('mutx-app-demo-intro-played')==='1'){document.documentElement.setAttribute('data-app-demo-intro-played','1');}else{document.documentElement.setAttribute('data-app-demo-intro-active','1');}}catch(_error){}})();",
+            }}
+          />
+        ) : null}
         <link rel="preconnect" href="https://calendly.com" />
         <link rel="dns-prefetch" href="https://calendly.com" />
         <link rel="preconnect" href="https://challenges.cloudflare.com" />
@@ -123,7 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${appFontVariables} h-full min-h-screen antialiased`}>
         {children}
-        <AppDomainDemoIntro />
+        {shouldRenderAppDemoIntro ? <AppDomainDemoIntro /> : null}
       </body>
     </html>
   );

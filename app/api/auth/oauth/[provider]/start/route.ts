@@ -7,7 +7,10 @@ import {
   getCookieDomain,
   shouldUseSecureCookies,
 } from "@/app/api/_lib/controlPlane";
-import { resolveRedirectPath } from "@/lib/auth/redirects";
+import {
+  getDefaultRedirectPathForHost,
+  resolveRedirectPath,
+} from "@/lib/auth/redirects";
 
 const OAUTH_COOKIE_PREFIX = "mutx_oauth";
 const OAUTH_MAX_AGE_SECONDS = 60 * 10;
@@ -60,6 +63,7 @@ export async function GET(
   const intent = resolveIntent(request.nextUrl.searchParams.get("intent"));
   const nextPath = resolveRedirectPath(
     request.nextUrl.searchParams.get("next"),
+    getDefaultRedirectPathForHost(request.nextUrl.hostname),
   );
 
   if (!provider) {

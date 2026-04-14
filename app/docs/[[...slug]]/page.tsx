@@ -9,122 +9,10 @@ import { TableOfContents } from "@/components/site/docs/TableOfContents";
 import { SectionLanding } from "@/components/site/docs/SectionLanding";
 import { PrevNextNav } from "@/components/site/docs/PrevNextNav";
 import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
-import { parseSummary } from "@/lib/docs";
+import { parseSummary, resolveDocFileFromSlug } from "@/lib/docs";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
-
-function docsDir() {
-  return path.join(process.cwd(), "docs");
-}
-
-// Root-level content directories (mirrored from repo root, not inside docs/)
-const ROOT_CONTENT_DIRS = ["agents"];
-
-function isRootContent(slugSegments: string[]): boolean {
-  return slugSegments.length >= 1 && ROOT_CONTENT_DIRS.includes(slugSegments[0]);
-}
-
-function resolveRootContentSlug(slugSegments: string[]): string | null {
-  if (!isRootContent(slugSegments)) return null;
-  const dir = slugSegments[0];
-
-  // 1+ segments: /docs/agents/mission-control-orchestrator
-  // → check docs/agents/mission-control-orchestrator.md first
-  if (slugSegments.length >= 2) {
-    const subFile = path.join(process.cwd(), "docs", dir, slugSegments[1] + ".md");
-    if (fs.existsSync(subFile)) return subFile;
-    // Also try AGENT.md for agent subdirs that mirror from repo root
-    const agentFile = path.join(process.cwd(), dir, slugSegments[1], "AGENT.md");
-    if (fs.existsSync(agentFile)) return agentFile;
-  }
-
-  // Top-level: /docs/agents
-  const candidates = [
-    path.join(process.cwd(), dir, "README.md"),
-    path.join(process.cwd(), dir, "index.md"),
-    path.join(process.cwd(), "docs", dir, "README.md"),
-  ];
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) return candidate;
-  }
-  return null;
-}
-
-function resolveSlug(slugSegments: string[]): string | null {
-  // Root-level content (e.g. agents/README.md lives at /agents not /docs/agents)
-  if (isRootContent(slugSegments)) {
-    return resolveRootContentSlug(slugSegments);
-  }
-  if (hasUnsafeSlugSegment(slugSegments)) {
-    return null;
-  }
-
-  const docsRoot = path.resolve(docsDir());
-
-  if (slugSegments.length === 1 && slugSegments[0] === "README") {
-    const rootReadme = path.join(docsRoot, "README.md");
-    if (fs.existsSync(rootReadme)) return rootReadme;
-  }
-
-  if (slugSegments.length === 0) {
-    const rootReadme = path.join(docsRoot, "README.md");
-    if (fs.existsSync(rootReadme)) return rootReadme;
-  }
-
-  const candidates = [
-    path.join(...slugSegments) + ".md",
-    path.join(...slugSegments, "README.md"),
-    path.join(...slugSegments, "index.md"),
-  ];
-
-  for (const candidate of candidates) {
-    const fullPath = path.resolve(docsRoot, candidate);
-    if (!fullPath.startsWith(`${docsRoot}${path.sep}`)) {
-      continue;
-    }
-
-    if (fs.existsSync(fullPath)) {
-      return fullPath;
-    }
-  }
-
-  // GitBook maps docs/api/* → /docs/* (api/ prefix is flattened)
-  // e.g. /docs/reference → docs/api/reference.md
-  // e.g. /docs/reference/authentication → docs/api/authentication.md
-  // e.g. /docs/reference/index → docs/api/index.md (API Overview)
-  const apiCandidates = [
-    path.join("api", ...slugSegments) + ".md",
-    path.join("api", ...slugSegments, "README.md"),
-    path.join("api", ...slugSegments, "index.md"),
-    // Special case: /docs/X/index → serve docs/api/index.md
-    path.join("api", slugSegments[0], "index.md"),
-  ];
-
-  for (const candidate of apiCandidates) {
-    const fullPath = path.resolve(docsRoot, candidate);
-    if (!fullPath.startsWith(`${docsRoot}${path.sep}`)) {
-      continue;
-    }
-    if (fs.existsSync(fullPath)) {
-      return fullPath;
-    }
-  }
-
-  return null;
-}
-
-function hasUnsafeSlugSegment(slugSegments: string[]): boolean {
-  return slugSegments.some(
-    (segment) =>
-      segment.length === 0 ||
-      segment === "." ||
-      segment === ".." ||
-      segment.includes("/") ||
-      segment.includes("\\") ||
-      segment.includes("\0")
-  );
-}
 
 export async function generateMetadata({
   params,
@@ -132,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug?: string[] }>;
 }): Promise<Metadata> {
   const { slug = [] } = await params;
-  const filePath = resolveSlug(slug);
+  const filePath = resolveDocFileFromSlug(slug);
   if (!filePath) return { title: "Not Found" };
 
   const source = fs.readFileSync(filePath, "utf-8");
@@ -314,7 +202,7 @@ export default async function DocPage({
     return <DocsHomePage />;
   }
 
-  const filePath = resolveSlug(slug);
+  const filePath = resolveDocFileFromSlug(slug);
 
   if (!filePath) {
     notFound();

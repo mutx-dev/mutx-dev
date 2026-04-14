@@ -8,8 +8,8 @@
 .heroSection {
   position: relative;
   overflow: hidden;
-  background: #07090e;
-  color: #f7f4ef;
+  background: #05080f;
+  color: #edf6ff;
 }
 
 /* Geometric accent — top left corner */
@@ -22,8 +22,8 @@
   height: 120%;
   background: radial-gradient(
     ellipse at 30% 50%,
-    rgba(212, 171, 115, 0.13) 0%,
-    rgba(212, 171, 115, 0.04) 40%,
+    rgba(111, 198, 255, 0.16) 0%,
+    rgba(80, 126, 255, 0.06) 40%,
     transparent 70%
   );
   pointer-events: none;
@@ -57,8 +57,8 @@
   gap: 0.6rem;
   padding: 0.35rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(212, 171, 115, 0.4);
-  background: rgba(212, 171, 115, 0.1);
+  border: 1px solid rgba(111, 198, 255, 0.34);
+  background: rgba(111, 198, 255, 0.08);
   font-family: var(--font-mono), monospace;
   font-size: 0.65rem;
   font-weight: 700;
@@ -74,7 +74,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #d4ab73;
+  background: #6fc6ff;
   flex-shrink: 0;
 }
 
@@ -86,7 +86,7 @@
   font-weight: 300;
   line-height: 0.9;
   letter-spacing: -0.065em;
-  color: #f7f4ef;
+  color: #edf6ff;
 }
 
 /* Support line — one punchy sentence */
@@ -97,7 +97,7 @@
   font-weight: 500;
   line-height: 1.6;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.62);
+  color: rgba(201, 219, 241, 0.72);
 }
 
 .heroActions {
@@ -120,7 +120,7 @@
 }
 
 .contentSection + .contentSection {
-  border-top: 1px solid rgba(19, 26, 36, 0.09);
+  border-top: 1px solid rgba(166, 201, 255, 0.12);
 }
 
 /* Intro block — strong title, readable body */
@@ -136,7 +136,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #d4ab73;
+  color: #6fc6ff;
 }
 
 .sectionTitle {
@@ -146,7 +146,7 @@
   font-weight: 300;
   line-height: 1.05;
   letter-spacing: -0.055em;
-  color: #131a24;
+  color: #dcefff;
 }
 
 .sectionBody {
@@ -155,7 +155,7 @@
   font-weight: 500;
   line-height: 1.65;
   letter-spacing: -0.01em;
-  color: rgba(19, 26, 36, 0.68);
+  color: rgba(188, 212, 238, 0.74);
 }
 
 /* Feature cards — editorial, not a grid of pills */
@@ -168,14 +168,14 @@
 .featureCard {
   padding: 2rem 2.2rem 2.2rem;
   border-radius: 1.1rem;
-  border: 1px solid rgba(19, 26, 36, 0.09);
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(10, 18, 38, 0.05);
+  border: 1px solid rgba(166, 201, 255, 0.12);
+  background: linear-gradient(180deg, rgba(12, 18, 28, 0.94), rgba(7, 10, 16, 0.98));
+  box-shadow: 0 10px 36px rgba(2, 8, 22, 0.16);
   transition: box-shadow 220ms ease, transform 220ms ease;
 }
 
 .featureCard:hover {
-  box-shadow: 0 8px 32px rgba(10, 18, 38, 0.1);
+  box-shadow: 0 16px 40px rgba(2, 8, 22, 0.22);
   transform: translateY(-3px);
 }
 
@@ -186,7 +186,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #131a24;
+  color: #dcefff;
 }
 
 .featureCardTitle a {
@@ -195,7 +195,7 @@
 }
 
 .featureCardTitle a:hover {
-  color: #d4ab73;
+  color: #88ceff;
 }
 
 .featureCardBody {
@@ -203,14 +203,14 @@
   font-size: clamp(0.9rem, 0.95vw, 0.97rem);
   font-weight: 500;
   line-height: 1.62;
-  color: rgba(19, 26, 36, 0.6);
+  color: rgba(191, 214, 240, 0.74);
 }
 
 /* ---- Final CTA section — dark ---- */
 .finalSection {
   padding: clamp(6rem, 11vw, 9rem) 0;
-  background: #07090e;
-  color: #f7f4ef;
+  background: #05080f;
+  color: #edf6ff;
   position: relative;
   overflow: hidden;
 }
@@ -225,7 +225,7 @@
   height: 160%;
   background: radial-gradient(
     ellipse at 70% 50%,
-    rgba(212, 171, 115, 0.1) 0%,
+    rgba(111, 198, 255, 0.14) 0%,
     transparent 65%
   );
   pointer-events: none;
@@ -254,7 +254,7 @@
   font-weight: 300;
   line-height: 0.95;
   letter-spacing: -0.06em;
-  color: #f7f4ef;
+  color: #edf6ff;
 }
 
 .finalBody {
@@ -264,7 +264,7 @@
   font-weight: 500;
   line-height: 1.62;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.62);
+  color: rgba(201, 219, 241, 0.72);
 }
 
 .finalActions {
@@ -285,7 +285,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(247, 244, 239, 0.82);
+  color: rgba(227, 242, 255, 0.82);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
@@ -310,7 +310,7 @@
 
 @media (max-width: 768px) {
   .heroSection {
-    background: linear-gradient(168deg, #07090e 0%, #0a0e18 100%);
+    background: linear-gradient(168deg, #05080f 0%, #09111d 100%);
   }
 
   .heroStage {

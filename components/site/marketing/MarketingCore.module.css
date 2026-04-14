@@ -1,20 +1,20 @@
 .page {
-  --marketing-bg: #09080b;
-  --marketing-bg-soft: #131117;
-  --marketing-bg-strong: #07060a;
-  --marketing-surface: rgba(24, 21, 28, 0.94);
-  --marketing-surface-soft: rgba(255, 248, 236, 0.05);
-  --marketing-text: #f7f0e4;
-  --marketing-text-soft: rgba(232, 221, 203, 0.82);
-  --marketing-text-muted: rgba(188, 172, 149, 0.6);
-  --marketing-text-reverse: #fff5e8;
-  --marketing-text-reverse-soft: rgba(255, 241, 223, 0.72);
-  --marketing-border: rgba(255, 233, 204, 0.11);
-  --marketing-border-strong: rgba(212, 171, 115, 0.22);
-  --marketing-border-reverse: rgba(255, 241, 223, 0.14);
-  --marketing-accent: #d4ab73;
-  --marketing-accent-soft: #f0d0a1;
-  --marketing-shadow: 0 28px 80px rgba(2, 2, 5, 0.28);
+  --marketing-bg: #04070d;
+  --marketing-bg-soft: #0b1220;
+  --marketing-bg-strong: #03050a;
+  --marketing-surface: rgba(12, 18, 28, 0.94);
+  --marketing-surface-soft: rgba(255, 255, 255, 0.04);
+  --marketing-text: #edf6ff;
+  --marketing-text-soft: rgba(201, 219, 241, 0.82);
+  --marketing-text-muted: rgba(145, 167, 195, 0.64);
+  --marketing-text-reverse: #edf6ff;
+  --marketing-text-reverse-soft: rgba(214, 228, 244, 0.78);
+  --marketing-border: rgba(166, 201, 255, 0.11);
+  --marketing-border-strong: rgba(111, 198, 255, 0.24);
+  --marketing-border-reverse: rgba(214, 228, 244, 0.16);
+  --marketing-accent: #6fc6ff;
+  --marketing-accent-soft: #dff2ff;
+  --marketing-shadow: 0 28px 80px rgba(2, 8, 22, 0.28);
   position: relative;
   min-height: 100vh;
   background: var(--marketing-bg);
@@ -34,30 +34,30 @@
 
 .homePage {
   background:
-    radial-gradient(circle at 14% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 86% 12%, rgba(137, 120, 184, 0.12), transparent 28rem),
-    linear-gradient(180deg, #111014 0%, #08070b 100%);
+    radial-gradient(circle at 14% 0%, rgba(111, 198, 255, 0.14), transparent 24rem),
+    radial-gradient(circle at 86% 12%, rgba(80, 126, 255, 0.12), transparent 28rem),
+    linear-gradient(180deg, #09101a 0%, #04070d 100%);
 }
 
 .publicPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.1), transparent 28rem),
-    linear-gradient(180deg, #111014 0 28rem, #0c0b10 28rem 38rem, var(--marketing-bg) 38rem 100%);
+    radial-gradient(circle at 12% 0%, rgba(111, 198, 255, 0.14), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(80, 126, 255, 0.12), transparent 28rem),
+    linear-gradient(180deg, #09101a 0 28rem, #060b14 28rem 38rem, var(--marketing-bg) 38rem 100%);
 }
 
 .downloadPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
-    linear-gradient(180deg, #111014 0%, #0c0b10 46rem, #08070b 100%);
+    radial-gradient(circle at 12% 0%, rgba(111, 198, 255, 0.14), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(80, 126, 255, 0.14), transparent 30rem),
+    linear-gradient(180deg, #09101a 0%, #060b14 46rem, #04070d 100%);
 }
 
 .releasesPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
-    linear-gradient(180deg, #111014 0%, #0c0b10 58rem, #08070b 100%);
+    radial-gradient(circle at 12% 0%, rgba(111, 198, 255, 0.14), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(80, 126, 255, 0.14), transparent 30rem),
+    linear-gradient(180deg, #09101a 0%, #060b14 58rem, #04070d 100%);
 }
 
 .shell {
@@ -84,9 +84,9 @@
   width: 3rem;
   height: 3rem;
   border-radius: 0.9rem;
-  border: 1px solid rgba(248, 247, 245, 0.16);
+  border: 1px solid rgba(214, 228, 244, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.22), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(111, 198, 255, 0.24), transparent 72%),
     linear-gradient(180deg, rgba(16, 20, 30, 0.92), rgba(5, 7, 11, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
@@ -96,7 +96,7 @@
 .brandLight .brandMarkWrap {
   border-color: rgba(19, 26, 36, 0.12);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.16), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(111, 198, 255, 0.18), transparent 72%),
     linear-gradient(180deg, rgba(19, 26, 36, 0.96), rgba(8, 10, 14, 0.98));
 }
 
@@ -170,10 +170,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 240, 221, 0.16);
+  border: 1px solid rgba(214, 228, 244, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.18), transparent 72%),
-    linear-gradient(180deg, rgba(49, 35, 28, 0.98), rgba(20, 14, 11, 1));
+    radial-gradient(circle at 50% 0%, rgba(111, 198, 255, 0.18), transparent 72%),
+    linear-gradient(180deg, rgba(14, 20, 31, 0.98), rgba(7, 10, 16, 1));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 18px 42px rgba(0, 7, 18, 0.28);
@@ -194,7 +194,7 @@
 .publicRailWord {
   display: block;
   width: 100%;
-  color: rgba(248, 247, 245, 0.88);
+  color: rgba(227, 242, 255, 0.88);
   font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
   font-weight: 800;
@@ -221,7 +221,7 @@
 }
 
 .publicRailMeta {
-  color: rgba(248, 247, 245, 0.64);
+  color: rgba(171, 192, 217, 0.64);
   font-size: 0.92rem;
   line-height: 1;
 }
@@ -243,8 +243,8 @@
   padding: 0 1rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 240, 221, 0.12);
-  background: rgba(255, 247, 235, 0.05);
-  color: rgba(248, 247, 245, 0.92);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(227, 242, 255, 0.92);
   font-size: 0.86rem;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -255,8 +255,8 @@
 
 .publicRailLink:hover {
   transform: translateY(-1px);
-  background: rgba(212, 171, 115, 0.16);
-  border-color: rgba(255, 240, 221, 0.22);
+  background: rgba(111, 198, 255, 0.16);
+  border-color: rgba(214, 228, 244, 0.22);
 }
 
 .section {
@@ -303,7 +303,7 @@
 
 .eyebrowOnDark {
   color: var(--marketing-text-reverse);
-  border-color: rgba(248, 247, 245, 0.2);
+  border-color: rgba(214, 228, 244, 0.2);
   background: rgba(255, 255, 255, 0.03);
 }
 
@@ -368,6 +368,7 @@
 }
 
 .buttonPrimary,
+.buttonPico,
 .buttonSecondary,
 .buttonGhost {
   position: relative;
@@ -397,6 +398,7 @@
 }
 
 .buttonPrimary::after,
+.buttonPico::after,
 .buttonSecondary::after,
 .buttonGhost::after {
   content: "";
@@ -415,30 +417,48 @@
 }
 
 .buttonPrimary:hover,
+.buttonPico:hover,
 .buttonSecondary:hover,
 .buttonGhost:hover {
   transform: translateY(-1px);
 }
 
 .buttonPrimary:hover::after,
+.buttonPico:hover::after,
 .buttonSecondary:hover::after,
 .buttonGhost:hover::after {
   transform: translateX(120%);
 }
 
 .buttonPrimary {
-  background: linear-gradient(135deg, #edc492 0%, var(--marketing-accent) 100%);
-  color: #24160f;
+  background: linear-gradient(135deg, #dff2ff 0%, var(--marketing-accent) 100%);
+  color: #03111f;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    0 18px 42px rgba(85, 44, 21, 0.18);
+    0 18px 42px rgba(31, 93, 167, 0.18);
 }
 
 .buttonPrimary:hover {
-  background: linear-gradient(135deg, #f2d6af 0%, #d2683d 100%);
+  background: linear-gradient(135deg, #eff8ff 0%, #7ac5ff 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    0 24px 50px rgba(85, 44, 21, 0.22);
+    0 24px 50px rgba(31, 93, 167, 0.22);
+}
+
+.buttonPico {
+  border-color: rgba(159, 255, 78, 0.22);
+  background: linear-gradient(135deg, #dfff9a 0%, #52c51c 100%);
+  color: #071404;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 18px 42px rgba(73, 155, 24, 0.2);
+}
+
+.buttonPico:hover {
+  background: linear-gradient(135deg, #edffbf 0%, #6ddb2b 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 24px 50px rgba(73, 155, 24, 0.24);
 }
 
 .buttonSecondary {
@@ -452,13 +472,13 @@
 }
 
 .buttonGhost {
-  background: rgba(255, 247, 235, 0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--marketing-text-reverse);
   border-color: var(--marketing-border-reverse);
 }
 
 .buttonGhost:hover {
-  background: rgba(212, 171, 115, 0.14);
+  background: rgba(111, 198, 255, 0.14);
 }
 
 .utilityLinks {
@@ -551,7 +571,7 @@
   padding: 0.95rem 1rem;
   border-radius: 1.05rem;
   border: 1px solid var(--marketing-border);
-  background: rgba(255, 251, 244, 0.72);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--marketing-text-soft);
   font-size: 0.96rem;
   line-height: 1.45;
@@ -568,7 +588,7 @@
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid var(--marketing-border);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.9));
+  background: linear-gradient(180deg, rgba(14, 20, 31, 0.94), rgba(8, 12, 18, 0.98));
   min-height: 19rem;
 }
 
@@ -609,11 +629,16 @@
   width: 100%;
   border: 1px solid var(--marketing-border-strong);
   border-radius: 0.95rem;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(8, 12, 20, 0.86);
   color: var(--marketing-text);
   font: inherit;
   padding: 0.95rem 1rem;
   transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: rgba(145, 167, 195, 0.46);
 }
 
 .textarea {
@@ -625,8 +650,8 @@
 .textarea:focus,
 .select:focus {
   outline: none;
-  border-color: rgba(212, 171, 115, 0.82);
-  box-shadow: 0 0 0 3px rgba(212, 171, 115, 0.14);
+  border-color: rgba(111, 198, 255, 0.82);
+  box-shadow: 0 0 0 3px rgba(111, 198, 255, 0.14);
 }
 
 .error,
@@ -641,15 +666,15 @@
 }
 
 .error {
-  background: rgba(204, 51, 51, 0.08);
-  border: 1px solid rgba(204, 51, 51, 0.16);
-  color: #8b2929;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  color: #ffd1d1;
 }
 
 .success {
-  background: rgba(16, 133, 74, 0.08);
-  border: 1px solid rgba(16, 133, 74, 0.16);
-  color: #175f3d;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #d7ffe4;
 }
 
 .utilityPage {
@@ -681,9 +706,9 @@
 .routeDarkSection {
   padding: clamp(6rem, 9vw, 7.8rem) 0 clamp(3rem, 6vw, 4.5rem);
   background:
-    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.22), transparent 24rem),
-    radial-gradient(circle at 86% 10%, rgba(212, 171, 115, 0.11), transparent 28rem),
-    linear-gradient(180deg, #18110d 0%, #2a1e17 100%);
+    radial-gradient(circle at 16% 0%, rgba(111, 198, 255, 0.24), transparent 24rem),
+    radial-gradient(circle at 86% 10%, rgba(80, 126, 255, 0.14), transparent 28rem),
+    linear-gradient(180deg, #08101a 0%, #0f1b2d 100%);
   color: var(--marketing-text-reverse);
 }
 
@@ -692,8 +717,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 82% 24%, rgba(212, 171, 115, 0.12), transparent 26rem),
-    radial-gradient(circle at 22% 18%, rgba(212, 171, 115, 0.12), transparent 18rem);
+    radial-gradient(circle at 82% 24%, rgba(111, 198, 255, 0.14), transparent 26rem),
+    radial-gradient(circle at 22% 18%, rgba(80, 126, 255, 0.14), transparent 18rem);
   opacity: 0.9;
   animation: ambientShift 18s ease-in-out infinite;
   pointer-events: none;
@@ -707,7 +732,7 @@
   background: linear-gradient(
     90deg,
     rgba(248, 247, 245, 0),
-    rgba(248, 247, 245, 0.14),
+    rgba(214, 228, 244, 0.14),
     rgba(248, 247, 245, 0)
   );
 }
@@ -715,7 +740,7 @@
 .routeLightSection {
   padding: clamp(1.5rem, 3vw, 2.3rem) 0 clamp(4rem, 8vw, 5.5rem);
   background:
-    linear-gradient(180deg, rgba(255, 247, 235, 0.62), rgba(245, 237, 225, 0.96) 6rem),
+    linear-gradient(180deg, rgba(8, 12, 20, 0.98), rgba(5, 8, 14, 1) 6rem),
     var(--marketing-bg);
 }
 
@@ -771,13 +796,13 @@
   flex-wrap: wrap;
   gap: 0.8rem 1.2rem;
   align-items: center;
-  color: rgba(248, 247, 245, 0.68);
+  color: rgba(191, 214, 240, 0.72);
   font-size: 0.92rem;
   line-height: 1.5;
 }
 
 .routeDownloadMeta .inlineLink {
-  color: rgba(248, 247, 245, 0.9);
+  color: rgba(227, 242, 255, 0.92);
 }
 
 .routeDownloadMetaItem {
@@ -785,7 +810,7 @@
 }
 
 .routeDownloadMetaItem span {
-  color: rgba(248, 247, 245, 0.92);
+  color: rgba(227, 242, 255, 0.94);
   font-weight: 600;
 }
 
@@ -837,26 +862,26 @@
 
 .routeDownloadCard {
   min-height: 100%;
-  border-color: rgba(248, 247, 245, 0.12);
+  border-color: rgba(214, 228, 244, 0.12);
   background:
-    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.14), transparent 16rem),
+    radial-gradient(circle at 16% 0%, rgba(111, 198, 255, 0.16), transparent 16rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.96), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.24);
   min-height: 14.5rem;
 }
 
 .routeDownloadCard .bodyText {
-  color: rgba(248, 247, 245, 0.7);
+  color: rgba(191, 214, 240, 0.74);
 }
 
 .routeDownloadCard .inlineLink {
-  color: rgba(248, 247, 245, 0.9);
+  color: rgba(227, 242, 255, 0.92);
 }
 
 .routeDownloadCard .routeCardIcon {
-  border-color: rgba(248, 247, 245, 0.12);
+  border-color: rgba(214, 228, 244, 0.12);
   background:
-    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.18), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(111, 198, 255, 0.18), transparent 70%),
     rgba(255, 255, 255, 0.04);
 }
 
@@ -867,9 +892,9 @@
 }
 
 .routeArtifactPanel {
-  border-color: rgba(248, 247, 245, 0.12);
+  border-color: rgba(214, 228, 244, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.14), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(111, 198, 255, 0.16), transparent 22rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.94), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.22);
 }
@@ -883,21 +908,21 @@
 }
 
 .routeArtifactPanel .bodyText {
-  color: rgba(248, 247, 245, 0.72);
+  color: rgba(191, 214, 240, 0.76);
 }
 
 .routeArtifactPanel .eyebrow {
-  border-color: rgba(248, 247, 245, 0.18);
+  border-color: rgba(214, 228, 244, 0.18);
   background: rgba(255, 255, 255, 0.04);
-  color: rgba(248, 247, 245, 0.84);
+  color: rgba(227, 242, 255, 0.86);
 }
 
 .routeArtifactPanel .routeMetaLabel {
-  color: rgba(248, 247, 245, 0.54);
+  color: rgba(145, 167, 195, 0.68);
 }
 
 .routeArtifactPanel .routeMetaValue {
-  color: rgba(248, 247, 245, 0.94);
+  color: rgba(227, 242, 255, 0.94);
 }
 
 .routeArtifactList {
@@ -907,7 +932,7 @@
 
 .routeArtifactList .routeMetaItem {
   padding-top: 0.9rem;
-  border-top-color: rgba(248, 247, 245, 0.1);
+  border-top-color: rgba(214, 228, 244, 0.1);
 }
 
 .contactHero {
@@ -930,7 +955,7 @@
 
 .contactHeroAsideNote {
   margin: 0;
-  color: rgba(248, 247, 245, 0.68);
+  color: rgba(191, 214, 240, 0.72);
   font-size: 0.92rem;
   line-height: 1.5;
 }
@@ -949,15 +974,15 @@
 }
 
 .routeFormPanel {
-  background: rgba(255, 255, 255, 0.94);
+  background: linear-gradient(180deg, rgba(11, 16, 25, 0.96), rgba(7, 10, 16, 0.98));
   backdrop-filter: blur(10px);
-  box-shadow: 0 26px 60px rgba(10, 18, 38, 0.1);
+  box-shadow: 0 26px 60px rgba(2, 8, 22, 0.18);
 }
 
 .routeHeroPanel {
-  border-color: rgba(248, 247, 245, 0.12);
+  border-color: rgba(214, 228, 244, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.16), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(111, 198, 255, 0.18), transparent 22rem),
     linear-gradient(180deg, rgba(14, 17, 26, 0.96), rgba(9, 11, 18, 0.98));
   color: var(--marketing-text-reverse);
   box-shadow: 0 30px 80px rgba(3, 8, 20, 0.24);
@@ -975,21 +1000,21 @@
 }
 
 .routeHeroPanel .eyebrow {
-  border-color: rgba(248, 247, 245, 0.18);
+  border-color: rgba(214, 228, 244, 0.18);
   background: rgba(255, 255, 255, 0.04);
-  color: rgba(248, 247, 245, 0.84);
+  color: rgba(227, 242, 255, 0.86);
 }
 
 .routeHeroPanel .bodyText {
-  color: rgba(248, 247, 245, 0.72);
+  color: rgba(191, 214, 240, 0.76);
 }
 
 .routeHeroPanel .inlineLink {
-  color: rgba(248, 247, 245, 0.88);
+  color: rgba(227, 242, 255, 0.9);
 }
 
 .routeInfoPanel {
-  background: rgba(255, 255, 255, 0.94);
+  background: linear-gradient(180deg, rgba(11, 16, 25, 0.96), rgba(7, 10, 16, 0.98));
 }
 
 .routeCardsGrid {
@@ -1013,7 +1038,7 @@
 
 .routeCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(212, 171, 115, 0.24);
+  border-color: rgba(111, 198, 255, 0.24);
   box-shadow: 0 28px 68px rgba(10, 18, 38, 0.14);
 }
 
@@ -1026,7 +1051,7 @@
   border-radius: 1rem;
   border: 1px solid rgba(7, 7, 7, 0.1);
   background:
-    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.14), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(111, 198, 255, 0.14), transparent 70%),
     rgba(7, 7, 7, 0.04);
 }
 
@@ -1043,7 +1068,7 @@
   overflow: hidden;
   min-height: clamp(24rem, 40vw, 34rem);
   border-radius: 1.5rem;
-  border: 1px solid rgba(248, 247, 245, 0.12);
+  border: 1px solid rgba(214, 228, 244, 0.12);
   background:
     radial-gradient(circle at 20% 20%, rgba(92, 165, 255, 0.26), transparent 28%),
     linear-gradient(180deg, rgba(12, 13, 18, 0.86), rgba(8, 8, 10, 0.98));
@@ -1057,7 +1082,7 @@
   width: 16rem;
   height: 16rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(212, 171, 115, 0.24), transparent 64%);
+  background: radial-gradient(circle, rgba(111, 198, 255, 0.26), transparent 64%);
   filter: blur(4px);
   pointer-events: none;
   animation: glowPulse 10s ease-in-out infinite;
@@ -1089,8 +1114,8 @@
   gap: 1rem;
   align-content: start;
   background:
-    radial-gradient(circle at 20% 0%, rgba(212, 171, 115, 0.1), transparent 20rem),
-    rgba(255, 255, 255, 0.92);
+    radial-gradient(circle at 20% 0%, rgba(111, 198, 255, 0.12), transparent 20rem),
+    linear-gradient(180deg, rgba(11, 16, 25, 0.96), rgba(7, 10, 16, 0.98));
 }
 
 .routeMetaList {
@@ -1159,10 +1184,10 @@
   padding: clamp(2.5rem, 6vw, 4rem);
   border-radius: 1.8rem;
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(236, 223, 205, 0.94));
-  border: 1px solid rgba(58, 38, 25, 0.08);
-  box-shadow: 0 30px 80px rgba(50, 28, 16, 0.12);
+    radial-gradient(circle at 50% 0%, rgba(111, 198, 255, 0.16), transparent 24rem),
+    linear-gradient(180deg, rgba(12, 18, 28, 0.98), rgba(7, 10, 16, 0.96));
+  border: 1px solid rgba(166, 201, 255, 0.1);
+  box-shadow: 0 30px 80px rgba(2, 8, 22, 0.16);
   animation: fadeUpIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -1224,27 +1249,27 @@
 }
 
 .downloadPage .footerBottom {
-  border-top-color: rgba(248, 247, 245, 0.12);
+  border-top-color: rgba(214, 228, 244, 0.12);
 }
 
 .releasesPage .footerBottom {
-  border-top-color: rgba(248, 247, 245, 0.12);
+  border-top-color: rgba(214, 228, 244, 0.12);
 }
 
 .downloadPage .footerLink {
-  color: rgba(248, 247, 245, 0.78);
+  color: rgba(191, 214, 240, 0.8);
 }
 
 .releasesPage .footerLink {
-  color: rgba(248, 247, 245, 0.78);
+  color: rgba(191, 214, 240, 0.8);
 }
 
 .downloadPage .footerMeta {
-  color: rgba(248, 247, 245, 0.56);
+  color: rgba(145, 167, 195, 0.64);
 }
 
 .releasesPage .footerMeta {
-  color: rgba(248, 247, 245, 0.56);
+  color: rgba(145, 167, 195, 0.64);
 }
 
 .contactHeroStage {
@@ -1267,7 +1292,7 @@
   min-height: clamp(16rem, 46vw, 22rem);
   border-radius: 1.25rem;
   overflow: hidden;
-  border: 1px solid rgba(248, 247, 245, 0.1);
+  border: 1px solid rgba(214, 228, 244, 0.1);
   background: rgba(255, 255, 255, 0.04);
   box-shadow: 0 24px 64px rgba(3, 3, 8, 0.28);
 }

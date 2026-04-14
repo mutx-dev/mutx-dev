@@ -5,6 +5,9 @@ import {
   AppWindow,
   ArrowRight,
   BookOpenText,
+  Download,
+  FileCheck2,
+  LayoutDashboard,
   ShieldCheck,
 } from "lucide-react";
 
@@ -131,6 +134,37 @@ export default async function ReleasesPage() {
     "Docs notes, checksums, and GitHub point at the same build.",
     "Preview surfaces stay out of the primary release lane.",
   ] as const;
+  const releaseFlow: ReadonlyArray<{
+    title: string;
+    body: string;
+    href: string;
+    label: string;
+    icon: typeof Download;
+    external?: boolean;
+  }> = [
+    {
+      title: "Pick the signed build",
+      body: "Apple Silicon stays first, Intel stays available, and the public download lane always hands off to the current stable desktop release.",
+      href: "/download",
+      label: "Open downloads",
+      icon: Download,
+    },
+    {
+      title: "Verify the artifact set",
+      body: "Checksums, docs-backed notes, and the GitHub release all stay pinned to the same version so rollout review never drifts from the binary.",
+      href: checksumsHref,
+      label: "Verify checksums",
+      icon: FileCheck2,
+      external: true,
+    },
+    {
+      title: "Move into the runtime",
+      body: "Install the Mac app, open the operator surface, and continue from a release lane into the live dashboard without guessing which build is active.",
+      href: "/dashboard",
+      label: "Open dashboard",
+      icon: LayoutDashboard,
+    },
+  ];
 
   return (
     <PublicSurface className={`${styles.page} ${styles.publicPage} ${styles.releasesPage}`}>
@@ -270,6 +304,70 @@ export default async function ReleasesPage() {
                   ))}
                 </div>
               </aside>
+
+              <div className={`${styles.routeDownloadCards} ${styles.routeCardsGridCompact}`}>
+                {releaseFlow.map((step, index) =>
+                  step.external ? (
+                    <a
+                      key={step.title}
+                      href={step.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeCard} ${styles.routeDownloadCard}`}
+                    >
+                      <div className={styles.routeCardIcon}>
+                        <step.icon className="h-4 w-4" />
+                      </div>
+                      <p className={styles.routeMetaLabel}>Step 0{index + 1}</p>
+                      <h3 className={styles.routeCardTitle}>{step.title}</h3>
+                      <p className={styles.bodyText}>{step.body}</p>
+                      <span className={styles.inlineLink}>
+                        {step.label}
+                        <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </a>
+                  ) : (
+                    <Link
+                      key={step.title}
+                      href={step.href}
+                      className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeCard} ${styles.routeDownloadCard}`}
+                    >
+                      <div className={styles.routeCardIcon}>
+                        <step.icon className="h-4 w-4" />
+                      </div>
+                      <p className={styles.routeMetaLabel}>Step 0{index + 1}</p>
+                      <h3 className={styles.routeCardTitle}>{step.title}</h3>
+                      <p className={styles.bodyText}>{step.body}</p>
+                      <span className={styles.inlineLink}>
+                        {step.label}
+                        <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </Link>
+                  ),
+                )}
+              </div>
+
+              <div className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeHeroPanel}`}>
+                <div className={styles.intro}>
+                  <p className={styles.eyebrow}>Release flow</p>
+                  <h2 className={styles.sectionTitle}>One lane from binary to runtime.</h2>
+                  <p className={styles.bodyText}>
+                    The release page now reads in the same order the product does:
+                    choose the build, verify the exact artifact set, then step
+                    directly into the operator surface.
+                  </p>
+                </div>
+
+                <div className={styles.ctaRow}>
+                  <Link href="/download" className={styles.buttonPrimary}>
+                    Open Mac downloads
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <a href={docsReleaseNotesHref} target="_blank" rel="noopener noreferrer" className={styles.buttonGhost}>
+                    Read docs notes
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>

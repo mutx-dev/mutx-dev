@@ -1,3 +1,16 @@
+const PICO_HOSTS = new Set(["pico.mutx.dev", "pico.mutxx.dev", "pico.localhost"]);
+
+export function getDefaultRedirectPathForHost(
+  hostname?: string | null,
+  fallback = "/dashboard",
+) {
+  if (!hostname) {
+    return fallback;
+  }
+
+  return PICO_HOSTS.has(hostname.toLowerCase()) ? "/" : fallback;
+}
+
 export function resolveRedirectPath(
   nextPath?: string | null,
   fallback = "/dashboard",

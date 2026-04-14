@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpenText, Download, FileCheck2, LayoutDashboard, ShieldCheck } from "lucide-react";
 
 import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
@@ -84,6 +84,37 @@ export default async function MacDownloadPage() {
       icon: ShieldCheck,
       label: "View checksums",
       external: true,
+    },
+  ];
+  const installFlow: ReadonlyArray<{
+    title: string;
+    body: string;
+    href: string;
+    label: string;
+    icon: typeof Download;
+    external?: boolean;
+  }> = [
+    {
+      title: "Choose the Mac lane",
+      body: "Apple Silicon is the default path. Intel remains available when you need a compatible signed build for older hardware.",
+      href: "/releases",
+      label: "View release lane",
+      icon: Download,
+    },
+    {
+      title: "Confirm the artifact set",
+      body: "Checksums and docs notes stay aligned with the exact version you install, so rollout review happens before you open the app.",
+      href: checksumsHref,
+      label: "Check artifact proof",
+      icon: FileCheck2,
+      external: true,
+    },
+    {
+      title: "Hand off to the operator surface",
+      body: "After install, continue straight into the MUTX dashboard and work from the runtime that matches the signed public release.",
+      href: "/dashboard",
+      label: "Open dashboard",
+      icon: LayoutDashboard,
     },
   ];
 
@@ -216,8 +247,72 @@ export default async function MacDownloadPage() {
                     {card.label}
                     <ArrowRight className="h-4 w-4" />
                   </span>
-                </a>
+                  </a>
               ))}
+            </div>
+
+            <div className={`${styles.routeDownloadCards} ${styles.routeCardsGridCompact}`}>
+              {installFlow.map((step, index) =>
+                step.external ? (
+                  <a
+                    key={step.title}
+                    href={step.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeCard} ${styles.routeDownloadCard}`}
+                  >
+                    <div className={styles.routeCardIcon}>
+                      <step.icon className="h-4 w-4" />
+                    </div>
+                    <p className={styles.routeMetaLabel}>Step 0{index + 1}</p>
+                    <h3 className={styles.routeCardTitle}>{step.title}</h3>
+                    <p className={styles.bodyText}>{step.body}</p>
+                    <span className={styles.inlineLink}>
+                      {step.label}
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </a>
+                ) : (
+                  <Link
+                    key={step.title}
+                    href={step.href}
+                    className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeCard} ${styles.routeDownloadCard}`}
+                  >
+                    <div className={styles.routeCardIcon}>
+                      <step.icon className="h-4 w-4" />
+                    </div>
+                    <p className={styles.routeMetaLabel}>Step 0{index + 1}</p>
+                    <h3 className={styles.routeCardTitle}>{step.title}</h3>
+                    <p className={styles.bodyText}>{step.body}</p>
+                    <span className={styles.inlineLink}>
+                      {step.label}
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </Link>
+                ),
+              )}
+            </div>
+
+            <div className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeHeroPanel}`}>
+              <div className={styles.intro}>
+                <p className={styles.eyebrow}>After install</p>
+                <h2 className={styles.sectionTitle}>Signed build in, operator flow on.</h2>
+                <p className={styles.bodyText}>
+                  The Mac download page now keeps the handoff explicit: pick the
+                  architecture, confirm the artifact proof, then continue into the
+                  live operator surface without breaking the visual rhythm of the site.
+                </p>
+              </div>
+
+              <div className={styles.ctaRow}>
+                <Link href="/dashboard" className={styles.buttonPrimary}>
+                  Open dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link href="/releases" className={styles.buttonGhost}>
+                  Back to releases
+                </Link>
+              </div>
             </div>
           </div>
         </section>

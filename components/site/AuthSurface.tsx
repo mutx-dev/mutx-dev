@@ -59,22 +59,22 @@ export function AuthSurface({
                 <div className="space-y-5">
                   <span className="studio-chip">{eyebrow}</span>
                   <div className="space-y-4">
-                    <h1 className="max-w-3xl font-[family:var(--font-site-display)] text-5xl leading-[0.92] tracking-[-0.08em] text-[#f7f0e4] sm:text-6xl">
+                    <h1 className="max-w-3xl font-[family:var(--font-site-display)] text-5xl leading-[0.92] tracking-[-0.08em] text-[#edf6ff] sm:text-6xl">
                       {title}
                     </h1>
-                    <p className="max-w-2xl text-base leading-8 text-[rgba(232,221,203,0.78)]">
+                    <p className="max-w-2xl text-base leading-8 text-[rgba(201,219,241,0.78)]">
                       {description}
                     </p>
                   </div>
 
                   <div className="studio-inset max-w-2xl rounded-[28px] p-4 sm:p-5">
-                    <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.22em] text-[#b9976d]">
+                    <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.22em] text-[#88ceff]">
                       {asideEyebrow}
                     </p>
-                    <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[#f7f0e4]">
+                    <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[#edf6ff]">
                       {asideTitle}
                     </h2>
-                    <p className="mt-3 text-sm leading-7 text-[rgba(232,221,203,0.74)]">
+                    <p className="mt-3 text-sm leading-7 text-[rgba(191,214,240,0.74)]">
                       {asideBody}
                     </p>
                   </div>
@@ -87,7 +87,7 @@ export function AuthSurface({
                       : "studio-plane relative overflow-hidden rounded-[32px] p-3 sm:p-4"
                   }
                 >
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,171,115,0.16),transparent_28%)]" />
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(111,198,255,0.18),transparent_28%)]" />
                   <Image
                     src={mediaSrc}
                     alt={mediaAlt}
@@ -118,22 +118,22 @@ export function AuthSurface({
               <div
                 className={
                   isRecovery
-                    ? "rounded-[34px] border border-[rgba(73,46,26,0.12)] bg-[linear-gradient(180deg,rgba(250,243,232,0.98),rgba(235,221,197,0.92))] p-5 text-[#2c1d15] shadow-[0_28px_80px_rgba(10,8,10,0.22)] sm:p-6 lg:p-7 lg:max-w-[52rem]"
-                    : "rounded-[34px] border border-[rgba(73,46,26,0.12)] bg-[linear-gradient(180deg,rgba(250,243,232,0.98),rgba(235,221,197,0.92))] p-5 text-[#2c1d15] shadow-[0_28px_80px_rgba(10,8,10,0.22)] sm:p-6 lg:p-7"
+                    ? "rounded-[34px] border border-[rgba(166,201,255,0.14)] bg-[linear-gradient(180deg,rgba(10,15,24,0.98),rgba(7,10,16,0.98))] p-5 text-[#edf6ff] shadow-[0_28px_80px_rgba(2,8,22,0.26)] sm:p-6 lg:p-7 lg:max-w-[52rem]"
+                    : "rounded-[34px] border border-[rgba(166,201,255,0.14)] bg-[linear-gradient(180deg,rgba(10,15,24,0.98),rgba(7,10,16,0.98))] p-5 text-[#edf6ff] shadow-[0_28px_80px_rgba(2,8,22,0.26)] sm:p-6 lg:p-7"
                 }
               >
                 {children}
               </div>
 
-              <div className="rounded-[32px] border border-[rgba(73,46,26,0.12)] bg-[linear-gradient(180deg,rgba(244,233,214,0.96),rgba(229,212,187,0.9))] p-5 text-[#392416] shadow-[0_24px_64px_rgba(10,8,10,0.18)] sm:p-6">
-                <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8b633b]">
+              <div className="rounded-[32px] border border-[rgba(166,201,255,0.14)] bg-[linear-gradient(180deg,rgba(12,18,28,0.96),rgba(7,10,16,0.98))] p-5 text-[#edf6ff] shadow-[0_24px_64px_rgba(2,8,22,0.22)] sm:p-6">
+                <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.22em] text-[#88ceff]">
                   {isRecovery ? "Recovery checklist" : "Operator checklist"}
                 </p>
                 <div className="mt-4 grid gap-3">
                   {highlights.map((item) => (
                     <div
                       key={item}
-                      className="rounded-[20px] border border-[rgba(88,58,34,0.12)] bg-[rgba(255,251,245,0.56)] px-4 py-3 text-sm leading-7 text-[rgba(57,36,22,0.82)]"
+                      className="rounded-[20px] border border-[rgba(166,201,255,0.12)] bg-[rgba(255,255,255,0.04)] px-4 py-3 text-sm leading-7 text-[rgba(191,214,240,0.82)]"
                     >
                       {item}
                     </div>

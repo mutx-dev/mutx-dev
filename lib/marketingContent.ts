@@ -1,4 +1,4 @@
-export type MarketingActionTone = 'primary' | 'secondary' | 'ghost' | 'utility'
+export type MarketingActionTone = 'primary' | 'secondary' | 'ghost' | 'utility' | 'pico'
 
 export type MarketingActionLink = {
   label: string
@@ -27,6 +27,16 @@ export type MarketingHomepage = {
     backgroundSrc: string
     backgroundAlt: string
     actions: MarketingActionLink[]
+  }
+  socialProof: {
+    tagline: string
+    title: string
+    body: string
+    items: Array<{
+      value: string
+      label: string
+      detail: string
+    }>
   }
   salesSections: {
     demo: {
@@ -82,7 +92,7 @@ const homepageActions: MarketingActionLink[] = [
     label: 'Go to PicoMUTX',
     href: 'https://pico.mutx.dev',
     external: true,
-    tone: 'primary',
+    tone: 'pico',
   },
   {
     label: 'Download for Mac',
@@ -110,6 +120,43 @@ export const marketingHomepage: MarketingHomepage = {
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
+  },
+  socialProof: {
+    tagline: 'Built for teams running AI agents in production',
+    title: 'Deep control-plane depth, not a thin wrapper.',
+    body: 'Audit history, RBAC, approvals, observability, and hard execution boundaries stay in one operating surface.',
+    items: [
+      {
+        value: '100%',
+        label: 'Audit coverage',
+        detail: 'Every run keeps a readable trail of steps, decisions, and changes.',
+      },
+      {
+        value: 'RBAC',
+        label: 'Governance built in',
+        detail: 'Roles, route-level enforcement, and boundaries stay explicit from the start.',
+      },
+      {
+        value: 'Approvals',
+        label: 'Human checkpoints',
+        detail: 'Insert review gates before risky actions turn into production incidents.',
+      },
+      {
+        value: 'Tracing',
+        label: 'Observability',
+        detail: 'Follow execution across agents, sessions, and downstream systems.',
+      },
+      {
+        value: 'Policies',
+        label: 'Guardrails',
+        detail: 'Constrain tools, access, and change scope before an agent can overreach.',
+      },
+      {
+        value: 'macOS',
+        label: 'Native desktop',
+        detail: 'Start locally with a real operator surface instead of raw config work.',
+      },
+    ],
   },
   salesSections: {
     demo: {

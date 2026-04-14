@@ -5,7 +5,15 @@
  * and a smoke test that SUMMARY.md is well-formed.
  */
 
-import { parseSummary, flatNav, getDocSitemapRoutes, type DocNavItem } from '../../lib/docs'
+import path from 'path'
+
+import {
+  parseSummary,
+  flatNav,
+  getDocSitemapRoutes,
+  resolveDocFileFromRoute,
+  type DocNavItem,
+} from '../../lib/docs'
 
 // -----------------------------------------------------------------------------
 // Helper constants (replicate lib/docs.ts internals for isolation)
@@ -177,5 +185,22 @@ describe('parseSummary integration', () => {
     const routes = getDocSitemapRoutes()
     const unique = new Set(routes)
     expect(routes.length).toBe(unique.size)
+  })
+
+  it('keeps deep API reference routes that resolve through docs/api/*.md', () => {
+    expect(resolveDocFileFromRoute('/docs/reference/authentication')).toBe(
+      path.join(process.cwd(), 'docs', 'api', 'authentication.md')
+    )
+    expect(getDocSitemapRoutes()).toContain('/docs/reference/authentication')
+  })
+
+  it('excludes summary entries that do not resolve to a docs page', () => {
+    const routes = getDocSitemapRoutes()
+
+    expect(resolveDocFileFromRoute('/docs/AGENTS')).toBeNull()
+    expect(routes).not.toContain('/docs/contributing')
+    expect(routes).not.toContain('/docs/security')
+    expect(routes).not.toContain('/docs/code_of_conduct')
+    expect(routes).not.toContain('/docs/AGENTS')
   })
 })

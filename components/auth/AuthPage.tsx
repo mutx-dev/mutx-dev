@@ -16,6 +16,7 @@ type AuthMode = "login" | "register";
 type AuthPageProps = {
   mode: AuthMode;
   nextPath?: string | null;
+  fallbackPath?: string;
   initialError?: string | null;
   initialEmail?: string | null;
 };
@@ -78,13 +79,14 @@ function buildAuthHref(mode: AuthMode, nextPath: string) {
 export function AuthPage({
   mode,
   nextPath,
+  fallbackPath = "/dashboard",
   initialError,
   initialEmail,
 }: AuthPageProps) {
   const router = useRouter();
   const content = authContent[mode];
   const isRegister = mode === "register";
-  const redirectPath = resolveRedirectPath(nextPath);
+  const redirectPath = resolveRedirectPath(nextPath, fallbackPath);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState(initialEmail ?? "");
@@ -229,10 +231,10 @@ export function AuthPage({
           ))}
         </div>
 
-        <div className="flex items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(77,58,45,0.58)]">
-          <span className="h-px flex-1 bg-[rgba(58,38,25,0.16)]" />
+        <div className="flex items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(145,167,195,0.62)]">
+          <span className="h-px flex-1 bg-[rgba(166,201,255,0.16)]" />
           Or use email
-          <span className="h-px flex-1 bg-[rgba(58,38,25,0.16)]" />
+          <span className="h-px flex-1 bg-[rgba(166,201,255,0.16)]" />
         </div>
 
         <form onSubmit={handleSubmit} className={styles.formWrap}>
