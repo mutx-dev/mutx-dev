@@ -113,6 +113,7 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 - [Platform Overview](./overview.md)
 - [Surface Matrix](./surfaces.md)
 - [App and Dashboard](./app-dashboard.md)
+- [v1.3 Release Notes](./releases/v1.3.md)
 - [v1.3 Release Checklist](./releases/v1.3-checklist.md)
 - [Manifesto](https://github.com/mutx-dev/mutx-dev/blob/main/manifesto.md)
 - [Technical Whitepaper](https://github.com/mutx-dev/mutx-dev/blob/main/whitepaper.md)
