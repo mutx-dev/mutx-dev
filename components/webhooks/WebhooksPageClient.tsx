@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Plus,
   Search,
@@ -21,7 +21,16 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { readJson, writeJson } from "@/components/app/http";
-import { LiveAuthRequired } from "@/components/dashboard/livePrimitives";
+import {
+  getWebhookDeliverySignal,
+  getWebhookLifecycleState,
+  type WebhookDeliverySignal,
+} from "@/components/app/operatorReadiness";
+import {
+  LiveAuthRequired,
+  formatRelativeTime,
+} from "@/components/dashboard/livePrimitives";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
 
 type WebhookDelivery = {
   id: string;
@@ -101,6 +110,7 @@ function normalizeDeliveries(payload: unknown): WebhookDelivery[] {
 
 export default function WebhooksPageClient() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
+  const [deliverySignals, setDeliverySignals] = useState<Record<string, WebhookDeliverySignal>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -115,6 +125,7 @@ export default function WebhooksPageClient() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const deliverySignalRequestRef = useRef(0);
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
@@ -154,6 +165,35 @@ export default function WebhooksPageClient() {
       )
     : webhooks;
 
+  const readinessSummary = useMemo(() => {
+    const summary = {
+      active: 0,
+      attention: 0,
+      healthy: 0,
+      notExercised: 0,
+    };
+
+    for (const webhook of webhooks) {
+      if (!webhook.is_active) continue;
+      summary.active += 1;
+
+      const signal = deliverySignals[webhook.id];
+      if (!signal) continue;
+
+      if (signal.status === "success") {
+        summary.healthy += 1;
+      }
+      if (signal.status === "warning" || signal.status === "error") {
+        summary.attention += 1;
+      }
+      if (signal.label === "not exercised") {
+        summary.notExercised += 1;
+      }
+    }
+
+    return summary;
+  }, [deliverySignals, webhooks]);
+
   const hasAuthError = Boolean(error && /unauthorized|forbidden|auth|token|sign in|login/i.test(error));
 
   async function fetchWebhooks() {
@@ -161,13 +201,52 @@ export default function WebhooksPageClient() {
       setLoading(true);
       setError(null);
       const data = await readJson<unknown>("/api/webhooks");
-      setWebhooks(normalizeWebhooks(data));
+      const nextWebhooks = normalizeWebhooks(data);
+      setWebhooks(nextWebhooks);
+      void hydrateDeliverySignals(nextWebhooks);
     } catch (err) {
       setWebhooks([]);
+      setDeliverySignals({});
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function hydrateDeliverySignals(nextWebhooks: Webhook[]) {
+    const requestId = ++deliverySignalRequestRef.current;
+
+    const nextSignals = await Promise.all(
+      nextWebhooks.map(async (webhook) => {
+        if (!webhook.is_active) {
+          return [webhook.id, getWebhookDeliverySignal(webhook, [])] as const;
+        }
+
+        try {
+          const payload = await readJson<unknown>(`/api/webhooks/${webhook.id}/deliveries?limit=5`);
+          return [webhook.id, getWebhookDeliverySignal(webhook, normalizeDeliveries(payload))] as const;
+        } catch (deliveryError) {
+          return [
+            webhook.id,
+            {
+              detail:
+                deliveryError instanceof Error
+                  ? deliveryError.message
+                  : "Failed to load recent delivery history.",
+              label: "delivery data unavailable",
+              lastDeliveryAt: null,
+              lastStatusCode: null,
+              recentAttempts: 0,
+              recentFailures: 0,
+              status: "warning",
+            } satisfies WebhookDeliverySignal,
+          ] as const;
+        }
+      }),
+    );
+
+    if (requestId !== deliverySignalRequestRef.current) return;
+    setDeliverySignals(Object.fromEntries(nextSignals));
   }
 
   async function fetchDeliveries(webhookId: string) {
@@ -285,6 +364,31 @@ export default function WebhooksPageClient() {
           >
             <X className="h-4 w-4" />
           </button>
+        </div>
+      )}
+
+      {!showForm && !viewingDeliveries && webhooks.length > 0 && (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="p-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Active routes</p>
+            <p className="mt-2 text-2xl font-semibold">{readinessSummary.active}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Webhooks that can accept test or live deliveries.</p>
+          </Card>
+          <Card className="p-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Healthy sample</p>
+            <p className="mt-2 text-2xl font-semibold">{readinessSummary.healthy}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Active routes whose recent delivery sample is succeeding.</p>
+          </Card>
+          <Card className="p-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Attention needed</p>
+            <p className="mt-2 text-2xl font-semibold">{readinessSummary.attention}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Routes currently failing, recovering, stale, or missing delivery data.</p>
+          </Card>
+          <Card className="p-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Not exercised</p>
+            <p className="mt-2 text-2xl font-semibold">{readinessSummary.notExercised}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Active routes with no recorded delivery attempts yet.</p>
+          </Card>
         </div>
       )}
 
@@ -509,19 +613,30 @@ export default function WebhooksPageClient() {
       ) : (
         !viewingDeliveries && (
           <div className="space-y-4">
-            {filteredWebhooks.map((webhook) => (
-              <Card key={webhook.id} className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
+            {filteredWebhooks.map((webhook) => {
+              const lifecycle = getWebhookLifecycleState(webhook);
+              const deliverySignal =
+                deliverySignals[webhook.id] ??
+                ({
+                  detail: "Loading recent delivery sample.",
+                  label: "probing",
+                  lastDeliveryAt: null,
+                  lastStatusCode: null,
+                  recentAttempts: 0,
+                  recentFailures: 0,
+                  status: "idle",
+                } satisfies WebhookDeliverySignal);
+
+              return (
+                <Card key={webhook.id} className="p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <code className="text-sm bg-muted px-2 py-1 rounded">
                         {webhook.url}
                       </code>
-                      {webhook.is_active ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4 text-amber-500" />
-                      )}
+                      <StatusBadge status={lifecycle.status} label={lifecycle.label} />
+                      <StatusBadge status={deliverySignal.status} label={deliverySignal.label} />
                       <button
                         onClick={() => handleCopyId(webhook.id)}
                         className="flex items-center gap-1 rounded p-1 text-slate-500 hover:text-cyan-400 transition-colors"
@@ -542,46 +657,57 @@ export default function WebhooksPageClient() {
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Created {new Date(webhook.created_at).toLocaleString()}
+                      {deliverySignal.lastDeliveryAt
+                        ? ` · last delivery ${formatRelativeTime(deliverySignal.lastDeliveryAt)}`
+                        : ""}
                     </p>
+                    <p className="text-xs text-muted-foreground">{deliverySignal.detail}</p>
+                    {deliverySignal.lastStatusCode ? (
+                      <p className="text-xs text-muted-foreground">
+                        Latest HTTP status {deliverySignal.lastStatusCode} across {deliverySignal.recentAttempts} sampled attempt
+                        {deliverySignal.recentAttempts === 1 ? "" : "s"}.
+                      </p>
+                    ) : null}
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setViewingDeliveries(webhook)}
-                      className="p-2 hover:bg-accent rounded-md"
-                      title="View delivery history"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleTest(webhook.id)}
-                      disabled={testingId === webhook.id}
-                      className="p-2 hover:bg-accent rounded-md disabled:opacity-50"
-                      title="Test webhook"
-                    >
-                      {testingId === webhook.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => startEdit(webhook)}
-                      className="p-2 hover:bg-accent rounded-md"
-                      title="Edit webhook"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(webhook.id)}
-                      className="p-2 hover:bg-accent rounded-md text-destructive"
-                      title="Delete webhook"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setViewingDeliveries(webhook)}
+                        className="p-2 hover:bg-accent rounded-md"
+                        title="View delivery history"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleTest(webhook.id)}
+                        disabled={testingId === webhook.id}
+                        className="p-2 hover:bg-accent rounded-md disabled:opacity-50"
+                        title="Test webhook"
+                      >
+                        {testingId === webhook.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Play className="h-4 w-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => startEdit(webhook)}
+                        className="p-2 hover:bg-accent rounded-md"
+                        title="Edit webhook"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(webhook.id)}
+                        className="p-2 hover:bg-accent rounded-md text-destructive"
+                        title="Delete webhook"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )
       )}

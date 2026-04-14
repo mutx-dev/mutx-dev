@@ -14,29 +14,41 @@ Issue: `#3592`
 
 Make the dashboard the shared operator summary layer for webhook and API-key depth, while keeping the API and CLI as thin contract clients underneath it.
 
-That means phase 1 should add truthful summary and status structure in the dashboard, not a new backend abstraction. The goal is to make the current lifecycle data easier to understand and compare, then leave deeper unification for later phases.
+That means phase 1 should add truthful summary and status structure in the dashboard and CLI, not a new backend abstraction. The goal is to make the current lifecycle data easier to understand and compare, then leave deeper unification for later phases.
+
+## Shared Status Vocabulary
+
+- API keys keep a lifecycle state of `active`, `expired`, or `revoked`.
+- Active API keys also expose a readiness cue of `ready`, `expires soon`, `unused`, or `stale`.
+- Webhooks keep a lifecycle state of `active` or `inactive`.
+- Active webhooks also expose a delivery cue of `healthy`, `recovering`, `failing`, `stale`, or `not exercised`.
+- Dashboard and CLI compute those cues from existing list and delivery-history payloads only. No backend contract expansion is required for this phase.
 
 ## File-Level Map
 
 - `components/dashboard/ApiKeysPageClient.tsx`
   - keep the existing lifecycle actions
   - surface compact key-risk summary signals that operators can scan quickly
+  - use the shared lifecycle and readiness labels above
 - `components/webhooks/WebhooksPageClient.tsx`
   - keep CRUD and delivery history
   - add a matching summary treatment so webhook state reads like an operator surface, not just a form
+  - use recent delivery-history samples to compute truthful health cues
 - `src/api/routes/api_keys.py`
   - remain the source of truth for API-key lifecycle and one-time secret issuance
 - `src/api/routes/webhooks.py`
   - remain the source of truth for webhook lifecycle, delivery inspection, and test dispatch
 - `cli/commands/api_keys.py`
   - keep command names and response handling aligned with the backend contract
+  - render the same lifecycle/readiness labels as the dashboard
 - `cli/commands/webhooks.py`
   - keep list/get/deliveries commands aligned with the backend contract
+  - render the same lifecycle/delivery labels as the dashboard and expose the test action
 
 ## Phased Build Sequence
 
-1. Phase 1: add the smallest truthful dashboard summary layer for keys and webhooks, using existing API payloads only.
-2. Phase 2: tighten naming, status labels, and empty states so the two surfaces read consistently across dashboard and CLI.
+1. Phase 1: add the smallest truthful dashboard and CLI summary layer for keys and webhooks, using existing API payloads only.
+2. Phase 2: decide whether create, update, delete, and test actions need more CLI parity or whether the current dashboard-first split is enough.
 3. Phase 3: decide whether any backend aggregation endpoint is justified, but only after the UI proves a shared summary actually helps.
 
 ## Risks
@@ -56,4 +68,6 @@ That means phase 1 should add truthful summary and status structure in the dashb
   - `cli/commands/webhooks.py`
 - Keep future validation lightweight for phase 1:
   - `sed` or `rg` for contract drift
-  - local frontend build or targeted tests only if code changes land later
+  - targeted Jest tests for the shared readiness helpers
+  - targeted CLI contract tests for status output and webhook test dispatch
+  - local frontend build after dashboard changes land

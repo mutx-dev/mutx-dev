@@ -5,6 +5,12 @@ import { Copy, KeyRound, RefreshCcw, Trash2 } from "lucide-react";
 
 import { ApiRequestError, normalizeCollection, readJson } from "@/components/app/http";
 import {
+  getApiKeyLastUsed,
+  getApiKeyLifecycleState,
+  getApiKeyReadinessSignal,
+  isApiKeyUsable,
+} from "@/components/app/operatorReadiness";
+import {
   LiveAuthRequired,
   LiveEmptyState,
   LiveErrorState,
@@ -48,51 +54,9 @@ function isApiKeyCreateResponse(value: unknown): value is ApiKeyCreateResponse {
   );
 }
 
-function keyLastUsed(key: ApiKeyRecord) {
-  return key.last_used_at ?? key.last_used ?? null;
-}
-
-function isKeyActive(key: ApiKeyRecord) {
-  if (typeof key.is_active === "boolean") {
-    return key.is_active;
-  }
-
-  const normalizedStatus = (key.status ?? "").toLowerCase();
-  if (normalizedStatus.includes("revoked") || normalizedStatus.includes("inactive")) {
-    return false;
-  }
-
-  if (key.expires_at) {
-    const expiresAt = new Date(key.expires_at).getTime();
-    if (!Number.isNaN(expiresAt) && expiresAt <= Date.now()) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 function maskKeyId(id: string) {
   if (id.length <= 10) return id;
   return `${id.slice(0, 6)}...${id.slice(-4)}`;
-}
-
-function getExpiryLabel(expiresAt?: string | null) {
-  if (!expiresAt) return null;
-
-  const millis = new Date(expiresAt).getTime();
-  if (Number.isNaN(millis)) return null;
-
-  if (millis <= Date.now()) {
-    return { label: "expired", status: "error" as const };
-  }
-
-  const daysUntilExpiry = Math.ceil((millis - Date.now()) / 86_400_000);
-  if (daysUntilExpiry <= 7) {
-    return { label: `expires in ${daysUntilExpiry}d`, status: "warning" as const };
-  }
-
-  return null;
 }
 
 function sortKeys(keys: ApiKeyRecord[]) {
@@ -153,14 +117,11 @@ export function ApiKeysPageClient() {
     };
   }, []);
 
-  const activeKeys = useMemo(
-    () => keys.filter((key) => isKeyActive(key)),
-    [keys],
-  );
+  const activeKeys = useMemo(() => keys.filter((key) => isApiKeyUsable(key)), [keys]);
   const recentlyUsedKeys = useMemo(
     () =>
       keys.filter((key) => {
-        const lastUsed = keyLastUsed(key);
+        const lastUsed = getApiKeyLastUsed(key);
         if (!lastUsed) return false;
         const millis = new Date(lastUsed).getTime();
         return !Number.isNaN(millis) && millis >= Date.now() - 7 * 86_400_000;
@@ -168,7 +129,15 @@ export function ApiKeysPageClient() {
     [keys],
   );
   const expiringSoon = useMemo(
-    () => activeKeys.filter((key) => getExpiryLabel(key.expires_at)?.status === "warning"),
+    () => activeKeys.filter((key) => getApiKeyReadinessSignal(key)?.label === "expires soon"),
+    [activeKeys],
+  );
+  const attentionKeys = useMemo(
+    () =>
+      activeKeys.filter((key) => {
+        const readiness = getApiKeyReadinessSignal(key);
+        return Boolean(readiness && readiness.status !== "success");
+      }),
     [activeKeys],
   );
 
@@ -296,10 +265,10 @@ export function ApiKeysPageClient() {
           detail="Keys with a recent `last used` signal in the last 7 days."
         />
         <LiveStatCard
-          label="Expiring soon"
-          value={String(expiringSoon.length)}
-          detail="Active keys expiring within the next 7 days."
-          status={asDashboardStatus(expiringSoon.length > 0 ? "warning" : "healthy")}
+          label="Attention needed"
+          value={String(attentionKeys.length)}
+          detail={`Includes ${expiringSoon.length} key${expiringSoon.length === 1 ? "" : "s"} in the 7-day rotation window.`}
+          status={asDashboardStatus(attentionKeys.length > 0 ? "warning" : "healthy")}
         />
         <LiveStatCard
           label="One-time reveal"
@@ -379,7 +348,7 @@ export function ApiKeysPageClient() {
             ) : null}
           </LivePanel>
 
-          <LivePanel title="Key registry" meta={`${keys.length} records`}>
+          <LivePanel title="Key registry" meta={`${keys.length} records · ${attentionKeys.length} attention`}>
             {keys.length === 0 ? (
               <LiveEmptyState
                 title="No API keys provisioned yet"
@@ -388,9 +357,10 @@ export function ApiKeysPageClient() {
             ) : (
               <div className="space-y-3">
                 {keys.map((key) => {
-                  const lastUsed = keyLastUsed(key);
-                  const active = isKeyActive(key);
-                  const expiry = getExpiryLabel(key.expires_at);
+                  const lastUsed = getApiKeyLastUsed(key);
+                  const lifecycle = getApiKeyLifecycleState(key);
+                  const readiness = getApiKeyReadinessSignal(key);
+                  const active = lifecycle.label === "active";
 
                   return (
                     <div key={key.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
@@ -398,13 +368,8 @@ export function ApiKeysPageClient() {
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="truncate text-sm font-medium text-white">{key.name}</p>
-                            <StatusBadge
-                              status={active ? "success" : "idle"}
-                              label={active ? "active" : "inactive"}
-                            />
-                            {expiry ? (
-                              <StatusBadge status={expiry.status} label={expiry.label} />
-                            ) : null}
+                            <StatusBadge status={lifecycle.status} label={lifecycle.label} />
+                            {readiness ? <StatusBadge status={readiness.status} label={readiness.label} /> : null}
                           </div>
                           <p className="mt-2 font-mono text-xs text-slate-500">{maskKeyId(key.id)}</p>
                           <div className="mt-3 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
@@ -413,7 +378,7 @@ export function ApiKeysPageClient() {
                               last used {lastUsed ? formatRelativeTime(lastUsed) : "never"}
                             </div>
                             <div>expires {key.expires_at ? formatDateTime(key.expires_at) : "no expiry"}</div>
-                            <div>scopes {(key.scopes ?? []).join(", ") || "default"}</div>
+                            <div>operator health {readiness?.detail ?? lifecycle.detail}</div>
                           </div>
                         </div>
 
