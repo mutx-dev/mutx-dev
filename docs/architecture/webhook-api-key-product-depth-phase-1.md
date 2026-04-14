@@ -57,4 +57,3 @@ That means phase 1 should add truthful summary and status structure in the dashb
 - Keep future validation lightweight for phase 1:
   - `sed` or `rg` for contract drift
   - local frontend build or targeted tests only if code changes land later
-
