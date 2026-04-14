@@ -8,6 +8,7 @@ import { motion, useInView, useReducedMotion } from 'framer-motion'
 import {
   marketingHomepage,
   type MarketingActionLink,
+  type MarketingActionTone,
   type MarketingHomepage,
 } from '@/lib/marketingContent'
 
@@ -38,6 +39,7 @@ type TerminalPlaybackCardProps = {
   delay?: number
 }
 
+const prefetchedDemoMedia = new Set<string>()
 const TERMINAL_PROMPT_DELAY_MS = 160
 const TERMINAL_TYPING_STEP_MS = 18
 const TERMINAL_REPLY_STAGGER_MS = 240
@@ -69,6 +71,18 @@ function ActionLink({ action, className }: ActionLinkProps) {
       {icon}
     </Link>
   )
+}
+
+function prominentActionClassName(tone?: MarketingActionTone) {
+  switch (tone) {
+    case 'pico':
+      return core.buttonPico
+    case 'secondary':
+    case 'ghost':
+      return core.buttonGhost
+    default:
+      return core.buttonPrimary
+  }
 }
 
 function HoverCard({ className, children, delay = 0, distance = 18 }: HoverCardProps) {
@@ -232,7 +246,7 @@ function ActiveDemoMedia({ activeDemo }: { activeDemo: MarketingDemoItem }) {
         poster={activeDemo.mediaPosterSrc}
         ariaLabel={activeDemo.mediaAlt}
         className={home.demoVideo}
-        preload="metadata"
+        preload="auto"
       />
     )
   }
@@ -249,14 +263,44 @@ function ActiveDemoMedia({ activeDemo }: { activeDemo: MarketingDemoItem }) {
 }
 
 export function MarketingHomePage() {
+  const demoTabs = marketingHomepage.salesSections.demo.tabs
   const prefersReducedMotion = useReducedMotion()
-  const [activeDemoId, setActiveDemoId] = useState(marketingHomepage.salesSections.demo.tabs[0]?.id)
-  const demoBeatRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const [activeDemoId, setActiveDemoId] = useState(demoTabs[0]?.id)
+  const demoSectionRef = useRef<HTMLElement | null>(null)
+  const demoStateRefs = useRef<Array<HTMLDivElement | null>>([])
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
   const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.salesSections.cta.actions
-  const activeDemo =
-    marketingHomepage.salesSections.demo.tabs.find((tab) => tab.id === activeDemoId) ??
-    marketingHomepage.salesSections.demo.tabs[0]
+  const isDemoSectionNear = useInView(demoSectionRef, {
+    once: true,
+    margin: '320px 0px',
+  })
+  const activeDemoIndex = Math.max(demoTabs.findIndex((tab) => tab.id === activeDemoId), 0)
+  const activeDemo = demoTabs[activeDemoIndex] ?? demoTabs[0]
+
+  useEffect(() => {
+    if (!isDemoSectionNear) {
+      return
+    }
+
+    for (const tab of demoTabs) {
+      if (!prefetchedDemoMedia.has(tab.mediaSrc)) {
+        if (tab.mediaType === 'video') {
+          const video = document.createElement('video')
+          video.preload = 'auto'
+          video.src = tab.mediaSrc
+          video.load()
+        }
+
+        prefetchedDemoMedia.add(tab.mediaSrc)
+      }
+
+      if (tab.mediaPosterSrc && !prefetchedDemoMedia.has(tab.mediaPosterSrc)) {
+        const image = new Image()
+        image.src = tab.mediaPosterSrc
+        prefetchedDemoMedia.add(tab.mediaPosterSrc)
+      }
+    }
+  }, [demoTabs, isDemoSectionNear])
 
   useEffect(() => {
     let frameId = 0
@@ -264,13 +308,13 @@ export function MarketingHomePage() {
     const syncActiveDemoToScroll = () => {
       frameId = 0
 
-      const beatNodes = demoBeatRefs.current.filter((node): node is HTMLButtonElement => Boolean(node))
+      const beatNodes = demoStateRefs.current.filter((node): node is HTMLDivElement => Boolean(node))
 
       if (beatNodes.length === 0) {
         return
       }
 
-      const focusLine = window.innerHeight * 0.36
+      const focusLine = window.innerHeight * 0.52
       const nextDemoId = beatNodes
         .map((node) => ({
           id: node.getAttribute('data-demo-id'),
@@ -306,6 +350,24 @@ export function MarketingHomePage() {
       window.removeEventListener('resize', queueSync)
     }
   }, [])
+
+  const scrollToDemoState = (index: number) => {
+    const nextNode = demoStateRefs.current[index]
+    const nextDemo = demoTabs[index]
+
+    if (nextDemo) {
+      setActiveDemoId(nextDemo.id)
+    }
+
+    if (!nextNode) {
+      return
+    }
+
+    nextNode.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 
   return (
     <div className={`${core.page} ${core.homePage}`}>
@@ -357,9 +419,15 @@ export function MarketingHomePage() {
                   <p className={home.heroSupport}>{marketingHomepage.hero.support}</p>
                 )}
                 <div className={home.heroActions}>
-                  <ActionLink action={primaryAction} className={core.buttonPrimary} />
+                  <ActionLink
+                    action={primaryAction}
+                    className={prominentActionClassName(primaryAction?.tone)}
+                  />
                   {secondaryActions[0] ? (
-                    <ActionLink action={secondaryActions[0]} className={core.buttonGhost} />
+                    <ActionLink
+                      action={secondaryActions[0]}
+                      className={prominentActionClassName(secondaryActions[0].tone)}
+                    />
                   ) : null}
                   <div className={home.heroSecondaryActions}>
                     {secondaryActions.slice(1).map((action) => (
@@ -379,30 +447,29 @@ export function MarketingHomePage() {
         <section className={home.socialProofStrip} data-testid="homepage-social-proof">
           <div className={core.shell}>
             <div className={home.socialProofInner}>
-              <p className={home.socialProofTagline}>Trusted by teams running AI agents in production</p>
+              <div className={home.socialProofIntro}>
+                <p className={home.socialProofTagline}>{marketingHomepage.socialProof.tagline}</p>
+                <h2 className={home.socialProofTitle}>{marketingHomepage.socialProof.title}</h2>
+                <p className={home.socialProofBody}>{marketingHomepage.socialProof.body}</p>
+              </div>
               <div className={home.socialProofMetrics}>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>100%</p>
-                  <p className={home.socialProofLabel}>Audit Coverage</p>
-                </div>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>&lt;2 min</p>
-                  <p className={home.socialProofLabel}>Time to First Run</p>
-                </div>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>0</p>
-                  <p className={home.socialProofLabel}>Config Required</p>
-                </div>
-                <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>macOS</p>
-                  <p className={home.socialProofLabel}>Native Desktop</p>
-                </div>
+                {marketingHomepage.socialProof.items.map((item) => (
+                  <div key={item.label} className={home.socialProofMetric}>
+                    <p className={home.socialProofValue}>{item.value}</p>
+                    <p className={home.socialProofLabel}>{item.label}</p>
+                    <p className={home.socialProofDetail}>{item.detail}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </section>
 
-        <section className={home.demoSection} data-testid="homepage-demo-section">
+        <section
+          ref={demoSectionRef}
+          className={home.demoSection}
+          data-testid="homepage-demo-section"
+        >
           <div className={core.shell}>
             <div className={home.demoLayout}>
               <MarketingReveal className={home.demoIntro} distance={22}>
@@ -411,60 +478,67 @@ export function MarketingHomePage() {
                 <p className={home.sectionBody}>{marketingHomepage.salesSections.demo.body}</p>
               </MarketingReveal>
 
-              <div className={home.demoStory}>
-                <div className={home.demoBeats} data-testid="homepage-demo-beats">
-                  {marketingHomepage.salesSections.demo.tabs.map((tab, index) => {
-                    const isActive = tab.id === activeDemo.id
-
-                    return (
-                      <motion.button
-                        key={tab.id}
-                        ref={(node) => {
-                          demoBeatRefs.current[index] = node
-                        }}
-                        type="button"
-                        className={home.demoBeat}
-                        data-active={isActive ? '1' : '0'}
-                        data-demo-id={tab.id}
-                        onClick={() => setActiveDemoId(tab.id)}
-                        aria-pressed={isActive}
-                        initial={prefersReducedMotion ? false : { opacity: 0.72, y: 14 }}
-                        whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.45 }}
-                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                      >
-                        <span className={home.demoBeatMarker} aria-hidden="true">
-                          <span className={home.demoBeatIndex}>{`0${index + 1}`}</span>
-                          <span className={home.demoBeatLine} />
-                        </span>
-                        <span className={home.demoBeatCopy}>
-                          <span className={home.demoTabLabel}>{tab.label}</span>
-                          <span className={home.demoTabTitle}>{tab.title}</span>
-                          <span className={home.demoTabBody}>{tab.body}</span>
-                        </span>
-                      </motion.button>
-                    )
-                  })}
-                </div>
-
+              <div className={home.demoScroller}>
                 <div className={home.demoStickyStage}>
                   <div className={home.demoStickyInner}>
+                    <div className={home.demoNarrative}>
+                      <div className={home.demoStateNav} aria-label="Operator walkthrough states">
+                        {demoTabs.map((tab, index) => {
+                          const isActive = tab.id === activeDemo.id
+
+                          return (
+                            <button
+                              key={tab.id}
+                              type="button"
+                              className={home.demoStateButton}
+                              data-active={isActive ? '1' : '0'}
+                              onClick={() => scrollToDemoState(index)}
+                              aria-pressed={isActive}
+                            >
+                              <span className={home.demoStateNumber}>{`0${index + 1}`}</span>
+                              <span className={home.demoStateName}>{tab.label}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      <motion.div
+                        key={activeDemo.id}
+                        className={home.demoNarrativeCopy}
+                        initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <p className={home.demoMetaLabel}>{activeDemo.label}</p>
+                        <h3 className={home.demoStateTitle}>{activeDemo.title}</h3>
+                        <p className={home.demoStateBody}>{activeDemo.body}</p>
+                      </motion.div>
+                    </div>
+
                     <motion.div
                       key={activeDemo.id}
                       className={home.demoFrame}
                       data-testid="homepage-demo-panel"
                       initial={prefersReducedMotion ? false : { opacity: 0.88, y: 16, scale: 0.994 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                     >
                       <ActiveDemoMedia activeDemo={activeDemo} />
                     </motion.div>
-
-                    <div className={home.demoMeta}>
-                      <p className={home.demoMetaLabel}>{activeDemo.label}</p>
-                      <p className={home.demoMetaBody}>{activeDemo.body}</p>
-                    </div>
                   </div>
+                </div>
+
+                <div className={home.demoStateRail} aria-hidden="true">
+                  {demoTabs.map((tab, index) => (
+                    <div
+                      key={tab.id}
+                      ref={(node) => {
+                        demoStateRefs.current[index] = node
+                      }}
+                      className={home.demoStateStep}
+                      data-demo-id={tab.id}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
@@ -540,7 +614,10 @@ export function MarketingHomePage() {
                 <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.cta.title}</h2>
                 <p className={home.sectionBody}>{marketingHomepage.salesSections.cta.body}</p>
                 <div className={home.finalActions}>
-                  <ActionLink action={finalPrimaryAction} className={core.buttonPrimary} />
+                  <ActionLink
+                    action={finalPrimaryAction}
+                    className={prominentActionClassName(finalPrimaryAction?.tone)}
+                  />
                   <div className={home.finalSecondaryActions}>
                     {finalSecondaryActions.map((action) => (
                       <ActionLink
