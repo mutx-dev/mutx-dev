@@ -2,6 +2,8 @@ import type { NextRequest } from 'next/server'
 
 import { proxy } from '../../proxy'
 
+const authCookies = { access_token: 'token-123' }
+
 function mockRequest(
   url: string,
   headers: Record<string, string> = {},
@@ -150,15 +152,39 @@ describe('host-aware UI routing proxy', () => {
     )
   })
 
-  it('maps pico geolocation headers to supported locales on first visit', () => {
-    const jpResponse = proxy(
+  it('redirects anonymous pico host traffic into the login lane', () => {
+    const response = proxy(
       mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }),
     )
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2F')
+  })
+
+  it('maps pico geolocation headers to supported locales on first authenticated visit', () => {
+    const jpResponse = proxy(
+      mockRequest(
+        'https://pico.mutx.dev/',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
+        'GET',
+        authCookies,
+      ),
+    )
     const krResponse = proxy(
-      mockRequest('https://pico.mutxx.dev/', { host: 'pico.mutxx.dev', 'CF-IPCountry': 'KR' }),
+      mockRequest(
+        'https://pico.mutxx.dev/',
+        { host: 'pico.mutxx.dev', 'CF-IPCountry': 'KR' },
+        'GET',
+        authCookies,
+      ),
     )
     const cnResponse = proxy(
-      mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'CF-IPCountry': 'CN' }),
+      mockRequest(
+        'https://pico.mutx.dev/',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'CN' },
+        'GET',
+        authCookies,
+      ),
     )
 
     expect(jpResponse.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
@@ -174,7 +200,7 @@ describe('host-aware UI routing proxy', () => {
         'https://pico.mutxx.dev/',
         { host: 'pico.mutxx.dev', 'CF-IPCountry': 'JP' },
         'GET',
-        { NEXT_LOCALE: 'es' },
+        { ...authCookies, NEXT_LOCALE: 'es' },
       ),
     )
 
@@ -186,6 +212,8 @@ describe('host-aware UI routing proxy', () => {
       mockRequest(
         'https://pico.mutxx.dev/',
         { host: 'pico.mutxx.dev', 'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8' },
+        'GET',
+        authCookies,
       ),
     )
 
@@ -208,6 +236,19 @@ describe('host-aware UI routing proxy', () => {
     expect(registerResponse.status).toBe(200)
     expect(registerResponse.headers.get('x-middleware-rewrite')).toBeNull()
     expect(registerResponse.headers.get('location')).toBeNull()
+  })
+
+  it('allows verify-email on the pico host without forcing an authenticated session first', () => {
+    const response = proxy(
+      mockRequest(
+        'https://pico.mutx.dev/verify-email?token=test-token',
+        { host: 'pico.mutx.dev' },
+      ),
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
+    expect(response.headers.get('location')).toBeNull()
   })
 
   it('still applies rate-limit headers on protected auth endpoints', () => {

@@ -6,7 +6,10 @@ import {
   getCookieDomain,
   shouldUseSecureCookies,
 } from "@/app/api/_lib/controlPlane";
-import { resolveRedirectPath } from "@/lib/auth/redirects";
+import {
+  getDefaultRedirectPathForHost,
+  resolveRedirectPath,
+} from "@/lib/auth/redirects";
 
 const OAUTH_COOKIE_PREFIX = "mutx_oauth";
 const SUPPORTED_PROVIDERS = new Set(["google", "github", "discord"]);
@@ -61,6 +64,7 @@ export async function GET(
   const nextPath = resolveRedirectPath(
     request.cookies.get(`${OAUTH_COOKIE_PREFIX}_next`)?.value ??
       request.nextUrl.searchParams.get("next"),
+    getDefaultRedirectPathForHost(request.nextUrl.hostname),
   );
 
   const fail = (message: string) => {
