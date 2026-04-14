@@ -591,7 +591,6 @@
   padding: 1rem 1.05rem;
   text-align: left;
   color: inherit;
-  cursor: pointer;
   border-radius: 1.35rem;
   border: 1px solid rgba(247, 244, 239, 0.08);
   background: rgba(255, 255, 255, 0.025);
@@ -603,8 +602,7 @@
     box-shadow 180ms ease;
 }
 
-.demoTab:hover,
-.demoTab[data-active='1'] {
+.demoTab:hover {
   transform: translateY(-1px);
   border-color: rgba(109, 175, 255, 0.34);
   background: rgba(255, 255, 255, 0.05);
@@ -620,21 +618,11 @@
   height: 0.16rem;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(109, 175, 255, 0.92), rgba(176, 224, 255, 0.9));
-  transform: scaleX(0);
-  transform-origin: left center;
-  opacity: 0;
-}
-
-.demoTab[data-active='1']::after {
-  opacity: 0.76;
   transform: scaleX(1);
+  transform-origin: left center;
+  opacity: 0.72;
 }
 
-.demoTabs[data-autoplaying='1'] .demoTab[data-active='1']::after {
-  animation: demoTabProgress 2.6s linear both;
-}
-
-.demoTab:focus-visible,
 .secondaryAction:focus-visible {
   outline: 2px solid rgba(125, 211, 252, 0.95);
   outline-offset: 3px;
@@ -1226,15 +1214,6 @@
   }
 }
 
-@keyframes demoTabProgress {
-  0% {
-    transform: scaleX(0);
-  }
-  100% {
-    transform: scaleX(1);
-  }
-}
-
 @keyframes terminalCursorBlink {
   0%,
   48% {
@@ -1251,7 +1230,6 @@
     animation: none;
   }
 
-  .demoTabs[data-autoplaying='1'] .demoTab[data-active='1']::after,
   .terminalCursor {
     animation: none;
   }

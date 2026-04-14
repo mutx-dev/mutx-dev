@@ -707,13 +707,11 @@ test.describe('mutx.dev QA', () => {
     expect(after).toBeGreaterThan(0);
   });
 
-  test('homepage still assets stay single-use in the content model', async () => {
-    const stillAssets = [
-      marketingHomepage.hero.backgroundSrc,
-      marketingHomepage.salesSections.demo.tabs[2]?.mediaSrc,
-    ];
+  test('homepage demo section stays pinned to the real product gif', async () => {
+    const demoAssets = marketingHomepage.salesSections.demo.tabs.map((tab) => tab.mediaSrc);
 
-    expect(new Set(stillAssets).size).toBe(stillAssets.length);
+    expect(demoAssets.length).toBeGreaterThan(0);
+    expect(new Set(demoAssets)).toEqual(new Set(['/demo.gif']));
   });
 
   test('download page exposes the mac release lane and release-notes path', async ({ page }) => {

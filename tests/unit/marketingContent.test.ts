@@ -42,13 +42,13 @@ describe('marketingHomepage', () => {
     expect(marketingHomepage.salesSections.cta).toBeDefined()
   })
 
-  it('demo section has tabs with mediaType and mediaSrc', () => {
+  it('demo section keeps every feature pinned to the real product demo gif', () => {
     const tabs = marketingHomepage.salesSections.demo.tabs
     expect(Array.isArray(tabs)).toBe(true)
     expect(tabs.length).toBeGreaterThan(0)
     for (const tab of tabs) {
-      expect(tab.mediaType).toMatch(/^(image|gif)$/)
-      expect(typeof tab.mediaSrc).toBe('string')
+      expect(tab.mediaType).toBe('gif')
+      expect(tab.mediaSrc).toBe('/demo.gif')
       expect(typeof tab.label).toBe('string')
     }
   })

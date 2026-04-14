@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
@@ -37,7 +36,6 @@ type TerminalPlaybackCardProps = {
   delay?: number
 }
 
-const DEMO_AUTOPLAY_INTERVAL_MS = 2600
 const TERMINAL_PROMPT_DELAY_MS = 160
 const TERMINAL_TYPING_STEP_MS = 18
 const TERMINAL_REPLY_STAGGER_MS = 240
@@ -226,36 +224,9 @@ function TerminalPlaybackCard({ item, delay = 0 }: TerminalPlaybackCardProps) {
 
 export function MarketingHomePage() {
   const prefersReducedMotion = useReducedMotion()
-  const demoSectionRef = useRef<HTMLElement | null>(null)
-  const isDemoSectionInView = useInView(demoSectionRef, {
-    amount: 0.46,
-  })
-  const [activeDemoId, setActiveDemoId] = useState(marketingHomepage.salesSections.demo.tabs[0]?.id)
-  const [demoAutoplayArmed, setDemoAutoplayArmed] = useState(true)
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
   const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.salesSections.cta.actions
-
-  const activeDemo =
-    marketingHomepage.salesSections.demo.tabs.find((tab) => tab.id === activeDemoId) ??
-    marketingHomepage.salesSections.demo.tabs[0]
-
-  useEffect(() => {
-    if (prefersReducedMotion || !isDemoSectionInView || !demoAutoplayArmed) {
-      return
-    }
-
-    const interval = window.setInterval(() => {
-      setActiveDemoId((currentId) => {
-        const tabIds = marketingHomepage.salesSections.demo.tabs.map((tab) => tab.id)
-        const currentIndex = Math.max(tabIds.indexOf(currentId ?? tabIds[0]), 0)
-        return tabIds[(currentIndex + 1) % tabIds.length]
-      })
-    }, DEMO_AUTOPLAY_INTERVAL_MS)
-
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [demoAutoplayArmed, isDemoSectionInView, prefersReducedMotion])
+  const demoMedia = marketingHomepage.salesSections.demo.tabs[0]
 
   return (
     <div className={`${core.page} ${core.homePage}`}>
@@ -352,11 +323,7 @@ export function MarketingHomePage() {
           </div>
         </section>
 
-        <section
-          ref={demoSectionRef}
-          className={home.demoSection}
-          data-testid="homepage-demo-section"
-        >
+        <section className={home.demoSection} data-testid="homepage-demo-section">
           <div className={core.shell}>
             <div className={home.demoLayout}>
               <MarketingReveal className={home.demoIntro}>
@@ -367,11 +334,7 @@ export function MarketingHomePage() {
 
               <div className={home.demoStage}>
                 <motion.div
-                  key={activeDemo.id}
                   className={home.demoFrame}
-                  id={`demo-panel-${activeDemo.id}`}
-                  role="tabpanel"
-                  aria-labelledby={`demo-tab-${activeDemo.id}`}
                   data-testid="homepage-demo-panel"
                   initial={prefersReducedMotion ? false : { opacity: 0.86, y: 14, scale: 0.992 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -385,56 +348,22 @@ export function MarketingHomePage() {
                   }
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {activeDemo.mediaType === 'gif' ? (
-                    <img
-                      key={activeDemo.id}
-                      src={activeDemo.mediaSrc}
-                      alt={activeDemo.mediaAlt}
-                      className={home.demoVideo}
-                      decoding="async"
-                    />
-                  ) : (
-                    <Image
-                      key={activeDemo.id}
-                      src={activeDemo.mediaSrc}
-                      alt={activeDemo.mediaAlt}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 64rem"
-                      className={home.exampleImage}
-                    />
-                  )}
+                  <img
+                    src={demoMedia.mediaSrc}
+                    alt={demoMedia.mediaAlt}
+                    className={home.demoVideo}
+                    decoding="async"
+                  />
                 </motion.div>
 
-                <div
-                  className={home.demoTabs}
-                  data-testid="homepage-demo-tabs"
-                  data-autoplaying={
-                    isDemoSectionInView && demoAutoplayArmed && !prefersReducedMotion ? '1' : '0'
-                  }
-                >
-                  {marketingHomepage.salesSections.demo.tabs.map((tab) => {
-                    const isActive = tab.id === activeDemo.id
-
-                    return (
-                      <button
-                        key={tab.id}
-                        id={`demo-tab-${tab.id}`}
-                        type="button"
-                        className={home.demoTab}
-                        data-active={isActive ? '1' : '0'}
-                        onClick={() => {
-                          setDemoAutoplayArmed(false)
-                          setActiveDemoId(tab.id)
-                        }}
-                        aria-controls={`demo-panel-${tab.id}`}
-                        aria-selected={isActive}
-                      >
-                        <p className={home.demoTabLabel}>{tab.label}</p>
-                        <h3 className={home.demoTabTitle}>{tab.title}</h3>
-                        <p className={home.demoTabBody}>{tab.body}</p>
-                      </button>
-                    )
-                  })}
+                <div className={home.demoTabs} data-testid="homepage-demo-tabs">
+                  {marketingHomepage.salesSections.demo.tabs.map((tab) => (
+                    <article key={tab.id} className={home.demoTab}>
+                      <p className={home.demoTabLabel}>{tab.label}</p>
+                      <h3 className={home.demoTabTitle}>{tab.title}</h3>
+                      <p className={home.demoTabBody}>{tab.body}</p>
+                    </article>
+                  ))}
                 </div>
               </div>
             </div>
