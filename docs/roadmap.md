@@ -41,11 +41,12 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Next
 
-- Runtime-backed lifecycle semantics
-  - surface deployment version history and rollback posture consistently across dashboard and CLI
-  - keep deployment versions, rollback, and restart behavior tied to real execution posture
+- Pico product contract follow-through
+  - keep `/pico` as the waitlist landing while the routed product remains inside `/pico/*`
+  - keep Jest and Playwright contracts honest as the premium Pico surface evolves
 - Local operator ergonomics
   - keep the hosted and local setup lanes recoverable when installs, migrations, or stale local state drift
+  - reduce false local verification signals from worktree server reuse and stale standalone builds
 
 ## Later
 
@@ -56,6 +57,8 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Shipped (Last 30 Days)
 
+- `2026-04-14` Deployment lifecycle history and rollback posture now ship consistently across the dashboard and CLI
+- `2026-04-14` Pico now uses the premium studio surface across onboarding, academy, tutor, autopilot, and support
 - `2026-04-14` Dashboard observability aggregates telemetry config, traces, and session health into `/dashboard/observability`
 - `2026-04-14` Webhook and API-key lifecycle status is unified across dashboard and CLI operator surfaces
 - `2026-04-11` Pico progress API mounted at `/v1/pico/progress` with GET/POST progress persistence
