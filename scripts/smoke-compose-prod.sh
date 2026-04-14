@@ -83,9 +83,12 @@ wait_for_postgres_auth() {
 
   echo "Waiting for postgres to accept user '${user}' authentication..."
   for _ in $(seq 1 60); do
-    # pg_isready only checks TCP availability; use psql to verify auth works
-    if docker compose -f "$COMPOSE_FILE" exec -T postgres \
-      psql -h localhost -U "${user}" -d "${db}" -c "SELECT 1" -w >/dev/null 2>&1; then
+    # pg_isready only checks TCP availability; use psql to verify auth works.
+    # PGPASSWORD must be passed explicitly — psql's -w flag waits for password
+    # auth and will hang indefinitely without it in non-interactive mode.
+    if env PGPASSWORD="$password" \
+      docker compose -f "$COMPOSE_FILE" exec -T postgres \
+      psql -h localhost -U "${user}" -d "${db}" -c "SELECT 1" >/dev/null 2>&1; then
       return 0
     fi
     sleep 2
