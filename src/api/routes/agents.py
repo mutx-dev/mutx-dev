@@ -27,12 +27,12 @@ from src.api.models.schemas import (
     AgentConfigBase,
     AgentConfigResponse,
     AgentConfigUpdateRequest,
+    AgentLogHistoryResponse,
+    AgentMetricHistoryResponse,
     AgentResourceUsageCreate,
     AgentResourceUsageResponse,
     AgentCreate,
     AgentDetailResponse,
-    AgentLogResponse,
-    AgentMetricResponse,
     AgentResponse,
     AnthropicAgentConfig,
     CustomAgentConfig,
@@ -488,7 +488,7 @@ async def stop_agent(
     return {"status": "stopped"}
 
 
-@router.get("/{agent_id}/logs", response_model=list[AgentLogResponse])
+@router.get("/{agent_id}/logs", response_model=AgentLogHistoryResponse)
 async def get_agent_logs(
     agent_id: uuid.UUID,
     skip: int = Query(0, ge=0),
@@ -504,16 +504,27 @@ async def get_agent_logs(
         forbidden_detail="Not authorized to access this agent's logs",
     )
 
+    count_query = select(AgentLog).where(AgentLog.agent_id == agent_id)
+    if level:
+        count_query = count_query.where(AgentLog.level == level)
+    count_result = await db.execute(count_query)
+    total = len(count_result.scalars().all())
+
     query = select(AgentLog).where(AgentLog.agent_id == agent_id).offset(skip).limit(limit)
     if level:
         query = query.where(AgentLog.level == level)
     query = query.order_by(AgentLog.timestamp.desc())
     result = await db.execute(query)
     logs = result.scalars().all()
-    return logs
+    return AgentLogHistoryResponse(
+        agent_id=agent_id,
+        items=logs,
+        total=total,
+        has_more=(skip + limit) < total,
+    )
 
 
-@router.get("/{agent_id}/metrics", response_model=list[AgentMetricResponse])
+@router.get("/{agent_id}/metrics", response_model=AgentMetricHistoryResponse)
 async def get_agent_metrics(
     agent_id: uuid.UUID,
     skip: int = Query(0, ge=0),
@@ -528,6 +539,10 @@ async def get_agent_metrics(
         forbidden_detail="Not authorized to access this agent's metrics",
     )
 
+    count_query = select(AgentMetric).where(AgentMetric.agent_id == agent_id)
+    count_result = await db.execute(count_query)
+    total = len(count_result.scalars().all())
+
     query = (
         select(AgentMetric)
         .where(AgentMetric.agent_id == agent_id)
@@ -537,7 +552,12 @@ async def get_agent_metrics(
     )
     result = await db.execute(query)
     metrics = result.scalars().all()
-    return metrics
+    return AgentMetricHistoryResponse(
+        agent_id=agent_id,
+        items=metrics,
+        total=total,
+        has_more=(skip + limit) < total,
+    )
 
 
 # --- Resource Usage Routes ---

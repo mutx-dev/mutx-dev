@@ -287,6 +287,24 @@ class AgentMetricResponse(BaseModel):
     timestamp: datetime
 
 
+class AgentLogHistoryResponse(BaseModel):
+    """Paginated response for agent logs."""
+
+    agent_id: uuid.UUID
+    items: list["AgentLogResponse"]
+    total: int
+    has_more: bool
+
+
+class AgentMetricHistoryResponse(BaseModel):
+    """Paginated response for agent metrics."""
+
+    agent_id: uuid.UUID
+    items: list["AgentMetricResponse"]
+    total: int
+    has_more: bool
+
+
 class AgentResourceUsageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

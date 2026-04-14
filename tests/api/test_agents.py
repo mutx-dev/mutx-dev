@@ -591,7 +591,12 @@ class TestAgentLogs:
         """Test getting agent logs."""
         response = await client.get(f"/v1/agents/{test_agent.id}/logs")
         assert response.status_code == 200
-        assert isinstance(response.json(), list)
+        data = response.json()
+        assert isinstance(data, dict)
+        assert "items" in data
+        assert "total" in data
+        assert "has_more" in data
+        assert isinstance(data["items"], list)
 
     @pytest.mark.asyncio
     async def test_get_agent_logs_not_found(self, client: AsyncClient):
@@ -616,7 +621,12 @@ class TestAgentMetrics:
         """Test getting agent metrics."""
         response = await client.get(f"/v1/agents/{test_agent.id}/metrics")
         assert response.status_code == 200
-        assert isinstance(response.json(), list)
+        data = response.json()
+        assert isinstance(data, dict)
+        assert "items" in data
+        assert "total" in data
+        assert "has_more" in data
+        assert isinstance(data["items"], list)
 
     @pytest.mark.asyncio
     async def test_get_agent_metrics_not_found(self, client: AsyncClient):
