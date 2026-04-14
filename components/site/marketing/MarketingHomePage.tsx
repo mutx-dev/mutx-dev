@@ -87,7 +87,7 @@ function ActionLink({ action, className }: ActionLinkProps) {
 function prominentActionClassName(tone?: MarketingActionTone) {
   switch (tone) {
     case 'pico':
-      return core.buttonPico
+      return core.buttonPrimary
     case 'secondary':
     case 'ghost':
       return core.buttonGhost
