@@ -90,9 +90,10 @@ Use `npm run test:app` for the current app-level Jest coverage under `tests/unit
 npm run build
 npx playwright test --list
 npx playwright test tests/website.spec.ts -g "no console errors or remote Guild asset requests"
+PLAYWRIGHT_REUSE_EXISTING_SERVER=1 npx playwright test tests/website.spec.ts -g "homepage"
 ```
 
-Current Playwright smoke coverage runs locally via the checked-in config. Build first when `.next/standalone` is missing, then use `npx playwright test --list` to confirm discovery and run the smallest matching spec or grep target.
+Current Playwright smoke coverage runs locally via the checked-in config. Build first when `.next/standalone` is missing, then use `npx playwright test --list` to confirm discovery and run the smallest matching spec or grep target. Local runs now start a fresh standalone server by default so the suite fails closed against stale worktree servers; only set `PLAYWRIGHT_REUSE_EXISTING_SERVER=1` when you intentionally want to reuse an already running standalone server.
 
 ## Trusted Validation Baseline
 

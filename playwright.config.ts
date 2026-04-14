@@ -3,6 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 const port = Number(process.env.PORT || '3000');
 const baseURL = process.env.BASE_URL || `http://127.0.0.1:${port}`;
 const isCI = !!process.env.CI;
+const reuseExistingServer =
+  !isCI && process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER === '1';
 
 export default defineConfig({
   testDir: './tests',
@@ -27,7 +29,7 @@ export default defineConfig({
   webServer: {
     command: "sh -c 'npm run prepare:standalone && PORT=" + port + " HOSTNAME=127.0.0.1 node .next/standalone/server.js'",
     url: baseURL,
-    reuseExistingServer: !isCI,
+    reuseExistingServer,
     timeout: 120000,
     stdout: isCI ? 'pipe' : 'ignore',
     stderr: isCI ? 'pipe' : 'ignore',
