@@ -784,6 +784,216 @@ describe('dashboard route proxies', () => {
     expect(response.status).toBe(200)
   })
 
+  it('returns 401 from dashboard observability proxy when no auth session exists', async () => {
+    hasAuthSession.mockReturnValue(false)
+    const { GET } = await import('../../app/api/dashboard/observability/route')
+
+    const response = await GET(mockRequest('http://localhost:3000/api/dashboard/observability'))
+
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({
+      status: 'error',
+      error: { code: 'UNAUTHORIZED', message: 'Unauthorized' },
+    })
+  })
+
+  it('aggregates telemetry and session summary into dashboard observability responses', async () => {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          items: [{ id: 'run_123', agent_id: 'agent_123', status: 'running' }],
+          total: 1,
+          skip: 0,
+          limit: 25,
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          otel_enabled: true,
+          exporter_type: 'otlp',
+          endpoint: 'http://collector:4318',
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          configured: true,
+          endpoint_reachable: true,
+          using_grpc: false,
+          endpoint: 'http://collector:4318',
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          sessions: [
+            {
+              id: 'sess_1',
+              active: true,
+              channel: 'web',
+              source: 'gateway',
+              last_activity: '2026-04-14T10:00:00Z',
+            },
+            {
+              id: 'sess_2',
+              active: false,
+              channel: 'cli',
+              source: 'desktop',
+              last_activity: '2026-04-14T11:00:00Z',
+            },
+          ],
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+
+    const { GET } = await import('../../app/api/dashboard/observability/route')
+    const request = mockRequest('http://localhost:3000/api/dashboard/observability?limit=25')
+    const response = await GET(request)
+
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      1,
+      request,
+      'http://localhost:8000/v1/observability/runs?limit=25',
+      { cache: 'no-store' },
+    )
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      2,
+      request,
+      'http://localhost:8000/v1/telemetry/config',
+      { cache: 'no-store' },
+    )
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      3,
+      request,
+      'http://localhost:8000/v1/telemetry/health',
+      { cache: 'no-store' },
+    )
+    expect(authenticatedFetch).toHaveBeenNthCalledWith(
+      4,
+      request,
+      'http://localhost:8000/v1/sessions?limit=100',
+      { cache: 'no-store' },
+    )
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      items: [{ id: 'run_123', agent_id: 'agent_123', status: 'running' }],
+      total: 1,
+      skip: 0,
+      limit: 25,
+      telemetry: {
+        config: {
+          otel_enabled: true,
+          exporter_type: 'otlp',
+          endpoint: 'http://collector:4318',
+        },
+        health: {
+          configured: true,
+          endpoint_reachable: true,
+          using_grpc: false,
+          endpoint: 'http://collector:4318',
+        },
+        errors: null,
+      },
+      sessionSummary: {
+        total: 2,
+        active: 1,
+        channels: 2,
+        sources: 2,
+        latestActivityAt: '2026-04-14T11:00:00.000Z',
+      },
+      sessionSummaryError: null,
+    })
+  })
+
+  it('keeps observability runs available when telemetry summary calls fail', async () => {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          items: [],
+          total: 0,
+          skip: 0,
+          limit: 50,
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({ detail: 'telemetry unavailable' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({
+          configured: false,
+          endpoint_reachable: false,
+          using_grpc: true,
+          endpoint: null,
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+      .mockResolvedValueOnce({
+        response: new Response(JSON.stringify({ sessions: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+        tokenRefreshed: false,
+      })
+
+    const { GET } = await import('../../app/api/dashboard/observability/route')
+    const response = await GET(mockRequest('http://localhost:3000/api/dashboard/observability'))
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      items: [],
+      total: 0,
+      skip: 0,
+      limit: 50,
+      telemetry: {
+        config: null,
+        health: {
+          configured: false,
+          endpoint_reachable: false,
+          using_grpc: true,
+          endpoint: null,
+        },
+        errors: {
+          config: 'telemetry unavailable',
+        },
+      },
+      sessionSummary: {
+        total: 0,
+        active: 0,
+        channels: 0,
+        sources: 0,
+        latestActivityAt: null,
+      },
+      sessionSummaryError: null,
+    })
+  })
+
   it('proxies dashboard budget usage with forwarded query params', async () => {
     proxyJson.mockResolvedValue(
       new Response(JSON.stringify({ usage_by_agent: [] }), {
