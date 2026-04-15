@@ -65,6 +65,7 @@ jobs:
         id: meta
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_run" ]; then
             BRANCH="${{ github.event.workflow_run.head_branch }}"
@@ -103,6 +104,7 @@ jobs:
         id: classify
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           CLASSIFICATION="unknown"
 
@@ -318,6 +320,7 @@ jobs:
           needs.classify-failure.outputs.pr_number != ''
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           FIX_TYPE="${{ steps.fix-type.outputs.fix_type }}"
           PR="${{ needs.classify-failure.outputs.pr_number }}"
@@ -364,6 +367,7 @@ jobs:
       - name: Comment on PR or create issue
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
           CLASSIFICATION: ${{ needs.classify-failure.outputs.classification }}
           BRANCH: ${{ needs.classify-failure.outputs.branch }}
           PR_NUMBER: ${{ needs.classify-failure.outputs.pr_number }}
