@@ -78,6 +78,7 @@ async def list_document_jobs_endpoint(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(items),
         status=status_filter,
         template_id=template_id,
     )

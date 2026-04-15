@@ -199,6 +199,7 @@ async def list_runs(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(runs),
         agent_id=agent_id,
         status=status,
     )
@@ -252,6 +253,7 @@ async def list_run_traces(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(traces),
         event_type=event_type,
     )
 
@@ -323,4 +325,5 @@ async def add_run_traces(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(all_traces),
     )

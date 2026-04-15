@@ -135,6 +135,7 @@ class DeploymentEventHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     event_type: Optional[str] = None
     status: Optional[str] = None
 
@@ -213,6 +214,7 @@ class DeploymentLogsHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     level: Optional[str] = None
 
 
@@ -224,6 +226,7 @@ class DeploymentMetricsHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
 
 
 class DeploymentVersionHistoryResponse(BaseModel):
@@ -232,6 +235,7 @@ class DeploymentVersionHistoryResponse(BaseModel):
     deployment_id: uuid.UUID
     items: list[DeploymentVersionResponse]
     total: int
+    has_more: bool
 
 
 class DeploymentRollbackRequest(BaseModel):
@@ -447,6 +451,7 @@ class RunHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     agent_id: Optional[uuid.UUID] = None
     status: Optional[str] = None
 
@@ -457,6 +462,7 @@ class RunTraceHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     event_type: Optional[str] = None
 
 
@@ -577,6 +583,7 @@ class DocumentJobHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     status: str | None = None
     template_id: str | None = None
 
@@ -698,6 +705,7 @@ class ReasoningJobHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     status: str | None = None
     template_id: str | None = None
 
@@ -1069,6 +1077,7 @@ class WebhookListResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
 
 
 class WebhookDeliveryListResponse(BaseModel):
@@ -1079,6 +1088,7 @@ class WebhookDeliveryListResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     event: Optional[str] = None
     success: Optional[bool] = None
 
@@ -1144,6 +1154,7 @@ class APIKeyHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
 
 
 # Usage Event Schemas
