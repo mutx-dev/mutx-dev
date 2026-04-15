@@ -222,7 +222,7 @@ class TestCreateAgent:
         # Should have different IDs
         agents = await client.get("/v1/agents")
         agent_list = agents.json()
-        assert len(agent_list) == 2
+        assert len(agent_list["items"]) == 2
 
     @pytest.mark.asyncio
     async def test_create_agent_unauthorized(self, client_no_auth: AsyncClient):
