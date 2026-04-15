@@ -563,13 +563,16 @@ class Agents:
         agent_id: UUID | str,
         skip: int = 0,
         limit: int = 50,
-    ) -> list[AgentResourceUsage]:
+    ) -> dict[str, Any]:
         """List recorded resource usage for an agent.
 
         Args:
             agent_id: The agent UUID
             skip: Number of records to skip (for pagination)
             limit: Maximum number of records to return (default 50, max 100)
+
+        Returns:
+            dict with items (list of AgentResourceUsage), total, has_more, skip, and limit
         """
         self._require_sync_client()
         response = self._client.get(
@@ -577,20 +580,35 @@ class Agents:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [AgentResourceUsage(r) for r in response.json()]
+        result = response.json()
+        # Normalise: newer servers return {items,total,has_more,...}, older returned a raw list
+        if isinstance(result, list):
+            result = {
+                "items": result,
+                "total": len(result),
+                "skip": skip,
+                "limit": limit,
+                "has_more": False,
+            }
+        else:
+            result.setdefault("has_more", False)
+        return result
 
     async def alist_resource_usage(
         self,
         agent_id: UUID | str,
         skip: int = 0,
         limit: int = 50,
-    ) -> list[AgentResourceUsage]:
+    ) -> dict[str, Any]:
         """List recorded resource usage for an agent (async).
 
         Args:
             agent_id: The agent UUID
             skip: Number of records to skip (for pagination)
             limit: Maximum number of records to return (default 50, max 100)
+
+        Returns:
+            dict with items (list of AgentResourceUsage), total, has_more, skip, and limit
         """
         self._require_async_client()
         response = await self._client.get(
@@ -598,7 +616,19 @@ class Agents:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [AgentResourceUsage(r) for r in response.json()]
+        result = response.json()
+        # Normalise: newer servers return {items,total,has_more,...}, older returned a raw list
+        if isinstance(result, list):
+            result = {
+                "items": result,
+                "total": len(result),
+                "skip": skip,
+                "limit": limit,
+                "has_more": False,
+            }
+        else:
+            result.setdefault("has_more", False)
+        return result
 
     def stream_logs(
         self,
