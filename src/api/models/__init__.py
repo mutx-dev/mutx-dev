@@ -30,6 +30,8 @@ from src.api.models.models import (
     UsageEvent,
     AnalyticsEvent,
     Swarm,
+    WaitlistSignup,
+    Lead,
 )
 
 from src.api.models.observability_models import (
@@ -87,6 +89,8 @@ __all__ = [
     "UsageEvent",
     "AnalyticsEvent",
     "Swarm",
+    "WaitlistSignup",
+    "Lead",
     "MutxRun",
     "MutxStep",
     "MutxCost",
