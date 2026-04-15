@@ -84,7 +84,7 @@ def _build_engine_config(database_url: str, override_ssl_mode: str | None = None
 
     asyncpg_url = url.set(drivername="postgresql+asyncpg", query=query)
     return EngineConfig(
-        url=asyncpg_url.render_as_string(hide_password=True),
+        url=asyncpg_url.render_as_string(hide_password=False),
         connect_args=connect_args,
         ssl_mode_explicitly_set=ssl_setting is not None,
     )
