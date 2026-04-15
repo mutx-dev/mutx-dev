@@ -314,7 +314,10 @@ class TestApprovalRoutes:
         response = await client.get("/v1/approvals")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 3
+        assert "items" in data
+        assert "total" in data
+        assert data["total"] >= 3
+        assert len(data["items"]) == 3
 
     @pytest.mark.asyncio
     async def test_list_approvals_filter_by_status(
@@ -342,12 +345,14 @@ class TestApprovalRoutes:
         # Filter by APPROVED status
         response = await client.get("/v1/approvals?status=APPROVED")
         assert response.status_code == 200
-        assert all(r["status"] == "APPROVED" for r in response.json())
+        items = response.json()["items"]
+        assert all(r["status"] == "APPROVED" for r in items)
 
         # Filter by PENDING status
         response = await client.get("/v1/approvals?status=PENDING")
         assert response.status_code == 200
-        assert all(r["status"] == "PENDING" for r in response.json())
+        items = response.json()["items"]
+        assert all(r["status"] == "PENDING" for r in items)
 
     @pytest.mark.asyncio
     async def test_list_approvals_filter_by_agent(
@@ -377,8 +382,8 @@ class TestApprovalRoutes:
         response = await client.get("/v1/approvals?agent_id=agent-target")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["agent_id"] == "agent-target"
+        assert len(data["items"]) == 1
+        assert data["items"][0]["agent_id"] == "agent-target"
 
     @pytest.mark.asyncio
     async def test_approve_request(
