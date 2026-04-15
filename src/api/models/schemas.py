@@ -231,6 +231,7 @@ class AgentVersionHistoryResponse(BaseModel):
     agent_id: uuid.UUID
     items: list[AgentVersionResponse]
     total: int
+    has_more: bool
 
 
 class AgentRollbackRequest(BaseModel):
