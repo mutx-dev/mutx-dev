@@ -146,9 +146,7 @@ async def list_webhooks(
     total_stmt = select(func.count()).select_from(Webhook).where(*filters)
     total = (await db.execute(total_stmt)).scalar_one()
 
-    result = await db.execute(
-        select(Webhook).where(*filters).offset(skip).limit(limit)
-    )
+    result = await db.execute(select(Webhook).where(*filters).offset(skip).limit(limit))
     webhooks = result.scalars().all()
     return WebhookListResponse(
         items=[_serialize_webhook(w) for w in webhooks],

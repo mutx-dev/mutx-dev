@@ -312,11 +312,7 @@ async def list_agents(
     total = (await db.execute(count_stmt)).scalar_one()
 
     query = (
-        select(Agent)
-        .where(base_filter)
-        .order_by(Agent.created_at.desc())
-        .offset(skip)
-        .limit(limit)
+        select(Agent).where(base_filter).order_by(Agent.created_at.desc()).offset(skip).limit(limit)
     )
     result = await db.execute(query)
     agents = result.scalars().all()

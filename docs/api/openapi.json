@@ -137,11 +137,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AgentResponse"
-                  },
-                  "title": "Response List Agents V1 Agents Get"
+                  "$ref": "#/components/schemas/AgentListResponse"
                 }
               }
             }
@@ -1886,7 +1882,7 @@
           "deployments"
         ],
         "summary": "Get Deployment Logs",
-        "description": "Get logs for a specific deployment.",
+        "description": "Get paginated logs for a specific deployment.",
         "operationId": "get_deployment_logs_v1_deployments__deployment_id__logs_get",
         "parameters": [
           {
@@ -1961,11 +1957,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DeploymentLogsResponse"
-                  },
-                  "title": "Response Get Deployment Logs V1 Deployments  Deployment Id  Logs Get"
+                  "$ref": "#/components/schemas/DeploymentLogsHistoryResponse"
                 }
               }
             }
@@ -1989,7 +1981,7 @@
           "deployments"
         ],
         "summary": "Get Deployment Metrics",
-        "description": "Get metrics for a specific deployment.",
+        "description": "Get paginated metrics for a specific deployment.",
         "operationId": "get_deployment_metrics_v1_deployments__deployment_id__metrics_get",
         "parameters": [
           {
@@ -2048,11 +2040,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DeploymentMetricsResponse"
-                  },
-                  "title": "Response Get Deployment Metrics V1 Deployments  Deployment Id  Metrics Get"
+                  "$ref": "#/components/schemas/DeploymentMetricsHistoryResponse"
                 }
               }
             }
@@ -2446,11 +2434,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WebhookResponse"
-                  },
-                  "title": "Response List Webhooks V1 Webhooks  Get"
+                  "$ref": "#/components/schemas/WebhookListResponse"
                 }
               }
             }
@@ -2902,11 +2886,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WebhookDelivery"
-                  },
-                  "title": "Response List Webhook Deliveries V1 Webhooks  Webhook Id  Deliveries Get"
+                  "$ref": "#/components/schemas/WebhookDeliveryListResponse"
                 }
               }
             }
@@ -4251,11 +4231,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LeadResponse"
-                  },
-                  "title": "Response List Leads V1 Leads Contacts Get"
+                  "$ref": "#/components/schemas/LeadListResponse"
                 }
               }
             }
@@ -4547,11 +4523,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LeadResponse"
-                  },
-                  "title": "Response List Leads V1 Leads Get"
+                  "$ref": "#/components/schemas/LeadListResponse"
                 }
               }
             }
@@ -12672,7 +12644,7 @@
           "approvals"
         ],
         "summary": "List Approvals",
-        "description": "List approval requests visible to the authenticated user.\n\n- ``status``: filter by status (e.g. PENDING)\n- ``agent_id``: filter by agent",
+        "description": "List approval requests visible to the authenticated user.\n\n- ``status``: filter by status (PENDING, APPROVED, REJECTED, EXPIRED).\n  Omit to return all statuses.\n- ``agent_id``: filter by agent\n- ``skip`` / ``limit``: pagination controls",
         "operationId": "list_approvals_v1_approvals_get",
         "parameters": [
           {
@@ -12708,6 +12680,29 @@
             }
           },
           {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
             "name": "authorization",
             "in": "header",
             "required": false,
@@ -12730,11 +12725,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ApprovalRequest"
-                  },
-                  "title": "Response List Approvals V1 Approvals Get"
+                  "$ref": "#/components/schemas/ApprovalListResponse"
                 }
               }
             }
@@ -13719,6 +13710,43 @@
         ],
         "title": "AgentDetailResponse"
       },
+      "AgentListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "skip",
+          "limit",
+          "has_more"
+        ],
+        "title": "AgentListResponse",
+        "description": "Paginated response for listing agents."
+      },
       "AgentLogHistoryResponse": {
         "properties": {
           "agent_id": {
@@ -14358,8 +14386,9 @@
         "properties": {
           "version": {
             "type": "integer",
+            "exclusiveMinimum": 0.0,
             "title": "Version",
-            "description": "The version number to rollback to"
+            "description": "Version number to rollback to"
           }
         },
         "type": "object",
@@ -14367,7 +14396,7 @@
           "version"
         ],
         "title": "AgentRollbackRequest",
-        "description": "Request model for rolling back an agent to a specific version."
+        "description": "Request model for rolling back an agent"
       },
       "AgentStatus": {
         "type": "string",
@@ -14470,11 +14499,12 @@
         "properties": {
           "agent_id": {
             "type": "string",
+            "format": "uuid",
             "title": "Agent Id"
           },
           "items": {
             "items": {
-              "$ref": "#/components/schemas/AgentVersionItem"
+              "$ref": "#/components/schemas/AgentVersionResponse"
             },
             "type": "array",
             "title": "Items"
@@ -14482,24 +14512,32 @@
           "total": {
             "type": "integer",
             "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
         "required": [
           "agent_id",
           "items",
-          "total"
+          "total",
+          "has_more"
         ],
-        "title": "AgentVersionHistoryResponse"
+        "title": "AgentVersionHistoryResponse",
+        "description": "Response model for agent version history"
       },
-      "AgentVersionItem": {
+      "AgentVersionResponse": {
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "title": "Id"
           },
           "agent_id": {
             "type": "string",
+            "format": "uuid",
             "title": "Agent Id"
           },
           "version": {
@@ -14516,7 +14554,20 @@
           },
           "created_at": {
             "type": "string",
+            "format": "date-time",
             "title": "Created At"
+          },
+          "rolled_back_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rolled Back At"
           }
         },
         "type": "object",
@@ -14528,7 +14579,8 @@
           "status",
           "created_at"
         ],
-        "title": "AgentVersionItem"
+        "title": "AgentVersionResponse",
+        "description": "Response model for agent version"
       },
       "AlertListResponse": {
         "properties": {
@@ -14870,6 +14922,59 @@
         ],
         "title": "ApprovalCreate",
         "description": "Payload for creating a new approval request."
+      },
+      "ApprovalListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ApprovalRequest"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "ApprovalListResponse",
+        "description": "Paginated response for listing approval requests."
       },
       "ApprovalRequest": {
         "properties": {
@@ -16617,6 +16722,55 @@
         ],
         "title": "DeploymentListResponse"
       },
+      "DeploymentLogsHistoryResponse": {
+        "properties": {
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Deployment Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeploymentLogsResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deployment_id",
+          "items",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "DeploymentLogsHistoryResponse",
+        "description": "Paginated response for deployment logs"
+      },
       "DeploymentLogsResponse": {
         "properties": {
           "id": {
@@ -16665,6 +16819,44 @@
         ],
         "title": "DeploymentLogsResponse",
         "description": "Response model for deployment logs"
+      },
+      "DeploymentMetricsHistoryResponse": {
+        "properties": {
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Deployment Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeploymentMetricsResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deployment_id",
+          "items",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "DeploymentMetricsHistoryResponse",
+        "description": "Paginated response for deployment metrics"
       },
       "DeploymentMetricsResponse": {
         "properties": {
@@ -17986,6 +18178,42 @@
           "email"
         ],
         "title": "LeadCreate"
+      },
+      "LeadListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LeadResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "skip",
+          "limit",
+          "has_more"
+        ],
+        "title": "LeadListResponse",
+        "description": "Paginated response for listing leads."
       },
       "LeadResponse": {
         "properties": {
@@ -24857,6 +25085,96 @@
         ],
         "title": "WebhookDelivery",
         "description": "Schema for webhook delivery attempts"
+      },
+      "WebhookDeliveryListResponse": {
+        "properties": {
+          "webhook_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Webhook Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WebhookDelivery"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "event": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event"
+          },
+          "success": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Success"
+          }
+        },
+        "type": "object",
+        "required": [
+          "webhook_id",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "WebhookDeliveryListResponse",
+        "description": "Paginated response for listing webhook deliveries."
+      },
+      "WebhookListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WebhookResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "WebhookListResponse",
+        "description": "Paginated response for listing webhooks."
       },
       "WebhookResponse": {
         "properties": {

@@ -106,15 +106,17 @@ async def get_analytics_summary(
     if agent_ids:
         total_deployments = (
             await db.execute(
-                select(func.count()).select_from(Deployment).where(
-                    Deployment.agent_id.in_(agent_ids)
-                )
+                select(func.count())
+                .select_from(Deployment)
+                .where(Deployment.agent_id.in_(agent_ids))
             )
         ).scalar_one() or 0
 
         active_deployments = (
             await db.execute(
-                select(func.count()).select_from(Deployment).where(
+                select(func.count())
+                .select_from(Deployment)
+                .where(
                     Deployment.agent_id.in_(agent_ids),
                     Deployment.status.in_(["running", "ready", "deploying"]),
                 )
@@ -126,13 +128,15 @@ async def get_analytics_summary(
     if agent_ids:
         status_rows = (
             await db.execute(
-                select(AgentRun.status, func.count().label("count")).where(
+                select(AgentRun.status, func.count().label("count"))
+                .where(
                     and_(
                         AgentRun.agent_id.in_(agent_ids),
                         AgentRun.started_at >= period_start_dt,
                         AgentRun.started_at <= period_end_dt,
                     )
-                ).group_by(AgentRun.status)
+                )
+                .group_by(AgentRun.status)
             )
         ).all()
         status_counts = {row.status: row.count for row in status_rows}
@@ -213,13 +217,15 @@ async def get_agent_metrics_summary(
 
     run_status_rows = (
         await db.execute(
-            select(AgentRun.status, func.count().label("count")).where(
+            select(AgentRun.status, func.count().label("count"))
+            .where(
                 and_(
                     AgentRun.agent_id == agent_id,
                     AgentRun.started_at >= period_start_dt,
                     AgentRun.started_at <= period_end_dt,
                 )
-            ).group_by(AgentRun.status)
+            )
+            .group_by(AgentRun.status)
         )
     ).all()
     status_counts = {row.status: row.count for row in run_status_rows}

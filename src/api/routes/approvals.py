@@ -81,8 +81,10 @@ async def _load_approval_setting(
 
 async def _count_approval_settings(db: AsyncSession) -> int:
     """Count total approval records in the user_settings table."""
-    stmt = select(func.count()).select_from(UserSetting).where(
-        UserSetting.key.like(f"{APPROVAL_KEY_PREFIX}%")
+    stmt = (
+        select(func.count())
+        .select_from(UserSetting)
+        .where(UserSetting.key.like(f"{APPROVAL_KEY_PREFIX}%"))
     )
     return (await db.execute(stmt)).scalar_one()
 
