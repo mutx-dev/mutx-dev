@@ -1,0 +1,151 @@
+# =============================================================================
+# MUTX pre-commit configuration
+# =============================================================================
+# Install:  bash scripts/pre-commit-install.sh
+# Manual:   .venv/bin/pre-commit run --all-files
+# Skip:     git commit --no-verify
+# =============================================================================
+
+default_language_version:
+  python: python3.11
+
+exclude: |
+  (?x)^(
+    \.venv/|
+    node_modules/|
+    \.next/|
+    dist/|
+    __pycache__/|
+    .*\.pyc$|
+    docs/api/openapi\.json|   # generated — do not lint
+    app/types/api\.ts|         # generated — do not lint
+    sdk/mutx/.*\.egg-info/|
+    build/|
+    infrastructure/helm/charts/|
+  )$
+
+repos:
+  # ---------------------------------------------------------------------------
+  # Python — Ruff (formatter + linter)
+  # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      # 1. ruff format — fast Python formatter
+      - id: ruff-format
+        name: "ruff format"
+        entry: .venv/bin/ruff format
+        language: system
+        types: [python]
+        files: ^(src/api|cli|sdk|tests)/
+        require_serial: true
+
+      # 2. ruff check --fix — lint with safe auto-fixes
+      - id: ruff-check
+        name: "ruff check"
+        entry: .venv/bin/ruff check --fix --exit-non-zero-on-fix
+        language: system
+        types: [python]
+        files: ^(src/api|cli|sdk|tests)/
+        require_serial: true
+
+  # ---------------------------------------------------------------------------
+  # TypeScript / Frontend — ESLint
+  # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      # 3. eslint --fix (only when npm/node_modules available)
+      - id: eslint
+        name: "eslint --fix"
+        entry: bash -c 'npx eslint --fix "$@"' --
+        language: system
+        types_or: [ts, tsx]
+        files: ^(app|components|lib|tests/unit)/
+        exclude: app/types/api\.ts$
+        require_serial: true
+        verbose: false
+
+  # ---------------------------------------------------------------------------
+  # General — whitespace, EOF, syntax, secrets, branch protection
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # 4. Trim trailing whitespace
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude_types: [svg]
+
+      # 5. Ensure newline at end of files
+      - id: end-of-file-fixer
+        exclude: |
+          (?x)^(
+            docs/api/openapi\.json|
+            app/types/api\.ts|
+          )$
+
+      # 6. Validate YAML syntax
+      - id: check-yaml
+        args: [--unsafe]  # allows custom YAML tags (e.g. !!python)
+        exclude: infrastructure/
+
+      # 7. Validate JSON syntax
+      - id: check-json
+        exclude: |
+          (?x)^(
+            docs/api/openapi\.json|
+            package-lock\.json|
+            tsconfig\.json|
+          )$
+
+      # 8. Prevent giant files from being committed
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+      # 9. Merge conflict markers
+      - id: check-merge-conflict
+
+      # 10. Detect accidentally committed private keys
+      - id: detect-private-key
+
+  # ---------------------------------------------------------------------------
+  # Local — prevent direct commits to main
+  # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: no-commit-to-main
+        name: "no commit to main"
+        entry: bash -c 'branch=$(git symbolic-ref --short HEAD 2>/dev/null); if [ "$branch" = "main" ]; then echo "Direct commits to main are not allowed. Use a feature branch."; exit 1; fi'
+        language: system
+        always_run: true
+        pass_filenames: false
+        stages: [pre-commit]
+
+# =============================================================================
+# Pre-push hooks (slower checks — only run before push, not on every commit)
+# =============================================================================
+# These are installed via:  pre-commit install --hook-type pre-push
+# To run manually:          .venv/bin/pre-commit run --hook-stage pre-push --all-files
+# =============================================================================
+  - repo: local
+    hooks:
+      # 11. Verify generated OpenAPI artifacts are current
+      #     Only triggers when src/api/ or scripts/ change
+      - id: verify-generated-artifacts
+        name: "verify generated artifacts (openapi.json + api.ts)"
+        entry: bash -c 'PYTHON_BIN=.venv/bin/python bash scripts/verify-generated-artifacts.sh'
+        language: system
+        pass_filenames: false
+        always_run: false
+        files: ^(src/api/|scripts/generate_openapi\.py|scripts/generate-contract-artifacts\.sh|scripts/verify-generated-artifacts\.sh)
+        stages: [pre-push, manual]
+        verbose: true
+
+      # 12. Python compilation check (catches syntax errors fast)
+      - id: python-compile-check
+        name: "python compile check"
+        entry: .venv/bin/python -m compileall
+        language: system
+        types: [python]
+        files: ^(src/api|cli|sdk)/
+        require_serial: true
+        stages: [pre-push, manual]
