@@ -187,6 +187,12 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       DATABASE_URL: postgresql://mutx:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/mutx
 
+    env:
+      POSTGRES_USER: mutx
+      POSTGRES_DB: mutx
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      DATABASE_URL: postgresql://mutx:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/mutx
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
