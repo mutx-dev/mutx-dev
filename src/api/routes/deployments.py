@@ -179,6 +179,7 @@ async def get_deployment_events(
         "total": total,
         "skip": skip,
         "limit": limit,
+        "has_more": total > skip + len(items),
         "event_type": event_type,
         "status": status,
     }
@@ -404,6 +405,7 @@ async def get_deployment_logs(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(logs),
         level=level,
     )
 
@@ -440,6 +442,7 @@ async def get_deployment_metrics(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(metrics),
     )
 
 
@@ -472,6 +475,7 @@ async def get_deployment_versions(
         deployment_id=deployment.id,
         items=versions,
         total=total,
+        has_more=False,
     )
 
 

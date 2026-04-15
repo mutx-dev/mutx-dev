@@ -153,6 +153,7 @@ async def list_webhooks(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(webhooks),
     )
 
 
@@ -281,6 +282,7 @@ async def list_webhook_deliveries(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(deliveries),
         event=event,
         success=success,
     )

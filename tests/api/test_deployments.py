@@ -323,6 +323,7 @@ class TestDeploymentEvents:
             "limit": 100,
             "event_type": None,
             "status": None,
+            "has_more": False,
         }
 
     @pytest.mark.asyncio

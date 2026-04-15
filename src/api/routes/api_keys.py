@@ -69,6 +69,7 @@ async def list_api_keys(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(keys),
     )
 
 
