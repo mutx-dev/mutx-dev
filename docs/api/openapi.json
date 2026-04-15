@@ -19434,6 +19434,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "agent_id": {
             "anyOf": [
               {
@@ -19462,7 +19466,8 @@
           "items",
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "MutxRunHistoryResponse",
         "description": "Paginated list of runs."

@@ -5888,6 +5888,8 @@ export interface components {
             skip: number;
             /** Limit */
             limit: number;
+            /** Has More */
+            has_more: boolean;
             /** Agent Id */
             agent_id?: string | null;
             /** Status */
