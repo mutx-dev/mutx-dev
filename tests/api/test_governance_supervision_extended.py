@@ -117,6 +117,24 @@ async def test_list_supervised_launch_profiles_returns_profiles(client: AsyncCli
 
 
 @pytest.mark.asyncio
+async def test_list_supervised_launch_profiles_forbidden_for_non_internal_user(
+    other_user_client: AsyncClient,
+    monkeypatch,
+):
+    from src.api.routes import governance_supervision
+
+    monkeypatch.setattr(
+        governance_supervision,
+        'get_faramesh_supervisor',
+        lambda: _MockSupervisor(),
+    )
+
+    response = await other_user_client.get('/v1/runtime/governance/supervised/profiles')
+
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_get_supervised_agent_returns_404_for_unknown_agent(client: AsyncClient, monkeypatch):
     from src.api.routes import governance_supervision
 

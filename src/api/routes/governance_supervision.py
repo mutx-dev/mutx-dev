@@ -68,6 +68,7 @@ async def list_supervised_launch_profiles(
     current_user: User = Depends(get_current_user),
 ):
     """List configured launch profiles for supervised agents."""
+    _assert_internal_user(current_user)
     supervisor = get_faramesh_supervisor()
     return [
         SupervisedLaunchProfileResponse(
