@@ -240,9 +240,12 @@ def merge_and_dedupe_sessions(
 
     seen: dict[str, dict[str, Any]] = {}
     for session in all_sessions:
-        key = f"{session.get('source', 'unknown')}:{session.get('id', '')}"
-        if not session.get("id"):
+        session_id = session.get("id", "")
+        if not session_id:
             continue
+        # Local sessions already include their source prefix in the id
+        # (e.g. "claude:abc123"), so use id directly as the dedup key.
+        key = str(session_id)
         existing = seen.get(key)
         current_activity = session.get("last_activity", 0)
         existing_activity = existing.get("last_activity", 0) if existing else 0
