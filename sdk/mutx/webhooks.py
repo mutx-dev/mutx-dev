@@ -118,7 +118,9 @@ class Webhooks:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [Webhook(data) for data in response.json()]
+        body = response.json()
+        items = body.get("items", body) if isinstance(body, dict) else body
+        return [Webhook(data) for data in items]
 
     async def alist(
         self,
@@ -131,7 +133,9 @@ class Webhooks:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [Webhook(data) for data in response.json()]
+        body = response.json()
+        items = body.get("items", body) if isinstance(body, dict) else body
+        return [Webhook(data) for data in items]
 
     def get(self, webhook_id: UUID | str) -> Webhook:
         self._require_sync_client()
@@ -175,7 +179,9 @@ class Webhooks:
             params=params,
         )
         response.raise_for_status()
-        return [WebhookDelivery(data) for data in response.json()]
+        body = response.json()
+        items = body.get("items", body) if isinstance(body, dict) else body
+        return [WebhookDelivery(data) for data in items]
 
     async def aget_deliveries(
         self,
@@ -197,7 +203,9 @@ class Webhooks:
             params=params,
         )
         response.raise_for_status()
-        return [WebhookDelivery(data) for data in response.json()]
+        body = response.json()
+        items = body.get("items", body) if isinstance(body, dict) else body
+        return [WebhookDelivery(data) for data in items]
 
     def update(
         self,

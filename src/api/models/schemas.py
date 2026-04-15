@@ -1023,6 +1023,27 @@ class WebhookDelivery(BaseModel):
     delivered_at: Optional[datetime]
 
 
+class WebhookListResponse(BaseModel):
+    """Paginated response for listing webhooks."""
+
+    items: list[WebhookResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+
+
+class WebhookDeliveryListResponse(BaseModel):
+    """Paginated response for listing webhook deliveries."""
+
+    webhook_id: uuid.UUID
+    items: list[WebhookDelivery] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    event: Optional[str] = None
+    success: Optional[bool] = None
+
+
 class WaitlistSignupCreate(BaseModel):
     email: EmailStr
     source: Optional[str] = None
