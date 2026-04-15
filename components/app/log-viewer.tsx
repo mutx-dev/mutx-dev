@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { EmptyState } from '@/components/dashboard'
+import { normalizeCollection } from '@/components/app/http'
 import { cn } from '@/lib/utils'
 
 interface LogEntry {
@@ -83,7 +84,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
       const res = await fetch('/api/dashboard/deployments')
       if (!res.ok) return
       const data = await res.json()
-      const deps = Array.isArray(data) ? data : (data.deployments || [])
+      const deps = normalizeCollection<Deployment>(data, ['items', 'deployments', 'data'])
       setDeployments(deps)
     } catch {
       // silent
