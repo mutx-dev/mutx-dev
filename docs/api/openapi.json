@@ -13294,13 +13294,18 @@
           "limit": {
             "type": "integer",
             "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
         "required": [
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "APIKeyHistoryResponse",
         "description": "Paginated response for listing API keys."
@@ -16520,6 +16525,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "event_type": {
             "anyOf": [
               {
@@ -16549,7 +16558,8 @@
           "deployment_status",
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "DeploymentEventHistoryResponse",
         "description": "Paginated deployment lifecycle event history."
@@ -16676,6 +16686,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "level": {
             "anyOf": [
               {
@@ -16694,7 +16708,8 @@
           "items",
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "DeploymentLogsHistoryResponse",
         "description": "Paginated response for deployment logs"
@@ -16773,6 +16788,10 @@
           "limit": {
             "type": "integer",
             "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
@@ -16781,7 +16800,8 @@
           "items",
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "DeploymentMetricsHistoryResponse",
         "description": "Paginated response for deployment metrics"
@@ -16980,13 +17000,18 @@
           "total": {
             "type": "integer",
             "title": "Total"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
         "required": [
           "deployment_id",
           "items",
-          "total"
+          "total",
+          "has_more"
         ],
         "title": "DeploymentVersionHistoryResponse",
         "description": "Response model for deployment version history"
@@ -17304,6 +17329,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "status": {
             "anyOf": [
               {
@@ -17331,7 +17360,8 @@
         "required": [
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "DocumentJobHistoryResponse"
       },
@@ -21733,6 +21763,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "status": {
             "anyOf": [
               {
@@ -21760,7 +21794,8 @@
         "required": [
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "ReasoningJobHistoryResponse"
       },
@@ -22503,6 +22538,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "agent_id": {
             "anyOf": [
               {
@@ -22531,7 +22570,8 @@
         "required": [
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "RunHistoryResponse"
       },
@@ -22761,6 +22801,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "event_type": {
             "anyOf": [
               {
@@ -22778,7 +22822,8 @@
           "run_id",
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "RunTraceHistoryResponse"
       },
@@ -25040,6 +25085,10 @@
             "type": "integer",
             "title": "Limit"
           },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
           "event": {
             "anyOf": [
               {
@@ -25068,7 +25117,8 @@
           "webhook_id",
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "WebhookDeliveryListResponse",
         "description": "Paginated response for listing webhook deliveries."
@@ -25093,13 +25143,18 @@
           "limit": {
             "type": "integer",
             "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
         "required": [
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "WebhookListResponse",
         "description": "Paginated response for listing webhooks."
