@@ -14583,13 +14583,28 @@
           "unresolved_count": {
             "type": "integer",
             "title": "Unresolved Count"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
         "required": [
           "items",
           "total",
-          "unresolved_count"
+          "unresolved_count",
+          "skip",
+          "limit",
+          "has_more"
         ],
         "title": "AlertListResponse"
       },
@@ -24435,12 +24450,27 @@
           "total": {
             "type": "integer",
             "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
         "required": [
           "items",
-          "total"
+          "total",
+          "skip",
+          "limit",
+          "has_more"
         ],
         "title": "SwarmListResponse"
       },
@@ -24846,6 +24876,10 @@
           "limit": {
             "type": "integer",
             "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
           }
         },
         "type": "object",
@@ -24853,7 +24887,8 @@
           "items",
           "total",
           "skip",
-          "limit"
+          "limit",
+          "has_more"
         ],
         "title": "UsageEventListResponse",
         "description": "Paginated response for usage events"

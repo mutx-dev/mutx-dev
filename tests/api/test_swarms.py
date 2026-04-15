@@ -19,6 +19,8 @@ class TestListSwarms:
         # Response is wrapped in {"items": [...], "total": N}
         assert data["items"] == []
         assert data["total"] == 0
+        assert "has_more" in data
+        assert data["has_more"] is False
 
     @pytest.mark.asyncio
     async def test_list_swarms_after_create(self, client: AsyncClient, test_agent):

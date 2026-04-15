@@ -3933,6 +3933,12 @@ export interface components {
             total: number;
             /** Unresolved Count */
             unresolved_count: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Has More */
+            has_more: boolean;
         };
         /** AlertResolveRequest */
         AlertResolveRequest: {
@@ -7712,6 +7718,12 @@ export interface components {
             items: components["schemas"]["SwarmResponse"][];
             /** Total */
             total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Has More */
+            has_more: boolean;
         };
         /** SwarmResponse */
         SwarmResponse: {
@@ -7893,6 +7905,8 @@ export interface components {
             skip: number;
             /** Limit */
             limit: number;
+            /** Has More */
+            has_more: boolean;
         };
         /**
          * UsageEventResponse
