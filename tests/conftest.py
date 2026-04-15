@@ -294,3 +294,22 @@ async def test_deployment(db_session: AsyncSession, test_agent):
     db_session.add(deployment)
     await db_session.commit()
     return deployment
+
+
+@pytest.fixture(scope="session", autouse=True)
+def shutdown_telemetry_after_tests() -> None:
+    """Gracefully shut down OpenTelemetry after all tests complete.
+
+    This prevents the BatchSpanProcessor background thread from writing
+    to pytest's closed stdout/stderr (ValueError: I/O operation on closed file).
+    Must run after all tests and at all process exits — including forked workers.
+    """
+    yield
+    # Runs after the session ends but before the process exits.
+    # We need to be defensive since the telemetry module may not have been imported.
+    try:
+        from src.api.telemetry.telemetry import shutdown_telemetry
+
+        shutdown_telemetry()
+    except Exception:
+        pass  # telemetry may not be imported in this test run
