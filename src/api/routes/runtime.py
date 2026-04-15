@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends, Response
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
@@ -91,4 +92,7 @@ async def governance_status(
         }
     except Exception:
         logger.exception("Failed to collect governance status")
-        return {"error": "Failed to collect governance status"}
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Failed to collect governance status"},
+        )
