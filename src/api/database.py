@@ -414,6 +414,7 @@ async def _repair_runtime_schema() -> None:
 async def _create_tables() -> None:
     """Bootstrap all tables on a fresh database (idempotent — skips existing)."""
     import src.api.models  # noqa: F401 — registers all model classes with Base
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database tables verified/created")

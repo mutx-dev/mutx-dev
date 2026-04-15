@@ -452,8 +452,10 @@ async def get_deployment_versions(
     """Get version history for a specific deployment."""
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
-    count_stmt = select(func.count()).select_from(DeploymentVersion).where(
-        DeploymentVersion.deployment_id == deployment.id
+    count_stmt = (
+        select(func.count())
+        .select_from(DeploymentVersion)
+        .where(DeploymentVersion.deployment_id == deployment.id)
     )
     total = (await db.execute(count_stmt)).scalar_one()
 
