@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Header, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import func, select
 import uuid
 import logging
 from typing import Optional
@@ -12,7 +12,8 @@ from src.api.models.schemas import (
     WebhookCreate,
     WebhookUpdate,
     WebhookResponse,
-    WebhookDelivery,
+    WebhookListResponse,
+    WebhookDeliveryListResponse,
 )
 from src.api.middleware.auth import get_current_user_or_api_key
 from src.api.security import encrypt_secret_value
@@ -132,7 +133,7 @@ async def create_webhook(
     return _serialize_webhook(webhook)
 
 
-@router.get("/", response_model=list[WebhookResponse])
+@router.get("/", response_model=WebhookListResponse)
 async def list_webhooks(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
@@ -140,11 +141,21 @@ async def list_webhooks(
     current_user: User = Depends(get_webhook_auth),
 ):
     """List all webhooks registered by the authenticated user."""
+    filters = [Webhook.user_id == current_user.id]
+
+    total_stmt = select(func.count()).select_from(Webhook).where(*filters)
+    total = (await db.execute(total_stmt)).scalar_one()
+
     result = await db.execute(
-        select(Webhook).where(Webhook.user_id == current_user.id).offset(skip).limit(limit)
+        select(Webhook).where(*filters).offset(skip).limit(limit)
     )
     webhooks = result.scalars().all()
-    return [_serialize_webhook(webhook) for webhook in webhooks]
+    return WebhookListResponse(
+        items=[_serialize_webhook(w) for w in webhooks],
+        total=total,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.get("/{webhook_id}", response_model=WebhookResponse)
@@ -234,7 +245,7 @@ async def test_webhook(
         )
 
 
-@router.get("/{webhook_id}/deliveries", response_model=list[WebhookDelivery])
+@router.get("/{webhook_id}/deliveries", response_model=WebhookDeliveryListResponse)
 async def list_webhook_deliveries(
     webhook_id: uuid.UUID,
     event: Optional[str] = Query(None),
@@ -247,17 +258,31 @@ async def list_webhook_deliveries(
     """List delivery attempts for a webhook owned by the authenticated user."""
     webhook = await _get_owned_webhook(webhook_id, db, current_user)
 
+    filters = [WebhookDeliveryLog.webhook_id == webhook.id]
+    if event is not None:
+        filters.append(WebhookDeliveryLog.event == event)
+    if success is not None:
+        filters.append(WebhookDeliveryLog.success == success)
+
+    total_stmt = select(func.count()).select_from(WebhookDeliveryLog).where(*filters)
+    total = (await db.execute(total_stmt)).scalar_one()
+
     query = (
         select(WebhookDeliveryLog)
-        .where(WebhookDeliveryLog.webhook_id == webhook.id)
+        .where(*filters)
         .order_by(WebhookDeliveryLog.created_at.desc())
         .offset(skip)
         .limit(limit)
     )
-    if event is not None:
-        query = query.where(WebhookDeliveryLog.event == event)
-    if success is not None:
-        query = query.where(WebhookDeliveryLog.success == success)
 
     result = await db.execute(query)
-    return result.scalars().all()
+    deliveries = result.scalars().all()
+    return WebhookDeliveryListResponse(
+        webhook_id=webhook.id,
+        items=deliveries,
+        total=total,
+        skip=skip,
+        limit=limit,
+        event=event,
+        success=success,
+    )

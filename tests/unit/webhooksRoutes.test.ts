@@ -43,15 +43,20 @@ describe('Webhooks route proxies', () => {
       expect(authenticatedFetch).not.toHaveBeenCalled()
     })
 
-    it('wraps array responses into a webhooks collection payload', async () => {
+    it('wraps paginated responses into a webhooks collection payload', async () => {
       hasAuthSession.mockReturnValue(true)
       authenticatedFetch.mockResolvedValue({
         response: {
           ok: true,
           status: 200,
-          json: async () => [
-            { id: 'wh_456', name: 'another-webhook', url: 'https://example.com/hook', events: ['agent.stopped'], active: false },
-          ],
+          json: async () => ({
+            items: [
+              { id: 'wh_456', name: 'another-webhook', url: 'https://example.com/hook', events: ['agent.stopped'], active: false },
+            ],
+            total: 1,
+            skip: 0,
+            limit: 50,
+          }),
         },
         tokenRefreshed: false,
       })
@@ -71,6 +76,9 @@ describe('Webhooks route proxies', () => {
         webhooks: [
           { id: 'wh_456', name: 'another-webhook', url: 'https://example.com/hook', events: ['agent.stopped'], active: false },
         ],
+        total: 1,
+        skip: 0,
+        limit: 50,
       })
     })
 

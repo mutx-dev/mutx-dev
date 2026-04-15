@@ -42,7 +42,15 @@ export async function GET(
 
     const payload = await response.json().catch(() => ({}));
     const nextResponse = response.ok
-      ? NextResponse.json({ deliveries: payload }, { status: response.status })
+      ? NextResponse.json(
+          {
+            deliveries: Array.isArray(payload) ? payload : payload?.items ?? [],
+            total: payload?.total,
+            skip: payload?.skip,
+            limit: payload?.limit,
+          },
+          { status: response.status }
+        )
       : NextResponse.json(
           { error: payload.detail || "Failed to fetch webhook deliveries" },
           { status: response.status }
