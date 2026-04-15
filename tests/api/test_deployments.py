@@ -354,10 +354,11 @@ class TestDeploymentLogs:
         assert response.status_code == 200
 
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["agent_id"] == str(test_deployment.agent_id)
-        assert data[0]["level"] == "ERROR"
-        assert data[0]["message"] == "probe failed"
+        assert data["total"] == 1
+        assert len(data["items"]) == 1
+        assert data["items"][0]["agent_id"] == str(test_deployment.agent_id)
+        assert data["items"][0]["level"] == "ERROR"
+        assert data["items"][0]["message"] == "probe failed"
 
     @pytest.mark.asyncio
     async def test_get_deployment_logs_other_user_forbidden(
@@ -396,10 +397,11 @@ class TestDeploymentMetrics:
         assert response.status_code == 200
 
         data = response.json()
-        assert len(data) == 2
-        assert data[0]["agent_id"] == str(test_deployment.agent_id)
-        assert data[0]["cpu_usage"] == 0.85
-        assert data[1]["cpu_usage"] == 0.22
+        assert data["total"] == 2
+        assert len(data["items"]) == 2
+        assert data["items"][0]["agent_id"] == str(test_deployment.agent_id)
+        assert data["items"][0]["cpu_usage"] == 0.85
+        assert data["items"][1]["cpu_usage"] == 0.22
 
     @pytest.mark.asyncio
     async def test_get_deployment_metrics_other_user_forbidden(

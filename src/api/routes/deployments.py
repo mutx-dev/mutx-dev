@@ -25,8 +25,8 @@ from src.api.models.schemas import (
     DeploymentScale,
     DeploymentCreate,
     DeploymentEventHistoryResponse,
-    DeploymentLogsResponse,
-    DeploymentMetricsResponse,
+    DeploymentLogsHistoryResponse,
+    DeploymentMetricsHistoryResponse,
     DeploymentVersionHistoryResponse,
     DeploymentRollbackRequest,
 )
@@ -349,7 +349,7 @@ async def restart_deployment(
     return _serialize_deployment(deployment)
 
 
-@router.get("/{deployment_id}/logs", response_model=list[DeploymentLogsResponse])
+@router.get("/{deployment_id}/logs", response_model=DeploymentLogsHistoryResponse)
 async def get_deployment_logs(
     deployment_id: uuid.UUID,
     skip: int = Query(0, ge=0),
@@ -358,23 +358,37 @@ async def get_deployment_logs(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get logs for a specific deployment."""
+    """Get paginated logs for a specific deployment."""
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
-    # Query logs for the deployment's agent
-    query = (
-        select(AgentLog).where(AgentLog.agent_id == deployment.agent_id).offset(skip).limit(limit)
-    )
+    filters = [AgentLog.agent_id == deployment.agent_id]
     if level:
-        query = query.where(AgentLog.level == level)
-    query = query.order_by(AgentLog.timestamp.desc())
+        filters.append(AgentLog.level == level)
+
+    total_stmt = select(func.count()).select_from(AgentLog).where(*filters)
+    total = (await db.execute(total_stmt)).scalar_one()
+
+    query = (
+        select(AgentLog)
+        .where(*filters)
+        .order_by(AgentLog.timestamp.desc())
+        .offset(skip)
+        .limit(limit)
+    )
 
     result = await db.execute(query)
     logs = result.scalars().all()
-    return logs
+    return DeploymentLogsHistoryResponse(
+        deployment_id=deployment.id,
+        items=logs,
+        total=total,
+        skip=skip,
+        limit=limit,
+        level=level,
+    )
 
 
-@router.get("/{deployment_id}/metrics", response_model=list[DeploymentMetricsResponse])
+@router.get("/{deployment_id}/metrics", response_model=DeploymentMetricsHistoryResponse)
 async def get_deployment_metrics(
     deployment_id: uuid.UUID,
     skip: int = Query(0, ge=0),
@@ -382,13 +396,17 @@ async def get_deployment_metrics(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get metrics for a specific deployment."""
+    """Get paginated metrics for a specific deployment."""
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
-    # Query metrics for the deployment's agent
+    filters = [AgentMetric.agent_id == deployment.agent_id]
+
+    total_stmt = select(func.count()).select_from(AgentMetric).where(*filters)
+    total = (await db.execute(total_stmt)).scalar_one()
+
     query = (
         select(AgentMetric)
-        .where(AgentMetric.agent_id == deployment.agent_id)
+        .where(*filters)
         .offset(skip)
         .limit(limit)
         .order_by(AgentMetric.timestamp.desc())
@@ -396,7 +414,13 @@ async def get_deployment_metrics(
 
     result = await db.execute(query)
     metrics = result.scalars().all()
-    return metrics
+    return DeploymentMetricsHistoryResponse(
+        deployment_id=deployment.id,
+        items=metrics,
+        total=total,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.get("/{deployment_id}/versions", response_model=DeploymentVersionHistoryResponse)
@@ -408,6 +432,11 @@ async def get_deployment_versions(
     """Get version history for a specific deployment."""
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
+    count_stmt = select(func.count()).select_from(DeploymentVersion).where(
+        DeploymentVersion.deployment_id == deployment.id
+    )
+    total = (await db.execute(count_stmt)).scalar_one()
+
     query = (
         select(DeploymentVersion)
         .where(DeploymentVersion.deployment_id == deployment.id)
@@ -417,11 +446,11 @@ async def get_deployment_versions(
     result = await db.execute(query)
     versions = result.scalars().all()
 
-    return {
-        "deployment_id": deployment.id,
-        "items": versions,
-        "total": len(versions),
-    }
+    return DeploymentVersionHistoryResponse(
+        deployment_id=deployment.id,
+        items=versions,
+        total=total,
+    )
 
 
 @router.post("/{deployment_id}/rollback", response_model=DeploymentResponse)
