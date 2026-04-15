@@ -73,6 +73,9 @@ class SwarmResponse(BaseModel):
 class SwarmListResponse(BaseModel):
     items: list[SwarmResponse]
     total: int
+    skip: int
+    limit: int
+    has_more: bool
 
 
 @router.get("/blueprints", response_model=list[SwarmBlueprintResponse])
@@ -162,6 +165,9 @@ async def list_swarms(
     return SwarmListResponse(
         items=[await _serialize_swarm(s, db) for s in swarms],
         total=total,
+        skip=skip,
+        limit=limit,
+        has_more=total > skip + len(swarms),
     )
 
 

@@ -105,6 +105,8 @@ class TestListUsageEvents:
         data = response.json()
         assert "items" in data
         assert "total" in data
+        assert "has_more" in data
+        assert data["has_more"] is False
         assert len(data["items"]) == 0
 
     @pytest.mark.asyncio
@@ -185,12 +187,14 @@ class TestListUsageEvents:
         data = response.json()
         assert len(data["items"]) == 5
         assert data["limit"] == 5
+        assert data["has_more"] is True
 
         # Test offset
         response = await client.get("/v1/usage/events?skip=10&limit=5")
         assert response.status_code == 200
         data = response.json()
         assert len(data["items"]) == 5
+        assert data["has_more"] is False
 
     @pytest.mark.asyncio
     async def test_list_usage_events_requires_auth(self, client_no_auth: AsyncClient):

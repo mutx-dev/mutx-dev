@@ -26,6 +26,7 @@ class UsageEventListResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
 
 
 @router.post("/events", response_model=UsageEventResponse, status_code=201)
@@ -83,6 +84,7 @@ async def list_usage_events(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(events),
     )
 
 

@@ -37,6 +37,9 @@ class AlertListResponse(BaseModel):
     items: list[AlertResponse]
     total: int
     unresolved_count: int
+    skip: int
+    limit: int
+    has_more: bool
 
 
 class AlertResolveRequest(BaseModel):
@@ -139,6 +142,9 @@ async def list_alerts(
         items=[_serialize_alert(a) for a in alerts],
         total=total,
         unresolved_count=unresolved_count,
+        skip=skip,
+        limit=limit,
+        has_more=total > skip + len(alerts),
     )
 
 
