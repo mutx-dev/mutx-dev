@@ -323,6 +323,16 @@ class AgentResourceUsageResponse(BaseModel):
     created_at: datetime
 
 
+class PaginatedAgentResourceUsageResponse(BaseModel):
+    """Paginated response for agent resource usage records."""
+
+    items: list[AgentResourceUsageResponse]
+    total: int
+    skip: int
+    limit: int
+    has_more: bool
+
+
 class AgentResourceUsageCreate(BaseModel):
     """Request schema for creating agent resource usage record."""
 

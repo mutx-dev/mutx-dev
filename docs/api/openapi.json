@@ -826,11 +826,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AgentResourceUsageResponse"
-                  },
-                  "title": "Response List Agent Resource Usage V1 Agents  Agent Id  Resource Usage Get"
+                  "$ref": "#/components/schemas/PaginatedAgentResourceUsageResponse"
                 }
               }
             }
@@ -20643,6 +20639,43 @@
         "additionalProperties": false,
         "type": "object",
         "title": "OpenClawWakeupConfig"
+      },
+      "PaginatedAgentResourceUsageResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentResourceUsageResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "skip",
+          "limit",
+          "has_more"
+        ],
+        "title": "PaginatedAgentResourceUsageResponse",
+        "description": "Paginated response for agent resource usage records."
       },
       "PicoProgressPayload": {
         "properties": {},

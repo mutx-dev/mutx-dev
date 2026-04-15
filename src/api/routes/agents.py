@@ -30,6 +30,7 @@ from src.api.models.schemas import (
     AgentLogHistoryResponse,
     AgentMetricHistoryResponse,
     AgentResourceUsageCreate,
+    PaginatedAgentResourceUsageResponse,
     AgentResourceUsageResponse,
     AgentCreate,
     AgentDetailResponse,
@@ -605,7 +606,7 @@ async def create_agent_resource_usage(
 
 @router.get(
     "/{agent_id}/resource-usage",
-    response_model=list[AgentResourceUsageResponse],
+    response_model=PaginatedAgentResourceUsageResponse,
 )
 async def list_agent_resource_usage(
     agent_id: uuid.UUID,
@@ -622,6 +623,14 @@ async def list_agent_resource_usage(
         forbidden_detail="Not authorized to access this agent's resource usage",
     )
 
+    # Total count
+    count_stmt = (
+        select(func.count())
+        .select_from(AgentResourceUsage)
+        .where(AgentResourceUsage.agent_id == agent_id)
+    )
+    total = (await db.execute(count_stmt)).scalar_one()
+
     query = (
         select(AgentResourceUsage)
         .where(AgentResourceUsage.agent_id == agent_id)
@@ -631,4 +640,11 @@ async def list_agent_resource_usage(
     )
     result = await db.execute(query)
     usages = result.scalars().all()
-    return [_to_agent_resource_usage_response(usage) for usage in usages]
+
+    return PaginatedAgentResourceUsageResponse(
+        items=[_to_agent_resource_usage_response(usage) for usage in usages],
+        total=total,
+        skip=skip,
+        limit=limit,
+        has_more=(skip + limit) < total,
+    )
