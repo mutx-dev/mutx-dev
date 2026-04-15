@@ -4821,7 +4821,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/HeartbeatResponse"
+                }
               }
             }
           },
@@ -4879,7 +4881,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/src__api__routes__agent_runtime__MetricsResponse"
+                }
               }
             }
           },
@@ -5012,7 +5016,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CommandAckResponse"
+                }
               }
             }
           },
@@ -5070,7 +5076,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/LogSubmitResponse"
+                }
               }
             }
           },
@@ -8283,7 +8291,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MetricsResponse"
+                  "$ref": "#/components/schemas/src__api__routes__security__MetricsResponse"
                 }
               }
             }
@@ -16100,6 +16108,24 @@
         ],
         "title": "ClawHubSkillBundleResponse"
       },
+      "CommandAckResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "command_id": {
+            "type": "string",
+            "title": "Command Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "command_id"
+        ],
+        "title": "CommandAckResponse"
+      },
       "CommandAcknowledgeRequest": {
         "properties": {
           "command_id": {
@@ -17920,6 +17946,29 @@
         ],
         "title": "HeartbeatRequest"
       },
+      "HeartbeatResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "agent_id",
+          "timestamp"
+        ],
+        "title": "HeartbeatResponse"
+      },
       "IngestRequest": {
         "properties": {
           "texts": {
@@ -18370,6 +18419,24 @@
         ],
         "title": "LogRequest"
       },
+      "LogSubmitResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "agent_id"
+        ],
+        "title": "LogSubmitResponse"
+      },
       "LoginRequest": {
         "properties": {
           "email": {
@@ -18532,65 +18599,6 @@
           "timestamp"
         ],
         "title": "MetricsRequest"
-      },
-      "MetricsResponse": {
-        "properties": {
-          "total_evaluations": {
-            "type": "integer",
-            "title": "Total Evaluations"
-          },
-          "permits": {
-            "type": "integer",
-            "title": "Permits"
-          },
-          "denials": {
-            "type": "integer",
-            "title": "Denials"
-          },
-          "defers": {
-            "type": "integer",
-            "title": "Defers"
-          },
-          "pending_approvals": {
-            "type": "integer",
-            "title": "Pending Approvals"
-          },
-          "intent_drifts": {
-            "type": "integer",
-            "title": "Intent Drifts"
-          },
-          "active_sessions": {
-            "type": "integer",
-            "title": "Active Sessions"
-          },
-          "avg_latency_ms": {
-            "type": "number",
-            "title": "Avg Latency Ms"
-          },
-          "decisions_per_minute": {
-            "type": "integer",
-            "title": "Decisions Per Minute"
-          },
-          "decisions_per_hour": {
-            "type": "integer",
-            "title": "Decisions Per Hour"
-          }
-        },
-        "type": "object",
-        "required": [
-          "total_evaluations",
-          "permits",
-          "denials",
-          "defers",
-          "pending_approvals",
-          "intent_drifts",
-          "active_sessions",
-          "avg_latency_ms",
-          "decisions_per_minute",
-          "decisions_per_hour"
-        ],
-        "title": "MetricsResponse",
-        "description": "Governance metrics response."
       },
       "MutxCost": {
         "properties": {
@@ -25407,6 +25415,83 @@
         },
         "type": "object",
         "title": "WebhookUpdate"
+      },
+      "src__api__routes__agent_runtime__MetricsResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "agent_id"
+        ],
+        "title": "MetricsResponse"
+      },
+      "src__api__routes__security__MetricsResponse": {
+        "properties": {
+          "total_evaluations": {
+            "type": "integer",
+            "title": "Total Evaluations"
+          },
+          "permits": {
+            "type": "integer",
+            "title": "Permits"
+          },
+          "denials": {
+            "type": "integer",
+            "title": "Denials"
+          },
+          "defers": {
+            "type": "integer",
+            "title": "Defers"
+          },
+          "pending_approvals": {
+            "type": "integer",
+            "title": "Pending Approvals"
+          },
+          "intent_drifts": {
+            "type": "integer",
+            "title": "Intent Drifts"
+          },
+          "active_sessions": {
+            "type": "integer",
+            "title": "Active Sessions"
+          },
+          "avg_latency_ms": {
+            "type": "number",
+            "title": "Avg Latency Ms"
+          },
+          "decisions_per_minute": {
+            "type": "integer",
+            "title": "Decisions Per Minute"
+          },
+          "decisions_per_hour": {
+            "type": "integer",
+            "title": "Decisions Per Hour"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_evaluations",
+          "permits",
+          "denials",
+          "defers",
+          "pending_approvals",
+          "intent_drifts",
+          "active_sessions",
+          "avg_latency_ms",
+          "decisions_per_minute",
+          "decisions_per_hour"
+        ],
+        "title": "MetricsResponse",
+        "description": "Governance metrics response."
       }
     },
     "securitySchemes": {
