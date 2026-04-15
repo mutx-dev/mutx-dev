@@ -431,8 +431,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "title": "Response Deploy Agent V1 Agents  Agent Id  Deploy Post"
+                  "$ref": "#/components/schemas/AgentDeployResponse"
                 }
               }
             }
@@ -491,8 +490,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "title": "Response Stop Agent V1 Agents  Agent Id  Stop Post"
+                  "$ref": "#/components/schemas/AgentStopResponse"
                 }
               }
             }
@@ -10407,8 +10405,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "title": "Response Get Scheduler V1 Scheduler Get"
+                  "$ref": "#/components/schemas/SchedulerListResponse"
                 }
               }
             }
@@ -13597,6 +13594,25 @@
         ],
         "title": "AgentCreate"
       },
+      "AgentDeployResponse": {
+        "properties": {
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Deployment Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deployment_id",
+          "status"
+        ],
+        "title": "AgentDeployResponse"
+      },
       "AgentDetailResponse": {
         "properties": {
           "id": {
@@ -14468,6 +14484,19 @@
           "status"
         ],
         "title": "AgentStatusUpdate"
+      },
+      "AgentStopResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "AgentStopResponse"
       },
       "AgentType": {
         "type": "string",
@@ -23660,6 +23689,27 @@
         ],
         "title": "SSOCallbackResponse",
         "description": "Response model for SSO callback."
+      },
+      "SchedulerListResponse": {
+        "properties": {
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/SchedulerTaskResponse"
+            },
+            "type": "array",
+            "title": "Tasks"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tasks",
+          "total"
+        ],
+        "title": "SchedulerListResponse"
       },
       "SchedulerTaskCreate": {
         "properties": {
