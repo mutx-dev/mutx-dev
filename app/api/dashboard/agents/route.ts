@@ -30,7 +30,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     )
 
     const payload = await response.json().catch(() => ({ detail: 'Failed to fetch agents' }))
-    const nextResponse = NextResponse.json(payload, { status: response.status })
+    // Backend returns { items, total, skip, limit, has_more } envelope.
+    // Extract items for backward-compatible client consumption.
+    const agents = Array.isArray(payload) ? payload : payload.items ?? payload
+    const nextResponse = NextResponse.json(agents, { status: response.status })
     
     if (tokenRefreshed && refreshedTokens) {
       applyAuthCookies(nextResponse, request, refreshedTokens)

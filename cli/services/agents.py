@@ -12,7 +12,9 @@ class AgentsService(APIService):
     def list_agents(self, *, limit: int = 50, skip: int = 0) -> list[AgentRecord]:
         response = self._request("get", "/v1/agents", params={"limit": limit, "skip": skip})
         self._expect_status(response, {200})
-        return [AgentRecord.from_payload(item) for item in response.json()]
+        payload = response.json()
+        items = payload.get("items", payload) if isinstance(payload, dict) else payload
+        return [AgentRecord.from_payload(item) for item in items]
 
     def get_agent(self, agent_id: str) -> AgentRecord:
         response = self._request("get", f"/v1/agents/{agent_id}")
