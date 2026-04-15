@@ -41,7 +41,7 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     response = await client.get("/v1/webhooks/")
     assert response.status_code == 200
     webhooks = response.json()
-    assert any(w["id"] == webhook_id for w in webhooks)
+    assert any(w["id"] == webhook_id for w in webhooks["items"])
 
     # 3. Get Webhook
     response = await client.get(f"/v1/webhooks/{webhook_id}")
@@ -112,15 +112,15 @@ async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
 
     full_response = await client.get("/v1/webhooks/")
     assert full_response.status_code == 200
-    assert len(full_response.json()) == 3
+    assert len(full_response.json()["items"]) == 3
 
     limited_response = await client.get("/v1/webhooks/?limit=1")
     assert limited_response.status_code == 200
-    assert len(limited_response.json()) == 1
+    assert len(limited_response.json()["items"]) == 1
 
     skipped_response = await client.get("/v1/webhooks/?skip=1&limit=10")
     assert skipped_response.status_code == 200
-    assert len(skipped_response.json()) == 2
+    assert len(skipped_response.json()["items"]) == 2
 
 
 @pytest.mark.asyncio
@@ -219,9 +219,9 @@ async def test_webhook_delivery_history_filters(client: AsyncClient, db_session,
     )
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["event"] == "agent.status"
-    assert data[0]["success"] is False
+    assert len(data["items"]) == 1
+    assert data["items"][0]["event"] == "agent.status"
+    assert data["items"][0]["success"] is False
 
 
 @pytest.mark.asyncio
@@ -269,9 +269,9 @@ async def test_webhook_delivery_history_honors_skip_limit_and_desc_order(
     response = await client.get(f"/v1/webhooks/{webhook_id}/deliveries?skip=1&limit=1")
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["payload"] == '{"seq":2}'
-    assert data[0]["success"] is False
+    assert len(data["items"]) == 1
+    assert data["items"][0]["payload"] == '{"seq":2}'
+    assert data["items"][0]["success"] is False
 
 
 @pytest.mark.asyncio
@@ -365,8 +365,8 @@ async def test_webhook_delivery_history_supports_managed_api_key_auth(
 
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["event"] == "agent.heartbeat"
+    assert len(data["items"]) == 1
+    assert data["items"][0]["event"] == "agent.heartbeat"
 
 
 @pytest.mark.asyncio
@@ -562,7 +562,7 @@ async def test_webhook_delivery_history_empty(client: AsyncClient):
     # Get deliveries (should be empty list)
     response = await client.get(f"/v1/webhooks/{webhook_id}/deliveries")
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json()["items"] == []
 
 
 @pytest.mark.asyncio
