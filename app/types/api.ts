@@ -4565,6 +4565,13 @@ export interface components {
              */
             source: string;
         };
+        /** CommandAckResponse */
+        CommandAckResponse: {
+            /** Status */
+            status: string;
+            /** Command Id */
+            command_id: string;
+        };
         /** CommandAcknowledgeRequest */
         CommandAcknowledgeRequest: {
             /** Command Id */
@@ -5310,6 +5317,15 @@ export interface components {
             /** Hostname */
             hostname?: string | null;
         };
+        /** HeartbeatResponse */
+        HeartbeatResponse: {
+            /** Status */
+            status: string;
+            /** Agent Id */
+            agent_id: string;
+            /** Timestamp */
+            timestamp: string;
+        };
         /**
          * IngestRequest
          * @description Request model for document ingestion.
@@ -5475,6 +5491,13 @@ export interface components {
             /** Timestamp */
             timestamp: string;
         };
+        /** LogSubmitResponse */
+        LogSubmitResponse: {
+            /** Status */
+            status: string;
+            /** Agent Id */
+            agent_id: string;
+        };
         /** LoginRequest */
         LoginRequest: {
             /**
@@ -5552,32 +5575,6 @@ export interface components {
             custom: Record<string, never>;
             /** Timestamp */
             timestamp: string;
-        };
-        /**
-         * MetricsResponse
-         * @description Governance metrics response.
-         */
-        MetricsResponse: {
-            /** Total Evaluations */
-            total_evaluations: number;
-            /** Permits */
-            permits: number;
-            /** Denials */
-            denials: number;
-            /** Defers */
-            defers: number;
-            /** Pending Approvals */
-            pending_approvals: number;
-            /** Intent Drifts */
-            intent_drifts: number;
-            /** Active Sessions */
-            active_sessions: number;
-            /** Avg Latency Ms */
-            avg_latency_ms: number;
-            /** Decisions Per Minute */
-            decisions_per_minute: number;
-            /** Decisions Per Hour */
-            decisions_per_hour: number;
         };
         /**
          * MutxCost
@@ -8130,6 +8127,39 @@ export interface components {
             events?: string[] | null;
             /** Is Active */
             is_active?: boolean | null;
+        };
+        /** MetricsResponse */
+        src__api__routes__agent_runtime__MetricsResponse: {
+            /** Status */
+            status: string;
+            /** Agent Id */
+            agent_id: string;
+        };
+        /**
+         * MetricsResponse
+         * @description Governance metrics response.
+         */
+        src__api__routes__security__MetricsResponse: {
+            /** Total Evaluations */
+            total_evaluations: number;
+            /** Permits */
+            permits: number;
+            /** Denials */
+            denials: number;
+            /** Defers */
+            defers: number;
+            /** Pending Approvals */
+            pending_approvals: number;
+            /** Intent Drifts */
+            intent_drifts: number;
+            /** Active Sessions */
+            active_sessions: number;
+            /** Avg Latency Ms */
+            avg_latency_ms: number;
+            /** Decisions Per Minute */
+            decisions_per_minute: number;
+            /** Decisions Per Hour */
+            decisions_per_hour: number;
         };
     };
     responses: never;
@@ -10715,7 +10745,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["HeartbeatResponse"];
                 };
             };
             /** @description Validation Error */
@@ -10750,7 +10780,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["src__api__routes__agent_runtime__MetricsResponse"];
                 };
             };
             /** @description Validation Error */
@@ -10819,7 +10849,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["CommandAckResponse"];
                 };
             };
             /** @description Validation Error */
@@ -10854,7 +10884,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["LogSubmitResponse"];
                 };
             };
             /** @description Validation Error */
@@ -12484,7 +12514,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MetricsResponse"];
+                    "application/json": components["schemas"]["src__api__routes__security__MetricsResponse"];
                 };
             };
             /** @description Validation Error */
