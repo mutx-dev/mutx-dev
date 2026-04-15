@@ -325,6 +325,15 @@ def _build_lifespan(
 
             await dispose_engine()
 
+            # Shutdown OpenTelemetry to flush pending spans before process exit
+            try:
+                from src.api.telemetry.telemetry import shutdown_telemetry
+
+                shutdown_telemetry()
+                logger.info("OpenTelemetry shutdown complete")
+            except Exception as e:
+                logger.warning(f"Error shutting down telemetry: {e}")
+
     return lifespan
 
 
