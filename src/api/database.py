@@ -367,9 +367,20 @@ async def _repair_runtime_schema() -> None:
         )
 
 
+async def _create_tables_if_needed() -> None:
+    """Create all tables that don't exist yet (fresh DB bootstrap)."""
+    import src.api.models.models  # noqa: F401 – registers ORM models with Base
+    import src.api.models.observability_models  # noqa: F401
+    import src.api.models.plan_tiers  # noqa: F401
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database tables verified/created")
+
+
 async def init_db() -> list[str]:
     try:
         await _run_startup_probe()
+        await _create_tables_if_needed()
         await _repair_runtime_schema()
     except Exception as exc:
         if not _should_retry_without_ssl(exc):
@@ -378,6 +389,7 @@ async def init_db() -> list[str]:
         logger.warning("Database rejected SSL upgrade; retrying with SSL disabled for asyncpg")
         await _reconfigure_engine(override_ssl_mode="disable")
         await _run_startup_probe()
+        await _create_tables_if_needed()
         await _repair_runtime_schema()
 
     return get_last_runtime_schema_repairs()
