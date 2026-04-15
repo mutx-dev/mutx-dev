@@ -3410,7 +3410,9 @@ export interface components {
              * Tool Args
              * @description Tool arguments
              */
-            tool_args?: Record<string, never>;
+            tool_args?: {
+                [key: string]: unknown;
+            };
             /**
              * Agent Id
              * @description Agent ID
@@ -3471,7 +3473,9 @@ export interface components {
             agent_id: string;
             type: components["schemas"]["AgentType"];
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
             /** Config Version */
             config_version: number;
             /**
@@ -3486,7 +3490,9 @@ export interface components {
              * Config
              * @description Updated agent configuration payload. Can be a JSON object or JSON string.
              */
-            config: Record<string, never> | string;
+            config: {
+                [key: string]: unknown;
+            } | string;
         };
         /** AgentCreate */
         AgentCreate: {
@@ -3497,7 +3503,9 @@ export interface components {
             /** @default openai */
             type: components["schemas"]["AgentType"];
             /** Config */
-            config?: Record<string, never> | string | null;
+            config?: {
+                [key: string]: unknown;
+            } | string | null;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -3514,7 +3522,9 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            } | null;
             /**
              * Config Version
              * @default 1
@@ -3681,7 +3691,9 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Capabilities
              * @default []
@@ -3732,7 +3744,9 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: Record<string, never> | null;
+            extra_metadata?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Period Start
              * Format: date-time
@@ -3781,7 +3795,9 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: Record<string, never> | null;
+            extra_metadata?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Period Start
              * Format: date-time
@@ -3810,7 +3826,9 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            } | null;
             /**
              * Config Version
              * @default 1
@@ -4091,7 +4109,9 @@ export interface components {
              * Payload
              * @default {}
              */
-            payload: Record<string, never>;
+            payload: {
+                [key: string]: unknown;
+            };
         };
         /**
          * ApprovalRequest
@@ -4110,7 +4130,9 @@ export interface components {
             /** Action Type */
             action_type: string;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
             /** @default PENDING */
             status: components["schemas"]["ApprovalStatus"];
             /** Requester */
@@ -4141,7 +4163,9 @@ export interface components {
              * Tool Args
              * @description Tool arguments
              */
-            tool_args?: Record<string, never>;
+            tool_args?: {
+                [key: string]: unknown;
+            };
             /**
              * Agent Id
              * @description Agent ID
@@ -4296,7 +4320,9 @@ export interface components {
             /** Deployments */
             deployments?: components["schemas"]["DeploymentResponse"][];
             /** Config */
-            config: components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
+            config: components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
         };
         /** AssistantSessionResponse */
         AssistantSessionResponse: {
@@ -4385,7 +4411,9 @@ export interface components {
             /** Starter Prompt */
             starter_prompt: string;
             /** Default Config */
-            default_config: components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
+            default_config: components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
             /** Category */
             category?: string | null;
             /** Tags */
@@ -4433,7 +4461,9 @@ export interface components {
             /** Event Type */
             event_type: string;
             /** Payload */
-            payload: Record<string, never>;
+            payload: {
+                [key: string]: unknown;
+            };
             /**
              * Timestamp
              * Format: date-time
@@ -4566,7 +4596,9 @@ export interface components {
             /** Success */
             success: boolean;
             /** Result */
-            result?: Record<string, never> | null;
+            result?: {
+                [key: string]: unknown;
+            } | null;
             /** Error */
             error?: string | null;
             /** Completed At */
@@ -4579,7 +4611,9 @@ export interface components {
             /** Action */
             action: string;
             /** Parameters */
-            parameters: Record<string, never>;
+            parameters: {
+                [key: string]: unknown;
+            };
             /** Received At */
             received_at: string;
         };
@@ -4600,9 +4634,13 @@ export interface components {
             /** Checked At */
             checked_at: string;
             /** Summary */
-            summary: Record<string, never>;
+            summary: {
+                [key: string]: unknown;
+            };
             /** Results */
-            results: Record<string, never>[];
+            results: {
+                [key: string]: unknown;
+            }[];
         };
         /** CostSummaryResponse */
         CostSummaryResponse: {
@@ -4645,7 +4683,9 @@ export interface components {
              */
             ttl: number | null;
             /** Config */
-            config?: Record<string, never>;
+            config?: {
+                [key: string]: unknown;
+            };
         };
         /** CredentialResponse */
         CredentialResponse: {
@@ -4665,7 +4705,9 @@ export interface components {
             /** Expires At */
             expires_at?: string | null;
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
         };
         /** CustomAgentConfig */
         CustomAgentConfig: {
@@ -4999,7 +5041,9 @@ export interface components {
             /** Sha256 */
             sha256?: string | null;
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
@@ -5021,7 +5065,9 @@ export interface components {
              */
             execution_mode: string;
             /** Parameters */
-            parameters?: Record<string, never>;
+            parameters?: {
+                [key: string]: unknown;
+            };
         };
         /** DocumentJobDispatchRequest */
         DocumentJobDispatchRequest: {
@@ -5038,7 +5084,9 @@ export interface components {
             /** Message */
             message?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
             /** Status */
             status?: string | null;
             /** Output Text */
@@ -5046,7 +5094,9 @@ export interface components {
             /** Error Message */
             error_message?: string | null;
             /** Result Summary */
-            result_summary?: Record<string, never> | null;
+            result_summary?: {
+                [key: string]: unknown;
+            } | null;
             /** Timestamp */
             timestamp?: string | null;
         };
@@ -5082,7 +5132,9 @@ export interface components {
             /** Execution Mode */
             execution_mode: string;
             /** Manifest */
-            manifest?: Record<string, never>;
+            manifest?: {
+                [key: string]: unknown;
+            };
             /** Artifacts */
             artifacts?: components["schemas"]["DocumentArtifactResponse"][];
         };
@@ -5105,9 +5157,13 @@ export interface components {
             /** Status */
             status: string;
             /** Parameters */
-            parameters?: Record<string, never>;
+            parameters?: {
+                [key: string]: unknown;
+            };
             /** Result Summary */
-            result_summary?: Record<string, never>;
+            result_summary?: {
+                [key: string]: unknown;
+            };
             /** Error Message */
             error_message?: string | null;
             /** Claimed By */
@@ -5253,7 +5309,9 @@ export interface components {
             uptime_seconds?: number | null;
             /** Components */
             components?: {
-                [key: string]: Record<string, never>;
+                [key: string]: {
+                    [key: string]: unknown;
+                };
             };
             /** Schema Repairs Applied */
             schema_repairs_applied?: string[];
@@ -5310,7 +5368,9 @@ export interface components {
              */
             model: string;
             /** Metadatas */
-            metadatas?: Record<string, never>[] | null;
+            metadatas?: {
+                [key: string]: unknown;
+            }[] | null;
             /** Ids */
             ids?: string[] | null;
         };
@@ -5360,7 +5420,9 @@ export interface components {
             /** Chain Id */
             chain_id: string;
             /** Parameters */
-            parameters?: Record<string, never>;
+            parameters?: {
+                [key: string]: unknown;
+            };
         };
         /** LeadCreate */
         LeadCreate: {
@@ -5453,7 +5515,9 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp: string;
         };
@@ -5531,7 +5595,9 @@ export interface components {
              * Custom
              * @default {}
              */
-            custom: Record<string, never>;
+            custom: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp: string;
         };
@@ -5903,7 +5969,9 @@ export interface components {
              * Run Metadata
              * @description Additional metadata
              */
-            run_metadata?: Record<string, never>;
+            run_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /**
          * MutxRunDetailResponse
@@ -5970,7 +6038,9 @@ export interface components {
              * Run Metadata
              * @default {}
              */
-            run_metadata: Record<string, never>;
+            run_metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
@@ -6067,7 +6137,9 @@ export interface components {
              * Run Metadata
              * @default {}
              */
-            run_metadata: Record<string, never>;
+            run_metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
@@ -6080,6 +6152,29 @@ export interface components {
          * @enum {string}
          */
         MutxRunStatus: "pending" | "running" | "completed" | "failed" | "cancelled" | "timeout";
+        /**
+         * MutxRunStatusUpdate
+         * @description Validated payload for patching run status.
+         */
+        MutxRunStatusUpdate: {
+            status?: components["schemas"]["MutxRunStatus"] | null;
+            /** Outcome */
+            outcome?: string | null;
+            /** Ended At */
+            ended_at?: string | null;
+            /** Duration Ms */
+            duration_ms?: number | null;
+            /** Error */
+            error?: string | null;
+            /** Input Tokens */
+            input_tokens?: number | null;
+            /** Output Tokens */
+            output_tokens?: number | null;
+            /** Total Tokens */
+            total_tokens?: number | null;
+            /** Cost Usd */
+            cost_usd?: number | null;
+        };
         /**
          * MutxRunTrigger
          * @description What initiated a run.
@@ -6155,7 +6250,9 @@ export interface components {
              * Step Metadata
              * @description Extension point for step-specific data
              */
-            step_metadata?: Record<string, never>;
+            step_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /**
          * MutxStepBatchResponse
@@ -6239,7 +6336,9 @@ export interface components {
              * Step Metadata
              * @description Additional metadata
              */
-            step_metadata?: Record<string, never>;
+            step_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /**
          * MutxStepType
@@ -6276,7 +6375,9 @@ export interface components {
             /** Action Type */
             action_type?: string | null;
             /** Import Source */
-            import_source?: Record<string, never>;
+            import_source?: {
+                [key: string]: unknown;
+            };
             /** Current Step */
             current_step: string;
             /** Completed Steps */
@@ -6329,7 +6430,9 @@ export interface components {
             /** Step */
             step?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
         };
         /** OpenAIAgentConfig */
         OpenAIAgentConfig: {
@@ -6402,7 +6505,9 @@ export interface components {
             /** Wakeups */
             wakeups?: components["schemas"]["OpenClawWakeupConfig"][];
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             gateway?: components["schemas"]["OpenClawGatewayConfig"];
         };
         /** OpenClawChannelConfig */
@@ -6468,7 +6573,9 @@ export interface components {
             has_more: boolean;
         };
         /** PicoProgressPayload */
-        PicoProgressPayload: Record<string, never>;
+        PicoProgressPayload: {
+            [key: string]: unknown;
+        };
         /** PicoTutorCommand */
         PicoTutorCommand: {
             /** Label */
@@ -6543,7 +6650,9 @@ export interface components {
             /** Lessonslug */
             lessonSlug?: string | null;
             /** Progress */
-            progress?: Record<string, never> | null;
+            progress?: {
+                [key: string]: unknown;
+            } | null;
             setupContext?: components["schemas"]["PicoTutorSetupContext"] | null;
         };
         /** PicoTutorResponse */
@@ -6594,11 +6703,17 @@ export interface components {
         /** PicoTutorSetupContext */
         PicoTutorSetupContext: {
             /** Onboarding */
-            onboarding?: Record<string, never> | null;
+            onboarding?: {
+                [key: string]: unknown;
+            } | null;
             /** Runtime */
-            runtime?: Record<string, never> | null;
+            runtime?: {
+                [key: string]: unknown;
+            } | null;
             /** Currentsurface */
             currentSurface?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** PicoTutorSource */
         PicoTutorSource: {
@@ -6704,7 +6819,9 @@ export interface components {
             /** Sha256 */
             sha256?: string | null;
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
@@ -6726,7 +6843,9 @@ export interface components {
              */
             execution_mode: string;
             /** Parameters */
-            parameters?: Record<string, never>;
+            parameters?: {
+                [key: string]: unknown;
+            };
         };
         /** ReasoningJobDispatchRequest */
         ReasoningJobDispatchRequest: {
@@ -6743,7 +6862,9 @@ export interface components {
             /** Message */
             message?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
             /** Status */
             status?: string | null;
             /** Output Text */
@@ -6751,7 +6872,9 @@ export interface components {
             /** Error Message */
             error_message?: string | null;
             /** Result Summary */
-            result_summary?: Record<string, never> | null;
+            result_summary?: {
+                [key: string]: unknown;
+            } | null;
             /** Timestamp */
             timestamp?: string | null;
         };
@@ -6787,7 +6910,9 @@ export interface components {
             /** Execution Mode */
             execution_mode: string;
             /** Manifest */
-            manifest?: Record<string, never>;
+            manifest?: {
+                [key: string]: unknown;
+            };
             /** Artifacts */
             artifacts?: components["schemas"]["ReasoningArtifactResponse"][];
         };
@@ -6810,9 +6935,13 @@ export interface components {
             /** Status */
             status: string;
             /** Parameters */
-            parameters?: Record<string, never>;
+            parameters?: {
+                [key: string]: unknown;
+            };
             /** Result Summary */
-            result_summary?: Record<string, never>;
+            result_summary?: {
+                [key: string]: unknown;
+            };
             /** Error Message */
             error_message?: string | null;
             /** Claimed By */
@@ -6995,7 +7124,9 @@ export interface components {
             /** Error Message */
             error_message?: string | null;
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             /** Started At */
             started_at?: string | null;
             /** Completed At */
@@ -7021,7 +7152,9 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Started At
              * Format: date-time
@@ -7085,7 +7218,9 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Started At
              * Format: date-time
@@ -7121,7 +7256,9 @@ export interface components {
             /** Message */
             message?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp?: string | null;
         };
@@ -7160,7 +7297,9 @@ export interface components {
             /** Message */
             message: string | null;
             /** Payload */
-            payload: Record<string, never>;
+            payload: {
+                [key: string]: unknown;
+            };
             /** Sequence */
             sequence: number;
             /**
@@ -7235,7 +7374,9 @@ export interface components {
             /** Last Action Type */
             last_action_type?: string | null;
             /** Import Source */
-            import_source?: Record<string, never>;
+            import_source?: {
+                [key: string]: unknown;
+            };
             /** Version */
             version?: string | null;
             /**
@@ -7244,7 +7385,9 @@ export interface components {
              */
             status: string;
             /** Gateway */
-            gateway?: Record<string, never>;
+            gateway?: {
+                [key: string]: unknown;
+            };
             /** Gateway Url */
             gateway_url?: string | null;
             /** Gateway Port */
@@ -7259,9 +7402,13 @@ export interface components {
              */
             binding_count: number;
             /** Current Binding */
-            current_binding?: Record<string, never> | null;
+            current_binding?: {
+                [key: string]: unknown;
+            } | null;
             /** Bindings */
-            bindings?: Record<string, never>[];
+            bindings?: {
+                [key: string]: unknown;
+            }[];
             /**
              * Observed Source
              * @default local
@@ -7344,7 +7491,9 @@ export interface components {
             /** Last Action Type */
             last_action_type?: string | null;
             /** Import Source */
-            import_source?: Record<string, never>;
+            import_source?: {
+                [key: string]: unknown;
+            };
             /** Version */
             version?: string | null;
             /**
@@ -7353,7 +7502,9 @@ export interface components {
              */
             status: string;
             /** Gateway */
-            gateway?: Record<string, never>;
+            gateway?: {
+                [key: string]: unknown;
+            };
             /** Gateway Url */
             gateway_url?: string | null;
             /** Gateway Port */
@@ -7368,9 +7519,13 @@ export interface components {
              */
             binding_count: number;
             /** Current Binding */
-            current_binding?: Record<string, never> | null;
+            current_binding?: {
+                [key: string]: unknown;
+            } | null;
             /** Bindings */
-            bindings?: Record<string, never>[];
+            bindings?: {
+                [key: string]: unknown;
+            }[];
             /**
              * Observed Source
              * @default local
@@ -7423,7 +7578,9 @@ export interface components {
              */
             task_type: string;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
         };
         /** SchedulerTaskResponse */
         SchedulerTaskResponse: {
@@ -7442,7 +7599,9 @@ export interface components {
             /** Task Type */
             task_type: string;
             /** Payload */
-            payload: Record<string, never>;
+            payload: {
+                [key: string]: unknown;
+            };
             /** Last Run */
             last_run: number | null;
             /** Next Run */
@@ -7469,7 +7628,9 @@ export interface components {
             /** Task Type */
             task_type?: string | null;
             /** Payload */
-            payload?: Record<string, never> | null;
+            payload?: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * SearchRequest
@@ -7522,7 +7683,9 @@ export interface components {
         /** SessionListResponse */
         SessionListResponse: {
             /** Sessions */
-            sessions: Record<string, never>[];
+            sessions: {
+                [key: string]: unknown;
+            }[];
         };
         /** StarterDeploymentCreate */
         StarterDeploymentCreate: {
@@ -7551,7 +7714,9 @@ export interface components {
                 [key: string]: components["schemas"]["OpenClawChannelConfig"];
             };
             /** Runtime Metadata */
-            runtime_metadata?: Record<string, never>;
+            runtime_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /** StarterDeploymentResponse */
         StarterDeploymentResponse: {
@@ -7837,7 +8002,9 @@ export interface components {
              * Metadata
              * @description Additional event metadata
              */
-            metadata?: Record<string, never> | null;
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * UsageEventListResponse
@@ -7887,7 +8054,9 @@ export interface components {
              * Metadata
              * @description Deserialize event_metadata JSON string to dict
              */
-            readonly metadata: Record<string, never> | null;
+            readonly metadata: {
+                [key: string]: unknown;
+            } | null;
         };
         /** UserResponse */
         UserResponse: {
@@ -8323,7 +8492,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -8356,7 +8527,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -12077,7 +12250,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": Record<string, never>;
+                "application/json": components["schemas"]["MutxRunStatusUpdate"];
             };
         };
         responses: {
@@ -13204,7 +13377,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -13239,7 +13414,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -13534,7 +13711,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

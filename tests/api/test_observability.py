@@ -131,6 +131,38 @@ async def test_update_run_status_updates_cost_fields(client):
 
 
 @pytest.mark.asyncio
+async def test_update_run_status_rejects_invalid_status(client):
+    """Status must be a valid MutxRunStatus enum value."""
+    create_response = await client.post(
+        "/v1/observability/runs",
+        json={"agent_id": "test-agent-bad-status", "status": "running"},
+    )
+    run_id = create_response.json()["id"]
+
+    response = await client.patch(
+        f"/v1/observability/runs/{run_id}/status",
+        json={"status": "not_a_real_status"},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_run_status_rejects_negative_tokens(client):
+    """Token counts must be non-negative."""
+    create_response = await client.post(
+        "/v1/observability/runs",
+        json={"agent_id": "test-agent-neg-tokens", "status": "running"},
+    )
+    run_id = create_response.json()["id"]
+
+    response = await client.patch(
+        f"/v1/observability/runs/{run_id}/status",
+        json={"input_tokens": -5},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_security_evaluate_endpoint(client):
     """Test the security action evaluation endpoint."""
     response = await client.post(
