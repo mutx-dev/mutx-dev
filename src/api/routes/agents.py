@@ -509,7 +509,7 @@ async def get_agent_logs(
     if level:
         count_query = count_query.where(AgentLog.level == level)
     count_result = await db.execute(count_query)
-    total = count_result.scalar() or 0
+    total = count_result.scalar_one()
 
     query = select(AgentLog).where(AgentLog.agent_id == agent_id).offset(skip).limit(limit)
     if level:
@@ -540,11 +540,9 @@ async def get_agent_metrics(
         forbidden_detail="Not authorized to access this agent's metrics",
     )
 
-    count_query = (
-        select(func.count()).select_from(AgentMetric).where(AgentMetric.agent_id == agent_id)
-    )
+    count_query = select(func.count()).select_from(AgentMetric).where(AgentMetric.agent_id == agent_id)
     count_result = await db.execute(count_query)
-    total = count_result.scalar() or 0
+    total = count_result.scalar_one()
 
     query = (
         select(AgentMetric)
