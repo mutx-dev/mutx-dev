@@ -184,8 +184,8 @@ jobs:
     env:
       POSTGRES_USER: mutx
       POSTGRES_DB: mutx
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      DATABASE_URL: postgresql://mutx:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/mutx
+      POSTGRES_PASSWORD: mutx-ci-test-password
+      DATABASE_URL: postgresql://mutx:mutx-ci-test-password@postgres:5432/mutx
 
     steps:
       - name: Check out repository
