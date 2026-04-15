@@ -27,7 +27,10 @@ class TestListDeployments:
         """Test listing deployments when none exist."""
         response = await client.get("/v1/deployments")
         assert response.status_code == 200
-        assert response.json() == []
+        data = response.json()
+        assert data["items"] == []
+        assert data["total"] == 0
+        assert data["has_more"] is False
 
     @pytest.mark.asyncio
     async def test_list_deployments_with_data(self, client: AsyncClient, test_deployment):
@@ -35,8 +38,9 @@ class TestListDeployments:
         response = await client.get("/v1/deployments")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["id"] == str(test_deployment.id)
+        assert data["total"] == 1
+        assert len(data["items"]) == 1
+        assert data["items"][0]["id"] == str(test_deployment.id)
 
     @pytest.mark.asyncio
     async def test_list_deployments_pagination(
@@ -56,7 +60,11 @@ class TestListDeployments:
         response = await client.get("/v1/deployments?limit=2")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 2
+        assert data["total"] == 5
+        assert len(data["items"]) == 2
+        assert data["has_more"] is True
+        assert data["skip"] == 0
+        assert data["limit"] == 2
 
     @pytest.mark.asyncio
     async def test_list_deployments_by_agent_id(
@@ -87,8 +95,9 @@ class TestListDeployments:
         response = await client.get(f"/v1/deployments?agent_id={test_agent.id}")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["agent_id"] == str(test_agent.id)
+        assert data["total"] == 1
+        assert len(data["items"]) == 1
+        assert data["items"][0]["agent_id"] == str(test_agent.id)
 
     @pytest.mark.asyncio
     async def test_list_deployments_other_user_agent_forbidden(
@@ -116,8 +125,9 @@ class TestListDeployments:
         response = await client.get("/v1/deployments?status=running")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["status"] == "running"
+        assert data["total"] == 1
+        assert len(data["items"]) == 1
+        assert data["items"][0]["status"] == "running"
 
 
 class TestGetDeployment:

@@ -154,6 +154,14 @@ class DeploymentResponse(BaseModel):
     events: list[DeploymentEventResponse] = Field(default_factory=list)
 
 
+class DeploymentListResponse(BaseModel):
+    items: list[DeploymentResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    has_more: bool
+
+
 class DeploymentScale(BaseModel):
     replicas: int
 

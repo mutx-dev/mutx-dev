@@ -1451,11 +1451,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DeploymentResponse"
-                  },
-                  "title": "Response List Deployments V1 Deployments Get"
+                  "$ref": "#/components/schemas/DeploymentListResponse"
                 }
               }
             }
@@ -16585,6 +16581,41 @@
         ],
         "title": "DeploymentEventResponse",
         "description": "Response model for deployment events"
+      },
+      "DeploymentListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeploymentResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "skip",
+          "limit",
+          "has_more"
+        ],
+        "title": "DeploymentListResponse"
       },
       "DeploymentLogsResponse": {
         "properties": {

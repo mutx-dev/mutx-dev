@@ -30,7 +30,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     )
 
     const payload = await response.json().catch(() => ({ detail: 'Failed to fetch deployments' }))
-    const nextResponse = NextResponse.json(payload, { status: response.status })
+    // Backend returns {items, total, skip, limit, has_more} envelope; pass only items to client
+    const items = Array.isArray(payload) ? payload : (payload.items ?? payload)
+    const nextResponse = NextResponse.json(items, { status: response.status })
     
     if (tokenRefreshed && refreshedTokens) {
       applyAuthCookies(nextResponse, request, refreshedTokens)

@@ -4736,6 +4736,19 @@ export interface components {
              */
             created_at: string;
         };
+        /** DeploymentListResponse */
+        DeploymentListResponse: {
+            /** Items */
+            items?: components["schemas"]["DeploymentResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Has More */
+            has_more: boolean;
+        };
         /**
          * DeploymentLogsResponse
          * @description Response model for deployment logs
@@ -8660,7 +8673,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DeploymentResponse"][];
+                    "application/json": components["schemas"]["DeploymentListResponse"];
                 };
             };
             /** @description Validation Error */

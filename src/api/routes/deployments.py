@@ -21,6 +21,7 @@ from src.api.models import (
     DeploymentVersion,
 )
 from src.api.models.schemas import (
+    DeploymentListResponse,
     DeploymentResponse,
     DeploymentScale,
     DeploymentCreate,
@@ -65,7 +66,7 @@ def _serialize_deployment(deployment: Deployment):
     }
 
 
-@router.get("", response_model=list[DeploymentResponse])
+@router.get("", response_model=DeploymentListResponse)
 async def list_deployments(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
@@ -77,16 +78,8 @@ async def list_deployments(
     # Ownership enforcement: always filter by authenticated user's agent ownership.
     # Client-supplied user_id query params are ignored - ownership is derived
     # from the auth token via current_user, not from client input.
-    # Filter deployments by agents owned by the current user
-    query = (
-        select(Deployment)
-        .options(selectinload(Deployment.events))
-        .join(Agent, Deployment.agent_id == Agent.id)
-        .where(Agent.user_id == current_user.id)
-        .order_by(Deployment.created_at.desc())
-        .offset(skip)
-        .limit(limit)
-    )
+    # Build base filters for both count and data queries
+    base_filters = [Agent.user_id == current_user.id]
     if agent_id:
         await get_owned_agent(
             agent_id,
@@ -95,12 +88,39 @@ async def list_deployments(
             not_found_detail="Agent not found",
             forbidden_detail="Not authorized to view deployments for this agent",
         )
-        query = query.where(Deployment.agent_id == agent_id)
+        base_filters.append(Deployment.agent_id == agent_id)
     if status:
-        query = query.where(Deployment.status == status)
+        base_filters.append(Deployment.status == status)
+
+    # Count total matching deployments using SQL aggregate
+    count_query = (
+        select(func.count())
+        .select_from(Deployment)
+        .join(Agent, Deployment.agent_id == Agent.id)
+        .where(*base_filters)
+    )
+    total = (await db.execute(count_query)).scalar_one()
+
+    # Fetch paginated results
+    query = (
+        select(Deployment)
+        .options(selectinload(Deployment.events))
+        .join(Agent, Deployment.agent_id == Agent.id)
+        .where(*base_filters)
+        .order_by(Deployment.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
     result = await db.execute(query)
     deployments = result.scalars().all()
-    return [_serialize_deployment(deployment) for deployment in deployments]
+
+    return DeploymentListResponse(
+        items=[_serialize_deployment(d) for d in deployments],
+        total=total,
+        skip=skip,
+        limit=limit,
+        has_more=(skip + limit) < total,
+    )
 
 
 @router.get("/{deployment_id}", response_model=DeploymentResponse)
