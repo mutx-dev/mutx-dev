@@ -102,6 +102,52 @@ class TestIngestEndpoints:
         )
         assert response.status_code == 403
 
+    @pytest.mark.asyncio
+    async def test_agent_status_with_error_overrides_to_failed(
+        self, client: AsyncClient, db_session: AsyncSession, test_user: User
+    ):
+        """Test that sending status=running with error_message overrides to FAILED."""
+        from src.api.models.models import AgentLog
+        from sqlalchemy import select
+
+        agent_id = uuid.uuid4()
+        agent = Agent(
+            id=agent_id,
+            user_id=test_user.id,
+            name="Test Agent",
+            status=AgentStatus.CREATING.value,
+        )
+        db_session.add(agent)
+        await db_session.commit()
+
+        response = await client.post(
+            "/v1/ingest/agent-status",
+            json={
+                "agent_id": str(agent_id),
+                "status": "running",
+                "error_message": "Something went wrong",
+                "node_id": "test-node",
+            },
+        )
+        assert response.status_code == 200
+
+        # Agent status should be FAILED, not running
+        await db_session.refresh(agent)
+        assert agent.status == AgentStatus.FAILED.value
+
+        # The info log should record the FINAL status (failed), not the requested one (running)
+        logs = (
+            await db_session.execute(
+                select(AgentLog)
+                .where(AgentLog.agent_id == agent_id, AgentLog.level == "info")
+                .order_by(AgentLog.timestamp.desc())
+            )
+        ).scalars().all()
+        assert len(logs) >= 1
+        info_log = logs[0]
+        assert "failed" in info_log.message.lower()
+        assert "running" not in info_log.message.lower()
+
 
 @pytest.mark.asyncio
 async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status_change(

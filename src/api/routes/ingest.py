@@ -72,20 +72,26 @@ async def agent_status_update(
         raise HTTPException(status_code=403, detail="Not authorized to update this agent")
 
     old_status = agent.status
-    agent.status = status_data.status.value
+
+    # Determine final status: error_message overrides to FAILED
+    if status_data.error_message:
+        final_status = AgentStatus.FAILED.value
+    else:
+        final_status = status_data.status.value
+
+    agent.status = final_status
     agent.last_heartbeat = utc_now()
     agent.updated_at = datetime.now(timezone.utc)
 
     log = AgentLog(
         agent_id=agent.id,
         level="info",
-        message=f"Status changed from {old_status} to {status_data.status.value}",
+        message=f"Status changed from {old_status} to {final_status}",
         extra_data=f"node_id: {status_data.node_id}",
     )
     db.add(log)
 
     if status_data.error_message:
-        agent.status = AgentStatus.FAILED.value
         error_log = AgentLog(
             agent_id=agent.id,
             level="error",
@@ -101,7 +107,7 @@ async def agent_status_update(
         db, current_user.id, agent.id, old_status, agent.status, agent.name
     )
 
-    logger.info(f"Agent {agent.id} status updated to {status_data.status.value}")
+    logger.info(f"Agent {agent.id} status updated to {final_status}")
     return {"status": "updated"}
 
 
@@ -195,7 +201,6 @@ async def receive_metrics(
         cpu_usage=metrics_data.cpu_usage,
         memory_usage=metrics_data.memory_usage,
     )
-    agent.last_heartbeat = utc_now()
     db.add(metric)
     await db.commit()
 
