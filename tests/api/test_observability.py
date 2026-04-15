@@ -37,6 +37,7 @@ async def test_list_observability_runs(client):
     assert response.status_code == 200
     payload = response.json()
     assert "items" in payload
+    assert "has_more" in payload
 
 
 @pytest.mark.asyncio

@@ -110,7 +110,7 @@ class Observability:
             trigger: Filter by trigger (manual, cron, webhook, agent, pipeline, queue)
 
         Returns:
-            dict with items (list), total, skip, limit, and filter values
+            dict with items (list), total, has_more, skip, limit, and filter values
         """
         self._require_sync_client()
         params = {"skip": skip, "limit": limit}
@@ -125,7 +125,10 @@ class Observability:
 
         response = self._client.get("/v1/observability/runs", params=params)
         response.raise_for_status()
-        return response.json()
+        result = response.json()
+        # Backwards-compat: older servers may not include has_more
+        result.setdefault("has_more", False)
+        return result
 
     async def alist_runs(
         self,
@@ -152,7 +155,10 @@ class Observability:
 
         response = await self._client.get("/v1/observability/runs", params=params)
         response.raise_for_status()
-        return response.json()
+        result = response.json()
+        # Backwards-compat: older servers may not include has_more
+        result.setdefault("has_more", False)
+        return result
 
     def get_run(self, run_id: str) -> dict:
         """

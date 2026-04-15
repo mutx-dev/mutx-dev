@@ -131,6 +131,8 @@ trap dump_failure_context ERR
 trap cleanup EXIT
 
 echo "Starting production compose smoke core services..."
+# Clean named volumes before starting to prevent auth failures from stale postgres state.
+docker compose -f "$COMPOSE_FILE" down -v --remove-orphans >/dev/null 2>&1 || true
 docker compose -f "$COMPOSE_FILE" up -d --build postgres redis migrate api monitor
 
 # Wait for postgres to fully initialize — pg_isready in the healthcheck confirms

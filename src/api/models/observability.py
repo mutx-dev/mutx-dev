@@ -461,6 +461,7 @@ class MutxRunHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+    has_more: bool
     agent_id: Optional[str] = None
     status: Optional[str] = None
 
