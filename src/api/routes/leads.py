@@ -1,15 +1,14 @@
 import asyncio
 import uuid
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.middleware.auth import assert_internal_user, get_current_user
 from src.api.models.models import Lead, User
-from src.api.models.schemas import LeadCreate, LeadResponse, LeadUpdate
+from src.api.models.schemas import LeadCreate, LeadListResponse, LeadResponse, LeadUpdate
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 contacts_router = APIRouter(prefix="/contacts", tags=["contacts"])
@@ -65,8 +64,8 @@ async def capture_lead(
     return lead
 
 
-@router.get("", response_model=List[LeadResponse])
-@contacts_router.get("", response_model=List[LeadResponse])
+@router.get("", response_model=LeadListResponse)
+@contacts_router.get("", response_model=LeadListResponse)
 async def list_leads(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
@@ -78,11 +77,21 @@ async def list_leads(
     Restricted to internal/admin users.
     """
     _assert_internal_user(current_user)
-    result = await db.execute(
-        select(Lead).order_by(Lead.created_at.desc()).offset(skip).limit(limit)
-    )
+
+    base_query = select(Lead)
+    count_result = await db.execute(select(func.count()).select_from(base_query.subquery()))
+    total = count_result.scalar_one()
+
+    result = await db.execute(base_query.order_by(Lead.created_at.desc()).offset(skip).limit(limit))
     leads = result.scalars().all()
-    return leads
+
+    return LeadListResponse(
+        items=leads,
+        total=total,
+        skip=skip,
+        limit=limit,
+        has_more=(skip + len(leads)) < total,
+    )
 
 
 @router.get("/{lead_id}", response_model=LeadResponse)

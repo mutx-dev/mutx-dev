@@ -155,7 +155,16 @@ def test_leads_list_hits_contract_route() -> None:
         captured["path"] = request.url.path
         captured["method"] = request.method
         captured["params"] = dict(request.url.params)
-        return httpx.Response(200, json=[_lead_payload(), _lead_payload(id=str(uuid.uuid4()))])
+        return httpx.Response(
+            200,
+            json={
+                "items": [_lead_payload(), _lead_payload(id=str(uuid.uuid4()))],
+                "total": 2,
+                "skip": 0,
+                "limit": 50,
+                "has_more": False,
+            },
+        )
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
@@ -170,7 +179,16 @@ def test_leads_list_hits_contract_route() -> None:
 
 def test_leads_list_returns_list_of_leads() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json=[_lead_payload(), _lead_payload(id=str(uuid.uuid4()))])
+        return httpx.Response(
+            200,
+            json={
+                "items": [_lead_payload(), _lead_payload(id=str(uuid.uuid4()))],
+                "total": 2,
+                "skip": 0,
+                "limit": 50,
+                "has_more": False,
+            },
+        )
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
@@ -189,7 +207,10 @@ def test_leads_alist_hits_contract_route() -> None:
         captured["path"] = request.url.path
         captured["method"] = request.method
         captured["params"] = dict(request.url.params)
-        return httpx.Response(200, json=[])
+        return httpx.Response(
+            200,
+            json={"items": [], "total": 0, "skip": 0, "limit": 50, "has_more": False},
+        )
 
     client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
@@ -204,7 +225,16 @@ def test_leads_alist_hits_contract_route() -> None:
 
 def test_leads_alist_returns_list_of_leads() -> None:
     async def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json=[_lead_payload()])
+        return httpx.Response(
+            200,
+            json={
+                "items": [_lead_payload()],
+                "total": 1,
+                "skip": 0,
+                "limit": 50,
+                "has_more": False,
+            },
+        )
 
     client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
@@ -478,7 +508,10 @@ def test_contacts_list_hits_contacts_route() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["method"] = request.method
-        return httpx.Response(200, json=[])
+        return httpx.Response(
+            200,
+            json={"items": [], "total": 0, "skip": 0, "limit": 50, "has_more": False},
+        )
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     contacts = Contacts(client)
@@ -495,7 +528,10 @@ def test_contacts_alist_hits_contacts_route() -> None:
     async def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["method"] = request.method
-        return httpx.Response(200, json=[])
+        return httpx.Response(
+            200,
+            json={"items": [], "total": 0, "skip": 0, "limit": 50, "has_more": False},
+        )
 
     client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
     contacts = Contacts(client)

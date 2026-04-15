@@ -64,7 +64,11 @@ async def test_list_leads_internal_user(client: AsyncClient, test_user):
     """Test listing leads for an internal user."""
     response = await client.get("/v1/leads")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
+    data = response.json()
+    assert "items" in data
+    assert "total" in data
+    assert "has_more" in data
+    assert isinstance(data["items"], list)
 
 
 @pytest.mark.asyncio
@@ -72,7 +76,9 @@ async def test_list_contacts_alias_internal_user(client: AsyncClient):
     """Test /contacts alias for listing."""
     response = await client.get("/v1/leads/contacts")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
+    data = response.json()
+    assert "items" in data
+    assert isinstance(data["items"], list)
 
 
 @pytest.mark.asyncio

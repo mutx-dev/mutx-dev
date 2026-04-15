@@ -1067,6 +1067,16 @@ class LeadResponse(BaseModel):
     created_at: datetime
 
 
+class LeadListResponse(BaseModel):
+    """Paginated response for listing leads."""
+
+    items: list[LeadResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    has_more: bool
+
+
 class APIKeyHistoryResponse(BaseModel):
     """Paginated response for listing API keys."""
 
