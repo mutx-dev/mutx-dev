@@ -95,38 +95,50 @@ async def get_analytics_summary(
 ):
     period_start_dt, period_end_dt = _resolve_period(period_start, period_end)
 
-    agent_query = select(Agent).where(Agent.user_id == current_user.id)
+    agent_query = select(Agent.id, Agent.status).where(Agent.user_id == current_user.id)
     agent_result = await db.execute(agent_query)
-    user_agents = agent_result.scalars().all()
-    agent_ids = [a.id for a in user_agents]
+    agent_rows = agent_result.all()
+    agent_ids = [row.id for row in agent_rows]
 
-    total_agents = len(user_agents)
-    active_agents = sum(1 for a in user_agents if a.status == "running")
+    total_agents = len(agent_rows)
+    active_agents = sum(1 for row in agent_rows if row.status == "running")
 
     if agent_ids:
-        deploy_query = select(Deployment).where(Deployment.agent_id.in_(agent_ids))
-        deploy_result = await db.execute(deploy_query)
-        deployments = deploy_result.scalars().all()
-        total_deployments = len(deployments)
-        active_deployments = sum(
-            1 for d in deployments if d.status in ["running", "ready", "deploying"]
-        )
+        total_deployments = (
+            await db.execute(
+                select(func.count()).select_from(Deployment).where(
+                    Deployment.agent_id.in_(agent_ids)
+                )
+            )
+        ).scalar_one() or 0
+
+        active_deployments = (
+            await db.execute(
+                select(func.count()).select_from(Deployment).where(
+                    Deployment.agent_id.in_(agent_ids),
+                    Deployment.status.in_(["running", "ready", "deploying"]),
+                )
+            )
+        ).scalar_one() or 0
     else:
         total_deployments = active_deployments = 0
 
     if agent_ids:
-        runs_query = select(AgentRun).where(
-            and_(
-                AgentRun.agent_id.in_(agent_ids),
-                AgentRun.started_at >= period_start_dt,
-                AgentRun.started_at <= period_end_dt,
+        status_rows = (
+            await db.execute(
+                select(AgentRun.status, func.count().label("count")).where(
+                    and_(
+                        AgentRun.agent_id.in_(agent_ids),
+                        AgentRun.started_at >= period_start_dt,
+                        AgentRun.started_at <= period_end_dt,
+                    )
+                ).group_by(AgentRun.status)
             )
-        )
-        runs_result = await db.execute(runs_query)
-        runs = runs_result.scalars().all()
-        total_runs = len(runs)
-        successful_runs = sum(1 for r in runs if r.status == "completed")
-        failed_runs = sum(1 for r in runs if r.status == "failed")
+        ).all()
+        status_counts = {row.status: row.count for row in status_rows}
+        total_runs = sum(status_counts.values())
+        successful_runs = status_counts.get("completed", 0)
+        failed_runs = status_counts.get("failed", 0)
     else:
         total_runs = successful_runs = failed_runs = 0
 
@@ -199,49 +211,72 @@ async def get_agent_metrics_summary(
         period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
     period_end_dt = _parse_datetime(period_end) or now
 
-    runs_result = await db.execute(
-        select(AgentRun).where(
-            and_(
-                AgentRun.agent_id == agent_id,
-                AgentRun.started_at >= period_start_dt,
-                AgentRun.started_at <= period_end_dt,
-            )
+    run_status_rows = (
+        await db.execute(
+            select(AgentRun.status, func.count().label("count")).where(
+                and_(
+                    AgentRun.agent_id == agent_id,
+                    AgentRun.started_at >= period_start_dt,
+                    AgentRun.started_at <= period_end_dt,
+                )
+            ).group_by(AgentRun.status)
         )
-    )
-    runs = runs_result.scalars().all()
-    total_runs = len(runs)
-    successful_runs = sum(1 for r in runs if r.status == "completed")
-    failed_runs = sum(1 for r in runs if r.status == "failed")
+    ).all()
+    status_counts = {row.status: row.count for row in run_status_rows}
+    total_runs = sum(status_counts.values())
+    successful_runs = status_counts.get("completed", 0)
+    failed_runs = status_counts.get("failed", 0)
 
-    metrics_result = await db.execute(
-        select(AgentMetric).where(
-            and_(
-                AgentMetric.agent_id == agent_id,
-                AgentMetric.timestamp >= period_start_dt,
-                AgentMetric.timestamp <= period_end_dt,
+    avg_cpu_result = (
+        await db.execute(
+            select(func.avg(AgentMetric.cpu_usage)).where(
+                and_(
+                    AgentMetric.agent_id == agent_id,
+                    AgentMetric.timestamp >= period_start_dt,
+                    AgentMetric.timestamp <= period_end_dt,
+                )
             )
         )
-    )
-    metrics = metrics_result.scalars().all()
-    avg_cpu = sum(m.cpu_usage for m in metrics if m.cpu_usage) / len(metrics) if metrics else None
-    avg_memory = (
-        sum(m.memory_usage for m in metrics if m.memory_usage) / len(metrics) if metrics else None
-    )
+    ).scalar_one_or_none()
+    avg_cpu = round(avg_cpu_result, 2) if avg_cpu_result else None
 
-    sys_result = await db.execute(
-        select(Metrics).where(
-            and_(
-                Metrics.agent_id == agent_id,
-                Metrics.timestamp >= period_start_dt,
-                Metrics.timestamp <= period_end_dt,
+    avg_memory_result = (
+        await db.execute(
+            select(func.avg(AgentMetric.memory_usage)).where(
+                and_(
+                    AgentMetric.agent_id == agent_id,
+                    AgentMetric.timestamp >= period_start_dt,
+                    AgentMetric.timestamp <= period_end_dt,
+                )
             )
         )
-    )
-    sys_metrics = sys_result.scalars().all()
-    total_requests = sum(m.requests for m in sys_metrics)
-    avg_latency = (
-        sum(m.latency for m in sys_metrics if m.latency) / len(sys_metrics) if sys_metrics else None
-    )
+    ).scalar_one_or_none()
+    avg_memory = round(avg_memory_result, 2) if avg_memory_result else None
+
+    total_requests = (
+        await db.execute(
+            select(func.coalesce(func.sum(Metrics.requests), 0)).where(
+                and_(
+                    Metrics.agent_id == agent_id,
+                    Metrics.timestamp >= period_start_dt,
+                    Metrics.timestamp <= period_end_dt,
+                )
+            )
+        )
+    ).scalar_one()
+
+    avg_latency_result = (
+        await db.execute(
+            select(func.avg(Metrics.latency)).where(
+                and_(
+                    Metrics.agent_id == agent_id,
+                    Metrics.timestamp >= period_start_dt,
+                    Metrics.timestamp <= period_end_dt,
+                )
+            )
+        )
+    ).scalar_one_or_none()
+    avg_latency = round(avg_latency_result, 2) if avg_latency_result else None
 
     return AgentMetricsSummary(
         agent_id=agent_id,
@@ -249,10 +284,10 @@ async def get_agent_metrics_summary(
         total_runs=total_runs,
         successful_runs=successful_runs,
         failed_runs=failed_runs,
-        avg_cpu=round(avg_cpu, 2) if avg_cpu else None,
-        avg_memory=round(avg_memory, 2) if avg_memory else None,
+        avg_cpu=avg_cpu,
+        avg_memory=avg_memory,
         total_requests=total_requests,
-        avg_latency_ms=round(avg_latency, 2) if avg_latency else None,
+        avg_latency_ms=avg_latency,
         period_start=period_start_dt,
         period_end=period_end_dt,
     )
