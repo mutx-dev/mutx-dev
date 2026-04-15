@@ -188,6 +188,70 @@ Both lanes now:
 
 Document workflows require `MUTX_DOCUMENTS_ENABLED=true`, `predict-rlm`, `deno`, and valid model credentials. See [Document Workflows](./document-workflows.md) for the full runtime contract and credit trail.
 
+### Reasoning workflows
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx reasoning templates` | List reasoning workflow templates |
+| `mutx reasoning list` | List reasoning jobs |
+| `mutx reasoning run --template-id <id>` | Start a reasoning job |
+
+### Scheduled tasks
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx scheduler list` | List scheduled tasks |
+| `mutx scheduler get <schedule_id>` | Get a scheduled task by ID |
+
+### Budgets
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx budgets list` | List budgets |
+| `mutx budgets get <budget_id>` | Get a budget by ID |
+
+### Usage
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx usage summary --period <period>` | Show overall usage summary |
+| `mutx usage by-agent --limit <n>` | Show usage breakdown by agent |
+
+### Governance
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx governance status` | Show Faramesh daemon health and policy status |
+| `mutx governance decisions --limit <n>` | Show recent governance decisions |
+
+### Observability
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx observability runs list` | List agent runs |
+| `mutx observability runs get <run_id>` | Get a specific run |
+
+### Security
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx security evaluate --agent-id <id> --session-id <id> <tool_name>` | Evaluate a tool call against security policy |
+
+### Webhooks
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx webhooks list` | List webhook destinations |
+| `mutx webhooks create` | Create a webhook destination |
+| `mutx webhooks delete <webhook_id>` | Delete a webhook |
+
+### Self-update
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx update check` | Check for CLI updates |
+| `mutx update apply` | Apply available CLI updates |
+
 ### Compatibility commands
 
 The older flat commands remain available for compatibility:
