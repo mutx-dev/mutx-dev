@@ -10684,7 +10684,10 @@ export interface operations {
     };
     get_agent_versions_v1_agents__agent_id__versions_get: {
         parameters: {
-            query?: never;
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
             header?: {
                 authorization?: string | null;
             };

@@ -519,9 +519,7 @@ async def get_agent_versions(
 
     # Count total for pagination
     count_query = (
-        select(func.count())
-        .select_from(AgentVersion)
-        .where(AgentVersion.agent_id == agent.id)
+        select(func.count()).select_from(AgentVersion).where(AgentVersion.agent_id == agent.id)
     )
     count_result = await db.execute(count_query)
     total = count_result.scalar() or 0
