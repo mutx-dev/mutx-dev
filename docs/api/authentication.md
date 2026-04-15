@@ -18,6 +18,10 @@ Successful `register`, `login`, `local-bootstrap`, and `refresh` calls all retur
 | `POST /v1/auth/reset-password` | Complete password reset and revoke prior refresh sessions |
 | `POST /v1/auth/verify-email` | Mark an email as verified |
 | `POST /v1/auth/resend-verification` | Re-send verification email |
+| `GET /v1/auth/oauth/{provider}/authorize` | Build an OAuth authorization URL for a social provider |
+| `POST /v1/auth/oauth/{provider}/exchange` | Exchange an OAuth authorization code for a MUTX token pair |
+| `GET /v1/auth/sso/{provider}` | Initiate SSO by redirecting to the provider's authorization endpoint |
+| `GET /v1/auth/sso/{provider}/callback` | Handle SSO callback and issue a MUTX access token |
 
 ## Password Policy
 
@@ -152,6 +156,65 @@ curl -X POST "$BASE_URL/v1/auth/reset-password" \
 ```
 
 `forgot-password` and some verification flows intentionally return generic success messages to reduce account enumeration.
+
+## OAuth Social Login
+
+MUTX supports social login via external OAuth providers (e.g. GitHub, Google).
+
+### Authorize
+
+```bash
+curl "$BASE_URL/v1/auth/oauth/github/authorize?redirect_uri=https://localhost:3000/api/auth/oauth/github/callback&state=RANDOM_STATE"
+```
+
+Returns an `authorization_url` to redirect the user to:
+
+```json
+{
+  "authorization_url": "https://github.com/login/oauth/authorize?..."
+}
+```
+
+### Exchange
+
+```bash
+curl -X POST "$BASE_URL/v1/auth/oauth/github/exchange" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "OAUTH_CODE",
+    "redirect_uri": "https://localhost:3000/api/auth/oauth/github/callback"
+  }'
+```
+
+Returns the same token payload shape as `register` (`access_token`, `refresh_token`, `token_type`, `expires_in`).
+
+If the OAuth user does not yet exist in MUTX, it is created automatically.
+
+## SSO Provider Login
+
+SSO login supports Okta, Auth0, Keycloak, and Google.
+
+### Initiate SSO
+
+```bash
+curl "$BASE_URL/v1/auth/sso/okta"
+```
+
+Returns a `302` redirect to the provider's authorization URL.
+
+### SSO Callback
+
+The provider redirects back to `GET /v1/auth/sso/{provider}/callback?code=...&state=...`.
+
+On success, the callback returns a MUTX access token:
+
+```json
+{
+  "access_token": "eyJhbG...",
+  "token_type": "bearer",
+  "expires_in": 86400
+}
+```
 
 ## OIDC Token Validation
 

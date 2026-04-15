@@ -59,7 +59,8 @@ Example response:
   ],
   "total": 1,
   "skip": 0,
-  "limit": 50
+  "limit": 50,
+  "has_more": false
 }
 ```
 
