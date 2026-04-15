@@ -133,16 +133,21 @@ trap cleanup EXIT
 echo "Starting production compose smoke core services..."
 # Clean named volumes before starting to prevent auth failures from stale postgres state.
 docker compose -f "$COMPOSE_FILE" down -v --remove-orphans >/dev/null 2>&1 || true
-docker compose -f "$COMPOSE_FILE" up -d --build postgres redis migrate api monitor
 
-# Wait for postgres to fully initialize — pg_isready in the healthcheck confirms
-# TCP availability but does NOT verify that init scripts have created the mutx user.
-# Without this wait, the migrate container races ahead and hits auth failure.
+# Phase 1: Start only postgres and redis so we can verify auth before starting
+# services that depend on the database. The compose healthcheck uses pg_isready
+# which only confirms TCP availability — the initdb scripts that create the user
+# may not have finished yet. Starting migrate before auth is ready causes a race.
+docker compose -f "$COMPOSE_FILE" up -d --build postgres redis
+
 wait_for_postgres_auth \
   "postgres" \
   "${POSTGRES_USER:-mutx}" \
   "${POSTGRES_DB:-mutx}" \
   "${POSTGRES_PASSWORD}"
+
+# Phase 2: Now that postgres auth is confirmed, start migrate + api + monitor.
+docker compose -f "$COMPOSE_FILE" up -d --build migrate api monitor
 
 wait_for_command \
   "API health endpoint" \
