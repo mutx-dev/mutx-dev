@@ -94,13 +94,17 @@ class Leads:
         self._require_sync_client()
         response = self._client.get("/v1/leads", params={"skip": skip, "limit": limit})
         response.raise_for_status()
-        return [Lead(data) for data in response.json()]
+        data = response.json()
+        items = data.get("items", data) if isinstance(data, dict) else data
+        return [Lead(item) for item in items]
 
     async def alist(self, skip: int = 0, limit: int = 50) -> list[Lead]:
         self._require_async_client()
         response = await self._client.get("/v1/leads", params={"skip": skip, "limit": limit})
         response.raise_for_status()
-        return [Lead(data) for data in response.json()]
+        data = response.json()
+        items = data.get("items", data) if isinstance(data, dict) else data
+        return [Lead(item) for item in items]
 
     def get(self, lead_id: UUID | str) -> Lead:
         self._require_sync_client()
@@ -222,7 +226,9 @@ class Contacts(Leads):
         self._require_sync_client()
         response = self._client.get("/v1/leads/contacts", params={"skip": skip, "limit": limit})
         response.raise_for_status()
-        return [Lead(data) for data in response.json()]
+        data = response.json()
+        items = data.get("items", data) if isinstance(data, dict) else data
+        return [Lead(item) for item in items]
 
     async def alist(self, skip: int = 0, limit: int = 50) -> list[Lead]:
         self._require_async_client()
@@ -230,7 +236,9 @@ class Contacts(Leads):
             "/v1/leads/contacts", params={"skip": skip, "limit": limit}
         )
         response.raise_for_status()
-        return [Lead(data) for data in response.json()]
+        data = response.json()
+        items = data.get("items", data) if isinstance(data, dict) else data
+        return [Lead(item) for item in items]
 
     def get(self, contact_id: UUID | str) -> Lead:
         self._require_sync_client()
