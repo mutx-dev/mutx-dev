@@ -205,6 +205,27 @@ class DeploymentVersionResponse(BaseModel):
     rolled_back_at: Optional[datetime] = None
 
 
+class DeploymentLogsHistoryResponse(BaseModel):
+    """Paginated response for deployment logs"""
+
+    deployment_id: uuid.UUID
+    items: list[DeploymentLogsResponse]
+    total: int
+    skip: int
+    limit: int
+    level: Optional[str] = None
+
+
+class DeploymentMetricsHistoryResponse(BaseModel):
+    """Paginated response for deployment metrics"""
+
+    deployment_id: uuid.UUID
+    items: list[DeploymentMetricsResponse]
+    total: int
+    skip: int
+    limit: int
+
+
 class DeploymentVersionHistoryResponse(BaseModel):
     """Response model for deployment version history"""
 
