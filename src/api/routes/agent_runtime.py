@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,7 +35,7 @@ from src.api.models import (
     DeploymentEvent as DeploymentEventModel,
     User,
 )
-from src.api.models.schemas import AgentResponse
+from src.api.models.schemas import AgentResponse, AgentRollbackRequest, AgentVersionHistoryResponse
 from src.api.services.user_service import hash_api_key
 from src.api.services.webhook_service import trigger_deployment_event, trigger_webhook_event
 from src.api.time_utils import as_utc, as_utc_naive
@@ -115,27 +115,6 @@ class AgentStatusResponse(BaseModel):
     status: str
     last_heartbeat: Optional[str]
     uptime_seconds: float
-
-
-class AgentVersionItem(BaseModel):
-    id: str
-    agent_id: str
-    version: int
-    config_snapshot: str
-    status: str
-    created_at: str
-
-
-class AgentVersionHistoryResponse(BaseModel):
-    agent_id: str
-    items: list[AgentVersionItem]
-    total: int
-
-
-class AgentRollbackRequest(BaseModel):
-    """Request model for rolling back an agent to a specific version."""
-
-    version: int = Field(..., description="The version number to rollback to")
 
 
 # --- Routes ---
@@ -536,18 +515,8 @@ async def get_agent_versions(
     versions = result.scalars().all()
 
     return AgentVersionHistoryResponse(
-        agent_id=str(agent.id),
-        items=[
-            AgentVersionItem(
-                id=str(v.id),
-                agent_id=str(v.agent_id),
-                version=v.version,
-                config_snapshot=v.config_snapshot,
-                status=v.status,
-                created_at=v.created_at.isoformat(),
-            )
-            for v in versions
-        ],
+        agent_id=agent.id,
+        items=list(versions),
         total=total,
         has_more=(skip + limit) < total,
     )
