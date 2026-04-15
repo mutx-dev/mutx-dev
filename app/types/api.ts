@@ -6344,6 +6344,22 @@ export interface components {
             /** Label */
             label?: string | null;
         };
+        /**
+         * PaginatedAgentResourceUsageResponse
+         * @description Paginated response for agent resource usage records.
+         */
+        PaginatedAgentResourceUsageResponse: {
+            /** Items */
+            items: components["schemas"]["AgentResourceUsageResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Has More */
+            has_more: boolean;
+        };
         /** PicoProgressPayload */
         PicoProgressPayload: Record<string, never>;
         /** PicoTutorCommand */
@@ -8305,7 +8321,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AgentResourceUsageResponse"][];
+                    "application/json": components["schemas"]["PaginatedAgentResourceUsageResponse"];
                 };
             };
             /** @description Validation Error */
