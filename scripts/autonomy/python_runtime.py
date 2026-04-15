@@ -52,7 +52,6 @@ def _candidate_bins() -> Iterable[str]:
         resolved = shutil.which(name)
         if resolved:
             yield resolved
-    yield '/usr/bin/python3'
 
 
 def resolve_python(min_version: Tuple[int, int] = MIN_VERSION) -> Tuple[str, Tuple[int, int, int]]:
