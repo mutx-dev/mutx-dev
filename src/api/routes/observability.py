@@ -25,6 +25,7 @@ from enum import Enum
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -529,30 +530,49 @@ async def get_provenance(
     return _serialize_provenance(run.provenance)
 
 
+class MutxRunStatusUpdate(BaseModel):
+    """Validated payload for patching run status."""
+
+    status: Optional[MutxRunStatus] = None
+    outcome: Optional[str] = None
+    ended_at: Optional[datetime] = None
+    duration_ms: Optional[int] = Field(default=None, ge=0)
+    error: Optional[str] = None
+    input_tokens: Optional[int] = Field(default=None, ge=0)
+    output_tokens: Optional[int] = Field(default=None, ge=0)
+    total_tokens: Optional[int] = Field(default=None, ge=0)
+    cost_usd: Optional[float] = Field(default=None, ge=0.0)
+
+
 @router.patch("/runs/{run_id}/status", response_model=MutxRunResponse)
 async def update_run_status(
     run_id: str,
-    status_update: dict,
+    status_update: MutxRunStatusUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Update the status of a run (e.g., mark as completed, failed)."""
     run = await _get_user_run(run_id, current_user, db)
 
-    if "status" in status_update:
-        run.status = status_update["status"]
-    if "outcome" in status_update:
-        run.outcome = status_update["outcome"]
-    if "ended_at" in status_update:
-        run.ended_at = datetime.fromisoformat(status_update["ended_at"])
-    if "duration_ms" in status_update:
-        run.duration_ms = status_update["duration_ms"]
-    if "error" in status_update:
-        run.error = status_update["error"]
+    if status_update.status is not None:
+        run.status = status_update.status
+    if status_update.outcome is not None:
+        run.outcome = status_update.outcome
+    if status_update.ended_at is not None:
+        run.ended_at = status_update.ended_at
+    if status_update.duration_ms is not None:
+        run.duration_ms = status_update.duration_ms
+    if status_update.error is not None:
+        run.error = status_update.error
 
     if any(
-        key in status_update
-        for key in ("input_tokens", "output_tokens", "total_tokens", "cost_usd")
+        v is not None
+        for v in (
+            status_update.input_tokens,
+            status_update.output_tokens,
+            status_update.total_tokens,
+            status_update.cost_usd,
+        )
     ):
         if run.cost is None:
             run.cost = MutxCost(
@@ -563,16 +583,16 @@ async def update_run_status(
                 model=run.model,
             )
             db.add(run.cost)
-        if "input_tokens" in status_update:
-            run.cost.input_tokens = status_update["input_tokens"]
-        if "output_tokens" in status_update:
-            run.cost.output_tokens = status_update["output_tokens"]
-        if "total_tokens" in status_update:
-            run.cost.total_tokens = status_update["total_tokens"]
+        if status_update.input_tokens is not None:
+            run.cost.input_tokens = status_update.input_tokens
+        if status_update.output_tokens is not None:
+            run.cost.output_tokens = status_update.output_tokens
+        if status_update.total_tokens is not None:
+            run.cost.total_tokens = status_update.total_tokens
         else:
             run.cost.total_tokens = (run.cost.input_tokens or 0) + (run.cost.output_tokens or 0)
-        if "cost_usd" in status_update:
-            run.cost.cost_usd = status_update["cost_usd"]
+        if status_update.cost_usd is not None:
+            run.cost.cost_usd = status_update.cost_usd
 
     await db.commit()
     persisted_run = await _get_user_run(run_id, current_user, db)

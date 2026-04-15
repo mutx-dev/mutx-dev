@@ -6081,6 +6081,29 @@ export interface components {
          */
         MutxRunStatus: "pending" | "running" | "completed" | "failed" | "cancelled" | "timeout";
         /**
+         * MutxRunStatusUpdate
+         * @description Validated payload for patching run status.
+         */
+        MutxRunStatusUpdate: {
+            status?: components["schemas"]["MutxRunStatus"] | null;
+            /** Outcome */
+            outcome?: string | null;
+            /** Ended At */
+            ended_at?: string | null;
+            /** Duration Ms */
+            duration_ms?: number | null;
+            /** Error */
+            error?: string | null;
+            /** Input Tokens */
+            input_tokens?: number | null;
+            /** Output Tokens */
+            output_tokens?: number | null;
+            /** Total Tokens */
+            total_tokens?: number | null;
+            /** Cost Usd */
+            cost_usd?: number | null;
+        };
+        /**
          * MutxRunTrigger
          * @description What initiated a run.
          * @enum {string}
@@ -12077,7 +12100,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": Record<string, never>;
+                "application/json": components["schemas"]["MutxRunStatusUpdate"];
             };
         };
         responses: {
