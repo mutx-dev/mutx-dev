@@ -377,6 +377,7 @@ async def list_runs(
         total=total,
         skip=skip,
         limit=limit,
+        has_more=total > skip + len(runs),
         agent_id=agent_id,
         status=status_filter,
     )
