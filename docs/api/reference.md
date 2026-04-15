@@ -46,6 +46,7 @@ jq -r '.paths | keys[]' docs/api/openapi.json | sort
 - Authentication: [authentication.md](./authentication.md)
 - API keys: [api-keys.md](./api-keys.md)
 - Agents: [agents.md](./agents.md)
+- Analytics: [analytics.md](./analytics.md)
 - Deployments: [deployments.md](./deployments.md)
 - Webhooks and ingestion: [webhooks.md](./webhooks.md)
 - Leads: [leads.md](./leads.md)
