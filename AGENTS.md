@@ -34,7 +34,7 @@ Repo guidance for agentic coding agents working in `/Users/fortune/MUTX`.
 * FastAPI public control-plane routes are mounted under `/v1/*`, with root probes at `/`, `/health`, `/ready`, and `/metrics`.
 * RBAC is now enforced on all routes — roles are checked via dependencies in `src/api/routes/`. See `src/api/security.py` for the enforcement layer.
 * OIDC token validation exists at `src/api/auth/oidc.py`; configure via `OIDC_ISSUER`, `OIDC_CLIENT_ID`, and `OIDC_JWKS_URI` environment variables.
-* `docs/api/AGENTS.md` is stale: `POST /agents` no longer accepts `user_id` from the request body, and auth dependencies are attached.
+* `docs/api/agents.md` is current: `POST /agents` ownership comes from the bearer token (no `user_id` in request body); auth dependencies are attached.
 * Parts of older docs still drift; check `src/api/main.py`, `src/api/routes/`, and `docs/api/openapi.json` before copying examples.
 * The repo uses flat-config ESLint via `eslint.config.mjs`; `npm run lint` now checks the repo surface with `eslint . --max-warnings=0`.
 * `npm run build` uses plain `next build`.
