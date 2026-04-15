@@ -395,7 +395,7 @@ export interface paths {
         };
         /**
          * Get Deployment Logs
-         * @description Get logs for a specific deployment.
+         * @description Get paginated logs for a specific deployment.
          */
         get: operations["get_deployment_logs_v1_deployments__deployment_id__logs_get"];
         put?: never;
@@ -415,7 +415,7 @@ export interface paths {
         };
         /**
          * Get Deployment Metrics
-         * @description Get metrics for a specific deployment.
+         * @description Get paginated metrics for a specific deployment.
          */
         get: operations["get_deployment_metrics_v1_deployments__deployment_id__metrics_get"];
         put?: never;
@@ -3539,6 +3539,22 @@ export interface components {
             deployments?: components["schemas"]["DeploymentResponse"][];
         };
         /**
+         * AgentListResponse
+         * @description Paginated response for listing agents.
+         */
+        AgentListResponse: {
+            /** Items */
+            items: components["schemas"]["AgentResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Has More */
+            has_more: boolean;
+        };
+        /**
          * AgentLogHistoryResponse
          * @description Paginated response for agent logs.
          */
@@ -3818,12 +3834,12 @@ export interface components {
         };
         /**
          * AgentRollbackRequest
-         * @description Request model for rolling back an agent to a specific version.
+         * @description Request model for rolling back an agent
          */
         AgentRollbackRequest: {
             /**
              * Version
-             * @description The version number to rollback to
+             * @description Version number to rollback to
              */
             version: number;
         };
@@ -3861,20 +3877,37 @@ export interface components {
          * @enum {string}
          */
         AgentType: "openai" | "anthropic" | "langchain" | "custom" | "openclaw";
-        /** AgentVersionHistoryResponse */
+        /**
+         * AgentVersionHistoryResponse
+         * @description Response model for agent version history
+         */
         AgentVersionHistoryResponse: {
-            /** Agent Id */
+            /**
+             * Agent Id
+             * Format: uuid
+             */
             agent_id: string;
             /** Items */
-            items: components["schemas"]["AgentVersionItem"][];
+            items: components["schemas"]["AgentVersionResponse"][];
             /** Total */
             total: number;
+            /** Has More */
+            has_more: boolean;
         };
-        /** AgentVersionItem */
-        AgentVersionItem: {
-            /** Id */
+        /**
+         * AgentVersionResponse
+         * @description Response model for agent version
+         */
+        AgentVersionResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
             id: string;
-            /** Agent Id */
+            /**
+             * Agent Id
+             * Format: uuid
+             */
             agent_id: string;
             /** Version */
             version: number;
@@ -3882,8 +3915,13 @@ export interface components {
             config_snapshot: string;
             /** Status */
             status: string;
-            /** Created At */
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
+            /** Rolled Back At */
+            rolled_back_at?: string | null;
         };
         /** AlertListResponse */
         AlertListResponse: {
@@ -4750,6 +4788,27 @@ export interface components {
             has_more: boolean;
         };
         /**
+         * DeploymentLogsHistoryResponse
+         * @description Paginated response for deployment logs
+         */
+        DeploymentLogsHistoryResponse: {
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /** Items */
+            items: components["schemas"]["DeploymentLogsResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Level */
+            level?: string | null;
+        };
+        /**
          * DeploymentLogsResponse
          * @description Response model for deployment logs
          */
@@ -4775,6 +4834,25 @@ export interface components {
              * Format: date-time
              */
             timestamp: string;
+        };
+        /**
+         * DeploymentMetricsHistoryResponse
+         * @description Paginated response for deployment metrics
+         */
+        DeploymentMetricsHistoryResponse: {
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /** Items */
+            items: components["schemas"]["DeploymentMetricsResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
         };
         /**
          * DeploymentMetricsResponse
@@ -5299,6 +5377,22 @@ export interface components {
             message?: string | null;
             /** Source */
             source?: string | null;
+        };
+        /**
+         * LeadListResponse
+         * @description Paginated response for listing leads.
+         */
+        LeadListResponse: {
+            /** Items */
+            items?: components["schemas"]["LeadResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Has More */
+            has_more: boolean;
         };
         /** LeadResponse */
         LeadResponse: {
@@ -7898,6 +7992,43 @@ export interface components {
             /** Delivered At */
             delivered_at: string | null;
         };
+        /**
+         * WebhookDeliveryListResponse
+         * @description Paginated response for listing webhook deliveries.
+         */
+        WebhookDeliveryListResponse: {
+            /**
+             * Webhook Id
+             * Format: uuid
+             */
+            webhook_id: string;
+            /** Items */
+            items?: components["schemas"]["WebhookDelivery"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Event */
+            event?: string | null;
+            /** Success */
+            success?: boolean | null;
+        };
+        /**
+         * WebhookListResponse
+         * @description Paginated response for listing webhooks.
+         */
+        WebhookListResponse: {
+            /** Items */
+            items?: components["schemas"]["WebhookResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+        };
         /** WebhookResponse */
         WebhookResponse: {
             /**
@@ -7990,7 +8121,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AgentResponse"][];
+                    "application/json": components["schemas"]["AgentListResponse"];
                 };
             };
             /** @description Validation Error */
@@ -8917,7 +9048,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DeploymentLogsResponse"][];
+                    "application/json": components["schemas"]["DeploymentLogsHistoryResponse"];
                 };
             };
             /** @description Validation Error */
@@ -8953,7 +9084,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DeploymentMetricsResponse"][];
+                    "application/json": components["schemas"]["DeploymentMetricsHistoryResponse"];
                 };
             };
             /** @description Validation Error */
@@ -9117,7 +9248,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WebhookResponse"][];
+                    "application/json": components["schemas"]["WebhookListResponse"];
                 };
             };
             /** @description Validation Error */
@@ -9342,7 +9473,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WebhookDelivery"][];
+                    "application/json": components["schemas"]["WebhookDeliveryListResponse"];
                 };
             };
             /** @description Validation Error */
@@ -10153,7 +10284,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LeadResponse"][];
+                    "application/json": components["schemas"]["LeadListResponse"];
                 };
             };
             /** @description Validation Error */
@@ -10321,7 +10452,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LeadResponse"][];
+                    "application/json": components["schemas"]["LeadListResponse"];
                 };
             };
             /** @description Validation Error */
