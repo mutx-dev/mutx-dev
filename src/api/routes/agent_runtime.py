@@ -19,7 +19,7 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
@@ -500,6 +500,8 @@ def _create_agent_version(agent: Agent, db: AsyncSession) -> AgentVersion:
 @router.get("/{agent_id}/versions", response_model=AgentVersionHistoryResponse)
 async def get_agent_versions(
     agent_id: uuid.UUID,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -515,10 +517,21 @@ async def get_agent_versions(
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found or not authorized")
 
+    # Count total for pagination
+    count_query = (
+        select(func.count())
+        .select_from(AgentVersion)
+        .where(AgentVersion.agent_id == agent.id)
+    )
+    count_result = await db.execute(count_query)
+    total = count_result.scalar() or 0
+
     query = (
         select(AgentVersion)
         .where(AgentVersion.agent_id == agent.id)
         .order_by(AgentVersion.created_at.desc())
+        .offset(skip)
+        .limit(limit)
     )
 
     result = await db.execute(query)
@@ -537,7 +550,8 @@ async def get_agent_versions(
             )
             for v in versions
         ],
-        total=len(versions),
+        total=total,
+        has_more=(skip + limit) < total,
     )
 
 

@@ -395,13 +395,16 @@ class Agents:
         agent_id: UUID | str,
         skip: int = 0,
         limit: int = 50,
-    ) -> list[AgentVersion]:
+    ) -> dict[str, Any]:
         """List version history for an agent.
 
         Args:
             agent_id: The agent UUID
             skip: Number of records to skip (for pagination)
             limit: Maximum number of versions to return (default 50)
+
+        Returns:
+            dict with items (list of AgentVersion), total, has_more, skip, and limit
         """
         self._require_sync_client()
         response = self._client.get(
@@ -409,14 +412,17 @@ class Agents:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [AgentVersion(v) for v in response.json()["items"]]
+        result = response.json()
+        # Backwards-compat: older servers may not include has_more
+        result.setdefault("has_more", False)
+        return result
 
     async def aversions(
         self,
         agent_id: UUID | str,
         skip: int = 0,
         limit: int = 50,
-    ) -> list[AgentVersion]:
+    ) -> dict[str, Any]:
         """List version history for an agent (async).
 
         Args:
@@ -430,7 +436,10 @@ class Agents:
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return [AgentVersion(v) for v in response.json()["items"]]
+        result = response.json()
+        # Backwards-compat: older servers may not include has_more
+        result.setdefault("has_more", False)
+        return result
 
     def rollback(self, agent_id: UUID | str, version: int) -> Agent:
         """Roll back an agent to a specific config version.
