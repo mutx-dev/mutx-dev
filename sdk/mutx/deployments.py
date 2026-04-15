@@ -136,7 +136,10 @@ class Deployments:
         self._require_sync_client()
         response = self._client.get("/v1/deployments", params=params)
         response.raise_for_status()
-        return [Deployment(data) for data in response.json()]
+        body = response.json()
+        # Support new envelope {items, total, ...} and legacy bare-array format
+        items = body.get("items", body) if isinstance(body, dict) else body
+        return [Deployment(data) for data in items]
 
     async def alist(
         self,
@@ -154,7 +157,10 @@ class Deployments:
         self._require_async_client()
         response = await self._client.get("/v1/deployments", params=params)
         response.raise_for_status()
-        return [Deployment(data) for data in response.json()]
+        body = response.json()
+        # Support new envelope {items, total, ...} and legacy bare-array format
+        items = body.get("items", body) if isinstance(body, dict) else body
+        return [Deployment(data) for data in items]
 
     def get(self, deployment_id: UUID | str) -> Deployment:
         self._require_sync_client()

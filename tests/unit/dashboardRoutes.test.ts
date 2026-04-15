@@ -172,13 +172,19 @@ describe('dashboard route proxies', () => {
     authenticatedFetch.mockResolvedValue({
       response: {
         status: 200,
-        json: async () => [
-          {
-          id: 'dep_123',
-          agent_id: 'agent_123',
-          status: 'running',
-        },
-      ],
+        json: async () => ({
+          items: [
+            {
+              id: 'dep_123',
+              agent_id: 'agent_123',
+              status: 'running',
+            },
+          ],
+          total: 1,
+          skip: 0,
+          limit: 20,
+          has_more: false,
+        }),
       },
       tokenRefreshed: false,
     })
