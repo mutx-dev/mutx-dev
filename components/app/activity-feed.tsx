@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { EmptyState } from '@/components/dashboard'
+import { normalizeCollection } from '@/components/app/http'
 import { cn } from '@/lib/utils'
 
 interface ActivityEvent {
@@ -155,13 +156,13 @@ export function ActivityFeed({
 
       if (agentsRes?.ok) {
         const data = await agentsRes.json()
-        agentsData = Array.isArray(data) ? data : (data.agents || [])
+        agentsData = normalizeCollection<Agent>(data, ['items', 'agents', 'data'])
         setAgents(agentsData)
       }
 
       if (deploymentsRes?.ok) {
         const data = await deploymentsRes.json()
-        deploymentsData = Array.isArray(data) ? data : (data.deployments || [])
+        deploymentsData = normalizeCollection<Deployment>(data, ['items', 'deployments', 'data'])
         setDeployments(deploymentsData)
       }
 
