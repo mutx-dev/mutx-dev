@@ -404,7 +404,16 @@ async def delete_agent(
     logger.info(f"Deleted agent: {agent_id}")
 
 
-@router.post("/{agent_id}/deploy", response_model=dict)
+class AgentDeployResponse(BaseModel):
+    deployment_id: uuid.UUID
+    status: str
+
+
+class AgentStopResponse(BaseModel):
+    status: str
+
+
+@router.post("/{agent_id}/deploy", response_model=AgentDeployResponse)
 async def deploy_agent(
     agent_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -459,7 +468,7 @@ async def deploy_agent(
         ) from e
 
 
-@router.post("/{agent_id}/stop", response_model=dict)
+@router.post("/{agent_id}/stop", response_model=AgentStopResponse)
 async def stop_agent(
     agent_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
