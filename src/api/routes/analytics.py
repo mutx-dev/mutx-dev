@@ -64,17 +64,24 @@ def _decode_event_metadata(raw: Optional[str]) -> dict[str, str]:
     return parsed if isinstance(parsed, dict) else {}
 
 
-def _resolve_usage_agent_key(event: UsageEvent, owned_agent_ids: set[str]) -> str | None:
-    metadata = _decode_event_metadata(event.event_metadata)
+def _resolve_usage_agent_key(
+    *,
+    event_type: str,
+    resource_type: Optional[str],
+    resource_id: Optional[str],
+    event_metadata: Optional[str],
+    owned_agent_ids: set[str],
+) -> str | None:
+    metadata = _decode_event_metadata(event_metadata)
     metadata_agent_id = metadata.get("agent_id")
     if isinstance(metadata_agent_id, str) and metadata_agent_id:
         return metadata_agent_id
 
-    if event.resource_type == "agent" and event.resource_id:
-        return event.resource_id
+    if resource_type == "agent" and resource_id:
+        return resource_id
 
-    if event.event_type.startswith("agent_") and event.resource_id in owned_agent_ids:
-        return event.resource_id
+    if event_type.startswith("agent_") and resource_id in owned_agent_ids:
+        return resource_id
 
     return None
 
@@ -357,42 +364,72 @@ async def get_cost_summary(
 ):
     period_start_dt, period_end_dt = _resolve_period(period_start, period_end)
 
-    result = await db.execute(
-        select(UsageEvent).where(
-            and_(
-                UsageEvent.user_id == current_user.id,
-                UsageEvent.created_at >= period_start_dt,
-                UsageEvent.created_at <= period_end_dt,
-            )
-        )
+    period_filter = and_(
+        UsageEvent.user_id == current_user.id,
+        UsageEvent.created_at >= period_start_dt,
+        UsageEvent.created_at <= period_end_dt,
     )
-    events = result.scalars().all()
 
+    # Total credits via SQL aggregate instead of loading all rows
+    total_credits = (
+        await db.execute(
+            select(func.coalesce(func.sum(UsageEvent.credits_used), 0.0)).where(period_filter)
+        )
+    ).scalar_one()
+
+    # Credits grouped by event_type via SQL aggregate
+    event_type_rows = (
+        await db.execute(
+            select(
+                UsageEvent.event_type,
+                func.coalesce(func.sum(UsageEvent.credits_used), 0.0).label("total"),
+            )
+            .where(period_filter)
+            .group_by(UsageEvent.event_type)
+        )
+    ).all()
+    usage_by_event_type = {
+        (row.event_type or "unknown"): round(float(row.total), 2) for row in event_type_rows
+    }
+
+    # Agent breakdown: select only the columns needed for _resolve_usage_agent_key
+    # instead of loading full ORM objects
     agent_result = await db.execute(select(Agent.id).where(Agent.user_id == current_user.id))
     owned_agent_ids = {str(agent_id) for agent_id in agent_result.scalars().all()}
 
-    usage_by_event_type: dict[str, float] = {}
     usage_by_agent: dict[str, float] = {}
-    total_credits = 0.0
+    agent_key_rows = (
+        await db.execute(
+            select(
+                UsageEvent.event_type,
+                UsageEvent.resource_type,
+                UsageEvent.resource_id,
+                UsageEvent.event_metadata,
+                UsageEvent.credits_used,
+            ).where(period_filter)
+        )
+    ).all()
 
-    for event in events:
-        event_credits = float(event.credits_used or 0.0)
-        total_credits += event_credits
-
-        event_type = event.event_type or "unknown"
-        usage_by_event_type[event_type] = usage_by_event_type.get(event_type, 0.0) + event_credits
-
-        agent_key = _resolve_usage_agent_key(event, owned_agent_ids)
+    for row in agent_key_rows:
+        agent_key = _resolve_usage_agent_key(
+            event_type=row.event_type or "",
+            resource_type=row.resource_type,
+            resource_id=row.resource_id,
+            event_metadata=row.event_metadata,
+            owned_agent_ids=owned_agent_ids,
+        )
         if agent_key:
-            usage_by_agent[agent_key] = usage_by_agent.get(agent_key, 0.0) + event_credits
+            usage_by_agent[agent_key] = usage_by_agent.get(agent_key, 0.0) + float(
+                row.credits_used or 0.0
+            )
 
     credits_total = get_plan_credits(current_user.plan)
 
     return CostSummaryResponse(
-        total_credits_used=round(total_credits, 2),
-        credits_remaining=round(max(0.0, credits_total - total_credits), 2),
+        total_credits_used=round(float(total_credits), 2),
+        credits_remaining=round(max(0.0, credits_total - float(total_credits)), 2),
         credits_total=credits_total,
-        usage_by_event_type={key: round(value, 2) for key, value in usage_by_event_type.items()},
+        usage_by_event_type=usage_by_event_type,
         usage_by_agent={key: round(value, 2) for key, value in usage_by_agent.items()},
         period_start=period_start_dt,
         period_end=period_end_dt,
