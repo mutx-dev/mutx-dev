@@ -35,8 +35,10 @@ async def get_owned_api_key(
 
 
 async def count_active_api_keys(db: AsyncSession, user_id: uuid.UUID) -> int:
-    result = await db.execute(select(APIKey).where(APIKey.user_id == user_id, APIKey.is_active))
-    return len(result.scalars().all())
+    count_result = await db.execute(
+        select(func.count()).select_from(APIKey).where(APIKey.user_id == user_id, APIKey.is_active),
+    )
+    return count_result.scalar() or 0
 
 
 @router.get("", response_model=APIKeyHistoryResponse)
