@@ -112,8 +112,10 @@ def setup_telemetry(service_name: str | None = None) -> trace.Tracer:
         # If exporter fails, continue without it
         pass
 
-    # Set global tracer provider
+    # Set global tracer provider and keep a reference for shutdown
+    global _tracer_provider
     trace.set_tracer_provider(provider)
+    _tracer_provider = provider
 
     # Return configured tracer
     return trace.get_tracer(name)
@@ -157,8 +159,9 @@ class Spans:
     AGENT_RESPONSE = "agent.response"
 
 
-# Pre-configured tracer (initialized on first use)
+# Pre-configured tracer and provider (initialized on first use)
 _tracer: trace.Tracer | None = None
+_tracer_provider: trace.TracerProvider | None = None
 
 
 def get_tracer() -> trace.Tracer:
@@ -167,3 +170,19 @@ def get_tracer() -> trace.Tracer:
     if _tracer is None:
         _tracer = setup_telemetry()
     return _tracer
+
+
+def shutdown_telemetry() -> None:
+    """Gracefully shut down the tracer provider and flush pending spans.
+
+    Call this during application shutdown to prevent the OTel
+    BatchSpanProcessor background thread from writing to a closed
+    logging stream (ValueError: I/O operation on closed file).
+    """
+    global _tracer_provider
+    if _tracer_provider is not None:
+        try:
+            _tracer_provider.shutdown(timeout=5.0)
+        except Exception:
+            pass
+        _tracer_provider = None
