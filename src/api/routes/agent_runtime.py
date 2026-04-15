@@ -110,6 +110,27 @@ class CommandsListResponse(BaseModel):
     commands: list[CommandResponse]
 
 
+class HeartbeatResponse(BaseModel):
+    status: str
+    agent_id: str
+    timestamp: str
+
+
+class MetricsResponse(BaseModel):
+    status: str
+    agent_id: str
+
+
+class CommandAckResponse(BaseModel):
+    status: str
+    command_id: str
+
+
+class LogSubmitResponse(BaseModel):
+    status: str
+    agent_id: str
+
+
 class AgentStatusResponse(BaseModel):
     agent_id: str
     status: str
@@ -195,7 +216,7 @@ async def register_agent(
     )
 
 
-@router.post("/heartbeat")
+@router.post("/heartbeat", response_model=HeartbeatResponse)
 async def heartbeat(
     request: HeartbeatRequest,
     db: AsyncSession = Depends(get_db),
@@ -291,7 +312,7 @@ async def heartbeat(
     }
 
 
-@router.post("/metrics")
+@router.post("/metrics", response_model=MetricsResponse)
 async def report_metrics(
     request: MetricsRequest,
     db: AsyncSession = Depends(get_db),
@@ -361,7 +382,7 @@ async def poll_commands(
     )
 
 
-@router.post("/commands/acknowledge")
+@router.post("/commands/acknowledge", response_model=CommandAckResponse)
 async def acknowledge_command(
     request: CommandAcknowledgeRequest,
     db: AsyncSession = Depends(get_db),
@@ -397,7 +418,7 @@ async def acknowledge_command(
     }
 
 
-@router.post("/logs")
+@router.post("/logs", response_model=LogSubmitResponse)
 async def submit_log(
     request: LogRequest,
     db: AsyncSession = Depends(get_db),
