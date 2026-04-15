@@ -10,7 +10,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
-from sqlalchemy import and_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
@@ -132,48 +132,113 @@ async def get_usage_breakdown(
 
     period_end_dt = _parse_datetime(period_end) or now
 
-    result = await db.execute(
-        select(UsageEvent).where(
+    date_filter = and_(
+        UsageEvent.user_id == current_user.id,
+        UsageEvent.created_at >= period_start_dt,
+        UsageEvent.created_at <= period_end_dt,
+    )
+
+    # --- Total credits via SQL aggregate ---
+    total_result = await db.execute(
+        select(func.coalesce(func.sum(UsageEvent.credits_used), 0.0)).where(date_filter)
+    )
+    total_credits = float(total_result.scalar_one())
+
+    # --- Breakdown by event_type via SQL GROUP BY ---
+    type_result = await db.execute(
+        select(
+            UsageEvent.event_type,
+            func.coalesce(func.sum(UsageEvent.credits_used), 0.0),
+            func.count(),
+        )
+        .where(date_filter)
+        .group_by(UsageEvent.event_type)
+    )
+    type_rows = type_result.all()
+    usage_by_type = [
+        UsageByType(
+            event_type=row[0] or "unknown",
+            credits_used=round(float(row[1]), 2),
+            event_count=int(row[2]),
+        )
+        for row in type_rows
+    ]
+
+    # --- Breakdown by agent via SQL GROUP BY on resource_id ---
+    # The original code extracted agent_id from event_metadata JSON first,
+    # then fell back to resource_id when resource_type == "agent" or
+    # event_type starts with "agent_".  Doing JSON parsing inside SQL
+    # across heterogeneous databases is fragile, so we use a simpler
+    # SQL-level aggregation keyed on (resource_type, resource_id) and
+    # post-process in Python only for the metadata-based cases.
+    agent_result = await db.execute(
+        select(
+            UsageEvent.resource_type,
+            UsageEvent.resource_id,
+            UsageEvent.event_metadata,
+            UsageEvent.event_type,
+            func.coalesce(func.sum(UsageEvent.credits_used), 0.0),
+            func.count(),
+        )
+        .where(
             and_(
-                UsageEvent.user_id == current_user.id,
-                UsageEvent.created_at >= period_start_dt,
-                UsageEvent.created_at <= period_end_dt,
+                date_filter,
+                UsageEvent.resource_id.isnot(None),
             )
         )
+        .group_by(
+            UsageEvent.resource_type,
+            UsageEvent.resource_id,
+            UsageEvent.event_metadata,
+            UsageEvent.event_type,
+        )
     )
-    events = result.scalars().all()
+    agent_rows = agent_result.all()
 
+    # Collapse rows into a dict keyed by resolved agent_id string
     agent_usage: dict[str, dict[str, float | int]] = {}
-    for event in events:
-        metadata = _decode_event_metadata(event.event_metadata)
+    for resource_type, resource_id, raw_metadata, event_type_val, credits, count in agent_rows:
+        metadata = _decode_event_metadata(raw_metadata)
         agent_key = metadata.get("agent_id") if isinstance(metadata.get("agent_id"), str) else None
 
-        if not agent_key and event.resource_type == "agent" and event.resource_id:
-            agent_key = event.resource_id
+        if not agent_key and resource_type == "agent" and resource_id:
+            agent_key = resource_id
 
-        if not agent_key and event.event_type.startswith("agent_") and event.resource_id:
-            agent_key = event.resource_id
+        if not agent_key and event_type_val and event_type_val.startswith("agent_") and resource_id:
+            agent_key = resource_id
 
         if not agent_key:
             continue
 
         if agent_key not in agent_usage:
             agent_usage[agent_key] = {"credits": 0.0, "count": 0}
-        agent_usage[agent_key]["credits"] += event.credits_used or 0
-        agent_usage[agent_key]["count"] += 1
+        agent_usage[agent_key]["credits"] += float(credits)
+        agent_usage[agent_key]["count"] += int(count)
+
+    # Batch-resolve agent names (single query instead of N+1)
+    agent_uuids = [
+        _safe_uuid(agent_id_str)
+        for agent_id_str in agent_usage
+        if _safe_uuid(agent_id_str).int != 0
+    ]
+
+    agent_name_map: dict[uuid.UUID, str] = {}
+    if agent_uuids:
+        agent_rows_db = await db.execute(
+            select(Agent.id, Agent.name).where(Agent.id.in_(agent_uuids))
+        )
+        for row in agent_rows_db.all():
+            agent_name_map[row[0]] = row[1]
 
     usage_by_agent = []
     for agent_id_str, data in agent_usage.items():
         agent_uuid = _safe_uuid(agent_id_str)
-        agent_name = f"Unscoped usage ({str(agent_uuid)[:8]})"
-
-        if agent_uuid.int != 0:
-            agent_result = await db.execute(select(Agent).where(Agent.id == agent_uuid))
-            agent = agent_result.scalar_one_or_none()
-            if agent is not None:
-                agent_name = agent.name
-            else:
-                agent_name = f"Unknown agent ({str(agent_uuid)[:8]})"
+        if agent_uuid in agent_name_map:
+            agent_name = agent_name_map[agent_uuid]
+        elif agent_uuid.int != 0:
+            agent_name = f"Unknown agent ({str(agent_uuid)[:8]})"
+        else:
+            agent_name = f"Unscoped usage ({str(agent_uuid)[:8]})"
 
         usage_by_agent.append(
             UsageByAgent(
@@ -183,25 +248,6 @@ async def get_usage_breakdown(
                 event_count=int(data["count"]),
             )
         )
-
-    type_usage = {}
-    for event in events:
-        event_type = event.event_type or "unknown"
-        if event_type not in type_usage:
-            type_usage[event_type] = {"credits": 0.0, "count": 0}
-        type_usage[event_type]["credits"] += event.credits_used or 0
-        type_usage[event_type]["count"] += 1
-
-    usage_by_type = [
-        UsageByType(
-            event_type=event_type,
-            credits_used=round(data["credits"], 2),
-            event_count=data["count"],
-        )
-        for event_type, data in type_usage.items()
-    ]
-
-    total_credits = sum((event.credits_used or 0) for event in events)
 
     credits_total = get_plan_credits(current_user.plan)
 
