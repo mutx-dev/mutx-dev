@@ -35,6 +35,7 @@ from src.api.models.schemas import (
     AgentCreate,
     AgentDetailResponse,
     AgentResponse,
+    AgentListResponse,
     AnthropicAgentConfig,
     CustomAgentConfig,
     LangChainAgentConfig,
@@ -294,7 +295,7 @@ async def create_agent(
     return _serialize_agent(agent)
 
 
-@router.get("", response_model=list[AgentResponse])
+@router.get("", response_model=AgentListResponse)
 async def list_agents(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
@@ -304,11 +305,29 @@ async def list_agents(
     # Ownership enforcement: always filter by authenticated user's ID.
     # Client-supplied user_id query params are ignored - ownership is derived
     # from the auth token via current_user, not from client input.
-    query = select(Agent).order_by(Agent.created_at.desc()).offset(skip).limit(limit)
-    query = query.where(Agent.user_id == current_user.id)
+    base_filter = Agent.user_id == current_user.id
+
+    # Total count via SQL aggregate — avoids loading full rows just to count.
+    count_stmt = select(func.count()).select_from(Agent).where(base_filter)
+    total = (await db.execute(count_stmt)).scalar_one()
+
+    query = (
+        select(Agent)
+        .where(base_filter)
+        .order_by(Agent.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
     result = await db.execute(query)
     agents = result.scalars().all()
-    return [_serialize_agent(agent) for agent in agents]
+
+    return AgentListResponse(
+        items=[_serialize_agent(agent) for agent in agents],
+        total=total,
+        skip=skip,
+        limit=limit,
+        has_more=(skip + limit) < total,
+    )
 
 
 @router.get("/{agent_id}", response_model=AgentDetailResponse)

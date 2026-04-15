@@ -317,7 +317,10 @@ class TestListAgents:
         """Test listing agents when none exist."""
         response = await client.get("/v1/agents")
         assert response.status_code == 200
-        assert response.json() == []
+        data = response.json()
+        assert data["items"] == []
+        assert data["total"] == 0
+        assert data["has_more"] is False
 
     @pytest.mark.asyncio
     async def test_list_agents_with_data(self, client: AsyncClient, test_agent):
@@ -325,8 +328,10 @@ class TestListAgents:
         response = await client.get("/v1/agents")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["id"] == str(test_agent.id)
+        assert len(data["items"]) == 1
+        assert data["items"][0]["id"] == str(test_agent.id)
+        assert data["total"] == 1
+        assert data["has_more"] is False
 
     @pytest.mark.asyncio
     async def test_list_agents_pagination(
@@ -348,7 +353,9 @@ class TestListAgents:
         response = await client.get("/v1/agents?limit=2")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 2
+        assert len(data["items"]) == 2
+        assert data["total"] == 5
+        assert data["has_more"] is True
 
     @pytest.mark.asyncio
     async def test_list_agents_scoped_to_authenticated_user(
@@ -357,16 +364,16 @@ class TestListAgents:
         """Test listing agents always uses the authenticated user scope."""
         # Test user can see their own agents
         response = await client.get("/v1/agents")
-        assert len(response.json()) == 1
+        assert len(response.json()["items"]) == 1
 
         # Other user sees empty list
         response = await other_user_client.get("/v1/agents")
-        assert len(response.json()) == 0
+        assert len(response.json()["items"]) == 0
 
         # Supplying user_id in query must not expand access scope
         response = await other_user_client.get(f"/v1/agents?user_id={test_agent.user_id}")
         assert response.status_code == 200
-        assert response.json() == []
+        assert response.json()["items"] == []
 
 
 class TestAgentAuthorization:

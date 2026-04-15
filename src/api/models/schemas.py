@@ -263,6 +263,16 @@ class AgentResponse(BaseModel):
     user_id: uuid.UUID
 
 
+class AgentListResponse(BaseModel):
+    """Paginated response for listing agents."""
+
+    items: list[AgentResponse]
+    total: int
+    skip: int
+    limit: int
+    has_more: bool
+
+
 class AgentDetailResponse(AgentResponse):
     deployments: list[DeploymentResponse] = Field(default_factory=list)
 
