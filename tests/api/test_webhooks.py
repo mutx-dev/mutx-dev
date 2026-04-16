@@ -627,12 +627,14 @@ async def test_deliver_webhook_blocks_unsafe_destination_before_network():
         is_active=True,
     )
 
-    success, status_code, error_message = await deliver_webhook(
-        ExplodingSession(),
-        webhook,
-        "test",
-        {"message": "blocked"},
-        uuid.uuid4(),
+    success, status_code, error_message, duration_ms, response_body = (
+        await deliver_webhook(
+            ExplodingSession(),
+            webhook,
+            "test",
+            {"message": "blocked"},
+            uuid.uuid4(),
+        )
     )
 
     assert success is False
