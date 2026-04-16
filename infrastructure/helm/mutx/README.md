@@ -45,7 +45,7 @@ The following table lists the configurable parameters of the MUTX chart and thei
 
 | Parameter | Description | Default |
 | --- | --- | --- |
-| `replicaCount` | Number of pod replicas | `2` |
+| `replicaCount` | Number of pod replicas | `1` |
 | `resources.limits.cpu` | CPU limit | `1000m` |
 | `resources.limits.memory` | Memory limit | `1Gi` |
 | `resources.requests.cpu` | CPU request | `100m` |
@@ -73,7 +73,7 @@ The following table lists the configurable parameters of the MUTX chart and thei
 | Parameter | Description | Default |
 | --- | --- | --- |
 | `autoscaling.enabled` | Enable HPA | `false` |
-| `autoscaling.minReplicas` | Minimum replicas | `2` |
+| `autoscaling.minReplicas` | Minimum replicas | `1` |
 | `autoscaling.maxReplicas` | Maximum replicas | `10` |
 | `autoscaling.targetCPUUtilizationPercentage` | CPU target for scale-up | `75` |
 
@@ -81,14 +81,15 @@ The following table lists the configurable parameters of the MUTX chart and thei
 
 | Parameter | Description | Default |
 | --- | --- | --- |
-| `env.DATABASE_URL` | PostgreSQL connection string | _(not set)_ |
 | `env.REDIS_URL` | Redis connection string | _(not set)_ |
-| `env.JWT_SECRET` | JWT signing secret | _(auto-generated)_ |
 | `env.LOG_LEVEL` | Application log level | _(not set)_ |
 | `env.ENVIRONMENT` | Deployment environment name | _(not set)_ |
-| `env.OIDC_ISSUER` | OIDC provider issuer URL | _(not set)_ |
-| `env.OIDC_CLIENT_ID` | OIDC client ID | _(not set)_ |
-| `env.OIDC_JWKS_URI` | OIDC JWKS endpoint | _(not set)_ |
+| `secretEnv.DATABASE_URL` | PostgreSQL connection string | _(not set)_ |
+| `secretEnv.JWT_SECRET` | JWT signing secret | _(required in production)_ |
+| `secretEnv.SECRET_ENCRYPTION_KEY` | Secret encryption key | _(required in production)_ |
+| `secretEnv.OIDC_ISSUER` | OIDC provider issuer URL | _(not set)_ |
+| `secretEnv.OIDC_CLIENT_ID` | OIDC client ID | _(not set)_ |
+| `secretEnv.OIDC_JWKS_URI` | OIDC JWKS endpoint | _(not set)_ |
 
 ## Production Deployment
 
@@ -102,13 +103,14 @@ helm upgrade --install mutx-prod ./infrastructure/helm/mutx \
 
 `values.prod.yaml` sets:
 
-- `replicaCount: 3`
+- `replicaCount: 1` until governance state is moved to shared storage
 - `image.pullPolicy: Always`
 - `resources.limits: cpu 2000m, memory 2Gi`
 - `resources.requests: cpu 500m, memory 1Gi`
-- `autoscaling.enabled: true` (3--20 replicas, 70% CPU target)
+- `autoscaling.enabled: false` until governance state is moved to shared storage
 - `env.LOG_LEVEL: "WARNING"`
 - `env.ENVIRONMENT: "production"`
+- `secretEnv.JWT_SECRET` and `secretEnv.SECRET_ENCRYPTION_KEY` must be set
 - Ingress enabled with TLS
 
 ## RBAC Setup
@@ -126,7 +128,7 @@ Roles are sourced from OIDC token claims. Configure your identity provider to in
 
 ```yaml
 # In values.yaml or a -f override
-env:
+secretEnv:
   OIDC_ISSUER: "https://your-idp.example.com"
   OIDC_CLIENT_ID: "mutx-production"
   OIDC_JWKS_URI: "https://your-idp.example.com/.well-known/jwks.json"
@@ -141,7 +143,7 @@ See [Security Architecture](../../../docs/architecture/security.md#rbac-enforcem
 MUTX validates OIDC tokens from Okta, Auth0, Keycloak, and Google. Configure via environment variables:
 
 ```yaml
-env:
+secretEnv:
   OIDC_ISSUER: "https://your-org.okta.com"
   OIDC_CLIENT_ID: "0oa1abc2def3ghi4jkl5"
   OIDC_JWKS_URI: "https://your-org.okta.com/oauth2/v1/keys"

@@ -81,7 +81,14 @@ export async function POST(request: NextRequest) {
   const auth = request.headers.get("authorization");
   const syncToken = process.env.DOCS_SYNC_TOKEN;
 
-  if (!isDev && syncToken) {
+  if (!isDev) {
+    if (!syncToken) {
+      return NextResponse.json(
+        { error: "DOCS_SYNC_TOKEN is required outside development" },
+        { status: 503 }
+      );
+    }
+
     if (auth !== `Bearer ${syncToken}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

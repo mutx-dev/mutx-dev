@@ -25,5 +25,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "mutx.fullname" . }}-env
+            {{- if .Values.secretEnv }}
+            - secretRef:
+                name: {{ include "mutx.fullname" . }}-env
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

@@ -28,10 +28,40 @@ from src.api.services.email.email_service import (
 from src.api.services.social_auth import OAuthUserProfile
 
 settings = get_settings()
+MANAGED_API_KEY_PREFIX_LENGTH = 12
 
 
-def generate_api_key() -> str:
-    return f"mutx_{secrets.token_urlsafe(32)}"
+def generate_api_key() -> tuple[str, str]:
+    key_prefix = secrets.token_hex(MANAGED_API_KEY_PREFIX_LENGTH // 2)
+    key_secret = secrets.token_urlsafe(32)
+    return f"mutx_live_{key_prefix}_{key_secret}", key_prefix
+
+
+def extract_api_key_prefix(key: str) -> str | None:
+    parts = key.split("_", 3)
+    if len(parts) != 4 or parts[0] != "mutx" or parts[1] != "live":
+        return None
+
+    key_prefix = parts[2]
+    if len(key_prefix) != MANAGED_API_KEY_PREFIX_LENGTH:
+        return None
+
+    if any(character not in "0123456789abcdef" for character in key_prefix):
+        return None
+
+    return key_prefix
+
+
+def generate_agent_api_key(agent_id: uuid.UUID) -> tuple[str, str]:
+    key_prefix = agent_id.hex
+    return f"mutx_agent_{key_prefix}_{uuid.uuid4().hex[:24]}", key_prefix
+
+
+def extract_agent_api_key_prefix(key: str) -> str | None:
+    parts = key.split("_", 3)
+    if len(parts) != 4 or parts[0] != "mutx" or parts[1] != "agent":
+        return None
+    return parts[2] or None
 
 
 def generate_user_api_key() -> str:
@@ -267,7 +297,7 @@ class UserService:
         name: str,
         expires_in_days: Optional[int] = None,
     ) -> tuple[APIKey, str]:
-        plain_key = generate_api_key()
+        plain_key, key_prefix = generate_api_key()
         key_hash = hash_api_key(plain_key)
 
         expires_at = None
@@ -278,6 +308,7 @@ class UserService:
             id=uuid.uuid4(),
             user_id=user_id,
             key_hash=key_hash,
+            key_prefix=key_prefix,
             name=name,
             expires_at=expires_at,
         )
@@ -293,10 +324,7 @@ class UserService:
         return list(result.scalars().all())
 
     async def verify_api_key(self, plain_key: str, user_id: uuid.UUID) -> Optional[APIKey]:
-        result = await self.session.execute(
-            select(APIKey).where(APIKey.user_id == user_id).where(APIKey.is_active)
-        )
-        api_keys = result.scalars().all()
+        api_keys = await self._get_api_key_candidates(plain_key, user_id=user_id)
 
         for api_key in api_keys:
             if verify_api_key(plain_key, api_key.key_hash):
@@ -317,12 +345,7 @@ class UserService:
         Returns the active user and a managed API key ID when present.
         """
         now = datetime.now(timezone.utc)
-        result = await self.session.execute(
-            select(APIKey, User)
-            .join(User, APIKey.user_id == User.id)
-            .where(APIKey.is_active, User.is_active)
-        )
-        managed_keys = result.all()
+        managed_keys = await self._get_authentication_candidates(plain_key)
 
         for api_key, active_user in managed_keys:
             if api_key.expires_at and api_key.expires_at < now:
@@ -333,6 +356,65 @@ class UserService:
                 return active_user, api_key.id
 
         return None
+
+    async def _get_api_key_candidates(
+        self,
+        plain_key: str,
+        *,
+        user_id: uuid.UUID | None = None,
+    ) -> list[APIKey]:
+        key_prefix = extract_api_key_prefix(plain_key)
+        candidates = await self._fetch_api_keys_by_prefix(key_prefix, user_id=user_id)
+
+        if key_prefix is not None:
+            candidates.extend(await self._fetch_api_keys_by_prefix(None, user_id=user_id))
+
+        return candidates
+
+    async def _fetch_api_keys_by_prefix(
+        self,
+        key_prefix: str | None,
+        *,
+        user_id: uuid.UUID | None = None,
+    ) -> list[APIKey]:
+        query = select(APIKey).where(APIKey.is_active)
+        if user_id is not None:
+            query = query.where(APIKey.user_id == user_id)
+
+        if key_prefix is None:
+            query = query.where(APIKey.key_prefix.is_(None))
+        else:
+            query = query.where(APIKey.key_prefix == key_prefix)
+
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
+
+    async def _get_authentication_candidates(self, plain_key: str) -> list[tuple[APIKey, User]]:
+        key_prefix = extract_api_key_prefix(plain_key)
+        candidates = await self._fetch_authentication_candidates_by_prefix(key_prefix)
+
+        if key_prefix is not None:
+            candidates.extend(await self._fetch_authentication_candidates_by_prefix(None))
+
+        return candidates
+
+    async def _fetch_authentication_candidates_by_prefix(
+        self,
+        key_prefix: str | None,
+    ) -> list[tuple[APIKey, User]]:
+        query = (
+            select(APIKey, User)
+            .join(User, APIKey.user_id == User.id)
+            .where(APIKey.is_active, User.is_active)
+        )
+
+        if key_prefix is None:
+            query = query.where(APIKey.key_prefix.is_(None))
+        else:
+            query = query.where(APIKey.key_prefix == key_prefix)
+
+        result = await self.session.execute(query)
+        return list(result.all())
 
     async def update_api_key_last_used(self, api_key_id: uuid.UUID) -> None:
         await self.session.execute(

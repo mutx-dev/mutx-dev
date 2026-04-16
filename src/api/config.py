@@ -468,6 +468,11 @@ class Settings(BaseSettings):
                     "SECRET_ENCRYPTION_KEY is not set; falling back to JWT secret for encryption. "
                     "This is not recommended — set a dedicated encryption key for production."
                 )
+        elif self.secret_encryption_key == self.jwt_secret:
+            errors.append(
+                "SECRET_ENCRYPTION_KEY must not match JWT_SECRET. "
+                "Use a dedicated encryption key to keep token signing and secret encryption separate."
+            )
 
         # Validate DATABASE_URL when database is required on startup
         if self.database_required_on_startup:
@@ -534,9 +539,9 @@ class Settings(BaseSettings):
                 )
 
             if "*" in self.forwarded_allow_ips:
-                warnings.append(
-                    "FORWARDED_ALLOW_IPS trusts all proxy sources ('*'). "
-                    "Set explicit ingress proxy IPs in production when possible."
+                errors.append(
+                    "FORWARDED_ALLOW_IPS must not trust all proxy sources ('*') in production. "
+                    "Set explicit ingress proxy IPs instead."
                 )
 
         # Raise errors if any

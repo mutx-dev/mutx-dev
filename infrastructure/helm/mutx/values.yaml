@@ -3,7 +3,7 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-replicaCount: 2
+replicaCount: 1
 
 service:
   type: ClusterIP
@@ -28,12 +28,18 @@ resources:
 env:
   {}
   # Example:
-  # DATABASE_URL: "postgresql://user:pass@localhost:5432/mutx"
   # REDIS_URL: "redis://localhost:6379/0"
   # LOG_LEVEL: "INFO"
 
+secretEnv:
+  {}
+  # Example:
+  # DATABASE_URL: "postgresql://user:pass@localhost:5432/mutx"
+  # JWT_SECRET: "replace-me"
+  # SECRET_ENCRYPTION_KEY: "replace-me"
+
 autoscaling:
   enabled: false
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 75

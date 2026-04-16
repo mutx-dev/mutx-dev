@@ -1,4 +1,3 @@
-import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -16,16 +15,9 @@ from src.api.models.schemas import (
     APIKeyHistoryResponse,
     APIKeyResponse,
 )
-from src.api.services.user_service import hash_api_key
+from src.api.services.user_service import generate_api_key, hash_api_key
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
-
-
-def generate_api_key() -> str:
-    """Generate a new API key with 'mutx_live_' prefix."""
-    random_part = secrets.token_urlsafe(32)
-    return f"mutx_live_{random_part}"
-
 
 async def get_owned_api_key(
     db: AsyncSession, user_id: uuid.UUID, key_id: uuid.UUID
@@ -104,7 +96,7 @@ async def create_api_key(
             detail=f"Active API key limit reached for your plan ({current_user.plan}): {max_keys} keys",
         )
 
-    plain_key = generate_api_key()
+    plain_key, key_prefix = generate_api_key()
     key_hash = hash_api_key(plain_key)
 
     expires_at = None
@@ -115,6 +107,7 @@ async def create_api_key(
         id=uuid.uuid4(),
         user_id=current_user.id,
         key_hash=key_hash,
+        key_prefix=key_prefix,
         name=key_data.name,
         expires_at=expires_at,
         is_active=True,
@@ -172,7 +165,7 @@ async def rotate_api_key(
             detail="API key is already revoked and cannot be rotated",
         )
 
-    plain_key = generate_api_key()
+    plain_key, key_prefix = generate_api_key()
     key_hash = hash_api_key(plain_key)
 
     old_key.is_active = False
@@ -181,6 +174,7 @@ async def rotate_api_key(
         id=uuid.uuid4(),
         user_id=current_user.id,
         key_hash=key_hash,
+        key_prefix=key_prefix,
         name=old_key.name,
         expires_at=old_key.expires_at,
         is_active=True,

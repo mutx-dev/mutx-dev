@@ -74,7 +74,7 @@ def test_supervised_profiles_accepts_json_object_env(monkeypatch):
     }
 
 
-def test_production_warns_when_forwarded_allow_ips_trusts_all(monkeypatch, caplog):
+def test_production_rejects_when_forwarded_allow_ips_trusts_all(monkeypatch):
     monkeypatch.setenv("ENVIRONMENT", "production")
     monkeypatch.setenv("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
     monkeypatch.setenv("SECRET_ENCRYPTION_KEY", "test-secret-key-that-is-32-bytes-long!")
@@ -82,10 +82,26 @@ def test_production_warns_when_forwarded_allow_ips_trusts_all(monkeypatch, caplo
     monkeypatch.setenv("CORS_ORIGINS", "https://app.example.com")
     monkeypatch.setenv("FORWARDED_ALLOW_IPS", "*")
 
-    with caplog.at_level("WARNING"):
+    with pytest.raises(
+        ValidationError,
+        match="FORWARDED_ALLOW_IPS must not trust all proxy sources",
+    ):
         Settings(_env_file=None)
 
-    assert "FORWARDED_ALLOW_IPS trusts all proxy sources" in caplog.text
+
+def test_production_rejects_when_secret_encryption_key_matches_jwt_secret(monkeypatch):
+    shared_secret = "abcdefghijklmnopqrstuvwxyz123456"
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("JWT_SECRET", shared_secret)
+    monkeypatch.setenv("SECRET_ENCRYPTION_KEY", shared_secret)
+    monkeypatch.setenv("DATABASE_URL", "postgresql://prod:***@db.example.com:5432/mutx")
+    monkeypatch.setenv("FORWARDED_ALLOW_IPS", "10.0.0.1")
+
+    with pytest.raises(
+        ValidationError,
+        match="SECRET_ENCRYPTION_KEY must not match JWT_SECRET",
+    ):
+        Settings(_env_file=None)
 
 
 def test_api_docs_are_disabled_in_production_by_default(monkeypatch):
@@ -93,6 +109,7 @@ def test_api_docs_are_disabled_in_production_by_default(monkeypatch):
     monkeypatch.setenv("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
     monkeypatch.setenv("SECRET_ENCRYPTION_KEY", "test-secret-key-that-is-32-bytes-long!")
     monkeypatch.setenv("DATABASE_URL", "postgresql://prod:***@db.example.com:5432/mutx")
+    monkeypatch.setenv("FORWARDED_ALLOW_IPS", "10.0.0.1")
 
     settings = Settings(_env_file=None)
 

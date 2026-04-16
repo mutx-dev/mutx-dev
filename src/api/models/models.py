@@ -259,6 +259,7 @@ class Agent(Base):
     api_key: Mapped[str] = mapped_column(
         String(128), nullable=True, index=True
     )  # Agent API key for self-auth
+    api_key_prefix: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     last_heartbeat: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
@@ -383,6 +384,7 @@ class APIKey(Base):
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
     key_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    key_prefix: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_used: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

@@ -36,7 +36,7 @@ from src.api.models import (
     User,
 )
 from src.api.models.schemas import AgentResponse, AgentRollbackRequest, AgentVersionHistoryResponse
-from src.api.services.user_service import hash_api_key
+from src.api.services.user_service import generate_agent_api_key, hash_api_key
 from src.api.services.webhook_service import trigger_deployment_event, trigger_webhook_event
 from src.api.time_utils import as_utc, as_utc_naive
 
@@ -197,8 +197,9 @@ async def register_agent(
 
     db.add(agent)
     await db.flush()  # Get agent.id before creating version
-    agent_api_key = f"mutx_agent_{agent.id.hex}_{uuid.uuid4().hex[:24]}"
+    agent_api_key, api_key_prefix = generate_agent_api_key(agent.id)
     agent.api_key = hash_api_key(agent_api_key)
+    agent.api_key_prefix = api_key_prefix
 
     # Create initial version
     _create_agent_version(agent, db)

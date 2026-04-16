@@ -3,14 +3,19 @@ from functools import wraps
 from typing import Callable, Optional
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.api.auth.jwt import verify_access_token
 from src.api.config import get_settings
 from src.api.database import async_session_maker, get_db
-from src.api.models.models import User
-from src.api.services.user_service import UserService, verify_api_key
+from src.api.models.models import Agent, User
+from src.api.services.user_service import (
+    UserService,
+    extract_agent_api_key_prefix,
+    verify_api_key,
+)
 
 
 async def _resolve_user_from_bearer_token(
@@ -275,9 +280,6 @@ async def get_current_agent(
     session: AsyncSession = Depends(get_db),
 ):
     """Authenticate an agent using its API key in the Authorization header."""
-    from sqlalchemy import select
-    from src.api.models.models import Agent
-
     if not authorization:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -295,6 +297,7 @@ async def get_current_agent(
 
     token = parts[1]
     agent = None
+    candidate_agents: list[Agent] = []
 
     if token.startswith("mutx_agent_"):
         candidate_agent_id = None
@@ -315,9 +318,22 @@ async def get_current_agent(
             ):
                 agent = candidate_agent
 
+        if agent is None:
+            candidate_prefix = extract_agent_api_key_prefix(token)
+            if candidate_prefix is not None:
+                result = await session.execute(
+                    select(Agent).where(Agent.api_key_prefix == candidate_prefix)
+                )
+                candidate_agents = list(result.scalars().all())
+
     if agent is None:
-        result = await session.execute(select(Agent).where(Agent.api_key.is_not(None)))
-        for candidate_agent in result.scalars().all():
+        if not candidate_agents:
+            result = await session.execute(
+                select(Agent).where(Agent.api_key.is_not(None), Agent.api_key_prefix.is_(None))
+            )
+            candidate_agents = list(result.scalars().all())
+
+        for candidate_agent in candidate_agents:
             if candidate_agent.api_key and verify_api_key(token, candidate_agent.api_key):
                 agent = candidate_agent
                 break

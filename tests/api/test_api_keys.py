@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.auth.jwt import create_access_token
 from src.api.models.models import APIKey
 from src.api.models import get_quota, PlanTier
-from src.api.services.user_service import verify_api_key
+from src.api.services.user_service import extract_api_key_prefix, verify_api_key
 
 
 class TestListAPIKeys:
@@ -88,6 +88,7 @@ class TestCreateAPIKey:
         result = await db_session.execute(select(APIKey).where(APIKey.user_id == test_user.id))
         stored_key = result.scalar_one()
         assert stored_key.name == "new-key"
+        assert stored_key.key_prefix == extract_api_key_prefix(data["key"])
         assert verify_api_key(data["key"], stored_key.key_hash)
         assert stored_key.is_active is True
         assert stored_key.expires_at is not None
@@ -339,6 +340,7 @@ class TestRotateAPIKey:
         active_keys = [item for item in keys if item.is_active]
         assert len(active_keys) == 1
         assert active_keys[0].name == "to-rotate"
+        assert active_keys[0].key_prefix == extract_api_key_prefix(data["key"])
         assert verify_api_key(data["key"], active_keys[0].key_hash)
 
     @pytest.mark.asyncio
