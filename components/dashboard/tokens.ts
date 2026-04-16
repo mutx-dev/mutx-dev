@@ -1,3 +1,98 @@
+// ---------------------------------------------------------------------------
+// HSL Triplet System (aligned with mission-control design-tokens.ts)
+// ---------------------------------------------------------------------------
+
+/** HSL color representation as numeric triplet */
+export interface HSL {
+  h: number;
+  s: number;
+  l: number;
+}
+
+/**
+ * Convert an HSL triplet to a CSS color string.
+ * With alpha: "hsl(187 82% 53% / 0.5)"
+ * Without alpha: "hsl(187 82% 53%)"
+ */
+export function hsl(color: HSL, alpha?: number): string {
+  const { h, s, l } = color;
+  if (alpha !== undefined) {
+    return `hsl(${h} ${s}% ${l}% / ${alpha})`;
+  }
+  return `hsl(${h} ${s}% ${l}%)`;
+}
+
+/**
+ * Convert an HSL triplet to raw CSS value (for use in CSS custom properties).
+ * Returns "187 82% 53%" without the hsl() wrapper.
+ */
+export function hslRaw(color: HSL): string {
+  const { h, s, l } = color;
+  return `${h} ${s}% ${l}%`;
+}
+
+/** Core void palette — dark theme foundation */
+export const voidPalette = {
+  background: { h: 215, s: 27, l: 4 },  // #07090C
+  card: { h: 220, s: 30, l: 8 },         // #0F141C
+  primary: { h: 217, s: 91, l: 60 },     // #3b82f6 (MUTX brand blue)
+  secondary: { h: 220, s: 25, l: 11 },
+  muted: { h: 220, s: 20, l: 14 },
+  border: { h: 220, s: 20, l: 14 },
+  ring: { h: 217, s: 91, l: 60 },        // #3b82f6 (brand blue)
+} satisfies Record<string, HSL>;
+
+/** Accent palette for status, highlights, and semantic colors */
+export const voidAccents = {
+  cyan: { h: 187, s: 82, l: 53 },    // #22D3EE
+  mint: { h: 160, s: 60, l: 52 },    // #34D399
+  amber: { h: 38, s: 92, l: 50 },    // #F59E0B
+  violet: { h: 263, s: 90, l: 66 },  // #A78BFA
+  crimson: { h: 0, s: 72, l: 51 },   // #DC2626
+} satisfies Record<string, HSL>;
+
+/** Status color mapping — maps status states to HSL accent values */
+export const statusColors = {
+  idle: voidAccents.cyan,
+  running: { h: 217, s: 91, l: 60 },    // brand blue
+  success: voidAccents.mint,
+  error: voidAccents.crimson,
+  warning: voidAccents.amber,
+} satisfies Record<string, HSL>;
+
+/** Surface elevation scale — 4-level depth system */
+export const surfaces = {
+  0: { h: 215, s: 27, l: 4 },   // Deepest void
+  1: { h: 222, s: 35, l: 7 },   // Dark navy
+  2: { h: 220, s: 30, l: 10 },  // Mid surface
+  3: { h: 220, s: 25, l: 14 },  // Raised surface
+} as const;
+
+/** Spacing scale (px) */
+export const spacing = {
+  unit: 4,
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  '2xl': 48,
+} as const;
+
+/** Border radius scale (px) */
+export const radius = {
+  xs: 6,
+  sm: 8,
+  md: 10,
+  lg: 12,
+  xl: 16,
+  full: 9999,
+} as const;
+
+// ---------------------------------------------------------------------------
+// Legacy CSS-var token system (unchanged — backward compatible)
+// ---------------------------------------------------------------------------
+
 export const dashboardTokens = {
   bgCanvas: "var(--mutx-dashboard-bg-canvas, #070b13)",
   bgCanvasRaised: "var(--mutx-dashboard-bg-canvas-raised, #0d1220)",
