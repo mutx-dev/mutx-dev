@@ -24,6 +24,10 @@ export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-mutx-smoke}"
 export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-mutx-smoke-password}"
 export JWT_SECRET="${JWT_SECRET:-mutx-smoke-jwt-secret-please-change-32chars}"
 export SECRET_ENCRYPTION_KEY="${SECRET_ENCRYPTION_KEY:-$JWT_SECRET}"
+
+if [ "$SECRET_ENCRYPTION_KEY" = "$JWT_SECRET" ]; then
+  export SECRET_ENCRYPTION_KEY="${SECRET_ENCRYPTION_KEY}-enc"
+fi
 export DATABASE_URL="${DATABASE_URL:-postgresql://mutx:${POSTGRES_PASSWORD}@postgres:5432/mutx}"
 export DATABASE_SSL_MODE="${DATABASE_SSL_MODE:-disable}"
 export NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-https://api.mutx.dev}"
