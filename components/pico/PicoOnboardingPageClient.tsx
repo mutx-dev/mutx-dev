@@ -20,26 +20,12 @@ import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
 import { getLessonBySlug, PICO_TRACKS } from '@/lib/pico/academy'
+import { PICO_GENERATED_CONTENT } from '@/lib/pico/generatedContent'
 import { usePicoHref } from '@/lib/pico/navigation'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
-const activationChecklist = [
-  {
-    chapter: '01',
-    title: 'Install Hermes',
-    body: 'Make sure the command opens from a fresh shell. Nothing else matters until that is real.',
-  },
-  {
-    chapter: '02',
-    title: 'Run one tiny prompt',
-    body: 'Pick the smallest prompt with an obvious answer so success cannot hide inside ambiguity.',
-  },
-  {
-    chapter: '03',
-    title: 'Keep proof',
-    body: 'Save the output. The first win should become a reusable artifact, not a feeling.',
-  },
-] as const
+const activationChecklist = PICO_GENERATED_CONTENT.onboarding.activationChecklist
+const stackSpotlights = PICO_GENERATED_CONTENT.onboarding.stackSpotlights
 
 const runtimeStatusOptions = [
   'client_required',
@@ -81,8 +67,8 @@ function joinClasses(...classes: Array<string | false | null | undefined>) {
 
 export function PicoOnboardingPageClient() {
   const pathname = usePathname()
-  const { progress, derived, actions } = usePicoProgress()
   const session = usePicoSession()
+  const { progress, derived, actions } = usePicoProgress(session.status === 'authenticated')
   const setup = usePicoSetupState(session.status === 'authenticated')
   const toHref = usePicoHref()
   const [runtimeDraft, setRuntimeDraft] = useState<RuntimeDraft>({
@@ -533,6 +519,42 @@ export function PicoOnboardingPageClient() {
                 {item.title}
               </h3>
               <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-stack-radar">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className={picoClasses.label}>Live stack radar</p>
+            <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+              The onboarding lane now knows what the tracked stacks are actually shipping
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+              Pico starts with Hermes in the lesson flow, but the product now keeps the rest of the
+              stack map visible instead of pretending there is only one runtime on earth.
+            </p>
+          </div>
+          <Link href={toHref('/wip')} className={picoClasses.secondaryButton}>
+            Open live ledger
+          </Link>
+        </div>
+
+        <div className={storyRailClass}>
+          {stackSpotlights.map((stack) => (
+            <article key={stack.id} className={picoInset('snap-start flex h-full flex-col p-5 sm:p-6')}>
+              <div className="flex items-center justify-between gap-3">
+                <span className={picoClasses.label}>{stack.name}</span>
+                <span className={picoClasses.chip}>{stack.latestSignal}</span>
+              </div>
+              <p className="mt-6 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                {stack.whyNow}
+              </p>
+              <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+                Keep this map in view while you execute the first lessons. Stack choice, launch
+                posture, and remote-access decisions should stay explicit from day one.
+              </p>
             </article>
           ))}
         </div>

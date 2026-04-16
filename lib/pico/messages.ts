@@ -1,0 +1,136 @@
+import type { AbstractIntlMessages } from 'next-intl'
+
+import ar from '@/messages/ar.json'
+import de from '@/messages/de.json'
+import en from '@/messages/en.json'
+import es from '@/messages/es.json'
+import fr from '@/messages/fr.json'
+import it from '@/messages/it.json'
+import ja from '@/messages/ja.json'
+import ko from '@/messages/ko.json'
+import pt from '@/messages/pt.json'
+import zh from '@/messages/zh.json'
+
+import { getPicoDefaultMessages } from '@/lib/pico/defaultMessages'
+import {
+  PICO_DEFAULT_LOCALE,
+  type PicoLocale,
+  resolvePicoLocale,
+} from '@/lib/pico/locale'
+
+type MessageValue = string | number | boolean | null | MessageObject | MessageValue[]
+
+type MessageObject = {
+  [key: string]: MessageValue
+}
+
+const LOCALE_MESSAGES: Record<PicoLocale, MessageObject> = {
+  en,
+  es,
+  fr,
+  de,
+  it,
+  pt,
+  ja,
+  ko,
+  zh,
+  ar,
+}
+
+const missingLocaleWarnings = new Set<string>()
+
+function isObject(value: unknown): value is MessageObject {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function deepMergeMessages(base: MessageObject, override: MessageObject | undefined): MessageObject {
+  if (!override) {
+    return structuredClone(base)
+  }
+
+  const merged: MessageObject = structuredClone(base)
+
+  for (const [key, value] of Object.entries(override)) {
+    if (Array.isArray(value)) {
+      merged[key] = structuredClone(value)
+      continue
+    }
+
+    if (isObject(value) && isObject(merged[key])) {
+      merged[key] = deepMergeMessages(merged[key] as MessageObject, value)
+      continue
+    }
+
+    merged[key] = value
+  }
+
+  return merged
+}
+
+function collectMissingPaths(
+  base: MessageObject,
+  override: MessageObject | undefined,
+  path: string[] = [],
+): string[] {
+  const missing: string[] = []
+
+  for (const [key, baseValue] of Object.entries(base)) {
+    const nextPath = [...path, key]
+    const overrideValue = override?.[key]
+
+    if (overrideValue === undefined) {
+      if (isObject(baseValue)) {
+        missing.push(...collectMissingPaths(baseValue, undefined, nextPath))
+      } else {
+        missing.push(nextPath.join('.'))
+      }
+      continue
+    }
+
+    if (isObject(baseValue) && isObject(overrideValue)) {
+      missing.push(...collectMissingPaths(baseValue, overrideValue, nextPath))
+    }
+  }
+
+  return missing
+}
+
+function getBaseEnglishMessages() {
+  return deepMergeMessages(en as MessageObject, getPicoDefaultMessages() as MessageObject)
+}
+
+function warnMissingMessages(locale: PicoLocale, messages: MessageObject | undefined, base: MessageObject) {
+  if (locale === PICO_DEFAULT_LOCALE || missingLocaleWarnings.has(locale)) {
+    return
+  }
+
+  const missingPaths = collectMissingPaths(base, messages)
+  if (!missingPaths.length) {
+    return
+  }
+
+  missingLocaleWarnings.add(locale)
+  const preview = missingPaths.slice(0, 50).join(', ')
+  console.warn(
+    `[pico-i18n] Locale "${locale}" is missing ${missingPaths.length} message keys. Falling back to ${PICO_DEFAULT_LOCALE}. Missing: ${preview}`,
+  )
+}
+
+export async function loadPicoMessages(localeCandidate?: string | null): Promise<{
+  locale: PicoLocale
+  messages: AbstractIntlMessages
+}> {
+  const locale = resolvePicoLocale(localeCandidate)
+  const baseMessages = getBaseEnglishMessages()
+  const localeMessages = LOCALE_MESSAGES[locale]
+
+  warnMissingMessages(locale, localeMessages, baseMessages)
+
+  return {
+    locale,
+    messages:
+      locale === PICO_DEFAULT_LOCALE
+        ? (baseMessages as AbstractIntlMessages)
+        : (deepMergeMessages(baseMessages, localeMessages) as AbstractIntlMessages),
+  }
+}

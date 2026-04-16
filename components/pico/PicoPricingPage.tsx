@@ -2,83 +2,85 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
+import { PICO_GENERATED_CONTENT } from '@/lib/pico/generatedContent'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
-const PLANS = [
+type PricingTierId = 'free' | 'starter' | 'pro' | 'enterprise'
+
+type PricingTierContent = {
+  name: string
+  price: string
+  period: string
+  description: string
+  features: string[]
+  cta: string
+}
+
+const PLAN_CONFIG: Array<{
+  id: PricingTierId
+  priceId: string | null
+  highlight: boolean
+  supportHref?: string
+}> = [
   {
     id: 'free',
-    name: 'Free',
-    price: '$0',
-    period: 'forever',
-    description: 'Get started with the basics',
-    features: [
-      '100 monthly credits',
-      'Limited tutor access',
-      'Academy lessons (basic)',
-      'Community support',
-    ],
-    cta: 'Current Plan',
     priceId: null,
     highlight: false,
   },
   {
     id: 'starter',
-    name: 'Starter',
-    price: '€9',
-    period: '/mo',
-    description: 'Full learning experience',
-    features: [
-      '1,000 monthly credits',
-      'Full tutor access',
-      'All academy lessons',
-      'Autopilot mode',
-      'Priority support',
-    ],
-    cta: 'Start 7-Day Trial',
     priceId: 'price_1TMrgMLqNfXHzKqSL3dPg1JS',
     highlight: true,
   },
   {
     id: 'pro',
-    name: 'Pro',
-    price: '€29',
-    period: '/mo',
-    description: 'For serious builders',
-    features: [
-      '10,000 monthly credits',
-      'Full tutor + BYOK',
-      'API access',
-      'Priority support',
-      'Custom workflows',
-      'Early feature access',
-    ],
-    cta: 'Start 7-Day Trial',
     priceId: 'price_1TMrdKLqNfXHzKqS15LrJt9C',
     highlight: false,
   },
   {
     id: 'enterprise',
-    name: 'Enterprise',
-    price: 'Custom',
-    period: '',
-    description: 'Dedicated support & scale',
-    features: [
-      '100K+ monthly credits',
-      'SSO & team management',
-      'SLA & dedicated support',
-      'Custom workflows',
-      'Direct access to founders',
-    ],
-    cta: 'Book a Call',
     priceId: null,
     highlight: false,
+    supportHref: 'https://calendly.com/mutxdev',
   },
 ]
 
+function formatShortDate(value?: string | null) {
+  if (!value) return 'Unavailable'
+
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return 'Unavailable'
+  }
+
+  return parsed.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+function formatCompactNumber(value?: number | null) {
+  if (typeof value !== 'number') return 'n/a'
+
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(value)
+}
+
 export function PicoPricingPage() {
+  const t = useTranslations('pico')
+  const pageT = useTranslations('pico.pricingPage')
   const [loading, setLoading] = useState<string | null>(null)
   const pricingRobot = picoRobotArtById.coins
+  const generated = PICO_GENERATED_CONTENT
+  const plans = PLAN_CONFIG.map((plan) => ({
+    ...plan,
+    ...(t.raw(`pricing.tiers.${plan.id}`) as PricingTierContent),
+  }))
 
   async function handleCheckout(planId: string, priceId: string | null) {
     if (!priceId) return
@@ -97,8 +99,8 @@ export function PicoPricingPage() {
       }
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Checkout failed' }))
-        throw new Error(err.error || err.detail || 'Checkout failed')
+        const err = await res.json().catch(() => ({ error: pageT('checkoutError') }))
+        throw new Error(err.error || err.detail || pageT('checkoutError'))
       }
 
       const data = await res.json()
@@ -148,7 +150,7 @@ export function PicoPricingPage() {
           marginBottom: '0.75rem',
           letterSpacing: '-0.02em',
         }}>
-          Simple, transparent pricing
+          {pageT('title')}
         </h1>
         <p style={{
           color: 'var(--pico-text-secondary)',
@@ -157,8 +159,7 @@ export function PicoPricingPage() {
           margin: '0 auto',
           lineHeight: 1.6,
         }}>
-          Start free. Upgrade when you need more power.
-          Every paid plan includes a 7-day free trial.
+          {pageT('subtitle')}
         </p>
       </div>
 
@@ -168,7 +169,7 @@ export function PicoPricingPage() {
         gap: '1.5rem',
         alignItems: 'start',
       }}>
-        {PLANS.map((plan) => (
+        {plans.map((plan) => (
           <div
             key={plan.id}
             style={{
@@ -200,7 +201,7 @@ export function PicoPricingPage() {
                 padding: '0.25rem 0.75rem',
                 borderRadius: 'var(--pico-radius-full)',
               }}>
-                Most Popular
+                {pageT('badgePopular')}
               </div>
             )}
 
@@ -272,7 +273,7 @@ export function PicoPricingPage() {
 
             <button
               onClick={() => plan.id === 'enterprise'
-                ? window.location.href = 'https://calendly.com/mutxdev'
+                ? window.location.href = (plan.supportHref ?? '/pico/support')
                 : handleCheckout(plan.id, plan.priceId)
               }
               disabled={loading === plan.id || (!plan.priceId && plan.id !== 'enterprise')}
@@ -297,11 +298,169 @@ export function PicoPricingPage() {
                 transition: 'all 0.2s',
               }}
             >
-              {loading === plan.id ? 'Loading...' : plan.cta}
+              {loading === plan.id ? pageT('loading') : plan.cta}
             </button>
           </div>
         ))}
       </div>
+
+      <section style={{ marginTop: '4rem' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '1rem',
+          marginBottom: '1.5rem',
+        }}>
+          {generated.pricing.truthStrip.map((item) => (
+            <div
+              key={item}
+              style={{
+                borderRadius: '1.15rem',
+                border: '1px solid var(--pico-border)',
+                background: 'var(--pico-bg-surface)',
+                padding: '1rem 1.1rem',
+                color: 'var(--pico-text-secondary)',
+                lineHeight: 1.55,
+              }}
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div style={{
+          borderRadius: '1.6rem',
+          border: '1px solid rgba(164, 255, 92, 0.18)',
+          background: 'linear-gradient(180deg, rgba(7, 14, 8, 0.96), rgba(4, 8, 5, 0.98))',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+        }}>
+          <p style={{
+            margin: 0,
+            fontFamily: 'var(--pico-font-accent)',
+            fontSize: '0.74rem',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'var(--pico-accent)',
+          }}>
+            Live content footing
+          </p>
+          <h2 style={{
+            margin: '0.85rem 0 0',
+            fontFamily: 'var(--pico-font-display)',
+            fontSize: 'clamp(1.5rem, 4vw, 2.3rem)',
+            color: 'var(--pico-text)',
+            letterSpacing: '-0.03em',
+          }}>
+            Pricing now sits on the same tracked stack truth as the rest of Pico
+          </h2>
+          <p style={{
+            margin: '0.85rem 0 0',
+            maxWidth: '48rem',
+            color: 'var(--pico-text-secondary)',
+            lineHeight: 1.65,
+          }}>
+            Builder-pack docs last refreshed {formatShortDate(generated.packSnapshot.refreshedAt)} now feed
+            the product copy, while live repo metadata keeps the stack briefings honest instead of frozen.
+          </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '1rem',
+        }}>
+          {generated.stacks.map((stack) => (
+            <article
+              key={stack.id}
+              style={{
+                borderRadius: '1.5rem',
+                border: '1px solid var(--pico-border)',
+                background: 'var(--pico-bg-raised)',
+                padding: '1.25rem',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
+                <div>
+                  <p style={{
+                    margin: 0,
+                    fontFamily: 'var(--pico-font-accent)',
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: 'var(--pico-accent)',
+                  }}>
+                    {stack.name}
+                  </p>
+                  <h3 style={{
+                    margin: '0.55rem 0 0',
+                    fontFamily: 'var(--pico-font-display)',
+                    fontSize: '1.45rem',
+                    color: 'var(--pico-text)',
+                    letterSpacing: '-0.03em',
+                  }}>
+                    {stack.live?.latestRef?.label ?? 'Tracked repo'}
+                  </h3>
+                </div>
+                <div style={{ textAlign: 'right', color: 'var(--pico-text-muted)', fontSize: '0.8rem' }}>
+                  <div>{formatCompactNumber(stack.live?.stars)} stars</div>
+                  <div>{formatShortDate(stack.live?.latestRef?.publishedAt ?? stack.live?.pushedAt)}</div>
+                </div>
+              </div>
+
+              <p style={{
+                margin: '0.9rem 0 0',
+                color: 'var(--pico-text-secondary)',
+                lineHeight: 1.65,
+                fontSize: '0.94rem',
+              }}>
+                {stack.productProfile}
+              </p>
+
+              <ul style={{
+                listStyle: 'none',
+                margin: '1rem 0 0',
+                padding: 0,
+                display: 'grid',
+                gap: '0.45rem',
+                color: 'var(--pico-text-secondary)',
+                fontSize: '0.88rem',
+              }}>
+                {stack.strengths.slice(0, 3).map((item) => (
+                  <li key={item} style={{ display: 'flex', gap: '0.6rem' }}>
+                    <span style={{ color: 'var(--pico-accent)' }}>•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                flexWrap: 'wrap',
+                marginTop: '1rem',
+                fontSize: '0.86rem',
+              }}>
+                {stack.docsUrl ? (
+                  <a href={stack.docsUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--pico-accent)' }}>
+                    Docs
+                  </a>
+                ) : null}
+                {stack.repoUrl ? (
+                  <a href={stack.repoUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--pico-text-secondary)' }}>
+                    Repo
+                  </a>
+                ) : null}
+                {stack.live?.latestRef?.url ? (
+                  <a href={stack.live.latestRef.url} target="_blank" rel="noreferrer" style={{ color: 'var(--pico-text-secondary)' }}>
+                    Latest ship
+                  </a>
+                ) : null}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <p style={{
         textAlign: 'center',
@@ -309,7 +468,11 @@ export function PicoPricingPage() {
         fontSize: '0.8rem',
         marginTop: '2.5rem',
       }}>
-        Need more? <a href="/pico/support" style={{ color: 'var(--pico-accent)' }}>Contact us</a> for Enterprise pricing (100K+ credits, SSO, SLA).
+        {pageT('enterpriseSupport')}{' '}
+        <a href="/pico/support" style={{ color: 'var(--pico-accent)' }}>
+          {pageT('enterpriseSupportCta')}
+        </a>{' '}
+        {pageT('enterpriseSupportBody')}
       </p>
     </div>
   )

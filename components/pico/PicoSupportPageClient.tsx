@@ -20,40 +20,14 @@ import { usePicoLessonWorkspace } from '@/components/pico/usePicoLessonWorkspace
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
+import { PICO_GENERATED_CONTENT } from '@/lib/pico/generatedContent'
 import { usePicoHref } from '@/lib/pico/navigation'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 import { cn } from '@/lib/utils'
 
-const supportLanes = [
-  {
-    id: 'fixing-existing',
-    title: 'Runtime or lesson blocker',
-    body: 'Use this when the product path stopped on a real command, lesson, or hosted state mismatch.',
-  },
-  {
-    id: 'other',
-    title: 'Office hours or deeper walkthrough',
-    body: 'Use this when the problem is bigger than one blocker and you need a guided operator session.',
-  },
-] as const
+const supportLanes = PICO_GENERATED_CONTENT.support.lanes
 
-const escalationStandards = [
-  {
-    label: '01 • Route',
-    title: 'Name the exact surface that broke',
-    body: 'Say whether the failure belongs to a lesson, Tutor, Autopilot, approvals, or hosted account state.',
-  },
-  {
-    label: '02 • Evidence',
-    title: 'Attach the failure, not the feeling',
-    body: 'Paste the command, error, packet, or approval state that proves where the route stopped.',
-  },
-  {
-    label: '03 • Return',
-    title: 'Ask for the route back in',
-    body: 'Great support returns you to the product with one clearer move than before.',
-  },
-] as const
+const escalationStandards = PICO_GENERATED_CONTENT.support.escalationStandards
 
 const supportInterestOptions = [
   { value: 'fixing-existing', label: 'Lesson or command blocker' },
@@ -82,7 +56,7 @@ export function PicoSupportPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
   const setup = usePicoSetupState(session.status === 'authenticated')
-  const { actions, progress, derived } = usePicoProgress()
+  const { actions, progress, derived } = usePicoProgress(session.status === 'authenticated')
   const toHref = usePicoHref()
   const [formOpen, setFormOpen] = useState(false)
   const [interest, setInterest] = useState<string | undefined>()

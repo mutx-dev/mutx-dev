@@ -6,11 +6,11 @@
   "packageManager": "npm@11.12.1",
   "main": "desktop/main.cjs",
   "scripts": {
-    "prebuild": "node -e \"require('fs').rmSync('public/_next', { recursive: true, force: true })\"",
+    "prebuild": "node -e \"const { rmSync } = require('fs'); for (const target of ['public/_next', '.next/standalone']) { rmSync(target, { recursive: true, force: true }); }\"",
     "postbuild": "node scripts/fix-next-types.mjs",
     "prepare:standalone": "node scripts/prepare-standalone.mjs",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "npm run prepare:standalone && node scripts/start-standalone.mjs",
     "lint": "eslint . --max-warnings=0",
     "desktop:start": "npm run prepare:standalone && npx electron .",
@@ -39,6 +39,7 @@
     "release:promote:railway": "bash scripts/promote-railway-production.sh",
     "release:verify:production": "bash scripts/verify-production-release.sh",
     "release:check": "bash scripts/release-check.sh",
+    "sync:pico-content": "node scripts/build-pico-content.mjs",
     "build:docs-search": "npx tsx scripts/build-docs-search-index.ts",
     "docs:watch": "npx tsx scripts/docs-watcher.ts",
     "qa:pico-i18n": "node scripts/qa-pico-i18n.mjs"

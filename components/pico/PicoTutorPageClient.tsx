@@ -20,21 +20,14 @@ import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
 import { PICO_LESSONS } from '@/lib/pico/academy'
+import { PICO_GENERATED_CONTENT } from '@/lib/pico/generatedContent'
 import { usePicoHref } from '@/lib/pico/navigation'
 import { normalizeTutorReplyPayload, type PicoTutorReply } from '@/lib/pico/tutor'
 import { cn } from '@/lib/utils'
 
-const examplePrompts = [
-  'Hermes launches locally but dies on the VPS. What should I check first?',
-  'How do I keep the agent alive after I close SSH?',
-  'I want approval before any outbound send. Which lesson do I follow?',
-] as const
+const examplePrompts = PICO_GENERATED_CONTENT.tutor.examplePrompts
 
-const questionProtocol = [
-  'Say what step you were on.',
-  'Say what you expected to happen.',
-  'Say what happened instead.',
-] as const
+const questionProtocol = PICO_GENERATED_CONTENT.tutor.questionProtocol
 
 const RECENT_QUESTIONS_KEY = 'pico.tutor.recent.v1'
 
@@ -132,7 +125,7 @@ export function PicoTutorPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
   const setup = usePicoSetupState(session.status === 'authenticated')
-  const { progress, derived, actions } = usePicoProgress()
+  const { progress, derived, actions } = usePicoProgress(session.status === 'authenticated')
   const toHref = usePicoHref()
   const searchParams = useSearchParams()
   const lessonFromQuery = searchParams.get('lesson')
