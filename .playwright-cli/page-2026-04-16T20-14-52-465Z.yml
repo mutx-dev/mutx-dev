@@ -1,0 +1,48 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e94]:
+    - banner [ref=e95]:
+      - link "PicoMUTX" [ref=e97] [cursor=pointer]:
+        - /url: /
+    - main [ref=e98]:
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - paragraph [ref=e101]: Pico preview access
+          - heading "Enter the current Pico build" [level=1] [ref=e102]
+          - paragraph [ref=e103]: Use a provider or email to open the preview and save your place.
+        - generic [ref=e104]:
+          - generic [ref=e105]:
+            - link "Google" [ref=e106] [cursor=pointer]:
+              - /url: /api/auth/oauth/google/start?intent=login&next=%2F
+              - img [ref=e107]
+              - text: Google
+            - link "GitHub" [ref=e112] [cursor=pointer]:
+              - /url: /api/auth/oauth/github/start?intent=login&next=%2F
+              - img [ref=e113]
+              - text: GitHub
+            - link "Discord" [ref=e115] [cursor=pointer]:
+              - /url: /api/auth/oauth/discord/start?intent=login&next=%2F
+              - img [ref=e116]
+              - text: Discord
+            - link "Apple" [ref=e118] [cursor=pointer]:
+              - /url: /api/auth/oauth/apple/start?intent=login&next=%2F
+              - img [ref=e119]
+              - text: Apple
+          - generic [ref=e123]: Or use email
+          - generic [ref=e125]:
+            - generic [ref=e126]:
+              - generic [ref=e127]: Email address
+              - textbox "Email address" [ref=e128]:
+                - /placeholder: you@company.com
+            - generic [ref=e129]:
+              - generic [ref=e130]: Password
+              - textbox "Password" [ref=e131]:
+                - /placeholder: Enter at least 8 characters
+            - button "Enter Pico" [ref=e132] [cursor=pointer]
+          - generic [ref=e133]:
+            - link "Forgot password?" [ref=e134] [cursor=pointer]:
+              - /url: /forgot-password
+            - paragraph [ref=e135]:
+              - text: Need access?
+              - link "Create one" [ref=e136] [cursor=pointer]:
+                - /url: /register?next=%2F
+  - alert [ref=e45]

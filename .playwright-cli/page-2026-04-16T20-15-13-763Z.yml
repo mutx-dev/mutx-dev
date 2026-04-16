@@ -1,0 +1,338 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - dialog "Modulo di contatto" [ref=e375]:
+        - button "Chiudi" [ref=e376] [cursor=pointer]:
+          - img [ref=e377]
+        - generic [ref=e380]:
+          - heading "Preregistrati per l'accesso anticipato" [level=2] [ref=e381]
+          - paragraph [ref=e382]: Raccontaci a che punto sei. Al resto pensiamo noi.
+        - generic [ref=e383]:
+          - generic [ref=e385]:
+            - generic [ref=e386]: Email di lavoro
+            - textbox "Email di lavoro" [ref=e387]:
+              - /placeholder: tu@azienda.com
+          - generic [ref=e388]:
+            - generic [ref=e389]:
+              - generic [ref=e390]: Nome
+              - textbox "Nome" [ref=e391]:
+                - /placeholder: Marco Rossi
+            - generic [ref=e392]:
+              - generic [ref=e393]: Azienda
+              - textbox "Azienda" [ref=e394]:
+                - /placeholder: Acme S.r.l.
+          - generic [ref=e395]:
+            - generic [ref=e396]: Cosa ti porta qui?
+            - combobox [ref=e397] [cursor=pointer]:
+              - generic: Sto creando il mio primo agente IA
+              - img [ref=e399]
+            - combobox [ref=e401]
+          - generic [ref=e402]:
+            - generic [ref=e403]: C'è qualcosa che dovremmo sapere? (opzionale)
+            - textbox "C'è qualcosa che dovremmo sapere? (opzionale)" [ref=e404]:
+              - /placeholder: "Es.: Gestisco un piccolo SaaS e voglio automatizzare il supporto clienti..."
+          - button "Unisciti alla lista di accesso anticipato" [ref=e405] [cursor=pointer]:
+            - text: Unisciti alla lista di accesso anticipato
+            - img [ref=e406]
+          - paragraph [ref=e408]: Niente spam. Nessuna chiamata commerciale. Solo una risposta umana.
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "PicoMUTX logo PicoMUTX di MUTX" [ref=e7] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e9]
+            - generic [ref=e10]: PicoMUTX di MUTX
+          - generic [ref=e11]:
+            - button "it Italiano ▾" [ref=e13] [cursor=pointer]:
+              - generic [ref=e14]: 🇮🇹
+              - generic [ref=e15]: it
+              - generic [ref=e16]: Italiano
+              - generic [ref=e17]: ▾
+            - button "Preregistrati" [active] [ref=e18] [cursor=pointer]
+      - main [ref=e19]:
+        - generic [ref=e21]:
+          - img "PicoMUTX mascot" [ref=e23]
+          - generic [ref=e25]: Accesso anticipato · Posti limitati
+          - heading "Crea e distribuisci agenti IA senza assumere uno sviluppatore." [level=1] [ref=e27]
+          - paragraph [ref=e29]: PicoMUTX ti offre un percorso sicuro e guidato verso un agente IA funzionante, che tu stia partendo da zero, correggendo un agente che non funziona o cercando di evitare un altro errore costoso.
+          - generic [ref=e32]:
+            - link "Preregistrati per l'accesso anticipato" [ref=e33] [cursor=pointer]:
+              - /url: /login
+              - text: Preregistrati per l'accesso anticipato
+              - img [ref=e34]
+            - link "Vedi prezzi" [ref=e36] [cursor=pointer]:
+              - /url: "#pricing"
+          - paragraph [ref=e38]: Preregistrazione gratuita · Nessuna carta di credito richiesta · Posti da fondatore limitati
+          - generic [ref=e40]:
+            - generic [ref=e41]: Per fondatori, operatori e piccoli team
+            - generic [ref=e42]:
+              - generic [ref=e43]: "|"
+              - text: Guida passo dopo passo
+            - generic [ref=e44]:
+              - generic [ref=e45]: "|"
+              - text: Salvaguardie integrate fin dal primo giorno
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - generic [ref=e49]: Il problema
+            - heading "Il problema non è l'idea. È tutto ciò che viene dopo." [level=2] [ref=e50]:
+              - text: Il problema non è l'idea.
+              - text: È tutto ciò che viene dopo.
+            - paragraph [ref=e51]: La maggior parte delle persone non si blocca per mancanza di ambizione. Si blocca perché creare un agente IA dà ancora la sensazione di entrare in un mondo progettato da ingegneri, per ingegneri.
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: "\"Voglio un agente IA, ma non so da dove cominciare.\""
+              - paragraph [ref=e55]: Ci sono troppi strumenti, troppe opinioni e troppe persone che danno per scontato che tu conosca già le basi. La distanza tra "ho un'idea" e "ho qualcosa che funziona" sembra più grande di quanto dovrebbe essere.
+            - generic [ref=e56]:
+              - generic [ref=e57]: "\"Ci ho già provato, e mi sono bloccato.\""
+              - paragraph [ref=e58]: Hai fatto progressi, hai sbattuto contro un muro e non avevi nessuno a cui chiedere un aiuto davvero utile. L'idea resta nel backlog invece di generare valore.
+            - generic [ref=e59]:
+              - generic [ref=e60]: "\"Ho speso soldi, e ancora non funziona come dovrebbe.\""
+              - paragraph [ref=e61]: "Forse hai assunto qualcuno. Forse hai pagato degli strumenti. Ora non sei solo incerto: sei diventato scettico."
+            - generic [ref=e62]:
+              - generic [ref=e63]: "\"Non voglio distribuire qualcosa di cui non posso fidarmi.\""
+              - paragraph [ref=e64]: Un agente che dà risposte sbagliate, si comporta in modo imprevedibile o genera costi nascosti non è una risorsa. È un rischio.
+          - paragraph [ref=e65]: È esattamente per questo che esiste PicoMUTX.
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - generic [ref=e69]: Che cos'è PicoMUTX
+            - heading "Dove gli agenti IA passano da \"idea interessante\" a \"sistema funzionante\"." [level=2] [ref=e70]
+            - paragraph [ref=e71]: "PicoMUTX è una piattaforma guidata per chi vuole creare e gestire agenti IA in modo sicuro, senza dover diventare ingegnere a tempo pieno. Ti offre la struttura, il supporto e le salvaguardie che di solito mancano quando si prova a fare tutto da soli. Invece di assemblare ogni pezzo da zero, procedi passo dopo passo: dall'idea all'implementazione, dalla confusione alla chiarezza, dal prototipo a qualcosa che puoi davvero usare."
+          - generic [ref=e72]:
+            - generic [ref=e74]:
+              - img [ref=e76]
+              - heading "Percorsi di implementazione passo dopo passo" [level=3] [ref=e79]
+              - paragraph [ref=e80]: Segui percorsi strutturati in base a ciò che vuoi creare, dagli agenti per il supporto clienti alle automazioni interne. Niente teoria generica. Niente ricerche infinite.
+            - generic [ref=e82]:
+              - img [ref=e84]
+              - heading "Supporto guidato quando ti blocchi" [level=3] [ref=e86]
+              - paragraph [ref=e87]: Quando qualcosa si rompe o non è più chiaro, non devi cavartela da solo. PicoMUTX mantiene vivo lo slancio invece di lasciare che i progetti si fermino nella confusione.
+            - generic [ref=e89]:
+              - img [ref=e91]
+              - heading "Sicurezza integrata fin dal primo giorno" [level=3] [ref=e94]
+              - paragraph [ref=e95]: Visibilità, controllo dei costi e guardrail contano. Sai sempre cosa sta facendo il tuo agente, quanto costa e quando richiede attenzione.
+            - generic [ref=e97]:
+              - img [ref=e99]
+              - heading "Confronto diretto con esperti" [level=3] [ref=e101]
+              - paragraph [ref=e102]: Alcuni aspetti sono troppo sfumati per essere risolti con una documentazione statica. Per questo hai momenti di confronto reale, pensati per aiutarti a sbloccarti più rapidamente e prendere decisioni migliori.
+        - generic [ref=e104]:
+          - generic [ref=e105]:
+            - generic [ref=e106]: PicoMUTX fa per te?
+            - heading "PicoMUTX non è per tutti." [level=2] [ref=e107]
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - heading "Fa per te se…" [level=3] [ref=e110]
+              - list [ref=e111]:
+                - listitem [ref=e112]:
+                  - img [ref=e113]
+                  - generic [ref=e115]: Vuoi creare un agente IA, ma non vuoi dipendere completamente dagli sviluppatori
+                - listitem [ref=e116]:
+                  - img [ref=e117]
+                  - generic [ref=e119]: Ci hai già provato e ti sei bloccato a metà strada
+                - listitem [ref=e120]:
+                  - img [ref=e121]
+                  - generic [ref=e123]: Hai già speso soldi in strumenti o implementazione e ancora non ti fidi del risultato
+                - listitem [ref=e124]:
+                  - img [ref=e125]
+                  - generic [ref=e127]: Vuoi un percorso pratico, non altra teoria
+                - listitem [ref=e128]:
+                  - img [ref=e129]
+                  - generic [ref=e131]: Vuoi supporto mentre costruisci, non solo dopo che qualcosa è andato storto
+            - generic [ref=e133]:
+              - heading "Non fa per te se…" [level=3] [ref=e134]
+              - list [ref=e135]:
+                - listitem [ref=e136]:
+                  - generic [ref=e137]: —
+                  - generic [ref=e138]: Cerchi una scorciatoia senza dover imparare nulla
+                - listitem [ref=e139]:
+                  - generic [ref=e140]: —
+                  - generic [ref=e141]: Gestisci già uno stack enterprise maturo di agenti e hai bisogno di un'infrastruttura di governance complessa
+                - listitem [ref=e142]:
+                  - generic [ref=e143]: —
+                  - generic [ref=e144]: Cerchi più intrattenimento, trend o hype che esecuzione
+                - listitem [ref=e145]:
+                  - generic [ref=e146]: —
+                  - generic [ref=e147]: Non sei pronto a cambiare il modo in cui la tua attività opera davvero
+                - listitem [ref=e148]:
+                  - generic [ref=e149]: —
+                  - generic [ref=e150]: Ti aspetti che l'IA sostituisca giudizio, leadership o responsabilità
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - generic [ref=e154]: Il cambiamento
+            - heading "Cosa cambia quando smetti di cercare di risolvere tutto da solo" [level=2] [ref=e155]
+          - generic [ref=e156]:
+            - generic [ref=e158]:
+              - generic [ref=e159]:
+                - paragraph [ref=e160]: Prima
+                - paragraph [ref=e161]: Hai un'idea, ma non un percorso chiaro
+              - generic [ref=e162]:
+                - paragraph [ref=e163]: Dopo
+                - paragraph [ref=e164]: Hai una strada strutturata per andare avanti
+            - generic [ref=e166]:
+              - generic [ref=e167]:
+                - paragraph [ref=e168]: Prima
+                - paragraph [ref=e169]: Perdi tempo saltando tra strumenti, documentazione e tutorial
+              - generic [ref=e170]:
+                - paragraph [ref=e171]: Dopo
+                - paragraph [ref=e172]: Segui percorsi di implementazione guidati
+            - generic [ref=e174]:
+              - generic [ref=e175]:
+                - paragraph [ref=e176]: Prima
+                - paragraph [ref=e177]: Ti blocchi e perdi slancio
+              - generic [ref=e178]:
+                - paragraph [ref=e179]: Dopo
+                - paragraph [ref=e180]: Ottieni supporto prima che il progetto si spenga
+            - generic [ref=e182]:
+              - generic [ref=e183]:
+                - paragraph [ref=e184]: Prima
+                - paragraph [ref=e185]: Il tuo agente resta solo teoria
+              - generic [ref=e186]:
+                - paragraph [ref=e187]: Dopo
+                - paragraph [ref=e188]: Il tuo agente viene creato e messo al lavoro
+          - paragraph [ref=e189]: L'obiettivo non è "imparare l'IA un giorno". L'obiettivo è portare il tuo agente in produzione, in modo sicuro, chiaro e con meno attrito.
+        - generic [ref=e191]:
+          - generic [ref=e192]:
+            - generic [ref=e193]: Accesso anticipato
+            - heading "PicoMUTX si aprirà per fasi. L'accesso da fondatore non resterà disponibile per sempre." [level=2] [ref=e194]
+            - paragraph [ref=e195]: Preregistrarti ora ti mette davanti al lancio pubblico e ti inserisce nel gruppo che contribuirà a plasmare la piattaforma fin dall'inizio. I primi utenti avranno un accesso più diretto al prodotto, un onboarding anticipato e maggiore influenza sulle priorità.
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - img [ref=e198]
+              - generic [ref=e200]: Accesso anticipato prima del lancio pubblico
+            - generic [ref=e201]:
+              - img [ref=e202]
+              - generic [ref=e204]: Considerazione prioritaria per i posti da membro fondatore
+            - generic [ref=e205]:
+              - img [ref=e206]
+              - generic [ref=e208]: Onboarding anticipato e aggiornamenti sul lancio
+            - generic [ref=e209]:
+              - img [ref=e210]
+              - generic [ref=e212]: La possibilità di influenzare i primi casi d'uso e le priorità di rollout
+            - generic [ref=e213]:
+              - img [ref=e214]
+              - generic [ref=e216]: Visibilità anticipata su prezzi e condizioni di accesso
+        - generic [ref=e218]:
+          - generic [ref=e219]:
+            - generic [ref=e220]: Domande
+            - heading "Le domande che le persone si pongono di solito prima di iscriversi" [level=2] [ref=e221]
+          - generic [ref=e222]:
+            - generic [ref=e223]:
+              - heading "Devo saper programmare?" [level=3] [ref=e224]
+              - paragraph [ref=e225]: No. PicoMUTX è pensato per chi vuole creare agenti IA utili senza aver bisogno di competenze tecniche approfondite.
+            - generic [ref=e226]:
+              - heading "E se ci ho già provato e ho fallito?" [level=3] [ref=e227]
+              - paragraph [ref=e228]: È esattamente uno dei profili per cui questa piattaforma esiste. PicoMUTX è progettato per ridurre la confusione e la frammentazione che di solito spingono le persone a fermarsi a metà percorso.
+            - generic [ref=e229]:
+              - heading "Che tipo di agenti posso creare?" [level=3] [ref=e230]
+              - paragraph [ref=e231]: "Agenti pratici: quelli che fanno risparmiare tempo, supportano le operazioni, migliorano i flussi di lavoro e aiutano le aziende a lavorare meglio. Il focus è sull'utilità, non sulle demo giocattolo."
+            - generic [ref=e232]:
+              - heading "La preregistrazione è gratuita?" [level=3] [ref=e233]
+              - paragraph [ref=e234]: Sì. La preregistrazione è gratuita e non richiede alcun pagamento. Sarai tra i primi a sapere quando l'accesso aprirà e quando saranno disponibili i posti da fondatore.
+            - generic [ref=e235]:
+              - heading "È pensato per le aziende?" [level=3] [ref=e236]
+              - paragraph [ref=e237]: PicoMUTX è più adatto a fondatori, operatori e piccoli team che vogliono un modo guidato per creare e distribuire agenti IA. Le esigenze di governance enterprise più complesse appartengono al più ampio ecosistema MUTX.
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - generic [ref=e241]: Prezzi semplici
+            - heading "Scegli il tuo percorso" [level=2] [ref=e242]
+          - generic [ref=e243]:
+            - generic [ref=e244]:
+              - heading "Starter" [level=3] [ref=e245]
+              - generic [ref=e246]:
+                - generic [ref=e247]: €9
+                - generic [ref=e248]: /mese
+              - paragraph [ref=e249]: Esperienza di apprendimento completa
+              - list [ref=e250]:
+                - listitem [ref=e251]:
+                  - img [ref=e253]
+                  - generic [ref=e255]: 1.000 crediti mensili
+                - listitem [ref=e256]:
+                  - img [ref=e258]
+                  - generic [ref=e260]: Accesso completo al tutor
+                - listitem [ref=e261]:
+                  - img [ref=e263]
+                  - generic [ref=e265]: Tutte le lezioni dell'accademia
+                - listitem [ref=e266]:
+                  - img [ref=e268]
+                  - generic [ref=e270]: Modalità Autopilot
+                - listitem [ref=e271]:
+                  - img [ref=e273]
+                  - generic [ref=e275]: Prova gratuita di 7 giorni
+              - link "Inizia la prova di 7 giorni" [ref=e276] [cursor=pointer]:
+                - /url: /pricing
+            - generic [ref=e277]:
+              - generic [ref=e278]: RECOMMENDED
+              - heading "Pro" [level=3] [ref=e279]
+              - generic [ref=e280]:
+                - generic [ref=e281]: €29
+                - generic [ref=e282]: /mese
+              - paragraph [ref=e283]: Per chi costruisce sul serio
+              - list [ref=e284]:
+                - listitem [ref=e285]:
+                  - img [ref=e287]
+                  - generic [ref=e289]: 10.000 crediti mensili
+                - listitem [ref=e290]:
+                  - img [ref=e292]
+                  - generic [ref=e294]: Tutor completo + BYOK
+                - listitem [ref=e295]:
+                  - img [ref=e297]
+                  - generic [ref=e299]: Accesso API
+                - listitem [ref=e300]:
+                  - img [ref=e302]
+                  - generic [ref=e304]: Supporto prioritario
+                - listitem [ref=e305]:
+                  - img [ref=e307]
+                  - generic [ref=e309]: Prova gratuita di 7 giorni
+              - link "Inizia la prova di 7 giorni" [ref=e310] [cursor=pointer]:
+                - /url: /pricing
+            - generic [ref=e311]:
+              - heading "Enterprise" [level=3] [ref=e312]
+              - generic [ref=e314]: Personalizzato
+              - paragraph [ref=e315]: Supporto dedicato e scalabilità
+              - list [ref=e316]:
+                - listitem [ref=e317]:
+                  - img [ref=e319]
+                  - generic [ref=e321]: 100K+ crediti mensili
+                - listitem [ref=e322]:
+                  - img [ref=e324]
+                  - generic [ref=e326]: SSO e gestione team
+                - listitem [ref=e327]:
+                  - img [ref=e329]
+                  - generic [ref=e331]: SLA e supporto dedicato
+                - listitem [ref=e332]:
+                  - img [ref=e334]
+                  - generic [ref=e336]: Flussi di lavoro personalizzati
+                - listitem [ref=e337]:
+                  - img [ref=e339]
+                  - generic [ref=e341]: Accesso diretto ai fondatori
+              - link "Prenota una chiamata" [ref=e342] [cursor=pointer]:
+                - /url: https://calendly.com/mutxdev
+        - generic [ref=e346]:
+          - generic [ref=e347]:
+            - generic [ref=e348]: Accesso anticipato · Posti limitati
+            - heading "Il tuo agente non deve restare un'idea incompiuta." [level=2] [ref=e350]
+          - paragraph [ref=e352]: Non ti servono altre schede aperte. Non ti serve un altro tutorial. Ti serve un percorso più chiaro verso qualcosa che funziona. PicoMUTX è pensato proprio per quel momento.
+          - generic [ref=e354]:
+            - paragraph [ref=e355]: Preregistrati a PicoMUTX
+            - paragraph [ref=e356]: Unisciti alla lista di accesso anticipato. Sii tra i primi quando apriremo.
+            - button "Preregistrati ora" [ref=e357] [cursor=pointer]:
+              - text: Preregistrati ora
+              - img [ref=e358]
+            - paragraph [ref=e360]: Preregistrazione gratuita · Nessuna carta di credito richiesta · I primi utenti ottengono accesso prioritario
+    - contentinfo [ref=e361]:
+      - generic [ref=e362]:
+        - generic [ref=e363]:
+          - link "PicoMUTX logo PicoMUTX" [ref=e364] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e366]
+            - text: PicoMUTX
+          - link "Releases" [ref=e367] [cursor=pointer]:
+            - /url: https://mutx.dev/releases
+          - link "Docs" [ref=e368] [cursor=pointer]:
+            - /url: https://docs.mutx.dev
+          - link "GitHub" [ref=e369] [cursor=pointer]:
+            - /url: https://github.com/mutx-dev/mutx-dev
+          - link "Download" [ref=e370] [cursor=pointer]:
+            - /url: https://mutx.dev/download
+          - link "Privacy" [ref=e371] [cursor=pointer]:
+            - /url: https://mutx.dev/privacy-policy
+        - paragraph [ref=e372]: © 2026 MUTX. PicoMUTX is a learning and operations platform for AI agent builders.
+  - alert [ref=e373]

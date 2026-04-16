@@ -1,0 +1,80 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - link "Back to MUTX home" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "MUTX" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: MUTX
+            - generic [ref=e10]: auth lane
+        - generic [ref=e11]: hosted operator identity
+    - main [ref=e12]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Password recovery
+          - generic [ref=e19]:
+            - heading "Recover operator access without leaving the control plane." [level=1] [ref=e20]
+            - paragraph [ref=e21]: Use the email attached to your MUTX account and we will send a reset link. If hosted auth is not the lane you need today, the dashboard, docs, and install flow are still available.
+          - generic [ref=e22]:
+            - paragraph [ref=e23]: Recovery notes
+            - heading "Keep the auth lane practical." [level=2] [ref=e24]
+            - paragraph [ref=e25]: Reset flows should be simple, honest, and easy to verify. If the account does not exist or the hosted lane is unavailable, the rest of the public surface still tells the truth.
+        - img "MUTX robot reading and reviewing system state on a bench" [ref=e27]
+      - generic [ref=e30]:
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - heading "Send reset instructions" [level=2] [ref=e34]
+            - paragraph [ref=e35]: No drama. Just the email and a fresh link.
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - generic [ref=e38]: Email address
+              - textbox "Email address" [ref=e39]:
+                - /placeholder: you@company.com
+            - button "Send reset link" [ref=e40] [cursor=pointer]:
+              - text: Send reset link
+              - img [ref=e41]
+          - link "Back to sign in" [ref=e43] [cursor=pointer]:
+            - /url: /login
+            - img [ref=e44]
+            - text: Back to sign in
+        - generic [ref=e46]:
+          - paragraph [ref=e47]: Recovery checklist
+          - generic [ref=e48]:
+            - generic [ref=e49]: Use the work email tied to the hosted operator account.
+            - generic [ref=e50]: Reset links expire, so handle the email quickly once it lands.
+            - generic [ref=e51]: Docs and dashboard stay available if you only need product truth right now.
+    - contentinfo [ref=e52]:
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Final lane
+            - paragraph [ref=e58]: YOUR AI AGENTS, UNDER CONTROL.
+            - paragraph [ref=e59]: Start with the Mac app and inspect one real run.
+          - link "Download for Mac" [ref=e60] [cursor=pointer]:
+            - /url: /download
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - paragraph [ref=e64]: MUTX
+              - paragraph [ref=e65]: One brand frame for the public site, docs, auth, dashboard, and Pico product.
+            - generic [ref=e66]:
+              - link "Releases" [ref=e67] [cursor=pointer]:
+                - /url: /releases
+              - link "Docs" [ref=e68] [cursor=pointer]:
+                - /url: /docs
+              - link "GitHub" [ref=e69] [cursor=pointer]:
+                - /url: https://github.com/mutx-dev/mutx-dev
+              - link "Download" [ref=e70] [cursor=pointer]:
+                - /url: /download
+              - link "Dashboard" [ref=e71] [cursor=pointer]:
+                - /url: /dashboard
+              - link "Contact" [ref=e72] [cursor=pointer]:
+                - /url: /contact
+              - link "Privacy" [ref=e73] [cursor=pointer]:
+                - /url: /privacy-policy
+          - paragraph [ref=e74]:
+            - generic [ref=e75]:
+              - img "MUTX" [ref=e78]
+              - generic [ref=e79]: © MUTX 2026. Open control for deployed agents.
+  - alert [ref=e80]

@@ -1,0 +1,427 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e236]:
+    - generic [ref=e237]:
+      - banner [ref=e238]:
+        - generic [ref=e239]:
+          - link "PicoMUTX logo PicoMUTX operator atlas" [ref=e240] [cursor=pointer]:
+            - /url: /pico/onboarding
+            - img "PicoMUTX logo" [ref=e242]
+            - generic [ref=e243]:
+              - generic [ref=e244]: PicoMUTX
+              - generic [ref=e245]: operator atlas
+          - generic [ref=e246]:
+            - generic [ref=e247]: Chapter 02
+            - generic [ref=e248]:
+              - button "How this works" [ref=e249] [cursor=pointer]
+              - button "Map" [pressed] [ref=e250] [cursor=pointer]
+              - button "Help" [ref=e251] [cursor=pointer]
+        - generic [ref=e252]:
+          - generic [ref=e253]:
+            - paragraph [ref=e254]: Apprentice codex
+            - paragraph [ref=e255]: Academy
+            - paragraph [ref=e256]: One mission. One proof. One honest next move.
+          - generic [ref=e257]:
+            - generic [ref=e258]:
+              - paragraph [ref=e259]: Route mode
+              - generic [ref=e260]: Lessons
+            - paragraph [ref=e261]: the working path. The map stays open.
+            - generic [ref=e262]:
+              - generic [ref=e263]: "Previous: Start"
+              - generic [ref=e264]: "Next: Tutor"
+      - main [ref=e265]:
+        - generic [ref=e268]:
+          - generic [ref=e269]:
+            - generic [ref=e270]:
+              - paragraph [ref=e271]: Codex chapter
+              - paragraph [ref=e272]: "01"
+            - generic [ref=e273]:
+              - paragraph [ref=e274]: Track
+              - paragraph [ref=e275]: Track A — First Agent
+              - paragraph [ref=e276]: Stop 01 of 2
+          - generic [ref=e277]:
+            - generic [ref=e278]:
+              - generic [ref=e279]: Current mission
+              - generic [ref=e280]: local only
+              - generic [ref=e281]: local only
+            - generic [ref=e282]:
+              - heading "Install Hermes locally" [level=1] [ref=e283]
+              - paragraph [ref=e284]: Get one clean local Hermes install working end to end.
+              - paragraph [ref=e285]: "Validation: Open a brand-new shell and run `command -v hermes && hermes`. If the command is missing or the CLI errors immediately, this lesson is not done."
+            - generic [ref=e286]:
+              - link "Install Hermes now" [ref=e287] [cursor=pointer]:
+                - /url: /pico/academy/install-hermes-locally
+              - link "Ask tutor for the exact next step" [ref=e288] [cursor=pointer]:
+                - /url: /pico/tutor?lesson=install-hermes-locally
+            - generic [ref=e289]:
+              - generic [ref=e290]:
+                - paragraph [ref=e291]: Mission state
+                - paragraph [ref=e292]: ready
+                - paragraph [ref=e293]: 0/3 steps
+              - generic [ref=e294]:
+                - paragraph [ref=e295]: Track progress
+                - paragraph [ref=e296]: 0%
+                - paragraph [ref=e297]: 0/2 lessons
+              - generic [ref=e298]:
+                - paragraph [ref=e299]: Proof
+                - paragraph [ref=e300]: missing
+                - paragraph [ref=e301]: Install Hermes
+              - generic [ref=e302]:
+                - paragraph [ref=e303]: Hosted
+                - paragraph [ref=e304]: local only
+                - paragraph [ref=e305]: sign in to persist
+        - generic [ref=e308]:
+          - generic [ref=e309]:
+            - generic [ref=e310]:
+              - generic [ref=e311]:
+                - paragraph [ref=e312]: Active proof lane
+                - heading "Install Hermes" [level=2] [ref=e313]
+              - generic [ref=e314]: 0/3 steps
+            - generic [ref=e315]:
+              - paragraph [ref=e316]: Resume from here
+              - paragraph [ref=e317]: Run the install command exactly once. Do not compare package managers. Do not branch into extra tooling.
+              - code [ref=e319]: curl -fsSL https://hermes.nousresearch.com/install.sh | bash
+              - generic [ref=e321]:
+                - link "Resume mission" [ref=e322] [cursor=pointer]:
+                  - /url: /pico/academy/install-hermes-locally
+                - link "Ask tutor" [ref=e323] [cursor=pointer]:
+                  - /url: /pico/tutor?lesson=install-hermes-locally
+          - generic [ref=e324]:
+            - generic [ref=e325]:
+              - paragraph [ref=e326]: Proof state
+              - paragraph [ref=e327]: missing
+              - paragraph [ref=e328]: Updated not recorded
+            - generic [ref=e329]:
+              - paragraph [ref=e330]: Captured proof
+              - paragraph [ref=e331]: No proof has been logged yet. Save the single artifact that proves the mission actually worked.
+            - generic [ref=e332]:
+              - paragraph [ref=e333]: Hosted note
+              - paragraph [ref=e334]: sign in to persist
+        - generic [ref=e337]:
+          - generic [ref=e338]:
+            - generic [ref=e339]:
+              - generic [ref=e340]:
+                - paragraph [ref=e341]: Studio method
+                - heading "Learn like a boutique studio ships" [level=2] [ref=e342]
+              - generic [ref=e343]: brief • deliverable • critique
+            - generic [ref=e344]:
+              - article [ref=e345]:
+                - paragraph [ref=e346]: 01 • Brief
+                - heading "Read the mission like a client brief" [level=3] [ref=e347]
+                - paragraph [ref=e348]: Get one clean local Hermes install working end to end.
+              - article [ref=e349]:
+                - paragraph [ref=e350]: 02 • Deliverable
+                - heading "Make one artifact worth keeping" [level=3] [ref=e351]
+                - paragraph [ref=e352]: "Running `command -v hermes && hermes` from a fresh shell succeeds."
+              - article [ref=e353]:
+                - paragraph [ref=e354]: 03 • Critique
+                - heading "Use the validation like studio review" [level=3] [ref=e355]
+                - paragraph [ref=e356]: "Open a brand-new shell and run `command -v hermes && hermes`. If the command is missing or the CLI errors immediately, this lesson is not done."
+          - generic [ref=e357]:
+            - generic [ref=e358]:
+              - paragraph [ref=e359]: Track standards
+              - generic [ref=e360]:
+                - generic [ref=e361]:
+                  - paragraph [ref=e362]: Track outcome
+                  - paragraph [ref=e363]: Hermes runs and answers real prompts.
+                - generic [ref=e364]:
+                  - paragraph [ref=e365]: Level reward
+                  - paragraph [ref=e366]: A working local agent that responds on command.
+                - generic [ref=e367]:
+                  - paragraph [ref=e368]: Next standard
+                  - paragraph [ref=e369]: Deploy the same runtime somewhere persistent.
+            - generic [ref=e370]:
+              - paragraph [ref=e371]: Chapter checklist
+              - generic [ref=e372]:
+                - generic [ref=e373]:
+                  - generic [ref=e374]: ok
+                  - paragraph [ref=e375]: Hermes installed
+                - generic [ref=e376]:
+                  - generic [ref=e377]: ok
+                  - paragraph [ref=e378]: Model/provider configured
+                - generic [ref=e379]:
+                  - generic [ref=e380]: ok
+                  - paragraph [ref=e381]: One successful response captured
+        - generic [ref=e383]:
+          - generic [ref=e384]:
+            - generic [ref=e385]:
+              - generic [ref=e386]:
+                - paragraph [ref=e387]: Chapter ledger
+                - heading "One dominant chapter, with the rest of the map kept quiet." [level=2] [ref=e388]
+              - generic [ref=e389]: guided atlas
+            - paragraph [ref=e390]: The current track gets the full editorial treatment. The rest of the atlas stays visible, but compressed, so the route still feels authored instead of equally loud everywhere.
+          - generic [ref=e391]:
+            - article [ref=e393]:
+              - generic [ref=e394]:
+                - generic [ref=e395]:
+                  - generic [ref=e396]:
+                    - generic [ref=e397]: Track 01
+                    - img "PicoMUTX academy mascot" [ref=e398]
+                  - heading "Track A — First Agent" [level=3] [ref=e399]
+                  - paragraph [ref=e400]: Hermes runs and answers real prompts.
+                  - paragraph [ref=e401]: This is the fast path from zero to a working local runtime.
+                  - generic [ref=e402]:
+                    - generic [ref=e403]:
+                      - paragraph [ref=e404]: Route state
+                      - paragraph [ref=e405]: 0/2 cleared
+                    - generic [ref=e406]:
+                      - paragraph [ref=e407]: Next dominant stop
+                      - paragraph [ref=e408]: Install Hermes locally
+                - generic [ref=e411]:
+                  - 'link "Stop 01 • level 0 Install Hermes locally current Dominant stop Running `command -v hermes && hermes` from a fresh shell succeeds." [ref=e412] [cursor=pointer]':
+                    - /url: /pico/academy/install-hermes-locally
+                    - generic [ref=e414]:
+                      - generic [ref=e415]:
+                        - paragraph [ref=e416]: Stop 01 • level 0
+                        - paragraph [ref=e417]: Install Hermes locally
+                      - generic [ref=e418]: current
+                    - generic [ref=e419]:
+                      - paragraph [ref=e420]: Dominant stop
+                      - paragraph [ref=e421]: "Running `command -v hermes && hermes` from a fresh shell succeeds."
+                  - link "Stop 02 • level 0 Run your first agent locked Run one real prompt, get one visible answer, and save the transcript as proof." [ref=e422] [cursor=pointer]:
+                    - /url: /pico/academy/run-your-first-agent
+                    - generic [ref=e424]:
+                      - generic [ref=e425]:
+                        - paragraph [ref=e426]: Stop 02 • level 0
+                        - paragraph [ref=e427]: Run your first agent
+                      - generic [ref=e428]: locked
+                    - paragraph [ref=e429]: Run one real prompt, get one visible answer, and save the transcript as proof.
+            - complementary [ref=e430]:
+              - generic [ref=e431]:
+                - generic [ref=e432]:
+                  - paragraph [ref=e433]: Mission correction
+                  - paragraph [ref=e434]: The atlas stays useful only if it keeps pushing you back into the current mission.
+                  - generic [ref=e435]:
+                    - link "Install Hermes now" [ref=e436] [cursor=pointer]:
+                      - /url: /pico/academy/install-hermes-locally
+                    - link "Ask tutor for the exact next step" [ref=e437] [cursor=pointer]:
+                      - /url: /pico/tutor?lesson=install-hermes-locally
+                - generic [ref=e438]:
+                  - paragraph [ref=e439]: Other chapters
+                  - generic [ref=e440]:
+                    - article [ref=e441]:
+                      - generic [ref=e442]:
+                        - generic [ref=e443]:
+                          - paragraph [ref=e444]: Track 02
+                          - heading "Track B — Deployed Agent" [level=3] [ref=e445]
+                        - generic [ref=e446]: locked
+                      - paragraph [ref=e447]: The runtime stays alive somewhere persistent.
+                      - paragraph [ref=e448]: 0/3 cleared
+                    - article [ref=e449]:
+                      - generic [ref=e450]:
+                        - generic [ref=e451]:
+                          - paragraph [ref=e452]: Track 03
+                          - heading "Track C — Useful Workflow" [level=3] [ref=e453]
+                        - generic [ref=e454]: locked
+                      - paragraph [ref=e455]: The agent performs a bounded job that matters.
+                      - paragraph [ref=e456]: 0/2 cleared
+                    - article [ref=e457]:
+                      - generic [ref=e458]:
+                        - generic [ref=e459]:
+                          - paragraph [ref=e460]: Track 04
+                          - heading "Track D — Controlled Agent" [level=3] [ref=e461]
+                        - generic [ref=e462]: locked
+                      - paragraph [ref=e463]: The runtime is visible and governed.
+                      - paragraph [ref=e464]: 0/3 cleared
+                    - article [ref=e465]:
+                      - generic [ref=e466]:
+                        - generic [ref=e467]:
+                          - paragraph [ref=e468]: Track 05
+                          - heading "Track E — Production Pattern" [level=3] [ref=e469]
+                        - generic [ref=e470]: locked
+                      - paragraph [ref=e471]: A stronger, reusable workflow is live.
+                      - paragraph [ref=e472]: 0/2 cleared
+        - generic [ref=e474]:
+          - generic [ref=e475]:
+            - generic [ref=e476]:
+              - paragraph [ref=e477]: Reference annex
+              - heading "Capability, archive, and platform memory stay below the route on purpose" [level=2] [ref=e478]
+            - generic [ref=e479]: Setup • 11 locked
+          - generic [ref=e480]:
+            - generic [ref=e481]:
+              - generic [ref=e482]:
+                - generic [ref=e483]:
+                  - generic [ref=e484]:
+                    - paragraph [ref=e485]: Unlocked capabilities
+                    - paragraph [ref=e486]: The pieces that matter after the mission is already real.
+                  - generic [ref=e487]: 0 live
+                - paragraph [ref=e489]: The first capability unlock lands only after the first lessons are cleared for real.
+              - generic [ref=e490]:
+                - generic [ref=e491]:
+                  - paragraph [ref=e492]: Next unlock
+                  - heading "Persistent runtime unlocked" [level=3] [ref=e493]
+                  - paragraph [ref=e494]: "You proved the local loop. Next move: get the same agent onto a box that stays awake."
+                  - link "Deploy the runtime" [ref=e495] [cursor=pointer]:
+                    - /url: /pico/academy/deploy-hermes-on-a-vps
+                - generic [ref=e496]:
+                  - paragraph [ref=e497]: Pattern archive
+                  - generic [ref=e498]:
+                    - generic [ref=e499]:
+                      - paragraph [ref=e500]: Lead-response operator
+                      - paragraph [ref=e501]: Takes an inbound lead, drafts the first reply, and waits for approval before the risky send.
+                      - link "Open pattern lesson" [ref=e502] [cursor=pointer]:
+                        - /url: /pico/academy/build-a-lead-response-agent
+                    - generic [ref=e503]:
+                      - paragraph [ref=e504]: Document triage lane
+                      - paragraph [ref=e505]: Ingests files, extracts the useful parts, tags the result, and surfaces runs for review.
+                      - link "Open pattern lesson" [ref=e506] [cursor=pointer]:
+                        - /url: /pico/academy/build-a-document-processing-agent
+            - generic [ref=e507]:
+              - generic [ref=e508]:
+                - paragraph [ref=e509]: Field notes
+                - generic [ref=e510]:
+                  - generic [ref=e511]:
+                    - generic [ref=e512]:
+                      - paragraph [ref=e513]: Pico shell lands inside MUTX
+                      - generic [ref=e514]: 2026-04-11
+                    - paragraph [ref=e515]: Academy, tutor, support, and autopilot now live in one surface instead of a marketing-only landing page.
+                  - generic [ref=e516]:
+                    - generic [ref=e517]:
+                      - paragraph [ref=e518]: Progress persistence switched to user settings
+                      - generic [ref=e519]: 2026-04-11
+                    - paragraph [ref=e520]: Authenticated users sync progress to the backend while anonymous users keep a local fallback.
+              - generic [ref=e521]:
+                - paragraph [ref=e522]: Control annex
+                - paragraph [ref=e523]: Platform memory stays available, but it sits under the codex on purpose. The Academy leads with route and proof, then exposes configuration only when you need it.
+                - generic [ref=e525]:
+                  - generic [ref=e526]:
+                    - generic [ref=e527]:
+                      - paragraph [ref=e528]: Platform desk
+                      - heading "Identity, route memory, and limits in one place" [level=2] [ref=e529]
+                      - paragraph [ref=e530]: This is the operator-facing control desk for the Pico account. It should tell the truth about plan limits, where the operator was last working, and whether the product chrome is tuned for focus or recovery.
+                    - generic [ref=e531]: local only
+                  - generic [ref=e532]:
+                    - generic [ref=e533]:
+                      - generic [ref=e534]:
+                        - generic [ref=e535]:
+                          - generic [ref=e536]:
+                            - paragraph [ref=e537]: Plan
+                            - paragraph [ref=e538]: FREE
+                          - generic [ref=e539]:
+                            - paragraph [ref=e540]: Verification
+                            - paragraph [ref=e541]: sign in
+                          - generic [ref=e542]:
+                            - paragraph [ref=e543]: Workspace saves
+                            - paragraph [ref=e544]: "0"
+                        - generic [ref=e545]:
+                          - generic [ref=e546]:
+                            - generic [ref=e547]:
+                              - paragraph [ref=e548]: Route memory
+                              - paragraph [ref=e549]: The current surface should match what the operator is actually doing. Keep this updated when the product shifts lanes.
+                            - generic [ref=e550]: academy
+                          - generic [ref=e551]:
+                            - button "Launch bay memory Onboarding set route" [ref=e552] [cursor=pointer]:
+                              - generic [ref=e553]:
+                                - paragraph [ref=e554]: Launch bay memory
+                                - paragraph [ref=e555]: Onboarding
+                              - generic [ref=e556]: set route
+                            - button "Primary learning spine Academy active now" [pressed] [ref=e557] [cursor=pointer]:
+                              - generic [ref=e558]:
+                                - paragraph [ref=e559]: Primary learning spine
+                                - paragraph [ref=e560]: Academy
+                              - generic [ref=e561]: active now
+                            - button "Active step memory Lesson set route" [ref=e562] [cursor=pointer]:
+                              - generic [ref=e563]:
+                                - paragraph [ref=e564]: Active step memory
+                                - paragraph [ref=e565]: Lesson
+                              - generic [ref=e566]: set route
+                            - button "Grounded next-step help Tutor set route" [ref=e567] [cursor=pointer]:
+                              - generic [ref=e568]:
+                                - paragraph [ref=e569]: Grounded next-step help
+                                - paragraph [ref=e570]: Tutor
+                              - generic [ref=e571]: set route
+                            - button "Runtime control room Autopilot set route" [ref=e572] [cursor=pointer]:
+                              - generic [ref=e573]:
+                                - paragraph [ref=e574]: Runtime control room
+                                - paragraph [ref=e575]: Autopilot
+                              - generic [ref=e576]: set route
+                            - button "Human escalation lane Support set route" [ref=e577] [cursor=pointer]:
+                              - generic [ref=e578]:
+                                - paragraph [ref=e579]: Human escalation lane
+                                - paragraph [ref=e580]: Support
+                              - generic [ref=e581]: set route
+                        - generic [ref=e582]:
+                          - generic [ref=e583]:
+                            - paragraph [ref=e584]: Current surface
+                            - paragraph [ref=e585]: academy
+                            - paragraph [ref=e586]: Route memory should follow the operator through Pico instead of resetting every time the page changes.
+                          - generic [ref=e587]:
+                            - paragraph [ref=e588]: Last lesson context
+                            - paragraph [ref=e589]: install-hermes-locally
+                            - paragraph [ref=e590]: This is the recovery point when the operator needs to re-enter the lesson spine.
+                        - generic [ref=e591]:
+                          - generic [ref=e592]:
+                            - checkbox "Collapse rail Use a tighter chrome when the operator already knows the route and needs more room for the live surface." [ref=e593]
+                            - generic [ref=e594]:
+                              - generic [ref=e595]: Collapse rail
+                              - generic [ref=e596]: Use a tighter chrome when the operator already knows the route and needs more room for the live surface.
+                          - generic [ref=e597]:
+                            - checkbox "Keep help lane open Keep recovery guidance visible when the operator is still learning the product routes." [ref=e598]
+                            - generic [ref=e599]:
+                              - generic [ref=e600]: Keep help lane open
+                              - generic [ref=e601]: Keep recovery guidance visible when the operator is still learning the product routes.
+                        - generic [ref=e602]:
+                          - link "Resume last lesson" [ref=e603] [cursor=pointer]:
+                            - /url: /pico/academy/install-hermes-locally
+                          - button "Clear lesson memory" [ref=e604] [cursor=pointer]
+                          - button "Reset platform memory" [ref=e605] [cursor=pointer]
+                          - link "Open live control room" [ref=e606] [cursor=pointer]:
+                            - /url: /pico/autopilot
+                      - generic [ref=e607]:
+                        - paragraph [ref=e608]: Entitlements
+                        - generic [ref=e609]:
+                          - generic [ref=e610]:
+                            - generic [ref=e611]: academy
+                            - generic [ref=e612]: Full academy access
+                          - generic [ref=e613]:
+                            - generic [ref=e614]: tutor
+                            - generic [ref=e615]: Grounded tutor with light daily usage
+                          - generic [ref=e616]:
+                            - generic [ref=e617]: project limit
+                            - generic [ref=e618]: 1 active project lane
+                          - generic [ref=e619]:
+                            - generic [ref=e620]: monitored agents
+                            - generic [ref=e621]: Preview only
+                          - generic [ref=e622]:
+                            - generic [ref=e623]: alerts
+                            - generic [ref=e624]: In-app threshold alerts
+                          - generic [ref=e625]:
+                            - generic [ref=e626]: approvals
+                            - generic [ref=e627]: Preview the approval workflow
+                          - generic [ref=e628]:
+                            - generic [ref=e629]: retention
+                            - generic [ref=e630]: 7-day product memory
+                    - generic [ref=e631]:
+                      - generic [ref=e632]:
+                        - paragraph [ref=e633]: Route ledger
+                        - generic [ref=e634]:
+                          - generic [ref=e635]:
+                            - paragraph [ref=e636]: Current path
+                            - paragraph [ref=e637]: /pico/academy
+                          - generic [ref=e638]:
+                            - paragraph [ref=e639]: Platform state updated
+                            - paragraph [ref=e640]: Apr 16, 10:13 PM
+                          - generic [ref=e641]:
+                            - paragraph [ref=e642]: Sync confidence
+                            - paragraph [ref=e643]: local only
+                      - generic [ref=e644]:
+                        - paragraph [ref=e645]: Operator truth
+                        - paragraph [ref=e646]: "The product should remember the route and lesson context without pretending it knows more than it does. `activeSurface`, `lastOpenedLessonSlug`, the rail state, and the help lane are the minimum persisted memory needed to make Pico feel like one platform."
+    - contentinfo [ref=e647]:
+      - generic [ref=e648]:
+        - generic [ref=e649]:
+          - link "PicoMUTX logo PicoMUTX" [ref=e650] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e652]
+            - text: PicoMUTX
+          - link "Releases" [ref=e653] [cursor=pointer]:
+            - /url: https://mutx.dev/releases
+          - link "Docs" [ref=e654] [cursor=pointer]:
+            - /url: https://docs.mutx.dev
+          - link "GitHub" [ref=e655] [cursor=pointer]:
+            - /url: https://github.com/mutx-dev/mutx-dev
+          - link "Download" [ref=e656] [cursor=pointer]:
+            - /url: https://mutx.dev/download
+          - link "Privacy" [ref=e657] [cursor=pointer]:
+            - /url: https://mutx.dev/privacy-policy
+        - paragraph [ref=e658]: © 2026 MUTX. PicoMUTX is a learning and operations platform for AI agent builders.
+  - alert [ref=e235]: Academy — PicoMUTX

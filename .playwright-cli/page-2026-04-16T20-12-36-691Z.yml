@@ -1,0 +1,48 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "PicoMUTX" [ref=e5] [cursor=pointer]:
+        - /url: /
+    - main [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - paragraph [ref=e9]: Pico preview access
+          - heading "Enter the current Pico build" [level=1] [ref=e10]
+          - paragraph [ref=e11]: Use a provider or email to open the preview and save your place.
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - link "Google" [ref=e14] [cursor=pointer]:
+              - /url: /api/auth/oauth/google/start?intent=login&next=%2F
+              - img [ref=e15]
+              - text: Google
+            - link "GitHub" [ref=e20] [cursor=pointer]:
+              - /url: /api/auth/oauth/github/start?intent=login&next=%2F
+              - img [ref=e21]
+              - text: GitHub
+            - link "Discord" [ref=e23] [cursor=pointer]:
+              - /url: /api/auth/oauth/discord/start?intent=login&next=%2F
+              - img [ref=e24]
+              - text: Discord
+            - link "Apple" [ref=e26] [cursor=pointer]:
+              - /url: /api/auth/oauth/apple/start?intent=login&next=%2F
+              - img [ref=e27]
+              - text: Apple
+          - generic [ref=e31]: Or use email
+          - generic [ref=e33]:
+            - generic [ref=e34]:
+              - generic [ref=e35]: Email address
+              - textbox "Email address" [ref=e36]:
+                - /placeholder: you@company.com
+            - generic [ref=e37]:
+              - generic [ref=e38]: Password
+              - textbox "Password" [ref=e39]:
+                - /placeholder: Enter at least 8 characters
+            - button "Enter Pico" [ref=e40] [cursor=pointer]
+          - generic [ref=e41]:
+            - link "Forgot password?" [ref=e42] [cursor=pointer]:
+              - /url: /forgot-password
+            - paragraph [ref=e43]:
+              - text: Need access?
+              - link "Create one" [ref=e44] [cursor=pointer]:
+                - /url: /register?next=%2F
+  - alert [ref=e45]

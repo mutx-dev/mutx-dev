@@ -1,0 +1,53 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "PicoMUTX" [ref=e5] [cursor=pointer]:
+        - /url: /
+    - main [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - paragraph [ref=e9]: Pico preview access
+          - heading "Create your Pico preview account" [level=1] [ref=e10]
+          - paragraph [ref=e11]: Sign up once, save your place, and keep following the product as it improves.
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - link "Google" [ref=e14] [cursor=pointer]:
+              - /url: /api/auth/oauth/google/start?intent=register&next=%2F
+              - img [ref=e15]
+              - text: Google
+            - link "GitHub" [ref=e20] [cursor=pointer]:
+              - /url: /api/auth/oauth/github/start?intent=register&next=%2F
+              - img [ref=e21]
+              - text: GitHub
+            - link "Discord" [ref=e23] [cursor=pointer]:
+              - /url: /api/auth/oauth/discord/start?intent=register&next=%2F
+              - img [ref=e24]
+              - text: Discord
+            - link "Apple" [ref=e26] [cursor=pointer]:
+              - /url: /api/auth/oauth/apple/start?intent=register&next=%2F
+              - img [ref=e27]
+              - text: Apple
+          - generic [ref=e31]: Or use email
+          - generic [ref=e33]:
+            - generic [ref=e34]:
+              - generic [ref=e35]: Name
+              - textbox "Name" [ref=e36]:
+                - /placeholder: Your name
+            - generic [ref=e37]:
+              - generic [ref=e38]: Email address
+              - textbox "Email address" [ref=e39]:
+                - /placeholder: you@company.com
+            - generic [ref=e40]:
+              - generic [ref=e41]: Password
+              - textbox "Password" [ref=e42]:
+                - /placeholder: Enter at least 8 characters
+            - generic [ref=e43]:
+              - generic [ref=e44]: Confirm password
+              - textbox "Confirm password" [ref=e45]:
+                - /placeholder: Enter at least 8 characters
+            - button "Create preview account" [ref=e46] [cursor=pointer]
+          - paragraph [ref=e48]:
+            - text: Already have an account?
+            - link "Sign in" [ref=e49] [cursor=pointer]:
+              - /url: /login?next=%2F
+  - alert [ref=e50]

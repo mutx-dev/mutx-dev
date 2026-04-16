@@ -1,0 +1,239 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - banner [ref=e5]:
+        - generic [ref=e6]:
+          - link "PicoMUTX logo PicoMUTX operator atlas" [ref=e7] [cursor=pointer]:
+            - /url: /pico/onboarding
+            - img "PicoMUTX logo" [ref=e9]
+            - generic [ref=e10]:
+              - generic [ref=e11]: PicoMUTX
+              - generic [ref=e12]: operator atlas
+          - generic [ref=e13]:
+            - generic [ref=e14]: Chapter 02
+            - generic [ref=e15]:
+              - button "How this works" [ref=e16] [cursor=pointer]
+              - button "Map" [pressed] [ref=e17] [cursor=pointer]
+              - button "Help" [ref=e18] [cursor=pointer]
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - paragraph [ref=e21]: Chapter 01 • lesson lane
+            - paragraph [ref=e22]: Install Hermes locally
+            - paragraph [ref=e23]: Install Hermes, prove the command works from a fresh shell, and leave this lesson with one working local runtime.
+          - generic [ref=e24]:
+            - generic [ref=e25]:
+              - paragraph [ref=e26]: Route mode
+              - generic [ref=e27]: Lessons
+            - paragraph [ref=e28]: the working path. The map stays open.
+            - generic [ref=e29]:
+              - generic [ref=e30]: "Previous: Start"
+              - generic [ref=e31]: "Next: Tutor"
+      - main [ref=e32]:
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - paragraph [ref=e37]: Lesson
+              - paragraph [ref=e38]: "01"
+            - generic [ref=e39]:
+              - paragraph [ref=e40]: Track
+              - paragraph [ref=e41]: Track A — First Agent
+              - paragraph [ref=e42]: 1/2
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]: Mission brief
+              - generic [ref=e46]: local only
+              - generic [ref=e47]: active
+            - generic [ref=e48]:
+              - heading "Install Hermes locally" [level=1] [ref=e49]
+              - paragraph [ref=e50]: Get one clean local Hermes install working end to end.
+              - paragraph [ref=e51]: "Expected result: Running `command -v hermes && hermes` from a fresh shell succeeds."
+            - generic [ref=e52]:
+              - button "Hermes is installed" [ref=e53] [cursor=pointer]
+              - link "Ask the tutor about this lesson" [ref=e54] [cursor=pointer]:
+                - /url: /pico/tutor?lesson=install-hermes-locally
+            - generic [ref=e55]:
+              - generic [ref=e56]:
+                - paragraph [ref=e57]: State
+                - paragraph [ref=e58]: active
+                - paragraph [ref=e59]: one route lane
+              - generic [ref=e60]:
+                - paragraph [ref=e61]: Proof
+                - paragraph [ref=e62]: pending
+                - paragraph [ref=e63]: Install Hermes
+              - generic [ref=e64]:
+                - paragraph [ref=e65]: Progress
+                - paragraph [ref=e66]: 0/3
+                - paragraph [ref=e67]: steps cleared
+              - generic [ref=e68]:
+                - paragraph [ref=e69]: Telemetry
+                - paragraph [ref=e70]: 8m
+                - paragraph [ref=e71]: 60 xp • setup
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - paragraph [ref=e77]: Studio review board
+                - heading "Brief, deliverable, critique" [level=2] [ref=e78]
+              - generic [ref=e79]: one real lesson at a time
+            - generic [ref=e80]:
+              - article [ref=e81]:
+                - paragraph [ref=e82]: 01 • Brief
+                - heading "The outcome the studio is chasing" [level=3] [ref=e83]
+                - paragraph [ref=e84]: Get one clean local Hermes install working end to end.
+              - article [ref=e85]:
+                - paragraph [ref=e86]: 02 • Deliverable
+                - heading "What the finished artifact should prove" [level=3] [ref=e87]
+                - paragraph [ref=e88]: "Running `command -v hermes && hermes` from a fresh shell succeeds."
+              - article [ref=e89]:
+                - paragraph [ref=e90]: 03 • Critique
+                - heading "The review line before you move on" [level=3] [ref=e91]
+                - paragraph [ref=e92]: "Open a brand-new shell and run `command -v hermes && hermes`. If the command is missing or the CLI errors immediately, this lesson is not done."
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - paragraph [ref=e95]: Chapter context
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - paragraph [ref=e98]: Track arc
+                  - paragraph [ref=e99]: Hermes runs and answers real prompts.
+                - generic [ref=e100]:
+                  - paragraph [ref=e101]: Lesson outcome
+                  - paragraph [ref=e102]: A local Hermes CLI that opens cleanly from a fresh shell.
+                - generic [ref=e103]:
+                  - paragraph [ref=e104]: Time and weight
+                  - paragraph [ref=e105]: 8m • 60 xp • setup
+            - generic [ref=e106]:
+              - paragraph [ref=e107]: Studio posture
+              - paragraph [ref=e108]: Keep this chapter narrow. The goal is not to feel busy or advanced. The goal is to produce one artifact a sharp operator would still trust tomorrow.
+        - generic [ref=e109]:
+          - complementary [ref=e110]:
+            - generic [ref=e111]:
+              - paragraph [ref=e112]: Chapter spine
+              - generic [ref=e113]:
+                - button "01 active Install Hermes" [ref=e114] [cursor=pointer]:
+                  - generic [ref=e115]:
+                    - generic [ref=e116]: "01"
+                    - generic [ref=e117]: active
+                  - generic [ref=e118]: Install Hermes
+                - button "02 Verify the binary from a fresh shell" [ref=e119] [cursor=pointer]:
+                  - generic [ref=e121]: "02"
+                  - generic [ref=e122]: Verify the binary from a fresh shell
+                - button "03 Open Hermes and finish one provider setup" [ref=e123] [cursor=pointer]:
+                  - generic [ref=e125]: "03"
+                  - generic [ref=e126]: Open Hermes and finish one provider setup
+          - generic [ref=e127]:
+            - generic [ref=e128]:
+              - generic [ref=e129]:
+                - paragraph [ref=e130]: Studio workspace
+                - heading "Install Hermes" [level=2] [ref=e131]
+              - generic [ref=e132]:
+                - button "Reset workspace" [ref=e133] [cursor=pointer]
+                - button "Mark step done" [ref=e134] [cursor=pointer]
+            - generic [ref=e135]:
+              - article [ref=e136]:
+                - paragraph [ref=e137]: Studio brief
+                - paragraph [ref=e138]: Run the install command exactly once. Do not compare package managers. Do not branch into extra tooling.
+                - code [ref=e140]: curl -fsSL https://hermes.nousresearch.com/install.sh | bash
+              - generic [ref=e141]:
+                - generic [ref=e142]:
+                  - generic [ref=e143]: Deliverable artifact
+                  - textbox "Deliverable artifact" [ref=e144]:
+                    - /placeholder: Paste the output, transcript note, or artifact that proves this chapter worked.
+                - generic [ref=e145]:
+                  - generic [ref=e146]: Bench notes
+                  - textbox "Bench notes" [ref=e147]:
+                    - /placeholder: Capture the blocker, file path, or command variation that mattered.
+              - generic [ref=e148]:
+                - generic [ref=e149]:
+                  - paragraph [ref=e150]: Review state
+                  - paragraph [ref=e151]: pending
+                  - paragraph [ref=e152]: Do not seal the chapter until the proof says something real.
+                  - button "Hermes is installed" [ref=e154] [cursor=pointer]
+                - generic [ref=e155]:
+                  - generic [ref=e156]:
+                    - paragraph [ref=e157]: Chapter completion
+                    - paragraph [ref=e158]: 0/3
+                  - generic [ref=e160]:
+                    - paragraph [ref=e161]: Creative direction
+                    - paragraph [ref=e162]: Finish the live step, log one proof artifact, then either seal the chapter or hand off to the next surface.
+        - generic [ref=e164]:
+          - generic [ref=e165]:
+            - generic [ref=e166]:
+              - generic [ref=e167]:
+                - generic [ref=e168]: Surface compass
+                - generic [ref=e169]: route lane active
+              - heading "Keep the lesson narrow until the proof is real" [level=2] [ref=e170]
+              - paragraph [ref=e171]: Use Tutor for one grounded blocker, switch to Autopilot when live runtime truth matters, and escalate to Support only after both stop being enough.
+            - generic [ref=e172]:
+              - paragraph [ref=e173]: Operating rule
+              - paragraph [ref=e174]: Recovery belongs below the proof lane, not inside it.
+          - generic [ref=e175]:
+            - link "Blocked → Ask tutor about this lesson Use this when one command, file path, or validation check is failing." [ref=e176] [cursor=pointer]:
+              - /url: /pico/tutor?lesson=install-hermes-locally
+              - generic [ref=e177]:
+                - generic [ref=e178]: Blocked
+                - generic [ref=e179]: →
+              - paragraph [ref=e180]: Ask tutor about this lesson
+              - paragraph [ref=e181]: Use this when one command, file path, or validation check is failing.
+            - link "Backtrack → Return to academy map Step back to the mapped route when the sequence itself is the problem." [ref=e182] [cursor=pointer]:
+              - /url: /pico/academy
+              - generic [ref=e183]:
+                - generic [ref=e184]: Backtrack
+                - generic [ref=e185]: →
+              - paragraph [ref=e186]: Return to academy map
+              - paragraph [ref=e187]: Step back to the mapped route when the sequence itself is the problem.
+            - link "Runtime → Inspect Autopilot Switch here when the blocker depends on live runtime or approvals." [ref=e188] [cursor=pointer]:
+              - /url: /pico/autopilot
+              - generic [ref=e189]:
+                - generic [ref=e190]: Runtime
+                - generic [ref=e191]: →
+              - paragraph [ref=e192]: Inspect Autopilot
+              - paragraph [ref=e193]: Switch here when the blocker depends on live runtime or approvals.
+            - link "Messy edge → Open support lane Escalate only after the lesson, tutor, and runtime views stop being enough." [ref=e194] [cursor=pointer]:
+              - /url: /pico/support
+              - generic [ref=e195]:
+                - generic [ref=e196]: Messy edge
+                - generic [ref=e197]: →
+              - paragraph [ref=e198]: Open support lane
+              - paragraph [ref=e199]: Escalate only after the lesson, tutor, and runtime views stop being enough.
+        - generic [ref=e200]:
+          - generic [ref=e201]:
+            - generic [ref=e202]:
+              - generic [ref=e203]:
+                - paragraph [ref=e204]: Troubleshooting appendix
+                - heading "The smaller notes you only read when the route goes crooked" [level=2] [ref=e205]
+              - generic [ref=e206]: 3 steps
+            - generic [ref=e207]:
+              - generic [ref=e208]: "If `command -v hermes` returns nothing, restart the shell and check that the install path was added to PATH."
+              - generic [ref=e209]: "If `hermes` opens and immediately errors on missing credentials, finish one provider setup before moving on."
+              - generic [ref=e210]: If the install script fails on a locked-down machine, switch to a user-local install path and rerun the verification step.
+          - complementary [ref=e211]:
+            - generic [ref=e212]:
+              - paragraph [ref=e213]: Next capability
+              - generic [ref=e214]:
+                - heading "Persistent runtime unlocked" [level=3] [ref=e215]
+                - paragraph [ref=e216]: "You proved the local loop. Next move: get the same agent onto a box that stays awake."
+                - link "Deploy the runtime" [ref=e217] [cursor=pointer]:
+                  - /url: /pico/academy/deploy-hermes-on-a-vps
+            - generic [ref=e218]:
+              - paragraph [ref=e219]: Route memory
+              - link "Back to academy map" [ref=e222] [cursor=pointer]:
+                - /url: /pico/academy
+    - contentinfo [ref=e223]:
+      - generic [ref=e224]:
+        - generic [ref=e225]:
+          - link "PicoMUTX logo PicoMUTX" [ref=e226] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e228]
+            - text: PicoMUTX
+          - link "Releases" [ref=e229] [cursor=pointer]:
+            - /url: https://mutx.dev/releases
+          - link "Docs" [ref=e230] [cursor=pointer]:
+            - /url: https://docs.mutx.dev
+          - link "GitHub" [ref=e231] [cursor=pointer]:
+            - /url: https://github.com/mutx-dev/mutx-dev
+          - link "Download" [ref=e232] [cursor=pointer]:
+            - /url: https://mutx.dev/download
+          - link "Privacy" [ref=e233] [cursor=pointer]:
+            - /url: https://mutx.dev/privacy-policy
+        - paragraph [ref=e234]: © 2026 MUTX. PicoMUTX is a learning and operations platform for AI agent builders.
+  - alert [ref=e235]

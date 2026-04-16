@@ -1,0 +1,437 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - complementary [ref=e6]:
+        - generic [ref=e7]:
+          - link "PicoMUTX logo PicoMUTX operator atlas" [ref=e9] [cursor=pointer]:
+            - /url: /pico/onboarding
+            - img "PicoMUTX logo" [ref=e11]
+            - generic [ref=e12]:
+              - generic [ref=e13]: PicoMUTX
+              - generic [ref=e14]: operator atlas
+          - generic [ref=e15]:
+            - paragraph [ref=e16]: Current chapter
+            - paragraph [ref=e17]: Tutor
+            - paragraph [ref=e18]: one grounded answer
+          - navigation [ref=e19]:
+            - link "01 Start first visible win" [ref=e20] [cursor=pointer]:
+              - /url: /pico/onboarding
+              - generic [ref=e21]: "01"
+              - generic [ref=e22]: Start
+              - generic [ref=e23]: first visible win
+            - link "02 Lessons the working path" [ref=e24] [cursor=pointer]:
+              - /url: /pico/academy
+              - generic [ref=e25]: "02"
+              - generic [ref=e26]: Lessons
+              - generic [ref=e27]: the working path
+            - link "03 Tutor one grounded answer" [ref=e28] [cursor=pointer]:
+              - /url: /pico/tutor
+              - generic [ref=e29]: "03"
+              - generic [ref=e30]: Tutor
+              - generic [ref=e31]: one grounded answer
+            - link "04 Autopilot live control room" [ref=e32] [cursor=pointer]:
+              - /url: /pico/autopilot
+              - generic [ref=e33]: "04"
+              - generic [ref=e34]: Autopilot
+              - generic [ref=e35]: live control room
+            - link "05 Human help the messy edge" [ref=e36] [cursor=pointer]:
+              - /url: /pico/support
+              - generic [ref=e37]: "05"
+              - generic [ref=e38]: Human help
+              - generic [ref=e39]: the messy edge
+      - generic [ref=e40]:
+        - banner [ref=e41]:
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]: Chapter 03
+              - generic [ref=e46]: one grounded answer
+            - generic [ref=e47]:
+              - button "Quick help" [ref=e48] [cursor=pointer]
+              - 'link "Go to previous chapter: Lessons" [ref=e49] [cursor=pointer]':
+                - /url: /pico/academy
+                - text: Previous chapter
+              - 'link "Go to next chapter: Autopilot" [ref=e50] [cursor=pointer]':
+                - /url: /pico/autopilot
+                - text: Next chapter
+              - button "Show recovery" [ref=e51] [cursor=pointer]
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: Grounded tutor
+              - heading "Ask for the exact next step" [level=1] [ref=e55]
+              - paragraph [ref=e56]: Treat this like an operator desk, not a chat toy. One concrete blocker in, one grounded move out, then back to the lesson.
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - paragraph [ref=e59]: Chapter note
+                - paragraph [ref=e60]: one grounded answer
+                - paragraph [ref=e61]: This surface should reduce uncertainty immediately and point to the next irreversible action.
+              - generic [ref=e63]:
+                - link "Back to lesson" [ref=e64] [cursor=pointer]:
+                  - /url: /pico/academy/install-hermes-locally
+                - link "Escalate to human help" [ref=e65] [cursor=pointer]:
+                  - /url: /pico/support
+        - main [ref=e66]:
+          - generic [ref=e231]:
+            - generic [ref=e232]:
+              - generic [ref=e233]:
+                - generic [ref=e234]: hosted session required
+                - generic [ref=e235]: pico host auth
+              - paragraph [ref=e236]: The Pico platform routes are live here, but the hosted session is not attached yet on this domain. Sign in on Pico to persist progress, read live runs, and use the backend onboarding/runtime state. Google, GitHub, Discord, Apple, password signup, and email confirmation all terminate on this host now.
+              - generic [ref=e237]:
+                - generic [ref=e238]:
+                  - paragraph [ref=e239]: Progress
+                  - paragraph [ref=e240]: won’t persist
+                - generic [ref=e241]:
+                  - paragraph [ref=e242]: Runtime truth
+                  - paragraph [ref=e243]: limited
+                - generic [ref=e244]:
+                  - paragraph [ref=e245]: Approvals
+                  - paragraph [ref=e246]: read-only feeling
+            - generic [ref=e247]:
+              - paragraph [ref=e248]: Without session
+              - generic [ref=e249]:
+                - generic [ref=e250]:
+                  - generic [ref=e251]: Progress sync
+                  - generic [ref=e252]: local only
+                - generic [ref=e253]:
+                  - generic [ref=e254]: Runtime truth
+                  - generic [ref=e255]: not trustworthy yet
+                - generic [ref=e256]:
+                  - generic [ref=e257]: Approvals + webhooks
+                  - generic [ref=e258]: blocked
+              - paragraph [ref=e259]: Attach the Pico account on this host before you trust progress, live runtime state, or approval behavior.
+              - generic [ref=e260]:
+                - link "Sign in" [ref=e261] [cursor=pointer]:
+                  - /url: /login?next=%2Fpico%2Ftutor
+                - link "Create account" [ref=e262] [cursor=pointer]:
+                  - /url: /register?next=%2Fpico%2Ftutor
+              - generic [ref=e263]:
+                - link "Continue with Google" [ref=e264] [cursor=pointer]:
+                  - /url: /api/auth/oauth/google/start?intent=login&next=%2Fpico%2Ftutor
+                - link "Continue with GitHub" [ref=e265] [cursor=pointer]:
+                  - /url: /api/auth/oauth/github/start?intent=login&next=%2Fpico%2Ftutor
+                - link "Continue with Discord" [ref=e266] [cursor=pointer]:
+                  - /url: /api/auth/oauth/discord/start?intent=login&next=%2Fpico%2Ftutor
+                - link "Continue with Apple" [ref=e267] [cursor=pointer]:
+                  - /url: /api/auth/oauth/apple/start?intent=login&next=%2Fpico%2Ftutor
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - generic [ref=e73]:
+                  - generic [ref=e74]: Surface compass
+                  - generic [ref=e75]: answer ready
+                - heading "The tutor should end in motion, not another loop" [level=2] [ref=e76]
+                - paragraph [ref=e77]: Use tutor only to recover one grounded next move. Return to the lesson when the answer is sufficient, inspect Autopilot when the runtime is the real blocker, and escalate only when neither route can tell the truth.
+              - generic [ref=e78]:
+                - paragraph [ref=e79]: Operating rule
+                - paragraph [ref=e80]: A good tutor answer collapses uncertainty into one move. If the answer does not create motion, this page should push the operator out of the loop immediately.
+            - generic [ref=e81]:
+              - link "Resume lane → Return to blocked lesson Go back here when the tutor answer still keeps the lesson path truthful." [ref=e82] [cursor=pointer]:
+                - /url: /pico/academy/install-hermes-locally
+                - generic [ref=e83]:
+                  - generic [ref=e84]: Resume lane
+                  - generic [ref=e85]: →
+                - paragraph [ref=e86]: Return to blocked lesson
+                - paragraph [ref=e87]: Go back here when the tutor answer still keeps the lesson path truthful.
+              - link "Runtime → Inspect live control room Open this when the problem has shifted from knowable lesson logic to runtime state." [ref=e88] [cursor=pointer]:
+                - /url: /pico/autopilot
+                - generic [ref=e89]:
+                  - generic [ref=e90]: Runtime
+                  - generic [ref=e91]: →
+                - paragraph [ref=e92]: Inspect live control room
+                - paragraph [ref=e93]: Open this when the problem has shifted from knowable lesson logic to runtime state.
+              - link "Escalate → Open support lane Escalate only when the tutor answer still does not give one concrete move." [ref=e94] [cursor=pointer]:
+                - /url: /pico/support
+                - generic [ref=e95]:
+                  - generic [ref=e96]: Escalate
+                  - generic [ref=e97]: →
+                - paragraph [ref=e98]: Open support lane
+                - paragraph [ref=e99]: Escalate only when the tutor answer still does not give one concrete move.
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - generic [ref=e103]:
+                - generic [ref=e104]:
+                  - paragraph [ref=e105]: Crit desk method
+                  - heading "Treat each question like a studio critique" [level=2] [ref=e106]
+                - generic [ref=e107]: frame • evidence • exit
+              - generic [ref=e108]:
+                - article [ref=e109]:
+                  - paragraph [ref=e110]: 01 • Frame
+                  - heading "Bring one blocked step" [level=3] [ref=e111]
+                  - paragraph [ref=e112]: Tie the question to Install Hermes locally. The desk works best when the lesson route is already attached.
+                - article [ref=e113]:
+                  - paragraph [ref=e114]: 02 • Evidence
+                  - heading "Bring what actually happened" [level=3] [ref=e115]
+                  - paragraph [ref=e116]: Paste the command, transcript, error, or runtime signal. This desk reviews evidence, not vibes.
+                - article [ref=e117]:
+                  - paragraph [ref=e118]: 03 • Exit
+                  - heading "Leave with one move" [level=3] [ref=e119]
+                  - paragraph [ref=e120]: A good tutor answer gives one next action, one verification line, and a clean handoff if the evidence stays thin.
+            - generic [ref=e121]:
+              - generic [ref=e122]:
+                - paragraph [ref=e123]: Desk posture
+                - paragraph [ref=e124]: The premium version of this page is not a friendly chatbot. It is a sharp review desk that narrows ambiguity into one next move.
+              - generic [ref=e125]:
+                - paragraph [ref=e126]: Attached lane
+                - paragraph [ref=e127]: Install Hermes locally is attached, so the tutor can answer against the real lesson brief instead of guessing.
+          - generic [ref=e128]:
+            - generic [ref=e130]:
+              - generic [ref=e131]:
+                - paragraph [ref=e132]: Crit desk
+                - generic [ref=e133]:
+                  - img "PicoMUTX tutor mascot" [ref=e134]
+                  - heading "Bring one blocker to the desk" [level=2] [ref=e135]
+                - paragraph [ref=e136]: Ask only when the lesson path is blocked. The answer should send you back into action, not into another loop of reading.
+                - paragraph [ref=e137]: Read-only tutor mode. Hosted session context is missing until you sign in.
+                - generic [ref=e138]:
+                  - paragraph [ref=e139]: Where you are
+                  - paragraph [ref=e140]: You are asking about Install Hermes locally. Keep the question tied to the step that is actually blocked.
+                  - generic [ref=e141]:
+                    - generic [ref=e142]:
+                      - paragraph: Lesson brief
+                      - paragraph: Get one clean local Hermes install working end to end.
+                    - generic [ref=e143]:
+                      - paragraph: Deliverable
+                      - paragraph: "Running `command -v hermes && hermes` from a fresh shell succeeds."
+                    - generic [ref=e144]:
+                      - paragraph: Critique line
+                      - paragraph: "Open a brand-new shell and run `command -v hermes && hermes`. If the command is missing or the CLI errors immediately, this lesson is not done."
+                  - generic [ref=e145]:
+                    - generic [ref=e146]:
+                      - paragraph [ref=e147]: Lesson steps
+                      - paragraph [ref=e148]: 0/3
+                    - generic [ref=e149]:
+                      - paragraph [ref=e150]: Focused step
+                      - paragraph [ref=e151]: Install Hermes
+                  - link "Back to lesson" [ref=e152] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+                - generic [ref=e153]:
+                  - generic [ref=e154]:
+                    - generic [ref=e155]:
+                      - paragraph [ref=e156]: Crit packet
+                      - paragraph [ref=e157]: "Bring just enough context for a sharp answer: route, failure, and exact expectation."
+                    - generic [ref=e158]: route • failure • expectation
+                  - generic [ref=e159]:
+                    - generic [ref=e160]:
+                      - paragraph: Current track
+                      - paragraph: not chosen yet
+                    - generic [ref=e161]:
+                      - paragraph: Next lesson
+                      - paragraph: Install Hermes locally
+                    - generic [ref=e162]:
+                      - paragraph: Hosted onboarding step
+                      - paragraph: session required
+                    - generic [ref=e163]:
+                      - paragraph: Runtime status
+                      - paragraph: not synced
+                  - generic [ref=e164]:
+                    - generic [ref=e166]:
+                      - generic [ref=e167]: "01"
+                      - paragraph [ref=e168]: Say what step you were on.
+                    - generic [ref=e170]:
+                      - generic [ref=e171]: "02"
+                      - paragraph [ref=e172]: Say what you expected to happen.
+                    - generic [ref=e174]:
+                      - generic [ref=e175]: "03"
+                      - paragraph [ref=e176]: Say what happened instead.
+                - textbox "Describe the blocker, the exact step, and what you expected to happen." [ref=e177]: I ran the install command, but command -v hermes returns nothing in a new shell. I expected hermes to be on PATH.
+                - generic [ref=e178]:
+                  - generic [ref=e179]:
+                    - text: Blocked lesson
+                    - combobox "Blocked lesson" [ref=e180]:
+                      - option "No lesson selected"
+                      - option "Install Hermes locally" [selected]
+                      - option "Run your first agent"
+                      - option "Deploy Hermes on a VPS"
+                      - option "Keep your agent alive between sessions"
+                      - option "Connect a messaging layer"
+                      - option "Add your first skill/tool"
+                      - option "Create a scheduled workflow"
+                      - option "See your agent activity"
+                      - option "Set a cost threshold"
+                      - option "Add an approval gate"
+                      - option "Build a lead-response agent"
+                      - option "Build a document-processing agent"
+                  - button "Get next step" [ref=e181] [cursor=pointer]
+                - generic [ref=e182]:
+                  - button "Hermes launches locally but dies on the VPS. What should I check first?" [ref=e183] [cursor=pointer]
+                  - button "How do I keep the agent alive after I close SSH?" [ref=e184] [cursor=pointer]
+                  - button "I want approval before any outbound send. Which lesson do I follow?" [ref=e185] [cursor=pointer]
+              - generic [ref=e186]:
+                - paragraph [ref=e187]: Operator rail
+                - generic [ref=e188]:
+                  - generic [ref=e189]:
+                    - paragraph [ref=e190]: Questions asked
+                    - paragraph [ref=e191]: "1"
+                  - generic [ref=e192]:
+                    - paragraph [ref=e193]: Live answer state
+                    - paragraph [ref=e194]: high
+                - generic [ref=e268]:
+                  - paragraph [ref=e269]: Recent questions
+                  - button "I ran the install command, but command -v hermes returns nothing in a new shell. I expected hermes to be on PATH." [ref=e271] [cursor=pointer]
+                - generic [ref=e196]:
+                  - paragraph [ref=e197]: OpenAI connection
+                  - paragraph [ref=e199]: Sign in to attach your own OpenAI key. Tutor still works in read-only mode without a personal connection.
+                - generic [ref=e200]:
+                  - paragraph [ref=e201]: Escalation rule
+                  - paragraph [ref=e202]: If the answer still does not give you one concrete move, stop looping and open support with the lesson context attached.
+                  - link "Open support lane" [ref=e203] [cursor=pointer]:
+                    - /url: /pico/support
+            - complementary [ref=e204]:
+              - generic [ref=e205]:
+                - paragraph [ref=e206]: Studio critique
+                - generic [ref=e207]:
+                  - generic [ref=e272]:
+                    - generic [ref=e273]:
+                      - generic [ref=e274]: Install Hermes locally
+                      - generic [ref=e275]: high confidence
+                      - generic [ref=e276]: install
+                      - generic [ref=e277]: beginner
+                      - generic [ref=e278]: official fallback
+                    - generic [ref=e279]:
+                      - paragraph [ref=e280]: Single next move
+                      - paragraph [ref=e281]: "Install Hermes: Run the install command exactly once. Do not compare package managers. Do not branch into extra tooling."
+                    - generic [ref=e282]:
+                      - generic [ref=e283]:
+                        - paragraph [ref=e284]: Situation
+                        - paragraph [ref=e285]: "Operator asks: I ran the install command, but command -v hermes returns nothing in a new shell. I expected hermes to be on PATH.. Blocked lesson context: Install Hermes locally."
+                      - generic [ref=e286]:
+                        - paragraph [ref=e287]: Diagnosis
+                        - paragraph [ref=e288]: "The strongest grounded path is `Install Hermes locally` because it matches the active lesson lane and its validation path."
+                  - generic [ref=e289]:
+                    - paragraph [ref=e290]: Steps
+                    - generic [ref=e291]:
+                      - generic [ref=e292]: "01Install Hermes: Run the install command exactly once. Do not compare package managers. Do not branch into extra tooling."
+                      - generic [ref=e293]: "02Verify the binary from a fresh shell: Close the shell, open a new one, then prove the binary is actually on PATH."
+                      - generic [ref=e294]: "03Open Hermes and finish one provider setup: Launch the CLI and complete exactly one provider path until the CLI is usable. Do not leave this lesson with two half-configured providers."
+                      - generic [ref=e295]: 04Stop after the first successful verification. Do not optimize yet.
+                  - generic [ref=e296]:
+                    - paragraph [ref=e297]: Commands
+                    - generic [ref=e298]:
+                      - generic [ref=e299]:
+                        - paragraph [ref=e300]: Install Hermes
+                        - code [ref=e302]: curl -fsSL https://hermes.nousresearch.com/install.sh | bash
+                      - generic [ref=e303]:
+                        - paragraph [ref=e304]: Verify the binary from a fresh shell
+                        - code [ref=e306]: command -v hermes
+                      - generic [ref=e307]:
+                        - paragraph [ref=e308]: Open Hermes and finish one provider setup
+                        - code [ref=e310]: hermes
+                      - generic [ref=e311]:
+                        - paragraph [ref=e312]: Reference command 1
+                        - code [ref=e314]: git clone https://github.com/<your-username>/nanoclaw.git cd nanoclaw claude
+                  - generic [ref=e315]:
+                    - paragraph [ref=e316]: Review line
+                    - generic [ref=e318]: "Open a brand-new shell and run `command -v hermes && hermes`. If the command is missing or the CLI errors immediately, this lesson is not done."
+                  - generic [ref=e319]:
+                    - paragraph [ref=e320]: Fallback route
+                    - generic [ref=e321]:
+                      - generic [ref=e322]: "If `command -v hermes` returns nothing, restart the shell and check that the install path was added to PATH."
+                      - generic [ref=e323]: "If `hermes` opens and immediately errors on missing credentials, finish one provider setup before moving on."
+                      - generic [ref=e324]: If the install script fails on a locked-down machine, switch to a user-local install path and rerun the verification step.
+                      - generic [ref=e325]: Paste the exact install command you ran and the first failure output.
+              - generic [ref=e326]:
+                - paragraph [ref=e327]: Grounded lesson matches
+                - generic [ref=e328]:
+                  - link "Install Hermes locally best match" [ref=e329] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+                    - generic [ref=e330]: Install Hermes locally
+                    - generic [ref=e331]: best match
+                  - link "Keep your agent alive between sessions alt" [ref=e332] [cursor=pointer]:
+                    - /url: /pico/academy/keep-your-agent-alive
+                    - generic [ref=e333]: Keep your agent alive between sessions
+                    - generic [ref=e334]: alt
+                  - link "Deploy Hermes on a VPS alt" [ref=e335] [cursor=pointer]:
+                    - /url: /pico/academy/deploy-hermes-on-a-vps
+                    - generic [ref=e336]: Deploy Hermes on a VPS
+                    - generic [ref=e337]: alt
+                  - link "Run your first agent alt" [ref=e338] [cursor=pointer]:
+                    - /url: /pico/academy/run-your-first-agent
+                    - generic [ref=e339]: Run your first agent
+                    - generic [ref=e340]: alt
+              - generic [ref=e341]:
+                - paragraph [ref=e342]: Critique evidence
+                - generic [ref=e343]:
+                  - generic [ref=e344]:
+                    - generic [ref=e345]:
+                      - generic [ref=e346]: Install Hermes locally
+                      - generic [ref=e347]: lesson
+                    - paragraph [ref=e348]: pico/academy/install-hermes-locally
+                    - paragraph [ref=e349]: Install Hermes, prove the command works from a fresh shell, and leave this lesson with one working local runtime.
+                    - link "Open source" [ref=e350] [cursor=pointer]:
+                      - /url: /pico/academy/install-hermes-locally
+                  - generic [ref=e351]:
+                    - generic [ref=e352]:
+                      - generic [ref=e353]: Keep your agent alive between sessions
+                      - generic [ref=e354]: lesson
+                    - paragraph [ref=e355]: pico/academy/keep-your-agent-alive
+                    - paragraph [ref=e356]: Create one real service definition so logout does not kill the runtime.
+                    - link "Open source" [ref=e357] [cursor=pointer]:
+                      - /url: /pico/academy/keep-your-agent-alive
+                  - generic [ref=e358]:
+                    - generic [ref=e359]:
+                      - generic [ref=e360]: NanoClaw
+                      - generic [ref=e361]: knowledge pack
+                    - paragraph [ref=e362]: knowledge/pico_ops/NANOCLAW.md
+                    - paragraph [ref=e363]: lightweight mental model
+                  - generic [ref=e364]:
+                    - generic [ref=e365]:
+                      - generic [ref=e366]: Install Flow
+                      - generic [ref=e367]: knowledge pack
+                    - paragraph [ref=e368]: knowledge/pico_ops/INSTALL_FLOW.md
+                    - paragraph [ref=e369]: "If undecided, use `DECISION_MATRIX.md`."
+                  - generic [ref=e370]:
+                    - generic [ref=e371]:
+                      - generic [ref=e372]: "GitHub - qwibitai/nanoclaw: A lightweight alternative to OpenClaw that runs in containers for security. Connects to WhatsApp, Telegram, Slack, Discord, Gmail and other messaging apps,, has memory, scheduled jobs, and runs directly on Anthropic&#39;s Agents SDK · GitHub"
+                      - generic [ref=e373]: official
+                    - paragraph [ref=e374]: github.com
+                    - paragraph [ref=e375]: "GitHub - qwibitai/nanoclaw: A lightweight alternative to OpenClaw that runs in containers for security. Connects to WhatsApp, Telegram, Slack, Discord, Gmail and other messaging apps,, has memory, scheduled jobs, and runs directly on Anthropic&#39;s Agents SDK · GitHub Skip to content Navigation Menu Toggle navigation"
+                    - link "Open source" [ref=e376] [cursor=pointer]:
+                      - /url: https://github.com/qwibitai/nanoclaw
+                  - generic [ref=e377]:
+                    - generic [ref=e378]:
+                      - generic [ref=e379]: What is NanoClaw? - NanoClaw
+                      - generic [ref=e380]: official
+                    - paragraph [ref=e381]: docs.nanoclaw.dev
+                    - paragraph [ref=e382]: What is NanoClaw? - NanoClaw Skip to main content NanoClaw home page Search NanoClaw docs... ⌘ K Ask AI qwibitai/nanoclaw qwibitai/nanoclaw Search... Navigation Get Started What is NanoClaw? Documentation API Reference Get Started Introduction UPDATED Quick start UPDATED Installation Core Concepts System architecture U
+                    - link "Open source" [ref=e383] [cursor=pointer]:
+                      - /url: https://docs.nanoclaw.dev/
+              - generic [ref=e384]:
+                - paragraph [ref=e385]: Official links
+                - generic [ref=e386]:
+                  - link "github.com github.com" [ref=e387] [cursor=pointer]:
+                    - /url: https://github.com/qwibitai/nanoclaw
+                    - generic [ref=e388]: github.com
+                    - generic [ref=e389]: github.com
+                  - link "docs.nanoclaw.dev docs.nanoclaw.dev" [ref=e390] [cursor=pointer]:
+                    - /url: https://docs.nanoclaw.dev/
+                    - generic [ref=e391]: docs.nanoclaw.dev
+                    - generic [ref=e392]: docs.nanoclaw.dev
+              - generic [ref=e210]:
+                - paragraph [ref=e211]: Exit route
+                - generic [ref=e212]:
+                  - link "Return to blocked lesson" [ref=e213] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+                  - link "Open Autopilot" [ref=e214] [cursor=pointer]:
+                    - /url: /pico/autopilot
+                  - link "Open support lane" [ref=e215] [cursor=pointer]:
+                    - /url: /pico/support
+                - paragraph [ref=e217]: The tutor should end in motion. Return to the lesson if the path is still clear, open Autopilot if the runtime is now the bottleneck, and escalate only when the product path stopped being truthful.
+    - contentinfo [ref=e218]:
+      - generic [ref=e219]:
+        - generic [ref=e220]:
+          - link "PicoMUTX logo PicoMUTX" [ref=e221] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e223]
+            - text: PicoMUTX
+          - link "Releases" [ref=e224] [cursor=pointer]:
+            - /url: https://mutx.dev/releases
+          - link "Docs" [ref=e225] [cursor=pointer]:
+            - /url: https://docs.mutx.dev
+          - link "GitHub" [ref=e226] [cursor=pointer]:
+            - /url: https://github.com/mutx-dev/mutx-dev
+          - link "Download" [ref=e227] [cursor=pointer]:
+            - /url: https://mutx.dev/download
+          - link "Privacy" [ref=e228] [cursor=pointer]:
+            - /url: https://mutx.dev/privacy-policy
+        - paragraph [ref=e229]: © 2026 MUTX. PicoMUTX is a learning and operations platform for AI agent builders.
+  - alert [ref=e230]

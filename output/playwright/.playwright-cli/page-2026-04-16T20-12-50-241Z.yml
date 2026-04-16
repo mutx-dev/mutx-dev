@@ -1,0 +1,413 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - complementary [ref=e6]:
+        - generic [ref=e7]:
+          - link "PicoMUTX logo PicoMUTX operator atlas" [ref=e9] [cursor=pointer]:
+            - /url: /pico/onboarding
+            - img "PicoMUTX logo" [ref=e11]
+            - generic [ref=e12]:
+              - generic [ref=e13]: PicoMUTX
+              - generic [ref=e14]: operator atlas
+          - generic [ref=e15]:
+            - paragraph [ref=e16]: Current chapter
+            - paragraph [ref=e17]: Autopilot
+            - paragraph [ref=e18]: live control room
+          - navigation [ref=e19]:
+            - link "01 Start first visible win" [ref=e20] [cursor=pointer]:
+              - /url: /pico/onboarding
+              - generic [ref=e21]: "01"
+              - generic [ref=e22]: Start
+              - generic [ref=e23]: first visible win
+            - link "02 Lessons the working path" [ref=e24] [cursor=pointer]:
+              - /url: /pico/academy
+              - generic [ref=e25]: "02"
+              - generic [ref=e26]: Lessons
+              - generic [ref=e27]: the working path
+            - link "03 Tutor one grounded answer" [ref=e28] [cursor=pointer]:
+              - /url: /pico/tutor
+              - generic [ref=e29]: "03"
+              - generic [ref=e30]: Tutor
+              - generic [ref=e31]: one grounded answer
+            - link "04 Autopilot live control room" [ref=e32] [cursor=pointer]:
+              - /url: /pico/autopilot
+              - generic [ref=e33]: "04"
+              - generic [ref=e34]: Autopilot
+              - generic [ref=e35]: live control room
+            - link "05 Human help the messy edge" [ref=e36] [cursor=pointer]:
+              - /url: /pico/support
+              - generic [ref=e37]: "05"
+              - generic [ref=e38]: Human help
+              - generic [ref=e39]: the messy edge
+      - generic [ref=e40]:
+        - banner [ref=e41]:
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]: Chapter 04
+              - generic [ref=e46]: live control room
+            - generic [ref=e47]:
+              - button "Quick help" [ref=e48] [cursor=pointer]
+              - 'link "Go to previous chapter: Tutor" [ref=e49] [cursor=pointer]':
+                - /url: /pico/tutor
+                - text: Previous chapter
+              - 'link "Go to next chapter: Human help" [ref=e50] [cursor=pointer]':
+                - /url: /pico/support
+                - text: Next chapter
+              - button "Show recovery" [ref=e51] [cursor=pointer]
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: Autopilot bridge
+              - heading "Trust the runtime because the surface tells the truth" [level=1] [ref=e55]
+              - paragraph [ref=e56]: First inspect the latest run. Then tighten the threshold. Then decide which risky actions deserve a gate. That is how trust gets earned here.
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - paragraph [ref=e59]: Chapter note
+                - paragraph [ref=e60]: live control room
+                - paragraph [ref=e61]: This surface should reduce uncertainty immediately and point to the next irreversible action.
+              - link "Finish Install Hermes locally first" [ref=e63] [cursor=pointer]:
+                - /url: /pico/academy/install-hermes-locally
+        - main [ref=e64]:
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: Hosted session
+            - paragraph [ref=e67]: Checking whether this Pico host has an operator session attached.
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]: Surface compass
+                  - generic [ref=e73]: waiting for first run
+                - heading "Stay here only when the live runtime is the real source of truth" [level=2] [ref=e74]
+                - paragraph [ref=e75]: Autopilot is for reading the current run, spend, alerts, and approvals. If the product still needs a lesson answer, go back to academy or tutor. If the runtime truth is visible but still not enough, escalate with the evidence attached.
+              - generic [ref=e76]:
+                - paragraph [ref=e77]: Operating rule
+                - paragraph [ref=e78]: A control room should not ask for faith. If there is no live signal, leave and create one. If the signal exists, use it to decide the next move immediately.
+            - generic [ref=e79]:
+              - link "Back to lane → Finish Install Hermes locally Return here when the real blocker is still on the lesson path rather than in the runtime." [ref=e80] [cursor=pointer]:
+                - /url: /pico/academy/install-hermes-locally
+                - generic [ref=e81]:
+                  - generic [ref=e82]: Back to lane
+                  - generic [ref=e83]: →
+                - paragraph [ref=e84]: Finish Install Hermes locally
+                - paragraph [ref=e85]: Return here when the real blocker is still on the lesson path rather than in the runtime.
+              - link "Knowable → Ask tutor about the next move Use tutor when the product likely still knows the answer and the issue is not live runtime state." [ref=e86] [cursor=pointer]:
+                - /url: /pico/tutor?lesson=install-hermes-locally
+                - generic [ref=e87]:
+                  - generic [ref=e88]: Knowable
+                  - generic [ref=e89]: →
+                - paragraph [ref=e90]: Ask tutor about the next move
+                - paragraph [ref=e91]: Use tutor when the product likely still knows the answer and the issue is not live runtime state.
+              - link "Stay here → Stay on recent runs Remain here when the latest execution, trace, or alert feed is the actual decision surface." [ref=e92] [cursor=pointer]:
+                - /url: "#recent-runs"
+                - generic [ref=e93]:
+                  - generic [ref=e94]: Stay here
+                  - generic [ref=e95]: →
+                - paragraph [ref=e96]: Stay on recent runs
+                - paragraph [ref=e97]: Remain here when the latest execution, trace, or alert feed is the actual decision surface.
+              - link "Messy edge → Escalate with evidence Escalate only after you have the packet, the run context, and the live signal that proves where the truth broke." [ref=e98] [cursor=pointer]:
+                - /url: /pico/support
+                - generic [ref=e99]:
+                  - generic [ref=e100]: Messy edge
+                  - generic [ref=e101]: →
+                - paragraph [ref=e102]: Escalate with evidence
+                - paragraph [ref=e103]: Escalate only after you have the packet, the run context, and the live signal that proves where the truth broke.
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - generic [ref=e107]:
+                - generic [ref=e108]:
+                  - paragraph [ref=e109]: Operator doctrine
+                  - heading "Read, judge, then intervene" [level=2] [ref=e110]
+                - generic [ref=e111]: signal • line • gate
+              - generic [ref=e112]:
+                - article [ref=e113]:
+                  - paragraph [ref=e114]: 01 • Read
+                  - heading "Start with the strongest live signal" [level=3] [ref=e115]
+                  - paragraph [ref=e116]: No live run exists yet. The honest move is to trigger one real task before tuning anything else.
+                - article [ref=e117]:
+                  - paragraph [ref=e118]: 02 • Judge
+                  - heading "Make the decision line explicit" [level=3] [ref=e119]
+                  - paragraph [ref=e120]: No live budget snapshot yet. Do not pretend a threshold matters until it meets real spend.
+                - article [ref=e121]:
+                  - paragraph [ref=e122]: 03 • Intervene
+                  - heading "Keep risky actions reviewable" [level=3] [ref=e123]
+                  - paragraph [ref=e124]: The gate is still off. Turn it on before a risky action becomes an invisible side effect.
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - paragraph [ref=e127]: Control room posture
+                - paragraph [ref=e128]: This surface should feel like an operator review room, not a dashboard that celebrates motion for its own sake.
+              - generic [ref=e129]:
+                - paragraph [ref=e130]: Decision line
+                - paragraph [ref=e131]: Start with the last run, compare it against the budget line, then decide whether the gate needs a human call. That order matters.
+          - generic [ref=e132]:
+            - generic [ref=e133]:
+              - generic [ref=e134]:
+                - generic [ref=e135]:
+                  - paragraph [ref=e136]: Control brief
+                  - heading "Read the runtime before you trust the automation" [level=2] [ref=e137]
+                  - paragraph [ref=e138]: Autopilot only earns trust when the last run, the live spend, and the risky actions are visible in one surface. This page should feel like a control room, not a dashboard collage.
+                  - generic [ref=e139]:
+                    - generic [ref=e140]:
+                      - generic [ref=e141]: Loading live data
+                      - generic [ref=e142]: Live control-plane feed
+                      - generic [ref=e143]: Gate still off in Pico
+                    - paragraph [ref=e144]: No live run is visible yet. The next honest move is to finish the academy path, trigger one real task, and return here only once the runtime has something to say.
+                - generic [ref=e145]:
+                  - paragraph [ref=e146]: Operator rail
+                  - generic [ref=e147]:
+                    - generic [ref=e148]:
+                      - paragraph [ref=e149]: Session status
+                      - paragraph [ref=e150]: attached
+                    - generic [ref=e151]:
+                      - paragraph [ref=e152]: Progress sync
+                      - paragraph [ref=e153]: saving
+                    - generic [ref=e154]:
+                      - paragraph [ref=e155]: Budget line
+                      - paragraph [ref=e156]: 75%
+                    - generic [ref=e157]:
+                      - paragraph [ref=e158]: Gate state
+                      - paragraph [ref=e159]: "off"
+                    - generic [ref=e160]:
+                      - paragraph [ref=e161]: Active surface
+                      - paragraph [ref=e162]: autopilot
+                    - generic [ref=e163]:
+                      - paragraph [ref=e164]: Help lane
+                      - paragraph [ref=e165]: closed
+                  - generic [ref=e166]:
+                    - paragraph [ref=e167]: Jump to subsystem
+                    - generic [ref=e168]:
+                      - link "Timeline" [ref=e169] [cursor=pointer]:
+                        - /url: "#timeline-section"
+                      - link "Recent runs" [ref=e170] [cursor=pointer]:
+                        - /url: "#recent-runs"
+                      - link "Alerts" [ref=e171] [cursor=pointer]:
+                        - /url: "#alerts-section"
+                      - link "Approval queue" [ref=e172] [cursor=pointer]:
+                        - /url: "#approvals-section"
+                  - generic [ref=e173]:
+                    - paragraph [ref=e174]: If the feed is empty
+                    - paragraph [ref=e175]: Do not dress up missing runtime data. Finish the academy path, trigger one real action, and come back only when MUTX has something to report.
+                    - link "Open Install Hermes locally" [ref=e176] [cursor=pointer]:
+                      - /url: /pico/academy/install-hermes-locally
+              - generic [ref=e177]:
+                - generic [ref=e178]:
+                  - paragraph [ref=e179]: Runs
+                  - paragraph [ref=e180]: "0"
+                  - paragraph [ref=e181]: No agent is connected to MUTX yet.
+                - generic [ref=e182]:
+                  - paragraph [ref=e183]: Failures
+                  - paragraph [ref=e184]: "0"
+                  - paragraph [ref=e185]: No failed runs in the current window.
+                - generic [ref=e186]:
+                  - paragraph [ref=e187]: Alerts
+                  - paragraph [ref=e188]: "0"
+                  - paragraph [ref=e189]: No alerts yet because nothing has executed.
+                - generic [ref=e190]:
+                  - paragraph [ref=e191]: Budget
+                  - paragraph [ref=e192]: "--"
+                  - paragraph [ref=e193]: No live budget snapshot returned yet.
+                - generic [ref=e194]:
+                  - paragraph [ref=e195]: Approvals
+                  - paragraph [ref=e196]: "0"
+                  - paragraph [ref=e197]: No risky actions are blocked right now.
+            - complementary [ref=e198]:
+              - generic [ref=e199]:
+                - paragraph [ref=e200]: Control brief
+                - generic [ref=e201]:
+                  - generic [ref=e202]:
+                    - paragraph [ref=e203]: Latest run
+                    - paragraph [ref=e204]: none yet
+                  - generic [ref=e205]:
+                    - paragraph [ref=e206]: Threshold line
+                    - paragraph [ref=e207]: clear
+                  - generic [ref=e208]:
+                    - paragraph [ref=e209]: Recovery lesson
+                    - paragraph [ref=e210]: Install Hermes locally
+                    - paragraph [ref=e211]: 0/3 steps
+                    - paragraph [ref=e212]: missing
+                  - generic [ref=e213]:
+                    - paragraph [ref=e214]: Workspace proof
+                    - paragraph [ref=e215]: missing
+                    - paragraph [ref=e216]: 0/3 steps • Install Hermes
+                - generic [ref=e217]:
+                  - link "Open Install Hermes locally" [ref=e218] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+                  - link "Ask tutor about the next move" [ref=e219] [cursor=pointer]:
+                    - /url: /pico/tutor?lesson=install-hermes-locally
+                  - link "Escalate to human help" [ref=e220] [cursor=pointer]:
+                    - /url: /pico/support
+                - paragraph [ref=e222]: Stay here when the runtime is the source of truth. If the lesson workspace is still incomplete, the academy remains the cleaner route back to a real answer.
+          - generic [ref=e223]:
+            - generic [ref=e224]:
+              - generic [ref=e225]:
+                - paragraph [ref=e226]: Control protocol
+                - heading "Three operator checks before automation earns trust" [level=2] [ref=e227]
+                - paragraph [ref=e228]: The control room should stage the first decisions in plain sight. Read the last run, read the spend line, and keep risky actions exposed before you touch anything more abstract.
+              - generic [ref=e229]: live operator checklist
+            - generic [ref=e230]:
+              - article [ref=e231]:
+                - generic [ref=e232]:
+                  - generic [ref=e233]: "01"
+                  - generic [ref=e234]: Operator check
+                - heading "Start with the last run" [level=3] [ref=e235]
+                - paragraph [ref=e236]: If the latest execution does not make sense, the rest of this surface is just decoration.
+                - link "Open recent runs" [ref=e237] [cursor=pointer]:
+                  - /url: "#recent-runs"
+              - article [ref=e238]:
+                - generic [ref=e239]:
+                  - generic [ref=e240]: "02"
+                  - generic [ref=e241]: Operator check
+                - heading "Budget tells you when to stop" [level=3] [ref=e242]
+                - paragraph [ref=e243]: Thresholds are useful only when they are anchored to live spend rather than gut feel.
+                - link "Tune spend guardrail" [ref=e244] [cursor=pointer]:
+                  - /url: "#budget-section"
+              - article [ref=e245]:
+                - generic [ref=e246]:
+                  - generic [ref=e247]: "03"
+                  - generic [ref=e248]: Operator check
+                - heading "Risky actions stay visible" [level=3] [ref=e249]
+                - paragraph [ref=e250]: Approvals should survive restarts, stay reviewable, and read like real decisions.
+                - link "Open approval queue" [ref=e251] [cursor=pointer]:
+                  - /url: "#approvals-section"
+          - generic [ref=e252]:
+            - generic [ref=e253]:
+              - generic [ref=e254]:
+                - generic [ref=e255]:
+                  - generic [ref=e256]:
+                    - paragraph [ref=e257]: Signal narrative
+                    - heading "Read the live story before you touch settings" [level=2] [ref=e258]
+                    - paragraph [ref=e259]: This is the operator narrative. If the timeline is empty, the correct answer is that nothing meaningful has happened yet.
+                  - generic [ref=e260]: Loading live data
+                - generic [ref=e262]:
+                  - paragraph [ref=e263]: No monitored agent exists yet
+                  - paragraph [ref=e264]: Pico has no real MUTX agent to attach to. Create or deploy one actual agent first, then come back for run history.
+                  - link "Open Install Hermes locally" [ref=e265] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+              - generic [ref=e266]:
+                - generic [ref=e267]:
+                  - generic [ref=e268]:
+                    - paragraph [ref=e269]: Run review
+                    - heading "Recent execution review" [level=2] [ref=e270]
+                    - paragraph [ref=e271]: Start here. Read the latest run before you touch thresholds or approvals.
+                  - button "Refresh live data" [ref=e272] [cursor=pointer]
+                - generic [ref=e274]:
+                  - paragraph [ref=e275]: No monitored agent exists yet
+                  - paragraph [ref=e276]: Pico has no real MUTX agent to attach to. Create or deploy one actual agent first, then come back for run history.
+                  - link "Open Install Hermes locally" [ref=e277] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+            - complementary [ref=e278]:
+              - generic [ref=e279]:
+                - paragraph [ref=e280]: Spend review
+                - heading "Live spend and your line in the sand" [level=2] [ref=e281]
+                - generic [ref=e282]:
+                  - generic [ref=e283]:
+                    - generic [ref=e284]:
+                      - generic [ref=e285]:
+                        - paragraph [ref=e286]: Usage
+                        - paragraph [ref=e287]: "--"
+                      - generic [ref=e288]: within threshold
+                    - paragraph [ref=e289]: No live budget snapshot returned.
+                  - generic [ref=e290]:
+                    - paragraph [ref=e291]: Threshold
+                    - paragraph [ref=e292]: Pico stores the local budget line here. Real alert delivery still follows the live MUTX monitoring setup, so this surface refuses to pretend email or webhook routing is active when it is not.
+                    - generic [ref=e293]:
+                      - generic [ref=e294]: Cost threshold percent
+                      - spinbutton "Cost threshold percent" [ref=e295]: "75"
+                    - generic [ref=e296]:
+                      - button "Save threshold" [ref=e297] [cursor=pointer]
+                      - generic [ref=e298]: sync saving
+                  - generic [ref=e299]:
+                    - generic [ref=e300]:
+                      - paragraph [ref=e301]: Top spenders
+                      - generic [ref=e303]:
+                        - paragraph [ref=e304]: No live budget snapshot yet
+                        - paragraph [ref=e305]: There is no MUTX budget snapshot to compare against yet. Until that exists, cost awareness is incomplete.
+                        - link "Set up budget visibility" [ref=e306] [cursor=pointer]:
+                          - /url: /pico/academy/install-hermes-locally
+                    - generic [ref=e307]:
+                      - paragraph [ref=e308]: Usage drivers
+                      - generic [ref=e310]:
+                        - paragraph [ref=e311]: No live budget snapshot yet
+                        - paragraph [ref=e312]: There is no MUTX budget snapshot to compare against yet. Until that exists, cost awareness is incomplete.
+                        - link "Set up budget visibility" [ref=e313] [cursor=pointer]:
+                          - /url: /pico/academy/install-hermes-locally
+              - generic [ref=e314]:
+                - paragraph [ref=e315]: Alerts
+                - heading "Meaningful monitoring events" [level=2] [ref=e316]
+                - paragraph [ref=e317]: This is the live alert feed. No fake warning badges, no synthetic incidents.
+                - generic [ref=e319]:
+                  - paragraph [ref=e320]: No alerts because nothing is running yet
+                  - paragraph [ref=e321]: An empty alert feed means nothing until the agent has executed real work. Get one run into MUTX first.
+                  - link "Get the first run live" [ref=e322] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+          - generic [ref=e323]:
+            - generic [ref=e324]:
+              - paragraph [ref=e325]: Approvals
+              - heading "Risky actions and their decisions" [level=2] [ref=e326]
+              - paragraph [ref=e327]: This queue is now the approval source of truth for Pico. It should not disappear because a process restarted.
+              - generic [ref=e329]:
+                - paragraph [ref=e330]: No agent exists to gate yet
+                - paragraph [ref=e331]: Approval queues only matter when a real agent is capable of doing something risky. Create or deploy the agent first.
+                - link "Configure approval gate" [ref=e332] [cursor=pointer]:
+                  - /url: /pico/academy/add-an-approval-gate
+            - complementary [ref=e333]:
+              - generic [ref=e334]:
+                - generic [ref=e335]:
+                  - generic [ref=e336]:
+                    - paragraph [ref=e337]: Create a gated action
+                    - paragraph [ref=e338]: Exercise the live approval queue here instead of waiting for another surface to create the request first.
+                  - generic [ref=e339]: live queue write
+                - generic [ref=e340]:
+                  - generic [ref=e341]:
+                    - generic [ref=e342]:
+                      - generic [ref=e343]: Agent ID
+                      - textbox "Agent ID" [ref=e344]:
+                        - /placeholder: agent-founder-lab
+                        - text: agent-founder-lab
+                    - generic [ref=e345]:
+                      - generic [ref=e346]: Session or run ID
+                      - textbox "Session or run ID" [ref=e347]:
+                        - /placeholder: ses-pico-approval
+                        - text: ses-pico-approval
+                  - generic [ref=e348]:
+                    - generic [ref=e349]: Action type
+                    - textbox "Action type" [ref=e350]:
+                      - /placeholder: OUTBOUND_SEND
+                      - text: OUTBOUND_SEND
+                  - generic [ref=e351]:
+                    - generic [ref=e352]: Why this action needs a gate
+                    - textbox "Why this action needs a gate" [ref=e353]:
+                      - /placeholder: Describe the risky action clearly.
+                      - text: Outbound send requires a human decision before the runtime crosses the line.
+                  - generic [ref=e354]:
+                    - button "Create approval request" [ref=e355] [cursor=pointer]
+                    - button "Reset draft" [ref=e356] [cursor=pointer]
+              - generic [ref=e357]:
+                - paragraph [ref=e358]: Gate status
+                - generic [ref=e359]:
+                  - generic [ref=e360]:
+                    - paragraph [ref=e361]: Pending actions
+                    - paragraph [ref=e362]: "0"
+                  - generic [ref=e363]:
+                    - paragraph [ref=e364]: Decision history
+                    - paragraph [ref=e365]: "0"
+                  - generic [ref=e366]:
+                    - paragraph [ref=e367]: Configured locally
+                    - paragraph [ref=e368]: "no"
+    - contentinfo [ref=e369]:
+      - generic [ref=e370]:
+        - generic [ref=e371]:
+          - link "PicoMUTX logo PicoMUTX" [ref=e372] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e374]
+            - text: PicoMUTX
+          - link "Releases" [ref=e375] [cursor=pointer]:
+            - /url: https://mutx.dev/releases
+          - link "Docs" [ref=e376] [cursor=pointer]:
+            - /url: https://docs.mutx.dev
+          - link "GitHub" [ref=e377] [cursor=pointer]:
+            - /url: https://github.com/mutx-dev/mutx-dev
+          - link "Download" [ref=e378] [cursor=pointer]:
+            - /url: https://mutx.dev/download
+          - link "Privacy" [ref=e379] [cursor=pointer]:
+            - /url: https://mutx.dev/privacy-policy
+        - paragraph [ref=e380]: © 2026 MUTX. PicoMUTX is a learning and operations platform for AI agent builders.
+  - alert [ref=e381]

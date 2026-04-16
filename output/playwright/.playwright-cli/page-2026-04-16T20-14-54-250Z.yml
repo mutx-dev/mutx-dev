@@ -1,0 +1,285 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - complementary [ref=e6]:
+        - generic [ref=e7]:
+          - link "PicoMUTX logo PicoMUTX operator atlas" [ref=e9] [cursor=pointer]:
+            - /url: /pico/onboarding
+            - img "PicoMUTX logo" [ref=e11]
+            - generic [ref=e12]:
+              - generic [ref=e13]: PicoMUTX
+              - generic [ref=e14]: operator atlas
+          - generic [ref=e15]:
+            - paragraph [ref=e16]: Current chapter
+            - paragraph [ref=e17]: Human help
+            - paragraph [ref=e18]: the messy edge
+          - navigation [ref=e19]:
+            - link "01 Start first visible win" [ref=e20] [cursor=pointer]:
+              - /url: /pico/onboarding
+              - generic [ref=e21]: "01"
+              - generic [ref=e22]: Start
+              - generic [ref=e23]: first visible win
+            - link "02 Lessons the working path" [ref=e24] [cursor=pointer]:
+              - /url: /pico/academy
+              - generic [ref=e25]: "02"
+              - generic [ref=e26]: Lessons
+              - generic [ref=e27]: the working path
+            - link "03 Tutor one grounded answer" [ref=e28] [cursor=pointer]:
+              - /url: /pico/tutor
+              - generic [ref=e29]: "03"
+              - generic [ref=e30]: Tutor
+              - generic [ref=e31]: one grounded answer
+            - link "04 Autopilot live control room" [ref=e32] [cursor=pointer]:
+              - /url: /pico/autopilot
+              - generic [ref=e33]: "04"
+              - generic [ref=e34]: Autopilot
+              - generic [ref=e35]: live control room
+            - link "05 Human help the messy edge" [ref=e36] [cursor=pointer]:
+              - /url: /pico/support
+              - generic [ref=e37]: "05"
+              - generic [ref=e38]: Human help
+              - generic [ref=e39]: the messy edge
+      - generic [ref=e40]:
+        - banner [ref=e41]:
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]: Chapter 05
+              - generic [ref=e46]: the messy edge
+            - generic [ref=e47]:
+              - button "Quick help" [ref=e48] [cursor=pointer]
+              - 'link "Go to previous chapter: Autopilot" [ref=e49] [cursor=pointer]':
+                - /url: /pico/autopilot
+                - text: Previous chapter
+              - button "Show recovery" [ref=e50] [cursor=pointer]
+          - generic [ref=e51]:
+            - generic [ref=e52]:
+              - generic [ref=e53]: Human help
+              - heading "Get a human when the product path stops being enough" [level=1] [ref=e54]
+              - paragraph [ref=e55]: This route should triage the messy edge fast. Keep the escalation clean, attach the runtime truth, and send the operator back into motion.
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - paragraph [ref=e58]: Chapter note
+                - paragraph [ref=e59]: the messy edge
+                - paragraph [ref=e60]: This surface should reduce uncertainty immediately and point to the next irreversible action.
+              - generic [ref=e62]:
+                - button "Get human help" [ref=e63] [cursor=pointer]
+                - button "Request office hours" [ref=e64] [cursor=pointer]
+        - main [ref=e65]:
+          - generic [ref=e66]:
+            - paragraph [ref=e67]: Hosted session
+            - paragraph [ref=e68]: Checking whether this Pico host has an operator session attached.
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - generic [ref=e71]:
+                - generic [ref=e72]:
+                  - generic [ref=e73]: Surface compass
+                  - generic [ref=e74]: human help standby
+                - heading "Support only exists to return the operator to the product" [level=2] [ref=e75]
+                - paragraph [ref=e76]: Escalate cleanly, attach the packet, then go back to the surface that can move the work again. Academy is for sequence problems, tutor is for one knowable next step, and Autopilot is for live runtime truth.
+              - generic [ref=e77]:
+                - paragraph [ref=e78]: Operating rule
+                - paragraph [ref=e79]: Human help should resolve the messy edge, not replace the product. The best support interaction ends with a clearer route back into Pico.
+            - generic [ref=e80]:
+              - link "Sequence → Resume Install Hermes locally Go back here when the blocker was still fundamentally a lesson sequence problem." [ref=e81] [cursor=pointer]:
+                - /url: /pico/academy/install-hermes-locally
+                - generic [ref=e82]:
+                  - generic [ref=e83]: Sequence
+                  - generic [ref=e84]: →
+                - paragraph [ref=e85]: Resume Install Hermes locally
+                - paragraph [ref=e86]: Go back here when the blocker was still fundamentally a lesson sequence problem.
+              - link "Knowable → Ask tutor first Use this when the product probably still knows the answer but you need the exact next move." [ref=e87] [cursor=pointer]:
+                - /url: /pico/tutor
+                - generic [ref=e88]:
+                  - generic [ref=e89]: Knowable
+                  - generic [ref=e90]: →
+                - paragraph [ref=e91]: Ask tutor first
+                - paragraph [ref=e92]: Use this when the product probably still knows the answer but you need the exact next move.
+              - link "Runtime → Re-enter Autopilot Open the control room when the blocker depends on live runs, budget, alerts, or approvals." [ref=e93] [cursor=pointer]:
+                - /url: /pico/autopilot
+                - generic [ref=e94]:
+                  - generic [ref=e95]: Runtime
+                  - generic [ref=e96]: →
+                - paragraph [ref=e97]: Re-enter Autopilot
+                - paragraph [ref=e98]: Open the control room when the blocker depends on live runs, budget, alerts, or approvals.
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - generic [ref=e103]:
+                  - paragraph [ref=e104]: Escalation standards
+                  - heading "Hand off the problem like a sharp operator" [level=2] [ref=e105]
+                - generic [ref=e106]: route • evidence • return
+              - generic [ref=e107]:
+                - article [ref=e108]:
+                  - paragraph [ref=e109]: 01 • Route
+                  - heading "Name the exact surface that broke" [level=3] [ref=e110]
+                  - paragraph [ref=e111]: Say whether the failure belongs to a lesson, Tutor, Autopilot, approvals, or hosted account state.
+                - article [ref=e112]:
+                  - paragraph [ref=e113]: 02 • Evidence
+                  - heading "Attach the failure, not the feeling" [level=3] [ref=e114]
+                  - paragraph [ref=e115]: Paste the command, error, packet, or approval state that proves where the route stopped.
+                - article [ref=e116]:
+                  - paragraph [ref=e117]: 03 • Return
+                  - heading "Ask for the route back in" [level=3] [ref=e118]
+                  - paragraph [ref=e119]: Great support returns you to the product with one clearer move than before.
+            - generic [ref=e120]:
+              - generic [ref=e121]:
+                - paragraph [ref=e122]: Packet posture
+                - paragraph [ref=e123]: Premium support starts with a clean packet. The best escalation reads like an operator handoff, not a panic dump.
+              - generic [ref=e124]:
+                - paragraph [ref=e125]: Best first move
+                - paragraph [ref=e126]: Copy the packet, choose the right lane, and ask for the shortest route back into Academy, Tutor, or Autopilot.
+          - generic [ref=e127]:
+            - generic [ref=e129]:
+              - generic [ref=e130]:
+                - paragraph [ref=e131]: Support desk
+                - heading "Send context, not noise" [level=2] [ref=e132]
+                - paragraph [ref=e133]: Human help is for the part the product cannot truthfully close on its own. The faster you frame the blocker, the faster support can send you back to the product path.
+                - generic [ref=e134]:
+                  - paragraph [ref=e135]: If the next move is still obvious, go back and do it.
+                  - paragraph [ref=e136]: Support exists for the messy edge, not for skipping the lesson, the tutor, or the live control surface.
+                - generic [ref=e137]:
+                  - article [ref=e138]:
+                    - generic [ref=e139]:
+                      - heading "Runtime or lesson blocker" [level=3] [ref=e140]
+                      - paragraph [ref=e141]: Use this when the product path stopped on a real command, lesson, or hosted state mismatch.
+                    - button "Start escalation" [ref=e142] [cursor=pointer]
+                  - article [ref=e143]:
+                    - generic [ref=e144]:
+                      - heading "Office hours or deeper walkthrough" [level=3] [ref=e145]
+                      - paragraph [ref=e146]: Use this when the problem is bigger than one blocker and you need a guided operator session.
+                    - button "Book office hours" [ref=e147] [cursor=pointer]
+              - generic [ref=e148]:
+                - paragraph [ref=e149]: Operator rail
+                - generic [ref=e150]:
+                  - generic [ref=e151]:
+                    - paragraph [ref=e152]: Support requests
+                    - paragraph [ref=e153]: "0"
+                  - generic [ref=e154]:
+                    - paragraph [ref=e155]: Tutor questions
+                    - paragraph [ref=e156]: "0"
+                  - generic [ref=e157]:
+                    - paragraph [ref=e158]: Plan
+                    - paragraph [ref=e159]: sign in
+                  - generic [ref=e160]:
+                    - paragraph [ref=e161]: Active surface
+                    - paragraph [ref=e162]: support
+                - generic [ref=e163]:
+                  - paragraph [ref=e164]: Try these first
+                  - generic [ref=e165]:
+                    - link "Try tutor first" [ref=e166] [cursor=pointer]:
+                      - /url: /pico/tutor
+                    - link "Open Install Hermes locally" [ref=e167] [cursor=pointer]:
+                      - /url: /pico/academy/install-hermes-locally
+                    - link "Open Autopilot" [ref=e168] [cursor=pointer]:
+                      - /url: /pico/autopilot
+                - generic [ref=e169]:
+                  - paragraph [ref=e170]: Direct line
+                  - link "hello@mutx.dev" [ref=e171] [cursor=pointer]:
+                    - /url: mailto:hello@mutx.dev
+            - complementary [ref=e172]:
+              - generic [ref=e173]:
+                - generic [ref=e174]:
+                  - generic [ref=e175]:
+                    - paragraph [ref=e176]: Diagnostic packet
+                    - heading "Operator packet" [level=2] [ref=e177]
+                  - generic [ref=e178]: live context
+                - code [ref=e181]: "Pico diagnostic packet Route: /pico/support Hosted session: loading Hosted plan: n/a Selected track: none Completed lessons: 0 Next lesson: Install Hermes locally Recovery lesson workspace: 0/3 Recovery lesson focused step: Install Hermes Recovery lesson proof: missing Active surface: support Last opened lesson: none Rail collapsed: no Help lane open: no Support requests sent: 0 Tutor questions asked: 0 Approval gate enabled: no Hosted onboarding status: not available Hosted onboarding step: not available Hosted workspace: not available Runtime status: not available Gateway URL: not available Runtime bindings: 0"
+                - generic [ref=e182]:
+                  - button "Copy packet" [ref=e183] [cursor=pointer]
+                  - button "Open form with packet" [ref=e184] [cursor=pointer]
+              - generic [ref=e185]:
+                - paragraph [ref=e186]: Live operator state
+                - generic [ref=e187]:
+                  - generic [ref=e188]:
+                    - paragraph [ref=e189]: Hosted onboarding
+                    - paragraph [ref=e190]: not attached
+                  - generic [ref=e191]:
+                    - paragraph [ref=e192]: Runtime status
+                    - paragraph [ref=e193]: not attached
+                  - generic [ref=e194]:
+                    - paragraph [ref=e195]: Current track
+                    - paragraph [ref=e196]: not chosen yet
+                  - generic [ref=e197]:
+                    - paragraph [ref=e198]: Next lesson
+                    - paragraph [ref=e199]: Install Hermes locally
+                  - generic [ref=e200]:
+                    - paragraph [ref=e201]: Lesson workspace
+                    - paragraph [ref=e202]: 0/3
+                  - generic [ref=e203]:
+                    - paragraph [ref=e204]: Focused step
+                    - paragraph [ref=e205]: Install Hermes
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - generic [ref=e208]:
+                - paragraph [ref=e209]: Return map
+                - heading "Human help should end in one cleaner route back into Pico" [level=2] [ref=e210]
+              - generic [ref=e211]: operator return map
+            - generic [ref=e212]:
+              - generic [ref=e213]:
+                - article [ref=e214]:
+                  - paragraph [ref=e215]: Support return model
+                  - generic [ref=e216]:
+                    - generic [ref=e217]:
+                      - paragraph [ref=e218]: 1. Route the blocker fast
+                      - paragraph [ref=e219]: Do not send a life story. Lead with the exact surface that broke.
+                    - generic [ref=e220]:
+                      - paragraph [ref=e221]: 2. Attach the evidence
+                      - paragraph [ref=e222]: Send the command, runtime fact, or approval state that proves what failed.
+                    - generic [ref=e223]:
+                      - paragraph [ref=e224]: 3. Return to the product
+                      - paragraph [ref=e225]: The response should restore momentum, not create a support maze.
+                - article [ref=e226]:
+                  - generic [ref=e227]:
+                    - paragraph [ref=e228]: Packet anatomy
+                    - paragraph [ref=e229]: "A premium escalation packet always reads in the same order: route, evidence, return lane."
+                  - generic [ref=e230]:
+                    - generic [ref=e231]:
+                      - paragraph [ref=e232]: Route first
+                      - paragraph [ref=e233]: Name the exact surface that broke.
+                    - generic [ref=e234]:
+                      - paragraph [ref=e235]: Evidence second
+                      - paragraph [ref=e236]: Attach the signal that proves the failure.
+                    - generic [ref=e237]:
+                      - paragraph [ref=e238]: Return third
+                      - paragraph [ref=e239]: Ask for the cleanest way back into motion.
+              - generic [ref=e240]:
+                - article [ref=e241]:
+                  - generic [ref=e242]:
+                    - paragraph [ref=e243]: Lesson path
+                    - heading "Resume the academy lane" [level=3] [ref=e244]
+                    - paragraph [ref=e245]: Use this when the blocker was still fundamentally a lesson or setup sequence problem.
+                  - link "Open Install Hermes locally" [ref=e246] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+                - article [ref=e247]:
+                  - generic [ref=e248]:
+                    - paragraph [ref=e249]: Grounded answer
+                    - heading "Ask tutor if the next move is still knowable" [level=3] [ref=e250]
+                    - paragraph [ref=e251]: Go back here when the product likely still knows the answer but you need the exact next step.
+                  - link "Open tutor" [ref=e252] [cursor=pointer]:
+                    - /url: /pico/tutor
+                - article [ref=e253]:
+                  - generic [ref=e254]:
+                    - paragraph [ref=e255]: Runtime truth
+                    - heading "Re-enter the control room" [level=3] [ref=e256]
+                    - paragraph [ref=e257]: Use Autopilot when the blocker depends on live runs, budget, approvals, or alert state.
+                  - link "Open Autopilot" [ref=e258] [cursor=pointer]:
+                    - /url: /pico/autopilot
+    - contentinfo [ref=e259]:
+      - generic [ref=e260]:
+        - generic [ref=e261]:
+          - link "PicoMUTX logo PicoMUTX" [ref=e262] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e264]
+            - text: PicoMUTX
+          - link "Releases" [ref=e265] [cursor=pointer]:
+            - /url: https://mutx.dev/releases
+          - link "Docs" [ref=e266] [cursor=pointer]:
+            - /url: https://docs.mutx.dev
+          - link "GitHub" [ref=e267] [cursor=pointer]:
+            - /url: https://github.com/mutx-dev/mutx-dev
+          - link "Download" [ref=e268] [cursor=pointer]:
+            - /url: https://mutx.dev/download
+          - link "Privacy" [ref=e269] [cursor=pointer]:
+            - /url: https://mutx.dev/privacy-policy
+        - paragraph [ref=e270]: © 2026 MUTX. PicoMUTX is a learning and operations platform for AI agent builders.
+  - alert [ref=e271]

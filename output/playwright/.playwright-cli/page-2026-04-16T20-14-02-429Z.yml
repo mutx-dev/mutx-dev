@@ -1,0 +1,288 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e307]:
+    - generic [ref=e309]:
+      - complementary [ref=e310]:
+        - generic [ref=e311]:
+          - link "PicoMUTX logo PicoMUTX operator atlas" [ref=e313] [cursor=pointer]:
+            - /url: /pico/onboarding
+            - img "PicoMUTX logo" [ref=e315]
+            - generic [ref=e316]:
+              - generic [ref=e317]: PicoMUTX
+              - generic [ref=e318]: operator atlas
+          - generic [ref=e319]:
+            - paragraph [ref=e320]: Current chapter
+            - paragraph [ref=e321]: Tutor
+            - paragraph [ref=e322]: one grounded answer
+          - navigation [ref=e323]:
+            - link "01 Start first visible win" [ref=e324] [cursor=pointer]:
+              - /url: /pico/onboarding
+              - generic [ref=e325]: "01"
+              - generic [ref=e326]: Start
+              - generic [ref=e327]: first visible win
+            - link "02 Lessons the working path" [ref=e328] [cursor=pointer]:
+              - /url: /pico/academy
+              - generic [ref=e329]: "02"
+              - generic [ref=e330]: Lessons
+              - generic [ref=e331]: the working path
+            - link "03 Tutor one grounded answer" [ref=e332] [cursor=pointer]:
+              - /url: /pico/tutor
+              - generic [ref=e333]: "03"
+              - generic [ref=e334]: Tutor
+              - generic [ref=e335]: one grounded answer
+            - link "04 Autopilot live control room" [ref=e336] [cursor=pointer]:
+              - /url: /pico/autopilot
+              - generic [ref=e337]: "04"
+              - generic [ref=e338]: Autopilot
+              - generic [ref=e339]: live control room
+            - link "05 Human help the messy edge" [ref=e340] [cursor=pointer]:
+              - /url: /pico/support
+              - generic [ref=e341]: "05"
+              - generic [ref=e342]: Human help
+              - generic [ref=e343]: the messy edge
+      - generic [ref=e344]:
+        - banner [ref=e345]:
+          - generic [ref=e347]:
+            - generic [ref=e348]:
+              - generic [ref=e349]: Chapter 03
+              - generic [ref=e350]: one grounded answer
+            - generic [ref=e351]:
+              - button "Quick help" [ref=e352] [cursor=pointer]
+              - 'link "Go to previous chapter: Lessons" [ref=e353] [cursor=pointer]':
+                - /url: /pico/academy
+                - text: Previous chapter
+              - 'link "Go to next chapter: Autopilot" [ref=e354] [cursor=pointer]':
+                - /url: /pico/autopilot
+                - text: Next chapter
+              - button "Show recovery" [ref=e355] [cursor=pointer]
+          - generic [ref=e356]:
+            - generic [ref=e357]:
+              - generic [ref=e358]: Grounded tutor
+              - heading "Ask for the exact next step" [level=1] [ref=e359]
+              - paragraph [ref=e360]: Treat this like an operator desk, not a chat toy. One concrete blocker in, one grounded move out, then back to the lesson.
+            - generic [ref=e361]:
+              - generic [ref=e362]:
+                - paragraph [ref=e363]: Chapter note
+                - paragraph [ref=e364]: one grounded answer
+                - paragraph [ref=e365]: This surface should reduce uncertainty immediately and point to the next irreversible action.
+              - generic [ref=e367]:
+                - link "Open academy" [ref=e368] [cursor=pointer]:
+                  - /url: /pico/academy
+                - link "Escalate to human help" [ref=e369] [cursor=pointer]:
+                  - /url: /pico/support
+        - main [ref=e370]:
+          - generic [ref=e372]:
+            - generic [ref=e373]:
+              - generic [ref=e374]:
+                - generic [ref=e375]: hosted session required
+                - generic [ref=e376]: pico host auth
+              - paragraph [ref=e377]: The Pico platform routes are live here, but the hosted session is not attached yet on this domain. Sign in on Pico to persist progress, read live runs, and use the backend onboarding/runtime state. Google, GitHub, Discord, Apple, password signup, and email confirmation all terminate on this host now.
+              - generic [ref=e378]:
+                - generic [ref=e379]:
+                  - paragraph [ref=e380]: Progress
+                  - paragraph [ref=e381]: won’t persist
+                - generic [ref=e382]:
+                  - paragraph [ref=e383]: Runtime truth
+                  - paragraph [ref=e384]: limited
+                - generic [ref=e385]:
+                  - paragraph [ref=e386]: Approvals
+                  - paragraph [ref=e387]: read-only feeling
+            - generic [ref=e388]:
+              - paragraph [ref=e389]: Without session
+              - generic [ref=e390]:
+                - generic [ref=e391]:
+                  - generic [ref=e392]: Progress sync
+                  - generic [ref=e393]: local only
+                - generic [ref=e394]:
+                  - generic [ref=e395]: Runtime truth
+                  - generic [ref=e396]: not trustworthy yet
+                - generic [ref=e397]:
+                  - generic [ref=e398]: Approvals + webhooks
+                  - generic [ref=e399]: blocked
+              - paragraph [ref=e400]: Attach the Pico account on this host before you trust progress, live runtime state, or approval behavior.
+              - generic [ref=e401]:
+                - link "Sign in" [ref=e402] [cursor=pointer]:
+                  - /url: /login?next=%2Fpico%2Ftutor
+                - link "Create account" [ref=e403] [cursor=pointer]:
+                  - /url: /register?next=%2Fpico%2Ftutor
+              - generic [ref=e404]:
+                - link "Continue with Google" [ref=e405] [cursor=pointer]:
+                  - /url: /api/auth/oauth/google/start?intent=login&next=%2Fpico%2Ftutor
+                - link "Continue with GitHub" [ref=e406] [cursor=pointer]:
+                  - /url: /api/auth/oauth/github/start?intent=login&next=%2Fpico%2Ftutor
+                - link "Continue with Discord" [ref=e407] [cursor=pointer]:
+                  - /url: /api/auth/oauth/discord/start?intent=login&next=%2Fpico%2Ftutor
+                - link "Continue with Apple" [ref=e408] [cursor=pointer]:
+                  - /url: /api/auth/oauth/apple/start?intent=login&next=%2Fpico%2Ftutor
+          - generic [ref=e409]:
+            - generic [ref=e410]:
+              - generic [ref=e411]:
+                - generic [ref=e412]:
+                  - generic [ref=e413]: Surface compass
+                  - generic [ref=e414]: awaiting blocker
+                - heading "The tutor should end in motion, not another loop" [level=2] [ref=e415]
+                - paragraph [ref=e416]: Use tutor only to recover one grounded next move. Return to the lesson when the answer is sufficient, inspect Autopilot when the runtime is the real blocker, and escalate only when neither route can tell the truth.
+              - generic [ref=e417]:
+                - paragraph [ref=e418]: Operating rule
+                - paragraph [ref=e419]: A good tutor answer collapses uncertainty into one move. If the answer does not create motion, this page should push the operator out of the loop immediately.
+            - generic [ref=e420]:
+              - link "Resume lane → Open Install Hermes locally Go back here when the tutor answer still keeps the lesson path truthful." [ref=e421] [cursor=pointer]:
+                - /url: /pico/academy/install-hermes-locally
+                - generic [ref=e422]:
+                  - generic [ref=e423]: Resume lane
+                  - generic [ref=e424]: →
+                - paragraph [ref=e425]: Open Install Hermes locally
+                - paragraph [ref=e426]: Go back here when the tutor answer still keeps the lesson path truthful.
+              - link "Runtime → Inspect live control room Open this when the problem has shifted from knowable lesson logic to runtime state." [ref=e427] [cursor=pointer]:
+                - /url: /pico/autopilot
+                - generic [ref=e428]:
+                  - generic [ref=e429]: Runtime
+                  - generic [ref=e430]: →
+                - paragraph [ref=e431]: Inspect live control room
+                - paragraph [ref=e432]: Open this when the problem has shifted from knowable lesson logic to runtime state.
+              - link "Escalate → Open support lane Escalate only when the tutor answer still does not give one concrete move." [ref=e433] [cursor=pointer]:
+                - /url: /pico/support
+                - generic [ref=e434]:
+                  - generic [ref=e435]: Escalate
+                  - generic [ref=e436]: →
+                - paragraph [ref=e437]: Open support lane
+                - paragraph [ref=e438]: Escalate only when the tutor answer still does not give one concrete move.
+          - generic [ref=e440]:
+            - generic [ref=e441]:
+              - generic [ref=e442]:
+                - generic [ref=e443]:
+                  - paragraph [ref=e444]: Crit desk method
+                  - heading "Treat each question like a studio critique" [level=2] [ref=e445]
+                - generic [ref=e446]: frame • evidence • exit
+              - generic [ref=e447]:
+                - article [ref=e448]:
+                  - paragraph [ref=e449]: 01 • Frame
+                  - heading "Bring one blocked step" [level=3] [ref=e450]
+                  - paragraph [ref=e451]: Name the exact step, command, or approval state that broke. Broad anxiety is not enough.
+                - article [ref=e452]:
+                  - paragraph [ref=e453]: 02 • Evidence
+                  - heading "Bring what actually happened" [level=3] [ref=e454]
+                  - paragraph [ref=e455]: Paste the command, transcript, error, or runtime signal. This desk reviews evidence, not vibes.
+                - article [ref=e456]:
+                  - paragraph [ref=e457]: 03 • Exit
+                  - heading "Leave with one move" [level=3] [ref=e458]
+                  - paragraph [ref=e459]: A good tutor answer gives one next action, one verification line, and a clean handoff if the evidence stays thin.
+            - generic [ref=e460]:
+              - generic [ref=e461]:
+                - paragraph [ref=e462]: Desk posture
+                - paragraph [ref=e463]: The premium version of this page is not a friendly chatbot. It is a sharp review desk that narrows ambiguity into one next move.
+              - generic [ref=e464]:
+                - paragraph [ref=e465]: Attached lane
+                - paragraph [ref=e466]: No lesson is attached yet. Connect the blocked lesson if you want the tutor to stay grounded in the actual route.
+          - generic [ref=e467]:
+            - generic [ref=e469]:
+              - generic [ref=e470]:
+                - paragraph [ref=e471]: Crit desk
+                - generic [ref=e472]:
+                  - img "PicoMUTX tutor mascot" [ref=e473]
+                  - heading "Bring one blocker to the desk" [level=2] [ref=e474]
+                - paragraph [ref=e475]: Ask only when the lesson path is blocked. The answer should send you back into action, not into another loop of reading.
+                - paragraph [ref=e476]: Read-only tutor mode. Hosted session context is missing until you sign in.
+                - generic [ref=e477]:
+                  - generic [ref=e478]:
+                    - generic [ref=e479]:
+                      - paragraph [ref=e480]: Crit packet
+                      - paragraph [ref=e481]: "Bring just enough context for a sharp answer: route, failure, and exact expectation."
+                    - generic [ref=e482]: route • failure • expectation
+                  - generic [ref=e483]:
+                    - generic [ref=e484]:
+                      - paragraph: Current track
+                      - paragraph: not chosen yet
+                    - generic [ref=e485]:
+                      - paragraph: Next lesson
+                      - paragraph: Install Hermes locally
+                    - generic [ref=e486]:
+                      - paragraph: Hosted onboarding step
+                      - paragraph: session required
+                    - generic [ref=e487]:
+                      - paragraph: Runtime status
+                      - paragraph: not synced
+                  - generic [ref=e488]:
+                    - generic [ref=e490]:
+                      - generic [ref=e491]: "01"
+                      - paragraph [ref=e492]: Say what step you were on.
+                    - generic [ref=e494]:
+                      - generic [ref=e495]: "02"
+                      - paragraph [ref=e496]: Say what you expected to happen.
+                    - generic [ref=e498]:
+                      - generic [ref=e499]: "03"
+                      - paragraph [ref=e500]: Say what happened instead.
+                - textbox "Describe the blocker, the exact step, and what you expected to happen." [ref=e501]
+                - generic [ref=e502]:
+                  - generic [ref=e503]:
+                    - text: Blocked lesson
+                    - combobox "Blocked lesson" [ref=e504]:
+                      - option "No lesson selected" [selected]
+                      - option "Install Hermes locally"
+                      - option "Run your first agent"
+                      - option "Deploy Hermes on a VPS"
+                      - option "Keep your agent alive between sessions"
+                      - option "Connect a messaging layer"
+                      - option "Add your first skill/tool"
+                      - option "Create a scheduled workflow"
+                      - option "See your agent activity"
+                      - option "Set a cost threshold"
+                      - option "Add an approval gate"
+                      - option "Build a lead-response agent"
+                      - option "Build a document-processing agent"
+                  - button "Get next step" [ref=e505] [cursor=pointer]
+                - generic [ref=e506]:
+                  - button "Hermes launches locally but dies on the VPS. What should I check first?" [ref=e507] [cursor=pointer]
+                  - button "How do I keep the agent alive after I close SSH?" [ref=e508] [cursor=pointer]
+                  - button "I want approval before any outbound send. Which lesson do I follow?" [ref=e509] [cursor=pointer]
+              - generic [ref=e510]:
+                - paragraph [ref=e511]: Operator rail
+                - generic [ref=e512]:
+                  - generic [ref=e513]:
+                    - paragraph [ref=e514]: Questions asked
+                    - paragraph [ref=e515]: "0"
+                  - generic [ref=e516]:
+                    - paragraph [ref=e517]: Live answer state
+                    - paragraph [ref=e518]: waiting
+                - generic [ref=e520]:
+                  - paragraph [ref=e521]: OpenAI connection
+                  - paragraph [ref=e523]: Sign in to attach your own OpenAI key. Tutor still works in read-only mode without a personal connection.
+                - generic [ref=e524]:
+                  - paragraph [ref=e525]: Escalation rule
+                  - paragraph [ref=e526]: If the answer still does not give you one concrete move, stop looping and open support with the lesson context attached.
+                  - link "Open support lane" [ref=e527] [cursor=pointer]:
+                    - /url: /pico/support
+            - complementary [ref=e528]:
+              - generic [ref=e529]:
+                - paragraph [ref=e530]: Studio critique
+                - generic [ref=e531]:
+                  - paragraph [ref=e532]: Ask one blocker, not a whole story. Pico Tutor will ground the answer in lessons, the curated operator pack, and official docs when the question is version-sensitive.
+                  - paragraph [ref=e533]: "How this works: state the failing step, the expected result, and the exact failure. The answer should give you a concrete move, one verification step, and a clean escalation path if the evidence is still thin."
+              - generic [ref=e534]:
+                - paragraph [ref=e535]: Exit route
+                - generic [ref=e536]:
+                  - link "Open Install Hermes locally" [ref=e537] [cursor=pointer]:
+                    - /url: /pico/academy/install-hermes-locally
+                  - link "Open Autopilot" [ref=e538] [cursor=pointer]:
+                    - /url: /pico/autopilot
+                  - link "Open support lane" [ref=e539] [cursor=pointer]:
+                    - /url: /pico/support
+                - paragraph [ref=e541]: The tutor should end in motion. Return to the lesson if the path is still clear, open Autopilot if the runtime is now the bottleneck, and escalate only when the product path stopped being truthful.
+    - contentinfo [ref=e542]:
+      - generic [ref=e543]:
+        - generic [ref=e544]:
+          - link "PicoMUTX logo PicoMUTX" [ref=e545] [cursor=pointer]:
+            - /url: /pico
+            - img "PicoMUTX logo" [ref=e547]
+            - text: PicoMUTX
+          - link "Releases" [ref=e548] [cursor=pointer]:
+            - /url: https://mutx.dev/releases
+          - link "Docs" [ref=e549] [cursor=pointer]:
+            - /url: https://docs.mutx.dev
+          - link "GitHub" [ref=e550] [cursor=pointer]:
+            - /url: https://github.com/mutx-dev/mutx-dev
+          - link "Download" [ref=e551] [cursor=pointer]:
+            - /url: https://mutx.dev/download
+          - link "Privacy" [ref=e552] [cursor=pointer]:
+            - /url: https://mutx.dev/privacy-policy
+        - paragraph [ref=e553]: © 2026 MUTX. PicoMUTX is a learning and operations platform for AI agent builders.
+  - alert [ref=e306]: Tutor — PicoMUTX

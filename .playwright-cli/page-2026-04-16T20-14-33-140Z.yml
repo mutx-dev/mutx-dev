@@ -1,0 +1,53 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e46]:
+    - banner [ref=e47]:
+      - link "PicoMUTX" [ref=e49] [cursor=pointer]:
+        - /url: /
+    - main [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - paragraph [ref=e53]: Pico preview access
+          - heading "Create your Pico preview account" [level=1] [ref=e54]
+          - paragraph [ref=e55]: Sign up once, save your place, and keep following the product as it improves.
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - link "Google" [ref=e58] [cursor=pointer]:
+              - /url: /api/auth/oauth/google/start?intent=register&next=%2F
+              - img [ref=e59]
+              - text: Google
+            - link "GitHub" [ref=e64] [cursor=pointer]:
+              - /url: /api/auth/oauth/github/start?intent=register&next=%2F
+              - img [ref=e65]
+              - text: GitHub
+            - link "Discord" [ref=e67] [cursor=pointer]:
+              - /url: /api/auth/oauth/discord/start?intent=register&next=%2F
+              - img [ref=e68]
+              - text: Discord
+            - link "Apple" [ref=e70] [cursor=pointer]:
+              - /url: /api/auth/oauth/apple/start?intent=register&next=%2F
+              - img [ref=e71]
+              - text: Apple
+          - generic [ref=e75]: Or use email
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - generic [ref=e79]: Name
+              - textbox "Name" [ref=e80]:
+                - /placeholder: Your name
+            - generic [ref=e81]:
+              - generic [ref=e82]: Email address
+              - textbox "Email address" [ref=e83]:
+                - /placeholder: you@company.com
+            - generic [ref=e84]:
+              - generic [ref=e85]: Password
+              - textbox "Password" [ref=e86]:
+                - /placeholder: Enter at least 8 characters
+            - generic [ref=e87]:
+              - generic [ref=e88]: Confirm password
+              - textbox "Confirm password" [ref=e89]:
+                - /placeholder: Enter at least 8 characters
+            - button "Create preview account" [ref=e90] [cursor=pointer]
+          - paragraph [ref=e92]:
+            - text: Already have an account?
+            - link "Sign in" [ref=e93] [cursor=pointer]:
+              - /url: /login?next=%2F
+  - alert [ref=e45]
