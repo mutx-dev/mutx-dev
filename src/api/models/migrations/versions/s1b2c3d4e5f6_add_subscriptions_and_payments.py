@@ -1,6 +1,6 @@
 """Add subscriptions and payments tables for Stripe integration
 
-Revision ID: a1b2c3d4e5f6
+Revision ID: s1b2c3d4e5f6
 Revises: 6d1f566b49c8
 Create Date: 2026-04-16
 
@@ -16,7 +16,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "a1b2c3d4e5f6"
+revision: str = "s1b2c3d4e5f6"
 down_revision: Union[str, None] = "6d1f566b49c8"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
