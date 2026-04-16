@@ -502,6 +502,98 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+.picoSection {
+  position: relative;
+  padding: clamp(4.8rem, 8vw, 7rem) 0;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(115, 255, 94, 0.08), transparent 24rem),
+    linear-gradient(180deg, rgba(5, 7, 12, 0.98) 0%, rgba(6, 9, 12, 1) 100%);
+  border-top: 1px solid rgba(247, 244, 239, 0.06);
+  border-bottom: 1px solid rgba(247, 244, 239, 0.06);
+}
+
+.picoSectionGrid {
+  display: grid;
+  gap: 2rem;
+}
+
+.picoIntro {
+  max-width: 38rem;
+  display: grid;
+  gap: 1.4rem;
+  align-content: start;
+}
+
+.picoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.picoHighlights {
+  display: grid;
+  gap: 1rem;
+}
+
+.picoCard {
+  height: 100%;
+}
+
+.picoCardMedia {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 1.45rem;
+  border: 1px solid rgba(190, 255, 148, 0.2);
+  background:
+    radial-gradient(circle at 50% 16%, rgba(136, 255, 73, 0.24), transparent 50%),
+    linear-gradient(180deg, rgba(4, 10, 5, 0.96), rgba(1, 3, 2, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 60px rgba(0, 0, 0, 0.32);
+}
+
+.picoCardImage {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.picoCardCopy {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem 0.2rem 0;
+}
+
+.picoCardTitle {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: #f7f4ef;
+}
+
+.picoCardBody {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.58;
+  color: rgba(247, 244, 239, 0.66);
+}
+
+@media (min-width: 900px) {
+  .picoSectionGrid {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    align-items: start;
+  }
+
+  .picoHighlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .examplesSection .sectionEyebrow {
   border-color: rgba(247, 244, 239, 0.14);
   background: rgba(255, 255, 255, 0.04);

@@ -11,6 +11,7 @@ import s from './PicoLanding.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
+import { picoRobotArtById, picoRobotLandingGallery } from '@/lib/picoRobotArt'
 
 const HOW_ICONS = ['path', 'support', 'shield', 'expert'] as const
 
@@ -54,6 +55,8 @@ export function PicoLandingPage() {
   const prefersReducedMotion = useReducedMotion()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
+  const heroRobot = picoRobotArtById.heroWave
+  const robotGallery = picoRobotLandingGallery
 
   const openForm = useCallback((interest?: string) => {
     setFormInterest(interest)
@@ -91,18 +94,21 @@ export function PicoLandingPage() {
       <main className={s.main}>
         <section className={s.hero}>
           <div className={s.heroAmbient} aria-hidden="true" />
-          <div className={s.heroGrid}>
-            <div className={s.heroMascotWrap}>
+          <div className={s.heroRobotStage} aria-hidden="true">
+            <div className={s.heroRobotGlow} />
+            <div className={s.heroRobotFrame}>
               <Image
-                src="/pico/mascot/pico-hero.svg"
-                alt="PicoMUTX mascot"
-                width={180}
-                height={180}
+                src={heroRobot.src}
+                alt=""
+                width={1536}
+                height={1024}
                 priority
-                className={s.heroMascot}
+                className={s.heroRobotImage}
+                sizes="(max-width: 768px) 78vw, 36rem"
               />
             </div>
-
+          </div>
+          <div className={s.heroGrid}>
             <SiteReveal delay={0.05}>
               <span className={s.heroBadge}>{t('hero.badge')}</span>
             </SiteReveal>
@@ -121,11 +127,15 @@ export function PicoLandingPage() {
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
                 <div className={s.heroCtaRow}>
-                  <Link href="/login" className={s.heroCtaPrimary}>
+                  <button
+                    type="button"
+                    className={s.heroCtaPrimary}
+                    onClick={() => openForm('building-first')}
+                  >
                     {t('hero.cta')}
                     <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <a href="#pricing" className={s.heroCtaSecondary}>
+                  </button>
+                  <a href="#launch-path" className={s.heroCtaSecondary}>
                     {t('hero.ctaSecondary') || 'See pricing'}
                   </a>
                 </div>
@@ -173,26 +183,53 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        <section className={`${s.section} ${s.sectionAlt}`}>
+        <section id="launch-path" className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
-            <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>{t('platform.eyebrow')}</span>
-              <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
-              <p className={s.sectionBody}>{t('platform.body')}</p>
+            <div className={s.launchIntro}>
+              <div className={s.sectionHeader}>
+                <span className={s.eyebrow}>{t('platform.eyebrow')}</span>
+                <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
+                <p className={s.sectionBody}>{t('platform.body')}</p>
+              </div>
+              <p className={s.launchNote}>{t('beforeAfter.close')}</p>
             </div>
-            <div className={s.howGrid}>
+            <ol className={s.launchSteps}>
               {Array.from({ length: 4 }, (_, i) => (
                 <SiteReveal key={i} delay={i * 0.06}>
-                  <motion.div
+                  <motion.li
                     whileHover={prefersReducedMotion ? undefined : { y: -3 }}
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                    className={s.howCard}
+                    className={s.launchStep}
                   >
-                    <span className={s.howIconWrap}>
+                    <span className={s.launchIndex}>0{i + 1}</span>
+                    <div className={s.launchStepIcon}>
                       <HowItWorksIcon kind={HOW_ICONS[i]} />
-                    </span>
-                    <h3 className={s.howTitle}>{t(`platform.howItWorks.${i}.title`)}</h3>
-                    <p className={s.howBody}>{t(`platform.howItWorks.${i}.body`)}</p>
+                    </div>
+                    <div className={s.launchStepContent}>
+                      <h3 className={s.launchTitle}>{t(`platform.howItWorks.${i}.title`)}</h3>
+                      <p className={s.launchBody}>{t(`platform.howItWorks.${i}.body`)}</p>
+                    </div>
+                  </motion.li>
+                </SiteReveal>
+              ))}
+            </ol>
+            <div className={s.robotGallery} aria-label="PicoMUTX robot moments">
+              {robotGallery.map((item, index) => (
+                <SiteReveal key={item.id} delay={index * 0.03}>
+                  <motion.div
+                    whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                    className={s.robotTile}
+                  >
+                    <span className={s.robotTileIndex}>{String(index + 1).padStart(2, '0')}</span>
+                    <Image
+                      src={item.src}
+                      alt={item.alt}
+                      width={512}
+                      height={512}
+                      className={s.robotTileImage}
+                      sizes="(max-width: 639px) 46vw, (max-width: 1024px) 30vw, 16rem"
+                    />
                   </motion.div>
                 </SiteReveal>
               ))}
@@ -291,12 +328,15 @@ export function PicoLandingPage() {
               <span className={s.eyebrow}>{t('faq.eyebrow')}</span>
               <h2 className={s.sectionTitle}>{t('faq.title')}</h2>
             </div>
-            <div className={s.faqGrid}>
+            <div className={s.faqStack}>
               {Array.from({ length: 5 }, (_, i) => (
-                <div key={i} className={s.faqCard}>
-                  <h3 className={s.faqQ}>{t(`faq.items.${i}.q`)}</h3>
+                <details key={i} className={s.faqItem} open={i === 0}>
+                  <summary className={s.faqSummary}>
+                    <h3 className={s.faqQ}>{t(`faq.items.${i}.q`)}</h3>
+                    <span className={s.faqToggle} aria-hidden="true">+</span>
+                  </summary>
                   <p className={s.faqA}>{t(`faq.items.${i}.a`)}</p>
-                </div>
+                </details>
               ))}
             </div>
           </div>
@@ -311,16 +351,14 @@ export function PicoLandingPage() {
             <div className={s.pricingGrid}>
               {(['starter', 'pro', 'enterprise'] as const).map((tier) => {
                 const isRecommended = tier === 'pro'
+                const ctaHref = t(`pricing.tiers.${tier}.ctaHref`)
+                const isExternalCta = ctaHref.startsWith('http')
                 return (
                   <div
                     key={tier}
                     className={`${s.pricingCard} ${isRecommended ? s.pricingCardRecommended : ''}`}
                   >
-                    {isRecommended && (
-                      <span className={s.pricingBadge}>
-                        {t('pricing.tiers.pro.recommended') ? 'RECOMMENDED' : ''}
-                      </span>
-                    )}
+                    {isRecommended && <span className={s.pricingBadge}>Recommended</span>}
                     <h3 className={s.pricingName}>{t(`pricing.tiers.${tier}.name`)}</h3>
                     <div className={s.pricingPrice}>
                       <span className={s.pricingAmount}>{t(`pricing.tiers.${tier}.price`)}</span>
@@ -337,12 +375,24 @@ export function PicoLandingPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      href={t(`pricing.tiers.${tier}.ctaHref`)}
-                      className={`${s.pricingCta} ${isRecommended ? s.pricingCtaPrimary : ''}`}
-                    >
-                      {t(`pricing.tiers.${tier}.cta`)}
-                    </Link>
+                    {isExternalCta ? (
+                      <a
+                        href={ctaHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`${s.pricingCta} ${isRecommended ? s.pricingCtaPrimary : ''}`}
+                      >
+                        {t(`pricing.tiers.${tier}.cta`)}
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openForm(isRecommended ? 'evaluating' : 'building-first')}
+                        className={`${s.pricingCta} ${isRecommended ? s.pricingCtaPrimary : ''}`}
+                      >
+                        {t('finalCta.ctaButton')}
+                      </button>
+                    )}
                   </div>
                 )
               })}

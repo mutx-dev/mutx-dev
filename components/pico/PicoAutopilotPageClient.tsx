@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
@@ -11,6 +12,7 @@ import { picoClasses, picoEmber, picoInset, picoPanel, picoSoft } from '@/compon
 import { usePicoLessonWorkspace } from '@/components/pico/usePicoLessonWorkspace'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
+import { picoRobotAutopilotHighlights } from '@/lib/picoRobotArt'
 import { usePicoHref } from '@/lib/pico/navigation'
 import { cn } from '@/lib/utils'
 import {
@@ -181,6 +183,7 @@ function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
 export function PicoAutopilotPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
+  const autopilotVisuals = picoRobotAutopilotHighlights
   const { progress, derived, actions, syncState } = usePicoProgress()
   const toHref = usePicoHref()
   const [runs, setRuns] = useState<AutopilotRunSummary[]>([])
@@ -720,6 +723,35 @@ export function PicoAutopilotPageClient() {
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 Start with the last run, compare it against the budget line, then decide whether the gate needs a human call. That order matters.
               </p>
+            </div>
+
+            <div className={picoInset('p-4')}>
+              <p className={picoClasses.label}>Operator cues</p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                {autopilotVisuals.map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-[24px] border border-[color:var(--pico-border)] bg-[linear-gradient(180deg,rgba(8,15,9,0.96),rgba(4,7,4,1))] p-3"
+                  >
+                    <div className="overflow-hidden rounded-[20px] border border-[rgba(164,255,92,0.18)] bg-[radial-gradient(circle_at_50%_16%,rgba(var(--pico-accent-rgb),0.18),transparent_50%),linear-gradient(180deg,rgba(6,12,6,0.98),rgba(2,4,2,1))]">
+                      <Image
+                        src={item.src}
+                        alt={item.alt}
+                        width={512}
+                        height={512}
+                        className="h-auto w-full"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 40vw, 20rem"
+                      />
+                    </div>
+                    <p className="mt-3 text-sm font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-accent-bright)]">
+                      {item.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {item.caption}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
