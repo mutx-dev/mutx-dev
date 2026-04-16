@@ -1,6 +1,16 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
+import {
+  PICO_AUTH_LOCALE_COOKIE,
+  PICO_DEFAULT_LOCALE,
+  PICO_LOCALE_COOKIE,
+  PICO_LOCALE_QUERY_PARAM,
+  normalizePicoLocale,
+  resolvePicoLocale,
+  type PicoLocale,
+} from '@/lib/pico/locale'
+
 type RateLimitPolicy = {
   limit: number
   windowMs: number
@@ -18,9 +28,8 @@ const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
 const PICO_AUTH_PATHS = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'])
-const PICO_WHITELISTED_PATHS = new Set(['/onboarding', '/academy', '/support', '/tutor', '/autopilot', '/pricing'])
-const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
-const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, (typeof PICO_LOCALES)[number]>> = {
+const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
+const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
   JP: 'ja',
   KR: 'ko',
   CN: 'zh',
@@ -86,13 +95,7 @@ const POLICY_BY_PATH: Array<[string, RateLimitPolicy]> = [
   ['/api/newsletter', DEFAULT_POLICY],
 ]
 
-function getLocaleFromRequest(request: NextRequest): string {
-  // 1. Explicit cookie (highest priority)
-  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
-  if (cookieLocale && PICO_LOCALES.includes(cookieLocale as (typeof PICO_LOCALES)[number])) {
-    return cookieLocale
-  }
-  // 2. Cloudflare / Vercel geo headers
+function getGeoLocale(request: NextRequest): PicoLocale | null {
   const cfCountry = request.headers.get('CF-IPCountry') ||
                     request.headers.get('X-Vercel-IP-Country')
   if (cfCountry) {
@@ -101,17 +104,34 @@ function getLocaleFromRequest(request: NextRequest): string {
       return localeFromCountry
     }
   }
-  // 3. Accept-Language header
+
+  return null
+}
+
+function getAcceptLanguageLocale(request: NextRequest): PicoLocale | null {
   const acceptLang = request.headers.get('accept-language')
   if (acceptLang) {
     const langs = acceptLang.split(',').map(l => l.split(';')[0].trim().toLowerCase())
     for (const lang of langs) {
-      if (PICO_LOCALES.includes(lang as (typeof PICO_LOCALES)[number])) return lang
-      const base = lang.split('-')[0]
-      if (PICO_LOCALES.includes(base as (typeof PICO_LOCALES)[number])) return base
+      const locale = normalizePicoLocale(lang)
+      if (locale) {
+        return locale
+      }
     }
   }
-  return 'en'
+
+  return null
+}
+
+function getLocaleFromRequest(request: NextRequest): PicoLocale {
+  return resolvePicoLocale(
+    request.nextUrl.searchParams.get(PICO_LOCALE_QUERY_PARAM),
+    request.cookies.get(PICO_AUTH_LOCALE_COOKIE)?.value,
+    request.cookies.get(PICO_LOCALE_COOKIE)?.value,
+    getGeoLocale(request),
+    getAcceptLanguageLocale(request),
+    PICO_DEFAULT_LOCALE,
+  )
 }
 
 function getClientIp(request: NextRequest): string {
@@ -245,11 +265,65 @@ function redirectWithinHost(request: NextRequest, pathname: string) {
   return NextResponse.redirect(url)
 }
 
-function rewriteWithinHost(request: NextRequest, pathname: string) {
+function nextWithinHost(requestHeaders?: Headers) {
+  if (!requestHeaders) {
+    return NextResponse.next()
+  }
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
+}
+
+function rewriteWithinHost(request: NextRequest, pathname: string, requestHeaders?: Headers) {
   const url = new URL(request.url)
   url.pathname = pathname
   url.search = request.nextUrl.search
-  return NextResponse.rewrite(url)
+  if (!requestHeaders) {
+    return NextResponse.rewrite(url)
+  }
+
+  return NextResponse.rewrite(url, {
+    request: {
+      headers: requestHeaders,
+    },
+  })
+}
+
+function applyPicoLocale(response: NextResponse, locale: PicoLocale) {
+  response.cookies.set(PICO_LOCALE_COOKIE, locale, {
+    path: '/',
+    sameSite: 'lax',
+    maxAge: PICO_LOCALE_COOKIE_MAX_AGE,
+  })
+
+  return response
+}
+
+function buildPicoRequestHeaders(request: NextRequest, locale: PicoLocale) {
+  const requestHeaders = new Headers()
+  const rawHeaders = request.headers as unknown as {
+    entries?: () => IterableIterator<[string, string]>
+    get?: (name: string) => string | null
+  }
+
+  if (typeof rawHeaders.entries === 'function') {
+    for (const [key, value] of rawHeaders.entries()) {
+      requestHeaders.set(key, value)
+    }
+  } else if (typeof rawHeaders.get === 'function') {
+    for (const name of ['cookie', 'accept-language', 'host', 'x-forwarded-host', 'x-forwarded-proto']) {
+      const value = rawHeaders.get(name)
+      if (value) {
+        requestHeaders.set(name, value)
+      }
+    }
+  }
+
+  requestHeaders.set('x-mutx-locale', locale)
+  return requestHeaders
 }
 
 function shouldDisableUiCaching(host: string, pathname: string): boolean {
@@ -378,8 +452,15 @@ export function proxy(request: NextRequest) {
     if (normalizedPath.startsWith('/api')) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
+    const locale = getLocaleFromRequest(request)
+    const picoRequestHeaders = buildPicoRequestHeaders(request, locale)
+
     if (PICO_AUTH_PATHS.has(normalizedPath)) {
-      return finalizeResponse(NextResponse.next(), host, normalizedPath)
+      return finalizeResponse(
+        applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
     }
 
     // Strip /pico prefix on pico hosts (users may type /pico/pricing directly)
@@ -388,40 +469,22 @@ export function proxy(request: NextRequest) {
       picoPath = picoPath.slice('/pico'.length) || '/'
     }
 
-    const locale = getLocaleFromRequest(request)
-
     if (picoPath === '/') {
       // Root -> landing page (public, no auth required)
-      const rewrite = rewriteWithinHost(request, '/pico')
-      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
-      return finalizeResponse(rewrite, host, normalizedPath)
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, '/pico', picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
     }
 
-    if (picoPath === '/start') {
-      const rewrite = rewriteWithinHost(request, '/pico/onboarding')
-      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
-      return finalizeResponse(rewrite, host, normalizedPath)
-    }
-
-    // Whitelisted page paths -> serve their real /pico/{path} component
-    if (PICO_WHITELISTED_PATHS.has(picoPath)) {
-      const rewrite = rewriteWithinHost(request, `/pico${picoPath}`)
-      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
-      return finalizeResponse(rewrite, host, normalizedPath)
-    }
-
-    // Sub-paths of whitelisted routes (e.g. /academy/some-lesson)
-    const firstSegment = '/' + picoPath.split('/')[1]
-    if (PICO_WHITELISTED_PATHS.has(firstSegment)) {
-      const rewrite = rewriteWithinHost(request, `/pico${picoPath}`)
-      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
-      return finalizeResponse(rewrite, host, normalizedPath)
-    }
-
-    // All other non-root paths -> WIP animation page
-    const rewrite = rewriteWithinHost(request, '/pico/wip')
-    rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
-    return finalizeResponse(rewrite, host, normalizedPath)
+    // While Pico is closed, every non-root, non-auth path on the Pico host
+    // canonicalizes back to the waitlist landing.
+    return finalizeResponse(
+      applyPicoLocale(redirectWithinHost(request, '/'), locale),
+      host,
+      normalizedPath,
+    )
   }
 
   if (MARKETING_HOSTS.has(host)) {

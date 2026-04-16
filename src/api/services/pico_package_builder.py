@@ -9,7 +9,18 @@ from __future__ import annotations
 import io
 import zipfile
 from datetime import datetime, timezone
+from pathlib import Path
+
 from src.api.models.pico_onboarding import OnboardingState
+
+KNOWLEDGE_ROOT = Path(__file__).resolve().parents[1] / "knowledge" / "pico-builder-pack"
+COMMON_KB_DOCS = ("INSTALL_FLOW.md", "UPDATE_NOTES.md")
+STACK_KB_DOCS = {
+    "hermes": "HERMES.md",
+    "openclaw": "OPENCLAW.md",
+    "nanoclaw": "NANOCLAW.md",
+    "picoclaw": "PICOCLAW.md",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -332,6 +343,25 @@ def _build_channel_config(channel: str, state: OnboardingState) -> tuple[str, st
     return configs.get(channel, (f"{channel}.yaml", f"# {channel} configuration\n"))
 
 
+def _builder_docs_for_state(state: OnboardingState) -> list[tuple[str, str]]:
+    """Return builder-pack docs that should ship inside the ZIP."""
+    stack = state.stack or "hermes"
+    doc_names = list(COMMON_KB_DOCS)
+
+    stack_doc = STACK_KB_DOCS.get(stack)
+    if stack_doc:
+        doc_names.append(stack_doc)
+
+    if state.networking == "tailscale":
+        doc_names.append("TAILSCALE_PLAYBOOK.md")
+
+    docs: list[tuple[str, str]] = []
+    for name in doc_names:
+        docs.append((f"kb/{name}", (KNOWLEDGE_ROOT / name).read_text("utf-8")))
+
+    return docs
+
+
 def _build_readme(state: OnboardingState) -> str:
     """The key deliverable — personalized install guide."""
     stack = state.stack or "hermes"
@@ -422,6 +452,12 @@ def _build_readme(state: OnboardingState) -> str:
         "- Ensure your API key is valid and has credits",
         "- For networking issues, check that ports are not in use",
         "",
+        "## Included Builder KB",
+        "",
+        "- `kb/INSTALL_FLOW.md` — current install order and verification rules used by the builder",
+        f"- `kb/{STACK_KB_DOCS.get(stack, 'HERMES.md')}` — current stack-specific notes from the builder pack",
+        "- `kb/UPDATE_NOTES.md` — what changed in the refreshed builder knowledge base",
+        "",
         "## Need Help?",
         "",
         "Come back to **pico.mutx.dev** — your session is saved.",
@@ -435,6 +471,8 @@ def _build_readme(state: OnboardingState) -> str:
 
     if state.networking == "tailscale":
         lines += [
+            "",
+            "- `kb/TAILSCALE_PLAYBOOK.md` — current remote-access guidance for Tailscale",
             "",
             "## Tailscale Setup",
             "",
@@ -483,6 +521,8 @@ def build_onboarding_package(state: OnboardingState) -> tuple[bytes, str]:
         zf.writestr(".env.template", _build_env_template(state))
         zf.writestr("install.sh", _build_install_sh(state))
         zf.writestr("README.md", _build_readme(state))
+        for archive_name, content in _builder_docs_for_state(state):
+            zf.writestr(archive_name, content)
 
         # Channel configs
         for channel in state.channels or []:
