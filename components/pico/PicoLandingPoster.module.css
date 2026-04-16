@@ -1,5 +1,6 @@
 .page {
   --landing-shell: min(100% - 1.5rem, 82rem);
+  --landing-hero-shell: min(100% - 1.5rem, 95rem);
   --nav-height: 4.8rem;
   position: relative;
   min-height: 100vh;
@@ -22,10 +23,14 @@
   position: relative;
 }
 
-.heroShell,
 .sectionShell,
 .trustStrip {
   width: var(--landing-shell);
+  margin: 0 auto;
+}
+
+.heroShell {
+  width: var(--landing-hero-shell);
   margin: 0 auto;
 }
 
@@ -171,6 +176,15 @@
   padding: 0 1.05rem;
 }
 
+.navCtaLabel {
+  white-space: nowrap;
+}
+
+.navCtaIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
 .navCta:hover,
 .heroPrimary:hover,
 .finalButton:hover,
@@ -216,7 +230,7 @@
   position: relative;
   z-index: 1;
   display: grid;
-  gap: clamp(1.8rem, 5vw, 4rem);
+  gap: clamp(2rem, 5vw, 4.75rem);
   align-items: center;
   min-height: calc(100svh - var(--nav-height) - 4rem);
 }
@@ -225,7 +239,7 @@
   display: grid;
   gap: 1.15rem;
   align-content: center;
-  max-width: 36rem;
+  max-width: 38rem;
 }
 
 .heroPrelude {
@@ -279,7 +293,7 @@
 .heroWordmark {
   margin: 0;
   font-family: var(--pico-font-display);
-  font-size: clamp(3.4rem, 10vw, 6.8rem);
+  font-size: clamp(3.5rem, 10vw, 7.5rem);
   line-height: 0.82;
   letter-spacing: -0.09em;
   text-wrap: balance;
@@ -290,10 +304,10 @@
   display: grid;
   gap: 0.12em;
   font-family: var(--pico-font-display);
-  font-size: clamp(2.25rem, 5vw, 4.15rem);
+  font-size: clamp(2.4rem, 5vw, 4.55rem);
   line-height: 0.9;
   letter-spacing: -0.065em;
-  max-width: 11.5ch;
+  max-width: 10.2ch;
   text-wrap: balance;
 }
 
@@ -317,7 +331,7 @@
 }
 
 .heroSubtitle {
-  max-width: 34rem;
+  max-width: 31rem;
   margin: 0;
 }
 
@@ -368,21 +382,33 @@
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  min-height: clamp(28rem, 52vw, 42rem);
-  padding: clamp(1.1rem, 2vw, 1.4rem);
+  min-height: clamp(31rem, 50vw, 46rem);
+  padding: clamp(0.5rem, 1.4vw, 0.8rem) 0 0;
   overflow: hidden;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.16);
-  border-radius: 2rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.heroVisual::before {
+  content: '';
+  position: absolute;
+  inset: 1.4rem 0.35rem 1.2rem 4.2rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  border-radius: 2.65rem;
   background:
-    radial-gradient(circle at 50% 18%, rgba(var(--pico-accent-rgb), 0.14), transparent 34%),
+    radial-gradient(circle at 54% 20%, rgba(var(--pico-accent-rgb), 0.18), transparent 34%),
     linear-gradient(180deg, rgba(9, 17, 11, 0.98), rgba(4, 8, 5, 0.99));
-  box-shadow: var(--pico-shadow-frame);
+  box-shadow:
+    0 32px 92px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .heroVisual::after {
   content: '';
   position: absolute;
-  inset: auto 12% 1.6rem;
+  inset: auto 18% 2.2rem;
   height: 4rem;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.18), transparent 72%);
@@ -398,6 +424,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+}
+
+.heroVisualHeader {
+  justify-self: end;
+  width: min(100%, 23rem);
+  padding: 0.78rem 0.95rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  border-radius: 999px;
+  background: rgba(5, 11, 7, 0.58);
+  backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .heroVisualKicker,
@@ -424,8 +460,8 @@
 }
 
 .heroRobotStage {
-  min-height: 18rem;
-  padding: 0.5rem 0 0;
+  min-height: 21rem;
+  padding: 1.1rem 0 0;
 }
 
 .heroRobotGlow,
@@ -448,7 +484,7 @@
 .finalRobotImage {
   position: relative;
   z-index: 1;
-  width: min(100%, 36rem);
+  width: min(100%, 40rem);
   height: auto;
   display: block;
   object-fit: contain;
@@ -461,8 +497,13 @@
   z-index: 1;
   display: grid;
   gap: 0.75rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  justify-self: end;
+  width: min(100%, 32rem);
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  border-radius: 1.55rem;
+  background: linear-gradient(180deg, rgba(7, 13, 8, 0.82), rgba(4, 8, 5, 0.74));
+  backdrop-filter: blur(14px) saturate(1.15);
 }
 
 .heroSignal {
@@ -590,18 +631,23 @@
   max-width: 34rem;
 }
 
-.scenarioBoard,
-.whoBoard,
 .pathVisual,
-.shiftBoard,
 .pricingBoard,
-.faqStack,
 .finalPanel {
   border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
   background: linear-gradient(180deg, rgba(8, 15, 10, 0.94), rgba(4, 8, 5, 0.98));
   box-shadow:
     0 28px 80px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.scenarioBoard,
+.whoBoard,
+.shiftBoard,
+.faqStack {
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
 .scenarioBoard {
@@ -615,7 +661,7 @@
   width: 100%;
   padding: 1.2rem 1.25rem 1.3rem;
   border: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), rgba(255, 255, 255, 0));
   text-align: left;
 }
 
@@ -624,7 +670,7 @@
 }
 
 .scenarioItem:hover {
-  background: linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.08), rgba(255, 255, 255, 0));
+  background: linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.07), rgba(255, 255, 255, 0));
 }
 
 .scenarioLine {
@@ -650,7 +696,7 @@
 .whoBoard {
   display: grid;
   gap: 0;
-  margin-top: 1.7rem;
+  margin-top: 1.9rem;
   overflow: hidden;
   border-radius: 1.9rem;
 }
@@ -778,7 +824,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
 .pathItem {
@@ -787,9 +833,9 @@
   padding: clamp(1.2rem, 2vw, 1.45rem);
   border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
   border-radius: 1.6rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0));
   box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.18),
+    0 12px 32px rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
@@ -946,14 +992,22 @@
 
 .pricingTierRecommended {
   position: relative;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.14);
+  border-radius: 1.55rem;
+  background:
+    linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.11), rgba(255, 255, 255, 0.02) 72%),
+    rgba(7, 13, 8, 0.92);
+  box-shadow:
+    0 18px 54px rgba(var(--pico-accent-rgb), 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .pricingTierRecommended::before {
   content: '';
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 2px;
-  background: linear-gradient(180deg, var(--pico-accent), transparent 88%);
+  inset: 0.9rem 1rem auto;
+  height: 1px;
+  background: linear-gradient(90deg, var(--pico-accent), transparent 92%);
 }
 
 .pricingTop {
@@ -1190,11 +1244,11 @@
   }
 
   .heroShell {
-    grid-template-columns: minmax(0, 1.02fr) minmax(23rem, 0.98fr);
+    grid-template-columns: minmax(0, 0.9fr) minmax(27rem, 1.1fr);
   }
 
   .heroVisual {
-    min-height: clamp(33rem, 46vw, 44rem);
+    min-height: clamp(36rem, 49vw, 48rem);
   }
 
   .qualifyGrid {
@@ -1229,6 +1283,11 @@
     border-left: 1px solid rgba(var(--pico-accent-rgb), 0.08);
   }
 
+  .pricingTierRecommended {
+    top: -0.65rem;
+    padding: 1.45rem 1.15rem 0.95rem;
+  }
+
   .finalPanel {
     grid-template-columns: minmax(0, 0.96fr) minmax(20rem, 0.84fr);
     align-items: center;
@@ -1248,6 +1307,7 @@
 @media (max-width: 759px) {
   .page {
     --landing-shell: min(100% - 1rem, 82rem);
+    --landing-hero-shell: min(100% - 1rem, 95rem);
     --nav-height: 4.35rem;
   }
 
@@ -1264,6 +1324,12 @@
   }
 
   .navCta {
+    min-width: 2.7rem;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .navCtaLabel {
     display: none;
   }
 
@@ -1318,7 +1384,17 @@
 
   .heroVisual {
     min-height: 23rem;
-    padding: 0.95rem;
+    padding: 0.2rem 0 0;
+  }
+
+  .heroVisual::before {
+    inset: 1rem 0 0.85rem;
+    border-radius: 1.9rem;
+  }
+
+  .heroVisualHeader,
+  .heroSignalRail {
+    width: 100%;
   }
 
   .heroRobotStage {
@@ -1353,6 +1429,10 @@
 
   .whoBoard {
     border-radius: 1.55rem;
+  }
+
+  .pricingTierRecommended {
+    padding: 1.2rem 1rem 1.05rem;
   }
 
   .whoDivider {
@@ -1390,7 +1470,8 @@
   .pricingButton,
   .finalButton,
   .scenarioItem,
-  .faqMarker {
+  .faqMarker,
+  .pricingTierRecommended {
     transition: none;
   }
 

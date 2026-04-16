@@ -2,10 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowRight, Check, Map, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
@@ -21,6 +21,39 @@ export function PicoLandingPoster() {
   const prefersReducedMotion = useReducedMotion()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
+  const heroRef = useRef<HTMLElement | null>(null)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  })
+
+  const heroCopyY = useTransform(scrollYProgress, [0, 1], [0, prefersReducedMotion ? 0 : -46])
+  const heroCopyOpacity = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [1, prefersReducedMotion ? 1 : 0.66],
+  )
+  const heroVisualY = useTransform(scrollYProgress, [0, 1], [0, prefersReducedMotion ? 0 : 82])
+  const heroVisualScale = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [1, prefersReducedMotion ? 1 : 0.93],
+  )
+  const heroBackdropScale = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [1, prefersReducedMotion ? 1 : 1.08],
+  )
+  const heroBackdropOpacity = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [0.95, prefersReducedMotion ? 0.95 : 0.58],
+  )
+  const heroSignalOpacity = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [1, prefersReducedMotion ? 1 : 0.52],
+  )
 
   const heroRobot = picoRobotArtById.heroWave
   const guideRobot = picoRobotArtById.guide
@@ -68,19 +101,28 @@ export function PicoLandingPoster() {
           <div className={s.navActions}>
             <PicoLangSwitcher />
             <button type="button" className={s.navCta} onClick={() => openForm()}>
-              {t('nav.cta')}
+              <span className={s.navCtaLabel}>{t('nav.cta')}</span>
+              <ArrowRight className={s.navCtaIcon} />
             </button>
           </div>
         </div>
       </header>
 
       <main className={s.main}>
-        <section className={s.hero}>
-          <div className={s.heroBackdrop} aria-hidden="true" />
-          <div className={s.heroScanline} aria-hidden="true" />
+        <section ref={heroRef} className={s.hero}>
+          <motion.div
+            aria-hidden="true"
+            className={s.heroBackdrop}
+            style={{ scale: heroBackdropScale, opacity: heroBackdropOpacity }}
+          />
+          <motion.div
+            aria-hidden="true"
+            className={s.heroScanline}
+            style={{ opacity: heroSignalOpacity }}
+          />
 
           <div className={s.heroShell}>
-            <div className={s.heroCopy}>
+            <motion.div className={s.heroCopy} style={{ y: heroCopyY, opacity: heroCopyOpacity }}>
               <SiteReveal delay={0.04}>
                 <div className={s.heroPrelude}>
                   <span className={s.heroBadge}>{t('hero.badge')}</span>
@@ -118,10 +160,13 @@ export function PicoLandingPoster() {
               <SiteReveal delay={0.31}>
                 <p className={s.heroMeta}>{t('hero.meta')}</p>
               </SiteReveal>
-            </div>
+            </motion.div>
 
             <SiteReveal delay={0.16} className={s.heroVisualWrap}>
-              <div className={s.heroVisual}>
+              <motion.div
+                className={s.heroVisual}
+                style={{ y: heroVisualY, scale: heroVisualScale }}
+              >
                 <div className={s.heroVisualHeader}>
                   <span className={s.heroVisualKicker}>{t('platform.eyebrow')}</span>
                   <span className={s.heroVisualSignal}>{t('trustBar.items.1')}</span>
@@ -148,7 +193,7 @@ export function PicoLandingPoster() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </SiteReveal>
           </div>
 
