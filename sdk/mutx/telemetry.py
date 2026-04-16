@@ -11,6 +11,7 @@ Standard attributes: agent.id, session.id, trace.id
 
 from __future__ import annotations
 
+import atexit
 from contextlib import contextmanager
 from typing import Any, Generator
 
@@ -45,6 +46,22 @@ def _check_instrumentation() -> bool:
     return _instrumentation_available
 
 
+def shutdown_telemetry() -> None:
+    """Flush and stop the current telemetry provider."""
+    global _tracer_provider, _tracer, _telemetry_endpoint, _telemetry_enabled
+
+    if _tracer_provider is not None:
+        try:
+            _tracer_provider.shutdown()
+        except Exception:
+            pass
+
+    _tracer_provider = None
+    _tracer = None
+    _telemetry_endpoint = None
+    _telemetry_enabled = False
+
+
 def init_telemetry(agent_name: str, endpoint: str | None = None) -> None:
     """Initialize OpenTelemetry tracing.
 
@@ -53,6 +70,10 @@ def init_telemetry(agent_name: str, endpoint: str | None = None) -> None:
         endpoint: OTLP endpoint for exporting spans. If None, uses console exporter.
     """
     global _tracer_provider, _tracer, _telemetry_endpoint, _telemetry_enabled
+
+    # Re-initialization is common in tests; close the previous provider first so
+    # the BatchSpanProcessor worker thread cannot outlive the active stream.
+    shutdown_telemetry()
 
     resource = Resource.create({"service.name": agent_name, "service.version": "1.0.0"})
 
@@ -146,3 +167,6 @@ def get_telemetry_config() -> dict[str, Any]:
         "exporter_type": "otlp" if _telemetry_endpoint else "logging",
         "endpoint": _telemetry_endpoint,
     }
+
+
+atexit.register(shutdown_telemetry)

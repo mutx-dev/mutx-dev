@@ -43,6 +43,7 @@ class TestTelemetrySDK:
         # Reimport
         self.telemetry = import_telemetry_module()
         yield
+        self.telemetry.shutdown_telemetry()
 
     @pytest.mark.asyncio
     async def test_init_telemetry_with_endpoint(self):
@@ -112,6 +113,30 @@ class TestTelemetrySDK:
             pass
         with self.telemetry.span("mutx.tool.call") as _:
             pass
+
+    @pytest.mark.asyncio
+    async def test_reinit_shuts_down_previous_provider(self):
+        """Repeated init_telemetry calls should not leak background exporters."""
+        self.telemetry.init_telemetry("test-agent-one")
+        first_provider = self.telemetry._tracer_provider
+
+        self.telemetry.init_telemetry("test-agent-two")
+
+        assert first_provider is not None
+        assert self.telemetry._tracer_provider is not None
+        assert self.telemetry._tracer_provider is not first_provider
+
+    @pytest.mark.asyncio
+    async def test_shutdown_telemetry_clears_global_state(self):
+        """shutdown_telemetry should leave no active provider behind."""
+        self.telemetry.init_telemetry("test-agent")
+
+        self.telemetry.shutdown_telemetry()
+
+        assert self.telemetry._tracer_provider is None
+        assert self.telemetry._tracer is None
+        assert self.telemetry._telemetry_enabled is False
+        assert self.telemetry._telemetry_endpoint is None
 
 
 class TestTraceContextPropagation:
