@@ -216,6 +216,22 @@
         "privacy": "プライバシー"
       },
       "copyright": "© MUTX 2026. 導入済みエージェントのオープンコントロール。"
+    },
+    "waitlistForm": {
+      "submit": "アクセスをリクエスト",
+      "submitting": "送信中...",
+      "success": "リストに追加されました。",
+      "successCheckInbox": "リストに追加されました。受信箱をご確認ください。",
+      "alreadyJoined": "すでにリストに登録されています！",
+      "successNote": "近日中にご連絡いたします。",
+      "joinFailed": "ウェイティングリストへの参加に失敗しました",
+      "verificationLoading": "認証チャレンジを読み込み中...",
+      "verificationLoadingTryAgain": "認証がまだ読み込まれています。しばらくしてからもう一度お試しください。",
+      "verificationUnavailable": "現在、ウェイティングリストの認証は利用できません。後でもう一度お試しください。",
+      "verificationRequired": "認証チャレンジを完了してください。",
+      "verificationFailedRefresh": "認証に失敗しました。チャレンジを更新して再度お試しください。",
+      "verificationExpired": "認証の有効期限が切れました。再度チャレンジを完了してください。",
+      "verificationTimedOut": "認証がタイムアウトしました。再度チャレンジを完了してください。"
     }
   }
 }
