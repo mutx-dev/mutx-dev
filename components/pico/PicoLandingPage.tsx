@@ -54,37 +54,11 @@ export function PicoLandingPage() {
   const prefersReducedMotion = useReducedMotion()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
-  const [heroEmail, setHeroEmail] = useState('')
-  const [heroSubmitting, setHeroSubmitting] = useState(false)
-  const [heroSubmitted, setHeroSubmitted] = useState(false)
 
   const openForm = useCallback((interest?: string) => {
     setFormInterest(interest)
     setFormOpen(true)
   }, [])
-
-  const handleHeroSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-      if (!heroEmail.trim() || heroSubmitting) return
-      setHeroSubmitting(true)
-      try {
-        const res = await fetch('/api/leads', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: heroEmail.trim(), source: 'pico-landing' }),
-        })
-        if (res.ok) {
-          setHeroSubmitted(true)
-        }
-      } catch {
-        // silently fail — user can still use the contact form
-      } finally {
-        setHeroSubmitting(false)
-      }
-    },
-    [heroEmail, heroSubmitting],
-  )
 
   return (
     <div data-testid="pico-waitlist-landing" className={s.page}>
@@ -118,6 +92,17 @@ export function PicoLandingPage() {
         <section className={s.hero}>
           <div className={s.heroAmbient} aria-hidden="true" />
           <div className={s.heroGrid}>
+            <div className={s.heroMascotWrap}>
+              <Image
+                src="/pico/mascot/pico-hero.svg"
+                alt="PicoMUTX mascot"
+                width={180}
+                height={180}
+                priority
+                className={s.heroMascot}
+              />
+            </div>
+
             <SiteReveal delay={0.05}>
               <span className={s.heroBadge}>{t('hero.badge')}</span>
             </SiteReveal>
@@ -135,32 +120,15 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
-                {heroSubmitted ? (
-                  <div className={s.heroEmailSuccess}>
-                    <Check className="h-4 w-4" />
-                    <span>{t('preRegForm.successTitle')}</span>
-                  </div>
-                ) : (
-                  <form className={s.heroEmailForm} onSubmit={handleHeroSubmit}>
-                    <input
-                      type="email"
-                      required
-                      className={s.heroEmailInput}
-                      placeholder={t('preRegForm.emailPlaceholder')}
-                      value={heroEmail}
-                      onChange={(e) => setHeroEmail(e.target.value)}
-                      disabled={heroSubmitting}
-                    />
-                    <button
-                      type="submit"
-                      className={s.heroEmailSubmit}
-                      disabled={heroSubmitting}
-                    >
-                      {heroSubmitting ? t('preRegForm.submitting') : t('hero.cta')}
-                      {!heroSubmitting && <ArrowRight className="h-4 w-4" />}
-                    </button>
-                  </form>
-                )}
+                <div className={s.heroCtaRow}>
+                  <Link href="/login" className={s.heroCtaPrimary}>
+                    {t('hero.cta')}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/pricing" className={s.heroCtaSecondary}>
+                    {t('hero.ctaSecondary') || 'See pricing'}
+                  </Link>
+                </div>
               </div>
             </SiteReveal>
 

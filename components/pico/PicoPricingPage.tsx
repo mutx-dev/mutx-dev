@@ -266,7 +266,7 @@ export function PicoPricingPage() {
         fontSize: '0.8rem',
         marginTop: '2.5rem',
       }}>
-        Need more? <a href="/support" style={{ color: 'var(--pico-accent)' }}>Contact us</a> for Enterprise pricing (100K+ credits, SSO, SLA).
+        Need more? <a href="/pico/support" style={{ color: 'var(--pico-accent)' }}>Contact us</a> for Enterprise pricing (100K+ credits, SSO, SLA).
       </p>
     </div>
   )

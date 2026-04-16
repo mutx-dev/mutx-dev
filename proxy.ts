@@ -398,6 +398,14 @@ export function proxy(request: NextRequest) {
       return finalizeResponse(rewrite, host, normalizedPath)
     }
 
+    // Sub-paths of whitelisted routes (e.g. /academy/some-lesson)
+    const firstSegment = '/' + normalizedPath.split('/')[1]
+    if (PICO_WHITELISTED_PATHS.has(firstSegment)) {
+      const rewrite = rewriteWithinHost(request, `/pico${normalizedPath}`)
+      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
+      return finalizeResponse(rewrite, host, normalizedPath)
+    }
+
     // All other non-root paths -> WIP animation page
     const rewrite = rewriteWithinHost(request, '/pico/wip')
     rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })

@@ -289,6 +289,16 @@
   letter-spacing: -0.01em;
 }
 
+.heroMascotWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.heroMascot {
+  filter: drop-shadow(0 24px 48px rgba(212, 171, 115, 0.18));
+}
+
 .heroActions {
   display: flex;
   flex-wrap: wrap;
@@ -296,6 +306,58 @@
   align-items: center;
   justify-content: center;
   padding-top: 0.5rem;
+}
+
+.heroCtaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroCtaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: var(--pico-radius-full);
+  background: linear-gradient(135deg, #d4ab73, #c89b62);
+  color: #0e0c10;
+  font-family: var(--pico-font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 12px 32px rgba(200, 155, 98, 0.18);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.heroCtaPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px rgba(200, 155, 98, 0.24);
+}
+
+.heroCtaSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--pico-radius-full);
+  border: 1px solid var(--pico-border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--pico-text-secondary);
+  font-family: var(--pico-font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.heroCtaSecondary:hover {
+  border-color: var(--pico-border-hover);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .heroEmailForm {

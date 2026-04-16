@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { type ReactNode, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -592,13 +593,22 @@ export function PicoAcademyDashboard() {
               >
                 <div className="grid gap-5 lg:grid-cols-[16rem,minmax(0,1fr)]">
                   <div className="grid gap-3">
-                    <span className={picoCodex.stamp}>
-                      Track {String(activeTrackIndex + 1).padStart(2, '0')}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className={picoCodex.stamp}>
+                        Track {String(activeTrackIndex + 1).padStart(2, '0')}
+                      </span>
+                      <Image
+                        src="/pico/mascot/pico-sprout.svg"
+                        alt="PicoMUTX academy mascot"
+                        width={32}
+                        height={32}
+                        className="drop-shadow-[0_2px_8px_rgba(164,255,92,0.15)]"
+                      />
+                    </div>
                     <h3 className="font-[family:var(--font-site-display)] text-5xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                       {activeTrack.title}
                     </h3>
-                    <p className="text-sm leading-6 text-[#e0c9b0]">{activeTrack.outcome}</p>
+                    <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{activeTrack.outcome}</p>
                     <p className="text-sm leading-6 text-[color:var(--pico-text-muted)]">{activeTrack.intro}</p>
                     <div className="grid gap-3 pt-2">
                       <div className={picoCodexInset('p-4')}>

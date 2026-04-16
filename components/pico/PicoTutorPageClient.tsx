@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -533,9 +534,18 @@ export function PicoTutorPageClient() {
           <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
             <form onSubmit={submit} className="p-6 sm:p-7">
               <p className={picoClasses.label}>Crit desk</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
-                Bring one blocker to the desk
-              </h2>
+              <div className="mt-3 flex items-center gap-4">
+                <Image
+                  src="/pico/mascot/pico-atom.svg"
+                  alt="PicoMUTX tutor mascot"
+                  width={48}
+                  height={48}
+                  className="flex-shrink-0 drop-shadow-[0_4px_12px_rgba(164,255,92,0.18)]"
+                />
+                <h2 className="font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+                  Bring one blocker to the desk
+                </h2>
+              </div>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
                 Ask only when the lesson path is blocked. The answer should send you back into action, not into another loop of reading.
               </p>
