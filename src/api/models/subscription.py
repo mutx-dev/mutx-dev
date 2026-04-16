@@ -1,8 +1,13 @@
 """Stripe subscription and payment ORM models."""
 
+from __future__ import annotations
+
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from src.api.models.models import User
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID

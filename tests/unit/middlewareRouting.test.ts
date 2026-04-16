@@ -172,8 +172,8 @@ describe('host-aware UI routing proxy', () => {
     )
     const krResponse = proxy(
       mockRequest(
-        'https://pico.mutxx.dev/',
-        { host: 'pico.mutxx.dev', 'CF-IPCountry': 'KR' },
+        'https://pico.mutx.dev/',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'KR' },
         'GET',
         authCookies,
       ),
@@ -190,15 +190,15 @@ describe('host-aware UI routing proxy', () => {
     expect(jpResponse.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
     expect(jpResponse.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico')
     expect(krResponse.headers.get('set-cookie')).toContain('NEXT_LOCALE=ko')
-    expect(krResponse.headers.get('x-middleware-rewrite')).toBe('https://pico.mutxx.dev/pico')
+    expect(krResponse.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico')
     expect(cnResponse.headers.get('set-cookie')).toContain('NEXT_LOCALE=zh')
   })
 
   it('keeps cookie precedence over pico geolocation', () => {
     const response = proxy(
       mockRequest(
-        'https://pico.mutxx.dev/',
-        { host: 'pico.mutxx.dev', 'CF-IPCountry': 'JP' },
+        'https://pico.mutx.dev/',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
         'GET',
         { ...authCookies, NEXT_LOCALE: 'es' },
       ),
@@ -210,8 +210,8 @@ describe('host-aware UI routing proxy', () => {
   it('falls back to accept-language for pico when geo headers are missing', () => {
     const response = proxy(
       mockRequest(
-        'https://pico.mutxx.dev/',
-        { host: 'pico.mutxx.dev', 'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8' },
+        'https://pico.mutx.dev/',
+        { host: 'pico.mutx.dev', 'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8' },
         'GET',
         authCookies,
       ),
