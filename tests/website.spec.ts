@@ -95,6 +95,12 @@ async function stubPicoProductApis(
   }: PicoProductStubOptions = {},
 ) {
   const progress = createDefaultPicoProgress();
+  const sessionUser = {
+    email: 'operator@mutx.dev',
+    name: 'Pico Operator',
+    role: 'ADMIN',
+    is_email_verified: isEmailVerified,
+  };
   let openAIConnection = {
     provider: 'openai',
     status: 'disconnected',
@@ -120,12 +126,19 @@ async function stubPicoProductApis(
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({
-        email: 'operator@mutx.dev',
-        name: 'Pico Operator',
-        role: 'ADMIN',
-        is_email_verified: isEmailVerified,
-      }),
+      body: JSON.stringify(sessionUser),
+    });
+  });
+
+  await page.route('**/api/pico/session', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(
+        authenticated
+          ? { authenticated: true, user: sessionUser }
+          : { authenticated: false, user: null }
+      ),
     });
   });
 
@@ -874,17 +887,16 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('button', { name: /reset password/i })).toBeVisible();
   });
 
-  test('pico root is a truthful live product entry instead of a waitlist shell', async ({ page }) => {
-    await stubPicoProductApis(page);
-
+  test('pico root is the landing page and keeps product routes deeper in /pico', async ({ page }) => {
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('pico-waitlist-landing')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: /get to your first working agent fast/i })).toBeVisible();
-    await expect(page.getByTestId('pico-surface-compass')).toBeVisible();
-    await expect(page.getByRole('link', { name: /install hermes now/i }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: /pre-register for early access/i })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /^preregistrati$/i })).toHaveCount(0);
+    await expect(page.getByTestId('pico-waitlist-landing')).toBeVisible();
+    await expect(page.locator('main h1').first()).toBeVisible();
+    await expect(page.locator('main')).toContainText(/PicoMUTX/i);
+    await expect(page.getByTestId('pico-footer')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /get to your first working agent fast/i })).toHaveCount(0);
+    await expect(page.getByTestId('pico-surface-compass')).toHaveCount(0);
+    await expect(page.locator('a[href="/pico/onboarding"]')).toHaveCount(0);
     expect(new URL(page.url()).pathname).toBe('/pico');
   });
 
