@@ -42,6 +42,7 @@ async def checkout(
         result = await create_checkout_session(
             db=db,
             user=current_user,
+            plan_id=payload.plan_id,
             price_id=payload.price_id,
             success_url=payload.success_url,
             cancel_url=payload.cancel_url,
@@ -49,6 +50,8 @@ async def checkout(
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("Checkout session creation failed")
         raise HTTPException(status_code=500, detail="Failed to create checkout session") from exc
@@ -98,10 +101,9 @@ async def stripe_webhook(
 
     try:
         await dispatch_webhook_event(event, db)
-    except Exception:
+    except Exception as exc:
         logger.exception("Webhook handler error for event %s", event.type)
-        # Still return 200 so Stripe doesn't retry
-        # Log the error for investigation
+        raise HTTPException(status_code=500, detail="Failed to process webhook") from exc
 
     return {"received": True}
 

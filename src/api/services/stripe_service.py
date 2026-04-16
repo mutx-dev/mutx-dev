@@ -16,9 +16,22 @@ from src.api.models.models import User
 
 logger = logging.getLogger(__name__)
 
+
+def _configured_plan_prices() -> dict[str, str]:
+    import os
+
+    plan_prices = {
+        "starter": os.getenv("STRIPE_STARTER_PRICE_ID", "").strip(),
+        "pro": os.getenv("STRIPE_PRO_PRICE_ID", "").strip(),
+        "enterprise": os.getenv("STRIPE_ENTERPRISE_PRICE_ID", "").strip(),
+    }
+    return {plan: price_id for plan, price_id in plan_prices.items() if price_id}
+
+
 # Lazy config — reads from env at call time so tests can monkeypatch
 def _get_secret_key() -> str:
     import os
+
     key = os.getenv("STRIPE_SECRET_KEY", "")
     if not key:
         raise RuntimeError("STRIPE_SECRET_KEY not configured")
@@ -27,19 +40,113 @@ def _get_secret_key() -> str:
 
 def _get_webhook_secret() -> str:
     import os
+
     return os.getenv("STRIPE_WEBHOOK_SECRET", "")
 
 
 # Map Stripe price IDs to internal plan names
-def _price_id_to_plan(price_id: str) -> str:
-    import os
-    if price_id == os.getenv("STRIPE_STARTER_PRICE_ID", ""):
-        return "starter"
-    if price_id == os.getenv("STRIPE_PRO_PRICE_ID", ""):
-        return "pro"
-    if price_id == os.getenv("STRIPE_ENTERPRISE_PRICE_ID", ""):
-        return "enterprise"
-    return "starter"  # fallback
+def _price_id_to_plan(price_id: str | None) -> str | None:
+    if not price_id:
+        return None
+
+    for plan, configured_price_id in _configured_plan_prices().items():
+        if price_id == configured_price_id:
+            return plan
+
+    return None
+
+
+def _resolve_checkout_plan_and_price(
+    *,
+    plan_id: str | None,
+    price_id: str | None,
+) -> tuple[str, str]:
+    configured_prices = _configured_plan_prices()
+
+    if plan_id:
+        resolved_price_id = configured_prices.get(plan_id)
+        if not resolved_price_id:
+            raise RuntimeError(f"Stripe price for plan '{plan_id}' is not configured")
+        return plan_id, resolved_price_id
+
+    if price_id:
+        resolved_plan = _price_id_to_plan(price_id)
+        if not resolved_plan:
+            raise ValueError("Unsupported Stripe price")
+        return resolved_plan, price_id
+
+    raise ValueError("Either plan_id or price_id is required")
+
+
+def _subscription_price_id(subscription_data: dict[str, Any]) -> str | None:
+    items = subscription_data.get("items", {}).get("data", [])
+    if not items:
+        return None
+    return items[0].get("price", {}).get("id")
+
+
+def _unix_to_datetime(timestamp: int | None) -> datetime | None:
+    if not timestamp:
+        return None
+    return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+
+
+def _should_grant_plan_access(status: str | None) -> bool:
+    return status in {"active", "trialing", "past_due"}
+
+
+async def _sync_user_plan(
+    db: AsyncSession,
+    *,
+    user_id: uuid.UUID,
+    plan: str,
+    status: str | None,
+) -> None:
+    user_result = await db.execute(select(User).where(User.id == user_id))
+    user = user_result.scalars().first()
+    if not user:
+        return
+
+    user.plan = plan.upper() if _should_grant_plan_access(status) else "FREE"
+
+
+async def _resolve_subscription_user_id(
+    db: AsyncSession,
+    subscription_data: dict[str, Any],
+) -> uuid.UUID | None:
+    user_id_str = subscription_data.get("metadata", {}).get("user_id")
+    if user_id_str:
+        try:
+            return uuid.UUID(user_id_str)
+        except ValueError:
+            logger.warning("Ignoring invalid Stripe subscription metadata user_id: %s", user_id_str)
+
+    stripe_customer = subscription_data.get("customer")
+    if not stripe_customer:
+        return None
+
+    existing_result = await db.execute(
+        select(Subscription)
+        .where(Subscription.stripe_customer_id == stripe_customer)
+        .order_by(Subscription.created_at.desc())
+    )
+    existing_subscription = existing_result.scalars().first()
+    if existing_subscription:
+        return existing_subscription.user_id
+
+    customer = stripe.Customer.retrieve(stripe_customer, api_key=_get_secret_key())
+    customer_user_id = customer.get("metadata", {}).get("user_id")
+    if not customer_user_id:
+        return None
+
+    try:
+        return uuid.UUID(customer_user_id)
+    except ValueError:
+        logger.warning(
+            "Ignoring invalid Stripe customer metadata user_id for customer %s",
+            stripe_customer,
+        )
+        return None
 
 
 async def _get_or_create_customer(
@@ -51,7 +158,9 @@ async def _get_or_create_customer(
     Creates a Stripe Customer if the user doesn't have one yet.
     """
     sub = await db.execute(
-        select(Subscription).where(Subscription.user_id == user.id).order_by(Subscription.created_at.desc())
+        select(Subscription)
+        .where(Subscription.user_id == user.id)
+        .order_by(Subscription.created_at.desc())
     )
     existing = sub.scalars().first()
     if existing:
@@ -68,37 +177,58 @@ async def _get_or_create_customer(
 
 # ── Checkout ──────────────────────────────────────────────────────────
 
+
 async def create_checkout_session(
     db: AsyncSession,
     user: User,
-    price_id: str,
+    price_id: str | None,
     success_url: str,
     cancel_url: str,
     trial_days: int | None = None,
+    plan_id: str | None = None,
 ) -> dict[str, str]:
     """Create a Stripe Checkout Session for subscription signup."""
+    resolved_plan_id, resolved_price_id = _resolve_checkout_plan_and_price(
+        plan_id=plan_id,
+        price_id=price_id,
+    )
     customer_id, _ = await _get_or_create_customer(db, user)
 
     params: dict[str, Any] = {
         "customer": customer_id,
+        "client_reference_id": str(user.id),
         "mode": "subscription",
-        "line_items": [{"price": price_id, "quantity": 1}],
+        "line_items": [{"price": resolved_price_id, "quantity": 1}],
         "success_url": success_url,
         "cancel_url": cancel_url,
-        "metadata": {"user_id": str(user.id)},
+        "metadata": {
+            "user_id": str(user.id),
+            "plan_id": resolved_plan_id,
+        },
         "api_key": _get_secret_key(),
     }
 
+    subscription_data: dict[str, Any] = {
+        "metadata": {
+            "user_id": str(user.id),
+            "plan_id": resolved_plan_id,
+            "price_id": resolved_price_id,
+        }
+    }
     if trial_days and trial_days > 0:
         from datetime import timedelta
+
         trial_end = datetime.now(timezone.utc) + timedelta(days=trial_days)
-        params["subscription_data"] = {"trial_end": int(trial_end.timestamp())}
+        subscription_data["trial_end"] = int(trial_end.timestamp())
+
+    params["subscription_data"] = subscription_data
 
     session = stripe.checkout.Session.create(**params)
     return {"checkout_url": session.url, "session_id": session.id}
 
 
 # ── Customer Portal ──────────────────────────────────────────────────
+
 
 async def create_customer_portal(
     db: AsyncSession,
@@ -107,7 +237,9 @@ async def create_customer_portal(
 ) -> dict[str, str]:
     """Create a Stripe Customer Portal session."""
     result = await db.execute(
-        select(Subscription).where(Subscription.user_id == user.id).order_by(Subscription.created_at.desc())
+        select(Subscription)
+        .where(Subscription.user_id == user.id)
+        .order_by(Subscription.created_at.desc())
     )
     sub = result.scalars().first()
     if not sub:
@@ -123,16 +255,17 @@ async def create_customer_portal(
 
 # ── Webhook handlers ─────────────────────────────────────────────────
 
+
 def verify_webhook_signature(payload: bytes, sig_header: str) -> stripe.Event:
     """Verify and parse a Stripe webhook event."""
-    return stripe.Webhook.construct_event(
-        payload, sig_header, _get_webhook_secret()
-    )
+    return stripe.Webhook.construct_event(payload, sig_header, _get_webhook_secret())
 
 
 async def handle_checkout_complete(session_data: dict[str, Any], db: AsyncSession) -> None:
     """Handle checkout.session.completed — create subscription, upgrade user."""
-    user_id_str = session_data.get("metadata", {}).get("user_id") or session_data.get("client_reference_id")
+    user_id_str = session_data.get("metadata", {}).get("user_id") or session_data.get(
+        "client_reference_id"
+    )
     if not user_id_str:
         logger.error("checkout.session.completed: no user_id in metadata")
         return
@@ -145,16 +278,17 @@ async def handle_checkout_complete(session_data: dict[str, Any], db: AsyncSessio
         logger.error("checkout.session.completed: missing subscription or customer ID")
         return
 
-    # Get plan from line items
-    line_items = session_data.get("line_items", {}).get("data", [])
-    price_id = ""
-    if line_items:
-        price_id = line_items[0].get("price", {}).get("id", "")
-
     # Fetch subscription details from Stripe
     sub_details = stripe.Subscription.retrieve(stripe_sub, api_key=_get_secret_key())
-
-    plan = _price_id_to_plan(price_id) if price_id else "starter"
+    sub_status = sub_details.get("status")
+    price_id = _subscription_price_id(sub_details)
+    plan = _price_id_to_plan(price_id) or session_data.get("metadata", {}).get("plan_id")
+    if not plan:
+        logger.error(
+            "checkout.session.completed: could not resolve plan for subscription %s",
+            stripe_sub,
+        )
+        return
 
     # Create or update subscription record
     result = await db.execute(
@@ -163,31 +297,29 @@ async def handle_checkout_complete(session_data: dict[str, Any], db: AsyncSessio
     existing = result.scalars().first()
 
     if existing:
-        existing.status = sub_details.status
+        existing.status = sub_status
         existing.plan = plan
-        existing.current_period_start = datetime.fromtimestamp(sub_details.current_period_start, tz=timezone.utc)
-        existing.current_period_end = datetime.fromtimestamp(sub_details.current_period_end, tz=timezone.utc)
+        existing.current_period_start = _unix_to_datetime(sub_details.get("current_period_start"))
+        existing.current_period_end = _unix_to_datetime(sub_details.get("current_period_end"))
+        existing.cancel_at_period_end = sub_details.get("cancel_at_period_end", False)
+        existing.trial_end = _unix_to_datetime(sub_details.get("trial_end"))
     else:
         new_sub = Subscription(
             user_id=user_id,
             stripe_customer_id=stripe_customer,
             stripe_subscription_id=stripe_sub,
             plan=plan,
-            status=sub_details.status,
-            current_period_start=datetime.fromtimestamp(sub_details.current_period_start, tz=timezone.utc),
-            current_period_end=datetime.fromtimestamp(sub_details.current_period_end, tz=timezone.utc),
+            status=sub_status,
+            current_period_start=_unix_to_datetime(sub_details.get("current_period_start")),
+            current_period_end=_unix_to_datetime(sub_details.get("current_period_end")),
             cancel_at_period_end=sub_details.get("cancel_at_period_end", False),
         )
         if sub_details.get("trial_end"):
-            new_sub.trial_end = datetime.fromtimestamp(sub_details["trial_end"], tz=timezone.utc)
+            new_sub.trial_end = _unix_to_datetime(sub_details["trial_end"])
             new_sub.status = "trialing"
         db.add(new_sub)
 
-    # Upgrade user plan
-    user_result = await db.execute(select(User).where(User.id == user_id))
-    user = user_result.scalars().first()
-    if user:
-        user.plan = plan.upper()
+    await _sync_user_plan(db, user_id=user_id, plan=plan, status=sub_status)
 
     await db.commit()
     logger.info("Subscription created/upgraded: user=%s plan=%s", user_id, plan)
@@ -199,35 +331,45 @@ async def handle_subscription_updated(sub_data: dict[str, Any], db: AsyncSession
     if not stripe_sub_id:
         return
 
+    resolved_plan = _price_id_to_plan(_subscription_price_id(sub_data)) or sub_data.get(
+        "metadata", {}
+    ).get("plan_id")
+    stripe_customer = sub_data.get("customer")
+
     result = await db.execute(
         select(Subscription).where(Subscription.stripe_subscription_id == stripe_sub_id)
     )
     sub = result.scalars().first()
     if not sub:
-        logger.warning("subscription.updated: no local record for %s", stripe_sub_id)
-        return
+        user_id = await _resolve_subscription_user_id(db, sub_data)
+        if not user_id or not stripe_customer or not resolved_plan:
+            logger.warning(
+                "subscription.updated: no local record or user mapping for %s", stripe_sub_id
+            )
+            return
 
-    sub.status = sub_data.get("status", sub.status)
-    sub.cancel_at_period_end = sub_data.get("cancel_at_period_end", False)
+        sub = Subscription(
+            user_id=user_id,
+            stripe_customer_id=stripe_customer,
+            stripe_subscription_id=stripe_sub_id,
+            plan=resolved_plan,
+            status=sub_data.get("status", "active"),
+            current_period_start=_unix_to_datetime(sub_data.get("current_period_start")),
+            current_period_end=_unix_to_datetime(sub_data.get("current_period_end")),
+            cancel_at_period_end=sub_data.get("cancel_at_period_end", False),
+            trial_end=_unix_to_datetime(sub_data.get("trial_end")),
+        )
+        db.add(sub)
+    else:
+        sub.status = sub_data.get("status", sub.status)
+        sub.cancel_at_period_end = sub_data.get("cancel_at_period_end", False)
+        sub.current_period_start = _unix_to_datetime(sub_data.get("current_period_start"))
+        sub.current_period_end = _unix_to_datetime(sub_data.get("current_period_end"))
+        sub.trial_end = _unix_to_datetime(sub_data.get("trial_end"))
+        if resolved_plan:
+            sub.plan = resolved_plan
 
-    period_start = sub_data.get("current_period_start")
-    period_end = sub_data.get("current_period_end")
-    if period_start:
-        sub.current_period_start = datetime.fromtimestamp(period_start, tz=timezone.utc)
-    if period_end:
-        sub.current_period_end = datetime.fromtimestamp(period_end, tz=timezone.utc)
-
-    # Sync user plan if changed
-    items = sub_data.get("items", {}).get("data", [])
-    if items:
-        price_id = items[0].get("price", {}).get("id", "")
-        if price_id:
-            new_plan = _price_id_to_plan(price_id)
-            sub.plan = new_plan
-            user_result = await db.execute(select(User).where(User.id == sub.user_id))
-            user = user_result.scalars().first()
-            if user:
-                user.plan = new_plan.upper()
+    await _sync_user_plan(db, user_id=sub.user_id, plan=sub.plan, status=sub.status)
 
     await db.commit()
     logger.info("Subscription updated: %s status=%s", stripe_sub_id, sub.status)
@@ -268,9 +410,22 @@ async def handle_invoice_paid(invoice_data: dict[str, Any], db: AsyncSession) ->
     if not stripe_invoice_id:
         return
 
+    existing_payment_result = await db.execute(
+        select(Payment).where(Payment.stripe_invoice_id == stripe_invoice_id)
+    )
+    existing_payment = existing_payment_result.scalars().first()
+    if existing_payment:
+        existing_payment.amount_cents = amount
+        existing_payment.currency = currency
+        existing_payment.status = "paid"
+        await db.commit()
+        logger.info("Payment already recorded for invoice=%s", stripe_invoice_id)
+        return
+
     # Find user by subscription or customer
     user_id = None
-    subscription_id = None
+    subscription_id: uuid.UUID | None = None
+    subscription_record: Subscription | None = None
 
     if stripe_sub_id:
         sub_result = await db.execute(
@@ -280,15 +435,19 @@ async def handle_invoice_paid(invoice_data: dict[str, Any], db: AsyncSession) ->
         if sub:
             user_id = sub.user_id
             subscription_id = sub.id
+            subscription_record = sub
 
     if not user_id and stripe_customer:
         sub_result = await db.execute(
-            select(Subscription).where(Subscription.stripe_customer_id == stripe_customer).order_by(Subscription.created_at.desc())
+            select(Subscription)
+            .where(Subscription.stripe_customer_id == stripe_customer)
+            .order_by(Subscription.created_at.desc())
         )
         sub = sub_result.scalars().first()
         if sub:
             user_id = sub.user_id
             subscription_id = sub.id
+            subscription_record = sub
 
     if not user_id:
         logger.warning("invoice.paid: could not resolve user for invoice %s", stripe_invoice_id)
@@ -303,6 +462,14 @@ async def handle_invoice_paid(invoice_data: dict[str, Any], db: AsyncSession) ->
         status="paid",
     )
     db.add(payment)
+    if subscription_record:
+        subscription_record.status = "active"
+        await _sync_user_plan(
+            db,
+            user_id=subscription_record.user_id,
+            plan=subscription_record.plan,
+            status=subscription_record.status,
+        )
     await db.commit()
     logger.info("Payment recorded: invoice=%s amount=%d", stripe_invoice_id, amount)
 
@@ -327,6 +494,7 @@ async def dispatch_webhook_event(event: stripe.Event, db: AsyncSession) -> None:
     """Route a verified Stripe webhook event to the right handler."""
     handler_map = {
         "checkout.session.completed": handle_checkout_complete,
+        "customer.subscription.created": handle_subscription_updated,
         "customer.subscription.updated": handle_subscription_updated,
         "customer.subscription.deleted": handle_subscription_deleted,
         "invoice.paid": handle_invoice_paid,
@@ -342,6 +510,7 @@ async def dispatch_webhook_event(event: stripe.Event, db: AsyncSession) -> None:
 
 
 # ── Query helpers ────────────────────────────────────────────────────
+
 
 async def get_subscription_status(
     db: AsyncSession,
@@ -367,7 +536,9 @@ async def get_subscription_status(
     return {
         "plan": sub.plan,
         "status": sub.status,
-        "current_period_end": sub.current_period_end.isoformat() if sub.current_period_end else None,
+        "current_period_end": (
+            sub.current_period_end.isoformat() if sub.current_period_end else None
+        ),
         "cancel_at_period_end": sub.cancel_at_period_end,
         "trial_end": sub.trial_end.isoformat() if sub.trial_end else None,
     }

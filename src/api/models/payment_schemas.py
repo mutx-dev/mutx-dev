@@ -3,21 +3,36 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 import uuid
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class CheckoutSessionRequest(BaseModel):
     """Request body for creating a Stripe Checkout Session."""
 
-    price_id: str = Field(..., min_length=1, max_length=255, description="Stripe Price ID")
+    plan_id: Optional[Literal["starter", "pro"]] = Field(
+        None,
+        description="Supported MUTX plan identifier",
+    )
+    price_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        max_length=255,
+        description="Stripe Price ID",
+    )
     success_url: str = Field(..., min_length=1, description="URL to redirect on success")
     cancel_url: str = Field(..., min_length=1, description="URL to redirect on cancellation")
     trial_days: Optional[int] = Field(
         None, ge=1, le=365, description="Number of trial days (optional)"
     )
+
+    @model_validator(mode="after")
+    def validate_checkout_target(self) -> CheckoutSessionRequest:
+        if not self.plan_id and not self.price_id:
+            raise ValueError("Either plan_id or price_id is required")
+        return self
 
 
 class CheckoutSessionResponse(BaseModel):

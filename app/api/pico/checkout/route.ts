@@ -6,13 +6,28 @@ import { proxyJson } from '@/app/api/_lib/proxy'
 
 export const dynamic = 'force-dynamic'
 
+const supportedPlanIds = new Set(['starter', 'pro'])
+const supportedPriceIdsByPlanId = {
+  starter: process.env.STRIPE_STARTER_PRICE_ID,
+  pro: process.env.STRIPE_PRO_PRICE_ID,
+} as const
+
 export async function POST(request: NextRequest) {
   return withErrorHandling(async () => {
     const body = await request.json()
-    const { priceId } = body
+    const { planId, priceId } = body
 
-    if (!priceId) {
-      return NextResponse.json({ error: 'priceId is required' }, { status: 400 })
+    const resolvedPlanId = typeof planId === 'string' && supportedPlanIds.has(planId)
+      ? planId
+      : Object.entries(supportedPriceIdsByPlanId).find(([, configuredPriceId]) =>
+          typeof priceId === 'string' && configuredPriceId === priceId,
+        )?.[0]
+
+    if (!resolvedPlanId) {
+      return NextResponse.json(
+        { error: 'A supported planId or priceId is required' },
+        { status: 400 },
+      )
     }
 
     const origin = new URL(request.url).origin
@@ -21,8 +36,8 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        price_id: priceId,
-        success_url: `${origin}/onboarding?checkout=success`,
+        plan_id: resolvedPlanId,
+        success_url: `${origin}/onboarding?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/pricing?checkout=canceled`,
         trial_days: 7,
       }),
