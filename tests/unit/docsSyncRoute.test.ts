@@ -39,11 +39,11 @@ describe('/api/docs/sync route', () => {
     hasGit.mockReturnValue(false)
     syncDocsFromGit.mockReset()
     delete process.env.DOCS_SYNC_TOKEN
-    process.env.NODE_ENV = 'production'
+    ;(process.env as Record<string, string | undefined>).NODE_ENV = 'production'
   })
 
   afterAll(() => {
-    process.env.NODE_ENV = originalNodeEnv
+    ;(process.env as Record<string, string | undefined>).NODE_ENV = originalNodeEnv
     if (originalSyncToken === undefined) {
       delete process.env.DOCS_SYNC_TOKEN
     } else {
