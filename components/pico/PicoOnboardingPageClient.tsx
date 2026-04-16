@@ -153,6 +153,63 @@ export function PicoOnboardingPageClient() {
 
   const currentBinding = setup.runtime?.current_binding ?? setup.runtime?.bindings[0] ?? null
   const onboardingRobot = picoRobotArtById.guide
+  const proofCaptured = firstRunWorkspace.workspace.evidence.trim().length > 0 || firstRunDone
+  const chapterPulsePercent = useMemo(() => {
+    const totalSteps = (installLesson?.steps.length ?? 0) + (firstRunLesson?.steps.length ?? 0)
+
+    if (totalSteps === 0) {
+      return 0
+    }
+
+    return Math.round(
+      ((installWorkspace.completedStepCount + firstRunWorkspace.completedStepCount) / totalSteps) * 100,
+    )
+  }, [
+    firstRunLesson?.steps.length,
+    firstRunWorkspace.completedStepCount,
+    installLesson?.steps.length,
+    installWorkspace.completedStepCount,
+  ])
+  const runtimeSignal =
+    session.status !== 'authenticated'
+      ? 'local only'
+      : setup.loading
+        ? 'checking'
+        : setup.runtime?.status ?? 'not attached'
+  const runtimeSignalBody =
+    session.status !== 'authenticated'
+      ? 'Hosted sync is not attached yet, so Pico only knows the local workspace state.'
+      : setup.loading
+        ? 'Refreshing the hosted onboarding wizard and runtime snapshot now.'
+        : setup.runtime?.gateway_url
+          ? `Gateway attached at ${setup.runtime.gateway_url}.`
+          : 'Runtime snapshot exists, but the gateway endpoint is not recorded yet.'
+  const nextMoveTitle = !installDone
+    ? 'Install Hermes now'
+    : !proofCaptured
+      ? 'Run one bounded prompt'
+      : !firstRunDone
+        ? 'Seal the first win'
+        : derived.nextLesson
+          ? `Continue with ${derived.nextLesson.title}`
+          : 'Open Autopilot'
+  const nextMoveBody = !installDone
+    ? (installLesson?.objective ?? 'Make the runtime open from a fresh shell before doing anything else.')
+    : !proofCaptured
+      ? (firstRunLesson?.expectedResult ??
+        'Pick one tiny prompt with an obvious answer and capture the output.')
+      : !firstRunDone
+        ? (firstRunLesson?.validation ??
+          'The answer exists. Mark the chapter complete and keep the route moving.')
+        : derived.nextLesson?.summary ?? 'The first visible win is done. Switch to the next live surface.'
+  const activeFocusStep = !installDone ? installFocusedStep : firstRunFocusedStep
+  const activeWorkspaceLabel =
+    setup.onboarding?.workspace ?? currentBinding?.workspace ?? runtimeDraft.workspace ?? 'not recorded'
+  const heroEyebrow = !proofCaptured
+    ? 'Make the first proof impossible to miss.'
+    : !firstRunDone
+      ? 'Seal the proof while the route is still honest.'
+      : 'First proof is real. Keep the lane moving.'
 
   const runtimeDraftDirty = useMemo(() => {
     const runtime = setup.runtime
@@ -226,6 +283,111 @@ export function PicoOnboardingPageClient() {
       eyebrow="Onboarding"
       title="Get to your first working agent fast"
       description="Ignore everything except the first local win. Install Hermes, run one prompt, see a real answer, then keep moving."
+      heroContent={
+        <div className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.16),rgba(9,16,11,0.84)_40%,rgba(255,255,255,0.03)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-[radial-gradient(circle_at_70%_50%,rgba(var(--pico-accent-rgb),0.24),transparent_68%)]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)]"
+          />
+          <div className="relative grid gap-4 xl:grid-cols-[minmax(0,1.12fr),15rem]">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={picoClasses.chip}>First-win pulse</span>
+                <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
+                  {activeTrack.title}
+                </span>
+              </div>
+              <p className="mt-4 font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
+                {heroEyebrow}
+              </p>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                Keep the fold focused on the only things that matter right now: chapter pulse, proof state,
+                runtime truth, and the next irreversible move.
+              </p>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Chapter pulse</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {chapterPulsePercent}%
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {installWorkspace.completedStepCount + firstRunWorkspace.completedStepCount} /
+                    {' '}
+                    {(installLesson?.steps.length ?? 0) + (firstRunLesson?.steps.length ?? 0)}
+                    {' '}
+                    lesson steps cleared.
+                  </p>
+                </div>
+
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Proof state</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {proofCaptured ? (firstRunDone ? 'sealed' : 'captured') : 'missing'}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {proofCaptured
+                      ? 'The first answer exists. Do not let it dissolve back into setup fog.'
+                      : 'No artifact yet. The first answer still needs to become visible and reusable.'}
+                  </p>
+                </div>
+
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Runtime truth</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {runtimeSignal}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {runtimeSignalBody}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className={picoInset('grid content-start gap-3 p-4')}>
+              <p className={picoClasses.label}>Next irreversible move</p>
+              <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                {nextMoveTitle}
+              </p>
+              <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{nextMoveBody}</p>
+
+              <div className="overflow-hidden rounded-full bg-[color:var(--pico-bg-input)]">
+                <div
+                  className="h-2 rounded-full bg-[linear-gradient(90deg,var(--pico-accent),var(--pico-accent-bright))]"
+                  style={{ width: `${chapterPulsePercent}%` }}
+                />
+              </div>
+
+              <div className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--pico-text-muted)]">
+                    Focused step
+                  </span>
+                  <span className="text-right text-[color:var(--pico-text)]">{activeFocusStep}</span>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--pico-text-muted)]">
+                    Workspace
+                  </span>
+                  <span className="text-right text-[color:var(--pico-text)]">{activeWorkspaceLabel}</span>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--pico-text-muted)]">
+                    Hosted sync
+                  </span>
+                  <span className="text-right text-[color:var(--pico-text)]">
+                    {session.status === 'authenticated' ? `${hostedCompletionRatio}%` : 'not attached'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
       railCollapsed={progress.platform.railCollapsed}
       helpLaneOpen={progress.platform.helpLaneOpen}
       onToggleRail={() =>

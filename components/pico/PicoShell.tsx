@@ -33,6 +33,7 @@ type PicoShellProps = {
   eyebrow?: string
   title: string
   description: string
+  heroContent?: ReactNode
   actions?: ReactNode
   mode?: 'default' | 'academy'
   railCollapsed?: boolean
@@ -177,6 +178,7 @@ export function PicoShell({
   eyebrow,
   title,
   description,
+  heroContent,
   actions,
   mode = 'default',
   railCollapsed = false,
@@ -286,6 +288,7 @@ export function PicoShell({
                 <p className="max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)] sm:text-base">
                   {description}
                 </p>
+                {heroContent ? <div className="mt-5">{heroContent}</div> : null}
               </div>
 
               <div className="grid gap-4">
@@ -505,6 +508,7 @@ export function PicoShell({
                   <p className="max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
                     {description}
                   </p>
+                  {heroContent ? <div className="pt-1">{heroContent}</div> : null}
                 </div>
 
                 <div className="grid min-w-0 gap-4">
