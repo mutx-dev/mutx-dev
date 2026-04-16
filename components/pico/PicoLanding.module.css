@@ -193,12 +193,8 @@
 /* --- Hero --------------------------------------------------------- */
 .hero {
   position: relative;
-  min-height: max(calc(100svh - 3.6rem), 44rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding-top: 3.6rem;
+  min-height: max(calc(100svh - 3.6rem), 46rem);
+  padding: clamp(5.25rem, 9vw, 8rem) 0 clamp(3.25rem, 7vw, 5.75rem);
   overflow: clip;
   background: var(--pico-bg);
 }
@@ -222,34 +218,89 @@
     radial-gradient(ellipse 30% 20% at 50% 50%, rgba(212, 171, 115, 0.04), transparent 60%);
 }
 
-.heroRobotStage {
-  position: absolute;
-  inset: 0;
-  display: flex;
+.heroShell {
+  position: relative;
+  z-index: 1;
+  width: var(--pico-shell);
+  margin: 0 auto;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4.5rem);
   align-items: center;
-  justify-content: center;
+}
+
+@media (min-width: 980px) {
+  .heroShell {
+    grid-template-columns: minmax(0, 1.18fr) minmax(19rem, 0.82fr);
+  }
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1.2rem;
+  align-content: center;
+  max-width: 46rem;
+}
+
+.heroVisualRail {
+  position: relative;
+  display: grid;
+  align-items: end;
+  min-height: clamp(24rem, 46vw, 41rem);
+}
+
+.heroRobotStage {
+  position: relative;
+  display: grid;
+  justify-items: end;
+  align-items: center;
+  min-height: inherit;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .heroRobotGlow {
   position: absolute;
-  width: min(84vw, 52rem);
-  aspect-ratio: 3 / 2;
+  right: clamp(-1rem, 2vw, 1rem);
+  width: min(100%, 36rem);
+  aspect-ratio: 4 / 5;
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(164, 255, 92, 0.2) 0%, rgba(164, 255, 92, 0.06) 42%, transparent 72%);
-  filter: blur(42px);
+    radial-gradient(circle, rgba(164, 255, 92, 0.24) 0%, rgba(164, 255, 92, 0.1) 38%, transparent 74%);
+  filter: blur(58px);
   opacity: 0.95;
-  transform: translateY(-2%);
+}
+
+.heroVisualLabel {
+  position: absolute;
+  top: 8%;
+  right: 0;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(240, 208, 161, 0.45);
 }
 
 .heroRobotFrame {
   position: relative;
-  width: min(84vw, 44rem);
-  aspect-ratio: 3 / 2;
-  opacity: 0.92;
-  filter: drop-shadow(0 36px 70px rgba(0, 0, 0, 0.42));
-  transform: translateY(2%);
+  width: min(100%, 37rem);
+  aspect-ratio: 3 / 4;
+  opacity: 0.96;
+  filter: drop-shadow(0 34px 80px rgba(0, 0, 0, 0.52));
+  transform: translate(2.5rem, 2rem) scale(1.06);
+}
+
+.heroRobotFrame::after {
+  content: '';
+  position: absolute;
+  inset: auto 10% 2% 10%;
+  height: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(164, 255, 92, 0.16), transparent 72%);
+  filter: blur(18px);
 }
 
 .heroRobotImage {
@@ -257,18 +308,6 @@
   height: 100%;
   display: block;
   object-fit: contain;
-}
-
-.heroGrid {
-  position: relative;
-  z-index: 1;
-  width: var(--pico-shell);
-  margin: 0 auto;
-  padding: clamp(3.5rem, 8vh, 6.5rem) 0 clamp(2.5rem, 6vh, 4.5rem);
-  display: grid;
-  gap: 1.25rem;
-  justify-items: center;
-  max-width: 54rem;
 }
 
 .heroBadge {
@@ -289,6 +328,12 @@
   color: var(--pico-accent);
 }
 
+.heroBadge,
+.heroMeta,
+.trustBar {
+  justify-self: start;
+}
+
 .heroBadge::before {
   content: '';
   width: 0.4rem;
@@ -302,15 +347,25 @@
 
 .heroTitle {
   margin: 0;
+  display: grid;
+  gap: 0.05em;
   font-family: var(--pico-font-display);
-  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-size: clamp(2.95rem, 5.7vw, 5.35rem);
   font-weight: 400;
-  line-height: 0.94;
+  line-height: 0.9;
   letter-spacing: -0.055em;
-  max-width: 18ch;
+  max-width: 13ch;
+  text-wrap: balance;
+}
+
+.heroTitleMain {
+  display: block;
 }
 
 .heroTitleAccent {
+  display: block;
+  max-width: 12ch;
+  padding-left: clamp(0.45rem, 2vw, 1.4rem);
   background: linear-gradient(135deg, #d4ab73 0%, #f0d0a1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -320,11 +375,12 @@
 .heroSub {
   margin: 0;
   color: var(--pico-text-secondary);
-  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.22rem);
-  line-height: 1.62;
-  max-width: 36rem;
+  font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.22rem);
+  line-height: 1.66;
+  max-width: 34rem;
   letter-spacing: -0.01em;
   text-shadow: 0 12px 44px rgba(9, 8, 11, 0.42);
+  text-wrap: pretty;
 }
 
 .heroMascotWrap {
@@ -342,7 +398,7 @@
   flex-wrap: wrap;
   gap: 0.8rem;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding-top: 0.5rem;
 }
 
@@ -351,7 +407,7 @@
   flex-wrap: wrap;
   gap: 0.8rem;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .heroCtaPrimary {
@@ -477,7 +533,7 @@
   color: var(--pico-text-muted);
   font-size: 0.84rem;
   line-height: 1.5;
-  max-width: 28rem;
+  max-width: 30rem;
   letter-spacing: 0.01em;
 }
 
@@ -1299,27 +1355,32 @@
 
 /* --- Trust bar ---------------------------------------------------- */
 .trustBar {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
-  width: 100%;
-  max-width: 48rem;
+  padding-top: 0.35rem;
+  max-width: 34rem;
 }
 
 .trustItem {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 4rem;
-  padding: 0.85rem 1rem;
-  border-radius: 1.1rem;
-  border: 1px solid var(--pico-border);
-  background:
-    linear-gradient(180deg, rgba(255, 248, 236, 0.05), rgba(255, 248, 236, 0.02));
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: var(--pico-text-secondary);
-  text-align: center;
+  gap: 0.45rem;
+  min-height: 1.6rem;
+  padding: 0;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: var(--pico-text-muted);
+  text-align: left;
+}
+
+.trustItem::before {
+  content: '';
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 999px;
+  background: rgba(164, 255, 92, 0.9);
+  box-shadow: 0 0 10px rgba(164, 255, 92, 0.45);
 }
 
 .trustSep {
@@ -1934,20 +1995,46 @@
 
   .hero {
     min-height: auto;
+    padding-top: 4.85rem;
   }
 
-  .heroGrid {
-    padding: 2.25rem 0 1.5rem;
-    gap: 1rem;
+  .heroShell {
+    gap: 1.6rem;
   }
 
   .heroRobotFrame {
-    width: min(72vw, 18rem);
+    width: min(76vw, 19rem);
+    aspect-ratio: 1;
+    transform: none;
+  }
+
+  .heroVisualRail {
+    min-height: auto;
+    gap: 1rem;
+  }
+
+  .heroRobotStage {
+    justify-items: center;
+    min-height: 0;
+  }
+
+  .heroRobotGlow {
+    right: auto;
+    width: min(78vw, 20rem);
+  }
+
+  .heroVisualLabel {
+    display: none;
   }
 
   .heroTitle {
     font-size: clamp(2.7rem, 14vw, 4rem);
     max-width: 10ch;
+  }
+
+  .heroTitleAccent {
+    max-width: none;
+    padding-left: 0;
   }
 
   .heroSub {
@@ -1972,14 +2059,14 @@
   }
 
   .trustBar {
-    grid-template-columns: 1fr;
     max-width: 22rem;
   }
 
   .trustItem {
-    justify-content: flex-start;
-    min-height: auto;
-    text-align: left;
+    width: 100%;
+    justify-content: center;
+    min-height: 1.6rem;
+    text-align: center;
   }
 
   .launchStep {

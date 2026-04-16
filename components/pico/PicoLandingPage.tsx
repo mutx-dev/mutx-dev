@@ -93,66 +93,73 @@ export function PicoLandingPage() {
       <main className={s.main}>
         <section className={s.hero}>
           <div className={s.heroAmbient} aria-hidden="true" />
-          <div className={s.heroRobotStage} aria-hidden="true">
-            <div className={s.heroRobotGlow} />
-            <div className={s.heroRobotFrame}>
-              <Image
-                src={heroRobot.src}
-                alt=""
-                width={1536}
-                height={1024}
-                priority
-                className={s.heroRobotImage}
-                sizes="(max-width: 768px) 78vw, 36rem"
-              />
-            </div>
-          </div>
-          <div className={s.heroGrid}>
-            <SiteReveal delay={0.05}>
-              <span className={s.heroBadge}>{t('hero.badge')}</span>
-            </SiteReveal>
+          <div className={s.heroShell}>
+            <div className={s.heroCopy}>
+              <SiteReveal delay={0.05}>
+                <span className={s.heroBadge}>{t('hero.badge')}</span>
+              </SiteReveal>
 
-            <SiteReveal delay={0.1}>
-              <h1 className={s.heroTitle}>
-                {t('hero.title')}
-                <span className={s.heroTitleAccent}>{t('hero.titleAccent')}</span>
-              </h1>
-            </SiteReveal>
+              <SiteReveal delay={0.1}>
+                <h1 className={s.heroTitle}>
+                  <span className={s.heroTitleMain}>{t('hero.title')}</span>
+                  <span className={s.heroTitleAccent}>{t('hero.titleAccent')}</span>
+                </h1>
+              </SiteReveal>
 
-            <SiteReveal delay={0.16}>
-              <p className={s.heroSub}>{t('hero.subtitle')}</p>
-            </SiteReveal>
+              <SiteReveal delay={0.16}>
+                <p className={s.heroSub}>{t('hero.subtitle')}</p>
+              </SiteReveal>
 
-            <SiteReveal delay={0.22}>
-              <div className={s.heroActions}>
-                <div className={s.heroCtaRow}>
-                  <button
-                    type="button"
-                    className={s.heroCtaPrimary}
-                    onClick={() => openForm('building-first')}
-                  >
-                    {t('hero.cta')}
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <a href="#launch-path" className={s.heroCtaSecondary}>
-                    {t('hero.ctaSecondary') || 'See pricing'}
-                  </a>
+              <SiteReveal delay={0.22}>
+                <div className={s.heroActions}>
+                  <div className={s.heroCtaRow}>
+                    <button
+                      type="button"
+                      className={s.heroCtaPrimary}
+                      onClick={() => openForm('building-first')}
+                    >
+                      {t('hero.cta')}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <a href="#launch-path" className={s.heroCtaSecondary}>
+                      {t('hero.ctaSecondary') || 'See pricing'}
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </SiteReveal>
+              </SiteReveal>
 
-            <SiteReveal delay={0.26}>
-              <p className={s.heroMeta}>{t('hero.meta')}</p>
-            </SiteReveal>
+              <SiteReveal delay={0.26}>
+                <p className={s.heroMeta}>{t('hero.meta')}</p>
+              </SiteReveal>
 
-            <SiteReveal delay={0.3}>
-              <div className={s.trustBar}>
-                {Array.from({ length: 3 }, (_, i) => (
-                  <span key={i} className={s.trustItem}>
-                    {i > 0 && <span className={s.trustSep} aria-hidden="true">|</span>}
-                    {t(`trustBar.items.${i}`)}
-                  </span>
-                ))}
+              <SiteReveal delay={0.3}>
+                <div className={s.trustBar}>
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <span key={i} className={s.trustItem}>
+                      {t(`trustBar.items.${i}`)}
+                    </span>
+                  ))}
+                </div>
+              </SiteReveal>
+            </div>
+
+            <SiteReveal delay={0.18}>
+              <div className={s.heroVisualRail}>
+                <div className={s.heroRobotStage} aria-hidden="true">
+                  <div className={s.heroRobotGlow} />
+                  <div className={s.heroVisualLabel}>PicoMUTX</div>
+                  <div className={s.heroRobotFrame}>
+                    <Image
+                      src={heroRobot.src}
+                      alt=""
+                      width={1536}
+                      height={1024}
+                      priority
+                      className={s.heroRobotImage}
+                      sizes="(max-width: 768px) 78vw, (max-width: 1180px) 42vw, 34rem"
+                    />
+                  </div>
+                </div>
               </div>
             </SiteReveal>
           </div>
