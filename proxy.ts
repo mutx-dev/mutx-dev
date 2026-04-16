@@ -16,8 +16,9 @@ const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
 const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
-const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.mutxx.dev', 'pico.localhost'])
+const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
 const PICO_AUTH_PATHS = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'])
+const PICO_WHITELISTED_PATHS = new Set(['/onboarding', '/academy', '/support', '/tutor', '/autopilot'])
 const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, (typeof PICO_LOCALES)[number]>> = {
   JP: 'ja',
@@ -390,7 +391,14 @@ export function proxy(request: NextRequest) {
       return finalizeResponse(rewrite, host, normalizedPath)
     }
 
-    // Non-root paths -> WIP animation page
+    // Whitelisted page paths -> serve their real /pico/{path} component
+    if (PICO_WHITELISTED_PATHS.has(normalizedPath)) {
+      const rewrite = rewriteWithinHost(request, `/pico${normalizedPath}`)
+      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
+      return finalizeResponse(rewrite, host, normalizedPath)
+    }
+
+    // All other non-root paths -> WIP animation page
     const rewrite = rewriteWithinHost(request, '/pico/wip')
     rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
     return finalizeResponse(rewrite, host, normalizedPath)
