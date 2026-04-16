@@ -23,10 +23,6 @@ const GITHUB_HEADERS = {
   'User-Agent': 'mutx-pico-content-sync',
 }
 
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
 function compactWhitespace(value) {
   return value.replace(/\s+/g, ' ').trim()
 }

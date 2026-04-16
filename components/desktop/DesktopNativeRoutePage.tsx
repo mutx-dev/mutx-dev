@@ -21,7 +21,7 @@ import {
   Zap,
 } from "lucide-react";
 
-import { DesktopOperatorCockpit } from "@/app/onboarding/page";
+import { DesktopOperatorCockpit } from "@/components/desktop/DesktopOperatorCockpit";
 import {
   normalizeCollection,
   readJson,

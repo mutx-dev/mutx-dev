@@ -60,41 +60,55 @@ export function resolveHydratedPicoProgress(
   return mergePicoProgress(currentLocalValue, remoteValue)
 }
 
-export function usePicoProgress() {
+export function usePicoProgress(remoteSyncEnabled = true) {
   const [progress, setProgress] = useState<PicoProgressState>(() => createDefaultPicoProgress())
   const [ready, setReady] = useState(false)
   const [syncState, setSyncState] = useState<SyncState>('loading')
 
-  const persistRemote = useCallback(async (nextProgress: PicoProgressState) => {
-    try {
-      setSyncState('saving')
-      const response = await fetch('/api/pico/progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(nextProgress),
-      })
-
-      if (!response.ok) {
-        setSyncState(response.status === 401 ? 'offline' : 'idle')
+  const persistRemote = useCallback(
+    async (nextProgress: PicoProgressState) => {
+      if (!remoteSyncEnabled) {
+        setSyncState('offline')
         return
       }
 
-      const payload = normalizePicoProgress(await response.json())
-      writeLocalProgress(payload)
-      setProgress(payload)
-      setSyncState('synced')
-    } catch {
-      setSyncState('offline')
-    }
-  }, [])
+      try {
+        setSyncState('saving')
+        const response = await fetch('/api/pico/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(nextProgress),
+        })
+
+        if (!response.ok) {
+          setSyncState(response.status === 401 ? 'offline' : 'idle')
+          return
+        }
+
+        const payload = normalizePicoProgress(await response.json())
+        writeLocalProgress(payload)
+        setProgress(payload)
+        setSyncState('synced')
+      } catch {
+        setSyncState('offline')
+      }
+    },
+    [remoteSyncEnabled]
+  )
 
   useEffect(() => {
     const local = readLocalProgress()
     setProgress(local)
     writeLocalProgress(local)
+
+    if (!remoteSyncEnabled) {
+      setSyncState('offline')
+      setReady(true)
+      return
+    }
 
     async function hydrate() {
       try {
@@ -127,7 +141,7 @@ export function usePicoProgress() {
     }
 
     void hydrate()
-  }, [])
+  }, [persistRemote, remoteSyncEnabled])
 
   const update = useCallback(
     (updater: (current: PicoProgressState) => PicoProgressState) => {
