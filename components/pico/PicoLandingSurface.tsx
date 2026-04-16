@@ -1,11 +1,11 @@
 import { PicoFooter } from '@/components/pico/PicoFooter'
-import { PicoLandingPage } from '@/components/pico/PicoLandingPage'
+import { PicoLandingPoster } from '@/components/pico/PicoLandingPoster'
 import { PublicSurface } from '@/components/site/PublicSurface'
 
 export function PicoLandingSurface() {
   return (
     <PublicSurface>
-      <PicoLandingPage />
+      <PicoLandingPoster />
       <PicoFooter />
     </PublicSurface>
   )

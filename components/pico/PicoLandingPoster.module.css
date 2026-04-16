@@ -1,0 +1,1356 @@
+.page {
+  --landing-shell: min(100% - 1.5rem, 82rem);
+  --nav-height: 4.8rem;
+  position: relative;
+  min-height: 100vh;
+  color: var(--pico-text);
+  font-family: var(--pico-font-body);
+  overflow-x: clip;
+}
+
+.page *,
+.page *::before,
+.page *::after {
+  box-sizing: border-box;
+}
+
+.page a {
+  color: inherit;
+}
+
+.main {
+  position: relative;
+}
+
+.heroShell,
+.sectionShell,
+.trustStrip {
+  width: var(--landing-shell);
+  margin: 0 auto;
+}
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background:
+    linear-gradient(180deg, rgba(3, 8, 4, 0.94), rgba(3, 8, 4, 0.74)),
+    rgba(3, 8, 4, 0.74);
+  backdrop-filter: blur(24px) saturate(1.4);
+}
+
+.navInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: var(--landing-shell);
+  min-height: var(--nav-height);
+  margin: 0 auto;
+}
+
+.navBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.navLogo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  flex-shrink: 0;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.24);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(var(--pico-accent-rgb), 0.22), transparent 60%),
+    linear-gradient(180deg, rgba(10, 19, 11, 0.98), rgba(6, 13, 8, 0.94));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.navBrandCopy {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  min-width: 0;
+}
+
+.navName {
+  font-family: var(--pico-font-display);
+  font-size: 1.2rem;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: var(--pico-text);
+}
+
+.navTag {
+  color: var(--pico-text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.navLinks {
+  display: none;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.navLink {
+  color: var(--pico-text-muted);
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.navLink:hover {
+  color: var(--pico-text);
+}
+
+.navActions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.navCta,
+.heroPrimary,
+.finalButton,
+.pricingButtonPrimary {
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.24);
+  background:
+    linear-gradient(
+      135deg,
+      var(--pico-accent-bright) 0%,
+      var(--pico-accent) 48%,
+      var(--pico-accent-deep) 100%
+    );
+  color: var(--pico-accent-contrast);
+  box-shadow:
+    0 18px 44px rgba(var(--pico-accent-rgb), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.navCta,
+.heroPrimary,
+.heroSecondary,
+.pricingButton,
+.finalButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  border-radius: 999px;
+  font-family: var(--pico-font-body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+  cursor: pointer;
+}
+
+.navCta {
+  min-height: 2.7rem;
+  padding: 0 1.05rem;
+}
+
+.navCta:hover,
+.heroPrimary:hover,
+.finalButton:hover,
+.pricingButtonPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 22px 52px rgba(var(--pico-accent-rgb), 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.hero {
+  position: relative;
+  padding: calc(var(--nav-height) + 2rem) 0 2rem;
+  min-height: 100svh;
+  overflow: clip;
+}
+
+.heroBackdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 14% 16%, rgba(var(--pico-accent-rgb), 0.16), transparent 28%),
+    radial-gradient(circle at 78% 8%, rgba(115, 239, 190, 0.12), transparent 24%),
+    radial-gradient(circle at 58% 72%, rgba(var(--pico-accent-rgb), 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(5, 11, 7, 0.6) 0%, rgba(3, 8, 4, 0.04) 40%, rgba(3, 8, 4, 0) 100%);
+  opacity: 0.95;
+}
+
+.heroScanline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 84px 84px;
+  mask-image: radial-gradient(circle at 50% 36%, rgba(0, 0, 0, 0.86), transparent 92%);
+  opacity: 0.22;
+}
+
+.heroShell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(1.8rem, 5vw, 4rem);
+  align-items: center;
+  min-height: calc(100svh - var(--nav-height) - 4rem);
+}
+
+.heroCopy {
+  display: grid;
+  gap: 1.15rem;
+  align-content: center;
+  max-width: 36rem;
+}
+
+.heroPrelude {
+  display: grid;
+  gap: 0.85rem;
+  justify-items: start;
+}
+
+.heroBadge,
+.finalEyebrow,
+.eyebrow,
+.heroVisualKicker,
+.heroVisualSignal,
+.pathVisualLabel,
+.pathVisualRule,
+.shiftLabels,
+.pricingName,
+.pricingPeriod {
+  font-family: var(--pico-font-accent);
+  text-transform: uppercase;
+}
+
+.heroBadge,
+.finalEyebrow,
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.15rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.18);
+  background: rgba(var(--pico-accent-rgb), 0.08);
+  color: var(--pico-accent-bright);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.heroBadge::before,
+.finalEyebrowDot {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--pico-accent);
+  box-shadow: 0 0 16px rgba(var(--pico-accent-rgb), 0.8);
+  flex-shrink: 0;
+}
+
+.heroWordmark {
+  margin: 0;
+  font-family: var(--pico-font-display);
+  font-size: clamp(3.4rem, 10vw, 6.8rem);
+  line-height: 0.82;
+  letter-spacing: -0.09em;
+  text-wrap: balance;
+}
+
+.heroTitle {
+  margin: 0;
+  display: grid;
+  gap: 0.12em;
+  font-family: var(--pico-font-display);
+  font-size: clamp(2.25rem, 5vw, 4.15rem);
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+  max-width: 11.5ch;
+  text-wrap: balance;
+}
+
+.heroTitleAccent {
+  color: var(--pico-accent-bright);
+  text-shadow: 0 0 28px rgba(var(--pico-accent-rgb), 0.14);
+}
+
+.heroSubtitle,
+.sectionBody,
+.pathItemBody,
+.scenarioBody,
+.faqAnswer,
+.finalBody,
+.finalFormSubline {
+  color: var(--pico-text-secondary);
+  font-size: clamp(1rem, 0.96rem + 0.22vw, 1.1rem);
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+.heroSubtitle {
+  max-width: 34rem;
+  margin: 0;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+  padding-top: 0.45rem;
+}
+
+.heroPrimary,
+.finalButton {
+  padding: 0 1.35rem;
+  border: none;
+}
+
+.heroSecondary,
+.pricingButton {
+  padding: 0 1.35rem;
+  border: 1px solid var(--pico-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--pico-text);
+}
+
+.heroSecondary:hover,
+.pricingButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--pico-border-hover);
+  background: rgba(var(--pico-accent-rgb), 0.08);
+}
+
+.heroMeta,
+.sectionClose,
+.pathVisualNote,
+.finalMeta {
+  margin: 0;
+  color: var(--pico-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.heroVisualWrap {
+  display: grid;
+}
+
+.heroVisual {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: clamp(28rem, 52vw, 42rem);
+  padding: clamp(1.1rem, 2vw, 1.4rem);
+  overflow: hidden;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.16);
+  border-radius: 2rem;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(var(--pico-accent-rgb), 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(9, 17, 11, 0.98), rgba(4, 8, 5, 0.99));
+  box-shadow: var(--pico-shadow-frame);
+}
+
+.heroVisual::after {
+  content: '';
+  position: absolute;
+  inset: auto 12% 1.6rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.18), transparent 72%);
+  filter: blur(18px);
+  opacity: 0.9;
+}
+
+.heroVisualHeader,
+.pathVisualHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.heroVisualKicker,
+.heroVisualSignal,
+.pathVisualLabel,
+.pathVisualRule {
+  color: var(--pico-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.heroVisualSignal,
+.pathVisualRule {
+  text-align: right;
+}
+
+.heroRobotStage,
+.pathRobotWrap,
+.finalRobotFrame {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.heroRobotStage {
+  min-height: 18rem;
+  padding: 0.5rem 0 0;
+}
+
+.heroRobotGlow,
+.pathRobotGlow,
+.finalGlow {
+  position: absolute;
+  inset: auto 50% 50% auto;
+  transform: translate(50%, 50%);
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.24), transparent 72%);
+  filter: blur(50px);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.heroRobotImage,
+.pathRobotImage,
+.finalRobotImage {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 36rem);
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 90px rgba(0, 0, 0, 0.48));
+  animation: picoFloat 7s ease-in-out infinite;
+}
+
+.heroSignalRail {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+}
+
+.heroSignal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.heroSignalIndex,
+.scenarioNumber,
+.pathNumber {
+  color: var(--pico-text-muted);
+  font-family: var(--pico-font-accent);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.heroSignalIndex,
+.scenarioNumber {
+  font-size: 0.7rem;
+  padding-top: 0.25rem;
+}
+
+.heroSignalText {
+  margin: 0;
+  color: var(--pico-text);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.trustStrip {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0;
+  margin-top: clamp(1.35rem, 3vw, 2rem);
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.14);
+  border-bottom: 1px solid rgba(var(--pico-accent-rgb), 0.14);
+  background: linear-gradient(180deg, rgba(7, 14, 9, 0.78), rgba(5, 10, 7, 0.58));
+  backdrop-filter: blur(18px);
+}
+
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  color: var(--pico-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.trustDash {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--pico-accent);
+  box-shadow: 0 0 14px rgba(var(--pico-accent-rgb), 0.65);
+}
+
+.qualifySection,
+.pathSection,
+.shiftSection,
+.accessSection,
+.faqSection,
+.finalSection {
+  position: relative;
+  padding: clamp(4.5rem, 8vw, 7rem) 0;
+}
+
+.qualifySection,
+.pathSection,
+.accessSection {
+  scroll-margin-top: calc(var(--nav-height) + 1rem);
+}
+
+.qualifySection {
+  background: radial-gradient(circle at 18% 24%, rgba(var(--pico-accent-rgb), 0.05), transparent 26%), rgba(3, 8, 4, 0.4);
+}
+
+.qualifyGrid {
+  display: grid;
+  gap: 1.6rem;
+  align-items: start;
+}
+
+.qualifyIntro {
+  display: grid;
+  gap: 1rem;
+  max-width: 33rem;
+}
+
+.eyebrow {
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.sectionTitle,
+.whoTitle,
+.pathItemTitle,
+.pricingTitle,
+.finalTitle,
+.faqQuestion {
+  margin: 0;
+  color: var(--pico-text);
+  font-family: var(--pico-font-display);
+  line-height: 0.96;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.sectionTitle,
+.finalTitle {
+  font-size: clamp(2.2rem, 4.8vw, 4.1rem);
+}
+
+.sectionBody,
+.sectionClose {
+  max-width: 34rem;
+}
+
+.scenarioBoard,
+.whoBoard,
+.pathVisual,
+.shiftBoard,
+.pricingBoard,
+.faqStack,
+.finalPanel {
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  background: linear-gradient(180deg, rgba(8, 15, 10, 0.94), rgba(4, 8, 5, 0.98));
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.scenarioBoard {
+  overflow: hidden;
+  border-radius: 1.7rem;
+}
+
+.scenarioItem {
+  display: grid;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 1.2rem 1.25rem 1.3rem;
+  border: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0));
+  text-align: left;
+}
+
+.scenarioItem + .scenarioItem {
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+}
+
+.scenarioItem:hover {
+  background: linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.08), rgba(255, 255, 255, 0));
+}
+
+.scenarioLine {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.scenarioLabel {
+  margin: 0;
+  color: var(--pico-text);
+  font-size: 1.06rem;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+}
+
+.scenarioBody {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.whoBoard {
+  display: grid;
+  gap: 0;
+  margin-top: 1.7rem;
+  overflow: hidden;
+  border-radius: 1.9rem;
+}
+
+.whoColumn {
+  padding: 1.35rem 1.25rem 1.5rem;
+}
+
+.whoTitle {
+  margin-top: 0.45rem;
+  font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+}
+
+.whoDivider {
+  background: linear-gradient(180deg, transparent, rgba(var(--pico-accent-rgb), 0.16), transparent);
+}
+
+.whoList,
+.notList,
+.benefitsList,
+.pricingFeatures {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.whoItem,
+.notItem,
+.benefitItem,
+.pricingFeature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: var(--pico-text-secondary);
+  line-height: 1.55;
+}
+
+.whoCheck,
+.benefitCheck,
+.pricingFeatureCheck {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+  color: var(--pico-accent);
+}
+
+.notDash {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 140, 114, 0.85), rgba(255, 140, 114, 0.2));
+}
+
+.pathSection {
+  background: radial-gradient(circle at 78% 22%, rgba(115, 239, 190, 0.06), transparent 20%), linear-gradient(180deg, rgba(5, 10, 7, 0.24), rgba(3, 8, 4, 0.04));
+}
+
+.pathGrid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.pathSticky {
+  display: grid;
+  gap: 1.25rem;
+  align-self: start;
+}
+
+.pathIntro {
+  display: grid;
+  gap: 1rem;
+}
+
+.pathVisual {
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+  border-radius: 1.9rem;
+  overflow: hidden;
+}
+
+.pathRobotWrap {
+  min-height: 15rem;
+}
+
+.pathRobotGlow {
+  width: 72%;
+}
+
+.pathRobotImage {
+  width: min(100%, 22rem);
+}
+
+.pathGallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.pathGalleryCell {
+  display: grid;
+  place-items: center;
+  min-height: 7rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  background: linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.08), rgba(255, 255, 255, 0));
+}
+
+.pathGalleryImage {
+  width: min(100%, 6rem);
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.34));
+}
+
+.pathList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.pathItem {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.2rem, 2vw, 1.45rem);
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  border-radius: 1.6rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.pathItemTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pathNumber {
+  font-size: 0.72rem;
+}
+
+.pathIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.18);
+  background: rgba(var(--pico-accent-rgb), 0.08);
+  color: var(--pico-accent-bright);
+}
+
+.pathItemCopy {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.pathItemTitle {
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+}
+
+.pathItemBody {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.shiftSection {
+  background: radial-gradient(circle at 22% 16%, rgba(var(--pico-accent-rgb), 0.05), transparent 24%), rgba(3, 8, 4, 0.28);
+}
+
+.shiftHeader,
+.faqHeader {
+  max-width: 38rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.shiftBoard {
+  margin-top: 1.35rem;
+  overflow: hidden;
+  border-radius: 1.8rem;
+}
+
+.shiftLabels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  padding: 1rem 1.2rem;
+  color: var(--pico-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  border-bottom: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.shiftLabels span:last-child {
+  text-align: right;
+}
+
+.shiftRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
+
+.shiftRow + .shiftRow {
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+}
+
+.shiftBefore,
+.shiftAfter {
+  margin: 0;
+  padding: 1.25rem 1.2rem;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.shiftBefore {
+  color: var(--pico-text-secondary);
+  border-right: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+}
+
+.shiftAfter {
+  color: var(--pico-text);
+  background: linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.08), rgba(255, 255, 255, 0));
+}
+
+.accessSection {
+  background: linear-gradient(180deg, rgba(5, 10, 7, 0.16), rgba(3, 8, 4, 0));
+}
+
+.accessGrid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.accessIntro {
+  display: grid;
+  gap: 1rem;
+  max-width: 35rem;
+}
+
+.benefitsList {
+  margin-top: 0.75rem;
+}
+
+.pricingBoard {
+  display: grid;
+  gap: 1.15rem;
+  padding: 1.2rem;
+  border-radius: 1.9rem;
+}
+
+.pricingHeader {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.pricingTitle {
+  font-size: clamp(1.9rem, 3.5vw, 3rem);
+}
+
+.pricingTiers {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+}
+
+.pricingTier {
+  display: grid;
+  gap: 1.15rem;
+  padding: 1.2rem 0;
+}
+
+.pricingTier + .pricingTier {
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+}
+
+.pricingTierRecommended {
+  position: relative;
+}
+
+.pricingTierRecommended::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--pico-accent), transparent 88%);
+}
+
+.pricingTop {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.pricingName {
+  margin: 0;
+  color: var(--pico-accent-bright);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.pricingPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.pricingAmount {
+  color: var(--pico-text);
+  font-family: var(--pico-font-display);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+}
+
+.pricingPeriod {
+  color: var(--pico-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.pricingDescription {
+  margin: 0;
+  color: var(--pico-text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.pricingFeatures {
+  margin-top: 0;
+}
+
+.pricingButton {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0 1.15rem;
+}
+
+.pricingButtonPrimary {
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.24);
+  background:
+    linear-gradient(
+      135deg,
+      var(--pico-accent-bright) 0%,
+      var(--pico-accent) 48%,
+      var(--pico-accent-deep) 100%
+    );
+  color: var(--pico-accent-contrast);
+  box-shadow:
+    0 18px 44px rgba(var(--pico-accent-rgb), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.faqSection {
+  background: radial-gradient(circle at 80% 22%, rgba(115, 239, 190, 0.05), transparent 22%), rgba(3, 8, 4, 0.18);
+}
+
+.faqStack {
+  margin-top: 1.3rem;
+  overflow: hidden;
+  border-radius: 1.8rem;
+}
+
+.faqItem {
+  background: transparent;
+}
+
+.faqItem + .faqItem {
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+}
+
+.faqSummary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  list-style: none;
+  cursor: pointer;
+  padding: 1.2rem 1.25rem;
+}
+
+.faqSummary::-webkit-details-marker {
+  display: none;
+}
+
+.faqQuestion {
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+}
+
+.faqMarker {
+  color: var(--pico-text-muted);
+  font-size: 1.8rem;
+  line-height: 1;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.faqItem[open] .faqMarker {
+  transform: rotate(45deg);
+  color: var(--pico-accent-bright);
+}
+
+.faqAnswer {
+  max-width: 46rem;
+  margin: 0;
+  padding: 0 1.25rem 1.35rem;
+  font-size: 0.98rem;
+}
+
+.finalSection {
+  padding-bottom: clamp(5rem, 9vw, 7rem);
+}
+
+.finalPanel {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border-radius: 2rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(var(--pico-accent-rgb), 0.18), transparent 28%),
+    linear-gradient(180deg, rgba(9, 18, 11, 0.98), rgba(5, 10, 7, 0.99));
+}
+
+.finalGlow {
+  inset: 18% auto auto 18%;
+  transform: translate(-50%, -50%);
+  width: min(38rem, 55vw);
+  aspect-ratio: 1;
+}
+
+.finalCopy,
+.finalVisual {
+  position: relative;
+  z-index: 1;
+}
+
+.finalCopy {
+  display: grid;
+  gap: 1rem;
+  align-content: center;
+  max-width: 34rem;
+}
+
+.finalEyebrow {
+  padding-right: 1rem;
+}
+
+.finalBody {
+  margin: 0;
+}
+
+.finalCallout {
+  display: grid;
+  gap: 0.35rem;
+  padding-top: 0.35rem;
+}
+
+.finalFormHeadline {
+  margin: 0;
+  color: var(--pico-text);
+  font-family: var(--pico-font-display);
+  font-size: clamp(1.6rem, 3.1vw, 2.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.finalFormSubline {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.finalActions {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  padding-top: 0.2rem;
+}
+
+.finalButton {
+  padding: 0 1.4rem;
+}
+
+.finalRobotFrame {
+  min-height: 18rem;
+}
+
+.finalRobotFrame::after {
+  content: '';
+  position: absolute;
+  inset: auto 14% 1rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.18), transparent 72%);
+  filter: blur(16px);
+}
+
+.finalRobotImage {
+  width: min(100%, 28rem);
+}
+
+@media (min-width: 760px) {
+  .trustStrip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .trustItem + .trustItem {
+    border-left: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  }
+
+  .whoBoard {
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 980px) {
+  .navLinks {
+    display: inline-flex;
+  }
+
+  .heroShell {
+    grid-template-columns: minmax(0, 1.02fr) minmax(23rem, 0.98fr);
+  }
+
+  .heroVisual {
+    min-height: clamp(33rem, 46vw, 44rem);
+  }
+
+  .qualifyGrid {
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  }
+
+  .pathGrid {
+    grid-template-columns: minmax(18rem, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .pathSticky {
+    position: sticky;
+    top: calc(var(--nav-height) + 1.2rem);
+  }
+
+  .accessGrid {
+    grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
+  }
+
+  .pricingTiers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pricingTier {
+    min-height: 100%;
+    padding: 1.35rem 1.1rem 0.2rem;
+    align-content: start;
+  }
+
+  .pricingTier + .pricingTier {
+    border-top: 0;
+    border-left: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+  }
+
+  .finalPanel {
+    grid-template-columns: minmax(0, 0.96fr) minmax(20rem, 0.84fr);
+    align-items: center;
+  }
+}
+
+@media (max-width: 979px) {
+  .navTag {
+    display: none;
+  }
+
+  .navActions {
+    gap: 0.45rem;
+  }
+}
+
+@media (max-width: 759px) {
+  .page {
+    --landing-shell: min(100% - 1rem, 82rem);
+    --nav-height: 4.35rem;
+  }
+
+  .navInner {
+    gap: 0.75rem;
+  }
+
+  .navBrand {
+    gap: 0.65rem;
+  }
+
+  .navName {
+    font-size: 1.05rem;
+  }
+
+  .navCta {
+    display: none;
+  }
+
+  .hero {
+    padding-top: calc(var(--nav-height) + 1.35rem);
+  }
+
+  .heroWordmark {
+    font-size: clamp(2.8rem, 16vw, 5rem);
+  }
+
+  .heroTitle {
+    max-width: 12.5ch;
+  }
+
+  .heroVisual {
+    min-height: 28rem;
+  }
+
+  .scenarioItem,
+  .whoColumn,
+  .pathVisual,
+  .pricingBoard,
+  .faqSummary,
+  .faqAnswer,
+  .finalPanel {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .whoBoard {
+    border-radius: 1.55rem;
+  }
+
+  .whoDivider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .shiftLabels,
+  .shiftRow {
+    grid-template-columns: 1fr;
+  }
+
+  .shiftLabels span:last-child {
+    text-align: left;
+  }
+
+  .shiftBefore {
+    border-right: 0;
+    border-bottom: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+  }
+
+  .finalActions {
+    justify-items: stretch;
+  }
+
+  .finalButton {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navCta,
+  .heroPrimary,
+  .heroSecondary,
+  .pricingButton,
+  .finalButton,
+  .scenarioItem,
+  .faqMarker {
+    transition: none;
+  }
+
+  .heroRobotImage,
+  .pathRobotImage,
+  .finalRobotImage {
+    animation: none;
+  }
+}
+
+@keyframes picoFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
