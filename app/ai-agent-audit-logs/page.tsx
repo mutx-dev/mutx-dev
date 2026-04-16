@@ -14,24 +14,24 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX",
+  title: "AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX",
   description:
-    "Complete trace history for every agent decision. MUTX records agent actions, policy evaluations, and operator decisions — so you can answer what happened and why.",
+    "Complete trace history for every agent decision. MUTX records actions, policy evaluations, and operator overrides — so you can answer what happened and why, with the full execution context.",
   alternates: { canonical: getCanonicalUrl("/ai-agent-audit-logs") },
   openGraph: {
-    title: "AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX",
+    title: "AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX",
     description:
-      "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
+      "Complete trace history for every agent decision. Records built for compliance and operator investigation.",
     url: getCanonicalUrl("/ai-agent-audit-logs"),
-    images: [getPageOgImageUrl("AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX", "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.", { path: "/ai-agent-audit-logs" })],
+    images: [getPageOgImageUrl("AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX", "Complete trace history for every agent decision. Records built for compliance and operator investigation.", { path: "/ai-agent-audit-logs" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
     title: "AI Agent Audit Logs | MUTX",
     description:
-      "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
-    images: [getPageTwitterImageUrl("AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX", "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.", { path: "/ai-agent-audit-logs" })],
+      "Complete trace history for every agent decision. Records built for compliance and operator investigation.",
+    images: [getPageTwitterImageUrl("AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX", "Complete trace history for every agent decision. Records built for compliance and operator investigation.", { path: "/ai-agent-audit-logs" })],
   },
 };
 
@@ -59,7 +59,7 @@ const structuredData = {
       name: "AI Agent Audit Logs | MUTX",
       url: getCanonicalUrl("/ai-agent-audit-logs"),
       description:
-        "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
+        "Complete trace history for every agent decision. Records built for compliance and operator investigation.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
@@ -68,19 +68,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Decision records",
-    body: "Every agent decision — what it tried to do, what tool it called, what it read or wrote, what the outcome was — recorded as a durable trace with enough context to reconstruct what happened without asking the agent to explain itself.",
+    body: "Every agent decision — what it tried, what tool it called, what it read or wrote, what the outcome was — recorded as a durable trace. Enough context to reconstruct what happened without asking the agent to explain itself.",
   },
   {
     title: "Policy evaluation traces",
-    body: "When a governance policy is evaluated, that evaluation is in the log — not just whether it passed, but what policy version was active, what the input was, and what the decision was.",
+    body: "When a governance policy is evaluated, that evaluation is in the log: which policy version was active, what the input was, what the decision was. Not just pass/fail.",
   },
   {
     title: "Operator accountability",
-    body: "Who configured an agent, who approved a deployment, who reviewed and overrode a guardrail decision — all in the audit log, attached to the trace they affected.",
+    body: "Who configured an agent, who approved a deployment, who overrode a guardrail — all in the audit log, attached to the trace they affected.",
   },
   {
     title: "Compliance export",
-    body: "Audit logs structured for compliance review — filterable by policy, operator, time range, and outcome. Export what compliance teams need to see without giving them access to the full operational surface.",
+    body: "Audit logs structured for compliance review. Filter by policy, operator, time range, or outcome. Export what compliance needs without giving them access to the full operational surface.",
   },
 ];
 
@@ -102,14 +102,14 @@ export default function AIAgentAuditLogsPage() {
                   <h1 className={feat.heroTitle}>
                     A record of what
                     <br />
-                    your agents did.
+                    your agents decided.
                   </h1>
                   <p className={feat.heroSupport}>
                     When compliance asks what the agent decided and why, vague
                     chat logs and &ldquo;it ran successfully&rdquo; messages
-                    won&rsquo;t cut it. MUTX keeps a complete trace history — so
-                    you can answer that question definitively, with the full
-                    execution context, not just a summary.
+                    won&apos;t cut it. MUTX keeps a complete trace history with
+                    full execution context — so you can answer that question
+                    definitively, not with a summary.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -134,11 +134,10 @@ export default function AIAgentAuditLogsPage() {
                   not just retention.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most audit logs are written for compliance retention
-                  requirements — not for actual operator use. MUTX audit logs
-                  are structured for investigation: every record has enough
-                  context to reconstruct what happened and understand why, not
-                  just that something occurred.
+                  Most audit logs are written for compliance retention — not for
+                  anyone to actually read. MUTX audit logs are structured for
+                  investigation: every record has enough context to reconstruct
+                  what happened and understand why.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -162,11 +161,11 @@ export default function AIAgentAuditLogsPage() {
                   the audit log.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Audit logs aren&rsquo;t a separate system in MUTX — they&rsquo;re
-                  where everything that happens in the control plane ends up.
-                  Governance evaluations, approval decisions, deployment records,
-                  and monitoring traces all attach to the audit log — so a
-                  single record gives you the full picture.
+                  Audit logs aren&apos;t a separate system in MUTX — they&apos;re
+                  where everything in the control plane ends up. Governance
+                  evaluations, approval decisions, deployment records, and
+                  monitoring traces all attach to one record. The full picture in
+                  one place.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -175,9 +174,9 @@ export default function AIAgentAuditLogsPage() {
                     <Link href="/ai-agent-governance">Governance</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Policy evaluations are in the audit log — not just whether
-                    a policy passed or failed, but the full evaluation trace
-                    with the policy version and input context.
+                    Policy evaluations are in the audit log — not just pass or
+                    fail, but the full evaluation trace with policy version and
+                    input context.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -185,9 +184,9 @@ export default function AIAgentAuditLogsPage() {
                     <Link href="/ai-agent-monitoring">Monitoring</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Traces feed the audit log. Every tool call, every outcome,
-                    every error — in a record that satisfies compliance
-                    requirements and helps operators reason about incidents.
+                    Traces feed the audit log. Every tool call, outcome, and
+                    error — in a record that satisfies compliance and helps
+                    operators reason about incidents.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -206,8 +205,8 @@ export default function AIAgentAuditLogsPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Guardrail violations are first-class audit events. You see
-                    the policy that was violated, the operation that was
-                    attempted, and the context — not just an error code.
+                    the policy violated, the operation attempted, and the
+                    context — not just an error code.
                   </p>
                 </div>
               </div>
@@ -224,10 +223,10 @@ export default function AIAgentAuditLogsPage() {
                   before compliance asks it.
                 </h2>
                 <p className={feat.finalBody}>
-                  Download the Mac app and run an agent. Open the audit log and
-                  see the complete record — every decision, every policy
-                  evaluation, every operator action — structured for compliance
-                  review and operator investigation alike.
+                  Download the Mac app. Run an agent. Open the audit log and see
+                  every decision, policy evaluation, and operator action —
+                  structured for compliance review and operator investigation
+                  alike.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

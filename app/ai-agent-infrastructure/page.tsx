@@ -14,24 +14,24 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX",
+  title: "AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX",
   description:
-    "Agent infrastructure that doesn't hide from you. MUTX gives you a consistent surface for compute, secrets, and storage — so your team can own what runs.",
+    "Stop guessing where your agents run. MUTX surfaces compute, secrets, and storage as explicit control plane properties — auditable, versioned, and visible.",
   alternates: { canonical: getCanonicalUrl("/ai-agent-infrastructure") },
   openGraph: {
-    title: "AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX",
+    title: "AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX",
     description:
-      "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
+      "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.",
     url: getCanonicalUrl("/ai-agent-infrastructure"),
-    images: [getPageOgImageUrl("AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX", "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.", { path: "/ai-agent-infrastructure" })],
+    images: [getPageOgImageUrl("AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX", "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.", { path: "/ai-agent-infrastructure" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
     title: "AI Agent Infrastructure | MUTX",
     description:
-      "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
-    images: [getPageTwitterImageUrl("AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX", "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.", { path: "/ai-agent-infrastructure" })],
+      "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.",
+    images: [getPageTwitterImageUrl("AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX", "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.", { path: "/ai-agent-infrastructure" })],
   },
 };
 
@@ -59,7 +59,7 @@ const structuredData = {
       name: "AI Agent Infrastructure | MUTX",
       url: getCanonicalUrl("/ai-agent-infrastructure"),
       description:
-        "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
+        "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
@@ -68,19 +68,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Compute management",
-    body: "Where agents run is part of the control plane record. MUTX surfaces compute allocation, scheduling, and scaling as explicit properties — not hidden behind a hosting provider&rsquo;s console.",
+    body: "Where agents run is part of the control plane record. Compute allocation, scheduling, and scaling are surfaced as explicit properties — not buried in a hosting provider&rsquo;s console you check after something breaks.",
   },
   {
     title: "Secrets management",
-    body: "API keys, credentials, and secrets are managed through the control plane — not scattered across environment files, .env.local, and a notes app on someone&rsquo;s laptop.",
+    body: "API keys and credentials live in the control plane — not scattered across .env files, CI variables, and someone&rsquo;s notes app. Rotated, versioned, and attached to the agents that use them.",
   },
   {
     title: "Storage layer",
-    body: "What the agent reads and writes, where it writes state, and how long that state persists — all explicit in the control plane. No state that lives outside the system&rsquo;s awareness.",
+    body: "What the agent reads, what it writes, and how long that state persists — all explicit. No orphaned state blobs living outside the system&rsquo;s awareness.",
   },
   {
     title: "Network topology",
-    body: "Which services the agent can reach, which endpoints it&rsquo;s allowed to call, and how outbound traffic is routed — defined and enforced through the control plane, not assumed by convention.",
+    body: "Which services the agent can reach, which endpoints it&rsquo;s allowed to call, and how traffic routes out — defined in the control plane, not discovered during an incident.",
   },
 ];
 
@@ -100,16 +100,16 @@ export default function AIAgentInfrastructurePage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Infrastructure</p>
                   <h1 className={feat.heroTitle}>
-                    Infrastructure that
+                    Infrastructure you
                     <br />
-                    doesn&rsquo;t hide.
+                    can actually see.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Agent infrastructure shouldn&rsquo;t be a collection of
-                    one-off scripts, undocumented assumptions, and secrets nobody
-                    remembers adding. MUTX makes compute, storage, and secrets
-                    legible — so your team can actually own what runs in
-                    production.
+                    Your agent infrastructure shouldn&rsquo;t be a pile of
+                    one-off scripts, stale docs, and secrets nobody remembers
+                    provisioning. MUTX makes compute, storage, and secrets
+                    legible and versioned — so you own what runs in production,
+                    not just hope it works.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -132,16 +132,16 @@ export default function AIAgentInfrastructurePage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Infrastructure properties</p>
                 <h2 className={feat.sectionTitle}>
-                  Own the stack
+                  Know what&rsquo;s running.
                   <br />
-                  your agents run on.
+                  Own why.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most agent infrastructure is implicit — it lives in someone&rsquo;s
-                  head, a shared doc that hasn&rsquo;t been updated, or a hosting
-                  console that doesn&rsquo;t connect to the agent definition.
-                  MUTX makes infrastructure explicit and versioned, so it&rsquo;s
-                  auditable and recoverable.
+                  Most agent infra is implicit — a shared doc that hasn&rsquo;t
+                  been updated since Q1, a hosting console disconnected from the
+                  agent definition, and a tribal knowledge base that walks out
+                  the door with your senior engineer. MUTX makes infrastructure
+                  explicit, versioned, and auditable.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -160,16 +160,15 @@ export default function AIAgentInfrastructurePage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Connected surfaces</p>
                 <h2 className={feat.sectionTitle}>
-                  Infrastructure is where
+                  Infra isn&rsquo;t a side quest.
                   <br />
-                  everything runs.
+                  It&rsquo;s the foundation.
                 </h2>
                 <p className={feat.sectionBody}>
-                  When infrastructure is part of the control plane, it connects
-                  cleanly to governance, deployment, and observability. Secrets
-                  attach to agent records. Network policies enforce at the
-                  infrastructure layer. Compute allocation is visible in
-                  cost attribution.
+                  When infrastructure lives in the control plane, it connects to
+                  governance, deployment, and cost — no manual reconciliation.
+                  Secrets attach to agent records. Network policies enforce at
+                  the infra layer. Compute spend shows up in cost attribution.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -178,10 +177,10 @@ export default function AIAgentInfrastructurePage() {
                     <Link href="/ai-agent-governance">Governance</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Network topology and secrets are part of the governance
-                    surface. What the agent can access is determined by the
-                    infrastructure config, which is governed by the control
-                    plane — not left to convention.
+                    Network topology and secrets are governance surface. What
+                    the agent can access is determined by infra config, governed
+                    by the control plane — not left to convention and good
+                    intentions.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -190,9 +189,8 @@ export default function AIAgentInfrastructurePage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Compute and storage config travel with the deployment
-                    record. When you promote an agent to production, the
-                    infrastructure config promotes with it — no manual
-                    reconciliation.
+                    record. Promote an agent to production and the infra
+                    config goes with it — no copy-paste, no manual sync.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -200,9 +198,9 @@ export default function AIAgentInfrastructurePage() {
                     <Link href="/ai-agent-cost">Cost Management</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Compute allocation is visible in cost attribution. When
-                    you see a cost spike, you see which compute resources
-                    were running — not just which API calls were made.
+                    Compute allocation maps directly to cost attribution. A
+                    spend spike shows you which compute resources were running —
+                    not just a pile of API call records.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -210,9 +208,10 @@ export default function AIAgentInfrastructurePage() {
                     <Link href="/ai-agent-guardrails">Guardrails</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Safety boundaries and network policies can be enforced at
-                    the infrastructure layer. Guardrail violations that relate
-                    to network access are visible with infrastructure context.
+                    Safety boundaries and network policies enforced at the
+                    infra layer. Guardrail violations related to network access
+                    show up with full infrastructure context — not in a
+                    separate dashboard you never check.
                   </p>
                 </div>
               </div>
@@ -224,15 +223,15 @@ export default function AIAgentInfrastructurePage() {
               <div className={feat.finalInner}>
                 <p className={feat.finalEyebrow}>Get started</p>
                 <h2 className={feat.finalTitle}>
-                  Own the infrastructure
+                  See your infra.
                   <br />
-                  your agents run on.
+                  All of it.
                 </h2>
                 <p className={feat.finalBody}>
                   Download the Mac app and open the infrastructure surface.
-                  See where your agents run, what secrets they can access, and
-                  what the network topology looks like when it&rsquo;s defined and
-                  legible — not assumed.
+                  See where agents run, what secrets they hold, and what your
+                  network topology actually looks like when it&rsquo;s defined
+                  instead of assumed.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

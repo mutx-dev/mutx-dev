@@ -14,24 +14,24 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX",
+  title: "AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX",
   description:
-    "Define what agents can and can't do. MUTX lets you write explicit safety policies, enforce them at runtime, and see violations as first-class events — not silent failures.",
+    "Agents without guardrails will find every edge case — including the ones you didn't anticipate. MUTX enforces safety policies at runtime and surfaces violations as first-class events, not buried log lines.",
   alternates: { canonical: getCanonicalUrl("/ai-agent-guardrails") },
   openGraph: {
-    title: "AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX",
+    title: "AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX",
     description:
-      "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.",
+      "Runtime safety policies enforced by the control plane. Guardrail violations surface as first-class events.",
     url: getCanonicalUrl("/ai-agent-guardrails"),
-    images: [getPageOgImageUrl("AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX", "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.", { path: "/ai-agent-guardrails" })],
+    images: [getPageOgImageUrl("AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX", "Runtime safety policies enforced by the control plane. Guardrail violations surface as first-class events.", { path: "/ai-agent-guardrails" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
     title: "AI Agent Guardrails | MUTX",
     description:
-      "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.",
-    images: [getPageTwitterImageUrl("AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX", "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.", { path: "/ai-agent-guardrails" })],
+      "Safety policies enforced at runtime by the control plane. Violations surface as first-class events.",
+    images: [getPageTwitterImageUrl("AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX", "Runtime safety policies enforced by the control plane. Guardrail violations surface as first-class events.", { path: "/ai-agent-guardrails" })],
   },
 };
 
@@ -59,7 +59,7 @@ const structuredData = {
       name: "AI Agent Guardrails | MUTX",
       url: getCanonicalUrl("/ai-agent-guardrails"),
       description:
-        "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.",
+        "Runtime safety policies enforced by the control plane. Guardrail violations surface as first-class events with full context.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
@@ -68,19 +68,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Runtime policy enforcement",
-    body: "Define what agents can call, what data they can access, and what operations are off-limits. MUTX evaluates these policies at runtime — not at write-time, not at review-time.",
+    body: "Pin what agents can call, what data they can touch, what operations are off-limits. MUTX evaluates these policies at runtime — not at write-time, not in code review.",
   },
   {
     title: "Safety boundaries",
-    body: "Put explicit walls around operations that should never happen — destructive tool calls, sensitive data access, operations without a human-in-the-loop gate. Boundaries that travel with the agent.",
+    body: "Hard walls around operations that should never happen — destructive tool calls, sensitive data access, unattended privileged operations. Boundaries that follow the agent across environments.",
   },
   {
     title: "Violation visibility",
-    body: "When a guardrail is triggered, you see it. MUTX surfaces guardrail violations as first-class events — with the policy that was violated, the operation that was attempted, and the context that triggered it.",
+    body: "When a guardrail fires, you see it immediately. Violations surface as first-class events — the violated policy, the attempted operation, and the triggering context. Not a buried log line.",
   },
   {
     title: "Policy versioning",
-    body: "Guardrail policies are versioned with the agent definition. You can audit what policy was active when a violation occurred, roll back to an earlier policy, and test policy changes against production traces.",
+    body: "Guardrail policies version with the agent definition. You can check which policy was active during a violation, roll back, and test policy changes against real traces before shipping.",
   },
 ];
 
@@ -100,16 +100,16 @@ export default function AIAgentGuardrailsPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Guardrails</p>
                   <h1 className={feat.heroTitle}>
-                    Define what agents
+                    Draw the line on
                     <br />
-                    can&rsquo;t do.
+                    what agents can&rsquo;t do.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Without explicit guardrails, agents will explore every edge
-                    case — including the ones you never wanted them to find.
-                    MUTX lets you write safety policies, enforce them at
-                    runtime, and see violations as first-class events instead
-                    of silent failures buried in a log file nobody reads.
+                    An agent without guardrails will probe every edge case —
+                    especially the ones you never wanted it to find. MUTX lets
+                    you write safety policies, enforce them at runtime, and
+                    surface violations as first-class events instead of silent
+                    failures buried in a log file nobody opens.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -130,17 +130,17 @@ export default function AIAgentGuardrailsPage() {
           <section className={feat.contentSection}>
             <div className={core.shell}>
               <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>Guardrail properties</p>
+                <p className={feat.sectionEyebrow}>How guardrails work</p>
                 <h2 className={feat.sectionTitle}>
                   Safety policies,
                   <br />
                   not safety theater.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most guardrail implementations check a box without actually
-                  preventing anything. MUTX guardrails are enforced by the
-                  control plane at runtime — not by prompt instructions that
-                  the model can reason around when the stakes are high.
+                  Most guardrail setups check a compliance box without blocking
+                  anything real. MUTX guardrails are enforced by the control
+                  plane at runtime — not by prompt instructions a capable model
+                  will sidestep when the stakes are high.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -157,18 +157,17 @@ export default function AIAgentGuardrailsPage() {
           <section className={feat.contentSection}>
             <div className={core.shell}>
               <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>Connected surfaces</p>
+                <p className={feat.sectionEyebrow}>How guardrails connect</p>
                 <h2 className={feat.sectionTitle}>
                   Guardrails are
                   <br />
-                  governance made concrete.
+                  governance, enforced.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Auth boundaries and compliance requirements become concrete
-                  guardrail policies in MUTX. When a guardrail violation triggers,
-                  it surfaces through the monitoring surface, is recorded in the
-                  audit log, and can trigger a circuit breaker — all coordinated
-                  by the control plane.
+                  Auth boundaries and compliance requirements become guardrail
+                  policies in MUTX. When a violation fires, it surfaces in
+                  monitoring, gets recorded in the audit log, and can trip a
+                  circuit breaker — all coordinated by the control plane.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -177,9 +176,9 @@ export default function AIAgentGuardrailsPage() {
                     <Link href="/ai-agent-governance">Governance</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Guardrails are where governance policies become runtime
-                    enforcement. The auth boundary that&rsquo;s abstract in the
-                    governance model is the concrete guardrail that fires in
+                    Guardrails turn governance policies into runtime
+                    enforcement. The abstract auth boundary in your governance
+                    model becomes the concrete guardrail that fires in
                     production.
                   </p>
                 </div>
@@ -188,9 +187,9 @@ export default function AIAgentGuardrailsPage() {
                     <Link href="/ai-agent-monitoring">Monitoring</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Guardrail violations are first-class monitoring events. You
-                    see the policy that was violated, the operation that was
-                    attempted, and the context — not just an error code.
+                    Guardrail violations are first-class monitoring events. The
+                    policy that was violated, the operation attempted, the
+                    surrounding context — not just an error code.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -198,10 +197,9 @@ export default function AIAgentGuardrailsPage() {
                     <Link href="/ai-agent-reliability">Reliability</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Guardrail violations can trigger circuit breakers. A
-                    repeated policy violation isn&rsquo;t just a compliance
-                    problem — it&rsquo;s a reliability signal that the control
-                    plane can act on.
+                    Guardrail violations can trip circuit breakers. A repeated
+                    policy violation isn&rsquo;t just a compliance issue —
+                    it&rsquo;s a reliability signal the control plane can act on.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -209,9 +207,9 @@ export default function AIAgentGuardrailsPage() {
                     <Link href="/ai-agent-audit-logs">Audit Logs</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Every guardrail violation is logged with the policy version,
-                    the attempted operation, and the context. Records that
-                    satisfy compliance reviews, not just developer curiosity.
+                    Every violation is logged with the policy version, the
+                    attempted operation, and the context. Records that satisfy
+                    compliance reviews — not just developer curiosity.
                   </p>
                 </div>
               </div>
@@ -223,15 +221,15 @@ export default function AIAgentGuardrailsPage() {
               <div className={feat.finalInner}>
                 <p className={feat.finalEyebrow}>Get started</p>
                 <h2 className={feat.finalTitle}>
-                  Write a policy and
+                  Write a policy.
                   <br />
-                  watch it enforce.
+                  Break it on purpose.
                 </h2>
                 <p className={feat.finalBody}>
-                  Download the Mac app, write a guardrail policy for an agent,
-                  and trigger the violation deliberately. See what the violation
-                  event looks like in the control plane, what gets recorded in
-                  the audit log, and what the operator sees before users do.
+                  Download the Mac app, write a guardrail policy, and trigger
+                  the violation deliberately. See the violation event in the
+                  control plane, check the audit log entry, and understand what
+                  operators see before users are affected.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

@@ -14,9 +14,9 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Cost Management Software — LLM Spend Tracking, Budgets, Attribution | MUTX",
+  title: "AI Agent Cost Management — Per-Run Spend Tracking, Budgets, Attribution | MUTX",
   description:
-    "Track AI agent costs by run, model, provider, and workflow. MUTX gives operators spend attribution, budget enforcement, and runtime context before a runaway agent turns into an invoice surprise.",
+    "Track AI agent costs by run, model, provider, and workflow. MUTX attributes spend in real time, enforces budgets at the control plane, and catches runaway agents before the invoice lands.",
   keywords: [
     "ai agent cost management",
     "llm cost tracking",
@@ -26,19 +26,19 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: getCanonicalUrl("/ai-agent-cost") },
   openGraph: {
-    title: "AI Agent Cost Management Software — LLM Spend Tracking, Budgets, Attribution | MUTX",
+    title: "AI Agent Cost Management — Per-Run Spend Tracking, Budgets, Attribution | MUTX",
     description:
-      "Track AI agent costs by run, model, provider, and workflow with budgets and attribution built into the control plane.",
+      "Track AI agent costs by run, model, provider, and workflow. Budgets and attribution built into the control plane.",
     url: getCanonicalUrl("/ai-agent-cost"),
-    images: [getPageOgImageUrl("AI Agent Cost Management Software — LLM Spend Tracking, Budgets, Attribution | MUTX", "Track AI agent costs by run, model, provider, and workflow with budgets and attribution built into the control plane.", { path: "/ai-agent-cost" })],
+    images: [getPageOgImageUrl("AI Agent Cost Management — Per-Run Spend Tracking, Budgets, Attribution | MUTX", "Track AI agent costs by run, model, provider, and workflow. Budgets and attribution built into the control plane.", { path: "/ai-agent-cost" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Cost Management Software | MUTX",
+    title: "AI Agent Cost Management | MUTX",
     description:
-      "Track AI agent costs by run, model, provider, and workflow before spend turns into a billing surprise.",
-    images: [getPageTwitterImageUrl("AI Agent Cost Management Software — LLM Spend Tracking, Budgets, Attribution | MUTX", "Track AI agent costs by run, model, provider, and workflow with budgets and attribution built into the control plane.", { path: "/ai-agent-cost" })],
+      "Track AI agent costs by run, model, provider, and workflow. Catch runaway spend before the invoice lands.",
+    images: [getPageTwitterImageUrl("AI Agent Cost Management — Per-Run Spend Tracking, Budgets, Attribution | MUTX", "Track AI agent costs by run, model, provider, and workflow. Budgets and attribution built into the control plane.", { path: "/ai-agent-cost" })],
   },
 };
 
@@ -46,22 +46,22 @@ const faqItems = [
   {
     question: "How do you track AI agent costs per run?",
     answer:
-      "MUTX attributes spend to the agent, model, provider, and workflow context around the run, so operators can see which execution path actually consumed the budget.",
+      "MUTX attributes every dollar to the agent, model, provider, and workflow that generated it. You see which execution path consumed the budget — not just an aggregate API bill.",
   },
   {
-    question: "Can you stop runaway AI agent spend before the invoice arrives?",
+    question: "Can you stop runaway agent spend before the invoice arrives?",
     answer:
-      "Yes. MUTX treats budgets and rate limits as control plane policies, so operators can set spend ceilings and intervene before a retry storm or bad workflow keeps burning tokens.",
+      "Yes. MUTX enforces budgets and rate limits as control plane policies. Set a spend ceiling. If a retry storm or broken workflow starts burning tokens, the control plane intervenes.",
   },
   {
     question: "Does cost data connect to traces and approvals?",
     answer:
-      "Yes. Cost visibility is designed to sit next to traces, governance controls, and approval records so you can investigate expensive runs in operational context instead of reading a billing export in isolation.",
+      "Yes. Cost records sit next to traces, governance controls, and approval logs. When you investigate an expensive run, you see the full operational context — not a billing export in isolation.",
   },
   {
     question: "What is the difference between LLM billing and AI agent cost management?",
     answer:
-      "Provider billing tells you what was spent in aggregate. AI agent cost management explains which agent, workflow, model, and runtime decision created that spend, and lets you enforce limits at the control plane.",
+      "Provider billing tells you what was spent. Agent cost management tells you which agent, workflow, model, and runtime decision created that spend — and lets you enforce limits at the control plane.",
   },
 ];
 
@@ -86,10 +86,10 @@ const structuredData = {
     },
     {
       "@type": "WebPage",
-      name: "AI Agent Cost Management Software | MUTX",
+      name: "AI Agent Cost Management | MUTX",
       url: getCanonicalUrl("/ai-agent-cost"),
       description:
-        "Track AI agent costs by run, model, provider, and workflow with budget enforcement and runtime context built into the control plane.",
+        "Track AI agent costs by run, model, provider, and workflow. Budget enforcement and runtime context built into the control plane.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
     {
@@ -126,38 +126,38 @@ const structuredData = {
 const featureCards = [
   {
     title: "AI agent spend tracking",
-    body: "Track spend per agent, per model, per provider, and per workflow. MUTX gives operators a view that answers which run is expensive, not just what the provider charged in aggregate.",
+    body: "Track spend per agent, model, provider, and workflow. MUTX answers which run is expensive — not just what the provider charged.",
   },
   {
     title: "Per-run attribution",
-    body: "Which agent burned $4,200 last Tuesday? MUTX attributes spend to the actual agent record and runtime context instead of leaving you to reverse-engineer cost from an API key.",
+    body: "Which agent burned $4,200 last Tuesday? MUTX ties spend to the actual agent record and runtime context. No reverse-engineering from an API key.",
   },
   {
     title: "Budget enforcement",
-    body: "Set spend limits per agent or per team. MUTX enforces them at the control plane instead of hoping application code remembers to check budget before every model call.",
+    body: "Set spend limits per agent or per team. MUTX enforces them at the control plane — not by hoping application code checks the budget before every model call.",
   },
   {
     title: "Model and provider visibility",
-    body: "Compare which models and providers are actually worth their cost. Rate limits and provider-level controls live next to the agent definition instead of hiding in environment variables.",
+    body: "Compare which models and providers earn their cost. Rate limits and provider-level controls live on the agent definition — not in environment variables.",
   },
 ];
 
 const operationsCards = [
   {
     title: "Runaway retry loops",
-    body: "When an agent keeps retrying a broken tool path, the real problem is not just extra spend. It is invisible spend tied to a workflow nobody is watching. MUTX makes that burn attributable and interruptible.",
+    body: "An agent retrying a broken tool path burns tokens invisibly. MUTX makes that spend attributable and interruptible — you see the loop, you stop the loop.",
   },
   {
     title: "Background worker drift",
-    body: "Long-running or background agents often spend money quietly. Cost records stay attached to the runtime history so teams can inspect what happened before the budget report lands.",
+    body: "Long-running agents spend money quietly. Cost records stay attached to runtime history so you can inspect what happened before the budget report lands.",
   },
   {
     title: "Approval-aware budgets",
-    body: "High-cost actions can be treated like governance events. Budgets, approvals, and runtime controls can sit in the same operator surface instead of being split across finance, logs, and chat.",
+    body: "High-cost actions are governance events. Budgets, approvals, and runtime controls share one operator surface — not three disconnected tools.",
   },
   {
     title: "Trace-linked investigations",
-    body: "A cost spike is only useful if you can inspect the trace behind it. MUTX keeps spend visibility close to monitoring and audit surfaces so operators can investigate fast.",
+    body: "A cost spike is only useful if you can see the trace behind it. MUTX keeps spend next to monitoring and audit surfaces so operators can investigate fast.",
   },
 ];
 
@@ -179,14 +179,14 @@ export default function AIAgentCostPage() {
                   <h1 className={feat.heroTitle}>
                     Know what your AI
                     <br />
-                    agents cost.
+                    agents cost — per run.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Raw API bills do not tell you which AI agent ran up $4k last
-                    Tuesday, which model is actually worth what you are paying,
-                    or which workflow is about to surprise you at month end.
-                    MUTX turns LLM spend tracking into an operator workflow with
-                    attribution, budgets, and runtime context.
+                    API bills don&apos;t tell you which agent ran up $4k last
+                    Tuesday, which model earns its price, or which workflow is
+                    about to blow up the monthly budget. MUTX attributes LLM
+                    spend to the agent, the run, and the decision — with budgets
+                    enforced at the control plane.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -206,15 +206,15 @@ export default function AIAgentCostPage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Cost properties</p>
                 <h2 className={feat.sectionTitle}>
-                  Cost is an operator
+                  Cost is a control
                   <br />
-                  control surface.
+                  plane concern.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most teams discover AI agent cost problems from the provider
-                  invoice, not from their runtime tooling. MUTX treats cost
+                  Most teams discover agent cost problems from the provider
+                  invoice. By then it&apos;s too late. MUTX treats cost
                   visibility and budget enforcement as first-class control plane
-                  concerns instead of afterthoughts bolted onto a billing export.
+                  properties — not afterthoughts bolted onto a billing export.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -233,14 +233,12 @@ export default function AIAgentCostPage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Failure modes</p>
                 <h2 className={feat.sectionTitle}>
-                  Stop the expensive
+                  Catch expensive failures
                   <br />
-                  failures early.
+                  while the runtime is live.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Good AI agent cost management is not a finance dashboard. It
-                  is a way to catch retry storms, stale workers, and high-cost
-                  workflows while the runtime is still live.
+                  Agent cost management isn&apos;t a finance dashboard. It&apos;s a way to catch retry storms, stale workers, and runaway workflows before the billing cycle closes.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -259,15 +257,15 @@ export default function AIAgentCostPage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Connected surfaces</p>
                 <h2 className={feat.sectionTitle}>
-                  Cost talks to
+                  Cost connects to
                   <br />
                   everything else.
                 </h2>
                 <p className={feat.sectionBody}>
                   Spend limits and rate limits are governance controls. When cost
-                  enforcement is part of the same control plane as auth
-                  boundaries and deployment records, you get coherent policies
-                  instead of disconnected feature flags.
+                  enforcement lives in the same control plane as auth boundaries
+                  and deployment records, you get coherent policies — not
+                  disconnected feature flags.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -286,9 +284,9 @@ export default function AIAgentCostPage() {
                     <Link href="/ai-agent-deployment">Deployment</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Cost budgets travel with deployment configs. When you promote
-                    an agent from staging to production, the cost policies promote
-                    with it — no manual re-configuration.
+                    Cost budgets travel with deployment configs. Promote an agent
+                    from staging to production and the cost policies go with it —
+                    no manual re-configuration.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -296,8 +294,8 @@ export default function AIAgentCostPage() {
                     <Link href="/ai-agent-monitoring">Monitoring</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Cost anomalies surface through the same monitoring surface as
-                    runtime failures. You see the spike in spend and the
+                    Cost anomalies surface through the same monitoring view as
+                    runtime failures. You see the spend spike and the
                     corresponding traces in one place.
                   </p>
                 </div>
@@ -307,8 +305,8 @@ export default function AIAgentCostPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Circuit breakers and spend limits work together. An agent
-                    that hits its spend ceiling can be throttled gracefully
-                    before it becomes a production incident.
+                    that hits its spend ceiling gets throttled before it becomes
+                    a production incident.
                   </p>
                 </div>
               </div>
@@ -325,9 +323,8 @@ export default function AIAgentCostPage() {
                   about agent spend.
                 </h2>
                 <p className={feat.sectionBody}>
-                  These are the operational questions that usually show up once
-                  teams move beyond raw model billing and start running agents
-                  continuously.
+                  These come up once teams move past raw model billing and start
+                  running agents in production continuously.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -351,9 +348,9 @@ export default function AIAgentCostPage() {
                   your agents set one for you.
                 </h2>
                 <p className={feat.finalBody}>
-                  Download the Mac app, define spend limits for your first AI
-                  agents, and see what cost attribution looks like when it is
-                  built into the control plane from the start.
+                  Download the Mac app. Define spend limits for your first
+                  agents. See what cost attribution looks like when it&apos;s
+                  built into the control plane from day one.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

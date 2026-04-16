@@ -14,24 +14,24 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX",
+  title: "AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX",
   description:
-    "See what agents actually did, not what they said they'd do. MUTX captures execution traces, tool call history, and outcomes so your team can investigate incidents and improve behavior.",
+    "See what agents actually did — not what they said they'd do. MUTX captures execution traces, tool call chains, and outcomes so your team can investigate incidents and fix behavior in production.",
   alternates: { canonical: getCanonicalUrl("/ai-agent-monitoring") },
   openGraph: {
-    title: "AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX",
+    title: "AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX",
     description:
       "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.",
     url: getCanonicalUrl("/ai-agent-monitoring"),
-    images: [getPageOgImageUrl("AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
+    images: [getPageOgImageUrl("AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
     title: "AI Agent Monitoring | MUTX",
     description:
-      "See what agents actually did, not what they said they'd do. Runtime traces and tool call history built into the control plane.",
-    images: [getPageTwitterImageUrl("AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
+      "See what agents actually did, not what they said they'd do. Runtime traces and tool call history in the control plane.",
+    images: [getPageTwitterImageUrl("AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
   },
 };
 
@@ -59,7 +59,7 @@ const structuredData = {
       name: "AI Agent Monitoring | MUTX",
       url: getCanonicalUrl("/ai-agent-monitoring"),
       description:
-        "See what agents actually did. Runtime traces, tool call history, and outcome records — built into the control plane.",
+        "See what agents actually did. Execution traces, tool call history, and outcome records — built into the control plane.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
@@ -68,19 +68,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Execution traces",
-    body: "See the full sequence of what the agent did — every model call, every tool invocation, every context window change. Not a summary the model wrote about itself, but the actual trace.",
+    body: "The full sequence of what the agent did — every model call, tool invocation, and context window change. Not a self-summary. The actual trace.",
   },
   {
     title: "Tool call history",
-    body: "Which tool was called, with what arguments, in what order, and what came back. The information you need to understand why an agent chose a path — not just that it chose one.",
+    body: "Which tool was called, with what arguments, in what order, and what came back. The information you need to understand why an agent chose a path.",
   },
   {
     title: "Outcome records",
-    body: "What the agent produced, where it wrote state, what external calls it made. Outcome records let you reason backward from results instead of guessing forward from intentions.",
+    body: "What the agent produced, where it wrote state, what external calls it made. Reason backward from results instead of guessing forward from prompt intentions.",
   },
   {
     title: "Alert routing",
-    body: "When something in the trace looks wrong, alerts route to the right operator — not to a generic monitoring inbox nobody monitors. Alerts are attached to agent records, not floating in a SIEM.",
+    body: "When something in the trace looks wrong, alerts route to the right operator — not a generic inbox nobody reads. Alerts attach to agent records, not a SIEM.",
   },
 ];
 
@@ -106,10 +106,11 @@ export default function AIAgentMonitoringPage() {
                   </h1>
                   <p className={feat.heroSupport}>
                     When something breaks in production, you need to reason
-                    backward from what the agent actually did — not forward from
-                    what the model said it would do. MUTX captures execution
-                    traces, tool calls, and outcomes so your team can
-                    investigate incidents and improve agent behavior over time.
+                    backward from what the agent actually executed — not forward
+                    from what the model promised. MUTX captures the full
+                    execution trace: model calls, tool invocations, context
+                    changes, and outcomes. Built for investigation, not just
+                    alerting.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -135,10 +136,10 @@ export default function AIAgentMonitoringPage() {
                   Traces, not tail outputs.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Traditional monitoring tells you that something happened.
-                  MUTX traces tell you what the agent actually did — the full
-                  execution path, the tool call chain, the outcome. Information
-                  structured for investigation, not just alerting.
+                  Traditional monitoring tells you something happened. MUTX
+                  traces tell you what the agent did — the full execution path,
+                  the tool call chain, the outcome. Information structured for
+                  investigation, not just alerting.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -157,15 +158,15 @@ export default function AIAgentMonitoringPage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Connected surfaces</p>
                 <h2 className={feat.sectionTitle}>
-                  Monitoring is the
+                  Monitoring is the payoff
                   <br />
-                  payoff for good control.
+                  for good control.
                 </h2>
                 <p className={feat.sectionBody}>
-                  When governance, deployment, and cost are all part of the same
-                  control plane, monitoring traces attach to all of them. You see
-                  the deployment that shipped, the policy that was evaluated,
-                  and the cost that was incurred — in the same trace.
+                  When governance, deployment, and cost share one control plane,
+                  monitoring traces attach to all of them. You see the
+                  deployment that shipped, the policy that was evaluated, and
+                  the cost that was incurred — in the same trace.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -176,7 +177,7 @@ export default function AIAgentMonitoringPage() {
                   <p className={feat.featureCardBody}>
                     Auth failures and policy violations are first-class trace
                     events. You see when an agent hit a boundary and what it
-                    tried to do — not just the error that appeared in the logs.
+                    tried to do — not just the error in the logs.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -184,9 +185,9 @@ export default function AIAgentMonitoringPage() {
                     <Link href="/ai-agent-deployment">Deployment</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Traces are attached to deployment records. When you
-                    investigate a production incident, you see which deployment
-                    is running and what changed — not just a timestamp.
+                    Traces attach to deployment records. Investigate a production
+                    incident and you see which deployment is running and what
+                    changed — not just a timestamp.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -194,9 +195,9 @@ export default function AIAgentMonitoringPage() {
                     <Link href="/ai-agent-cost">Cost Management</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Cost spikes surface through the monitoring surface with
+                    Cost spikes surface through the monitoring view with
                     corresponding traces. You see the spend anomaly and the
-                    execution trace in the same incident view.
+                    execution trace in the same incident.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -204,9 +205,9 @@ export default function AIAgentMonitoringPage() {
                     <Link href="/ai-agent-audit-logs">Audit Logs</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Traces feed the audit log. Every action is recorded with
-                    enough context to satisfy a compliance review — not just a
-                    generic &ldquo;agent ran successfully&rdquo; entry.
+                    Traces feed the audit log. Every action recorded with enough
+                    context to satisfy a compliance review — not a generic
+                    &ldquo;agent ran successfully&rdquo; entry.
                   </p>
                 </div>
               </div>
@@ -223,10 +224,10 @@ export default function AIAgentMonitoringPage() {
                   do something real.
                 </h2>
                 <p className={feat.finalBody}>
-                  Download the Mac app and run an agent. Open the trace view and
-                  see what it actually did — every tool call, every context
-                  window change, every outcome. Then compare that to what you
-                  thought it would do.
+                  Download the Mac app. Run an agent. Open the trace view and
+                  see what it actually did — every tool call, context window
+                  change, and outcome. Then compare that to what you thought it
+                  would do.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

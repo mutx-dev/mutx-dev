@@ -1,14 +1,14 @@
 /* ============================================================
-   FEATURE PAGE — editorial poster style
-   Bold headline, breathing room, clean hierarchy
-   Used by all /ai-agent-* pages
+   FEATURE PAGE — dark editorial style
+   Matches the MUTX homepage: dark surfaces, gold accents, high contrast
+   Used by all /ai-agent-* SEO pages
    ============================================================ */
 
 /* ---- Hero ---- */
 .heroSection {
   position: relative;
   overflow: hidden;
-  background: #07090e;
+  background: #05070c;
   color: #f7f4ef;
 }
 
@@ -22,8 +22,8 @@
   height: 120%;
   background: radial-gradient(
     ellipse at 30% 50%,
-    rgba(212, 171, 115, 0.13) 0%,
-    rgba(212, 171, 115, 0.04) 40%,
+    rgba(212, 171, 115, 0.1) 0%,
+    rgba(212, 171, 115, 0.03) 40%,
     transparent 70%
   );
   pointer-events: none;
@@ -49,7 +49,7 @@
   max-width: 48rem;
 }
 
-/* Large, tracked eyebrow pill */
+/* Eyebrow pill */
 .heroEyebrow {
   margin: 0 0 2rem;
   display: inline-flex;
@@ -57,8 +57,8 @@
   gap: 0.6rem;
   padding: 0.35rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(212, 171, 115, 0.4);
-  background: rgba(212, 171, 115, 0.1);
+  border: 1px solid rgba(212, 171, 115, 0.35);
+  background: rgba(212, 171, 115, 0.08);
   font-family: var(--font-mono), monospace;
   font-size: 0.65rem;
   font-weight: 700;
@@ -78,7 +78,7 @@
   flex-shrink: 0;
 }
 
-/* Display headline — tight, bold, editorial */
+/* Display headline */
 .heroTitle {
   margin: 0 0 1.8rem;
   font-family: var(--font-site-display), serif;
@@ -89,7 +89,7 @@
   color: #f7f4ef;
 }
 
-/* Support line — one punchy sentence */
+/* Support line */
 .heroSupport {
   margin: 0 0 2.5rem;
   max-width: 26rem;
@@ -97,7 +97,7 @@
   font-weight: 500;
   line-height: 1.6;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.62);
+  color: rgba(247, 244, 239, 0.72);
 }
 
 .heroActions {
@@ -114,16 +114,18 @@
   gap: 0.5rem;
 }
 
-/* ---- Content sections — light background ---- */
+/* ---- Content sections — dark background ---- */
 .contentSection {
   padding: clamp(5rem, 9vw, 8rem) 0;
+  background: #09080b;
+  color: #f7f4ef;
 }
 
 .contentSection + .contentSection {
-  border-top: 1px solid rgba(19, 26, 36, 0.09);
+  border-top: 1px solid rgba(255, 233, 204, 0.07);
 }
 
-/* Intro block — strong title, readable body */
+/* Intro block */
 .contentIntro {
   max-width: 36rem;
   margin-bottom: clamp(3rem, 5vw, 4.5rem);
@@ -146,7 +148,7 @@
   font-weight: 300;
   line-height: 1.05;
   letter-spacing: -0.055em;
-  color: #131a24;
+  color: #f7f4ef;
 }
 
 .sectionBody {
@@ -155,10 +157,10 @@
   font-weight: 500;
   line-height: 1.65;
   letter-spacing: -0.01em;
-  color: rgba(19, 26, 36, 0.68);
+  color: rgba(247, 244, 239, 0.68);
 }
 
-/* Feature cards — editorial, not a grid of pills */
+/* Feature cards — dark surfaces */
 .featureGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
@@ -168,15 +170,16 @@
 .featureCard {
   padding: 2rem 2.2rem 2.2rem;
   border-radius: 1.1rem;
-  border: 1px solid rgba(19, 26, 36, 0.09);
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(10, 18, 38, 0.05);
-  transition: box-shadow 220ms ease, transform 220ms ease;
+  border: 1px solid rgba(255, 233, 204, 0.09);
+  background: rgba(24, 21, 28, 0.7);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease;
 }
 
 .featureCard:hover {
-  box-shadow: 0 8px 32px rgba(10, 18, 38, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   transform: translateY(-3px);
+  border-color: rgba(212, 171, 115, 0.18);
 }
 
 .featureCardTitle {
@@ -186,7 +189,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #131a24;
+  color: #f7f4ef;
 }
 
 .featureCardTitle a {
@@ -203,13 +206,13 @@
   font-size: clamp(0.9rem, 0.95vw, 0.97rem);
   font-weight: 500;
   line-height: 1.62;
-  color: rgba(19, 26, 36, 0.6);
+  color: rgba(247, 244, 239, 0.62);
 }
 
 /* ---- Final CTA section — dark ---- */
 .finalSection {
   padding: clamp(6rem, 11vw, 9rem) 0;
-  background: #07090e;
+  background: #05070c;
   color: #f7f4ef;
   position: relative;
   overflow: hidden;
@@ -225,7 +228,7 @@
   height: 160%;
   background: radial-gradient(
     ellipse at 70% 50%,
-    rgba(212, 171, 115, 0.1) 0%,
+    rgba(212, 171, 115, 0.08) 0%,
     transparent 65%
   );
   pointer-events: none;
@@ -264,7 +267,7 @@
   font-weight: 500;
   line-height: 1.62;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.62);
+  color: rgba(247, 244, 239, 0.68);
 }
 
 .finalActions {
@@ -310,7 +313,7 @@
 
 @media (max-width: 768px) {
   .heroSection {
-    background: linear-gradient(168deg, #07090e 0%, #0a0e18 100%);
+    background: linear-gradient(168deg, #05070c 0%, #070a14 100%);
   }
 
   .heroStage {

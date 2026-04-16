@@ -14,24 +14,24 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX",
+  title: "AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX",
   description:
-    "Agents that survive production. MUTX surfaces health checks, enforces reliability standards, and gives operators the visibility to keep agent runtimes healthy.",
+    "Agents that survive production. MUTX runs health probes, enforces circuit breakers, and routes around failures — so operators catch degradation before users do.",
   alternates: { canonical: getCanonicalUrl("/ai-agent-reliability") },
   openGraph: {
-    title: "AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX",
+    title: "AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX",
     description:
-      "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.",
+      "Agents that survive production. Health checks, circuit breakers, and operator visibility — built into the control plane.",
     url: getCanonicalUrl("/ai-agent-reliability"),
-    images: [getPageOgImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX", "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
+    images: [getPageOgImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX", "Agents that survive production. Health checks, circuit breakers, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
     title: "AI Agent Reliability | MUTX",
     description:
-      "Agents that survive production. Health checks and reliability standards built into the control plane.",
-    images: [getPageTwitterImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX", "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
+      "Agents that survive production. Health checks and circuit breakers built into the control plane.",
+    images: [getPageTwitterImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX", "Agents that survive production. Health checks, circuit breakers, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
   },
 };
 
@@ -68,19 +68,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Health checks",
-    body: "Agents have a health surface — not just &ldquo;is the process running&rdquo; but &ldquo;is the agent responsive, is the control plane reachable, is the toolchain intact.&rdquo; MUTX confirms health before declaring an agent operational.",
+    body: "Not just &ldquo;is the process running&rdquo; but &ldquo;is the agent responsive, is the control plane reachable, is the toolchain intact.&rdquo; MUTX confirms health before declaring an agent operational.",
   },
   {
     title: "Readiness probes",
-    body: "An agent that just started isn&rsquo;t necessarily ready. MUTX defines readiness as an explicit state — the agent has warmed its context, loaded its tools, and confirmed it can handle requests.",
+    body: "An agent that just started isn&rsquo;t ready. MUTX defines readiness as an explicit state — context warmed, tools loaded, ready to handle requests.",
   },
   {
     title: "Circuit breakers",
-    body: "When an agent hits persistent errors or a downstream service degrades, MUTX trips the circuit breaker before cascading failures take down the rest of your system.",
+    body: "When an agent hits persistent errors or a downstream service degrades, MUTX trips the circuit breaker before cascading failures spread.",
   },
   {
     title: "Failover paths",
-    body: "When an agent instance fails, the control plane can route requests to a healthy instance — without requiring a human operator to notice and intervene.",
+    body: "When an agent instance fails, the control plane routes requests to a healthy instance. No human intervention required.",
   },
 ];
 
@@ -105,11 +105,10 @@ export default function AIAgentReliabilityPage() {
                     survive production.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Pushing an agent to production and hoping for the best
-                    isn&rsquo;t a reliability strategy. MUTX surfaces health checks,
-                    enforces circuit breakers, and gives operators the
-                    visibility to catch degradation before it becomes an
-                    incident — not after.
+                    Shipping an agent to production and hoping for the best
+                    isn&apos;t a reliability strategy. MUTX runs health probes,
+                    enforces circuit breakers, and routes around failures — so
+                    operators catch degradation before users report it.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -129,16 +128,15 @@ export default function AIAgentReliabilityPage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Reliability properties</p>
                 <h2 className={feat.sectionTitle}>
-                  Reliability is a
+                  Reliability is a control
                   <br />
-                  control plane property.
+                  plane property.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most agent tooling treats reliability as something that
-                  happens if the model behaves. MUTX treats it as something
-                  the control plane enforces — through health checks, circuit
-                  breakers, and explicit operational state that operators can
-                  read and act on.
+                  Most agent tooling assumes the model will behave. MUTX
+                  doesn&apos;t. Health checks, circuit breakers, and explicit
+                  operational state give operators something to read and act on —
+                  before the model has a bad day.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -157,16 +155,15 @@ export default function AIAgentReliabilityPage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Connected surfaces</p>
                 <h2 className={feat.sectionTitle}>
-                  Reliability talks to
+                  Reliability connects to
                   <br />
                   the rest of the plane.
                 </h2>
                 <p className={feat.sectionBody}>
-                  When reliability standards are part of the control plane,
-                  circuit breakers can integrate with cost enforcement, failover
-                  can route based on deployment records, and health checks can
-                  feed the audit log — without stitching together separate
-                  monitoring tools.
+                  When reliability standards live in the control plane, circuit
+                  breakers integrate with cost enforcement, failover routes based
+                  on deployment records, and health checks feed the audit log —
+                  without stitching together separate monitoring tools.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -176,8 +173,8 @@ export default function AIAgentReliabilityPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Circuit breakers and spend limits work together. When an
-                    agent hits its cost ceiling, the control plane can throttle
-                    it gracefully — before it becomes a runaway API bill.
+                    agent hits its cost ceiling, the control plane throttles it
+                    — before it becomes a runaway API bill.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -186,8 +183,8 @@ export default function AIAgentReliabilityPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Health checks are part of the deployment record. The agent
-                    isn&rsquo;t &ldquo;deployed&rdquo; in MUTX until it passes its health
-                    probe — not just until the deployment command exits.
+                    isn&rsquo;t &ldquo;deployed&rdquo; in MUTX until it passes
+                    its health probe — not just until the deploy command exits.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -196,9 +193,8 @@ export default function AIAgentReliabilityPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Circuit breaker trips and health check failures surface
-                    through the monitoring surface. Operators see the
-                    degradation event with full context before customers report
-                    it.
+                    through the monitoring view. Operators see the degradation
+                    with full context — before customers report it.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -208,7 +204,7 @@ export default function AIAgentReliabilityPage() {
                   <p className={feat.featureCardBody}>
                     When a guardrail violation triggers a circuit breaker, the
                     response is coordinated by the control plane — not handled
-                    by two separate systems that may not agree on what happened.
+                    by two systems that disagree on what happened.
                   </p>
                 </div>
               </div>
@@ -220,15 +216,15 @@ export default function AIAgentReliabilityPage() {
               <div className={feat.finalInner}>
                 <p className={feat.finalEyebrow}>Get started</p>
                 <h2 className={feat.finalTitle}>
-                  Ship an agent and
+                  Ship an agent. Watch the
                   <br />
-                  watch the health surface.
+                  health surface respond.
                 </h2>
                 <p className={feat.finalBody}>
-                  Download the Mac app, deploy an agent, and open the reliability
-                  surface. See what the health probe reports, what happens when
-                  you trigger a circuit breaker, and what the operator sees before
-                  the incident reaches your users.
+                  Download the Mac app. Deploy an agent. Open the reliability
+                  surface and see what the health probe reports, what happens
+                  when you trip a circuit breaker, and what the operator sees
+                  before the incident reaches users.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

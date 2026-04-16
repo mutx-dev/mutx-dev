@@ -14,24 +14,24 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX",
+  title: "AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX",
   description:
-    "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane — so what agents can do stays legible.",
+    "Agent access is a minefield of implicit permissions and undocumented API keys. MUTX bakes auth boundaries, operator access controls, and compliance audit trails into the control plane — so what every agent can do is explicit, versioned, and enforced.",
   alternates: { canonical: getCanonicalUrl("/ai-agent-governance") },
   openGraph: {
-    title: "AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX",
+    title: "AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX",
     description:
-      "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.",
+      "Auth boundaries, operator access controls, and compliance audit trails baked into the control plane. No implicit permissions.",
     url: getCanonicalUrl("/ai-agent-governance"),
-    images: [getPageOgImageUrl("AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX", "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.", { path: "/ai-agent-governance" })],
+    images: [getPageOgImageUrl("AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX", "Auth boundaries, operator access controls, and compliance audit trails baked into the control plane. No implicit permissions.", { path: "/ai-agent-governance" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
     title: "AI Agent Governance | MUTX",
     description:
-      "Keep agent access explicit and auditable. MUTX bakes auth boundaries and compliance guardrails into the control plane.",
-    images: [getPageTwitterImageUrl("AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX", "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.", { path: "/ai-agent-governance" })],
+      "Auth boundaries and compliance guardrails baked into the control plane. Agent access stays explicit and auditable.",
+    images: [getPageTwitterImageUrl("AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX", "Auth boundaries, operator access controls, and compliance audit trails baked into the control plane. No implicit permissions.", { path: "/ai-agent-governance" })],
   },
 };
 
@@ -59,7 +59,7 @@ const structuredData = {
       name: "AI Agent Governance | MUTX",
       url: getCanonicalUrl("/ai-agent-governance"),
       description:
-        "Keep agent access explicit and auditable. Auth boundaries, operator access controls, and compliance guardrails baked into the control plane.",
+        "Auth boundaries, operator access controls, and compliance audit trails baked into the control plane. No implicit permissions, no undocumented access.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
@@ -68,19 +68,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Auth boundaries",
-    body: "Define what each agent can access — which APIs, data sources, and tools. The control plane enforces these boundaries everywhere the agent runs, not just in one environment.",
+    body: "Pin what each agent can touch — APIs, data sources, tools. The control plane enforces these boundaries in every environment the agent runs in. No environment-specific config drift.",
   },
   {
     title: "Operator access control",
-    body: "Control who can configure, operate, or observe each agent. Role-based access that travels with the agent definition, not buried in an environment config nobody reads.",
+    body: "Decide who can configure, operate, or observe each agent. RBAC that lives in the agent definition, not in some environment config nobody opens.",
   },
   {
     title: "Compliance guardrails",
-    body: "Data handling policies and access logs that satisfy audit requirements without slowing down agent development. Records that exist because the system requires them, not because someone remembered to add them.",
+    body: "Data handling policies and access logs that satisfy compliance without slowing down development. Audit records that exist because the system writes them, not because someone remembered to add logging.",
   },
   {
     title: "Policy-as-code",
-    body: "Governance policies defined in code, versioned alongside agent definitions, enforced by the control plane. No policy documents living separately from the system they're supposed to govern.",
+    body: "Governance policies written in code, versioned with agent definitions, enforced by the control plane. The policy lives next to the agent — not in a Google doc nobody updates.",
   },
 ];
 
@@ -101,16 +101,15 @@ export default function AIAgentGovernancePage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Governance</p>
                   <h1 className={feat.heroTitle}>
-                    Explicit control over
+                    Lock down what
                     <br />
-                    every agent&rsquo;s access.
+                    every agent can touch.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Implicit permissions, undocumented tool access, and loose
-                    API keys are how agent projects embarrass themselves in
-                    production. MUTX bakes auth boundaries into the control plane
-                    — so what agents can do stays legible, versioned, and
-                    enforced everywhere.
+                    Agents with implicit permissions, undocumented tool access,
+                    and loose API keys are how projects implode in production.
+                    MUTX makes every agent&rsquo;s access boundaries explicit,
+                    versioned, and enforced — everywhere the agent runs.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -132,17 +131,17 @@ export default function AIAgentGovernancePage() {
           <section className={feat.contentSection}>
             <div className={core.shell}>
               <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>Governance fundamentals</p>
+                <p className={feat.sectionEyebrow}>How governance works</p>
                 <h2 className={feat.sectionTitle}>
-                  Governance that travels
+                  Policies that follow
                   <br />
-                  with the agent.
+                  the agent.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most platforms enforce governance per-deployment, which means
-                  policies drift the moment an agent moves between environments
-                  or teams. MUTX governance is embedded in the control plane —
-                  it travels with the agent everywhere it goes.
+                  Most platforms bolt governance onto each deployment. The
+                  moment an agent moves environments or changes hands, policies
+                  drift. MUTX governance is wired into the control plane — it
+                  follows the agent everywhere.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -160,17 +159,17 @@ export default function AIAgentGovernancePage() {
           <section className={feat.contentSection}>
             <div className={core.shell}>
               <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>Built into every layer</p>
+                <p className={feat.sectionEyebrow}>Runs through every layer</p>
                 <h2 className={feat.sectionTitle}>
                   Governance isn&rsquo;t a bolt-on.
                   <br />
                   It&rsquo;s the foundation.
                 </h2>
                 <p className={feat.sectionBody}>
-                  MUTX governance isn&rsquo;t a separate product you add on.
-                  It&rsquo;s woven into the control plane from deployment through
-                  monitoring. Every action an agent takes is evaluated against
-                  your policies automatically — not policed by convention.
+                  MUTX governance isn&rsquo;t an add-on. It runs through the
+                  control plane from deployment to monitoring. Every agent
+                  action is evaluated against your policies automatically — not
+                  enforced by convention or hope.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -179,9 +178,9 @@ export default function AIAgentGovernancePage() {
                     <Link href="/ai-agent-control-plane">Control Plane</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Auth boundaries and operator access controls are enforced by
-                    the runtime. The control plane is where governance starts,
-                    not where it&rsquo;s documented.
+                    Auth boundaries and operator access controls enforced at
+                    the runtime layer. Governance starts here — it&rsquo;s not
+                    just documented, it&rsquo;s enforced.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -189,9 +188,9 @@ export default function AIAgentGovernancePage() {
                     <Link href="/ai-agent-deployment">Deployment</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Governance policies are versioned with deployment configs.
-                    What runs in production is what you reviewed — no drift
-                    between intention and reality.
+                    Policies are versioned with deployment configs. What runs
+                    in production is exactly what you reviewed — no gap between
+                    intention and reality.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -199,9 +198,9 @@ export default function AIAgentGovernancePage() {
                     <Link href="/ai-agent-monitoring">Monitoring</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Auth failures and policy violations are first-class
-                    monitoring events. You see when an agent hit a boundary,
-                    not just when something broke.
+                    Auth failures and policy violations surface as first-class
+                    events. You see when an agent hit a boundary — not just
+                    when something broke.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -209,9 +208,9 @@ export default function AIAgentGovernancePage() {
                     <Link href="/ai-agent-audit-logs">Audit Logs</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    A complete record of every access decision, policy
-                    evaluation, and operator action — built into the control
-                    plane, not retrofitted into a logging service.
+                    Every access decision, policy evaluation, and operator
+                    action — recorded by the control plane, not retrofitted
+                    into a logging service after the fact.
                   </p>
                 </div>
               </div>
@@ -224,14 +223,14 @@ export default function AIAgentGovernancePage() {
               <div className={feat.finalInner}>
                 <p className={feat.finalEyebrow}>Get started</p>
                 <h2 className={feat.finalTitle}>
-                  Define your first
+                  Ship your first
                   <br />
-                  governance policy.
+                  agent auth boundary.
                 </h2>
                 <p className={feat.finalBody}>
-                  Download the Mac app and write your auth boundaries in code.
-                  Apply them to one agent or your entire fleet — the control
-                  plane enforces them everywhere.
+                  Download the Mac app and define auth boundaries in code. Apply
+                  them to one agent or your whole fleet — the control plane
+                  handles enforcement across every environment.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>
