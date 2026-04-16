@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
 
 revision: str = "f7e2a1c8d9b4"
-down_revision: Union[str, None] = None
+down_revision: Union[str, None] = "e8f636a73690"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
