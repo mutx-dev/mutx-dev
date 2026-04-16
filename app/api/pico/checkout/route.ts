@@ -15,13 +15,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'priceId is required' }, { status: 400 })
     }
 
+    const origin = new URL(request.url).origin
+
     return proxyJson(request, `${getApiBaseUrl()}/v1/payments/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         price_id: priceId,
-        success_url: `${new URL(request.url).origin}/onboarding?checkout=success`,
-        cancel_url: `${new URL(request.url).origin}/pricing?checkout=canceled`,
+        success_url: `${origin}/onboarding?checkout=success`,
+        cancel_url: `${origin}/pricing?checkout=canceled`,
         trial_days: 7,
       }),
       fallbackMessage: 'Failed to create checkout session',

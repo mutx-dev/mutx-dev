@@ -70,9 +70,14 @@ export function PicoPricingPage() {
         body: JSON.stringify({ priceId }),
       })
 
+      if (res.status === 401) {
+        window.location.href = '/login?next=' + encodeURIComponent('/pricing')
+        return
+      }
+
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Checkout failed')
+        const err = await res.json().catch(() => ({ error: 'Checkout failed' }))
+        throw new Error(err.error || err.detail || 'Checkout failed')
       }
 
       const data = await res.json()
