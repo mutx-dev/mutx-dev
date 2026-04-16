@@ -1,5 +1,6 @@
 'use client'
 
+import { motion, useReducedMotion } from 'framer-motion'
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
@@ -67,6 +68,7 @@ function joinClasses(...classes: Array<string | false | null | undefined>) {
 
 export function PicoOnboardingPageClient() {
   const pathname = usePathname()
+  const prefersReducedMotion = useReducedMotion()
   const session = usePicoSession()
   const { progress, derived, actions } = usePicoProgress(session.status === 'authenticated')
   const setup = usePicoSetupState(session.status === 'authenticated')
@@ -154,36 +156,24 @@ export function PicoOnboardingPageClient() {
   const currentBinding = setup.runtime?.current_binding ?? setup.runtime?.bindings[0] ?? null
   const onboardingRobot = picoRobotArtById.guide
   const proofCaptured = firstRunWorkspace.workspace.evidence.trim().length > 0 || firstRunDone
+  const completedLessonStepCount =
+    installWorkspace.completedStepCount + firstRunWorkspace.completedStepCount
+  const totalLessonStepCount = (installLesson?.steps.length ?? 0) + (firstRunLesson?.steps.length ?? 0)
   const chapterPulsePercent = useMemo(() => {
-    const totalSteps = (installLesson?.steps.length ?? 0) + (firstRunLesson?.steps.length ?? 0)
-
-    if (totalSteps === 0) {
+    if (totalLessonStepCount === 0) {
       return 0
     }
 
     return Math.round(
-      ((installWorkspace.completedStepCount + firstRunWorkspace.completedStepCount) / totalSteps) * 100,
+      (completedLessonStepCount / totalLessonStepCount) * 100,
     )
-  }, [
-    firstRunLesson?.steps.length,
-    firstRunWorkspace.completedStepCount,
-    installLesson?.steps.length,
-    installWorkspace.completedStepCount,
-  ])
+  }, [completedLessonStepCount, totalLessonStepCount])
   const runtimeSignal =
     session.status !== 'authenticated'
       ? 'local only'
       : setup.loading
         ? 'checking'
         : setup.runtime?.status ?? 'not attached'
-  const runtimeSignalBody =
-    session.status !== 'authenticated'
-      ? 'Hosted sync is not attached yet, so Pico only knows the local workspace state.'
-      : setup.loading
-        ? 'Refreshing the hosted onboarding wizard and runtime snapshot now.'
-        : setup.runtime?.gateway_url
-          ? `Gateway attached at ${setup.runtime.gateway_url}.`
-          : 'Runtime snapshot exists, but the gateway endpoint is not recorded yet.'
   const nextMoveTitle = !installDone
     ? 'Install Hermes now'
     : !proofCaptured
@@ -193,15 +183,6 @@ export function PicoOnboardingPageClient() {
         : derived.nextLesson
           ? `Continue with ${derived.nextLesson.title}`
           : 'Open Autopilot'
-  const nextMoveBody = !installDone
-    ? (installLesson?.objective ?? 'Make the runtime open from a fresh shell before doing anything else.')
-    : !proofCaptured
-      ? (firstRunLesson?.expectedResult ??
-        'Pick one tiny prompt with an obvious answer and capture the output.')
-      : !firstRunDone
-        ? (firstRunLesson?.validation ??
-          'The answer exists. Mark the chapter complete and keep the route moving.')
-        : derived.nextLesson?.summary ?? 'The first visible win is done. Switch to the next live surface.'
   const activeFocusStep = !installDone ? installFocusedStep : firstRunFocusedStep
   const activeWorkspaceLabel =
     setup.onboarding?.workspace ?? currentBinding?.workspace ?? runtimeDraft.workspace ?? 'not recorded'
@@ -210,6 +191,25 @@ export function PicoOnboardingPageClient() {
     : !firstRunDone
       ? 'Seal the proof while the route is still honest.'
       : 'First proof is real. Keep the lane moving.'
+  const hostedSyncLabel = session.status === 'authenticated' ? `${hostedCompletionRatio}%` : 'local'
+  const proofSignalLabel = proofCaptured ? (firstRunDone ? 'sealed' : 'captured') : 'missing'
+  const runtimeSignalDetail =
+    session.status !== 'authenticated'
+      ? 'hosted sync offline'
+      : setup.loading
+        ? 'refreshing signal'
+        : setup.runtime?.gateway_url
+          ? 'gateway live'
+          : 'gateway unbound'
+  const orbitTransition = prefersReducedMotion
+    ? undefined
+    : { duration: 20, repeat: Infinity, ease: 'linear' as const }
+  const ambientDriftTransition = prefersReducedMotion
+    ? undefined
+    : { duration: 10, repeat: Infinity, repeatType: 'mirror' as const, ease: 'easeInOut' as const }
+  const slowFloatTransition = prefersReducedMotion
+    ? undefined
+    : { duration: 14, repeat: Infinity, repeatType: 'mirror' as const, ease: 'easeInOut' as const }
 
   const runtimeDraftDirty = useMemo(() => {
     const runtime = setup.runtime
@@ -284,55 +284,63 @@ export function PicoOnboardingPageClient() {
       title="Get to your first working agent fast"
       description="Ignore everything except the first local win. Install Hermes, run one prompt, see a real answer, then keep moving."
       heroContent={
-        <div className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.16),rgba(9,16,11,0.84)_40%,rgba(255,255,255,0.03)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6">
+        <div
+          className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.16),rgba(9,16,11,0.88)_38%,rgba(255,255,255,0.03)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+          data-testid="pico-onboarding-hero-signal"
+        >
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-[radial-gradient(circle_at_70%_50%,rgba(var(--pico-accent-rgb),0.24),transparent_68%)]"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_28%,transparent_72%,rgba(255,255,255,0.02))]"
           />
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)]"
           />
-          <div className="relative grid gap-4 xl:grid-cols-[minmax(0,1.12fr),15rem]">
-            <div>
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-8 top-10 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.16)] blur-3xl"
+            animate={prefersReducedMotion ? undefined : { x: [-10, 18, -6], y: [0, 14, -4], scale: [1, 1.08, 0.96] }}
+            transition={ambientDriftTransition}
+          />
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-0 right-0 h-52 w-52 rounded-full bg-[rgba(var(--pico-accent-rgb),0.12)] blur-3xl"
+            animate={prefersReducedMotion ? undefined : { x: [12, -10, 8], y: [8, -12, 0], scale: [0.94, 1.06, 1] }}
+            transition={slowFloatTransition}
+          />
+          <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
+            <div className="grid gap-5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className={picoClasses.chip}>First-win pulse</span>
                 <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                   {activeTrack.title}
                 </span>
               </div>
-              <p className="mt-4 font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
+              <p className="font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
                 {heroEyebrow}
               </p>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Keep the fold focused on the only things that matter right now: chapter pulse, proof state,
-                runtime truth, and the next irreversible move.
+              <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                This fold should read like a launch console, not a brochure.
               </p>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.label}>Chapter pulse</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {chapterPulsePercent}%
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    {installWorkspace.completedStepCount + firstRunWorkspace.completedStepCount} /
-                    {' '}
-                    {(installLesson?.steps.length ?? 0) + (firstRunLesson?.steps.length ?? 0)}
-                    {' '}
-                    lesson steps cleared.
+                    {completedLessonStepCount}/{totalLessonStepCount} steps clear
                   </p>
                 </div>
 
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.label}>Proof state</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                    {proofCaptured ? (firstRunDone ? 'sealed' : 'captured') : 'missing'}
+                    {proofSignalLabel}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    {proofCaptured
-                      ? 'The first answer exists. Do not let it dissolve back into setup fog.'
-                      : 'No artifact yet. The first answer still needs to become visible and reusable.'}
+                    {proofCaptured ? 'artifact logged' : 'artifact still missing'}
                   </p>
                 </div>
 
@@ -342,46 +350,102 @@ export function PicoOnboardingPageClient() {
                     {runtimeSignal}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    {runtimeSignalBody}
+                    {runtimeSignalDetail}
+                  </p>
+                </div>
+              </div>
+
+              <div className={picoInset('grid gap-3 p-4 sm:grid-cols-[auto,minmax(0,1fr)] sm:items-center')}>
+                <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-[rgba(var(--pico-accent-rgb),0.24)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.18),rgba(7,13,8,0.5))] shadow-[0_18px_40px_rgba(var(--pico-accent-rgb),0.12)]">
+                  <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
+                </div>
+                <div className="min-w-0">
+                  <p className={picoClasses.label}>Next irreversible move</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {nextMoveTitle}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {activeFocusStep} · {activeWorkspaceLabel}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className={picoInset('grid content-start gap-3 p-4')}>
-              <p className={picoClasses.label}>Next irreversible move</p>
-              <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                {nextMoveTitle}
-              </p>
-              <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{nextMoveBody}</p>
+            <div className={picoInset('relative min-h-[20rem] overflow-hidden border-[color:rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_22%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:28px_28px]"
+              />
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[16rem] w-[16rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(var(--pico-accent-rgb),0.16)]"
+                animate={prefersReducedMotion ? undefined : { rotate: 360 }}
+                transition={orbitTransition}
+              />
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[11rem] w-[11rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(var(--pico-accent-rgb),0.24)]"
+                animate={prefersReducedMotion ? undefined : { rotate: -360, scale: [0.98, 1.03, 0.98] }}
+                transition={prefersReducedMotion ? undefined : { duration: 16, repeat: Infinity, ease: 'linear' }}
+              />
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(var(--pico-accent-rgb),0.28),rgba(var(--pico-accent-rgb),0.02)_62%,transparent_74%)] blur-2xl"
+                animate={prefersReducedMotion ? undefined : { scale: [0.9, 1.08, 0.96], opacity: [0.35, 0.7, 0.45] }}
+                transition={ambientDriftTransition}
+              />
 
-              <div className="overflow-hidden rounded-full bg-[color:var(--pico-bg-input)]">
-                <div
-                  className="h-2 rounded-full bg-[linear-gradient(90deg,var(--pico-accent),var(--pico-accent-bright))]"
-                  style={{ width: `${chapterPulsePercent}%` }}
-                />
-              </div>
+              <motion.div
+                className="absolute left-4 top-4 max-w-[8.5rem] rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                animate={prefersReducedMotion ? undefined : { y: [-2, 10, -2], x: [0, 6, 0] }}
+                transition={ambientDriftTransition}
+              >
+                <p className={picoClasses.label}>Proof</p>
+                <p className="mt-1 font-medium text-[color:var(--pico-text)]">{proofSignalLabel}</p>
+              </motion.div>
 
-              <div className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                <div className="flex items-start justify-between gap-3">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--pico-text-muted)]">
-                    Focused step
-                  </span>
-                  <span className="text-right text-[color:var(--pico-text)]">{activeFocusStep}</span>
-                </div>
-                <div className="flex items-start justify-between gap-3">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--pico-text-muted)]">
-                    Workspace
-                  </span>
-                  <span className="text-right text-[color:var(--pico-text)]">{activeWorkspaceLabel}</span>
-                </div>
-                <div className="flex items-start justify-between gap-3">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--pico-text-muted)]">
-                    Hosted sync
-                  </span>
-                  <span className="text-right text-[color:var(--pico-text)]">
-                    {session.status === 'authenticated' ? `${hostedCompletionRatio}%` : 'not attached'}
-                  </span>
+              <motion.div
+                className="absolute right-4 top-7 max-w-[8.5rem] rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                animate={prefersReducedMotion ? undefined : { y: [8, -6, 8], x: [0, -4, 0] }}
+                transition={slowFloatTransition}
+              >
+                <p className={picoClasses.label}>Runtime</p>
+                <p className="mt-1 font-medium text-[color:var(--pico-text)]">{runtimeSignal}</p>
+              </motion.div>
+
+              <motion.div
+                className="absolute bottom-4 left-5 max-w-[9rem] rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                animate={prefersReducedMotion ? undefined : { y: [0, -10, 0], x: [-2, 6, -2] }}
+                transition={ambientDriftTransition}
+              >
+                <p className={picoClasses.label}>Focus</p>
+                <p className="mt-1 text-sm font-medium text-[color:var(--pico-text)]">{activeFocusStep}</p>
+              </motion.div>
+
+              <motion.div
+                className="absolute bottom-5 right-5 rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                animate={prefersReducedMotion ? undefined : { y: [6, -4, 6], x: [0, -6, 0] }}
+                transition={slowFloatTransition}
+              >
+                <p className={picoClasses.label}>Sync</p>
+                <p className="mt-1 font-medium text-[color:var(--pico-text)]">{hostedSyncLabel}</p>
+              </motion.div>
+
+              <div className="relative flex h-full items-center justify-center">
+                <div className="w-full max-w-[11rem] rounded-[30px] border border-[rgba(var(--pico-accent-rgb),0.22)] bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-4 text-center shadow-[0_22px_60px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+                  <p className={picoClasses.label}>Signal core</p>
+                  <p className="mt-3 font-[family:var(--font-site-display)] text-5xl tracking-[-0.08em] text-[color:var(--pico-text)]">
+                    {chapterPulsePercent}%
+                  </p>
+                  <div className="mt-4 overflow-hidden rounded-full bg-[rgba(255,255,255,0.07)]">
+                    <div
+                      className="h-2 rounded-full bg-[linear-gradient(90deg,var(--pico-accent),var(--pico-accent-bright))]"
+                      style={{ width: `${chapterPulsePercent}%` }}
+                    />
+                  </div>
+                  <p className="mt-3 text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
+                    {completedLessonStepCount}/{totalLessonStepCount} steps clear
+                  </p>
                 </div>
               </div>
             </div>
