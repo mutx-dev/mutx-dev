@@ -22,7 +22,7 @@ const PLANS = [
   {
     id: 'starter',
     name: 'Starter',
-    price: '$9',
+    price: '€9',
     period: '/mo',
     description: 'Full learning experience',
     features: [
@@ -33,13 +33,13 @@ const PLANS = [
       'Priority support',
     ],
     cta: 'Start 7-Day Trial',
-    priceId: 'STRIPE_STARTER_PRICE_ID',
+    priceId: 'price_1TMrgMLqNfXHzKqSL3dPg1JS',
     highlight: true,
   },
   {
     id: 'pro',
     name: 'Pro',
-    price: '$29',
+    price: '€29',
     period: '/mo',
     description: 'For serious builders',
     features: [
@@ -51,7 +51,7 @@ const PLANS = [
       'Early feature access',
     ],
     cta: 'Start 7-Day Trial',
-    priceId: 'STRIPE_PRO_PRICE_ID',
+    priceId: 'price_1TMrdKLqNfXHzKqS15LrJt9C',
     highlight: false,
   },
 ]
