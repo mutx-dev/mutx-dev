@@ -410,10 +410,12 @@ class Webhook(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
+    name: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
     url: Mapped[str] = mapped_column(String(512), nullable=False)
     events: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     secret: Mapped[str] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
@@ -723,6 +725,10 @@ class WebhookDeliveryLog(Base):
     success: Mapped[bool] = mapped_column(Boolean, default=False)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     attempts: Mapped[int] = mapped_column(Integer, default=1)
+    duration_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    parent_delivery_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

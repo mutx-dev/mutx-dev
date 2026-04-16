@@ -1021,6 +1021,9 @@ class WebhookCreate(BaseModel):
     url: str = Field(
         ..., max_length=512, min_length=1, description="The URL to receive webhook events"
     )
+    name: Optional[str] = Field(
+        None, max_length=120, description="Optional human-readable name for the webhook"
+    )
     events: list[str] = Field(
         default_factory=lambda: ["*"],
         description="List of events to subscribe to (e.g., 'agent.status', 'deployment.*', '*' for all)",
@@ -1033,8 +1036,12 @@ class WebhookCreate(BaseModel):
 
 class WebhookUpdate(BaseModel):
     url: Optional[str] = Field(None, max_length=512)
+    name: Optional[str] = Field(None, max_length=120)
     events: Optional[list[str]] = None
     is_active: Optional[bool] = None
+    reset_circuit: Optional[bool] = Field(
+        None, description="Set to true to reset the circuit breaker and re-enable delivery"
+    )
 
 
 class WebhookResponse(BaseModel):
@@ -1042,6 +1049,7 @@ class WebhookResponse(BaseModel):
 
     id: uuid.UUID
     user_id: uuid.UUID
+    name: Optional[str] = None
     url: str
     events: list[str]
     secret: Optional[str] = Field(
@@ -1050,7 +1058,13 @@ class WebhookResponse(BaseModel):
     )
     has_secret: bool = False
     is_active: bool
+    circuit_open: bool = False
+    consecutive_failures: int = 0
     created_at: datetime
+    # Aggregate delivery stats (populated when requested)
+    total_deliveries: Optional[int] = None
+    successful_deliveries: Optional[int] = None
+    failed_deliveries: Optional[int] = None
 
 
 class WebhookDelivery(BaseModel):
@@ -1063,11 +1077,22 @@ class WebhookDelivery(BaseModel):
     event: str
     payload: str
     status_code: Optional[int]
+    response_body: Optional[str] = None
     success: bool
     error_message: Optional[str]
     attempts: int
+    duration_ms: Optional[int] = None
+    parent_delivery_id: Optional[uuid.UUID] = None
     created_at: datetime
     delivered_at: Optional[datetime]
+
+
+class WebhookRetryRequest(BaseModel):
+    """Request body for manually retrying a delivery."""
+
+    delivery_id: uuid.UUID = Field(
+        ..., description="ID of the original delivery to retry"
+    )
 
 
 class WebhookListResponse(BaseModel):

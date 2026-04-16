@@ -13,7 +13,9 @@ import hmac
 import ipaddress
 import json
 import logging
+import random
 import socket
+import time
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
@@ -28,10 +30,18 @@ from src.api.security import decrypt_secret_value
 
 logger = logging.getLogger(__name__)
 
-# Delivery retry configuration
-MAX_RETRIES = 3
-RETRY_DELAYS = [2, 10, 30]  # Seconds between retries
+# Delivery retry configuration (MC v2.0 parity)
+MAX_RETRIES = 5
+BACKOFF_SCHEDULE = [30, 300, 1800, 7200, 28800]  # 30s, 5m, 30m, 2h, 8h
 TIMEOUT_SECONDS = 30
+CIRCUIT_BREAKER_THRESHOLD = MAX_RETRIES  # Open circuit after this many consecutive failures
+
+
+def _next_retry_delay(attempt: int) -> float:
+    """Calculate retry delay with ±20% jitter (MC v2.0 pattern)."""
+    base = BACKOFF_SCHEDULE[min(attempt, len(BACKOFF_SCHEDULE) - 1)]
+    jitter = base * 0.2 * (random.random() * 2 - 1)  # ±20%
+    return max(1.0, base + jitter)
 
 
 class UnsafeWebhookDestinationError(ValueError):
@@ -118,15 +128,16 @@ async def deliver_webhook(
     event: str,
     payload: dict,
     delivery_id: uuid.UUID,
-) -> tuple[bool, Optional[int], Optional[str]]:
+) -> tuple[bool, Optional[int], Optional[str], Optional[int], Optional[str]]:
     """
     Attempt to deliver a webhook event to the registered URL.
 
     Returns:
-        tuple of (success, status_code, error_message)
+        tuple of (success, status_code, error_message, duration_ms, response_body)
     """
     url = webhook.url
     secret = decrypt_secret_value(webhook.secret)
+    start_time = time.monotonic()
 
     # Prepare payload
     payload_json = json.dumps(
@@ -155,7 +166,8 @@ async def deliver_webhook(
     except UnsafeWebhookDestinationError as exc:
         error_msg = str(exc)
         logger.warning("Blocked webhook delivery to unsafe destination %s: %s", url, error_msg)
-        return False, None, error_msg
+        duration_ms = int((time.monotonic() - start_time) * 1000)
+        return False, None, error_msg, duration_ms, None
 
     try:
         async with session.post(
@@ -167,29 +179,33 @@ async def deliver_webhook(
         ) as response:
             status_code = response.status
             response_body = await response.text()
+            duration_ms = int((time.monotonic() - start_time) * 1000)
 
             if 200 <= status_code < 300:
                 logger.info(f"Webhook delivered successfully: {event} to {url}")
-                return True, status_code, None
+                return True, status_code, None, duration_ms, response_body
             else:
                 error_msg = f"HTTP {status_code}: {response_body[:200]}"
                 logger.warning(f"Webhook delivery failed: {error_msg}")
-                return False, status_code, error_msg
+                return False, status_code, error_msg, duration_ms, response_body
 
     except asyncio.TimeoutError:
         error_msg = f"Timeout after {TIMEOUT_SECONDS}s"
+        duration_ms = int((time.monotonic() - start_time) * 1000)
         logger.warning(f"Webhook delivery timeout: {event} to {url}")
-        return False, None, error_msg
+        return False, None, error_msg, duration_ms, None
 
     except aiohttp.ClientError as e:
         error_msg = str(e)
+        duration_ms = int((time.monotonic() - start_time) * 1000)
         logger.warning(f"Webhook delivery error: {error_msg}")
-        return False, None, error_msg
+        return False, None, error_msg, duration_ms, None
 
     except Exception as e:
         error_msg = f"Unexpected error: {str(e)}"
+        duration_ms = int((time.monotonic() - start_time) * 1000)
         logger.error(f"Webhook delivery failed: {error_msg}")
-        return False, None, error_msg
+        return False, None, error_msg, duration_ms, None
 
 
 async def deliver_webhook_with_retry(
@@ -198,11 +214,13 @@ async def deliver_webhook_with_retry(
     webhook: Webhook,
     event: str,
     payload: dict,
+    parent_delivery_id: Optional[uuid.UUID] = None,
 ) -> bool:
     """
-    Deliver webhook with retry logic.
+    Deliver webhook with retry logic, circuit breaker, and exponential backoff.
 
-    Retries up to MAX_RETRIES times with increasing delays.
+    Retries up to MAX_RETRIES times with increasing delays + jitter.
+    Tracks consecutive failures and opens the circuit breaker when threshold is reached.
     """
     if db.bind is None:
         raise RuntimeError("Database session is not bound")
@@ -218,39 +236,60 @@ async def deliver_webhook_with_retry(
             logger.info(f"Webhook {webhook.id} is inactive, skipping delivery")
             return False
 
+        # Circuit breaker check: skip if already open
+        if refreshed_webhook.consecutive_failures >= CIRCUIT_BREAKER_THRESHOLD:
+            logger.warning(
+                f"Circuit breaker open for webhook {webhook.id} "
+                f"({refreshed_webhook.consecutive_failures} consecutive failures). "
+                f"Skipping delivery."
+            )
+            return False
+
         delivery_id = uuid.uuid4()
         delivery_log = WebhookDeliveryLog(
             id=delivery_id,
             webhook_id=refreshed_webhook.id,
             event=event,
             payload=json.dumps(payload, default=str),
+            parent_delivery_id=parent_delivery_id,
         )
         isolated_db.add(delivery_log)
         await isolated_db.commit()
 
         for attempt in range(MAX_RETRIES):
-            success, status_code, error_message = await deliver_webhook(
+            success, status_code, error_message, duration_ms, response_body = await deliver_webhook(
                 session, refreshed_webhook, event, payload, delivery_id
             )
 
             if success:
                 delivery_log.success = True
                 delivery_log.status_code = status_code
+                delivery_log.duration_ms = duration_ms
+                delivery_log.response_body = (response_body or "")[:10000]  # Cap storage
                 delivery_log.delivered_at = datetime.now(timezone.utc)
+
+                # Reset circuit breaker on success
+                refreshed_webhook.consecutive_failures = 0
                 await isolated_db.commit()
                 return True
 
             delivery_log.attempts = attempt + 1
             delivery_log.status_code = status_code
             delivery_log.error_message = error_message
+            delivery_log.duration_ms = duration_ms
+            delivery_log.response_body = (response_body or "")[:10000]
             await isolated_db.commit()
 
             if attempt < MAX_RETRIES - 1:
-                delay = RETRY_DELAYS[attempt]
+                delay = _next_retry_delay(attempt)
                 logger.info(
-                    f"Retrying webhook delivery in {delay}s (attempt {attempt + 2}/{MAX_RETRIES})"
+                    f"Retrying webhook delivery in {delay:.1f}s (attempt {attempt + 2}/{MAX_RETRIES})"
                 )
                 await asyncio.sleep(delay)
+
+        # All retries exhausted — increment consecutive failures
+        refreshed_webhook.consecutive_failures += 1
+        await isolated_db.commit()
 
         logger.error(
             f"Webhook delivery failed after {MAX_RETRIES} attempts: {event} to {refreshed_webhook.url}"

@@ -592,6 +592,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/webhooks/verify-docs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Webhook Verify Docs
+         * @description Documentation for verifying webhook signatures.
+         *
+         *     Returns instructions for consumers to verify the HMAC-SHA256 signature
+         *     included in webhook deliveries.
+         */
+        get: operations["webhook_verify_docs_v1_webhooks_verify_docs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhooks/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry Webhook Delivery
+         * @description Manually retry a specific webhook delivery.
+         *
+         *     Looks up the original delivery, re-delivers the event to the same webhook
+         *     with no auto-retry. Links the new delivery to the original via parent_delivery_id.
+         */
+        post: operations["retry_webhook_delivery_v1_webhooks_retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/register": {
         parameters: {
             query?: never;
@@ -8443,6 +8489,11 @@ export interface components {
              */
             url: string;
             /**
+             * Name
+             * @description Optional human-readable name for the webhook
+             */
+            name?: string | null;
+            /**
              * Events
              * @description List of events to subscribe to (e.g., 'agent.status', 'deployment.*', '*' for all)
              */
@@ -8480,12 +8531,18 @@ export interface components {
             payload: string;
             /** Status Code */
             status_code: number | null;
+            /** Response Body */
+            response_body?: string | null;
             /** Success */
             success: boolean;
             /** Error Message */
             error_message: string | null;
             /** Attempts */
             attempts: number;
+            /** Duration Ms */
+            duration_ms?: number | null;
+            /** Parent Delivery Id */
+            parent_delivery_id?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -8547,6 +8604,8 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+            /** Name */
+            name?: string | null;
             /** Url */
             url: string;
             /** Events */
@@ -8564,19 +8623,54 @@ export interface components {
             /** Is Active */
             is_active: boolean;
             /**
+             * Circuit Open
+             * @default false
+             */
+            circuit_open: boolean;
+            /**
+             * Consecutive Failures
+             * @default 0
+             */
+            consecutive_failures: number;
+            /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Total Deliveries */
+            total_deliveries?: number | null;
+            /** Successful Deliveries */
+            successful_deliveries?: number | null;
+            /** Failed Deliveries */
+            failed_deliveries?: number | null;
+        };
+        /**
+         * WebhookRetryRequest
+         * @description Request body for manually retrying a delivery.
+         */
+        WebhookRetryRequest: {
+            /**
+             * Delivery Id
+             * Format: uuid
+             * @description ID of the original delivery to retry
+             */
+            delivery_id: string;
         };
         /** WebhookUpdate */
         WebhookUpdate: {
             /** Url */
             url?: string | null;
+            /** Name */
+            name?: string | null;
             /** Events */
             events?: string[] | null;
             /** Is Active */
             is_active?: boolean | null;
+            /**
+             * Reset Circuit
+             * @description Set to true to reset the circuit breaker and re-enable delivery
+             */
+            reset_circuit?: boolean | null;
         };
         /** MetricsResponse */
         src__api__routes__agent_runtime__MetricsResponse: {
@@ -10013,6 +10107,78 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WebhookDeliveryListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    webhook_verify_docs_v1_webhooks_verify_docs_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Bearer token for JWT auth */
+                authorization?: string | null;
+                /** @description API key for webhook management */
+                "X-API-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_webhook_delivery_v1_webhooks_retry_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Bearer token for JWT auth */
+                authorization?: string | null;
+                /** @description API key for webhook management */
+                "X-API-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebhookRetryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

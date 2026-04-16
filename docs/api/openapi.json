@@ -2902,6 +2902,152 @@
         }
       }
     },
+    "/v1/webhooks/verify-docs": {
+      "get": {
+        "tags": [
+          "webhooks"
+        ],
+        "summary": "Webhook Verify Docs",
+        "description": "Documentation for verifying webhook signatures.\n\nReturns instructions for consumers to verify the HMAC-SHA256 signature\nincluded in webhook deliveries.",
+        "operationId": "webhook_verify_docs_v1_webhooks_verify_docs_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer token for JWT auth",
+              "title": "Authorization"
+            },
+            "description": "Bearer token for JWT auth"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "API key for webhook management",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for webhook management"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/webhooks/retry": {
+      "post": {
+        "tags": [
+          "webhooks"
+        ],
+        "summary": "Retry Webhook Delivery",
+        "description": "Manually retry a specific webhook delivery.\n\nLooks up the original delivery, re-delivers the event to the same webhook\nwith no auto-retry. Links the new delivery to the original via parent_delivery_id.",
+        "operationId": "retry_webhook_delivery_v1_webhooks_retry_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer token for JWT auth",
+              "title": "Authorization"
+            },
+            "description": "Bearer token for JWT auth"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "API key for webhook management",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for webhook management"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookRetryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/auth/register": {
       "post": {
         "tags": [
@@ -25794,6 +25940,19 @@
             "title": "Url",
             "description": "The URL to receive webhook events"
           },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Optional human-readable name for the webhook"
+          },
           "events": {
             "items": {
               "type": "string"
@@ -25860,6 +26019,17 @@
             ],
             "title": "Status Code"
           },
+          "response_body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Body"
+          },
           "success": {
             "type": "boolean",
             "title": "Success"
@@ -25878,6 +26048,29 @@
           "attempts": {
             "type": "integer",
             "title": "Attempts"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "parent_delivery_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Delivery Id"
           },
           "created_at": {
             "type": "string",
@@ -26025,6 +26218,17 @@
             "format": "uuid",
             "title": "User Id"
           },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
           "url": {
             "type": "string",
             "title": "Url"
@@ -26057,10 +26261,53 @@
             "type": "boolean",
             "title": "Is Active"
           },
+          "circuit_open": {
+            "type": "boolean",
+            "title": "Circuit Open",
+            "default": false
+          },
+          "consecutive_failures": {
+            "type": "integer",
+            "title": "Consecutive Failures",
+            "default": 0
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "total_deliveries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Deliveries"
+          },
+          "successful_deliveries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Successful Deliveries"
+          },
+          "failed_deliveries": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed Deliveries"
           }
         },
         "type": "object",
@@ -26073,6 +26320,22 @@
           "created_at"
         ],
         "title": "WebhookResponse"
+      },
+      "WebhookRetryRequest": {
+        "properties": {
+          "delivery_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Delivery Id",
+            "description": "ID of the original delivery to retry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "delivery_id"
+        ],
+        "title": "WebhookRetryRequest",
+        "description": "Request body for manually retrying a delivery."
       },
       "WebhookUpdate": {
         "properties": {
@@ -26087,6 +26350,18 @@
               }
             ],
             "title": "Url"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
           },
           "events": {
             "anyOf": [
@@ -26112,6 +26387,18 @@
               }
             ],
             "title": "Is Active"
+          },
+          "reset_circuit": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reset Circuit",
+            "description": "Set to true to reset the circuit breaker and re-enable delivery"
           }
         },
         "type": "object",

@@ -14,6 +14,7 @@ from src.api.models.schemas import (
     WebhookResponse,
     WebhookListResponse,
     WebhookDeliveryListResponse,
+    WebhookRetryRequest,
 )
 from src.api.middleware.auth import get_current_user_or_api_key
 from src.api.security import encrypt_secret_value
@@ -26,16 +27,28 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 logger = logging.getLogger(__name__)
 
 
-def _serialize_webhook(webhook: Webhook) -> WebhookResponse:
+def _serialize_webhook(
+    webhook: Webhook,
+    total_deliveries: Optional[int] = None,
+    successful_deliveries: Optional[int] = None,
+    failed_deliveries: Optional[int] = None,
+) -> WebhookResponse:
     return WebhookResponse(
         id=webhook.id,
         user_id=webhook.user_id,
+        name=getattr(webhook, "name", None),
         url=webhook.url,
         events=webhook.events or [],
         secret=None,
         has_secret=bool(webhook.secret),
         is_active=webhook.is_active,
+        circuit_open=getattr(webhook, "consecutive_failures", 0)
+        >= 5,  # CIRCUIT_BREAKER_THRESHOLD
+        consecutive_failures=getattr(webhook, "consecutive_failures", 0),
         created_at=webhook.created_at,
+        total_deliveries=total_deliveries,
+        successful_deliveries=successful_deliveries,
+        failed_deliveries=failed_deliveries,
     )
 
 
@@ -120,6 +133,7 @@ async def create_webhook(
 
     webhook = Webhook(
         user_id=current_user.id,
+        name=webhook_data.name,
         url=webhook_data.url,
         events=webhook_data.events,
         secret=encrypt_secret_value(webhook_data.secret),
@@ -183,12 +197,20 @@ async def update_webhook(
         await _validate_webhook_url(webhook_data.url)
         webhook.url = webhook_data.url
 
+    if webhook_data.name is not None:
+        webhook.name = webhook_data.name
+
     if webhook_data.events is not None:
         _validate_webhook_events(webhook_data.events)
         webhook.events = webhook_data.events
 
     if webhook_data.is_active is not None:
         webhook.is_active = webhook_data.is_active
+
+    # Reset circuit breaker if requested
+    if webhook_data.reset_circuit:
+        webhook.consecutive_failures = 0
+        logger.info(f"Circuit breaker reset for webhook {webhook.id}")
 
     await db.commit()
     await db.refresh(webhook)
@@ -286,3 +308,103 @@ async def list_webhook_deliveries(
         event=event,
         success=success,
     )
+
+
+@router.get("/verify-docs")
+async def webhook_verify_docs(
+    current_user: User = Depends(get_webhook_auth),
+):
+    """Documentation for verifying webhook signatures.
+
+    Returns instructions for consumers to verify the HMAC-SHA256 signature
+    included in webhook deliveries.
+    """
+    return {
+        "algorithm": "HMAC-SHA256",
+        "header": "X-Webhook-Signature",
+        "format": "sha256=<hex>",
+        "verification_steps": [
+            "1. Extract the value of the X-Webhook-Signature header from the incoming request.",
+            "2. Remove the 'sha256=' prefix to get the hex digest.",
+            "3. Compute HMAC-SHA256 of the raw request body using your webhook secret as the key.",
+            "4. Compare the computed hex digest to the extracted signature using a constant-time comparison.",
+            "5. If they match, the webhook is authentic.",
+        ],
+        "example_nodejs": (
+            "const crypto = require('crypto');\n"
+            "function verifySignature(payload, signature, secret) {\n"
+            "  const expected = signature.replace('sha256=', '');\n"
+            "  const hmac = crypto.createHmac('sha256', secret);\n"
+            "  hmac.update(payload);\n"
+            "  const digest = hmac.digest('hex');\n"
+            "  try {\n"
+            "    return crypto.timingSafeEqual(\n"
+            "      Buffer.from(expected, 'hex'),\n"
+            "      Buffer.from(digest, 'hex')\n"
+            "    );\n"
+            "  } catch { return false; }\n"
+            "}"
+        ),
+    }
+
+
+@router.post("/retry")
+async def retry_webhook_delivery(
+    request: WebhookRetryRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_webhook_auth),
+):
+    """Manually retry a specific webhook delivery.
+
+    Looks up the original delivery, re-delivers the event to the same webhook
+    with no auto-retry. Links the new delivery to the original via parent_delivery_id.
+    """
+    # Find the original delivery
+    result = await db.execute(
+        select(WebhookDeliveryLog).where(
+            WebhookDeliveryLog.id == request.delivery_id
+        )
+    )
+    original = result.scalar_one_or_none()
+
+    if not original:
+        raise HTTPException(status_code=404, detail="Delivery not found")
+
+    # Verify ownership through webhook
+    webhook = await _get_owned_webhook(original.webhook_id, db, current_user)
+
+    # Parse original payload
+    import json as _json
+
+    try:
+        payload = _json.loads(original.payload)
+    except (ValueError, TypeError):
+        payload = {"data": original.payload}
+
+    # Deliver with no auto-retry (single attempt), linked to original
+    from src.api.services.webhook_service import (
+        deliver_webhook_with_retry,
+    )
+    import aiohttp
+
+    async with aiohttp.ClientSession() as session:
+        success = await deliver_webhook_with_retry(
+            session,
+            db,
+            webhook,
+            original.event,
+            payload,
+            parent_delivery_id=original.id,
+        )
+
+    if success:
+        return {
+            "status": "retry_delivered",
+            "message": "Retry delivery successful",
+            "original_delivery_id": str(original.id),
+        }
+    else:
+        raise HTTPException(
+            status_code=502,
+            detail="Retry delivery failed. Check webhook URL and circuit breaker state.",
+        )
