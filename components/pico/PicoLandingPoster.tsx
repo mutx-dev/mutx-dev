@@ -215,9 +215,8 @@ export function PicoLandingPoster() {
               <SiteReveal className={s.qualifyIntro} delay={0.04}>
                 <p className={s.eyebrow}>{t('problem.eyebrow')}</p>
                 <h2 className={s.sectionTitle}>
-                  {t('problem.title')}
-                  <br />
-                  {t('problem.titleLine2')}
+                  <span className={s.titleLine}>{t('problem.title')}</span>{' '}
+                  <span className={s.titleLine}>{t('problem.titleLine2')}</span>
                 </h2>
                 <p className={s.sectionBody}>{t('problem.body')}</p>
                 <p className={s.sectionClose}>{t('problem.close')}</p>

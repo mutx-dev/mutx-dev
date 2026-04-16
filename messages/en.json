@@ -1,8 +1,8 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer",
-      "description": "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access."
+      "title": "PicoMUTX — Build and Deploy AI Agents Without Hiring a Developer",
+      "description": "PicoMUTX gives founders and operators one practical path from AI-agent idea to trusted launch, with implementation guidance, safeguards, and real support built in."
     },
     "nav": {
       "brand": "PicoMUTX",
@@ -10,66 +10,66 @@
       "cta": "Pre-register"
     },
     "hero": {
-      "badge": "Early Access · Limited Spots",
+      "badge": "Founding Access · Open Now",
       "title": "Build and deploy AI agents ",
       "titleAccent": "without hiring a developer.",
-      "subtitle": "PicoMUTX gives you a safe, guided path to a working AI agent — whether you are starting from scratch, fixing an agent that is not working, or trying to avoid another expensive mistake.",
+      "subtitle": "PicoMUTX takes you from AI-agent idea to a working, reviewable system with one guided build path, grounded support, and guardrails before launch.",
       "cta": "Pre-Register for Early Access",
       "ctaSecondary": "See pricing",
-      "meta": "Free to pre-register · No credit card required · Founding spots limited"
+      "meta": "Free to pre-register · No credit card required · Human reply, not a nurture funnel"
     },
     "trustBar": {
       "items": {
-        "0": "For founders, operators, and small teams",
-        "1": "Step-by-step guidance",
-        "2": "Built-in safeguards from day one"
+        "0": "Built for founders, operators, and lean teams",
+        "1": "One path from first use case to live agent",
+        "2": "Support, safeguards, and escalation in one loop"
       }
     },
     "problem": {
       "eyebrow": "The Problem",
-      "title": "The problem is not the idea.",
-      "titleLine2": "It is everything that happens after it.",
-      "body": "Most people do not get stuck because they lack ambition. They get stuck because building an AI agent still feels like entering a world designed by engineers, for engineers.",
+      "title": "The idea is rarely",
+      "titleLine2": "what kills the build.",
+      "body": "Most AI-agent projects stall after the first real decision: what to use, what to trust, what to ship first, and who can help when the path stops being obvious.",
       "scenarios": {
         "0": {
-          "label": "\"I want an AI agent, but I don't know where to start.\"",
-          "body": "There are too many tools, too many opinions, and too many people assuming you already know the basics. The gap between \"I have an idea\" and \"I have something working\" feels larger than it should."
+          "label": "\"I know the use case. I do not know the stack.\"",
+          "body": "Every guide assumes a different toolset, a different skill level, and a different definition of done. The distance from concept to first working agent stays larger than it should."
         },
         "1": {
-          "label": "\"I already tried — and got stuck.\"",
-          "body": "You made progress, hit a wall, and had nobody to ask who could actually help. The idea is sitting in your backlog instead of creating value."
+          "label": "\"I already got halfway and lost momentum.\"",
+          "body": "The first blocker cost more than time. It killed confidence, and nobody around you could tell you the exact next move with enough certainty."
         },
         "2": {
-          "label": "\"I spent money, and it still isn't working properly.\"",
-          "body": "Maybe you hired someone. Maybe you paid for tools. Now you are not just uncertain — you are skeptical."
+          "label": "\"I already paid for help and still do not trust the result.\"",
+          "body": "Now the problem is not just delivery. It is whether the system is safe, legible, and worth putting in front of real work."
         },
         "3": {
-          "label": "\"I don't want to deploy something I can't trust.\"",
-          "body": "An agent that gives the wrong answer, behaves unpredictably, or creates hidden costs is not an asset. It is a liability."
+          "label": "\"I do not want to launch something I cannot explain.\"",
+          "body": "If you cannot see what it costs, why it failed, or how it behaves under pressure, you do not have an asset yet."
         }
       },
-      "close": "That's exactly why PicoMUTX exists."
+      "close": "PicoMUTX exists to close that gap."
     },
     "platform": {
-      "eyebrow": "What PicoMUTX Is",
-      "title": "Where AI agents go from “interesting idea” to “working system.”",
-      "body": "PicoMUTX is a guided platform for people who want to build and run AI agents safely — without needing to become full-time engineers. It gives you the structure, support, and safeguards that are usually missing when people try to do this alone. Instead of assembling everything from scratch, you move step by step: from idea to implementation, from confusion to clarity, from prototype to something you can actually use.",
+      "eyebrow": "What You Get",
+      "title": "One guided system from first build to trusted launch.",
+      "body": "PicoMUTX is not another folder of tutorials. It gives you the build path, the support layer, and the operating safeguards in the same product, so progress does not disappear the moment something breaks.",
       "howItWorks": {
         "0": {
-          "title": "Step-by-step implementation paths",
-          "body": "Follow structured paths based on what you are trying to build — from customer support agents to internal automations. No generic theory. No endless searching."
+          "title": "Paths built around the job to be done",
+          "body": "Start from the outcome you want, then follow a sequence designed to get one useful agent working instead of collecting disconnected theory."
         },
         "1": {
-          "title": "Guided support when you get stuck",
-          "body": "When something breaks or becomes unclear, you do not have to figure it out alone. PicoMUTX keeps momentum alive instead of letting projects die in confusion."
+          "title": "Help that knows where you are stuck",
+          "body": "When progress breaks, PicoMUTX responds from the same path and context instead of pushing you back into generic docs."
         },
         "2": {
-          "title": "Built-in safety from day one",
-          "body": "Cost awareness, visibility, and guardrails matter. You always know what your agent is doing, what it is costing, and when something needs attention."
+          "title": "Guardrails before the first real launch",
+          "body": "Track cost, behavior, and approval boundaries before the agent touches work you actually care about."
         },
         "3": {
-          "title": "Live expert touchpoints",
-          "body": "Some things are too nuanced for static documentation. Real guidance moments designed to help you unblock faster and make better decisions."
+          "title": "Expert escalation when the edge case is real",
+          "body": "Static content takes you far. When nuance matters, you have a faster route to a human decision."
         }
       }
     },
@@ -95,50 +95,50 @@
     },
     "beforeAfter": {
       "eyebrow": "The Shift",
-      "title": "What changes when you stop figuring it out alone",
+      "title": "What changes when the build path stops fracturing",
       "beforeLabel": "Before",
       "afterLabel": "After",
       "items": {
         "0": {
-          "before": "You have an idea, but no clear path",
-          "after": "You have a structured way forward"
+          "before": "You have a use case, but no reliable next move",
+          "after": "You have a visible sequence and a named next step"
         },
         "1": {
-          "before": "You waste time jumping between tools, docs, and tutorials",
-          "after": "You follow guided implementation paths"
+          "before": "You jump between tools, tutorials, and half-relevant advice",
+          "after": "You build, review, and troubleshoot in one surface"
         },
         "2": {
-          "before": "You get stuck and lose momentum",
-          "after": "You get support before the project dies"
+          "before": "One blocker drains momentum and confidence",
+          "after": "One blocker becomes the next action instead of the end"
         },
         "3": {
-          "before": "Your agent stays in theory",
-          "after": "Your agent gets built and put to work"
+          "before": "Your prototype stays risky, vague, or hidden",
+          "after": "Your agent becomes something you can review, trust, and run"
         }
       },
-      "close": "The goal is not to “learn AI someday.” The goal is to get your agent live — safely, clearly, and with less friction."
+      "close": "The goal is not to admire AI. The goal is to ship one useful agent you can understand, trust, and improve."
     },
     "earlyAccess": {
       "eyebrow": "Early Access",
-      "title": "PicoMUTX is opening in stages. Founding access won't stay open forever.",
-      "body": "Pre-registering now puts you ahead of the public rollout and inside the group that helps shape the platform early. Early users get a closer line to the product, earlier onboarding, and more influence over what gets prioritized.",
+      "title": "Founding access is open now. It will not stay that way.",
+      "body": "Pre-register now to get into the first release wave while the product is still being shaped with early operators. That means earlier onboarding, tighter feedback loops, and a clearer line into what gets built next.",
       "benefits": {
-        "0": "Early access before public release",
-        "1": "Priority consideration for founding member spots",
-        "2": "Early onboarding and launch updates",
-        "3": "The ability to influence early use cases and rollout priorities",
-        "4": "First visibility into pricing and access terms"
+        "0": "Get in before the public opening",
+        "1": "Priority for founding-member seats",
+        "2": "Earlier onboarding windows",
+        "3": "Influence over early workflows and use cases",
+        "4": "First visibility into final pricing and access terms"
       }
     },
     "pricing": {
-      "eyebrow": "Simple pricing",
-      "title": "Choose your path",
+      "eyebrow": "Access lanes",
+      "title": "Choose the level of support and velocity you need",
       "tiers": {
         "starter": {
           "name": "Starter",
           "price": "€9",
           "period": "/mo",
-          "description": "Full learning experience",
+          "description": "For your first serious build",
           "features": ["1,000 monthly credits", "Full tutor access", "All academy lessons", "Autopilot mode", "7-day free trial"],
           "cta": "Start 7-Day Trial",
           "ctaHref": "/pricing"
@@ -147,7 +147,7 @@
           "name": "Pro",
           "price": "€29",
           "period": "/mo",
-          "description": "For serious builders",
+          "description": "For operators shipping real workflows",
           "recommended": true,
           "features": ["10,000 monthly credits", "Full tutor + BYOK", "API access", "Priority support", "7-day free trial"],
           "cta": "Start 7-Day Trial",
@@ -157,7 +157,7 @@
           "name": "Enterprise",
           "price": "Custom",
           "period": "",
-          "description": "Dedicated support & scale",
+          "description": "For teams rolling this out across the business",
           "features": ["100K+ monthly credits", "SSO & team management", "SLA & dedicated support", "Custom workflows", "Direct access to founders"],
           "cta": "Book a Call",
           "ctaHref": "https://calendly.com/mutxdev"
@@ -166,38 +166,38 @@
     },
     "faq": {
       "eyebrow": "Questions",
-      "title": "Questions people usually have before joining",
+      "title": "Questions worth clearing up before you commit",
       "items": {
         "0": {
           "q": "Do I need to know how to code?",
-          "a": "No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise."
+          "a": "No. PicoMUTX is for people who need the outcome without turning themselves into full-time agent engineers."
         },
         "1": {
           "q": "What if I've already tried and failed?",
-          "a": "That is exactly one of the people this is for. PicoMUTX is designed to reduce the confusion and fragmentation that usually cause people to stop halfway."
+          "a": "That is one of the main use cases. PicoMUTX is built to recover momentum after the first confusing, expensive, or credibility-killing blocker."
         },
         "2": {
           "q": "What kind of agents can I build?",
-          "a": "Practical ones — the kind that save time, support operations, improve workflows, and help businesses run better. The focus is usefulness, not toy demos."
+          "a": "Practical ones: support agents, internal copilots, workflow automations, and business systems that remove real manual work. The focus is operational usefulness, not toy demos."
         },
         "3": {
           "q": "Is pre-registration free?",
-          "a": "Yes. Pre-registration is free and does not require payment. You will be among the first to hear when access opens and when founding spots become available."
+          "a": "Yes. Pre-registration is free and requires no payment. You join the first release queue and hear first when founding access opens."
         },
         "4": {
           "q": "Is this for enterprises?",
-          "a": "PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem."
+          "a": "PicoMUTX is strongest for founders, operators, and smaller teams that need a clear route to something working. Heavier enterprise governance belongs in the broader MUTX stack."
         }
       }
     },
     "finalCta": {
-      "eyebrow": "Early Access · Limited Spots",
-      "title": "Your agent does not need to stay an unfinished idea.",
-      "body": "You do not need more tabs open. You do not need another tutorial. You need a clearer path to something that works. PicoMUTX is built for that moment.",
-      "formHeadline": "Pre-register for PicoMUTX",
-      "formSubline": "Join the early access list. Be first when we open.",
+      "eyebrow": "Founding Access · Limited Spots",
+      "title": "Stop leaving the agent in planning mode.",
+      "body": "If the use case matters, the next step is not another tab. It is a path that gets one working system into the open with less risk, less drift, and less wasted motion.",
+      "formHeadline": "Get into the first PicoMUTX wave",
+      "formSubline": "Join the list and get the earliest onboarding window we can offer.",
       "ctaButton": "Pre-Register Now",
-      "formCtaMeta": "Free to pre-register · No credit card required · Early users get priority access"
+      "formCtaMeta": "Free to pre-register · No credit card required · Early replies come from a human"
     },
     "contactForm": {
       "dialogLabel": "Contact form",

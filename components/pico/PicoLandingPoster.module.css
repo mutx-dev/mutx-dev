@@ -626,6 +626,10 @@
   font-size: clamp(2.2rem, 4.8vw, 4.1rem);
 }
 
+.titleLine {
+  display: block;
+}
+
 .sectionBody,
 .sectionClose {
   max-width: 34rem;
@@ -1433,6 +1437,15 @@
 
   .pricingTierRecommended {
     padding: 1.2rem 1rem 1.05rem;
+  }
+
+  .pathGallery,
+  .finalVisual {
+    display: none;
+  }
+
+  .finalPanel {
+    gap: 1rem;
   }
 
   .whoDivider {
