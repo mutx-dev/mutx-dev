@@ -397,6 +397,12 @@ export function proxy(request: NextRequest) {
       return finalizeResponse(rewrite, host, normalizedPath)
     }
 
+    if (picoPath === '/start') {
+      const rewrite = rewriteWithinHost(request, '/pico/onboarding')
+      rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
+      return finalizeResponse(rewrite, host, normalizedPath)
+    }
+
     // Whitelisted page paths -> serve their real /pico/{path} component
     if (PICO_WHITELISTED_PATHS.has(picoPath)) {
       const rewrite = rewriteWithinHost(request, `/pico${picoPath}`)
