@@ -2,6 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "mutx.dev API",
+    "description": "API for the mutx platform",
     "version": "1.0.0"
   },
   "paths": {
@@ -22,8 +23,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/agents": {
@@ -2940,8 +2940,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/login": {
@@ -2982,8 +2981,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/local-bootstrap": {
@@ -3220,8 +3218,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/reset-password": {
@@ -3263,8 +3260,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/verify-email": {
@@ -3306,8 +3302,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/resend-verification": {
@@ -3349,8 +3344,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/v1/auth/oauth/{provider}/authorize": {
@@ -9884,6 +9878,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Pico Progress V1 Pico Progress Get"
                 }
               }
@@ -9942,6 +9937,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Pico Progress Update V1 Pico Progress Post"
                 }
               }
@@ -10908,6 +10904,134 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionActionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_key}/control": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Session Control",
+        "description": "Control session lifecycle: pause, resume, or kill a session.\n\nForwards the action to the OpenClaw gateway's ``POST /control`` endpoint.\nThe gateway handles the actual state transition; MUTX validates the request\nand enriches the response with state information.",
+        "operationId": "session_control_v1_sessions__session_key__control_post",
+        "parameters": [
+          {
+            "name": "session_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Key"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionControlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionControlResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_key}/transcript": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Session Transcript",
+        "description": "Retrieve the full session transcript (conversation history).\n\nProxies to the OpenClaw gateway's ``GET /api/sessions/:key/history`` endpoint.",
+        "operationId": "session_transcript_v1_sessions__session_key__transcript_get",
+        "parameters": [
+          {
+            "name": "session_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Key"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionTranscriptResponse"
                 }
               }
             }
@@ -13196,8 +13320,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/ready": {
@@ -13213,8 +13336,7 @@
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/": {
@@ -13406,6 +13528,7 @@
             "description": "Name of the tool"
           },
           "tool_args": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Tool Args",
             "description": "Tool arguments"
@@ -13538,6 +13661,7 @@
                 "$ref": "#/components/schemas/OpenClawAgentConfig"
               },
               {
+                "additionalProperties": true,
                 "type": "object"
               }
             ],
@@ -13569,6 +13693,7 @@
           "config": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -13612,6 +13737,7 @@
           "config": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -13696,6 +13822,7 @@
                 "$ref": "#/components/schemas/OpenClawAgentConfig"
               },
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -14054,6 +14181,7 @@
             "default": ""
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata",
             "default": {}
@@ -14176,6 +14304,7 @@
           "extra_metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -14288,6 +14417,7 @@
           "extra_metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -14375,6 +14505,7 @@
                 "$ref": "#/components/schemas/OpenClawAgentConfig"
               },
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -14993,6 +15124,7 @@
             "title": "Action Type"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload",
             "default": {}
@@ -15080,6 +15212,7 @@
             "title": "Action Type"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -15149,6 +15282,7 @@
             "description": "Name of the tool"
           },
           "tool_args": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Tool Args",
             "description": "Tool arguments"
@@ -15522,6 +15656,7 @@
                 "$ref": "#/components/schemas/OpenClawAgentConfig"
               },
               {
+                "additionalProperties": true,
                 "type": "object"
               }
             ],
@@ -15775,6 +15910,7 @@
                 "$ref": "#/components/schemas/OpenClawAgentConfig"
               },
               {
+                "additionalProperties": true,
                 "type": "object"
               }
             ],
@@ -15943,6 +16079,7 @@
             "title": "Event Type"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -16272,6 +16409,7 @@
           "result": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -16316,6 +16454,7 @@
             "title": "Action"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           },
@@ -16364,11 +16503,13 @@
             "title": "Checked At"
           },
           "summary": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Summary"
           },
           "results": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -16464,6 +16605,7 @@
             "default": 900
           },
           "config": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Config"
           }
@@ -16518,6 +16660,7 @@
             "title": "Expires At"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           }
@@ -17323,6 +17466,7 @@
             "title": "Sha256"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -17366,6 +17510,7 @@
             "default": "managed"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           }
@@ -17410,6 +17555,7 @@
             "title": "Message"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -17450,6 +17596,7 @@
           "result_summary": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -17567,6 +17714,7 @@
             "title": "Execution Mode"
           },
           "manifest": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Manifest"
           },
@@ -17611,10 +17759,12 @@
             "title": "Status"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           },
           "result_summary": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Result Summary"
           },
@@ -17966,6 +18116,7 @@
           },
           "components": {
             "additionalProperties": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "object",
@@ -18121,6 +18272,7 @@
             "anyOf": [
               {
                 "items": {
+                  "additionalProperties": true,
                   "type": "object"
                 },
                 "type": "array"
@@ -18256,6 +18408,7 @@
             "title": "Chain Id"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           }
@@ -18531,6 +18684,7 @@
             "title": "Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata",
             "default": {}
@@ -18713,6 +18867,7 @@
             "default": 0
           },
           "custom": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Custom",
             "default": {}
@@ -19534,6 +19689,7 @@
             "description": "Tags"
           },
           "run_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Run Metadata",
             "description": "Additional metadata"
@@ -19780,6 +19936,7 @@
             "default": []
           },
           "run_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Run Metadata",
             "default": {}
@@ -20102,6 +20259,7 @@
             "default": []
           },
           "run_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Run Metadata",
             "default": {}
@@ -20131,7 +20289,8 @@
           "completed",
           "failed",
           "cancelled",
-          "timeout"
+          "timeout",
+          "awaiting_owner"
         ],
         "title": "MutxRunStatus",
         "description": "Current status of a run."
@@ -20391,6 +20550,7 @@
             "description": "Total tokens consumed by this step (input + output)"
           },
           "step_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Step Metadata",
             "description": "Extension point for step-specific data"
@@ -20571,6 +20731,7 @@
             "description": "Tokens consumed"
           },
           "step_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Step Metadata",
             "description": "Additional metadata"
@@ -20659,6 +20820,7 @@
             "title": "Action Type"
           },
           "import_source": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Import Source"
           },
@@ -20829,6 +20991,7 @@
             "title": "Step"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           }
@@ -21006,6 +21169,7 @@
             "title": "Wakeups"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -21167,6 +21331,7 @@
       },
       "PicoProgressPayload": {
         "properties": {},
+        "additionalProperties": true,
         "type": "object",
         "title": "PicoProgressPayload"
       },
@@ -21370,6 +21535,7 @@
           "progress": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -21511,6 +21677,7 @@
           "onboarding": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -21522,6 +21689,7 @@
           "runtime": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -21542,6 +21710,7 @@
             "title": "Currentsurface"
           }
         },
+        "additionalProperties": true,
         "type": "object",
         "title": "PicoTutorSetupContext"
       },
@@ -21850,6 +22019,7 @@
             "title": "Sha256"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -21893,6 +22063,7 @@
             "default": "managed"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           }
@@ -21937,6 +22108,7 @@
             "title": "Message"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -21977,6 +22149,7 @@
           "result_summary": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -22094,6 +22267,7 @@
             "title": "Execution Mode"
           },
           "manifest": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Manifest"
           },
@@ -22138,10 +22312,12 @@
             "title": "Status"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           },
           "result_summary": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Result Summary"
           },
@@ -22386,6 +22562,7 @@
             "default": ""
           },
           "tool_args": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Tool Args"
           },
@@ -22480,6 +22657,7 @@
             "title": "Signed By"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           }
@@ -22704,6 +22882,7 @@
             "title": "Error Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -22802,6 +22981,7 @@
             "title": "Error Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -23024,6 +23204,7 @@
             "title": "Error Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -23145,6 +23326,7 @@
             "title": "Message"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -23247,6 +23429,7 @@
             "title": "Message"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -23478,6 +23661,7 @@
             "title": "Last Action Type"
           },
           "import_source": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Import Source"
           },
@@ -23500,6 +23684,7 @@
             "default": "unknown"
           },
           "gateway": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Gateway"
           },
@@ -23558,6 +23743,7 @@
           "current_binding": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -23568,6 +23754,7 @@
           },
           "bindings": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -23799,6 +23986,7 @@
             "title": "Last Action Type"
           },
           "import_source": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Import Source"
           },
@@ -23821,6 +24009,7 @@
             "default": "unknown"
           },
           "gateway": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Gateway"
           },
@@ -23879,6 +24068,7 @@
           "current_binding": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -23889,6 +24079,7 @@
           },
           "bindings": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -24008,6 +24199,7 @@
             "default": "log"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           }
@@ -24070,6 +24262,7 @@
             "title": "Task Type"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -24203,6 +24396,7 @@
           "payload": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -24346,6 +24540,77 @@
         "title": "SessionCloseResponse",
         "description": "Response for closing a session."
       },
+      "SessionControlRequest": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "pause",
+              "resume",
+              "kill"
+            ],
+            "title": "Action"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "SessionControlRequest",
+        "description": "Request body for session lifecycle control (pause/resume/kill)."
+      },
+      "SessionControlResponse": {
+        "properties": {
+          "session_key": {
+            "type": "string",
+            "title": "Session Key"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "previous_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous State"
+          },
+          "current_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current State"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_key",
+          "action"
+        ],
+        "title": "SessionControlResponse",
+        "description": "Response from a session lifecycle control action."
+      },
       "SessionCreateResponse": {
         "properties": {
           "session_id": {
@@ -24374,6 +24639,7 @@
         "properties": {
           "sessions": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -24398,6 +24664,7 @@
           },
           "receipts": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -24465,6 +24732,34 @@
         ],
         "title": "SessionSummaryResponse",
         "description": "Response for getting a session summary."
+      },
+      "SessionTranscriptResponse": {
+        "properties": {
+          "session_key": {
+            "type": "string",
+            "title": "Session Key"
+          },
+          "messages": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Messages"
+          },
+          "total_count": {
+            "type": "integer",
+            "title": "Total Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_key",
+          "messages",
+          "total_count"
+        ],
+        "title": "SessionTranscriptResponse",
+        "description": "Full session transcript (conversation history)."
       },
       "StarterDeploymentCreate": {
         "properties": {
@@ -24548,6 +24843,7 @@
             "title": "Channels"
           },
           "runtime_metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Runtime Metadata"
           }
@@ -25250,6 +25546,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -25365,6 +25662,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -25896,19 +26194,6 @@
         "title": "MetricsResponse",
         "description": "Governance metrics response."
       }
-    },
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "JWT bearer token or API key. Example: 'Bearer eyJ...'"
-      }
     }
-  },
-  "security": [
-    {
-      "BearerAuth": []
-    }
-  ]
+  }
 }
