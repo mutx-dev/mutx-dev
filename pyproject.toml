@@ -42,6 +42,7 @@ dev = [
     "aiosqlite>=0.20.0",
     "mutmut>=3.0.0",
     "textual>=0.58.0,<2.0.0",
+    "stripe>=10.0.0",
 ]
 
 [project.scripts]

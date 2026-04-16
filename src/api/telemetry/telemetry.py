@@ -9,6 +9,7 @@ Issue: #1029
 
 from __future__ import annotations
 
+import atexit
 import os
 from contextlib import contextmanager
 from typing import Generator, Any
@@ -76,6 +77,11 @@ def setup_telemetry(service_name: str | None = None) -> trace.Tracer:
     # Get service name
     name = service_name or os.getenv("OTEL_SERVICE_NAME", DEFAULT_SERVICE_NAME)
 
+    global _tracer_provider, _tracer
+    if _tracer_provider is not None:
+        _tracer = trace.get_tracer(name)
+        return _tracer
+
     # Create resource with service name
     resource = Resource(attributes={SERVICE_NAME: name})
 
@@ -113,12 +119,12 @@ def setup_telemetry(service_name: str | None = None) -> trace.Tracer:
         pass
 
     # Set global tracer provider and keep a reference for shutdown
-    global _tracer_provider
     trace.set_tracer_provider(provider)
     _tracer_provider = provider
+    _tracer = trace.get_tracer(name)
 
     # Return configured tracer
-    return trace.get_tracer(name)
+    return _tracer
 
 
 @contextmanager
@@ -179,10 +185,14 @@ def shutdown_telemetry() -> None:
     BatchSpanProcessor background thread from writing to a closed
     logging stream (ValueError: I/O operation on closed file).
     """
-    global _tracer_provider
+    global _tracer_provider, _tracer
     if _tracer_provider is not None:
         try:
-            _tracer_provider.shutdown(timeout=5.0)
+            _tracer_provider.shutdown()
         except Exception:
             pass
         _tracer_provider = None
+    _tracer = None
+
+
+atexit.register(shutdown_telemetry)

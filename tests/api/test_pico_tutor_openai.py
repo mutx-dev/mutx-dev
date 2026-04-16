@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy import select
 
@@ -7,6 +8,15 @@ from src.api.services.pico_tutor_openai import (
     PICO_TUTOR_OPENAI_KEY,
     resolve_pico_tutor_api_key,
 )
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def starter_plan(db_session, test_user):
+    test_user.plan = "STARTER"
+    db_session.add(test_user)
+    await db_session.commit()
+    await db_session.refresh(test_user)
+    yield
 
 
 @pytest.mark.asyncio

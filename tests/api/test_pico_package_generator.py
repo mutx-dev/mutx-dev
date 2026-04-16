@@ -1,15 +1,30 @@
-"""Tests for POST /v1/pico/generate-package."""
+"""Tests for Pico package generation routes."""
+
 import io
 import zipfile
 
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient
+
+from src.api.models.pico_onboarding import OnboardingState
+from src.api.routes import pico as pico_routes
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def starter_plan(db_session, test_user):
+    test_user.plan = "STARTER"
+    db_session.add(test_user)
+    await db_session.commit()
+    await db_session.refresh(test_user)
+    yield
+    pico_routes._sessions.clear()
 
 
 @pytest.mark.asyncio
 async def test_generate_package_success(client: AsyncClient):
     response = await client.post(
-        "/v1/pico/generate-package",
+        "/v1/pico/generate-package-legacy",
         json={"agent_name": "my-agent", "pain_points": ["manual_repetitive"]},
     )
     assert response.status_code == 200
@@ -35,7 +50,7 @@ async def test_generate_package_success(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_generate_package_default_template(client: AsyncClient):
     response = await client.post(
-        "/v1/pico/generate-package",
+        "/v1/pico/generate-package-legacy",
         json={"agent_name": "generic-agent"},
     )
     assert response.status_code == 200
@@ -48,7 +63,7 @@ async def test_generate_package_default_template(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_generate_package_with_model(client: AsyncClient):
     response = await client.post(
-        "/v1/pico/generate-package",
+        "/v1/pico/generate-package-legacy",
         json={"agent_name": "model-agent", "model": "claude-3-opus"},
     )
     assert response.status_code == 200
@@ -61,7 +76,7 @@ async def test_generate_package_with_model(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_generate_package_empty_name(client: AsyncClient):
     response = await client.post(
-        "/v1/pico/generate-package",
+        "/v1/pico/generate-package-legacy",
         json={"agent_name": "   "},
     )
     assert response.status_code == 422
@@ -70,7 +85,7 @@ async def test_generate_package_empty_name(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_generate_package_missing_name(client: AsyncClient):
     response = await client.post(
-        "/v1/pico/generate-package",
+        "/v1/pico/generate-package-legacy",
         json={},
     )
     assert response.status_code == 422
@@ -79,7 +94,7 @@ async def test_generate_package_missing_name(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_generate_package_requires_auth(client_no_auth: AsyncClient):
     response = await client_no_auth.post(
-        "/v1/pico/generate-package",
+        "/v1/pico/generate-package-legacy",
         json={"agent_name": "test"},
     )
     assert response.status_code in (401, 403)
@@ -88,7 +103,7 @@ async def test_generate_package_requires_auth(client_no_auth: AsyncClient):
 @pytest.mark.asyncio
 async def test_generate_package_multiple_pain_points(client: AsyncClient):
     response = await client.post(
-        "/v1/pico/generate-package",
+        "/v1/pico/generate-package-legacy",
         json={
             "agent_name": "multi-agent",
             "pain_points": ["data_overload", "scattered_knowledge"],
@@ -102,3 +117,25 @@ async def test_generate_package_multiple_pain_points(client: AsyncClient):
         assert "data-analyst" in agent_md
         assert "data_overload" in agent_md
         assert "scattered_knowledge" in agent_md
+
+
+@pytest.mark.asyncio
+async def test_generate_package_requires_existing_ready_session(client: AsyncClient):
+    session_id = "ready-session"
+    pico_routes._sessions[session_id] = {
+        "history": [],
+        "state": OnboardingState(
+            stack="hermes",
+            os="macos",
+            provider="openai",
+            goal="install",
+        ),
+    }
+
+    response = await client.post(
+        "/v1/pico/generate-package",
+        json={"session_id": session_id},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/zip"

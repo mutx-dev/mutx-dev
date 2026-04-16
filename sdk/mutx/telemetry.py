@@ -11,6 +11,7 @@ Standard attributes: agent.id, session.id, trace.id
 
 from __future__ import annotations
 
+import atexit
 from contextlib import contextmanager
 from typing import Any, Generator
 
@@ -18,7 +19,11 @@ from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
+    ConsoleSpanExporter,
+    SimpleSpanProcessor,
+)
 from opentelemetry.trace import Status, StatusCode, Tracer
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
@@ -30,6 +35,7 @@ _telemetry_enabled: bool = False
 
 # Flag to track if instrumentation is available
 _instrumentation_available: bool | None = None
+_httpx_instrumented: bool = False
 
 
 def _check_instrumentation() -> bool:
@@ -45,6 +51,22 @@ def _check_instrumentation() -> bool:
     return _instrumentation_available
 
 
+def shutdown_telemetry() -> None:
+    """Flush and stop the current telemetry provider."""
+    global _tracer_provider, _tracer, _telemetry_endpoint, _telemetry_enabled
+
+    if _tracer_provider is not None:
+        try:
+            _tracer_provider.shutdown()
+        except Exception:
+            pass
+
+    _tracer_provider = None
+    _tracer = None
+    _telemetry_endpoint = None
+    _telemetry_enabled = False
+
+
 def init_telemetry(agent_name: str, endpoint: str | None = None) -> None:
     """Initialize OpenTelemetry tracing.
 
@@ -54,28 +76,54 @@ def init_telemetry(agent_name: str, endpoint: str | None = None) -> None:
     """
     global _tracer_provider, _tracer, _telemetry_endpoint, _telemetry_enabled
 
+    # Re-importing this module in tests loses the local globals but not the
+    # process-global OTel tracer provider. Reuse that provider instead of
+    # trying to replace it and spawning another exporter thread.
+    if _tracer_provider is None:
+        current_provider = trace.get_tracer_provider()
+        if isinstance(current_provider, TracerProvider):
+            _tracer_provider = current_provider
+            _tracer = trace.get_tracer(agent_name)
+            _telemetry_endpoint = endpoint
+            _telemetry_enabled = True
+            _instrument_httpx_once()
+            return
+    else:
+        shutdown_telemetry()
+
     resource = Resource.create({"service.name": agent_name, "service.version": "1.0.0"})
 
     if endpoint:
         _telemetry_endpoint = endpoint
         exporter = OTLPSpanExporter(endpoint=endpoint, insecure=True)
         _telemetry_enabled = True
+        span_processor = BatchSpanProcessor(exporter)
     else:
         _telemetry_endpoint = None
         exporter = ConsoleSpanExporter()
         _telemetry_enabled = True
+        # Console export in local/tests should stay synchronous to avoid a
+        # background worker writing after stdout/stderr closes.
+        span_processor = SimpleSpanProcessor(exporter)
 
     _tracer_provider = TracerProvider(resource=resource)
-    _tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
+    _tracer_provider.add_span_processor(span_processor)
     trace.set_tracer_provider(_tracer_provider)
     _tracer = trace.get_tracer(agent_name)
 
     # Auto-instrument httpx if available
+    _instrument_httpx_once()
+
+
+def _instrument_httpx_once() -> None:
+    global _httpx_instrumented
     if _check_instrumentation():
         try:
             from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
-            HTTPXClientInstrumentor().instrument()
+            if not _httpx_instrumented:
+                HTTPXClientInstrumentor().instrument()
+                _httpx_instrumented = True
         except Exception:
             pass
 
@@ -146,3 +194,6 @@ def get_telemetry_config() -> dict[str, Any]:
         "exporter_type": "otlp" if _telemetry_endpoint else "logging",
         "endpoint": _telemetry_endpoint,
     }
+
+
+atexit.register(shutdown_telemetry)
