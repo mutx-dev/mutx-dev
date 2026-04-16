@@ -181,6 +181,7 @@ class TestAuditLog:
 
         # Cleanup
         import os
+
         os.unlink(db_path)
 
     @pytest.mark.asyncio
@@ -290,7 +291,7 @@ class TestAuditLog:
     async def test_query_time_range(self, audit_log):
         """Test querying by time range."""
         now = datetime.now(timezone.utc)
-        
+
         event1 = AuditEvent(
             event_id=uuid.uuid4(),
             agent_id="agent-1",
@@ -347,7 +348,7 @@ class TestAuditLog:
     async def test_get_trace(self, audit_log):
         """Test getting all events for a trace."""
         trace_id = "trace-123"
-        
+
         events = [
             AuditEvent(
                 event_id=uuid.uuid4(),
@@ -423,8 +424,9 @@ class TestAuditLogGlobalInstance:
         """Test get_audit_log creates and returns global instance."""
         # Reset global state
         import src.api.services.audit_log as audit_module
+
         audit_module._audit_log = None
-        
+
         # Need to reset the lock too
         audit_module._audit_log_lock = asyncio.Lock()
 
@@ -432,7 +434,7 @@ class TestAuditLogGlobalInstance:
             log = await get_audit_log()
             assert log is not None
             assert isinstance(log, AuditLog)
-            
+
             # Second call should return same instance
             log2 = await get_audit_log()
             assert log is log2
@@ -443,14 +445,14 @@ class TestAuditLogGlobalInstance:
     async def test_close_audit_log(self):
         """Test closing the global audit log."""
         import src.api.services.audit_log as audit_module
-        
+
         # Reset state
         audit_module._audit_log = None
         audit_module._audit_log_lock = asyncio.Lock()
 
         await get_audit_log()
         await close_audit_log()
-        
+
         # Should be None after close
         assert audit_module._audit_log is None
 
@@ -499,6 +501,7 @@ class TestAuditEventPayload:
         finally:
             await log.close()
             import os
+
             os.unlink(db_path)
 
     @pytest.mark.asyncio
@@ -533,6 +536,7 @@ class TestAuditEventPayload:
         finally:
             await log.close()
             import os
+
             os.unlink(db_path)
 
 
@@ -587,6 +591,7 @@ class TestOTelIntegration:
         finally:
             await log.close()
             import os
+
             os.unlink(db_path)
 
     @pytest.mark.asyncio
@@ -630,6 +635,7 @@ class TestOTelIntegration:
         finally:
             await log.close()
             import os
+
             os.unlink(db_path)
 
     @pytest.mark.asyncio
@@ -662,7 +668,9 @@ class TestOTelIntegration:
             )
 
             with patch("opentelemetry.trace.get_current_span", return_value=mock_span):
-                await log.log_with_otel_context(event, auto_capture_trace=False, auto_capture_span=False)
+                await log.log_with_otel_context(
+                    event, auto_capture_trace=False, auto_capture_span=False
+                )
 
             # Neither should be captured since auto-capture is disabled
             assert event.trace_id is None
@@ -670,6 +678,7 @@ class TestOTelIntegration:
         finally:
             await log.close()
             import os
+
             os.unlink(db_path)
 
     @pytest.mark.asyncio
@@ -700,6 +709,7 @@ class TestOTelIntegration:
         finally:
             await log.close()
             import os
+
             os.unlink(db_path)
 
 

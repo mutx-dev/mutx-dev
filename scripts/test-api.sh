@@ -51,23 +51,23 @@ test_endpoint() {
     local method="${3:-GET}"
     local data="$4"
     local token="$5"
-    
+
     echo -n "$name... "
-    
+
     local curl_args=("-sf")
-    
+
     if [ -n "$token" ]; then
         curl_args+=("-H" "Authorization: Bearer $token")
     fi
-    
+
     if [ -n "$data" ]; then
         curl_args+=("-H" "Content-Type: application/json" "-d" "$data")
     fi
-    
+
     if [ "$method" != "GET" ]; then
         curl_args+=("-X" "$method")
     fi
-    
+
     local response
     if response=$(curl "${curl_args[@]}" "$url" 2>&1); then
         if echo "$response" | grep -q 'error' && echo "$response" | grep -q 'detail'; then
@@ -87,13 +87,13 @@ test_endpoint() {
 
 do_register() {
     print_header "Register Test User"
-    
+
     local payload
     payload=$(printf '{"email":"%s","name":"%s","password":"%s"}' "$TEST_EMAIL" "Test User" "$TEST_PASSWORD")
 
     local response
     response=$(curl -sf -X POST "$V1_URL/auth/register"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
-    
+
     if echo "$response" | grep -q "Email already registered"; then
         echo -e "${YELLOW}User already exists, trying login...${NC}"
         do_login
@@ -110,13 +110,13 @@ do_register() {
 
 do_login() {
     print_header "Login"
-    
+
     local payload
     payload=$(printf '{"email":"%s","password":"%s"}' "$TEST_EMAIL" "$TEST_PASSWORD")
 
     local response
     response=$(curl -sf -X POST "$V1_URL/auth/login"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
-    
+
     if echo "$response" | grep -q "access_token"; then
         ACCESS_TOKEN=$(echo "$response" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null || echo "")
         echo -e "${GREEN}OK Login successful${NC}"
@@ -133,9 +133,9 @@ do_auth_tests() {
         echo -e "${YELLOW}No access token, attempting login...${NC}"
         do_login
     fi
-    
+
     print_header "Authenticated API Tests"
-    
+
     test_endpoint "Get Current User" "$V1_URL/auth/me" "GET" "" "$ACCESS_TOKEN"
     test_endpoint "List Agents" "$V1_URL/agents?limit=5" "GET" "" "$ACCESS_TOKEN"
     test_endpoint "List Deployments" "$V1_URL/deployments?limit=5" "GET" "" "$ACCESS_TOKEN"
@@ -172,7 +172,7 @@ do_health_checks() {
     echo "API URL: $API_URL"
     echo "Test Email: $TEST_EMAIL"
     echo ""
-    
+
     test_endpoint "Health Check" "$API_URL/health"
     test_endpoint "Ready Check" "$API_URL/ready"
     test_endpoint "Root Endpoint" "$API_URL/"

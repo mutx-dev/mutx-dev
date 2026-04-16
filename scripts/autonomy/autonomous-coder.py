@@ -106,10 +106,10 @@ def implement(item):
     desc = item.get("description", "")
     wt = worktree_for(area)
     branch = f"autonomy/{validate_branch_name(id_)}"
-    
+
     log(f"Branch: {branch} in {wt}")
     make_branch(wt, branch)
-    
+
     # Generate implementation
     prompt = f"""You are implementing a MUTX autonomous task.
 
@@ -142,11 +142,11 @@ Respond with ONLY the JSON, no explanation."""
 
     log(f"Calling MiniMax for {id_}...")
     resp = api(prompt)
-    
+
     if not resp:
         log(f"MiniMax call failed for {id_}")
         return False
-    
+
     try:
         choices = resp.get("choices", [])
         if not choices:
@@ -157,26 +157,26 @@ Respond with ONLY the JSON, no explanation."""
         start = content.find("{")
         end = content.rfind("}") + 1
         data = json.loads(content[start:end])
-        
+
         files = data.get("files", [])
         commit_msg = data.get("commit_message", f"autonomy: {title}")
-        
+
         log(f"Applying {len(files)} files...")
-        
+
         for fdata in files:
             fpath = os.path.join(wt, fdata["path"])
             os.makedirs(os.path.dirname(fpath), exist_ok=True)
             with open(fpath, "w") as f:
                 f.write(fdata["content"])
             log(f"  wrote: {fdata['path']}")
-        
+
         # Commit and PR
         run("make lint 2>/dev/null || true", cwd=wt, timeout=60)
         run("git add -A", cwd=wt, timeout=30)
-        
+
         commit_body = f"autonomy: {title}\n\nid: {id_}\narea: {area}\nautonomous: yes"
         code, out, err = run(f'git commit -m {shlex.quote(commit_body)}', cwd=wt, timeout=30)
-        
+
         if code != 0:
             log(f"Commit failed: {err[:100]}")
             # Maybe nothing changed, check if at least the branch exists
@@ -185,9 +185,9 @@ Respond with ONLY the JSON, no explanation."""
                 run(f"git push -u origin {branch}", cwd=wt, timeout=60)
             else:
                 return False
-        
+
         run(f"git push -u origin {branch}", cwd=wt, timeout=60)
-        
+
         # Create PR — title and pr_body are untrusted, quote them
         pr_title = f"[autonomy] {title}"
         pr_body = f"Autonomous PR | id: {id_} | area: {area}\n\n{title}"
@@ -195,14 +195,14 @@ Respond with ONLY the JSON, no explanation."""
             f'gh pr create --title {shlex.quote(pr_title)} --body {shlex.quote(pr_body)} --base main',
             cwd=wt, timeout=30
         )
-        
+
         if code == 0:
             log(f"PR created for {id_}: {out[:100]}")
             return True
         else:
             log(f"PR create: {err[:100]}")
             return "already_exists" in err
-        
+
     except json.JSONDecodeError as e:
         log(f"JSON parse error: {e}")
         log(f"Content: {content[:200] if content else 'empty'}")
@@ -214,30 +214,30 @@ Respond with ONLY the JSON, no explanation."""
 def main():
     log("=== Autonomous coder starting ===")
     os.chdir(REPO)
-    
+
     while True:
         q = read_queue()
         item = top_item(q)
-        
+
         if not item:
             log("Queue empty, sleeping 5min")
             time.sleep(300)
             continue
-        
+
         id_ = item["id"]
         title = item["title"][:60]
         item["status"] = "in_progress"
         save(q)
-        
+
         log(f">>> {id_}: {title}")
-        
+
         ok = implement(item)
-        
+
         # Remove from queue
         q = read_queue()
         q["items"] = [i for i in q["items"] if i["id"] != id_]
         save(q)
-        
+
         log(f"<<< {id_} -> {'OK' if ok else 'FAIL'}")
         time.sleep(15)
 

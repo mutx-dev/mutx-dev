@@ -33,11 +33,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // Backend returns {items, total, skip, limit, has_more} envelope; pass only items to client
     const items = Array.isArray(payload) ? payload : (payload.items ?? payload)
     const nextResponse = NextResponse.json(items, { status: response.status })
-    
+
     if (tokenRefreshed && refreshedTokens) {
       applyAuthCookies(nextResponse, request, refreshedTokens)
     }
-    
+
     return nextResponse
   })(request)
 }
@@ -66,11 +66,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const payload = await response.json().catch(() => ({ detail: 'Failed to create deployment' }))
     const nextResponse = NextResponse.json(payload, { status: response.status })
-    
+
     if (tokenRefreshed && refreshedTokens) {
       applyAuthCookies(nextResponse, request, refreshedTokens)
     }
-    
+
     return nextResponse
   })(request)
 }

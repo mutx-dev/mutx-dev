@@ -21,6 +21,7 @@ from mutx.security import (
 # Payload factories
 # ---------------------------------------------------------------------------
 
+
 def _action_evaluate_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
         "decision": "permit",
@@ -72,6 +73,7 @@ def _governance_metrics_payload(**overrides: Any) -> dict[str, Any]:
 # Client helper
 # ---------------------------------------------------------------------------
 
+
 def _make_client(handler) -> httpx.Client:
     return httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
 
@@ -79,6 +81,7 @@ def _make_client(handler) -> httpx.Client:
 # ---------------------------------------------------------------------------
 # Response model tests
 # ---------------------------------------------------------------------------
+
 
 def test_action_evaluate_response_parsable() -> None:
     payload = _action_evaluate_payload()
@@ -167,6 +170,7 @@ def test_governance_metrics_optional_fields_missing() -> None:
 # Security resource: route + return-type contract tests (sync only)
 # ---------------------------------------------------------------------------
 
+
 def test_evaluate_action_uses_correct_route() -> None:
     captured: dict[str, Any] = {}
 
@@ -196,6 +200,7 @@ def test_evaluate_action_uses_correct_route() -> None:
 
 def test_evaluate_action_raises_on_async_client() -> None:
     import asyncio
+
     async_client = httpx.AsyncClient(base_url="https://api.test")
     sec = Security(async_client)
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from typing import Any
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -11,8 +10,6 @@ from mutx.guardrails import (
     GuardrailMiddleware,
     GuardrailResult,
     GuardrailViolationError,
-    InputGuardrail,
-    OutputGuardrail,
     PIIBlocklistGuardrail,
     RegexBlocklistGuardrail,
     ToxicityGuardrail,
@@ -161,9 +158,7 @@ class TestGuardrailMiddleware:
 
     def test_input_guardrail_blocks(self):
         guardrail = MockInputGuardrail(
-            GuardrailResult(
-                passed=False, triggered_rule="test", action="block", message="blocked"
-            )
+            GuardrailResult(passed=False, triggered_rule="test", action="block", message="blocked")
         )
         middleware = GuardrailMiddleware(input_guardrails=[guardrail])
         with pytest.raises(GuardrailViolationError) as exc_info:
@@ -197,7 +192,9 @@ class TestGuardrailMiddleware:
                 )
 
         second_guardrail = MockInputGuardrail(
-            GuardrailResult(passed=False, triggered_rule="second", action="block", message="blocked")
+            GuardrailResult(
+                passed=False, triggered_rule="second", action="block", message="blocked"
+            )
         )
 
         counting = CountingGuardrail()
@@ -274,9 +271,7 @@ class TestGuardrailsIntegration:
         """Test multiple guardrails applied in sequence."""
         pii_guardrail = PIIBlocklistGuardrail()
         regex_guardrail = RegexBlocklistGuardrail([r"confidential"])
-        middleware = GuardrailMiddleware(
-            input_guardrails=[pii_guardrail, regex_guardrail]
-        )
+        middleware = GuardrailMiddleware(input_guardrails=[pii_guardrail, regex_guardrail])
 
         # Clean text should pass
         middleware.check_input_text("Hello world", {})

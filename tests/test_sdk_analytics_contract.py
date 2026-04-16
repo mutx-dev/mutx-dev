@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
@@ -21,6 +21,7 @@ from sdk.mutx.analytics import (
 # ---------------------------------------------------------------------------
 # Payload factories
 # ---------------------------------------------------------------------------
+
 
 def _analytics_summary_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
@@ -58,7 +59,9 @@ def _agent_metrics_payload(agent_id: str = "agent-001", **overrides: Any) -> dic
     return payload
 
 
-def _timeseries_payload(metric: str = "runs", interval: str = "hour", **overrides: Any) -> dict[str, Any]:
+def _timeseries_payload(
+    metric: str = "runs", interval: str = "hour", **overrides: Any
+) -> dict[str, Any]:
     payload = {
         "metric": metric,
         "interval": interval,
@@ -77,6 +80,7 @@ def _timeseries_payload(metric: str = "runs", interval: str = "hour", **override
 # ---------------------------------------------------------------------------
 # DTO parsing tests
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyticsDTOs:
     def test_analytics_summary_parses_all_fields(self):
@@ -160,6 +164,7 @@ class TestAnalyticsDTOs:
 # ---------------------------------------------------------------------------
 # Sync method contract tests
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyticsSyncMethods:
     """Tests for sync Analytics methods using httpx.MockTransport."""
@@ -316,6 +321,7 @@ class TestAnalyticsSyncMethods:
 # ---------------------------------------------------------------------------
 # Async method contract tests
 # ---------------------------------------------------------------------------
+
 
 class TestAnalyticsAsyncMethods:
     """Tests for async Analytics methods using AsyncMock."""

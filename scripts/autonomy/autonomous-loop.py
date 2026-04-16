@@ -78,31 +78,31 @@ except Exception as e:
 def run_loop():
     log("=== Autonomous loop supervisor starting ===")
     os.chdir(REPO)
-    
+
     while True:
         q = read_queue()
         item = top_item(q)
-        
+
         if not item:
             log("Queue empty, sleeping 5min...")
             time.sleep(300)
             continue
-        
+
         id_ = item["id"]
         title = item["title"][:60].replace("'''", "\\'\\'\\'")
         area = item.get("area", "area:api")
-        
+
         log(f">>> {id_}: {title} [{area}]")
-        
+
         # Mark in-progress
         item["status"] = "in_progress"
         save(q)
-        
+
         # Build task prompt
         wt = "/Users/fortune/mutx-worktrees/factory/backend"
         if "web" in area or "test" in area:
             wt = "/Users/fortune/mutx-worktrees/factory/frontend"
-        
+
         task = f"""You are the MUTX autonomous coding agent. Implement ONE queue item, file the PR, then exit.
 
 Working directory: {wt}
@@ -134,7 +134,7 @@ Start now. Read the queue file first."""
 
         sock_path = "/var/run/openclaw/gateway.sock"
         gw_cfg = "/Users/fortune/.openclaw/gateway.json"
-        
+
         try:
             cfg = json2.load(open(gw_cfg))
             token = cfg.get("auth", {}).get("token", "dev")
@@ -143,17 +143,17 @@ Start now. Read the queue file first."""
 
         result = None
         error = None
-        
+
         try:
             ws = websocket.WebSocket()
             ws.settimeout(300)
             ws.connect(f"ws+unix://{sock_path}")
-            
+
             # Auth
             auth_msg = json2.dumps({"type":"auth","token":token})
             ws.send(auth_msg)
             resp = ws.recv()
-            
+
             # Send spawn request
             spawn_req = {
                 "type": "proactive",
@@ -165,7 +165,7 @@ Start now. Read the queue file first."""
                 "mode": "run"
             }
             ws.send(json2.dumps(spawn_req))
-            
+
             # Receive response
             while True:
                 msg = ws.recv()
@@ -175,21 +175,21 @@ Start now. Read the queue file first."""
                     break
                 if "content" in data:
                     log(f"  agent: {str(data['content'])[:80]}")
-            
+
             ws.close()
-            
+
         except Exception as e:
             error = str(e)
             log(f"WebSocket error: {e}")
-        
+
         # Remove from queue regardless
         q = read_queue()
         q["items"] = [i for i in q["items"] if i["id"] != id_]
         save(q)
-        
+
         ok = (result and result.get("type") == "done") or (error and "timeout" in error)
         log(f"<<< {id_} -> {'OK' if ok else 'FAIL'} {error or ''}")
-        
+
         time.sleep(30)
 
 if __name__ == "__main__":

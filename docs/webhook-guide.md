@@ -104,16 +104,16 @@ from mutx import AsyncMutxClient
 
 async def manage_webhooks():
     client = AsyncMutxClient(api_key="your-api-key")
-    
+
     # Create webhook
     webhook = await client.webhooks.acreate(
         url="https://your-app.com/webhooks/mutx",
         events=["agent.*"]
     )
-    
+
     # List webhooks
     webhooks = await client.webhooks.alist()
-    
+
     await client.close()
 
 asyncio.run(manage_webhooks())
@@ -133,10 +133,10 @@ app.use(express.json());
 // Verify HMAC signature
 function verifySignature(payload, signature, secret) {
   if (!signature || !secret) return true; // Skip if no secret configured
-  
+
   const hmac = crypto.createHmac('sha256', secret);
   const digest = 'sha256=' + hmac.update(payload).digest('hex');
-  
+
   return crypto.timingSafeEqual(
     Buffer.from(signature),
     Buffer.from(digest)
@@ -145,13 +145,13 @@ function verifySignature(payload, signature, secret) {
 
 app.post('/webhooks/mutx', (req, res) => {
   const signature = req.headers['x-webhook-signature'];
-  
+
   if (!verifySignature(JSON.stringify(req.body), signature, process.env.WEBHOOK_SECRET)) {
     return res.status(401).json({ error: 'Invalid signature' });
   }
-  
+
   const { event, data } = req.body;
-  
+
   switch (event) {
     case 'agent.status':
       console.log(`Agent ${data.agent_id} status: ${data.new_status}`);
@@ -164,7 +164,7 @@ app.post('/webhooks/mutx', (req, res) => {
       // Trigger alerting, rollback, etc.
       break;
   }
-  
+
   res.status(200).json({ received: true });
 });
 
@@ -184,37 +184,37 @@ WEBHOOK_SECRET = "your-webhook-secret"
 def verify_signature(payload: bytes, signature: str) -> bool:
     if not signature or not WEBHOOK_SECRET:
         return True
-    
+
     expected = f"sha256={hmac.new(
-        WEBHOOK_SECRET.encode(), 
-        payload, 
+        WEBHOOK_SECRET.encode(),
+        payload,
         hashlib.sha256
     ).hexdigest()}"
-    
+
     return hmac.compare_digest(signature, expected)
 
 @app.route('/webhooks/mutx', methods=['POST'])
 def handle_webhook():
     payload = request.get_data()
     signature = request.headers.get('X-Webhook-Signature')
-    
+
     if not verify_signature(payload, signature):
         return jsonify({'error': 'Invalid signature'}), 401
-    
+
     event = request.json.get('event')
     data = request.json.get('data', {})
-    
+
     if event == 'agent.status':
         agent_id = data.get('agent_id')
         new_status = data.get('new_status')
         print(f"Agent {agent_id} status: {new_status}")
-        
+
     elif event == 'deployment.failed':
         deployment_id = data.get('deployment_id')
         error = data.get('error')
         print(f"Deployment {deployment_id} failed: {error}")
         # Trigger alerting, rollback, etc.
-    
+
     return jsonify({'received': True}), 200
 
 if __name__ == '__main__':

@@ -6,7 +6,6 @@ Tests verify that the SDK correctly maps to the backend API contract.
 from __future__ import annotations
 
 import json
-import uuid
 from typing import Any
 
 import httpx
@@ -350,9 +349,7 @@ def test_credential_backend_parses_required_fields() -> None:
 
 
 def test_credential_backend_parses_optional_fields() -> None:
-    backend = CredentialBackend(
-        _backend_payload(is_active=False, is_healthy=True, ttl=3600)
-    )
+    backend = CredentialBackend(_backend_payload(is_active=False, is_healthy=True, ttl=3600))
 
     assert backend.is_active is False
     assert backend.is_healthy is True
@@ -433,7 +430,6 @@ def test_get_credential_rejects_async_client() -> None:
 
     with pytest.raises(RuntimeError, match="requires a sync httpx.Client"):
         gc.get_credential("vault:/x")
-
 
 
 # ---------------------------------------------------------------------------

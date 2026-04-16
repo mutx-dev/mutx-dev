@@ -271,6 +271,4 @@ async def test_templates_adeploy_hits_route_and_maps_payload() -> None:
 async def test_templates_adeploy_rejects_sync_client() -> None:
     with httpx.Client(base_url="https://api.test") as client:
         with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-            await Templates(client).adeploy(
-                template_id=str(uuid.uuid4()), name="Agent"
-            )
+            await Templates(client).adeploy(template_id=str(uuid.uuid4()), name="Agent")

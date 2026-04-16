@@ -39,7 +39,12 @@ async def test_list_sessions_returns_merged_sources_sorted(client: AsyncClient, 
 
     assert response.status_code == 200
     data = response.json()
-    assert [item["id"] for item in data["sessions"]] == ["codex-1", "gateway-1", "hermes-1", "claude-1"]
+    assert [item["id"] for item in data["sessions"]] == [
+        "codex-1",
+        "gateway-1",
+        "hermes-1",
+        "claude-1",
+    ]
 
 
 @pytest.mark.asyncio
@@ -74,7 +79,9 @@ async def test_list_sessions_with_agent_id_scopes_to_gateway_sessions_only(
     response = await client.get("/v1/sessions", params={"agent_id": str(test_agent.id)})
 
     assert response.status_code == 200
-    assert response.json()["sessions"] == [{"id": "agent-session", "source": "openclaw", "last_activity": 50}]
+    assert response.json()["sessions"] == [
+        {"id": "agent-session", "source": "openclaw", "last_activity": 50}
+    ]
     assert captured["assistant_id"] == "test-agent"
 
 

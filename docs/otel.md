@@ -221,7 +221,7 @@ Debug mode outputs:
    ```bash
    # For OTLP
    echo $OTEL_EXPORTER_OTLP_ENDPOINT
-   
+
    # For Jaeger
    curl -s http://localhost:14268/api/traces/status
    ```
@@ -298,7 +298,7 @@ class RedactingSpanProcessor(SpanProcessor):
         'password', 'token', 'api_key', 'authorization',
         'secret', 'private_token', 'credit_card'
     }
-    
+
     def on_end(self, span):
         for key in list(span.attributes.keys()):
             if key.lower() in self.SENSITIVE_ATTRIBUTES:
@@ -356,12 +356,12 @@ def process_data(data):
     with tracer.start_as_current_span("process_data") as span:
         span.set_attribute("data.type", type(data).__name__)
         span.set_attribute("data.size", len(data))
-        
+
         # Nested span
         with tracer.start_as_current_span("transform") as transform_span:
             result = transform(data)
             transform_span.set_attribute("result.size", len(result))
-        
+
         return result
 ```
 

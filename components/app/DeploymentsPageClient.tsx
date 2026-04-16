@@ -183,10 +183,10 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agentId) return;
-    
+
     setSubmitting(true);
     setError("");
-    
+
     try {
       await onSubmit(agentId, replicas);
       onOpenChange(false);
@@ -240,7 +240,7 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
               {error}
             </div>
           )}
-          
+
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
               Select Agent
@@ -262,7 +262,7 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
               )}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
               Replicas
@@ -450,7 +450,7 @@ export function DeploymentsPageClient() {
     if (!confirm("Are you sure you want to delete this deployment? This action cannot be undone.")) {
       return;
     }
-    
+
     setProcessingIds(prev => new Set(prev).add(deploymentId));
     try {
       await writeJson(`/api/dashboard/deployments/${deploymentId}`, {
@@ -547,7 +547,7 @@ export function DeploymentsPageClient() {
         agents={agents}
         onSubmit={handleCreateDeployment}
       />
-      
+
       {error && !authRequired && (
         <div className="flex items-center justify-between gap-4 rounded-[18px] border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-300">
           <div className="flex items-center gap-3">

@@ -301,7 +301,9 @@ def test_agents_logs_with_level_filter(monkeypatch) -> None:
     def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
         captured["path"] = path
         captured["params"] = params
-        return DummyResponse(200, {"agent_id": "agent-id", "items": [], "total": 0, "has_more": False})
+        return DummyResponse(
+            200, {"agent_id": "agent-id", "items": [], "total": 0, "has_more": False}
+        )
 
     monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(

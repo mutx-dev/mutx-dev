@@ -27,7 +27,7 @@ def test_railway_backend_manifest_keeps_healthcheck_contract() -> None:
 def test_railway_promotion_script_requires_both_frontend_and_backend_service_ids() -> None:
     script = read_text("scripts/promote-railway-production.sh")
 
-    assert 'RAILWAY_FRONTEND_SERVICE_ID' in script
-    assert 'RAILWAY_API_SERVICE_ID' in script
+    assert "RAILWAY_FRONTEND_SERVICE_ID" in script
+    assert "RAILWAY_API_SERVICE_ID" in script
     assert 'deploy_service "${RAILWAY_FRONTEND_SERVICE_ID}" "frontend"' in script
     assert 'deploy_service "${RAILWAY_API_SERVICE_ID}" "backend"' in script

@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Bot, 
-  Cloud, 
-  Play, 
-  FileText, 
-  Database, 
-  Wallet, 
-  Zap, 
-  Webhook, 
-  Key, 
+import {
+  LayoutDashboard,
+  Bot,
+  Cloud,
+  Play,
+  FileText,
+  Database,
+  Wallet,
+  Zap,
+  Webhook,
+  Key,
   Activity,
-  Brain 
+  Brain
 } from "lucide-react";
 
 const navItems = [
@@ -50,7 +50,7 @@ export function Sidebar() {
         <nav className="flex-1 overflow-y-auto py-4 px-3">
           <ul className="space-y-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || 
+              const isActive = pathname === item.href ||
                 (item.href !== "/dashboard" && pathname.startsWith(item.href));
               const Icon = item.icon;
 

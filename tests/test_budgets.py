@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
 
@@ -15,6 +14,7 @@ from sdk.mutx.budgets import Budget, Budgets, UsageByAgent, UsageByType, UsageBr
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def minimal_budget_data() -> dict:
@@ -64,6 +64,7 @@ def usage_breakdown_data(usage_by_agent_data, usage_by_type_data) -> dict:
 # ---------------------------------------------------------------------------
 # Data class parsing
 # ---------------------------------------------------------------------------
+
 
 class TestBudgetParsing:
     def test_required_fields(self, minimal_budget_data):
@@ -157,6 +158,7 @@ class TestUsageBreakdownParsing:
 # Type guards
 # ---------------------------------------------------------------------------
 
+
 class TestSyncClientTypeGuard:
     def test_sync_method_raises_on_async_client(self, minimal_budget_data):
         mock_client = MagicMock(spec=httpx.AsyncClient)
@@ -177,6 +179,7 @@ class TestAsyncClientTypeGuard:
 # ---------------------------------------------------------------------------
 # Sync methods
 # ---------------------------------------------------------------------------
+
 
 class TestBudgetsSyncGet:
     def test_get_success(self, minimal_budget_data):
@@ -249,6 +252,7 @@ class TestBudgetsSyncGetUsage:
 # ---------------------------------------------------------------------------
 # Async methods
 # ---------------------------------------------------------------------------
+
 
 class TestBudgetsAsyncGet:
     @pytest.mark.asyncio

@@ -66,6 +66,7 @@ class TestAnalyticsTimeSeriesResponse:
 
         async def counting_execute(stmt, *args, **kwargs):
             call_count[0] += 1
+
             # Return an object whose iteration yields one fake row
             class Row:
                 ts = now

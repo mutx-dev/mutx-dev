@@ -31,19 +31,19 @@ for issue in data:
         continue
     if 'autonomy:ready' not in labels:
         continue
-    
+
     # Determine size from labels
     size = 'm'
     for l in labels:
         if l.startswith('size:'):
             size = l.split(':')[1]
-    
+
     # Determine area
     area = 'area:api'
     for l in labels:
         if l.startswith('area:'):
             area = l
-    
+
     new_items.append({
         'id': f'gh{issue[\"number\"]}',
         'issue': issue['number'],
@@ -62,10 +62,10 @@ if new_items:
         q = json.load(open('$QUEUE_FILE'))
     except:
         q = {'version': '1.1.0', 'generated': datetime.datetime.now().isoformat(), 'items': []}
-    
+
     q['items'].extend(new_items)
     q['generated'] = datetime.datetime.now().isoformat()
-    
+
     with open('$QUEUE_FILE', 'w') as f:
         json.dump(q, f, indent=2)
     print(f'Added {len(new_items)} new items to queue')

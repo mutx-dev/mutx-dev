@@ -26,12 +26,36 @@ FLEET = load_module("generate_fleet_tasks", FLEET_GEN_PATH)
 
 BASE_FLEET = {
     "roles": [
-        {"id": "cto", "lane": "main", "scan_targets": ["docs/roadmap.md", "docs/project-status.md"]},
-        {"id": "cio", "lane": "main", "scan_targets": ["docs/whitepaper.md", "docs/surfaces.md", "docs/claim-to-reality-gap-matrix.md"]},
-        {"id": "backend", "lane": "codex", "scan_targets": ["src/api", "src/security", "sdk/mutx", "cli"]},
+        {
+            "id": "cto",
+            "lane": "main",
+            "scan_targets": ["docs/roadmap.md", "docs/project-status.md"],
+        },
+        {
+            "id": "cio",
+            "lane": "main",
+            "scan_targets": [
+                "docs/whitepaper.md",
+                "docs/surfaces.md",
+                "docs/claim-to-reality-gap-matrix.md",
+            ],
+        },
+        {
+            "id": "backend",
+            "lane": "codex",
+            "scan_targets": ["src/api", "src/security", "sdk/mutx", "cli"],
+        },
         {"id": "frontend", "lane": "opencode", "scan_targets": ["app", "components", "lib"]},
-        {"id": "ux", "lane": "opencode", "scan_targets": ["app/dashboard", "components/dashboard", "components/site"]},
-        {"id": "research", "lane": "main", "scan_targets": ["docs/whitepaper.md", "docs", "README.md"]},
+        {
+            "id": "ux",
+            "lane": "opencode",
+            "scan_targets": ["app/dashboard", "components/dashboard", "components/site"],
+        },
+        {
+            "id": "research",
+            "lane": "main",
+            "scan_targets": ["docs/whitepaper.md", "docs", "README.md"],
+        },
     ],
     "scanner_policies": {
         "max_new_tasks_per_cycle": 6,
@@ -68,7 +92,9 @@ This section is TODO before launch.
     (repo / "README.md").write_text("See /v1/leads for lead capture.\n", encoding="utf-8")
     (repo / "docs/roadmap.md").write_text("Vault integration is still a STUB.\n", encoding="utf-8")
     (repo / "docs" / "project-status.md").write_text("Monitoring is planned.\n", encoding="utf-8")
-    (repo / "docs" / "surfaces.md").write_text("Surface list includes /v1/governance/metrics.\n", encoding="utf-8")
+    (repo / "docs" / "surfaces.md").write_text(
+        "Surface list includes /v1/governance/metrics.\n", encoding="utf-8"
+    )
     (repo / "docs" / "api" / "reference.md").write_text("# API reference\n", encoding="utf-8")
     (repo / "docs" / "api" / "openapi.json").write_text(
         json.dumps({"paths": {"/v1/leads": {}, "/v1/health": {}}}),
@@ -79,7 +105,7 @@ This section is TODO before launch.
         encoding="utf-8",
     )
     (repo / "components" / "dashboard" / "Filters.tsx").write_text(
-        "export function Filters() { return <input placeholder=\"Search\" /> }\n",
+        'export function Filters() { return <input placeholder="Search" /> }\n',
         encoding="utf-8",
     )
     return repo
@@ -122,7 +148,11 @@ def test_generate_tasks_respects_role_and_lane_caps(tmp_path: Path) -> None:
     fleet = json.loads(json.dumps(BASE_FLEET))
     fleet["scanner_policies"]["max_new_tasks_per_cycle"] = 4
     fleet["scanner_policies"]["max_tasks_per_role_per_cycle"] = 1
-    fleet["scanner_policies"]["max_tasks_per_lane_per_cycle"] = {"main": 1, "codex": 1, "opencode": 1}
+    fleet["scanner_policies"]["max_tasks_per_lane_per_cycle"] = {
+        "main": 1,
+        "codex": 1,
+        "opencode": 1,
+    }
 
     tasks = FLEET.generate_tasks(repo, fleet)
 
@@ -142,14 +172,18 @@ def test_generate_tasks_can_disable_low_value_sources_and_apply_min_score(tmp_pa
     tasks = FLEET.generate_tasks(repo, fleet)
 
     assert tasks
-    assert all(task["source"] not in {"fleet:todo-scan", "fleet:docs-language-scan"} for task in tasks)
+    assert all(
+        task["source"] not in {"fleet:todo-scan", "fleet:docs-language-scan"} for task in tasks
+    )
     assert all(int(task["score"]) >= 40 for task in tasks)
 
 
 def test_main_filters_existing_ids_and_writes_output(tmp_path: Path) -> None:
     repo = write_repo_fixture(tmp_path)
     queue = tmp_path / "queue.json"
-    queue.write_text(json.dumps({"items": [{"id": "fleet-route-whitepaper-md-v1-newsletter"}]}), encoding="utf-8")
+    queue.write_text(
+        json.dumps({"items": [{"id": "fleet-route-whitepaper-md-v1-newsletter"}]}), encoding="utf-8"
+    )
     output = tmp_path / "generated.json"
     fleet = tmp_path / "fleet.json"
     fleet.write_text(json.dumps(BASE_FLEET), encoding="utf-8")

@@ -74,7 +74,10 @@ async def test_similarity_search_returns_503_when_vector_store_deps_missing(
     )
 
     assert response.status_code == 503
-    assert response.json()["detail"] == "RAG search dependencies are not available in this environment."
+    assert (
+        response.json()["detail"]
+        == "RAG search dependencies are not available in this environment."
+    )
 
 
 @pytest.mark.asyncio
@@ -93,4 +96,7 @@ async def test_ingest_returns_503_when_vector_store_deps_missing(
     )
 
     assert response.status_code == 503
-    assert response.json()["detail"] == "RAG ingestion is not available — vector store dependencies missing."
+    assert (
+        response.json()["detail"]
+        == "RAG ingestion is not available — vector store dependencies missing."
+    )

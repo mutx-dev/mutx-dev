@@ -192,9 +192,7 @@ class TestUnregisterCredentialBackend:
 
 class TestBackendHealthCheck:
     @pytest.mark.asyncio
-    async def test_health_existing_backend(
-        self, client: AsyncClient, patch_broker, fake_broker
-    ):
+    async def test_health_existing_backend(self, client: AsyncClient, patch_broker, fake_broker):
         fake_broker._backends.append(
             {
                 "name": "vault-health",
@@ -217,9 +215,7 @@ class TestBackendHealthCheck:
         assert response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_health_unhealthy_backend(
-        self, client: AsyncClient, patch_broker, fake_broker
-    ):
+    async def test_health_unhealthy_backend(self, client: AsyncClient, patch_broker, fake_broker):
         fake_broker._backends.append(
             {
                 "name": "vault-down",
@@ -260,12 +256,8 @@ class TestAllBackendsHealth:
 
 class TestGetCredential:
     @pytest.mark.asyncio
-    async def test_get_credential_returns_redacted_value(
-        self, client: AsyncClient, patch_broker
-    ):
-        response = await client.get(
-            "/v1/governance/credentials/get/vault:/secret/prod/api-key"
-        )
+    async def test_get_credential_returns_redacted_value(self, client: AsyncClient, patch_broker):
+        response = await client.get("/v1/governance/credentials/get/vault:/secret/prod/api-key")
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "test-secret"

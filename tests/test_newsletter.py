@@ -16,6 +16,7 @@ from mutx.newsletter import Newsletter
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _signup_response(duplicate: bool = False) -> dict[str, Any]:
     return {"message": "Subscribed successfully.", "duplicate": duplicate}
 
@@ -27,6 +28,7 @@ def _count_response(count: int) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Data class parsing (raw response dicts — newsletter.py returns plain JSON)
 # ---------------------------------------------------------------------------
+
 
 def test_get_count_parses_required_count_field() -> None:
     """get_count() returns the integer value from response['count']."""
@@ -68,6 +70,7 @@ def test_signup_parses_message_and_duplicate_fields() -> None:
 
 def test_signup_duplicate_flag_true() -> None:
     """signup() correctly parses duplicate=True response."""
+
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json=_signup_response(duplicate=True))
 
@@ -101,6 +104,7 @@ def test_signup_default_source() -> None:
 # Type guard: sync client rejects async client
 # ---------------------------------------------------------------------------
 
+
 def test_sync_methods_raise_when_client_is_async() -> None:
     """Sync methods raise RuntimeError when wrapped with an AsyncClient."""
     mock_client = Mock(spec=httpx.AsyncClient)
@@ -116,6 +120,7 @@ def test_sync_methods_raise_when_client_is_async() -> None:
 # ---------------------------------------------------------------------------
 # Type guard: async client rejects sync client
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_async_methods_raise_when_client_is_sync() -> None:
@@ -133,6 +138,7 @@ async def test_async_methods_raise_when_client_is_sync() -> None:
 # ---------------------------------------------------------------------------
 # Async methods with mocked AsyncClient
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_acount_returns_count_async() -> None:
@@ -177,6 +183,7 @@ async def test_asignup_returns_message_and_duplicate_async() -> None:
 # ---------------------------------------------------------------------------
 # raise_for_status coverage
 # ---------------------------------------------------------------------------
+
 
 def test_get_count_raises_for_error_status() -> None:
     """get_count() raises when the server returns an error status."""

@@ -100,11 +100,11 @@ export function withErrorHandling(
       return await handler(request)
     } catch (error) {
       console.error('Route handler error:', error)
-      
+
       if (error instanceof SyntaxError && 'status' in error && error.status === 400) {
         return badRequest('Invalid JSON in request body')
       }
-      
+
       return internalError('An unexpected error occurred')
     }
   }

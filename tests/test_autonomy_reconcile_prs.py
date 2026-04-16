@@ -5,10 +5,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-AUTONOMY_DIR = ROOT / 'scripts' / 'autonomy'
+AUTONOMY_DIR = ROOT / "scripts" / "autonomy"
 if str(AUTONOMY_DIR) not in sys.path:
     sys.path.insert(0, str(AUTONOMY_DIR))
-RECONCILE_PATH = AUTONOMY_DIR / 'reconcile_prs.py'
+RECONCILE_PATH = AUTONOMY_DIR / "reconcile_prs.py"
 
 
 def load_module(name: str, path: Path):
@@ -20,7 +20,7 @@ def load_module(name: str, path: Path):
     return module
 
 
-RECONCILE = load_module('reconcile_prs', RECONCILE_PATH)
+RECONCILE = load_module("reconcile_prs", RECONCILE_PATH)
 
 
 def test_safe_to_promote_accepts_green_autonomy_self_hosting_shape() -> None:

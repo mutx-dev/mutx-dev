@@ -253,7 +253,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (!sql) {
       throw new Error('Database not configured')
     }
-    
+
     const body = await request.json().catch(() => ({}))
     const { email: _email, source, locale, captchaToken, honeypot } = body
     const messages = getWaitlistMessages(locale)

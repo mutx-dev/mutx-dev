@@ -217,7 +217,9 @@ class TestRegisterWithAutoGen:
 
         assert isinstance(callback, MutxAutoGenCallback)
         assert callback.agent_name == "my-autogen-agent"
-        mock_agent.register_message_handler.assert_called_once_with(callback.on_agent_message_received)
+        mock_agent.register_message_handler.assert_called_once_with(
+            callback.on_agent_message_received
+        )
         mock_agent.register_teardown_handler.assert_called_once_with(callback.on_agent_teardown)
 
     def test_register_with_autogen_skips_missing_handlers(self):

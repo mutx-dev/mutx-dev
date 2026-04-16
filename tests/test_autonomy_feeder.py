@@ -37,7 +37,6 @@ def test_enqueue_task_appends_clean_item(tmp_path: Path) -> None:
     assert payload["items"][0]["status"] == "queued"
 
 
-
 def test_resume_lane_clears_pause(tmp_path: Path) -> None:
     lane_state = tmp_path / "lane-state.json"
     lane_state.write_text(
@@ -64,7 +63,6 @@ def test_resume_lane_clears_pause(tmp_path: Path) -> None:
     payload = json.loads(lane_state.read_text())
     assert payload["lanes"]["codex"]["paused"] is False
     assert payload["lanes"]["codex"]["reason"] is None
-
 
 
 def test_check_codex_resume_dry_run_and_apply_requeues_parked_items(tmp_path: Path) -> None:
@@ -102,7 +100,16 @@ def test_check_codex_resume_dry_run_and_apply_requeues_parked_items(tmp_path: Pa
     )
 
     dry_run = subprocess.run(
-        ["python3", str(CHECK_RESUME), "--lane-state", str(lane_state), "--queue", str(queue), "--min-pause-seconds", "60"],
+        [
+            "python3",
+            str(CHECK_RESUME),
+            "--lane-state",
+            str(lane_state),
+            "--queue",
+            str(queue),
+            "--min-pause-seconds",
+            "60",
+        ],
         cwd=ROOT,
         check=True,
         capture_output=True,
@@ -141,7 +148,9 @@ def test_check_codex_resume_dry_run_and_apply_requeues_parked_items(tmp_path: Pa
     assert queue_payload["items"][0]["status"] == "queued"
 
 
-def test_check_codex_resume_reports_remaining_wait_when_backoff_has_not_elapsed(tmp_path: Path) -> None:
+def test_check_codex_resume_reports_remaining_wait_when_backoff_has_not_elapsed(
+    tmp_path: Path,
+) -> None:
     lane_state = tmp_path / "lane-state.json"
     queue = tmp_path / "queue.json"
     lane_state.write_text(
@@ -163,7 +172,16 @@ def test_check_codex_resume_reports_remaining_wait_when_backoff_has_not_elapsed(
     queue.write_text(json.dumps({"items": []}))
 
     result = subprocess.run(
-        ["python3", str(CHECK_RESUME), "--lane-state", str(lane_state), "--queue", str(queue), "--min-pause-seconds", "60"],
+        [
+            "python3",
+            str(CHECK_RESUME),
+            "--lane-state",
+            str(lane_state),
+            "--queue",
+            str(queue),
+            "--min-pause-seconds",
+            "60",
+        ],
         cwd=ROOT,
         check=True,
         capture_output=True,

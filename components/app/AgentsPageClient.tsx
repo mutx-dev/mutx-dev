@@ -55,7 +55,7 @@ async function deleteAgent(agentId: string): Promise<void> {
     method: "DELETE",
     cache: "no-store",
   });
-  
+
   if (!response.ok) {
     const payload = await response.json().catch(() => ({ detail: "Delete failed" }));
     throw new Error(extractApiErrorMessage(payload, "Delete failed"));
@@ -125,7 +125,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
               </div>
             </div>
           </div>
-          
+
           {agent.description && (
             <p className="mt-3 text-sm text-slate-400 line-clamp-2">
               {agent.description}

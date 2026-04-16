@@ -2,9 +2,6 @@
 
 from src.api.routes.sessions import (
     merge_and_dedupe_sessions,
-    get_local_claude_sessions,
-    get_local_codex_sessions,
-    get_local_hermes_sessions,
 )
 
 
@@ -95,8 +92,7 @@ class TestMergeAndDedupeSessions:
     def test_results_capped_at_100(self):
         """Results should be capped at 100 sessions."""
         sessions = [
-            {"id": f"session-{i}", "source": "openclaw", "last_activity": i}
-            for i in range(150)
+            {"id": f"session-{i}", "source": "openclaw", "last_activity": i} for i in range(150)
         ]
 
         result = merge_and_dedupe_sessions(sessions, [], [], [])

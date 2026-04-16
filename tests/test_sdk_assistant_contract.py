@@ -24,6 +24,7 @@ from mutx.assistant import (
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
 
+
 def _skill_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
         "id": str(uuid.uuid4()),
@@ -103,6 +104,7 @@ def _read_json(request: httpx.Request) -> dict[str, Any]:
 # Dataclass tests — AssistantSkill
 # ---------------------------------------------------------------------------
 
+
 def test_assistant_skill_parses_all_fields() -> None:
     payload = _skill_payload()
     skill = AssistantSkill(payload)
@@ -138,6 +140,7 @@ def test_assistant_skill_repr() -> None:
 # Dataclass tests — AssistantChannel
 # ---------------------------------------------------------------------------
 
+
 def test_assistant_channel_parses_all_fields() -> None:
     config = {"token": "abc123"}
     payload = _channel_payload(config=config)
@@ -166,6 +169,7 @@ def test_assistant_channel_handles_missing_fields_with_defaults() -> None:
 # Dataclass tests — AssistantWakeup
 # ---------------------------------------------------------------------------
 
+
 def test_assistant_wakeup_parses_all_fields() -> None:
     payload = _wakeup_payload()
     wakeup = AssistantWakeup(payload)
@@ -188,6 +192,7 @@ def test_assistant_wakeup_handles_missing_fields_with_defaults() -> None:
 # ---------------------------------------------------------------------------
 # Dataclass tests — AssistantHealth
 # ---------------------------------------------------------------------------
+
 
 def test_assistant_health_parses_all_fields() -> None:
     payload = _health_payload()
@@ -214,6 +219,7 @@ def test_assistant_health_handles_missing_fields_with_defaults() -> None:
 # ---------------------------------------------------------------------------
 # Dataclass tests — AssistantSession
 # ---------------------------------------------------------------------------
+
 
 def test_assistant_session_parses_all_fields() -> None:
     payload = _session_payload()
@@ -243,6 +249,7 @@ def test_assistant_session_handles_missing_fields_with_defaults() -> None:
 # Dataclass tests — AssistantOverview
 # ---------------------------------------------------------------------------
 
+
 def test_assistant_overview_parses_all_fields() -> None:
     assistant_data = {"id": "ast-123", "name": "test"}
     payload = _overview_payload(assistant=assistant_data)
@@ -265,6 +272,7 @@ def test_assistant_overview_handles_missing_fields_with_defaults() -> None:
 # ---------------------------------------------------------------------------
 # Assistant.overview() — sync
 # ---------------------------------------------------------------------------
+
 
 def test_overview_returns_assistant_overview() -> None:
     captured: dict[str, Any] = {}
@@ -310,12 +318,14 @@ def test_overview_requires_sync_client() -> None:
         assistant.overview()
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.aoverview() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_aoverview_returns_assistant_overview() -> None:
@@ -350,6 +360,7 @@ async def test_aoverview_requires_async_client() -> None:
 # Assistant.skills() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_skills_returns_list_of_assistant_skills() -> None:
     captured: dict[str, Any] = {}
     agent_id = str(uuid.uuid4())
@@ -378,12 +389,14 @@ def test_skills_requires_sync_client() -> None:
         assistant.skills(str(uuid.uuid4()))
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.askills() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_askills_returns_list_of_assistant_skills() -> None:
@@ -421,6 +434,7 @@ async def test_askills_requires_async_client() -> None:
 # Assistant.install_skill() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_install_skill_returns_updated_skills_list() -> None:
     captured: dict[str, Any] = {}
     agent_id = str(uuid.uuid4())
@@ -451,12 +465,14 @@ def test_install_skill_requires_sync_client() -> None:
         assistant.install_skill(str(uuid.uuid4()), str(uuid.uuid4()))
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.ainstall_skill() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_ainstall_skill_returns_updated_skills_list() -> None:
@@ -494,6 +510,7 @@ async def test_ainstall_skill_requires_async_client() -> None:
 # Assistant.uninstall_skill() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_uninstall_skill_returns_updated_skills_list() -> None:
     captured: dict[str, Any] = {}
     agent_id = str(uuid.uuid4())
@@ -523,12 +540,14 @@ def test_uninstall_skill_requires_sync_client() -> None:
         assistant.uninstall_skill(str(uuid.uuid4()), str(uuid.uuid4()))
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.auninstall_skill() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_auninstall_skill_returns_updated_skills_list() -> None:
@@ -565,6 +584,7 @@ async def test_auninstall_skill_requires_async_client() -> None:
 # Assistant.channels() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_channels_returns_list_of_assistant_channels() -> None:
     captured: dict[str, Any] = {}
     agent_id = str(uuid.uuid4())
@@ -593,12 +613,14 @@ def test_channels_requires_sync_client() -> None:
         assistant.channels(str(uuid.uuid4()))
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.achannels() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_achannels_returns_list_of_assistant_channels() -> None:
@@ -636,6 +658,7 @@ async def test_achannels_requires_async_client() -> None:
 # Assistant.wakeups() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_wakeups_returns_list_of_assistant_wakeups() -> None:
     captured: dict[str, Any] = {}
     agent_id = str(uuid.uuid4())
@@ -664,12 +687,14 @@ def test_wakeups_requires_sync_client() -> None:
         assistant.wakeups(str(uuid.uuid4()))
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.awakeups() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_awakeups_returns_list_of_assistant_wakeups() -> None:
@@ -707,6 +732,7 @@ async def test_awakeups_requires_async_client() -> None:
 # Assistant.health() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_health_returns_assistant_health() -> None:
     captured: dict[str, Any] = {}
     agent_id = str(uuid.uuid4())
@@ -735,12 +761,14 @@ def test_health_requires_sync_client() -> None:
         assistant.health(str(uuid.uuid4()))
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.ahealth() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_ahealth_returns_assistant_health() -> None:
@@ -777,6 +805,7 @@ async def test_ahealth_requires_async_client() -> None:
 # Assistant.sessions() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_sessions_returns_list_of_assistant_sessions() -> None:
     captured: dict[str, Any] = {}
     agent_id = str(uuid.uuid4())
@@ -808,12 +837,14 @@ def test_sessions_requires_sync_client() -> None:
         assistant.sessions(str(uuid.uuid4()))
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Assistant.asessions() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_asessions_returns_list_of_assistant_sessions() -> None:

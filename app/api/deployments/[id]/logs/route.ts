@@ -18,18 +18,18 @@ export async function GET(
     }
 
     const { id } = await params
-    
+
     // Check ownership before proceeding
     const ownershipError = await checkDeploymentOwnership(request, id)
     if (ownershipError) {
       return ownershipError
     }
-    
+
     const { searchParams } = new URL(request.url)
     const paramsStr = searchParams.toString()
-    
+
     const response = await fetch(`${getApiBaseUrl()}/v1/deployments/${id}/logs?${paramsStr}`, {
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
       },
       cache: 'no-store',

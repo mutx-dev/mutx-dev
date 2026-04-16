@@ -15,7 +15,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const { email, password } = validation.data
     const body = { email, password }
-    
+
     const response = await fetch(`${getApiBaseUrl()}/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

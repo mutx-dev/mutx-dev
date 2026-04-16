@@ -7,7 +7,7 @@
 Set via environment variables:
 
 - `OIDC_ISSUER`
-- `OIDC_CLIENT_ID` 
+- `OIDC_CLIENT_ID`
 - `OIDC_JWKS_URI`
 
 ## Supported Providers

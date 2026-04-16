@@ -24,9 +24,9 @@ export async function GET(
     const { runId } = await params
     const { searchParams } = new URL(request.url)
     const paramsStr = searchParams.toString()
-    
+
     const response = await fetch(`${getApiBaseUrl()}/v1/runs/${runId}/traces${paramsStr ? '?' + paramsStr : ''}`, {
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
@@ -50,10 +50,10 @@ export async function POST(
 
     const { runId } = await params
     const body = await req.json()
-    
+
     const response = await fetch(`${getApiBaseUrl()}/v1/runs/${runId}/traces`, {
       method: 'POST',
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },

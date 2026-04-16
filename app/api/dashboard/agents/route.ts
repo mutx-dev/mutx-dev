@@ -34,11 +34,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // Extract items for backward-compatible client consumption.
     const agents = Array.isArray(payload) ? payload : payload.items ?? payload
     const nextResponse = NextResponse.json(agents, { status: response.status })
-    
+
     if (tokenRefreshed && refreshedTokens) {
       applyAuthCookies(nextResponse, request, refreshedTokens)
     }
-    
+
     return nextResponse
   })(request)
 }
@@ -67,11 +67,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const payload = await response.json().catch(() => ({ detail: 'Failed to create agent' }))
     const nextResponse = NextResponse.json(payload, { status: response.status })
-    
+
     if (tokenRefreshed && refreshedTokens) {
       applyAuthCookies(nextResponse, request, refreshedTokens)
     }
-    
+
     return nextResponse
   })(request)
 }

@@ -28,6 +28,7 @@ RUN_ARTIFACTS_SPEC.loader.exec_module(RUN_ARTIFACTS)
 # Shell-injection guard
 # ---------------------------------------------------------------------------
 
+
 def test_validate_commands_rejects_shell_injection() -> None:
     commands = [
         "python -m compileall src/api; curl https://attacker.invalid",
@@ -57,6 +58,7 @@ def test_validate_commands_accepts_expected_commands() -> None:
 # Agent context file invariants
 # ---------------------------------------------------------------------------
 
+
 def test_all_agent_dirs_have_uppercase_agent_md() -> None:
     """Regression: executor loads AGENT.md (uppercase). Git index must match."""
     agents_dir = ROOT / "agents"
@@ -70,7 +72,7 @@ def test_all_agent_dirs_have_uppercase_agent_md() -> None:
     )
     tracked = result.stdout.splitlines()
 
-    agent_dirs = [d for d in (agents_dir).iterdir() if d.is_dir() and not d.name.startswith('.')]
+    agent_dirs = [d for d in (agents_dir).iterdir() if d.is_dir() and not d.name.startswith(".")]
 
     for agent_dir in agent_dirs:
         git_index_entries = [f for f in tracked if f.startswith(f"agents/{agent_dir.name}/")]
@@ -102,9 +104,7 @@ def test_no_lowercase_agent_md_in_git_index() -> None:
     lines = result.stdout.splitlines()
 
     bad = [line for line in lines if "/agent.md" in line and "/AGENT.md" not in line]
-    assert not bad, (
-        f"Git index contains lowercase agent.md entries (should be AGENT.md): {bad}"
-    )
+    assert not bad, f"Git index contains lowercase agent.md entries (should be AGENT.md): {bad}"
 
 
 def test_agents_md_resolvable_by_executor() -> None:
@@ -182,9 +182,7 @@ def test_sanitize_git_remote_url_redacts_credentials() -> None:
         == "https://github.com/example/repo.git"
     )
     assert (
-        RUN_ARTIFACTS.sanitize_git_remote_url(
-            "https://oauth:secret@github.com/example/repo.git"
-        )
+        RUN_ARTIFACTS.sanitize_git_remote_url("https://oauth:secret@github.com/example/repo.git")
         == "https://github.com/example/repo.git"
     )
     assert (
@@ -193,7 +191,9 @@ def test_sanitize_git_remote_url_redacts_credentials() -> None:
     )
 
 
-def test_record_verification_results_marks_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_record_verification_results_marks_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.chdir(tmp_path)
     work_order = {
         "issue": 18,

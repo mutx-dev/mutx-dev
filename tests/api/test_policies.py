@@ -60,9 +60,7 @@ class TestPolicyStore:
         policy2 = Policy(
             id=str(uuid.uuid4()),
             name="test-policy",
-            rules=[
-                Rule(type="warn", pattern="*.bat", action="log", scope="input")
-            ],
+            rules=[Rule(type="warn", pattern="*.bat", action="log", scope="input")],
             enabled=True,
             version=1,
             created_at=datetime.now(timezone.utc),
@@ -221,7 +219,9 @@ class TestPolicyRoutes:
             json={
                 "id": str(uuid.uuid4()),
                 "name": "get-policy-test",
-                "rules": [{"type": "allow", "pattern": "*.txt", "action": "pass", "scope": "output"}],
+                "rules": [
+                    {"type": "allow", "pattern": "*.txt", "action": "pass", "scope": "output"}
+                ],
                 "enabled": True,
                 "version": 1,
             },
@@ -270,4 +270,3 @@ class TestPolicyRoutes:
     # returning, so an infinite SSE stream hangs forever.  The SSE generator
     # logic (event format, version-change detection, cancellation handling) is
     # fully exercised by TestPolicyStore.test_upsert_notifies_reload_clients.
-

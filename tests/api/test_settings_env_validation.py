@@ -27,7 +27,9 @@ def test_production_rejects_auto_generated_jwt_secret(monkeypatch):
     monkeypatch.delenv("JWT_SECRET", raising=False)
     monkeypatch.delenv("jwt_secret", raising=False)
 
-    with pytest.raises(ValidationError, match="JWT_SECRET environment variable must be set in production"):
+    with pytest.raises(
+        ValidationError, match="JWT_SECRET environment variable must be set in production"
+    ):
         Settings(_env_file=None)
 
 

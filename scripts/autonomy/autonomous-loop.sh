@@ -32,7 +32,7 @@ except: sys.exit(1)
     title=$(echo "$item" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['title'])")
     area=$(echo "$item" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('area','area:api'))")
     size=$(echo "$item" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('size','m'))")
-    
+
     echo "[$(date)] Working on: $title (id=$id, area=$area)"
 
     # Pick worktree based on area
@@ -55,7 +55,7 @@ with open('$QUEUE_FILE', 'w') as f:
 " 2>/dev/null
 
     # Call Codex to implement
-    # Using openclaw sessions_spawn via the CLI would be ideal, 
+    # Using openclaw sessions_spawn via the CLI would be ideal,
     # but we'll use a direct codex call for the implementation
     cd "$worktree"
     branch="autonomy/$id-$(date +%Y%m%d%H%M%S)"
@@ -63,13 +63,13 @@ with open('$QUEUE_FILE', 'w') as f:
 
     # Spawn implementation — mutx-engineering-agents handles this via Codex
     # For now, the Codex agent running in parallel reads the queue and works
-    
+
     echo "[$(date)] Codex implementing: $title"
-    
+
     # Mark as done (Codex will have made the actual changes)
     # In the real loop, we wait for Codex to signal completion
     sleep 2
-    
+
     # Check if changes exist
     if git diff --quiet 2>/dev/null; then
         echo "[$(date)] No changes made, marking skipped"
@@ -82,10 +82,10 @@ id: $id
 area: $area
 size: $size
 autonomous: yes" 2>/dev/null
-        
+
         gh pr create --title "[autonomy] $title" --body "Autonomous PR from MUTX dev loop. ID: $id. Area: $area. Size: $size." --base main 2>/dev/null || \
         git push -u origin "$branch" 2>/dev/null
-        
+
         echo "[$(date)] PR filed for: $title"
         status="pr_filed"
     fi

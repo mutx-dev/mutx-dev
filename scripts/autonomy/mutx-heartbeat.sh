@@ -35,12 +35,12 @@ open_github_issue() {
     existing=$(curl -s -X GET "https://api.github.com/repos/$GITHUB_REPO/issues?state=open&labels=heartbeat" \
         -H "Authorization: token $GITHUB_TOKEN" \
         -H "Accept: application/vnd.github.v3+json" 2>/dev/null || echo "[]")
-    
+
     if echo "$existing" | grep -q '"number"'; then
         log "Open heartbeat issue already exists, skipping duplicate"
         return
     fi
-    
+
     curl -s -X POST "$ISSUES_URL" \
         -H "Authorization: token $GITHUB_TOKEN" \
         -H "Accept: application/vnd.github.v3+json" \
@@ -70,7 +70,7 @@ if [[ $exit_code -eq 0 ]]; then
     baseline=$(cat /tmp/heartbeat_baseline.txt)
     log "PASS [${duration}s] commit=$baseline"
     notify_discord "✅ PASS" "MUTX healthy in ${duration}s | commit=$(cat /tmp/heartbeat_baseline.txt)"
-    
+
     # Close any open heartbeat issues if we're now healthy
     # (handled by next run if this was previously broken)
 else
@@ -80,7 +80,7 @@ else
     notify_discord "🚨 FAIL" "MUTX broken | commit=$baseline | ${duration}s | see heartbeat log"
     open_github_issue "🚨 [AUTOMATED] MUTX heartbeat failed — make dev broken" \
         "Heartbeat detected at $(date '+%Y-%m-%d %H:%M:%S').
-        
+
 Commit: \`$(cat /tmp/heartbeat_baseline.txt)\`
 Duration: ${duration}s
 Exit code: $exit_code

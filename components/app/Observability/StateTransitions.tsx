@@ -60,14 +60,14 @@ function formatRelativeTime(timestamp?: string | null) {
 
 function getEventIcon(eventType: string, status: string) {
   const normalizedStatus = status?.toLowerCase() ?? "";
-  
+
   if (normalizedStatus === "success" || normalizedStatus === "healthy" || normalizedStatus === "running") {
     return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
   }
   if (normalizedStatus === "failed" || normalizedStatus === "error" || normalizedStatus === "unhealthy") {
     return <XCircle className="h-4 w-4 text-rose-400" />;
   }
-  
+
   const normalizedEvent = eventType?.toLowerCase() ?? "";
   if (normalizedEvent === "created" || normalizedEvent === "healthy") {
     return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
@@ -81,20 +81,20 @@ function getEventIcon(eventType: string, status: string) {
   if (normalizedEvent === "stopping" || normalizedEvent === "stopped") {
     return <Clock className="h-4 w-4 text-slate-400" />;
   }
-  
+
   return <Server className="h-4 w-4 text-cyan-400" />;
 }
 
 function getEventColor(eventType: string, status: string): string {
   const normalizedStatus = status?.toLowerCase() ?? "";
-  
+
   if (normalizedStatus === "success" || normalizedStatus === "healthy" || normalizedStatus === "running") {
     return "border-emerald-400/20 bg-emerald-400/5";
   }
   if (normalizedStatus === "failed" || normalizedStatus === "error" || normalizedStatus === "unhealthy") {
     return "border-rose-400/20 bg-rose-400/5";
   }
-  
+
   const normalizedEvent = eventType?.toLowerCase() ?? "";
   if (normalizedEvent === "created" || normalizedEvent === "healthy") {
     return "border-emerald-400/20 bg-emerald-400/5";
@@ -108,17 +108,17 @@ function getEventColor(eventType: string, status: string): string {
   if (normalizedEvent === "stopping" || normalizedEvent === "stopped") {
     return "border-slate-400/20 bg-slate-400/5";
   }
-  
+
   return "border-cyan-400/20 bg-cyan-400/5";
 }
 
 function getStatusBadge(status?: string | null) {
   if (!status) return null;
-  
+
   const normalized = status.toLowerCase();
-  
+
   let tone = "bg-slate-400/10 text-slate-400 border-slate-400/20";
-  
+
   if (normalized === "success" || normalized === "healthy" || normalized === "running") {
     tone = "bg-emerald-400/10 text-emerald-400 border-emerald-400/20";
   } else if (normalized === "failed" || normalized === "error" || normalized === "unhealthy") {
@@ -126,7 +126,7 @@ function getStatusBadge(status?: string | null) {
   } else if (normalized === "pending" || normalized === "starting" || normalized === "restarting") {
     tone = "bg-amber-400/10 text-amber-400 border-amber-400/20";
   }
-  
+
   return (
     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${tone}`}>
       {status}
@@ -235,17 +235,17 @@ export function StateTransitions({
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
           <div className="relative p-4">
             <div className="absolute left-[27px] top-8 bottom-4 w-px bg-gradient-to-b from-violet-400/30 via-violet-400/10 to-transparent" />
-            
+
             <div className="space-y-4">
               {sortedEvents.map((event, index) => {
                 const nextEvent = sortedEvents[index + 1];
-                
+
                 return (
                   <div key={event.id ?? `${event.created_at}-${index}`} className="relative flex gap-4">
                     <div className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-xl border ${getEventColor(event.event_type, event.status ?? "")}`}>
                       {getEventIcon(event.event_type, event.status ?? "")}
                     </div>
-                    
+
                     <div className="flex-1 pt-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-medium text-white capitalize">
@@ -253,7 +253,7 @@ export function StateTransitions({
                         </span>
                         {getStatusBadge(event.status)}
                       </div>
-                      
+
                       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
@@ -265,13 +265,13 @@ export function StateTransitions({
                           </span>
                         )}
                       </div>
-                      
+
                       {event.error_message && (
                         <div className="mt-2 rounded-lg border border-rose-400/20 bg-rose-400/5 px-3 py-2 text-xs text-rose-200">
                           <span className="font-medium">Error:</span> {event.error_message}
                         </div>
                       )}
-                      
+
                       {nextEvent && (
                         <div className="mt-2 flex items-center gap-2 text-xs text-slate-600">
                           <ArrowRight className="h-3 w-3" />

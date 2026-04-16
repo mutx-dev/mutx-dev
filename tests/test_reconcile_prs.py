@@ -5,10 +5,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-AUTONOMY_DIR = ROOT / 'scripts' / 'autonomy'
+AUTONOMY_DIR = ROOT / "scripts" / "autonomy"
 if str(AUTONOMY_DIR) not in sys.path:
     sys.path.insert(0, str(AUTONOMY_DIR))
-MODULE_PATH = AUTONOMY_DIR / 'reconcile_prs.py'
+MODULE_PATH = AUTONOMY_DIR / "reconcile_prs.py"
 
 
 def load_module(name: str, path: Path):
@@ -20,33 +20,33 @@ def load_module(name: str, path: Path):
     return module
 
 
-RECONCILE = load_module('reconcile_prs_runtime', MODULE_PATH)
+RECONCILE = load_module("reconcile_prs_runtime", MODULE_PATH)
 
 
 def test_safe_to_promote_accepts_green_autonomy_self_hosting_shape() -> None:
-    pr = {'title': 'feat(autonomy): add lightweight task claim leases'}
+    pr = {"title": "feat(autonomy): add lightweight task claim leases"}
     files = [
-        'scripts/autonomy/daemon_main.py',
-        'scripts/autonomy/lane_contract.py',
-        'scripts/autonomy/orchestrator_main.py',
-        'scripts/autonomy/queue_state.py',
-        'scripts/autonomy/worktree_utils.py',
-        'tests/test_autonomy_daemon_ops.py',
-        'tests/test_autonomy_lane_contract.py',
+        "scripts/autonomy/daemon_main.py",
+        "scripts/autonomy/lane_contract.py",
+        "scripts/autonomy/orchestrator_main.py",
+        "scripts/autonomy/queue_state.py",
+        "scripts/autonomy/worktree_utils.py",
+        "tests/test_autonomy_daemon_ops.py",
+        "tests/test_autonomy_lane_contract.py",
     ]
 
     assert RECONCILE.safe_to_promote(pr, files) is True
 
 
 def test_safe_to_promote_accepts_small_sdk_coverage_pr() -> None:
-    pr = {'title': 'ci: add coverage for sdk/mutx/observability.py [abc123]'}
-    files = ['tests/test_sdk_observability_contract.py']
+    pr = {"title": "ci: add coverage for sdk/mutx/observability.py [abc123]"}
+    files = ["tests/test_sdk_observability_contract.py"]
 
     assert RECONCILE.safe_to_promote(pr, files) is True
 
 
 def test_safe_to_promote_rejects_stub_only_pr() -> None:
-    pr = {'title': '[autonomy] Add error handling to `sdk/mutx/agents.py`'}
-    files = ['autonomy_stubs/error_agents.md']
+    pr = {"title": "[autonomy] Add error handling to `sdk/mutx/agents.py`"}
+    files = ["autonomy_stubs/error_agents.md"]
 
     assert RECONCILE.safe_to_promote(pr, files) is False

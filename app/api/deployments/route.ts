@@ -19,10 +19,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const { searchParams } = new URL(request.url)
     const params = new URLSearchParams(searchParams)
-    
+
     // Proxy to control plane
     const response = await fetch(`${getApiBaseUrl()}/v1/deployments?${params}`, {
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
@@ -42,11 +42,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await req.json()
-    
+
     // Proxy to control plane
     const response = await fetch(`${getApiBaseUrl()}/v1/deployments`, {
       method: 'POST',
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },

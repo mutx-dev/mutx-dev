@@ -16,6 +16,7 @@ from mutx.sessions import Session, Sessions
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
 
+
 def _session_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
         "id": str(uuid.uuid4()),
@@ -47,6 +48,7 @@ def _read_json(request: httpx.Request) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Session dataclass tests
 # ---------------------------------------------------------------------------
+
 
 def test_session_parses_all_fields() -> None:
     payload = _session_payload()
@@ -97,6 +99,7 @@ def test_session_repr() -> None:
 # Sessions.list() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_list_returns_list_of_sessions() -> None:
     captured: dict[str, Any] = {}
 
@@ -105,9 +108,7 @@ def test_list_returns_list_of_sessions() -> None:
         captured["params"] = dict(request.url.params)
         return httpx.Response(
             200,
-            json=_sessions_response_payload(
-                [_session_payload(id="s1"), _session_payload(id="s2")]
-            ),
+            json=_sessions_response_payload([_session_payload(id="s1"), _session_payload(id="s2")]),
         )
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
@@ -148,12 +149,14 @@ def test_list_requires_sync_client() -> None:
         sessions.list()
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Sessions.alist() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_alist_returns_list_of_sessions() -> None:
@@ -214,6 +217,7 @@ async def test_alist_requires_async_client() -> None:
 # Sessions.set_thinking() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_set_thinking_hits_correct_route() -> None:
     captured: dict[str, Any] = {}
 
@@ -253,12 +257,14 @@ def test_set_thinking_requires_sync_client() -> None:
         sessions.set_thinking("sk_test", "medium")
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Sessions.aset_thinking() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_aset_thinking_hits_correct_route() -> None:
@@ -309,6 +315,7 @@ async def test_aset_thinking_requires_async_client() -> None:
 # Sessions.set_reasoning() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_set_reasoning_hits_correct_route() -> None:
     captured: dict[str, Any] = {}
 
@@ -348,12 +355,14 @@ def test_set_reasoning_requires_sync_client() -> None:
         sessions.set_reasoning("sk_test", "on")
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Sessions.aset_reasoning() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_aset_reasoning_hits_correct_route() -> None:
@@ -392,6 +401,7 @@ async def test_aset_reasoning_rejects_invalid_level() -> None:
 # ---------------------------------------------------------------------------
 # Sessions.set_label() — sync
 # ---------------------------------------------------------------------------
+
 
 def test_set_label_hits_correct_route() -> None:
     captured: dict[str, Any] = {}
@@ -432,12 +442,14 @@ def test_set_label_requires_sync_client() -> None:
         sessions.set_label("sk_test", "label")
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Sessions.aset_label() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_aset_label_hits_correct_route() -> None:
@@ -477,6 +489,7 @@ async def test_aset_label_rejects_label_over_100_chars() -> None:
 # Sessions.delete() — sync
 # ---------------------------------------------------------------------------
 
+
 def test_delete_rejects_json_kwarg_incompatible_with_httpx_028() -> None:
     """httpx.Client.delete() does not accept a `json` kwarg in httpx 0.28.
 
@@ -501,12 +514,14 @@ def test_delete_requires_sync_client() -> None:
         sessions.delete("sk_test")
 
     import asyncio
+
     asyncio.run(async_client.aclose())
 
 
 # ---------------------------------------------------------------------------
 # Sessions.adelete() — async
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_adelete_rejects_json_kwarg_incompatible_with_httpx_028() -> None:
@@ -535,9 +550,11 @@ async def test_adelete_requires_async_client() -> None:
 # Sessions exported from mutx top-level
 # ---------------------------------------------------------------------------
 
+
 def test_sessions_exported_from_mutx_top_level() -> None:
     import importlib
     import mutx as mutx_mod
+
     importlib.reload(mutx_mod)
     ImportedSessions = getattr(mutx_mod, "Sessions", None)
     from mutx import MutxClient

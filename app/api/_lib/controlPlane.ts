@@ -127,7 +127,7 @@ export async function refreshAuthToken(
   refreshToken: string
 ): Promise<AuthTokens | null> {
   const apiBaseUrl = getApiBaseUrl()
-  
+
   try {
     const response = await fetch(`${apiBaseUrl}/v1/auth/refresh`, {
       method: 'POST',
@@ -157,7 +157,7 @@ export async function authenticatedFetch(
 ): Promise<{ response: Response; tokenRefreshed: boolean; refreshedTokens?: AuthTokens }> {
   let token = await getAuthToken(request)
   const refreshToken = getRefreshToken(request)
-  
+
   // Initial fetch with current token
   let response = await fetch(url, {
     ...options,

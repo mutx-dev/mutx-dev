@@ -18,15 +18,15 @@ export async function GET(
     }
 
     const { id } = await params
-    
+
     // Check ownership before proceeding
     const ownershipError = await checkDeploymentOwnership(request, id)
     if (ownershipError) {
       return ownershipError
     }
-    
+
     const response = await fetch(`${getApiBaseUrl()}/v1/deployments/${id}`, {
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
       },
       cache: 'no-store',
@@ -48,16 +48,16 @@ export async function DELETE(
     }
 
     const { id } = await params
-    
+
     // Check ownership before proceeding
     const ownershipError = await checkDeploymentOwnership(request, id)
     if (ownershipError) {
       return ownershipError
     }
-    
+
     const response = await fetch(`${getApiBaseUrl()}/v1/deployments/${id}`, {
       method: 'DELETE',
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
       },
       cache: 'no-store',
@@ -66,7 +66,7 @@ export async function DELETE(
     if (response.status === 204) {
       return new NextResponse(null, { status: 204 })
     }
-    
+
     const payload = await response.json().catch(() => ({ detail: 'Failed to delete deployment' }))
     return NextResponse.json(payload, { status: response.status })
   })(request)

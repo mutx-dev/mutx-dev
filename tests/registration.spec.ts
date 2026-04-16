@@ -118,7 +118,7 @@ test.describe('Registration Flow', () => {
       await route.fulfill({
         status: 201,
         contentType: 'application/json',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           access_token: 'mock-access-token',
           refresh_token: 'mock-refresh-token',
           expires_in: 1800
@@ -137,7 +137,7 @@ test.describe('Registration Flow', () => {
 
     // Check loading state shows
     await expect(page.getByText(/creating account/i)).toBeVisible();
-    
+
     // Button should be disabled during loading
     await expect(page.getByRole('button', { name: /creating account/i })).toBeDisabled();
   });
@@ -151,7 +151,7 @@ test.describe('Registration Flow', () => {
       await route.fulfill({
         status: 201,
         contentType: 'application/json',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           access_token: 'mock-access-token',
           refresh_token: 'mock-refresh-token',
           expires_in: 1800
@@ -193,7 +193,7 @@ test.describe('Registration Flow', () => {
     await page.getByPlaceholder('you@company.com').fill('test@example.com');
     await page.getByPlaceholder('••••••••').first().fill('password123');
     await page.getByPlaceholder('••••••••').last().fill('password123');
-    
+
     // Submit the form
     await page.getByRole('button', { name: /sign up/i }).click();
 

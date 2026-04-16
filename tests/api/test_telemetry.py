@@ -15,13 +15,14 @@ import importlib.util
 def import_telemetry_module():
     """Import telemetry module directly without going through mutx/__init__.py."""
     import os
+
     telemetry_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-        "sdk", "mutx", "telemetry.py"
+        "sdk",
+        "mutx",
+        "telemetry.py",
     )
-    spec = importlib.util.spec_from_file_location(
-        "telemetry", telemetry_path
-    )
+    spec = importlib.util.spec_from_file_location("telemetry", telemetry_path)
     module = importlib.util.module_from_spec(spec)
     sys.modules["telemetry"] = module
     spec.loader.exec_module(module)
@@ -124,9 +125,7 @@ class TestTraceContextPropagation:
         propagator = TraceContextTextMapPropagator()
 
         # Simulate incoming headers
-        carrier = {
-            "traceparent": "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
-        }
+        carrier = {"traceparent": "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"}
 
         ctx = propagator.extract(carrier)
         assert ctx is not None

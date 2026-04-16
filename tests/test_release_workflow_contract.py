@@ -18,7 +18,7 @@ def test_cli_release_workflow_installs_or_inlines_twine_for_publish() -> None:
 def test_railway_promotion_release_notes_path_is_version_derived() -> None:
     workflow = read_text(".github/workflows/railway-production-promotion.yml")
 
-    assert "release_notes_file=\"docs/releases/v$(echo \"${version}\" | cut -d. -f1-2).md\"" in workflow
+    assert 'release_notes_file="docs/releases/v$(echo "${version}" | cut -d. -f1-2).md"' in workflow
     assert "test -f docs/releases/v1.3.md" not in workflow
 
 

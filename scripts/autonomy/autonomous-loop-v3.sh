@@ -29,7 +29,7 @@ except: pass
     ID=$(echo "$ITEM" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['id'])")
     TITLE=$(echo "$ITEM" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['title'])")
     AREA=$(echo "$ITEM" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('area','area:api'))")
-    
+
     log "=== Working: $TITLE [$ID] area=$AREA ==="
 
     if [[ "$AREA" == *"web"* ]] || [[ "$AREA" == *"test"* ]]; then
@@ -49,7 +49,7 @@ with open('$QUEUE', 'w') as f: json.dump(q, f, indent=2)
     BRANCH="autonomy/$ID-$(date +%Y%m%d%H%M)"
     cd "$WT" && git fetch origin 2>/dev/null && git checkout main 2>/dev/null && git pull origin main 2>/dev/null && git checkout -b "$BRANCH" 2>/dev/null
 
-    TASK="You are the MUTX autonomous coding agent. 
+    TASK="You are the MUTX autonomous coding agent.
 
 Item ID: $ID
 Title: $TITLE

@@ -22,5 +22,8 @@ def test_playwright_docs_match_local_standalone_reality() -> None:
     assert "hosted MUTX surface" not in common_issues
     assert "package.json` has no `test` script" not in common_issues
 
-    assert 'npx playwright test tests/website.spec.ts -g "no console errors or remote Guild asset requests"' in debugging
+    assert (
+        'npx playwright test tests/website.spec.ts -g "no console errors or remote Guild asset requests"'
+        in debugging
+    )
     assert "waitlist verification failure is surfaced to the user" not in debugging

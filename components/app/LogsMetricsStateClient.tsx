@@ -213,7 +213,7 @@ export function LogsMetricsStateClient() {
 
   const filteredLogs = useMemo(() => {
     return mockLogs.filter((log) => {
-      const matchesSearch = logFilter === "" || 
+      const matchesSearch = logFilter === "" ||
         log.message.toLowerCase().includes(logFilter.toLowerCase()) ||
         log.source.toLowerCase().includes(logFilter.toLowerCase());
       const matchesLevel = logLevelFilter === null || log.level === logLevelFilter;
@@ -245,7 +245,7 @@ export function LogsMetricsStateClient() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/40 px-3 py-1.5">
             <Server className="h-3.5 w-3.5 text-slate-400" />
             <select

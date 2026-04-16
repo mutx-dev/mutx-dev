@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import json
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 from unittest.mock import AsyncMock, MagicMock
@@ -25,6 +24,7 @@ from sdk.mutx.agents import (
 # ---------------------------------------------------------------------------
 # Payload factories
 # ---------------------------------------------------------------------------
+
 
 def _agent_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
@@ -101,6 +101,7 @@ def _agent_metric_payload(**overrides: Any) -> dict[str, Any]:
 # Data class tests: Agent
 # ---------------------------------------------------------------------------
 
+
 class TestAgent:
     def test_agent_parsed_fields(self):
         payload = _agent_payload()
@@ -159,6 +160,7 @@ class TestAgent:
 # Data class tests: DeploymentEvent
 # ---------------------------------------------------------------------------
 
+
 class TestDeploymentEvent:
     def test_deployment_event_fields(self):
         payload = _deployment_event_payload()
@@ -185,6 +187,7 @@ class TestDeploymentEvent:
 # ---------------------------------------------------------------------------
 # Data class tests: Deployment
 # ---------------------------------------------------------------------------
+
 
 class TestDeployment:
     def test_deployment_parsed_fields(self):
@@ -223,6 +226,7 @@ class TestDeployment:
 # Data class tests: AgentDetail
 # ---------------------------------------------------------------------------
 
+
 class TestAgentDetail:
     def test_agent_detail_inherits_agent(self):
         payload = _agent_payload()
@@ -245,6 +249,7 @@ class TestAgentDetail:
 # ---------------------------------------------------------------------------
 # Data class tests: AgentLog
 # ---------------------------------------------------------------------------
+
 
 class TestAgentLog:
     def test_agent_log_fields(self):
@@ -280,6 +285,7 @@ class TestAgentLog:
 # Data class tests: AgentMetric
 # ---------------------------------------------------------------------------
 
+
 class TestAgentMetric:
     def test_agent_metric_fields(self):
         payload = _agent_metric_payload()
@@ -304,6 +310,7 @@ class TestAgentMetric:
 # ---------------------------------------------------------------------------
 # Client guard: sync methods require httpx.Client
 # ---------------------------------------------------------------------------
+
 
 class TestAgentsSyncClientGuard:
     """Sync methods must raise when given an AsyncClient."""
@@ -338,6 +345,7 @@ class TestAgentsSyncClientGuard:
 # ---------------------------------------------------------------------------
 # Client guard: async methods require httpx.AsyncClient
 # ---------------------------------------------------------------------------
+
 
 class TestAgentsAsyncClientGuard:
     """Async methods must raise when given a sync httpx.Client.
@@ -388,6 +396,7 @@ class TestAgentsAsyncClientGuard:
 # Sync methods: create
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsCreate:
     def test_create_success(self):
         returned = _agent_payload(name="my-agent")
@@ -397,13 +406,20 @@ class TestAgentsCreate:
         mock_client.post.return_value = mock_response
         agents = Agents(mock_client)
 
-        result = agents.create(name="my-agent", description="desc", type="anthropic", config={"model": "claude-3"})
+        result = agents.create(
+            name="my-agent", description="desc", type="anthropic", config={"model": "claude-3"}
+        )
 
         assert isinstance(result, Agent)
         assert result.name == "my-agent"
         mock_client.post.assert_called_once_with(
             "/v1/agents",
-            json={"name": "my-agent", "description": "desc", "type": "anthropic", "config": {"model": "claude-3"}},
+            json={
+                "name": "my-agent",
+                "description": "desc",
+                "type": "anthropic",
+                "config": {"model": "claude-3"},
+            },
         )
         mock_response.raise_for_status.assert_called_once()
 
@@ -440,9 +456,13 @@ class TestAgentsCreate:
 # Sync methods: list
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsList:
     def test_list_success(self):
-        returned = [_agent_payload(name="agent-1"), _agent_payload(name="agent-2", id="660e8400-e29b-41d4-a716-446655440099")]
+        returned = [
+            _agent_payload(name="agent-1"),
+            _agent_payload(name="agent-2", id="660e8400-e29b-41d4-a716-446655440099"),
+        ]
         mock_response = MagicMock()
         mock_response.json.return_value = returned
         mock_client = MagicMock(spec=httpx.Client)
@@ -483,6 +503,7 @@ class TestAgentsList:
 # ---------------------------------------------------------------------------
 # Sync methods: get
 # ---------------------------------------------------------------------------
+
 
 class TestAgentsGet:
     def test_get_success(self):
@@ -530,6 +551,7 @@ class TestAgentsGet:
 # Sync methods: delete
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsDelete:
     def test_delete_success(self):
         mock_response = MagicMock()
@@ -539,7 +561,9 @@ class TestAgentsDelete:
 
         agents.delete("550e8400-e29b-41d4-a716-446655440000")
 
-        mock_client.delete.assert_called_once_with("/v1/agents/550e8400-e29b-41d4-a716-446655440000")
+        mock_client.delete.assert_called_once_with(
+            "/v1/agents/550e8400-e29b-41d4-a716-446655440000"
+        )
         mock_response.raise_for_status.assert_called_once()
 
     def test_delete_raises_for_status(self):
@@ -559,6 +583,7 @@ class TestAgentsDelete:
 # Sync methods: deploy
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsDeploy:
     def test_deploy_success(self):
         returned = {"deployment_id": "660e8400-e29b-41d4-a716-446655440001", "status": "deploying"}
@@ -571,7 +596,9 @@ class TestAgentsDeploy:
         result = agents.deploy("550e8400-e29b-41d4-a716-446655440000")
 
         assert result == returned
-        mock_client.post.assert_called_once_with("/v1/agents/550e8400-e29b-41d4-a716-446655440000/deploy")
+        mock_client.post.assert_called_once_with(
+            "/v1/agents/550e8400-e29b-41d4-a716-446655440000/deploy"
+        )
         mock_response.raise_for_status.assert_called_once()
 
     def test_deploy_raises_for_status(self):
@@ -591,6 +618,7 @@ class TestAgentsDeploy:
 # Sync methods: stop
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsStop:
     def test_stop_success(self):
         returned = {"status": "stopped"}
@@ -603,7 +631,9 @@ class TestAgentsStop:
         result = agents.stop("550e8400-e29b-41d4-a716-446655440000")
 
         assert result == returned
-        mock_client.post.assert_called_once_with("/v1/agents/550e8400-e29b-41d4-a716-446655440000/stop")
+        mock_client.post.assert_called_once_with(
+            "/v1/agents/550e8400-e29b-41d4-a716-446655440000/stop"
+        )
         mock_response.raise_for_status.assert_called_once()
 
     def test_stop_raises_for_status(self):
@@ -623,9 +653,13 @@ class TestAgentsStop:
 # Sync methods: logs
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsLogs:
     def test_logs_success(self):
-        returned = [_agent_log_payload(), _agent_log_payload(id="990e8400-e29b-41d4-a716-446655440099", level="ERROR")]
+        returned = [
+            _agent_log_payload(),
+            _agent_log_payload(id="990e8400-e29b-41d4-a716-446655440099", level="ERROR"),
+        ]
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "agent_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -683,9 +717,13 @@ class TestAgentsLogs:
 # Sync methods: metrics
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsMetrics:
     def test_metrics_success(self):
-        returned = [_agent_metric_payload(), _agent_metric_payload(id="aa0e8400-e29b-41d4-a716-4466554400aa")]
+        returned = [
+            _agent_metric_payload(),
+            _agent_metric_payload(id="aa0e8400-e29b-41d4-a716-4466554400aa"),
+        ]
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "agent_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -743,6 +781,7 @@ class TestAgentsMetrics:
 # Sync methods: update_config
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsUpdateConfig:
     def test_update_config_dict(self):
         returned = _agent_payload(config={"model": "gpt-4o"})
@@ -791,9 +830,13 @@ class TestAgentsUpdateConfig:
 # Sync methods: stream_logs
 # ---------------------------------------------------------------------------
 
+
 class TestAgentsStreamLogs:
     def test_stream_logs_yields_logs(self):
-        returned = [_agent_log_payload(), _agent_log_payload(id="bb0e8400-e29b-41d4-a716-4466554400bb")]
+        returned = [
+            _agent_log_payload(),
+            _agent_log_payload(id="bb0e8400-e29b-41d4-a716-4466554400bb"),
+        ]
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "agent_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -806,14 +849,19 @@ class TestAgentsStreamLogs:
         agents = Agents(mock_client)
         collected: list[AgentLog] = []
 
-        for log in agents.stream_logs("550e8400-e29b-41d4-a716-446655440000", callback=lambda l: collected.append(l)):
+        for log in agents.stream_logs(
+            "550e8400-e29b-41d4-a716-446655440000", callback=lambda l: collected.append(l)
+        ):
             pass
 
         assert len(collected) == 2
         assert all(isinstance(l, AgentLog) for l in collected)
 
     def test_stream_logs_calls_callback(self):
-        returned = [_agent_log_payload(), _agent_log_payload(id="cc0e8400-e29b-41d4-a716-4466554400cc")]
+        returned = [
+            _agent_log_payload(),
+            _agent_log_payload(id="cc0e8400-e29b-41d4-a716-4466554400cc"),
+        ]
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "agent_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -846,6 +894,7 @@ class TestAgentsStreamLogs:
 # ---------------------------------------------------------------------------
 # Async methods
 # ---------------------------------------------------------------------------
+
 
 class TestAgentsAsyncMethods:
     @pytest.mark.asyncio
@@ -982,7 +1031,9 @@ class TestAgentsAsyncMethods:
         mock_client.patch.return_value = mock_response
         agents = Agents(mock_client)
 
-        result = await agents.aupdate_config("550e8400-e29b-41d4-a716-446655440000", {"model": "gpt-4o"})
+        result = await agents.aupdate_config(
+            "550e8400-e29b-41d4-a716-446655440000", {"model": "gpt-4o"}
+        )
 
         assert isinstance(result, AgentDetail)
         mock_client.patch.assert_called_once()
@@ -990,7 +1041,10 @@ class TestAgentsAsyncMethods:
 
     @pytest.mark.asyncio
     async def test_astream_logs(self):
-        returned = [_agent_log_payload(), _agent_log_payload(id="dd0e8400-e29b-41d4-a716-4466554400dd")]
+        returned = [
+            _agent_log_payload(),
+            _agent_log_payload(id="dd0e8400-e29b-41d4-a716-4466554400dd"),
+        ]
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "agent_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -1008,7 +1062,9 @@ class TestAgentsAsyncMethods:
             nonlocal callback_count
             callback_count += 1
 
-        async for log in agents.astream_logs("550e8400-e29b-41d4-a716-446655440000", callback=callback):
+        async for log in agents.astream_logs(
+            "550e8400-e29b-41d4-a716-446655440000", callback=callback
+        ):
             collected.append(log)
 
         assert len(collected) == 2

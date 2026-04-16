@@ -1,7 +1,7 @@
 """Contract tests for sdk/mutx/onboarding.py."""
 
 from datetime import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import httpx
 import pytest
@@ -12,6 +12,7 @@ from sdk.mutx.onboarding import Onboarding, OnboardingState, OnboardingStep
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def step_data() -> dict:
@@ -94,6 +95,7 @@ def async_mock_client(step_data: dict) -> MagicMock:
 # OnboardingStep — data class parsing
 # ---------------------------------------------------------------------------
 
+
 class TestOnboardingStepParsing:
     def test_required_fields(self, step_data: dict) -> None:
         step = OnboardingStep(step_data)
@@ -118,6 +120,7 @@ class TestOnboardingStepParsing:
 # ---------------------------------------------------------------------------
 # OnboardingState — data class parsing + repr
 # ---------------------------------------------------------------------------
+
 
 class TestOnboardingStateParsing:
     def test_required_fields(self, state_data: dict) -> None:
@@ -168,6 +171,7 @@ class TestOnboardingStateParsing:
 # Type guards
 # ---------------------------------------------------------------------------
 
+
 class TestSyncClientTypeGuard:
     def test_sync_method_raises_on_async_client(self) -> None:
         async_client = httpx.AsyncClient()
@@ -188,6 +192,7 @@ class TestAsyncClientTypeGuard:
 # ---------------------------------------------------------------------------
 # Sync methods — mocked httpx.Client
 # ---------------------------------------------------------------------------
+
 
 class TestGetStateSync:
     def test_get_state_calls_get_with_params(self, sync_mock_client: MagicMock) -> None:
@@ -235,19 +240,24 @@ class TestUpdateSync:
 # Async methods — mocked httpx.AsyncClient
 # ---------------------------------------------------------------------------
 
+
 class TestGetStateAsync:
     @pytest.mark.asyncio
     async def test_aget_state_calls_get_with_params(self, async_mock_client: MagicMock) -> None:
         onboarding = Onboarding(async_mock_client)
         result = await onboarding.aget_state(provider="openclaw")
-        async_mock_client.get.assert_called_once_with("/onboarding", params={"provider": "openclaw"})
+        async_mock_client.get.assert_called_once_with(
+            "/onboarding", params={"provider": "openclaw"}
+        )
         assert isinstance(result, OnboardingState)
 
     @pytest.mark.asyncio
     async def test_aget_state_default_provider(self, async_mock_client: MagicMock) -> None:
         onboarding = Onboarding(async_mock_client)
         await onboarding.aget_state()
-        async_mock_client.get.assert_called_once_with("/onboarding", params={"provider": "openclaw"})
+        async_mock_client.get.assert_called_once_with(
+            "/onboarding", params={"provider": "openclaw"}
+        )
 
 
 class TestUpdateAsync:
@@ -270,7 +280,9 @@ class TestUpdateAsync:
         assert call_kwargs["json"]["step"] == "step-1"
 
     @pytest.mark.asyncio
-    async def test_aupdate_includes_payload_when_provided(self, async_mock_client: MagicMock) -> None:
+    async def test_aupdate_includes_payload_when_provided(
+        self, async_mock_client: MagicMock
+    ) -> None:
         onboarding = Onboarding(async_mock_client)
         await onboarding.aupdate(action="complete_step", payload={"foo": "bar"})
         call_kwargs = async_mock_client.post.call_args.kwargs
@@ -286,6 +298,7 @@ class TestUpdateAsync:
 # ---------------------------------------------------------------------------
 # raise_for_status coverage
 # ---------------------------------------------------------------------------
+
 
 class TestRaiseForStatus:
     def test_get_state_raises_for_status_on_error(self) -> None:

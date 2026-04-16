@@ -277,6 +277,7 @@ def test_openapi_snapshot_matches_current_app_routes() -> None:
 # Frontend code quality guards — prevent lint-regression of underscore-imports
 # ---------------------------------------------------------------------------
 
+
 def test_no_invalid_underscore_imports_from_external_modules() -> None:
     """
     Fail if any .tsx/.ts file imports a symbol with a leading underscore
@@ -296,7 +297,7 @@ def test_no_invalid_underscore_imports_from_external_modules() -> None:
     # where _Name is NOT preceded by "Name as"
 
     invalid_pattern = re.compile(r'^import \{\s*([^}]+)\}\s*from\s+"([^"]+)"')
-    alias_pattern = re.compile(r'\b(\w+)\s+as\s+_\w+\b')
+    alias_pattern = re.compile(r"\b(\w+)\s+as\s+_\w+\b")
 
     src_files = list(Path("components").rglob("*.tsx")) + list(Path("components").rglob("*.ts"))
     src_files += list(Path("app").rglob("*.tsx")) + list(Path("app").rglob("*.ts"))

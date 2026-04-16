@@ -36,6 +36,7 @@ def _events_page_payload(items: list[dict[str, Any]], total: int) -> dict[str, A
 # UsageEvent dataclass
 # -----------------------------------------------------------------
 
+
 def test_usage_event_parses_required_fields() -> None:
     raw = _event_payload(event_type="api_call", credits_used=2.0)
     event = UsageEvent(raw)
@@ -76,6 +77,7 @@ def test_usage_event_defaults() -> None:
 # -----------------------------------------------------------------
 # UsageEvents.create_event
 # -----------------------------------------------------------------
+
 
 def test_create_event_sends_correct_payload() -> None:
     captured: dict[str, Any] = {}
@@ -123,6 +125,7 @@ def test_create_event_returns_usage_event() -> None:
 # UsageEvents.acreate_event
 # -----------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_acreate_event_sends_correct_payload() -> None:
     captured: dict[str, Any] = {}
@@ -166,6 +169,7 @@ async def test_acreate_event_returns_usage_event() -> None:
 # -----------------------------------------------------------------
 # UsageEvents.list
 # -----------------------------------------------------------------
+
 
 def test_list_returns_tuple_of_events_and_total() -> None:
     items = [_event_payload(), _event_payload(event_type="api_call")]
@@ -211,6 +215,7 @@ def test_list_passes_query_params() -> None:
 # UsageEvents.alist
 # -----------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_alist_returns_tuple_of_events_and_total() -> None:
     items = [_event_payload(event_type="api_call")]
@@ -235,6 +240,7 @@ async def test_alist_returns_tuple_of_events_and_total() -> None:
 # UsageEvents.get
 # -----------------------------------------------------------------
 
+
 def test_get_returns_usage_event() -> None:
     raw = _event_payload(event_type="api_call")
     event_id = raw["id"]
@@ -254,6 +260,7 @@ def test_get_returns_usage_event() -> None:
 # -----------------------------------------------------------------
 # UsageEvents.aget
 # -----------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_aget_returns_usage_event() -> None:
@@ -276,6 +283,7 @@ async def test_aget_returns_usage_event() -> None:
 # -----------------------------------------------------------------
 # Sync client required enforcement
 # -----------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_list_rejects_async_client() -> None:
@@ -319,6 +327,7 @@ async def test_get_rejects_async_client() -> None:
 # -----------------------------------------------------------------
 # Async client required enforcement
 # -----------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_alist_rejects_sync_client() -> None:

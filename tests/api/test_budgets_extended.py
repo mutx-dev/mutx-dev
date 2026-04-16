@@ -51,8 +51,7 @@ class TestBudgetsPeriodFiltering:
     async def test_usage_with_iso_period(self, client: AsyncClient):
         """GET /budgets/usage with ISO date period returns valid structure."""
         response = await client.get(
-            "/v1/budgets/usage?period_start=2025-01-01T00:00:00Z"
-            "&period_end=2025-12-31T23:59:59Z"
+            "/v1/budgets/usage?period_start=2025-01-01T00:00:00Z&period_end=2025-12-31T23:59:59Z"
         )
         assert response.status_code == 200
         data = response.json()

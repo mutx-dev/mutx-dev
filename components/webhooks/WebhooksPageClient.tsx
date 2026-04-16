@@ -158,7 +158,7 @@ export default function WebhooksPageClient() {
 
   // Filter webhooks based on search query
   const filteredWebhooks = searchQuery
-    ? webhooks.filter(w => 
+    ? webhooks.filter(w =>
         w.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
         w.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         w.events.some(e => e.toLowerCase().includes(searchQuery.toLowerCase()))

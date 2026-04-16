@@ -18,16 +18,16 @@ export async function POST(
     }
 
     const { id } = await params
-    
+
     // Check ownership before proceeding
     const ownershipError = await checkDeploymentOwnership(request, id)
     if (ownershipError) {
       return ownershipError
     }
-    
+
     const response = await fetch(`${getApiBaseUrl()}/v1/deployments/${id}/restart`, {
       method: 'POST',
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
       },
       cache: 'no-store',

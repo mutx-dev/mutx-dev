@@ -158,8 +158,8 @@ export function AppDashboardClient() {
   const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | null>(null);
   const [observabilityTab, setObservabilityTab] = useState<"logs" | "metrics" | "state">("logs");
 
-  const selectedDeployment = selectedDeploymentId 
-    ? deployments.find(d => d.id === selectedDeploymentId) 
+  const selectedDeployment = selectedDeploymentId
+    ? deployments.find(d => d.id === selectedDeploymentId)
     : deployments[0] ?? null;
 
   const runningAgents = (Array.isArray(agents) ? agents : []).filter((agent) => agent.status === "running").length;
@@ -1045,7 +1045,7 @@ export function AppDashboardClient() {
                           <p className="mt-1 text-slate-300">
                             Status: {latestEvent.status}
                           </p>
-                          
+
                         </div>
                       ) : (
                         <div className="mt-3 rounded-lg border border-white/5 border-dashed p-3 text-xs text-slate-500">

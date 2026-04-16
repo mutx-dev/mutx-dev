@@ -1,7 +1,7 @@
 """
 Tests for /v1/approvals endpoints and ApprovalService.
 """
-import asyncio
+
 import uuid
 from datetime import datetime, timezone
 
@@ -13,7 +13,6 @@ from src.api.services.approval import (
     ApprovalRequest,
     ApprovalService,
     ApprovalStatus,
-    get_approval_service,
 )
 
 

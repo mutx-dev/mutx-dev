@@ -19,6 +19,7 @@ from mutx.governance_supervision import (
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
 
+
 def _agent_response(**overrides):
     payload = {
         "agent_id": str(uuid.uuid4()),
@@ -45,6 +46,7 @@ def _profile_response(**overrides):
 # ---------------------------------------------------------------------------
 # Data-class tests
 # ---------------------------------------------------------------------------
+
 
 def test_supervised_agent_parses_response():
     data = _agent_response(agent_id="agent-001", status="running", pid=9999)
@@ -74,7 +76,12 @@ def test_supervised_agent_repr():
 
 
 def test_launch_profile_parses_response():
-    data = _profile_response(name="prod-agent", command=["node", "index.js"], env_keys=["KEY"], faramesh_policy="permissive")
+    data = _profile_response(
+        name="prod-agent",
+        command=["node", "index.js"],
+        env_keys=["KEY"],
+        faramesh_policy="permissive",
+    )
     profile = LaunchProfile(data)
 
     assert profile.name == "prod-agent"
@@ -97,12 +104,15 @@ def test_launch_profile_required_fields():
 # Sync client tests — require httpx.Client
 # ---------------------------------------------------------------------------
 
+
 def test_list_agents_hits_contract_route():
     captured = {}
 
     def mock_get(*args, **kwargs):
         captured["path"] = args[1] if len(args) > 1 else args[0] if args else ""
-        response = httpx.Response(200, json=[_agent_response(), _agent_response(agent_id="agent-002")])
+        response = httpx.Response(
+            200, json=[_agent_response(), _agent_response(agent_id="agent-002")]
+        )
         response.raise_for_status = lambda: None
         return response
 
@@ -133,7 +143,9 @@ def test_list_profiles_hits_contract_route():
 
     def mock_get(*args, **kwargs):
         captured["path"] = args[1] if len(args) > 1 else args[0] if args else ""
-        response = httpx.Response(200, json=[_profile_response(), _profile_response(name="secondary")])
+        response = httpx.Response(
+            200, json=[_profile_response(), _profile_response(name="secondary")]
+        )
         response.raise_for_status = lambda: None
         return response
 
@@ -342,6 +354,7 @@ def test_restart_agent_requires_sync_client():
 # ---------------------------------------------------------------------------
 # Async client tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_alist_agents_hits_contract_route():

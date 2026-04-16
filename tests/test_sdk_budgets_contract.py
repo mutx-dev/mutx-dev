@@ -68,6 +68,7 @@ def _usage_breakdown_payload(**overrides: Any) -> dict[str, Any]:
 # Budget dataclass
 # -----------------------------------------------------------------
 
+
 def test_budget_parses_required_fields() -> None:
     raw = _budget_payload()
     budget = Budget(raw)
@@ -98,6 +99,7 @@ def test_budget_data_attribute() -> None:
 # UsageByAgent dataclass
 # -----------------------------------------------------------------
 
+
 def test_usage_by_agent_parses_fields() -> None:
     raw = {
         "agent_id": str(uuid.uuid4()),
@@ -118,6 +120,7 @@ def test_usage_by_agent_parses_fields() -> None:
 # UsageByType dataclass
 # -----------------------------------------------------------------
 
+
 def test_usage_by_type_parses_fields() -> None:
     raw = {
         "event_type": "api_call",
@@ -135,6 +138,7 @@ def test_usage_by_type_parses_fields() -> None:
 # -----------------------------------------------------------------
 # UsageBreakdown dataclass
 # -----------------------------------------------------------------
+
 
 def test_usage_breakdown_parses_fields() -> None:
     raw = _usage_breakdown_payload()
@@ -178,6 +182,7 @@ def test_usage_breakdown_empty_nested() -> None:
 # -----------------------------------------------------------------
 # Budgets.get
 # -----------------------------------------------------------------
+
 
 def test_get_returns_budget() -> None:
     raw = _budget_payload()
@@ -224,6 +229,7 @@ def test_get_parses_all_fields() -> None:
 # Budgets.aget
 # -----------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_aget_returns_budget() -> None:
     raw = _budget_payload(plan="starter")
@@ -245,6 +251,7 @@ async def test_aget_returns_budget() -> None:
 # -----------------------------------------------------------------
 # Budgets.get_usage
 # -----------------------------------------------------------------
+
 
 def test_get_usage_returns_usage_breakdown() -> None:
     raw = _usage_breakdown_payload()
@@ -300,6 +307,7 @@ def test_get_usage_handles_no_params() -> None:
 # Budgets.aget_usage
 # -----------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_aget_usage_returns_usage_breakdown() -> None:
     raw = _usage_breakdown_payload()
@@ -339,6 +347,7 @@ async def test_aget_usage_passes_period_params() -> None:
 # Sync client required enforcement
 # -----------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_get_rejects_async_client() -> None:
     async def handler(request: httpx.Request) -> httpx.Response:
@@ -368,6 +377,7 @@ async def test_get_usage_rejects_async_client() -> None:
 # -----------------------------------------------------------------
 # Async client required enforcement
 # -----------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_aget_rejects_sync_client() -> None:

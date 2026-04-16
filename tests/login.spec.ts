@@ -77,13 +77,13 @@ test.describe('Login Flow', () => {
 
     // Try to submit without filling fields
     const submitButton = page.getByRole('button', { name: /sign in/i });
-    
+
     // The button should be enabled (HTML5 validation will handle required)
     await expect(submitButton).toBeEnabled();
-    
+
     // Submit empty form - should trigger HTML5 validation
     await submitButton.click({ force: true });
-    
+
     // Check that email field shows validation error (required)
     const emailInput = page.getByLabel(/email address/i);
     await expect(emailInput).toHaveAttribute('required', '');
@@ -99,7 +99,7 @@ test.describe('Login Flow', () => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           access_token: 'mock-access-token',
           refresh_token: 'mock-refresh-token',
           expires_in: 1800
@@ -116,7 +116,7 @@ test.describe('Login Flow', () => {
 
     // Check loading state shows
     await expect(page.getByText(/signing in/i)).toBeVisible();
-    
+
     // Button should be disabled during loading
     await expect(page.getByRole('button', { name: /signing in/i })).toBeDisabled();
   });
@@ -130,7 +130,7 @@ test.describe('Login Flow', () => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           access_token: 'mock-access-token',
           refresh_token: 'mock-refresh-token',
           expires_in: 1800

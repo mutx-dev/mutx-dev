@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import warnings
-from datetime import datetime, timezone
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
@@ -19,7 +17,13 @@ def _run_payload(**overrides: Any) -> dict[str, Any]:
         "agent_id": "agent-001",
         "status": "running",
         "started_at": "2026-04-03T01:00:00+00:00",
-        "steps": [{"type": "reasoning", "started_at": "2026-04-03T01:00:00+00:00", "content": "thinking..."}],
+        "steps": [
+            {
+                "type": "reasoning",
+                "started_at": "2026-04-03T01:00:00+00:00",
+                "content": "thinking...",
+            }
+        ],
         "cost": {"input_tokens": 100, "output_tokens": 200},
         "provenance": {"run_hash": "abc123"},
         "runtime": "mutx",
@@ -66,6 +70,7 @@ def _provenance_payload(**overrides: Any) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Type guard: sync methods require httpx.Client
 # ---------------------------------------------------------------------------
+
 
 class TestObservabilitySyncClientGuard:
     def test_report_run_raises_on_async_client(self):
@@ -121,6 +126,7 @@ class TestObservabilitySyncClientGuard:
 # Sync methods - report_run
 # ---------------------------------------------------------------------------
 
+
 class TestObservabilityReportRun:
     def test_report_run_success(self):
         returned = _run_payload()
@@ -153,6 +159,7 @@ class TestObservabilityReportRun:
 # Sync methods - list_runs
 # ---------------------------------------------------------------------------
 
+
 class TestObservabilityListRuns:
     def test_list_runs_defaults(self):
         payload = {"items": [], "total": 0, "skip": 0, "limit": 50}
@@ -165,7 +172,9 @@ class TestObservabilityListRuns:
         result = obs.list_runs()
 
         assert result == payload
-        mock_client.get.assert_called_once_with("/v1/observability/runs", params={"skip": 0, "limit": 50})
+        mock_client.get.assert_called_once_with(
+            "/v1/observability/runs", params={"skip": 0, "limit": 50}
+        )
         mock_response.raise_for_status.assert_called_once()
 
     def test_list_runs_with_all_filters(self):
@@ -183,7 +192,14 @@ class TestObservabilityListRuns:
         assert result == payload
         mock_client.get.assert_called_once_with(
             "/v1/observability/runs",
-            params={"skip": 10, "limit": 20, "agent_id": "agent-x", "status": "failed", "runtime": "mutx", "trigger": "cron"},
+            params={
+                "skip": 10,
+                "limit": 20,
+                "agent_id": "agent-x",
+                "status": "failed",
+                "runtime": "mutx",
+                "trigger": "cron",
+            },
         )
 
     def test_list_runs_partial_filters(self):
@@ -217,6 +233,7 @@ class TestObservabilityListRuns:
 # Sync methods - get_run
 # ---------------------------------------------------------------------------
 
+
 class TestObservabilityGetRun:
     def test_get_run_success(self):
         payload = _run_payload()
@@ -248,6 +265,7 @@ class TestObservabilityGetRun:
 # ---------------------------------------------------------------------------
 # Sync methods - add_steps
 # ---------------------------------------------------------------------------
+
 
 class TestObservabilityAddSteps:
     def test_add_steps_success(self):
@@ -281,6 +299,7 @@ class TestObservabilityAddSteps:
 # ---------------------------------------------------------------------------
 # Sync methods - get_eval
 # ---------------------------------------------------------------------------
+
 
 class TestObservabilityGetEval:
     def test_get_eval_success(self):
@@ -326,6 +345,7 @@ class TestObservabilityGetEval:
 # Sync methods - submit_eval
 # ---------------------------------------------------------------------------
 
+
 class TestObservabilitySubmitEval:
     def test_submit_eval_success(self):
         payload = _eval_payload(score=85.0)
@@ -359,6 +379,7 @@ class TestObservabilitySubmitEval:
 # ---------------------------------------------------------------------------
 # Sync methods - get_provenance
 # ---------------------------------------------------------------------------
+
 
 class TestObservabilityGetProvenance:
     def test_get_provenance_success(self):
@@ -404,6 +425,7 @@ class TestObservabilityGetProvenance:
 # Sync methods - update_status
 # ---------------------------------------------------------------------------
 
+
 class TestObservabilityUpdateStatus:
     def test_update_status_full(self):
         payload = {"run_id": "run-upd", "status": "completed", "outcome": "success"}
@@ -425,7 +447,12 @@ class TestObservabilityUpdateStatus:
         assert result == payload
         mock_client.patch.assert_called_once_with(
             "/v1/observability/runs/run-upd/status",
-            json={"status": "completed", "outcome": "success", "ended_at": "2026-04-03T02:00:00+00:00", "duration_ms": 3600000},
+            json={
+                "status": "completed",
+                "outcome": "success",
+                "ended_at": "2026-04-03T02:00:00+00:00",
+                "duration_ms": 3600000,
+            },
         )
         mock_response.raise_for_status.assert_called_once()
 
@@ -487,6 +514,7 @@ class TestObservabilityUpdateStatus:
 # ---------------------------------------------------------------------------
 # Async methods
 # ---------------------------------------------------------------------------
+
 
 class TestObservabilityAsyncMethods:
     @pytest.mark.asyncio
@@ -625,6 +653,7 @@ class TestObservabilityAsyncMethods:
 # ---------------------------------------------------------------------------
 # _build_run_from_steps helper
 # ---------------------------------------------------------------------------
+
 
 class TestBuildRunFromSteps:
     def test_required_fields(self):

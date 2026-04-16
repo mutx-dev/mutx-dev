@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 
 import httpx
 import pytest
@@ -15,6 +15,7 @@ from sdk.mutx.onboarding import Onboarding, OnboardingState, OnboardingStep
 # ---------------------------------------------------------------------------
 # Payload factories
 # ---------------------------------------------------------------------------
+
 
 def _onboarding_step_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
@@ -48,6 +49,7 @@ def _onboarding_state_payload(**overrides: Any) -> dict[str, Any]:
 # Data class tests: OnboardingStep
 # ---------------------------------------------------------------------------
 
+
 class TestOnboardingStep:
     def test_onboarding_step_parsed_fields(self):
         payload = _onboarding_step_payload()
@@ -77,6 +79,7 @@ class TestOnboardingStep:
 # ---------------------------------------------------------------------------
 # Data class tests: OnboardingState
 # ---------------------------------------------------------------------------
+
 
 class TestOnboardingState:
     def test_onboarding_state_parsed_fields(self):
@@ -137,6 +140,7 @@ class TestOnboardingState:
 # Sync method tests: get_state
 # ---------------------------------------------------------------------------
 
+
 class TestOnboardingGetState:
     def test_get_state_returns_onboarding_state(self):
         returned = _onboarding_state_payload()
@@ -188,6 +192,7 @@ class TestOnboardingGetState:
 # ---------------------------------------------------------------------------
 # Sync method tests: update
 # ---------------------------------------------------------------------------
+
 
 class TestOnboardingUpdate:
     def test_update_returns_onboarding_state(self):
@@ -259,6 +264,7 @@ class TestOnboardingUpdate:
 # Async method tests: aget_state
 # ---------------------------------------------------------------------------
 
+
 class TestOnboardingAsyncGetState:
     @pytest.mark.asyncio
     async def test_aget_state_returns_onboarding_state(self):
@@ -286,6 +292,7 @@ class TestOnboardingAsyncGetState:
 # ---------------------------------------------------------------------------
 # Async method tests: aupdate
 # ---------------------------------------------------------------------------
+
 
 class TestOnboardingAsyncUpdate:
     @pytest.mark.asyncio

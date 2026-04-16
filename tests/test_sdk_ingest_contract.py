@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import httpx
 import pytest
@@ -44,6 +44,7 @@ def _metrics_response(**overrides):
 # ---------------------------------------------------------------------------
 # Sync client — report_agent_status
 # ---------------------------------------------------------------------------
+
 
 def test_report_agent_status_hits_contract_route():
     captured = {}
@@ -109,6 +110,7 @@ def test_report_agent_status_rejects_async_client():
 # ---------------------------------------------------------------------------
 # Sync client — report_deployment_event
 # ---------------------------------------------------------------------------
+
 
 def test_report_deployment_event_hits_contract_route():
     captured = {}
@@ -177,6 +179,7 @@ def test_report_deployment_event_rejects_async_client():
 # Sync client — report_metrics
 # ---------------------------------------------------------------------------
 
+
 def test_report_metrics_hits_contract_route():
     captured = {}
     agent_id = str(uuid.uuid4())
@@ -235,6 +238,7 @@ def test_report_metrics_rejects_async_client():
 # ---------------------------------------------------------------------------
 # Async client — areport_agent_status
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_areport_agent_status_hits_contract_route():
@@ -297,6 +301,7 @@ async def test_areport_agent_status_requires_async_client():
 # Async client — areport_deployment_event
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_areport_deployment_event_hits_contract_route():
     captured = {}
@@ -311,9 +316,7 @@ async def test_areport_deployment_event_hits_contract_route():
         base_url="https://api.test", transport=httpx.MockTransport(handler)
     ) as client:
         ingest = Ingest(client)
-        result = await ingest.areport_deployment_event(
-            deployment_id=deployment_id, event="healthy"
-        )
+        result = await ingest.areport_deployment_event(deployment_id=deployment_id, event="healthy")
 
     assert captured["path"] == "/ingest/deployment"
     assert captured["json"]["deployment_id"] == deployment_id
@@ -327,14 +330,13 @@ async def test_areport_deployment_event_requires_async_client():
 
     client = Ingest(sync_client)
     with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-        await client.areport_deployment_event(
-            deployment_id=str(uuid.uuid4()), event="healthy"
-        )
+        await client.areport_deployment_event(deployment_id=str(uuid.uuid4()), event="healthy")
 
 
 # ---------------------------------------------------------------------------
 # Async client — areport_metrics
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_areport_metrics_hits_contract_route():
@@ -350,9 +352,7 @@ async def test_areport_metrics_hits_contract_route():
         base_url="https://api.test", transport=httpx.MockTransport(handler)
     ) as client:
         ingest = Ingest(client)
-        result = await ingest.areport_metrics(
-            agent_id=agent_id, cpu_usage=25.0, memory_usage=512.0
-        )
+        result = await ingest.areport_metrics(agent_id=agent_id, cpu_usage=25.0, memory_usage=512.0)
 
     assert captured["path"] == "/ingest/metrics"
     assert captured["json"]["agent_id"] == agent_id

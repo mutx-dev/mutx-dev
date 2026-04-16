@@ -137,12 +137,16 @@ class TestIngestEndpoints:
 
         # The info log should record the FINAL status (failed), not the requested one (running)
         logs = (
-            await db_session.execute(
-                select(AgentLog)
-                .where(AgentLog.agent_id == agent_id, AgentLog.level == "info")
-                .order_by(AgentLog.timestamp.desc())
+            (
+                await db_session.execute(
+                    select(AgentLog)
+                    .where(AgentLog.agent_id == agent_id, AgentLog.level == "info")
+                    .order_by(AgentLog.timestamp.desc())
+                )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
         assert len(logs) >= 1
         info_log = logs[0]
         assert "failed" in info_log.message.lower()
@@ -192,7 +196,6 @@ async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status
     assert delivered[0][1]["timestamp"]
 
     client.app.dependency_overrides.pop(get_current_agent, None)
-
 
 
 @pytest.mark.asyncio

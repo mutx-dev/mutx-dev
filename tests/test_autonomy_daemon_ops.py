@@ -142,8 +142,9 @@ def test_enqueue_generated_tasks_skips_terminal_fleet_item_when_evidence_is_unch
     assert payload["items"][0]["status"] == "completed"
 
 
-
-def test_enqueue_generated_tasks_skips_refresh_when_pr_handoff_already_exists(tmp_path: Path) -> None:
+def test_enqueue_generated_tasks_skips_refresh_when_pr_handoff_already_exists(
+    tmp_path: Path,
+) -> None:
     queue_path = tmp_path / "queue.json"
     queue_path.write_text(
         json.dumps(
@@ -155,7 +156,11 @@ def test_enqueue_generated_tasks_skips_refresh_when_pr_handoff_already_exists(tm
                         "source": "fleet:route-claim-scan",
                         "completed_at": "2024-01-01T00:00:00Z",
                         "evidence_fingerprint": "old-fingerprint",
-                        "notes": [{"message": "runner completed successfully; pushed autonomy/fleet-task; draft PR ready"}],
+                        "notes": [
+                            {
+                                "message": "runner completed successfully; pushed autonomy/fleet-task; draft PR ready"
+                            }
+                        ],
                     }
                 ]
             }
@@ -164,14 +169,20 @@ def test_enqueue_generated_tasks_skips_refresh_when_pr_handoff_already_exists(tm
 
     appended = DAEMON.enqueue_generated_tasks(
         queue_path,
-        [{"id": "fleet-task", "title": "Skip me", "source": "fleet:route-claim-scan", "evidence_fingerprint": "new-fingerprint"}],
+        [
+            {
+                "id": "fleet-task",
+                "title": "Skip me",
+                "source": "fleet:route-claim-scan",
+                "evidence_fingerprint": "new-fingerprint",
+            }
+        ],
         cooldown_seconds=60,
     )
 
     assert appended == 0
     payload = json.loads(queue_path.read_text())
     assert payload["items"][0]["status"] == "completed"
-
 
 
 def test_recover_orphaned_running_items_requeues_stale_tasks(tmp_path: Path) -> None:
@@ -206,9 +217,11 @@ def test_recover_orphaned_running_items_requeues_stale_tasks(tmp_path: Path) -> 
     stale_item = next(item for item in payload["items"] if item["id"] == "stale-runner")
     fresh_item = next(item for item in payload["items"] if item["id"] == "fresh-runner")
     assert stale_item["status"] == "queued"
-    assert any("recovered orphaned running task" in note.get("message", "") for note in stale_item.get("notes", []))
+    assert any(
+        "recovered orphaned running task" in note.get("message", "")
+        for note in stale_item.get("notes", [])
+    )
     assert fresh_item["status"] == "running"
-
 
 
 def test_daemon_lock_prevents_second_instance(tmp_path: Path) -> None:

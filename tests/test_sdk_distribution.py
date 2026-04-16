@@ -11,8 +11,12 @@ SDK_ROOT = ROOT / "sdk"
 
 
 def test_cli_and_sdk_distributions_do_not_share_the_same_project_name() -> None:
-    root_name = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["name"]
-    sdk_name = tomllib.loads((SDK_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["name"]
+    root_name = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "name"
+    ]
+    sdk_name = tomllib.loads((SDK_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "name"
+    ]
 
     assert root_name != sdk_name
     assert root_name == "mutx-cli"

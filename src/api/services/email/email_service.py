@@ -91,12 +91,12 @@ def send_verification_email(
     """
     text_body = f"""
     Welcome to MUTX, {name}!
-    
+
     Thanks for signing up! Please verify your email address by visiting this link:
     {verify_url}
-    
+
     This link will expire in {settings.email_verification_token_expire_hours} hours.
-    
+
     If you didn't create an account with MUTX, you can safely ignore this email.
     """
 
@@ -142,14 +142,14 @@ def send_password_reset_email(
     """
     text_body = f"""
     Reset your password
-    
+
     Hi {name},
-    
+
     We received a request to reset your password. Visit this link to create a new password:
     {reset_url}
-    
+
     This link will expire in {PASSWORD_RESET_TOKEN_EXPIRE_HOURS} hour.
-    
+
     If you didn't request a password reset, you can safely ignore this email.
     """
 
