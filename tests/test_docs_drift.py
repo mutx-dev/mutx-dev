@@ -104,9 +104,31 @@ def extract_local_links(path: Path) -> list[str]:
     return local_links
 
 
+def _try_resolve(candidate: Path) -> Path | None:
+    """Try multiple resolution strategies for a docs-style path."""
+    if candidate.exists():
+        return candidate
+    # Many docs links omit the .md extension (web-style routing).
+    with_md = Path(str(candidate) + ".md")
+    if with_md.exists():
+        return with_md
+    # Directory-style links resolve to README.md or index.md inside.
+    for index in (candidate / "README.md", candidate / "index.md"):
+        if index.exists():
+            return index
+    # Next.js app routes: /ai-agent-approvals -> app/ai-agent-approvals/
+    app_candidate = ROOT / "app" / candidate.relative_to(ROOT) if candidate.is_relative_to(ROOT) else None
+    if app_candidate and app_candidate.exists():
+        return app_candidate
+    return None
+
+
 def resolve_local_link(source: Path, target: str) -> Path:
     if target.startswith("/"):
         resolved = ROOT / target.lstrip("/")
+        fallback = _try_resolve(resolved)
+        if fallback is not None:
+            return fallback
     else:
         resolved = (source.parent / target).resolve()
     return resolved

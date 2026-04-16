@@ -145,7 +145,7 @@ This is why the architecture spans more than the FastAPI app. MUTX includes the 
 Some architecture questions are easier to answer from adjacent pages:
 
 * [Deployment Quickstart](/docs/deployment/quickstart) for the shortest supported install and setup path
-* [API Reference](/docs/reference) for the public `/v1/*` contract
+* [API Reference](/docs/api/reference) for the public `/v1/*` contract
 * [AI Agent Approvals](/ai-agent-approvals) for human approval gates in the control plane
 * [AI Agent Cost Management](/ai-agent-cost) for spend visibility and budget controls
 * [Autonomous Agent Team](/docs/agents) for the specialist roles used in autonomous shipping workflows

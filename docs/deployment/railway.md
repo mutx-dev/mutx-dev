@@ -420,4 +420,4 @@ If Pico moves onto its own authenticated host later, register the equivalent `ht
 
 ### Database and migrations
 
-The backend Railway service already runs `alembic upgrade head` from [railway.json](/Users/fortune/MUTX/railway.json) before startup, so the external-auth identity table is deployed alongside the API. Keep that pre-start migration step in place for the `zooming-youth` backend service.
+The backend Railway service already runs `alembic upgrade head` from [railway.json](../../railway.json) before startup, so the external-auth identity table is deployed alongside the API. Keep that pre-start migration step in place for the `zooming-youth` backend service.

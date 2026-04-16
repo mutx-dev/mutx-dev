@@ -12,7 +12,7 @@ def read_text(relative_path: str) -> str:
 def test_repo_declares_npm_as_the_canonical_package_manager() -> None:
     package_json = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 
-    assert package_json["packageManager"] == "npm@10.7.0"
+    assert package_json["packageManager"] == "npm@11.12.1"
 
 
 def test_setup_and_frontend_docker_use_the_same_npm_install_lane() -> None:
