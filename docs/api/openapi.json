@@ -17047,10 +17047,33 @@
       },
       "CheckoutSessionRequest": {
         "properties": {
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "starter",
+                  "pro"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Id",
+            "description": "Supported MUTX plan identifier"
+          },
           "price_id": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Price Id",
             "description": "Stripe Price ID"
           },
@@ -17083,7 +17106,6 @@
         },
         "type": "object",
         "required": [
-          "price_id",
           "success_url",
           "cancel_url"
         ],

@@ -78,11 +78,7 @@ def build_coach_messages(
     system_prompt = load_builder_system_prompt()
     knowledge = load_builder_knowledge()
 
-    system_content = (
-        f"{system_prompt}\n\n"
-        "## Reference Knowledge\n\n"
-        f"{knowledge}"
-    )
+    system_content = f"{system_prompt}\n\n## Reference Knowledge\n\n{knowledge}"
 
     messages: list[dict] = [
         {"role": "system", "content": system_content},
@@ -192,8 +188,7 @@ async def handle_coach_chat(
     except Exception as exc:
         logger.error("Coach LLM call failed: %s", exc)
         return PicoChatResponse(
-            reply="Something went wrong reaching the AI backend. "
-            "Please try again in a moment.",
+            reply="Something went wrong reaching the AI backend. Please try again in a moment.",
             onboarding_state=OnboardingState(),
             ready_for_package=False,
         )

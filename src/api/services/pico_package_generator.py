@@ -5,6 +5,7 @@ Produces a ZIP bundle containing:
 - config.yaml  — structured agent configuration
 - skills/README.md  — placeholder for skill modules
 """
+
 from __future__ import annotations
 
 import io
@@ -75,14 +76,14 @@ def _build_agent_md(
 
 ## Overview
 
-Template: **{template['template']}**
-{template['description']}
+Template: **{template["template"]}**
+{template["description"]}
 
 ## Pain Points Addressed
 {pp_lines if pp_lines.strip() else no_pp_default}
 ## Owner
 
-{user_email or '(unknown)'}
+{user_email or "(unknown)"}
 
 ## Next Steps
 
@@ -107,10 +108,10 @@ def _build_config_yaml(
 
 agent:
   name: "{agent_name}"
-  template: "{template['template']}"
+  template: "{template["template"]}"
   description: |
-    {template['description']}
-  model: "{model or 'gpt-4o-mini'}"
+    {template["description"]}
+  model: "{model or "gpt-4o-mini"}"
   temperature: 0.7
   max_tokens: 4096
 

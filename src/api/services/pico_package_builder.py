@@ -3,6 +3,7 @@
 Produces a ZIP bundle containing actual config files for the user's
 chosen stack, OS, provider, and channels — not fantasy templates.
 """
+
 from __future__ import annotations
 
 import io
@@ -78,13 +79,19 @@ def _build_openclaw_config(state: OnboardingState) -> str:
 
     channels = [{"name": ch, "enabled": True} for ch in (state.channels or [])]
 
-    return _json.dumps({
-        "version": 1,
-        "provider": provider,
-        "channels": channels,
-        "gateway": {"enabled": True, "port": 18789},
-        "dashboard": {"enabled": True},
-    }, indent=2) + "\n"
+    return (
+        _json.dumps(
+            {
+                "version": 1,
+                "provider": provider,
+                "channels": channels,
+                "gateway": {"enabled": True, "port": 18789},
+                "dashboard": {"enabled": True},
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 
 
 def _build_nanoclaw_compose(state: OnboardingState) -> str:
@@ -137,8 +144,11 @@ def _build_picoclaw_config(state: OnboardingState) -> str:
 
 def _build_env_template(state: OnboardingState) -> str:
     """Provider-specific .env.template."""
-    lines = ["# API Keys — fill in your keys before running",
-             "# Never commit this file or share keys in chat", ""]
+    lines = [
+        "# API Keys — fill in your keys before running",
+        "# Never commit this file or share keys in chat",
+        "",
+    ]
 
     provider_keys = {
         "openai": "OPENAI_API_KEY=sk-...",
@@ -328,9 +338,24 @@ def _build_readme(state: OnboardingState) -> str:
     os_name = state.os or "linux"
     provider = state.provider or "openai"
 
-    stack_names = {"hermes": "Hermes", "openclaw": "OpenClaw", "nanoclaw": "NanoClaw", "picoclaw": "PicoClaw"}
-    os_names = {"macos": "macOS", "linux": "Linux", "windows_wsl2": "Windows (WSL2)", "android": "Android"}
-    provider_names = {"openai": "OpenAI", "anthropic": "Anthropic", "google": "Google", "local": "Local (LM Studio/Ollama)"}
+    stack_names = {
+        "hermes": "Hermes",
+        "openclaw": "OpenClaw",
+        "nanoclaw": "NanoClaw",
+        "picoclaw": "PicoClaw",
+    }
+    os_names = {
+        "macos": "macOS",
+        "linux": "Linux",
+        "windows_wsl2": "Windows (WSL2)",
+        "android": "Android",
+    }
+    provider_names = {
+        "openai": "OpenAI",
+        "anthropic": "Anthropic",
+        "google": "Google",
+        "local": "Local (LM Studio/Ollama)",
+    }
 
     s = stack_names.get(stack, stack.title())
     o = os_names.get(os_name, os_name.title())
@@ -450,7 +475,9 @@ def build_onboarding_package(state: OnboardingState) -> tuple[bytes, str]:
             zf.writestr("docker-compose.yml", _build_nanoclaw_compose(state))
         elif stack == "picoclaw":
             zf.writestr("config.json", _build_picoclaw_config(state))
-            zf.writestr(".security.yml.template", "# Sensitive values go here\nprovider:\n  apiKey: \n")
+            zf.writestr(
+                ".security.yml.template", "# Sensitive values go here\nprovider:\n  apiKey: \n"
+            )
 
         # Shared files
         zf.writestr(".env.template", _build_env_template(state))
@@ -458,7 +485,7 @@ def build_onboarding_package(state: OnboardingState) -> tuple[bytes, str]:
         zf.writestr("README.md", _build_readme(state))
 
         # Channel configs
-        for channel in (state.channels or []):
+        for channel in state.channels or []:
             ch_filename, ch_content = _build_channel_config(channel, state)
             zf.writestr(f"channels/{ch_filename}", ch_content)
 

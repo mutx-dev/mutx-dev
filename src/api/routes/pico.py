@@ -59,6 +59,7 @@ def _get_or_create_session(session_id: str | None) -> tuple[str, dict[str, Any]]
 # Progress (existing — unchanged)
 # ---------------------------------------------------------------------------
 
+
 class PicoProgressPayload(BaseModel):
     model_config = ConfigDict(extra="allow")
 
@@ -89,6 +90,7 @@ async def pico_progress_update(
 # Tutor (existing — unchanged)
 # ---------------------------------------------------------------------------
 
+
 @router.post("/tutor", response_model=PicoTutorResponse)
 async def pico_tutor(
     payload: PicoTutorRequest,
@@ -104,8 +106,11 @@ async def pico_tutor(
     )
 
 
-@router.get("/tutor/openai", response_model=PicoTutorOpenAIConnectionStatus,
-             dependencies=[Depends(require_plan("starter"))])
+@router.get(
+    "/tutor/openai",
+    response_model=PicoTutorOpenAIConnectionStatus,
+    dependencies=[Depends(require_plan("starter"))],
+)
 async def pico_tutor_openai_status(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -113,8 +118,11 @@ async def pico_tutor_openai_status(
     return await get_pico_tutor_openai_connection_status(db, user=current_user)
 
 
-@router.put("/tutor/openai", response_model=PicoTutorOpenAIConnectionStatus,
-             dependencies=[Depends(require_plan("starter"))])
+@router.put(
+    "/tutor/openai",
+    response_model=PicoTutorOpenAIConnectionStatus,
+    dependencies=[Depends(require_plan("starter"))],
+)
 async def pico_tutor_openai_connect(
     payload: PicoTutorOpenAIConnectionRequest,
     db: AsyncSession = Depends(get_db),
@@ -130,8 +138,11 @@ async def pico_tutor_openai_connect(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@router.delete("/tutor/openai", response_model=PicoTutorOpenAIConnectionStatus,
-                dependencies=[Depends(require_plan("starter"))])
+@router.delete(
+    "/tutor/openai",
+    response_model=PicoTutorOpenAIConnectionStatus,
+    dependencies=[Depends(require_plan("starter"))],
+)
 async def pico_tutor_openai_disconnect(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -142,6 +153,7 @@ async def pico_tutor_openai_disconnect(
 # ---------------------------------------------------------------------------
 # Onboarding coach (NEW)
 # ---------------------------------------------------------------------------
+
 
 @router.post("/chat", response_model=PicoChatResponse)
 async def pico_coach_chat(
@@ -168,11 +180,13 @@ async def pico_coach_chat(
 
     # Persist to in-memory session
     history.append(CoachMessage(role="user", content=payload.message))
-    history.append(CoachMessage(
-        role="assistant",
-        content=response.reply,
-        onboarding_state=response.onboarding_state,
-    ))
+    history.append(
+        CoachMessage(
+            role="assistant",
+            content=response.reply,
+            onboarding_state=response.onboarding_state,
+        )
+    )
     session_data["history"] = history
     if response.onboarding_state:
         session_data["state"] = response.onboarding_state
@@ -184,8 +198,8 @@ async def pico_coach_chat(
 # Package generation (REWRITTEN — real packages)
 # ---------------------------------------------------------------------------
 
-@router.post("/generate-package",
-             dependencies=[Depends(require_plan("starter"))])
+
+@router.post("/generate-package", dependencies=[Depends(require_plan("starter"))])
 async def pico_generate_package(
     payload: OnboardingGeneratePackageRequest,
     current_user: User = Depends(get_current_user),
@@ -200,7 +214,7 @@ async def pico_generate_package(
         raise HTTPException(
             status_code=422,
             detail="Not enough information to generate a package. "
-                   "Complete the onboarding chat first.",
+            "Complete the onboarding chat first.",
         )
 
     zip_bytes, filename = build_onboarding_package(state)
@@ -216,14 +230,14 @@ async def pico_generate_package(
 # Legacy package generation (kept for backward compat, will deprecate)
 # ---------------------------------------------------------------------------
 
+
 class LegacyGeneratePackageRequest(BaseModel):
     agent_name: str
     pain_points: list[str] | None = None
     model: str | None = None
 
 
-@router.post("/generate-package-legacy",
-             dependencies=[Depends(require_plan("starter"))])
+@router.post("/generate-package-legacy", dependencies=[Depends(require_plan("starter"))])
 async def pico_generate_package_legacy(
     payload: LegacyGeneratePackageRequest,
     current_user: User = Depends(get_current_user),

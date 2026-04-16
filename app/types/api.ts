@@ -4894,10 +4894,15 @@ export interface components {
          */
         CheckoutSessionRequest: {
             /**
+             * Plan Id
+             * @description Supported MUTX plan identifier
+             */
+            plan_id?: ("starter" | "pro") | null;
+            /**
              * Price Id
              * @description Stripe Price ID
              */
-            price_id: string;
+            price_id?: string | null;
             /**
              * Success Url
              * @description URL to redirect on success

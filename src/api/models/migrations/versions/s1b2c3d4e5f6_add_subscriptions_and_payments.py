@@ -34,7 +34,9 @@ def upgrade() -> None:
             index=True,
         ),
         sa.Column("stripe_customer_id", sa.String(255), nullable=False, index=True),
-        sa.Column("stripe_subscription_id", sa.String(255), unique=True, nullable=False, index=True),
+        sa.Column(
+            "stripe_subscription_id", sa.String(255), unique=True, nullable=False, index=True
+        ),
         sa.Column("plan", sa.String(20), nullable=False),
         sa.Column("status", sa.String(20), nullable=False, server_default="active"),
         sa.Column("current_period_start", sa.DateTime(timezone=True), nullable=True),

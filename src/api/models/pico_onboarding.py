@@ -17,6 +17,7 @@ PicoMessageRole = Literal["user", "assistant"]
 
 # ── Onboarding state ──────────────────────────────────────────────────
 
+
 class OnboardingState(BaseModel):
     """Structured state extracted from the onboarding conversation."""
 
@@ -35,8 +36,7 @@ class OnboardingState(BaseModel):
     def compute_ready(self) -> bool:
         """Return True when stack, os, provider, and goal are all non-null."""
         return all(
-            getattr(self, field) is not None
-            for field in ("stack", "os", "provider", "goal")
+            getattr(self, field) is not None for field in ("stack", "os", "provider", "goal")
         )
 
     @model_validator(mode="after")
@@ -46,6 +46,7 @@ class OnboardingState(BaseModel):
 
 
 # ── Chat endpoints ────────────────────────────────────────────────────
+
 
 class PicoChatRequest(BaseModel):
     """User message sent to the onboarding coach."""
@@ -69,6 +70,7 @@ class PicoChatResponse(BaseModel):
 
 # ── Package generation ────────────────────────────────────────────────
 
+
 class GeneratePackageRequest(BaseModel):
     """Trigger generation of a ready-to-deploy package for the session."""
 
@@ -88,6 +90,7 @@ class GeneratePackageResponse(BaseModel):
 
 
 # ── Conversation history ──────────────────────────────────────────────
+
 
 class CoachMessage(BaseModel):
     """A single message in the onboarding conversation history."""

@@ -512,6 +512,7 @@ async def get_revenue_overview(
 ):
     """Revenue overview — MRR, active subs, payments. Internal users only."""
     from src.api.middleware.auth import assert_internal_user
+
     assert_internal_user(current_user)
 
     from src.api.models.subscription import Subscription, Payment
@@ -529,15 +530,17 @@ async def get_revenue_overview(
 
     # MRR: sum payments this month
     mrr_result = await db.execute(
-        select(func.sum(Payment.amount_cents))
-        .where(Payment.status == "paid", Payment.created_at >= month_start)
+        select(func.sum(Payment.amount_cents)).where(
+            Payment.status == "paid", Payment.created_at >= month_start
+        )
     )
     mrr_cents = mrr_result.scalar_one() or 0
 
     # Total payments this month
     payment_count = await db.execute(
-        select(func.count(Payment.id))
-        .where(Payment.status == "paid", Payment.created_at >= month_start)
+        select(func.count(Payment.id)).where(
+            Payment.status == "paid", Payment.created_at >= month_start
+        )
     )
     total_payments = payment_count.scalar_one() or 0
 
@@ -545,9 +548,7 @@ async def get_revenue_overview(
     total_users = await db.execute(select(func.count(User.id)))
 
     # New users this month
-    new_users = await db.execute(
-        select(func.count(User.id)).where(User.created_at >= month_start)
-    )
+    new_users = await db.execute(select(func.count(User.id)).where(User.created_at >= month_start))
 
     return {
         "mrr_cents": mrr_cents,
@@ -570,6 +571,7 @@ async def get_subscriptions_list(
 ):
     """List subscriptions with user info. Internal users only."""
     from src.api.middleware.auth import assert_internal_user
+
     assert_internal_user(current_user)
 
     from src.api.models.subscription import Subscription
@@ -595,7 +597,9 @@ async def get_subscriptions_list(
                 "plan": sub.plan,
                 "status": sub.status,
                 "stripe_customer_id": sub.stripe_customer_id,
-                "current_period_end": sub.current_period_end.isoformat() if sub.current_period_end else None,
+                "current_period_end": sub.current_period_end.isoformat()
+                if sub.current_period_end
+                else None,
                 "cancel_at_period_end": sub.cancel_at_period_end,
                 "created_at": sub.created_at.isoformat() if sub.created_at else None,
             }
@@ -614,6 +618,7 @@ async def get_payments_list(
 ):
     """List recent payments. Internal users only."""
     from src.api.middleware.auth import assert_internal_user
+
     assert_internal_user(current_user)
 
     from src.api.models.subscription import Payment

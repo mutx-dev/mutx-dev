@@ -19,6 +19,7 @@ from src.api.services.user_service import generate_api_key, hash_api_key
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
+
 async def get_owned_api_key(
     db: AsyncSession, user_id: uuid.UUID, key_id: uuid.UUID
 ) -> APIKey | None:
