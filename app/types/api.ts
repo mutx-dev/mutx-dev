@@ -2384,6 +2384,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/analytics/revenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Revenue Overview
+         * @description Revenue overview — MRR, active subs, payments. Internal users only.
+         */
+        get: operations["get_revenue_overview_v1_analytics_revenue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/analytics/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Subscriptions List
+         * @description List subscriptions with user info. Internal users only.
+         */
+        get: operations["get_subscriptions_list_v1_analytics_subscriptions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/analytics/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Payments List
+         * @description List recent payments. Internal users only.
+         */
+        get: operations["get_payments_list_v1_analytics_payments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/monitoring/health": {
         parameters: {
             query?: never;
@@ -2462,6 +2522,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/payments/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Checkout
+         * @description Create a Stripe Checkout session for subscription signup.
+         */
+        post: operations["checkout_v1_payments_checkout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payments/portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Customer Portal
+         * @description Create a Stripe Customer Portal session for managing subscriptions.
+         */
+        post: operations["customer_portal_v1_payments_portal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payments/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stripe Webhook
+         * @description Handle Stripe webhook events.
+         *
+         *     This endpoint does NOT require auth — Stripe authenticates via signature.
+         */
+        post: operations["stripe_webhook_v1_payments_webhook_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payments/subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Subscription
+         * @description Get the current subscription status for the authenticated user.
+         */
+        get: operations["get_subscription_v1_payments_subscription_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/payments/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel
+         * @description Cancel the current subscription at period end.
+         */
+        post: operations["cancel_v1_payments_cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/pico/progress": {
         parameters: {
             query?: never;
@@ -2516,6 +2678,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/pico/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pico Coach Chat
+         * @description Conversation with the onboarding coach. Extracts state, returns reply.
+         */
+        post: operations["pico_coach_chat_v1_pico_chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/pico/generate-package": {
         parameters: {
             query?: never;
@@ -2527,9 +2709,29 @@ export interface paths {
         put?: never;
         /**
          * Pico Generate Package
-         * @description Generate an agent config ZIP from onboarding data.
+         * @description Generate a real, stack-specific config ZIP from the onboarding session.
          */
         post: operations["pico_generate_package_v1_pico_generate_package_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pico/generate-package-legacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pico Generate Package Legacy
+         * @description Legacy package generator — kept for backward compatibility.
+         */
+        post: operations["pico_generate_package_legacy_v1_pico_generate_package_legacy_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4686,6 +4888,48 @@ export interface components {
             /** Usage Percentage */
             usage_percentage: number;
         };
+        /**
+         * CheckoutSessionRequest
+         * @description Request body for creating a Stripe Checkout Session.
+         */
+        CheckoutSessionRequest: {
+            /**
+             * Price Id
+             * @description Stripe Price ID
+             */
+            price_id: string;
+            /**
+             * Success Url
+             * @description URL to redirect on success
+             */
+            success_url: string;
+            /**
+             * Cancel Url
+             * @description URL to redirect on cancellation
+             */
+            cancel_url: string;
+            /**
+             * Trial Days
+             * @description Number of trial days (optional)
+             */
+            trial_days?: number | null;
+        };
+        /**
+         * CheckoutSessionResponse
+         * @description Response containing the Stripe Checkout Session URL and ID.
+         */
+        CheckoutSessionResponse: {
+            /**
+             * Checkout Url
+             * @description Stripe Checkout Session URL
+             */
+            checkout_url: string;
+            /**
+             * Session Id
+             * @description Stripe Checkout Session ID
+             */
+            session_id: string;
+        };
         /** ClawHubSkillBundleResponse */
         ClawHubSkillBundleResponse: {
             /** Id */
@@ -4858,6 +5102,28 @@ export interface components {
             env?: {
                 [key: string]: string;
             };
+        };
+        /**
+         * CustomerPortalRequest
+         * @description Request body for creating a Stripe Customer Portal session.
+         */
+        CustomerPortalRequest: {
+            /**
+             * Return Url
+             * @description URL to return to after portal session
+             */
+            return_url: string;
+        };
+        /**
+         * CustomerPortalResponse
+         * @description Response containing the Stripe Customer Portal URL.
+         */
+        CustomerPortalResponse: {
+            /**
+             * Portal Url
+             * @description Stripe Customer Portal URL
+             */
+            portal_url: string;
         };
         /**
          * DeploymentCreate
@@ -5408,14 +5674,13 @@ export interface components {
             /** Email Link Origin */
             email_link_origin?: string | null;
         };
-        /** GeneratePackageRequest */
+        /**
+         * GeneratePackageRequest
+         * @description Trigger generation of a ready-to-deploy package for the session.
+         */
         GeneratePackageRequest: {
-            /** Agent Name */
-            agent_name: string;
-            /** Pain Points */
-            pain_points?: string[] | null;
-            /** Model */
-            model?: string | null;
+            /** Session Id */
+            session_id: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -5629,6 +5894,15 @@ export interface components {
             message?: string | null;
             /** Source */
             source?: string | null;
+        };
+        /** LegacyGeneratePackageRequest */
+        LegacyGeneratePackageRequest: {
+            /** Agent Name */
+            agent_name: string;
+            /** Pain Points */
+            pain_points?: string[] | null;
+            /** Model */
+            model?: string | null;
         };
         /** LocalBootstrapRequest */
         LocalBootstrapRequest: {
@@ -6468,6 +6742,33 @@ export interface components {
          * @enum {string}
          */
         OAuthProvider: "google" | "github" | "discord" | "apple";
+        /**
+         * OnboardingState
+         * @description Structured state extracted from the onboarding conversation.
+         */
+        OnboardingState: {
+            /** Stack */
+            stack?: ("hermes" | "openclaw" | "nanoclaw" | "picoclaw") | null;
+            /** Os */
+            os?: ("macos" | "linux" | "windows_wsl2" | "android") | null;
+            /** Provider */
+            provider?: ("openai" | "anthropic" | "google" | "local") | null;
+            /** Hardware */
+            hardware?: ("laptop" | "vps" | "mini_pc" | "edge") | null;
+            /** Channels */
+            channels?: ("telegram" | "discord" | "slack" | "whatsapp")[];
+            /** Networking */
+            networking?: ("local" | "tailscale" | "ssh_tunnel" | "public") | null;
+            /** Skill Level */
+            skill_level?: ("beginner" | "intermediate" | "advanced") | null;
+            /** Goal */
+            goal?: ("install" | "repair" | "migrate" | "compare") | null;
+            /**
+             * Ready
+             * @default false
+             */
+            ready: boolean;
+        };
         /** OnboardingStateResponse */
         OnboardingStateResponse: {
             /**
@@ -6670,6 +6971,32 @@ export interface components {
             limit: number;
             /** Has More */
             has_more: boolean;
+        };
+        /**
+         * PicoChatRequest
+         * @description User message sent to the onboarding coach.
+         */
+        PicoChatRequest: {
+            /** Message */
+            message: string;
+            /** Session Id */
+            session_id?: string | null;
+        };
+        /**
+         * PicoChatResponse
+         * @description Coach reply with optional onboarding state snapshot.
+         */
+        PicoChatResponse: {
+            /** Reply */
+            reply: string;
+            /** Session Id */
+            session_id: string;
+            onboarding_state?: components["schemas"]["OnboardingState"] | null;
+            /**
+             * Ready For Package
+             * @default false
+             */
+            ready_for_package: boolean;
         };
         /** PicoProgressPayload */
         PicoProgressPayload: Record<string, never>;
@@ -7974,6 +8301,37 @@ export interface components {
             template_id: string;
             agent: components["schemas"]["AgentResponse"];
             deployment: components["schemas"]["DeploymentResponse"];
+        };
+        /**
+         * SubscriptionStatus
+         * @description Current subscription status for a user.
+         */
+        SubscriptionStatus: {
+            /**
+             * Plan
+             * @description Subscription plan name
+             */
+            plan?: string | null;
+            /**
+             * Status
+             * @description Subscription status
+             */
+            status?: string | null;
+            /**
+             * Current Period End
+             * @description End of the current billing period
+             */
+            current_period_end?: string | null;
+            /**
+             * Cancel At Period End
+             * @description Whether the subscription cancels at period end
+             */
+            cancel_at_period_end?: boolean | null;
+            /**
+             * Trial End
+             * @description Trial period end date
+             */
+            trial_end?: string | null;
         };
         /** SupervisedAgentStartRequest */
         SupervisedAgentStartRequest: {
@@ -13603,6 +13961,106 @@ export interface operations {
             };
         };
     };
+    get_revenue_overview_v1_analytics_revenue_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_subscriptions_list_v1_analytics_subscriptions_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                status?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_payments_list_v1_analytics_payments_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_health_v1_monitoring_health_get: {
         parameters: {
             query?: never;
@@ -13752,6 +14210,158 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OnboardingStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    checkout_v1_payments_checkout_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutSessionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    customer_portal_v1_payments_portal_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerPortalRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPortalResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stripe_webhook_v1_payments_webhook_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_subscription_v1_payments_subscription_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_v1_payments_cancel_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
@@ -13963,6 +14573,41 @@ export interface operations {
             };
         };
     };
+    pico_coach_chat_v1_pico_chat_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PicoChatRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PicoChatResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     pico_generate_package_v1_pico_generate_package_post: {
         parameters: {
             query?: never;
@@ -13975,6 +14620,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["GeneratePackageRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pico_generate_package_legacy_v1_pico_generate_package_legacy_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LegacyGeneratePackageRequest"];
             };
         };
         responses: {

@@ -9668,6 +9668,212 @@
         }
       }
     },
+    "/v1/analytics/revenue": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Revenue Overview",
+        "description": "Revenue overview \u2014 MRR, active subs, payments. Internal users only.",
+        "operationId": "get_revenue_overview_v1_analytics_revenue_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/subscriptions": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Subscriptions List",
+        "description": "List subscriptions with user info. Internal users only.",
+        "operationId": "get_subscriptions_list_v1_analytics_subscriptions_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/payments": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Payments List",
+        "description": "List recent payments. Internal users only.",
+        "operationId": "get_payments_list_v1_analytics_payments_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/monitoring/health": {
       "get": {
         "tags": [
@@ -9982,6 +10188,244 @@
                 "schema": {
                   "$ref": "#/components/schemas/OnboardingStateResponse"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments/checkout": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Checkout",
+        "description": "Create a Stripe Checkout session for subscription signup.",
+        "operationId": "checkout_v1_payments_checkout_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments/portal": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Customer Portal",
+        "description": "Create a Stripe Customer Portal session for managing subscriptions.",
+        "operationId": "customer_portal_v1_payments_portal_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerPortalRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments/webhook": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Stripe Webhook",
+        "description": "Handle Stripe webhook events.\n\nThis endpoint does NOT require auth \u2014 Stripe authenticates via signature.",
+        "operationId": "stripe_webhook_v1_payments_webhook_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments/subscription": {
+      "get": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Get Subscription",
+        "description": "Get the current subscription status for the authenticated user.",
+        "operationId": "get_subscription_v1_payments_subscription_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments/cancel": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Cancel",
+        "description": "Cancel the current subscription at period end.",
+        "operationId": "cancel_v1_payments_cancel_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -10318,13 +10762,73 @@
         }
       }
     },
+    "/v1/pico/chat": {
+      "post": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Coach Chat",
+        "description": "Conversation with the onboarding coach. Extracts state, returns reply.",
+        "operationId": "pico_coach_chat_v1_pico_chat_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PicoChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PicoChatResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/pico/generate-package": {
       "post": {
         "tags": [
           "pico"
         ],
         "summary": "Pico Generate Package",
-        "description": "Generate an agent config ZIP from onboarding data.",
+        "description": "Generate a real, stack-specific config ZIP from the onboarding session.",
         "operationId": "pico_generate_package_v1_pico_generate_package_post",
         "parameters": [
           {
@@ -10350,6 +10854,64 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/GeneratePackageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pico/generate-package-legacy": {
+      "post": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Generate Package Legacy",
+        "description": "Legacy package generator \u2014 kept for backward compatibility.",
+        "operationId": "pico_generate_package_legacy_v1_pico_generate_package_legacy_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LegacyGeneratePackageRequest"
               }
             }
           }
@@ -16483,6 +17045,72 @@
         ],
         "title": "BudgetResponse"
       },
+      "CheckoutSessionRequest": {
+        "properties": {
+          "price_id": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Price Id",
+            "description": "Stripe Price ID"
+          },
+          "success_url": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Success Url",
+            "description": "URL to redirect on success"
+          },
+          "cancel_url": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Cancel Url",
+            "description": "URL to redirect on cancellation"
+          },
+          "trial_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 365.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trial Days",
+            "description": "Number of trial days (optional)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "price_id",
+          "success_url",
+          "cancel_url"
+        ],
+        "title": "CheckoutSessionRequest",
+        "description": "Request body for creating a Stripe Checkout Session."
+      },
+      "CheckoutSessionResponse": {
+        "properties": {
+          "checkout_url": {
+            "type": "string",
+            "title": "Checkout Url",
+            "description": "Stripe Checkout Session URL"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id",
+            "description": "Stripe Checkout Session ID"
+          }
+        },
+        "type": "object",
+        "required": [
+          "checkout_url",
+          "session_id"
+        ],
+        "title": "CheckoutSessionResponse",
+        "description": "Response containing the Stripe Checkout Session URL and ID."
+      },
       "ClawHubSkillBundleResponse": {
         "properties": {
           "id": {
@@ -16920,6 +17548,37 @@
           "image"
         ],
         "title": "CustomAgentConfig"
+      },
+      "CustomerPortalRequest": {
+        "properties": {
+          "return_url": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Return Url",
+            "description": "URL to return to after portal session"
+          }
+        },
+        "type": "object",
+        "required": [
+          "return_url"
+        ],
+        "title": "CustomerPortalRequest",
+        "description": "Request body for creating a Stripe Customer Portal session."
+      },
+      "CustomerPortalResponse": {
+        "properties": {
+          "portal_url": {
+            "type": "string",
+            "title": "Portal Url",
+            "description": "Stripe Customer Portal URL"
+          }
+        },
+        "type": "object",
+        "required": [
+          "portal_url"
+        ],
+        "title": "CustomerPortalResponse",
+        "description": "Response containing the Stripe Customer Portal URL."
       },
       "DeploymentCreate": {
         "properties": {
@@ -18236,41 +18895,18 @@
       },
       "GeneratePackageRequest": {
         "properties": {
-          "agent_name": {
+          "session_id": {
             "type": "string",
-            "title": "Agent Name"
-          },
-          "pain_points": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Pain Points"
-          },
-          "model": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Model"
+            "title": "Session Id"
           }
         },
+        "additionalProperties": false,
         "type": "object",
         "required": [
-          "agent_name"
+          "session_id"
         ],
-        "title": "GeneratePackageRequest"
+        "title": "GeneratePackageRequest",
+        "description": "Trigger generation of a ready-to-deploy package for the session."
       },
       "HTTPValidationError": {
         "properties": {
@@ -18873,6 +19509,44 @@
         },
         "type": "object",
         "title": "LeadUpdate"
+      },
+      "LegacyGeneratePackageRequest": {
+        "properties": {
+          "agent_name": {
+            "type": "string",
+            "title": "Agent Name"
+          },
+          "pain_points": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pain Points"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_name"
+        ],
+        "title": "LegacyGeneratePackageRequest"
       },
       "LocalBootstrapRequest": {
         "properties": {
@@ -21003,9 +21677,153 @@
         "enum": [
           "google",
           "github",
-          "discord"
+          "discord",
+          "apple"
         ],
         "title": "OAuthProvider"
+      },
+      "OnboardingState": {
+        "properties": {
+          "stack": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "hermes",
+                  "openclaw",
+                  "nanoclaw",
+                  "picoclaw"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stack"
+          },
+          "os": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "macos",
+                  "linux",
+                  "windows_wsl2",
+                  "android"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Os"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "openai",
+                  "anthropic",
+                  "google",
+                  "local"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "hardware": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "laptop",
+                  "vps",
+                  "mini_pc",
+                  "edge"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hardware"
+          },
+          "channels": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "telegram",
+                "discord",
+                "slack",
+                "whatsapp"
+              ]
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "networking": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "local",
+                  "tailscale",
+                  "ssh_tunnel",
+                  "public"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Networking"
+          },
+          "skill_level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "beginner",
+                  "intermediate",
+                  "advanced"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Level"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "install",
+                  "repair",
+                  "migrate",
+                  "compare"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal"
+          },
+          "ready": {
+            "type": "boolean",
+            "title": "Ready",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "OnboardingState",
+        "description": "Structured state extracted from the onboarding conversation."
       },
       "OnboardingStateResponse": {
         "properties": {
@@ -21535,6 +22353,68 @@
         ],
         "title": "PaginatedAgentResourceUsageResponse",
         "description": "Paginated response for agent resource usage records."
+      },
+      "PicoChatRequest": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 6000,
+            "minLength": 1,
+            "title": "Message"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "PicoChatRequest",
+        "description": "User message sent to the onboarding coach."
+      },
+      "PicoChatResponse": {
+        "properties": {
+          "reply": {
+            "type": "string",
+            "title": "Reply"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "onboarding_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OnboardingState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ready_for_package": {
+            "type": "boolean",
+            "title": "Ready For Package",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "reply",
+          "session_id"
+        ],
+        "title": "PicoChatResponse",
+        "description": "Coach reply with optional onboarding state snapshot."
       },
       "PicoProgressPayload": {
         "properties": {},
@@ -25044,6 +25924,75 @@
           "deployment"
         ],
         "title": "StarterDeploymentResponse"
+      },
+      "SubscriptionStatus": {
+        "properties": {
+          "plan": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan",
+            "description": "Subscription plan name"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status",
+            "description": "Subscription status"
+          },
+          "current_period_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Period End",
+            "description": "End of the current billing period"
+          },
+          "cancel_at_period_end": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancel At Period End",
+            "description": "Whether the subscription cancels at period end"
+          },
+          "trial_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trial End",
+            "description": "Trial period end date"
+          }
+        },
+        "type": "object",
+        "title": "SubscriptionStatus",
+        "description": "Current subscription status for a user."
       },
       "SupervisedAgentStartRequest": {
         "properties": {
