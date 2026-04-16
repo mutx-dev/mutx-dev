@@ -9,6 +9,26 @@ import { X, ArrowRight, Check, ChevronDown } from 'lucide-react'
 import s from './PicoContactForm.module.css'
 import { buildPicoContactPayload } from './picoContactPayload'
 
+type PicoContactFormOption = {
+  value: string
+  label: string
+}
+
+type PicoContactFormCopy = {
+  title?: string
+  subtitle?: string
+  interestLabel?: string
+  messageLabel?: string
+  messageOptional?: string
+  messagePlaceholder?: string
+  submit?: string
+  submitting?: string
+  disclaimer?: string
+  successTitle?: string
+  successBody?: string
+  successBack?: string
+}
+
 type PicoContactFormProps = {
   open: boolean
   onClose: () => void
@@ -16,6 +36,8 @@ type PicoContactFormProps = {
   defaultMessage?: string
   source?: string
   onSuccess?: () => void
+  copy?: PicoContactFormCopy
+  interestOptions?: ReadonlyArray<PicoContactFormOption>
 }
 
 export function PicoContactForm({
@@ -25,20 +47,50 @@ export function PicoContactForm({
   defaultMessage,
   source = 'pico-landing',
   onSuccess,
+  copy,
+  interestOptions,
 }: PicoContactFormProps) {
   const t = useTranslations('pico.contactForm')
   const locale = useLocale()
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [interest, setInterest] = useState(defaultInterest || 'building-first')
   const honeypotRef = useRef<HTMLInputElement>(null)
+
+  const defaultInterestOptions: PicoContactFormOption[] = [
+    { value: 'building-first', label: t('interestOptions.building-first') },
+    { value: 'fixing-existing', label: t('interestOptions.fixing-existing') },
+    { value: 'evaluating', label: t('interestOptions.evaluating') },
+    { value: 'spent-money', label: t('interestOptions.spent-money') },
+    { value: 'other', label: t('interestOptions.other') },
+  ]
+  const resolvedInterestOptions =
+    interestOptions && interestOptions.length > 0 ? [...interestOptions] : defaultInterestOptions
+  const resolvedDefaultInterest =
+    defaultInterest && resolvedInterestOptions.some((option) => option.value === defaultInterest)
+      ? defaultInterest
+      : resolvedInterestOptions[0]?.value ?? 'building-first'
+  const resolvedCopy = {
+    title: copy?.title ?? t('title'),
+    subtitle: copy?.subtitle ?? t('subtitle'),
+    interestLabel: copy?.interestLabel ?? t('interestLabel'),
+    messageLabel: copy?.messageLabel ?? t('messageLabel'),
+    messageOptional: copy?.messageOptional ?? t('messageOptional'),
+    messagePlaceholder: copy?.messagePlaceholder ?? t('messagePlaceholder'),
+    submit: copy?.submit ?? t('submit'),
+    submitting: copy?.submitting ?? t('submitting'),
+    disclaimer: copy?.disclaimer ?? t('disclaimer'),
+    successTitle: copy?.successTitle ?? t('successTitle'),
+    successBody: copy?.successBody ?? t('successBody'),
+    successBack: copy?.successBack ?? t('successBack'),
+  }
+  const [interest, setInterest] = useState(resolvedDefaultInterest)
 
   useEffect(() => {
     if (open) {
-      setInterest(defaultInterest || 'building-first')
+      setInterest(resolvedDefaultInterest)
     }
-  }, [defaultInterest, open])
+  }, [open, resolvedDefaultInterest])
 
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
@@ -85,7 +137,7 @@ export function PicoContactForm({
         setState('error')
       }
     },
-    [state, interest, locale, onSuccess, source, t],
+    [interest, locale, onSuccess, source, state, t],
   )
 
   const handleClose = useCallback(() => {
@@ -93,7 +145,7 @@ export function PicoContactForm({
     setState('idle')
     setErrorMsg('')
     onClose()
-  }, [state, onClose])
+  }, [onClose, state])
 
   return (
     <AnimatePresence>
@@ -114,136 +166,114 @@ export function PicoContactForm({
             animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
             exit={prefersReducedMotion ? undefined : { opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            role="dialog"
-            aria-modal="true"
+            role='dialog'
+            aria-modal='true'
             aria-label={t('dialogLabel')}
           >
             <button
               className={s.closeBtn}
               onClick={handleClose}
               aria-label={t('closeLabel')}
-              type="button"
+              type='button'
             >
-              <X className="h-4 w-4" />
+              <X className='h-4 w-4' />
             </button>
 
             {state === 'success' ? (
               <div className={s.successState}>
                 <span className={s.successIcon}>
-                  <Check className="h-6 w-6" />
+                  <Check className='h-6 w-6' />
                 </span>
-                <h2 className={s.successTitle}>{t('successTitle')}</h2>
-                <p className={s.successBody}>{t('successBody')}</p>
-                <button className={s.successBtn} onClick={handleClose} type="button">
-                  {t('successBack')}
+                <h2 className={s.successTitle}>{resolvedCopy.successTitle}</h2>
+                <p className={s.successBody}>{resolvedCopy.successBody}</p>
+                <button className={s.successBtn} onClick={handleClose} type='button'>
+                  {resolvedCopy.successBack}
                 </button>
               </div>
             ) : (
               <>
                 <div className={s.header}>
-                  <h2 className={s.title}>{t('title')}</h2>
-                  <p className={s.subtitle}>{t('subtitle')}</p>
+                  <h2 className={s.title}>{resolvedCopy.title}</h2>
+                  <p className={s.subtitle}>{resolvedCopy.subtitle}</p>
                 </div>
 
                 <form className={s.form} onSubmit={handleSubmit}>
                   <input
                     ref={honeypotRef}
-                    name="website"
-                    type="text"
-                    autoComplete="off"
+                    name='website'
+                    type='text'
+                    autoComplete='off'
                     tabIndex={-1}
-                    aria-hidden="true"
+                    aria-hidden='true'
                     className={s.honeypot}
                   />
 
                   <div className={s.row}>
-                    <label className={s.label} htmlFor="pico-email">
+                    <label className={s.label} htmlFor='pico-email'>
                       <span className={s.labelText}>{t('emailLabel')}</span>
                       <input
-                        id="pico-email"
-                        name="email"
-                        type="email"
+                        id='pico-email'
+                        name='email'
+                        type='email'
                         required
                         placeholder={t('emailPlaceholder')}
                         className={s.input}
-                        autoComplete="email"
+                        autoComplete='email'
                       />
                     </label>
                   </div>
 
                   <div className={s.row2}>
-                    <label className={s.label} htmlFor="pico-name">
+                    <label className={s.label} htmlFor='pico-name'>
                       <span className={s.labelText}>{t('nameLabel')}</span>
                       <input
-                        id="pico-name"
-                        name="name"
-                        type="text"
+                        id='pico-name'
+                        name='name'
+                        type='text'
                         placeholder={t('namePlaceholder')}
                         className={s.input}
-                        autoComplete="name"
+                        autoComplete='name'
                       />
                     </label>
-                    <label className={s.label} htmlFor="pico-company">
+                    <label className={s.label} htmlFor='pico-company'>
                       <span className={s.labelText}>{t('companyLabel')}</span>
                       <input
-                        id="pico-company"
-                        name="company"
-                        type="text"
+                        id='pico-company'
+                        name='company'
+                        type='text'
                         placeholder={t('companyPlaceholder')}
                         className={s.input}
-                        autoComplete="organization"
+                        autoComplete='organization'
                       />
                     </label>
                   </div>
 
                   <div className={s.label}>
-                    <span className={s.labelText}>{t('interestLabel')}</span>
+                    <span className={s.labelText}>{resolvedCopy.interestLabel}</span>
                     <Select.Root value={interest} onValueChange={setInterest}>
                       <Select.Trigger className={s.selectTrigger}>
                         <Select.Value />
                         <Select.Icon className={s.selectIcon}>
-                          <ChevronDown className="h-3.5 w-3.5" />
+                          <ChevronDown className='h-3.5 w-3.5' />
                         </Select.Icon>
                       </Select.Trigger>
                       <Select.Portal>
                         <Select.Content
                           className={s.selectContent}
-                          position="popper"
+                          position='popper'
                           sideOffset={4}
-                          align="start"
+                          align='start'
                         >
                           <Select.ScrollUpButton className={s.selectScroll} />
                           <Select.Viewport className={s.selectViewport}>
-                            <Select.Item value="building-first" className={s.selectItem}>
-                              <Select.ItemText>{t('interestOptions.building-first')}</Select.ItemText>
-                              <Select.ItemIndicator className={s.selectIndicator}>
-                                <Check className="h-3 w-3" />
-                              </Select.ItemIndicator>
-                            </Select.Item>
-                            <Select.Item value="fixing-existing" className={s.selectItem}>
-                              <Select.ItemText>{t('interestOptions.fixing-existing')}</Select.ItemText>
-                              <Select.ItemIndicator className={s.selectIndicator}>
-                                <Check className="h-3 w-3" />
-                              </Select.ItemIndicator>
-                            </Select.Item>
-                            <Select.Item value="evaluating" className={s.selectItem}>
-                              <Select.ItemText>{t('interestOptions.evaluating')}</Select.ItemText>
-                              <Select.ItemIndicator className={s.selectIndicator}>
-                                <Check className="h-3 w-3" />
-                              </Select.ItemIndicator>
-                            </Select.Item>
-                            <Select.Item value="spent-money" className={s.selectItem}>
-                              <Select.ItemText>{t('interestOptions.spent-money')}</Select.ItemText>
-                              <Select.ItemIndicator className={s.selectIndicator}>
-                                <Check className="h-3 w-3" />
-                              </Select.ItemIndicator>
-                            </Select.Item>
-                            <Select.Item value="other" className={s.selectItem}>
-                              <Select.ItemText>{t('interestOptions.other')}</Select.ItemText>
-                              <Select.ItemIndicator className={s.selectIndicator}>
-                                <Check className="h-3 w-3" />
-                              </Select.ItemIndicator>
-                            </Select.Item>
+                            {resolvedInterestOptions.map((option) => (
+                              <Select.Item key={option.value} value={option.value} className={s.selectItem}>
+                                <Select.ItemText>{option.label}</Select.ItemText>
+                                <Select.ItemIndicator className={s.selectIndicator}>
+                                  <Check className='h-3 w-3' />
+                                </Select.ItemIndicator>
+                              </Select.Item>
+                            ))}
                           </Select.Viewport>
                           <Select.ScrollDownButton className={s.selectScroll} />
                         </Select.Content>
@@ -251,16 +281,16 @@ export function PicoContactForm({
                     </Select.Root>
                   </div>
 
-                  <label className={s.label} htmlFor="pico-message">
+                  <label className={s.label} htmlFor='pico-message'>
                     <span className={s.labelText}>
-                      {t('messageLabel')} <span className={s.optional}>{t('messageOptional')}</span>
+                      {resolvedCopy.messageLabel} <span className={s.optional}>{resolvedCopy.messageOptional}</span>
                     </span>
                     <textarea
-                      id="pico-message"
-                      name="message"
+                      id='pico-message'
+                      name='message'
                       rows={3}
                       defaultValue={defaultMessage}
-                      placeholder={t('messagePlaceholder')}
+                      placeholder={resolvedCopy.messagePlaceholder}
                       className={s.textarea}
                     />
                   </label>
@@ -268,21 +298,21 @@ export function PicoContactForm({
                   {errorMsg && <p className={s.error}>{errorMsg}</p>}
 
                   <button
-                    type="submit"
+                    type='submit'
                     className={s.submit}
                     disabled={state === 'submitting'}
                   >
                     {state === 'submitting' ? (
-                      t('submitting')
+                      resolvedCopy.submitting
                     ) : (
                       <>
-                        {t('submit')}
-                        <ArrowRight className="h-4 w-4" />
+                        {resolvedCopy.submit}
+                        <ArrowRight className='h-4 w-4' />
                       </>
                     )}
                   </button>
 
-                  <p className={s.disclaimer}>{t('disclaimer')}</p>
+                  <p className={s.disclaimer}>{resolvedCopy.disclaimer}</p>
                 </form>
               </>
             )}

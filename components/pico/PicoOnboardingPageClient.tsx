@@ -266,14 +266,7 @@ export function PicoOnboardingPageClient() {
                   ? `Continue with ${derived.nextLesson.title}`
                   : 'Open Autopilot'}
           </Link>
-          {!installDone ? (
-            <Link
-              href={toHref(`/academy/${firstRunLessonSlug}`)}
-              className={picoClasses.secondaryButton}
-            >
-              Already installed? Go to first prompt
-            </Link>
-          ) : null}
+
         </div>
       }
     >

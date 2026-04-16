@@ -55,6 +55,29 @@ const escalationStandards = [
   },
 ] as const
 
+const supportInterestOptions = [
+  { value: 'fixing-existing', label: 'Lesson or command blocker' },
+  { value: 'runtime-truth', label: 'Live runtime or Autopilot mismatch' },
+  { value: 'hosted-session', label: 'Hosted session or account mismatch' },
+  { value: 'billing-or-plan', label: 'Billing, approvals, or plan question' },
+  { value: 'other', label: 'Office hours or deeper walkthrough' },
+] as const
+
+const supportContactCopy = {
+  title: 'Tell us where the product path broke',
+  subtitle: 'Share the route, blocker, and proof. We will answer like humans, not a waitlist.',
+  interestLabel: 'What broke?',
+  messageLabel: 'What happened?',
+  messageOptional: '(include the packet)',
+  messagePlaceholder: 'Paste the exact blocker, route, command, or runtime mismatch.',
+  submit: 'Send support request',
+  submitting: 'Sending support request...',
+  disclaimer: 'No waitlist. No launch theater. Just a human reply.',
+  successTitle: 'Support request sent.',
+  successBody: 'We got the packet. Expect a human reply that points you back into the product.',
+  successBack: 'Back to support',
+} as const
+
 export function PicoSupportPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
@@ -162,6 +185,8 @@ export function PicoSupportPageClient() {
         defaultMessage={defaultSupportMessage}
         source={interest === 'other' ? 'pico-office-hours' : 'pico-support'}
         onSuccess={() => actions.recordSupportRequest()}
+        copy={supportContactCopy}
+        interestOptions={supportInterestOptions}
       />
       <PicoShell
         eyebrow="Human help"

@@ -874,27 +874,18 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('button', { name: /reset password/i })).toBeVisible();
   });
 
-  test('pico root stays a waitlist landing while the platform lives on routed Pico pages', async ({ page }) => {
+  test('pico root is a truthful live product entry instead of a waitlist shell', async ({ page }) => {
     await stubPicoProductApis(page);
 
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('pico-waitlist-landing')).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: /build and deploy ai agents without hiring a developer/i })
-    ).toBeVisible();
-    await expect(page.getByRole('button', { name: /pre-register for early access/i }).first()).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: /picomutx is opening in stages\. founding access won't stay open forever\./i })
-    ).toBeVisible();
-    await expect(page.getByTestId('pico-footer')).toBeVisible();
+    await expect(page.getByTestId('pico-waitlist-landing')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: /get to your first working agent fast/i })).toBeVisible();
+    await expect(page.getByTestId('pico-surface-compass')).toBeVisible();
+    await expect(page.getByRole('link', { name: /install hermes now/i }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /pre-register for early access/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /^preregistrati$/i })).toHaveCount(0);
     expect(new URL(page.url()).pathname).toBe('/pico');
-
-    await expect(page.locator('a[href="/pico/onboarding"]')).toHaveCount(0);
-    await expect(page.locator('a[href="/pico/academy"]')).toHaveCount(0);
-    await expect(page.locator('a[href="/pico/tutor"]')).toHaveCount(0);
-    await expect(page.locator('a[href="/pico/autopilot"]')).toHaveCount(0);
-    await expect(page.locator('a[href="/pico/support"]')).toHaveCount(0);
   });
 
   test('pico product routes render live surfaces and linked lesson flows stay inside /pico', async ({ page }) => {
@@ -986,6 +977,30 @@ test.describe('mutx.dev QA', () => {
     await page.getByRole('link', { name: /open autopilot/i }).first().click();
     await expect(page.getByRole('heading', { name: /trust the runtime because the surface tells the truth/i })).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/autopilot');
+  });
+
+  test('pico onboarding hides the blocked first-prompt shortcut until install is complete', async ({ page }) => {
+    await stubPicoProductApis(page);
+
+    await page.goto('/pico/onboarding', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByRole('link', { name: /already installed\? go to first prompt/i })).toHaveCount(0);
+    await page.getByRole('link', { name: /install hermes now/i }).first().click();
+    await expect(page.getByRole('heading', { level: 1, name: /install hermes locally/i })).toBeVisible();
+    expect(new URL(page.url()).pathname).toBe('/pico/academy/install-hermes-locally');
+  });
+
+  test('pico support CTA opens a real escalation intake instead of prereg copy', async ({ page }) => {
+    await stubPicoProductApis(page, { authenticated: false });
+
+    await page.goto('/pico/support', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: /^get human help$/i }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: /tell us where the product path broke/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /send support request/i })).toBeVisible();
+    await expect(dialog.getByText(/pre-register|early access|preregistrati|accesso anticipato/i)).toHaveCount(0);
   });
 
   test('pico academy shell toggles keep atlas and recovery inside the product', async ({ page }) => {
