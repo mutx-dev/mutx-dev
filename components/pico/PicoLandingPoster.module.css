@@ -1271,16 +1271,73 @@
     padding-top: calc(var(--nav-height) + 1.35rem);
   }
 
+  .heroShell {
+    gap: 1.2rem;
+    min-height: auto;
+  }
+
+  .heroCopy {
+    gap: 0.95rem;
+  }
+
+  .heroPrelude {
+    gap: 0.6rem;
+  }
+
+  .heroBadge {
+    min-height: 2rem;
+    padding: 0 0.9rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+  }
+
   .heroWordmark {
-    font-size: clamp(2.8rem, 16vw, 5rem);
+    display: none;
   }
 
   .heroTitle {
-    max-width: 12.5ch;
+    font-size: clamp(1.72rem, 9.8vw, 3rem);
+    line-height: 0.92;
+    max-width: 8.4ch;
+  }
+
+  .heroSubtitle {
+    font-size: 0.98rem;
+    line-height: 1.58;
+  }
+
+  .heroActions {
+    gap: 0.7rem;
+    padding-top: 0.2rem;
+  }
+
+  .heroMeta {
+    font-size: 0.8rem;
+    line-height: 1.5;
   }
 
   .heroVisual {
-    min-height: 28rem;
+    min-height: 23rem;
+    padding: 0.95rem;
+  }
+
+  .heroRobotStage {
+    min-height: 13rem;
+    padding-top: 0;
+  }
+
+  .heroSignalRail {
+    gap: 0.6rem;
+    padding-top: 0.9rem;
+  }
+
+  .heroSignalText {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .trustStrip {
+    margin-top: 1rem;
   }
 
   .scenarioItem,
