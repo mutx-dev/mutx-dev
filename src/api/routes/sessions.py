@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Any, Optional
+from enum import Enum
+from typing import Any, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -273,6 +274,46 @@ class SessionActionResponse(BaseModel):
     detail: Optional[str] = None
 
 
+# --- Session Lifecycle (MC v2.0 parity) ---
+
+
+class SessionState(str, Enum):
+    """Session lifecycle states aligned with MC v2.0 / OpenClaw gateway."""
+
+    active = "active"
+    paused = "paused"
+    terminated = "terminated"
+    offline = "offline"
+    error = "error"
+
+
+VALID_CONTROL_ACTIONS: list[str] = ["pause", "resume", "kill"]
+
+
+class SessionControlRequest(BaseModel):
+    """Request body for session lifecycle control (pause/resume/kill)."""
+
+    action: Literal["pause", "resume", "kill"]
+
+
+class SessionControlResponse(BaseModel):
+    """Response from a session lifecycle control action."""
+
+    session_key: str
+    action: str
+    previous_state: Optional[str] = None
+    current_state: Optional[str] = None
+    detail: Optional[str] = None
+
+
+class SessionTranscriptResponse(BaseModel):
+    """Full session transcript (conversation history)."""
+
+    session_key: str
+    messages: list[dict[str, Any]]
+    total_count: int
+
+
 # --- Routes ---
 
 
@@ -387,4 +428,81 @@ async def delete_session(
         session_key=request.session_key,
         action="delete",
         applied=True,
+    )
+
+
+# --- Session Lifecycle Control (MC v2.0 parity) ---
+
+
+# Valid state transitions for session control actions.
+# Maps action → (allowed_from_states, resulting_state).
+_STATE_TRANSITIONS: dict[str, tuple[list[str], str]] = {
+    "pause": (["active"], "paused"),
+    "resume": (["paused"], "active"),
+    "kill": (["active", "paused"], "terminated"),
+}
+
+
+@router.post("/{session_key}/control", response_model=SessionControlResponse)
+async def session_control(
+    session_key: str,
+    request: SessionControlRequest,
+    current_user: User = Depends(get_current_user),
+) -> SessionControlResponse:
+    """Control session lifecycle: pause, resume, or kill a session.
+
+    Forwards the action to the OpenClaw gateway's ``POST /control`` endpoint.
+    The gateway handles the actual state transition; MUTX validates the request
+    and enriches the response with state information.
+    """
+    action = request.action
+
+    # Forward to the gateway control endpoint (MC v2.0 pattern).
+    # The gateway expects POST /api/sessions/{key}/control with {"action": ...}.
+    result = await _call_gateway(
+        "POST",
+        f"/api/sessions/{session_key}/control",
+        json={"action": action},
+    )
+
+    # Determine the resulting state from the transition map.
+    _, resulting_state = _STATE_TRANSITIONS[action]
+
+    return SessionControlResponse(
+        session_key=session_key,
+        action=action,
+        current_state=resulting_state,
+        detail=result.get("message") or result.get("detail") or "ok",
+    )
+
+
+@router.get("/{session_key}/transcript", response_model=SessionTranscriptResponse)
+async def session_transcript(
+    session_key: str,
+    current_user: User = Depends(get_current_user),
+) -> SessionTranscriptResponse:
+    """Retrieve the full session transcript (conversation history).
+
+    Proxies to the OpenClaw gateway's ``GET /api/sessions/:key/history`` endpoint.
+    """
+    data = await _call_gateway(
+        "GET",
+        f"/api/sessions/{session_key}/history",
+    )
+
+    # The gateway may return a list of messages directly or wrap them.
+    messages: list[dict[str, Any]]
+    if isinstance(data, list):
+        messages = data
+    elif isinstance(data, dict):
+        messages = data.get("messages", data.get("history", []))
+        if not isinstance(messages, list):
+            messages = []
+    else:
+        messages = []
+
+    return SessionTranscriptResponse(
+        session_key=session_key,
+        messages=messages,
+        total_count=len(messages),
     )

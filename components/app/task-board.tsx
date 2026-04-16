@@ -9,7 +9,7 @@ interface Task {
   id: string
   title: string
   description?: string
-  status: 'pending' | 'running' | 'done' | 'failed'
+  status: 'pending' | 'running' | 'done' | 'failed' | 'awaiting_owner'
   priority: 'low' | 'medium' | 'high' | 'critical'
   agentId?: string
   deploymentId?: string
@@ -35,6 +35,7 @@ interface Deployment {
 
 const COLUMNS = [
   { key: 'pending', label: 'Pending', color: 'bg-slate-500/20 text-slate-400' },
+  { key: 'awaiting_owner', label: 'Awaiting Owner', color: 'bg-amber-500/20 text-amber-400' },
   { key: 'running', label: 'Running', color: 'bg-blue-500/20 text-blue-400' },
   { key: 'done', label: 'Done', color: 'bg-emerald-500/20 text-emerald-400' },
   { key: 'failed', label: 'Failed', color: 'bg-red-500/20 text-red-400' },

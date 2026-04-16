@@ -6139,7 +6139,7 @@ export interface components {
          * @description Current status of a run.
          * @enum {string}
          */
-        MutxRunStatus: "pending" | "running" | "completed" | "failed" | "cancelled" | "timeout";
+        MutxRunStatus: "pending" | "running" | "completed" | "failed" | "cancelled" | "timeout" | "awaiting_owner";
         /**
          * MutxRunStatusUpdate
          * @description Validated payload for patching run status.

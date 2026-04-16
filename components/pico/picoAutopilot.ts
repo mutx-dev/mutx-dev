@@ -191,7 +191,7 @@ export function humanizeRunStatus(status: string) {
 export function getRunSeverity(status: string): AutopilotTimelineItem['severity'] {
   const normalized = status.toUpperCase()
   if (['FAILED', 'ERROR', 'CANCELLED'].includes(normalized)) return 'critical'
-  if (['RUNNING', 'QUEUED', 'PENDING'].includes(normalized)) return 'warn'
+  if (['RUNNING', 'QUEUED', 'PENDING', 'AWAITING_OWNER'].includes(normalized)) return 'warn'
   if (['COMPLETED', 'SUCCEEDED', 'SUCCESS'].includes(normalized)) return 'good'
   return 'neutral'
 }
@@ -213,6 +213,10 @@ export function describeRunDetail(run: AutopilotRunSummary, traces: AutopilotRun
     return excerpt(latestTrace?.message) ?? 'The run is still moving through the pipeline.'
   }
 
+  if (status === 'AWAITING_OWNER') {
+    return excerpt(latestTrace?.message) ?? 'The run is paused — waiting for owner input before continuing.'
+  }
+
   return excerpt(run.output_text) ?? excerpt(latestTrace?.message) ?? excerpt(run.input_text) ?? 'The run completed without a short summary.'
 }
 
@@ -224,6 +228,10 @@ export function explainRunImpact(run: AutopilotRunSummary) {
 
   if (['RUNNING', 'QUEUED', 'PENDING'].includes(status)) {
     return 'Work is still in flight. Watch for hangs, retries, or silence that lasts too long.'
+  }
+
+  if (status === 'AWAITING_OWNER') {
+    return 'The run is paused waiting for owner action. Respond to unblock the pipeline.'
   }
 
   return 'This run completed. Verify the output is actually useful before you automate it harder.'

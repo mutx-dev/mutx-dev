@@ -74,7 +74,8 @@ export function asDashboardStatus(value?: string | null): DashboardStatus {
     normalized.includes("warn") ||
     normalized.includes("retry") ||
     normalized.includes("queued") ||
-    normalized.includes("pending")
+    normalized.includes("pending") ||
+    normalized.includes("awaiting")
   ) {
     return "warning";
   }
@@ -429,7 +430,7 @@ export function BriefingBar({ entries }: { entries: BriefingBarEntry[] }) {
   );
 }
 
-export type RunFlowStatus = "pending" | "running" | "completed" | "failed";
+export type RunFlowStatus = "pending" | "running" | "completed" | "failed" | "awaiting_owner";
 
 export interface QueueDepthEntry {
   status: RunFlowStatus;
@@ -449,6 +450,7 @@ export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
     running: { bar: "bg-cyan-500", text: "text-cyan-300", dot: "bg-cyan-400" },
     completed: { bar: "bg-emerald-500", text: "text-emerald-300", dot: "bg-emerald-400" },
     failed: { bar: "bg-rose-500", text: "text-rose-300", dot: "bg-rose-400" },
+    awaiting_owner: { bar: "bg-amber-500", text: "text-amber-300", dot: "bg-amber-400" },
   };
 
   const total = entries.reduce((sum, e) => sum + e.count, 0);
@@ -511,6 +513,12 @@ export function FlowStatusBar({ stages }: { stages: FlowStage[] }) {
       pending: "border-rose-900/30 bg-[#0a1428] text-slate-600",
       label: "Failed",
       dot: "bg-rose-400",
+    },
+    awaiting_owner: {
+      active: "border-amber-500/50 bg-amber-500/15 text-amber-300",
+      pending: "border-amber-900/30 bg-[#0a1428] text-slate-600",
+      label: "Awaiting Owner",
+      dot: "bg-amber-400",
     },
   };
 

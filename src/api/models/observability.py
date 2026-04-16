@@ -50,6 +50,7 @@ class MutxRunStatus(str, Enum):
     FAILED = "failed"
     CANCELLED = "cancelled"
     TIMEOUT = "timeout"
+    AWAITING_OWNER = "awaiting_owner"
 
 
 class MutxOutcome(str, Enum):
