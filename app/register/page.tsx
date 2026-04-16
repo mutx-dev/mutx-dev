@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 
 import { AuthPage } from "@/components/auth/AuthPage";
+import { PicoAuthPage } from "@/components/pico/PicoAuthPage";
 import {
   getDefaultRedirectPathForHost,
   isPicoHost,
@@ -21,12 +22,24 @@ export default async function RegisterPage({
   const error = Array.isArray(params.error) ? params.error[0] : params.error;
   const email = Array.isArray(params.email) ? params.email[0] : params.email;
 
+  if (isPicoHost(host)) {
+    return (
+      <PicoAuthPage
+        mode="register"
+        nextPath={nextPath}
+        fallbackPath={getDefaultRedirectPathForHost(host)}
+        initialError={error}
+        initialEmail={email}
+      />
+    );
+  }
+
   return (
     <AuthPage
       mode="register"
       nextPath={nextPath}
       fallbackPath={getDefaultRedirectPathForHost(host)}
-      hostVariant={isPicoHost(host) ? "pico" : "default"}
+      hostVariant="default"
       initialError={error}
       initialEmail={email}
     />
