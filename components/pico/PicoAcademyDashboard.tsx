@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -54,6 +55,11 @@ export function PicoAcademyDashboard() {
       }
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="flex items-center justify-center xl:col-span-4">
+          <div className="drop-shadow-[0_0_24px_rgba(74,222,128,0.18)]">
+            <Image src="/pico/mascot/pico-tablet.webp" alt="" width={100} height={100} className="rounded-2xl" />
+          </div>
+        </div>
         <ProgressCard
           label="XP"
           value={String(derived.xp)}

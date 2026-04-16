@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -232,8 +233,13 @@ export function PicoTutorPageClient() {
               ) : null}
             </div>
           ) : (
-            <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-              Ask a concrete question and the tutor will route you to the exact lesson, troubleshooting note, and validation step.
+            <div className="mt-4 flex flex-col items-center gap-4">
+              <div className="drop-shadow-[0_0_24px_rgba(74,222,128,0.18)]">
+                <Image src="/pico/mascot/pico-sprout.webp" alt="" width={120} height={120} className="rounded-2xl" />
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300 text-center">
+                Ask a concrete question and the tutor will route you to the exact lesson, troubleshooting note, and validation step.
+              </div>
             </div>
           )}
         </div>

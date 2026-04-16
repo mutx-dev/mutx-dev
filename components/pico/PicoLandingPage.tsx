@@ -132,6 +132,12 @@ export function PicoLandingPage() {
             </SiteReveal>
 
             <SiteReveal delay={0.3}>
+              <div className={s.heroMascot}>
+                <Image src="/pico/mascot/pico-wave.webp" alt="PicoMUTX mascot" width={240} height={240} priority />
+              </div>
+            </SiteReveal>
+
+            <SiteReveal delay={0.34}>
               <div className={s.trustBar}>
                 {Array.from({ length: 3 }, (_, i) => (
                   <span key={i} className={s.trustItem}>
@@ -313,6 +319,12 @@ export function PicoLandingPage() {
             <div className={s.ctaPanel}>
               <div className={s.ctaPanelGlow} aria-hidden="true" />
               <div className={s.ctaStack}>
+                <div className={s.ctaMascotRow}>
+                  <div className={s.ctaMascot}>
+                    <Image src="/pico/mascot/pico-point-forward.webp" alt="" width={120} height={120} />
+                  </div>
+                </div>
+
                 <SiteReveal delay={0.05}>
                   <span className={s.ctaEyebrow}>
                     <span className={s.ctaEyebrowDot} />

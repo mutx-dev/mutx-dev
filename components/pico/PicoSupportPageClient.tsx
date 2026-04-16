@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -59,6 +60,9 @@ export function PicoSupportPageClient() {
       >
         <section className='grid gap-6 lg:grid-cols-[0.95fr,1.05fr]'>
           <div className='rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]'>
+            <div className='mb-4 flex justify-center drop-shadow-[0_0_24px_rgba(74,222,128,0.18)]'>
+              <Image src='/pico/mascot/pico-coffee.webp' alt='' width={120} height={120} className='rounded-2xl' />
+            </div>
             <p className='text-xs uppercase tracking-[0.24em] text-slate-500'>Before you escalate</p>
             <div className='mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm text-slate-200'>
               If the next move is still obvious, go back and do it. Human help is for the messy edge, not for skipping the lesson.

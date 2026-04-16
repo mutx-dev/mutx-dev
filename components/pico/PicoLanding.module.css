@@ -314,6 +314,17 @@
   margin-top: clamp(1rem, 3vw, 2rem);
 }
 
+.heroMascot {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  display: flex;
+  justify-content: center;
+  filter: drop-shadow(0 0 40px rgba(74, 222, 128, 0.15));
+}
+
+.heroMascot img {
+  border-radius: var(--pico-radius-lg);
+}
+
 .terminal {
   border-radius: var(--pico-radius);
   border: 1px solid var(--pico-border);
@@ -1680,4 +1691,20 @@
   font-size: 0.85rem;
   line-height: 1.5;
   color: var(--pico-text-secondary);
+}
+
+/* --- CTA mascot ---------------------------------------------------- */
+
+.ctaMascotRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.ctaMascot {
+  filter: drop-shadow(0 0 30px rgba(74, 222, 128, 0.18));
+}
+
+.ctaMascot img {
+  border-radius: var(--pico-radius-lg);
 }

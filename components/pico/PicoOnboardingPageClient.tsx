@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect } from 'react'
 import Link from 'next/link'
 
@@ -70,6 +71,9 @@ export function PicoOnboardingPageClient() {
     >
       <section className="grid gap-6 lg:grid-cols-[1fr,1fr]">
         <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
+          <div className="mb-5 flex justify-center drop-shadow-[0_0_30px_rgba(74,222,128,0.18)]">
+            <Image src="/pico/mascot/pico-running.webp" alt="" width={140} height={140} className="rounded-2xl" />
+          </div>
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">First 10 minutes</p>
           <div className="mt-4 rounded-[24px] border border-emerald-400/20 bg-emerald-400/10 p-5 text-sm text-slate-200">
             <p className="font-medium text-white">Fastest path to value</p>

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 
 import { PicoShell } from '@/components/pico/PicoShell'
@@ -466,6 +467,12 @@ export function PicoAutopilotPageClient() {
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div className="flex items-center justify-center md:col-span-2 xl:col-span-5">
+          <div className="drop-shadow-[0_0_24px_rgba(74,222,128,0.18)]">
+            <Image src="/pico/mascot/pico-atom.webp" alt="" width={100} height={100} className="rounded-2xl" />
+          </div>
+        </div>
+
         <StatCard
           label="Runs"
           value={liveValue(String(runs.length))}

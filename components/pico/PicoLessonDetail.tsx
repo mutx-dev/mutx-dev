@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect } from 'react'
 import Link from 'next/link'
 
@@ -182,6 +183,11 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
             </div>
           </section>
 
+          {completed ? (
+            <div className="mt-4 flex justify-center drop-shadow-[0_0_24px_rgba(74,222,128,0.18)]">
+              <Image src="/pico/mascot/pico-thumbs-up.webp" alt="" width={100} height={100} className="rounded-2xl" />
+            </div>
+          ) : null}
           <section className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Prerequisites</p>
             <div className="mt-4 space-y-2">
