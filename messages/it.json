@@ -139,7 +139,13 @@
           "price": "€9",
           "period": "/mese",
           "description": "Esperienza di apprendimento completa",
-          "features": ["1.000 crediti mensili", "Accesso completo al tutor", "Tutte le lezioni dell'accademia", "Modalità Autopilot", "Prova gratuita di 7 giorni"],
+          "features": [
+            "1.000 crediti mensili",
+            "Accesso completo al tutor",
+            "Tutte le lezioni dell'accademia",
+            "Modalità Autopilot",
+            "Prova gratuita di 7 giorni"
+          ],
           "cta": "Inizia la prova di 7 giorni",
           "ctaHref": "/pricing"
         },
@@ -149,7 +155,13 @@
           "period": "/mese",
           "description": "Per chi costruisce sul serio",
           "recommended": true,
-          "features": ["10.000 crediti mensili", "Tutor completo + BYOK", "Accesso API", "Supporto prioritario", "Prova gratuita di 7 giorni"],
+          "features": [
+            "10.000 crediti mensili",
+            "Tutor completo + BYOK",
+            "Accesso API",
+            "Supporto prioritario",
+            "Prova gratuita di 7 giorni"
+          ],
           "cta": "Inizia la prova di 7 giorni",
           "ctaHref": "/pricing"
         },
@@ -158,7 +170,13 @@
           "price": "Personalizzato",
           "period": "",
           "description": "Supporto dedicato e scalabilità",
-          "features": ["100K+ crediti mensili", "SSO e gestione team", "SLA e supporto dedicato", "Flussi di lavoro personalizzati", "Accesso diretto ai fondatori"],
+          "features": [
+            "100K+ crediti mensili",
+            "SSO e gestione team",
+            "SLA e supporto dedicato",
+            "Flussi di lavoro personalizzati",
+            "Accesso diretto ai fondatori"
+          ],
           "cta": "Prenota una chiamata",
           "ctaHref": "https://calendly.com/mutxdev"
         }
@@ -267,6 +285,22 @@
       "verificationFailedRefresh": "Verifica non riuscita. Aggiorna la verifica e riprova.",
       "verificationExpired": "La verifica è scaduta. Completa di nuovo la verifica.",
       "verificationTimedOut": "Timeout della verifica. Completa di nuovo la verifica."
+    },
+    "waitlistLanding": {
+      "badge": "Chiuso per ora · Solo lista d'attesa",
+      "title": "PicoMUTX è chiuso in questo momento.",
+      "body": "Al momento non stiamo accettando accessi al prodotto. Se vuoi essere tra i primi quando Pico riaprirà, pre-registrati qui e inviteremo le persone a ondate controllate.",
+      "secondaryCta": "Unisciti alla lista d'attesa",
+      "statusWorkspace": "Nessun accesso al workspace",
+      "statusAcademy": "Nessun accesso all'academy",
+      "statusEntry": "La lista d'attesa è l'unico punto d'ingresso"
     }
+  },
+  "waitlistForm": {
+    "eyebrow": "Lista d'attesa attiva",
+    "countFallback": "Unisciti alla lista d'attesa",
+    "countRegistered": "{count} iscritti",
+    "title": "Unisciti alla lista di accesso anticipato",
+    "body": "Apriremo l'accesso hosted a ondate. Iscriviti per ricevere aggiornamenti sul lancio e inviti prioritari."
   }
 }

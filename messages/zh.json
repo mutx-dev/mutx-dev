@@ -139,7 +139,13 @@
           "price": "€9",
           "period": "/月",
           "description": "完整的学习体验",
-          "features": ["每月 1,000 积分", "完整导师访问", "所有学院课程", "自动驾驶模式", "7天免费试用"],
+          "features": [
+            "每月 1,000 积分",
+            "完整导师访问",
+            "所有学院课程",
+            "自动驾驶模式",
+            "7天免费试用"
+          ],
           "cta": "开始7天试用",
           "ctaHref": "/pricing"
         },
@@ -149,7 +155,13 @@
           "period": "/月",
           "description": "面向认真的构建者",
           "recommended": true,
-          "features": ["每月 10,000 积分", "完整导师 + BYOK", "API 访问", "优先支持", "7天免费试用"],
+          "features": [
+            "每月 10,000 积分",
+            "完整导师 + BYOK",
+            "API 访问",
+            "优先支持",
+            "7天免费试用"
+          ],
           "cta": "开始7天试用",
           "ctaHref": "/pricing"
         },
@@ -158,7 +170,13 @@
           "price": "定制",
           "period": "",
           "description": "专属支持与规模化",
-          "features": ["每月 100K+ 积分", "SSO 和团队管理", "SLA 与专属支持", "自定义工作流", "直接联系创始人"],
+          "features": [
+            "每月 100K+ 积分",
+            "SSO 和团队管理",
+            "SLA 与专属支持",
+            "自定义工作流",
+            "直接联系创始人"
+          ],
           "cta": "预约通话",
           "ctaHref": "https://calendly.com/mutxdev"
         }
@@ -267,6 +285,22 @@
       "verificationFailedRefresh": "验证失败，请刷新挑战后重试。",
       "verificationExpired": "验证已过期，请重新完成挑战。",
       "verificationTimedOut": "验证超时，请重新完成挑战。"
+    },
+    "waitlistLanding": {
+      "badge": "暂时关闭 · 仅开放候补名单",
+      "title": "PicoMUTX 目前暂时关闭。",
+      "body": "我们目前不接受产品访问。如果你想在 Pico 重新开放时第一时间获得访问，请在这里预注册；我们会分批发出邀请。",
+      "secondaryCta": "加入候补名单",
+      "statusWorkspace": "暂无工作区访问权限",
+      "statusAcademy": "暂无 Academy 访问权限",
+      "statusEntry": "候补名单是唯一入口"
     }
+  },
+  "waitlistForm": {
+    "eyebrow": "候补名单开放中",
+    "countFallback": "加入候补名单",
+    "countRegistered": "已注册 {count} 人",
+    "title": "加入抢先访问名单",
+    "body": "我们会分批开放托管访问。加入名单即可接收上线消息和优先邀请。"
   }
 }

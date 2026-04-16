@@ -158,17 +158,17 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
     <div className={cn(styles.card, compact && styles.compact, className)}>
       <div>
         <div className={styles.topline}>
-          <span className={styles.eyebrow}>Waitlist Live</span>
+          <span className={styles.eyebrow}>{t('eyebrow')}</span>
           <span className={styles.count}>
-            {count === null ? 'Join the waitlist' : `${count.toLocaleString()} registered`}
+            {count === null
+              ? t('countFallback')
+              : t('countRegistered', { count: count.toLocaleString() })}
           </span>
         </div>
 
         <div>
-          <p className={styles.title}>Join the early access list</p>
-          <p className={styles.body}>
-            We’re opening hosted access in waves. Join the list for launch updates and priority invites.
-          </p>
+          <p className={styles.title}>{t('title')}</p>
+          <p className={styles.body}>{t('body')}</p>
         </div>
 
         {success ? (
