@@ -193,12 +193,12 @@
 /* --- Hero --------------------------------------------------------- */
 .hero {
   position: relative;
-  min-height: max(100dvh, 48rem);
+  min-height: max(calc(100svh - 3.6rem), 44rem);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding-top: 5rem;
+  padding-top: 3.6rem;
   overflow: clip;
   background: var(--pico-bg);
 }
@@ -227,9 +227,9 @@
   z-index: 1;
   width: var(--pico-shell);
   margin: 0 auto;
-  padding: clamp(5rem, 10vh, 8rem) 0 clamp(4rem, 8vh, 6rem);
+  padding: clamp(3.5rem, 8vh, 6.5rem) 0 clamp(2.5rem, 6vh, 4.5rem);
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
   justify-items: center;
   max-width: 54rem;
 }
@@ -329,6 +329,8 @@
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
+  border: none;
+  cursor: pointer;
   box-shadow: 0 12px 32px rgba(200, 155, 98, 0.18);
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
@@ -1259,26 +1261,31 @@
 
 /* --- Trust bar ---------------------------------------------------- */
 .trustBar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 0;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  color: var(--pico-text-muted);
-  max-width: 30rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 48rem;
 }
 
 .trustItem {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  min-height: 4rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1.1rem;
+  border: 1px solid var(--pico-border);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.05), rgba(255, 248, 236, 0.02));
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--pico-text-secondary);
+  text-align: center;
 }
 
 .trustSep {
-  color: var(--pico-text-muted);
-  opacity: 0.4;
-  margin: 0 0.5rem;
+  display: none;
 }
 
 /* --- Problem section --------------------------------------------- */
@@ -1339,45 +1346,79 @@
   line-height: 1.2;
 }
 
-/* --- How it works grid ------------------------------------------- */
-.howGrid {
+/* --- Launch path ------------------------------------------------- */
+.launchIntro {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: clamp(2.25rem, 4vw, 3.25rem);
 }
 
-@media (max-width: 639px) {
-  .howGrid {
-    grid-template-columns: 1fr;
+@media (min-width: 960px) {
+  .launchIntro {
+    grid-template-columns: minmax(0, 38rem) minmax(16rem, 1fr);
+    align-items: end;
   }
 }
 
-.howCard {
+.launchIntro .sectionHeader {
+  margin-bottom: 0;
+}
+
+.launchNote {
+  margin: 0;
+  max-width: 24rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--pico-text-secondary);
+}
+
+.launchSteps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   display: grid;
-  gap: 0.7rem;
-  padding: clamp(1.3rem, 3vw, 1.8rem);
-  border-radius: var(--pico-radius);
+  gap: 1rem;
+}
+
+.launchStep {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: clamp(1.1rem, 2.3vw, 1.45rem);
+  border-radius: var(--pico-radius-lg);
   border: 1px solid var(--pico-border);
-  border-left: 3px solid var(--pico-accent);
-  background: var(--pico-bg-surface);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.04), rgba(255, 248, 236, 0.02));
   transition: border-color 200ms ease, background 200ms ease, transform 200ms ease,
     box-shadow 200ms ease;
 }
 
-.howCard:hover {
+.launchStep:hover {
   border-color: rgba(212, 171, 115, 0.3);
-  border-left-color: var(--pico-accent);
   background: rgba(212, 171, 115, 0.04);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), -3px 0 20px rgba(212, 171, 115, 0.06);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.26);
 }
 
 @media (hover: hover) {
-  .howCard:hover {
+  .launchStep:hover {
     transform: translateY(-2px);
   }
 }
 
-.howIconWrap {
+.launchIndex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.4rem;
+  font-family: var(--pico-font-display);
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--pico-accent);
+}
+
+.launchStepIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1387,10 +1428,15 @@
   background: var(--pico-accent-soft);
   color: var(--pico-accent);
   border: 1px solid rgba(212, 171, 115, 0.1);
-  margin-bottom: 0.2rem;
 }
 
-.howTitle {
+.launchStepContent {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 40rem;
+}
+
+.launchTitle {
   margin: 0;
   font-family: var(--pico-font-body);
   font-size: clamp(1rem, 1.8vw, 1.25rem);
@@ -1400,7 +1446,7 @@
   color: var(--pico-text);
 }
 
-.howBody {
+.launchBody {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.55;
@@ -1568,43 +1614,70 @@
 }
 
 /* --- FAQ --------------------------------------------------------- */
-.faqGrid {
+.faqStack {
   display: grid;
+  gap: 0;
+  border-top: 1px solid var(--pico-border);
+  border-bottom: 1px solid var(--pico-border);
+}
+
+.faqItem {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 233, 204, 0.08);
+}
+
+.faqItem:first-child {
+  border-top: none;
+}
+
+.faqSummary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 1rem;
-  grid-template-columns: 1fr;
+  cursor: pointer;
+  list-style: none;
 }
 
-@media (min-width: 768px) {
-  .faqGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.faqCard {
-  padding: clamp(1.2rem, 2.5vw, 1.6rem);
-  border-radius: var(--pico-radius);
-  border: 1px solid var(--pico-border);
-  background: var(--pico-bg-surface);
-  display: grid;
-  gap: 0.6rem;
-  transition: border-color 200ms ease;
-}
-
-.faqCard:hover {
-  border-color: var(--pico-border-hover);
+.faqSummary::-webkit-details-marker {
+  display: none;
 }
 
 .faqQ {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
   color: var(--pico-text);
 }
 
+.faqToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--pico-border);
+  color: var(--pico-accent);
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.faqItem[open] .faqToggle {
+  transform: rotate(45deg);
+  border-color: var(--pico-border-hover);
+  background: rgba(212, 171, 115, 0.08);
+}
+
 .faqA {
   margin: 0;
-  font-size: 0.88rem;
+  max-width: 42rem;
+  font-size: 0.92rem;
   line-height: 1.55;
   color: var(--pico-text-secondary);
 }
@@ -1814,4 +1887,79 @@
   font-size: 0.85rem;
   line-height: 1.5;
   color: var(--pico-text-secondary);
+}
+
+@media (max-width: 767px) {
+  .navInner {
+    min-height: 3.35rem;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .heroGrid {
+    padding: 2.25rem 0 1.5rem;
+    gap: 1rem;
+  }
+
+  .heroMascot {
+    width: 128px;
+    height: 128px;
+  }
+
+  .heroTitle {
+    font-size: clamp(2.7rem, 14vw, 4rem);
+    max-width: 10ch;
+  }
+
+  .heroSub {
+    font-size: 1rem;
+    line-height: 1.55;
+    max-width: 22rem;
+  }
+
+  .heroCtaRow {
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .heroCtaPrimary,
+  .heroCtaSecondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .heroMeta {
+    max-width: 20rem;
+  }
+
+  .trustBar {
+    grid-template-columns: 1fr;
+    max-width: 22rem;
+  }
+
+  .trustItem {
+    justify-content: flex-start;
+    min-height: auto;
+    text-align: left;
+  }
+
+  .launchStep {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .launchIndex {
+    min-width: 0;
+  }
+
+  .pricingCardRecommended,
+  .pricingCardRecommended:hover {
+    transform: none;
+  }
+
+  .ctaPanel {
+    padding: 2rem 1.25rem;
+  }
 }

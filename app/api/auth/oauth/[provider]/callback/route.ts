@@ -11,7 +11,7 @@ import {
   resolveRedirectPath,
 } from "@/lib/auth/redirects";
 
-const OAUTH_COOKIE_PREFIX="***";
+const OAUTH_COOKIE_PREFIX = "mutx_oauth";
 const SUPPORTED_PROVIDERS = new Set(["google", "github", "discord", "apple"]);
 
 function resolveProvider(value: string) {
@@ -38,9 +38,18 @@ function clearOAuthCookies(response: NextResponse, request: NextRequest) {
   }
 }
 
+function getRequestHeader(request: NextRequest, name: string) {
+  return request.headers?.get?.(name) ?? null;
+}
+
 function getPublicOrigin(request: NextRequest): string {
-  const forwardedHost = request.headers.get("x-forwarded-host") || request.headers.get("host");
-  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+  const forwardedHost =
+    getRequestHeader(request, "x-forwarded-host") ||
+    getRequestHeader(request, "host");
+  const forwardedProto =
+    getRequestHeader(request, "x-forwarded-proto") ||
+    request.nextUrl.protocol.replace(":", "") ||
+    "https";
   return forwardedHost
     ? `${forwardedProto}://${forwardedHost.split(",")[0].trim()}`
     : request.nextUrl.origin;

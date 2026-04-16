@@ -40,6 +40,23 @@ function setOAuthCookie(
   });
 }
 
+function getRequestHeader(request: NextRequest, name: string) {
+  return request.headers?.get?.(name) ?? null;
+}
+
+function getPublicOrigin(request: NextRequest): string {
+  const forwardedHost =
+    getRequestHeader(request, "x-forwarded-host") ||
+    getRequestHeader(request, "host");
+  const forwardedProto =
+    getRequestHeader(request, "x-forwarded-proto") ||
+    request.nextUrl.protocol.replace(":", "") ||
+    "https";
+  return forwardedHost
+    ? `${forwardedProto}://${forwardedHost.split(",")[0].trim()}`
+    : request.nextUrl.origin;
+}
+
 function buildAuthRedirect(
   request: NextRequest,
   intent: string,
@@ -77,10 +94,7 @@ export async function GET(
     );
   }
 
-  const redirectUri = new URL(
-    `/api/auth/oauth/${provider}/callback`,
-    request.nextUrl.origin,
-  ).toString();
+  const redirectUri = `${getPublicOrigin(request)}/api/auth/oauth/${provider}/callback`;
   const state = randomBytes(24).toString("base64url");
   const authorizeUrl = new URL(
     `${getApiBaseUrl()}/v1/auth/oauth/${provider}/authorize`,

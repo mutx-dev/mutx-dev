@@ -121,11 +121,15 @@ export function PicoLandingPage() {
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
                 <div className={s.heroCtaRow}>
-                  <Link href="/login" className={s.heroCtaPrimary}>
+                  <button
+                    type="button"
+                    className={s.heroCtaPrimary}
+                    onClick={() => openForm('building-first')}
+                  >
                     {t('hero.cta')}
                     <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <a href="#pricing" className={s.heroCtaSecondary}>
+                  </button>
+                  <a href="#launch-path" className={s.heroCtaSecondary}>
                     {t('hero.ctaSecondary') || 'See pricing'}
                   </a>
                 </div>
@@ -173,30 +177,38 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        <section className={`${s.section} ${s.sectionAlt}`}>
+        <section id="launch-path" className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
-            <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>{t('platform.eyebrow')}</span>
-              <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
-              <p className={s.sectionBody}>{t('platform.body')}</p>
+            <div className={s.launchIntro}>
+              <div className={s.sectionHeader}>
+                <span className={s.eyebrow}>{t('platform.eyebrow')}</span>
+                <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
+                <p className={s.sectionBody}>{t('platform.body')}</p>
+              </div>
+              <p className={s.launchNote}>
+                {t('beforeAfter.close')}
+              </p>
             </div>
-            <div className={s.howGrid}>
+            <ol className={s.launchSteps}>
               {Array.from({ length: 4 }, (_, i) => (
                 <SiteReveal key={i} delay={i * 0.06}>
-                  <motion.div
+                  <motion.li
                     whileHover={prefersReducedMotion ? undefined : { y: -3 }}
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                    className={s.howCard}
+                    className={s.launchStep}
                   >
-                    <span className={s.howIconWrap}>
+                    <span className={s.launchIndex}>0{i + 1}</span>
+                    <div className={s.launchStepIcon}>
                       <HowItWorksIcon kind={HOW_ICONS[i]} />
-                    </span>
-                    <h3 className={s.howTitle}>{t(`platform.howItWorks.${i}.title`)}</h3>
-                    <p className={s.howBody}>{t(`platform.howItWorks.${i}.body`)}</p>
-                  </motion.div>
+                    </div>
+                    <div className={s.launchStepContent}>
+                      <h3 className={s.launchTitle}>{t(`platform.howItWorks.${i}.title`)}</h3>
+                      <p className={s.launchBody}>{t(`platform.howItWorks.${i}.body`)}</p>
+                    </div>
+                  </motion.li>
                 </SiteReveal>
               ))}
-            </div>
+            </ol>
           </div>
         </section>
 
@@ -291,12 +303,15 @@ export function PicoLandingPage() {
               <span className={s.eyebrow}>{t('faq.eyebrow')}</span>
               <h2 className={s.sectionTitle}>{t('faq.title')}</h2>
             </div>
-            <div className={s.faqGrid}>
+            <div className={s.faqStack}>
               {Array.from({ length: 5 }, (_, i) => (
-                <div key={i} className={s.faqCard}>
-                  <h3 className={s.faqQ}>{t(`faq.items.${i}.q`)}</h3>
+                <details key={i} className={s.faqItem} open={i === 0}>
+                  <summary className={s.faqSummary}>
+                    <h3 className={s.faqQ}>{t(`faq.items.${i}.q`)}</h3>
+                    <span className={s.faqToggle} aria-hidden="true">+</span>
+                  </summary>
                   <p className={s.faqA}>{t(`faq.items.${i}.a`)}</p>
-                </div>
+                </details>
               ))}
             </div>
           </div>
@@ -311,15 +326,15 @@ export function PicoLandingPage() {
             <div className={s.pricingGrid}>
               {(['starter', 'pro', 'enterprise'] as const).map((tier) => {
                 const isRecommended = tier === 'pro'
+                const ctaHref = t(`pricing.tiers.${tier}.ctaHref`)
+                const isExternalCta = ctaHref.startsWith('http')
                 return (
                   <div
                     key={tier}
                     className={`${s.pricingCard} ${isRecommended ? s.pricingCardRecommended : ''}`}
                   >
                     {isRecommended && (
-                      <span className={s.pricingBadge}>
-                        {t('pricing.tiers.pro.recommended') ? 'RECOMMENDED' : ''}
-                      </span>
+                      <span className={s.pricingBadge}>Recommended</span>
                     )}
                     <h3 className={s.pricingName}>{t(`pricing.tiers.${tier}.name`)}</h3>
                     <div className={s.pricingPrice}>
@@ -337,12 +352,24 @@ export function PicoLandingPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      href={t(`pricing.tiers.${tier}.ctaHref`)}
-                      className={`${s.pricingCta} ${isRecommended ? s.pricingCtaPrimary : ''}`}
-                    >
-                      {t(`pricing.tiers.${tier}.cta`)}
-                    </Link>
+                    {isExternalCta ? (
+                      <a
+                        href={ctaHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`${s.pricingCta} ${isRecommended ? s.pricingCtaPrimary : ''}`}
+                      >
+                        {t(`pricing.tiers.${tier}.cta`)}
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openForm(isRecommended ? 'evaluating' : 'building-first')}
+                        className={`${s.pricingCta} ${isRecommended ? s.pricingCtaPrimary : ''}`}
+                      >
+                        {t('finalCta.ctaButton')}
+                      </button>
+                    )}
                   </div>
                 )
               })}
