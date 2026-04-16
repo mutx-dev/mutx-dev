@@ -124,3 +124,6 @@ pnpm-lock.yaml
 public/docs-search-index.json
 *.bak
 ALL_MUTX_PDFs_Extracted.txt
+
+# GTM data — local only, never in repo
+docs/pico-gtm/
