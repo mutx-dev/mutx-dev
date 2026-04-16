@@ -7945,7 +7945,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalActionResponse"
+                }
               }
             }
           },
@@ -8012,7 +8014,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalActionResponse"
+                }
               }
             }
           },
@@ -8123,7 +8127,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptResponse"
+                }
               }
             }
           },
@@ -8192,7 +8198,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SessionReceiptListResponse"
+                }
               }
             }
           },
@@ -8337,12 +8345,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -8452,7 +8455,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCreateResponse"
+                }
               }
             }
           },
@@ -8509,7 +8514,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSummaryResponse"
+                }
               }
             }
           },
@@ -8564,7 +8571,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCloseResponse"
+                }
               }
             }
           },
@@ -14920,6 +14929,25 @@
         ],
         "title": "ApprovalActionRequest",
         "description": "Approve or deny a request."
+      },
+      "ApprovalActionResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "request_id"
+        ],
+        "title": "ApprovalActionResponse",
+        "description": "Response for approve/deny action on an approval request."
       },
       "ApprovalCreate": {
         "properties": {
@@ -22301,6 +22329,136 @@
         ],
         "title": "ReasoningTemplateResponse"
       },
+      "ReceiptResponse": {
+        "properties": {
+          "receipt_id": {
+            "type": "string",
+            "title": "Receipt Id",
+            "default": ""
+          },
+          "action_id": {
+            "type": "string",
+            "title": "Action Id",
+            "default": ""
+          },
+          "action_hash": {
+            "type": "string",
+            "title": "Action Hash",
+            "default": ""
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id",
+            "default": ""
+          },
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name",
+            "default": ""
+          },
+          "tool_args": {
+            "type": "object",
+            "title": "Tool Args"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id",
+            "default": ""
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id",
+            "default": ""
+          },
+          "policy_decision": {
+            "type": "string",
+            "title": "Policy Decision",
+            "default": ""
+          },
+          "policy_rule_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy Rule Id"
+          },
+          "policy_rule_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy Rule Name"
+          },
+          "decision_reason": {
+            "type": "string",
+            "title": "Decision Reason",
+            "default": ""
+          },
+          "outcome": {
+            "type": "string",
+            "title": "Outcome",
+            "default": ""
+          },
+          "outcome_detail": {
+            "type": "string",
+            "title": "Outcome Detail",
+            "default": ""
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp",
+            "default": ""
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "signature": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature"
+          },
+          "signed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signed By"
+          },
+          "metadata": {
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "title": "ReceiptResponse",
+        "description": "Response for a single action receipt."
+      },
       "RefreshRequest": {
         "properties": {
           "refresh_token": {
@@ -24119,6 +24277,49 @@
         ],
         "title": "SessionActionResponse"
       },
+      "SessionCloseResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "status"
+        ],
+        "title": "SessionCloseResponse",
+        "description": "Response for closing a session."
+      },
+      "SessionCreateResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "agent_id",
+          "created_at"
+        ],
+        "title": "SessionCreateResponse",
+        "description": "Response for creating a security session."
+      },
       "SessionListResponse": {
         "properties": {
           "sessions": {
@@ -24134,6 +24335,86 @@
           "sessions"
         ],
         "title": "SessionListResponse"
+      },
+      "SessionReceiptListResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "receipts": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Receipts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "count"
+        ],
+        "title": "SessionReceiptListResponse",
+        "description": "Response for listing receipts in a session."
+      },
+      "SessionSummaryResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "duration_seconds": {
+            "type": "number",
+            "title": "Duration Seconds",
+            "default": 0.0
+          },
+          "total_actions": {
+            "type": "integer",
+            "title": "Total Actions",
+            "default": 0
+          },
+          "permits": {
+            "type": "integer",
+            "title": "Permits",
+            "default": 0
+          },
+          "denials": {
+            "type": "integer",
+            "title": "Denials",
+            "default": 0
+          },
+          "defers": {
+            "type": "integer",
+            "title": "Defers",
+            "default": 0
+          },
+          "errors": {
+            "type": "integer",
+            "title": "Errors",
+            "default": 0
+          },
+          "intent_alignment": {
+            "type": "string",
+            "title": "Intent Alignment",
+            "default": "unknown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "agent_id"
+        ],
+        "title": "SessionSummaryResponse",
+        "description": "Response for getting a session summary."
       },
       "StarterDeploymentCreate": {
         "properties": {

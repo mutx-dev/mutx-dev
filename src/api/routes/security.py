@@ -23,6 +23,7 @@ https://github.com/aarm-dev/docs/blob/main/LICENSE.txt
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel, Field
 
 from src.api.middleware.auth import get_current_user
@@ -114,6 +115,84 @@ class ComplianceResponse(BaseModel):
     checked_at: str
     summary: dict[str, Any]
     results: list[dict[str, Any]]
+
+
+class ApprovalActionResponse(BaseModel):
+    """Response for approve/deny action on an approval request."""
+
+    status: str
+    request_id: str
+
+
+class ReceiptActionModel(BaseModel):
+    """Action summary within a receipt."""
+
+    id: str = ""
+    tool_name: str = ""
+    action_hash: str = ""
+    timestamp: str = ""
+    effect: str = ""
+
+
+class ReceiptResponse(BaseModel):
+    """Response for a single action receipt."""
+
+    receipt_id: str = ""
+    action_id: str = ""
+    action_hash: str = ""
+    session_id: str = ""
+    tool_name: str = ""
+    tool_args: dict[str, Any] = Field(default_factory=dict)
+    agent_id: str = ""
+    user_id: str = ""
+    policy_decision: str = ""
+    policy_rule_id: Optional[str] = None
+    policy_rule_name: Optional[str] = None
+    decision_reason: str = ""
+    outcome: str = ""
+    outcome_detail: str = ""
+    timestamp: str = ""
+    duration_ms: Optional[int] = None
+    signature: Optional[str] = None
+    signed_by: Optional[str] = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SessionReceiptListResponse(BaseModel):
+    """Response for listing receipts in a session."""
+
+    session_id: str
+    count: int
+    receipts: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class SessionCreateResponse(BaseModel):
+    """Response for creating a security session."""
+
+    session_id: str
+    agent_id: str
+    created_at: str
+
+
+class SessionSummaryResponse(BaseModel):
+    """Response for getting a session summary."""
+
+    session_id: str
+    agent_id: str
+    duration_seconds: float = 0.0
+    total_actions: int = 0
+    permits: int = 0
+    denials: int = 0
+    defers: int = 0
+    errors: int = 0
+    intent_alignment: str = "unknown"
+
+
+class SessionCloseResponse(BaseModel):
+    """Response for closing a session."""
+
+    session_id: str
+    status: str
 
 
 class MetricsResponse(BaseModel):
@@ -240,7 +319,11 @@ async def get_approval(
     )
 
 
-@router.post("/approvals/{token}/approve", status_code=status.HTTP_200_OK)
+@router.post(
+    "/approvals/{token}/approve",
+    response_model=ApprovalActionResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def approve_request(
     token: str,
     request: ApprovalActionRequest,
@@ -268,10 +351,17 @@ async def approve_request(
         comment=request.comment,
     )
 
-    return {"status": "approved", "request_id": approval_request.id}
+    return ApprovalActionResponse(
+        status="approved",
+        request_id=approval_request.id,
+    )
 
 
-@router.post("/approvals/{token}/deny", status_code=status.HTTP_200_OK)
+@router.post(
+    "/approvals/{token}/deny",
+    response_model=ApprovalActionResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def deny_request(
     token: str,
     request: ApprovalActionRequest,
@@ -299,7 +389,10 @@ async def deny_request(
         comment=request.comment,
     )
 
-    return {"status": "denied", "request_id": approval_request.id}
+    return ApprovalActionResponse(
+        status="denied",
+        request_id=approval_request.id,
+    )
 
 
 @router.get("/approvals", response_model=list[ApprovalRequestResponse])
@@ -324,7 +417,7 @@ async def list_pending_approvals(
     ]
 
 
-@router.get("/receipts/{receipt_id}")
+@router.get("/receipts/{receipt_id}", response_model=ReceiptResponse)
 async def get_receipt(
     receipt_id: str,
     current_user: User = Depends(get_current_user),
@@ -335,10 +428,10 @@ async def get_receipt(
     if not receipt:
         raise HTTPException(status_code=404, detail="Receipt not found")
 
-    return receipt.to_dict()
+    return ReceiptResponse(**receipt.to_dict())
 
 
-@router.get("/receipts/session/{session_id}")
+@router.get("/receipts/session/{session_id}", response_model=SessionReceiptListResponse)
 async def get_session_receipts(
     session_id: str,
     limit: int = Query(default=100, ge=1, le=1000),
@@ -347,11 +440,11 @@ async def get_session_receipts(
     """Get receipts for a session."""
     receipts = _receipt_generator.get_receipts_for_session(session_id, limit)
 
-    return {
-        "session_id": session_id,
-        "count": len(receipts),
-        "receipts": [r.to_dict() for r in receipts],
-    }
+    return SessionReceiptListResponse(
+        session_id=session_id,
+        count=len(receipts),
+        receipts=[r.to_dict() for r in receipts],
+    )
 
 
 @router.get("/compliance", response_model=ComplianceResponse)
@@ -396,15 +489,15 @@ async def get_metrics(
     return MetricsResponse(**_telemetry_exporter.get_metrics_summary())
 
 
-@router.get("/metrics/prometheus")
+@router.get("/metrics/prometheus", response_class=Response)
 async def get_prometheus_metrics(
     current_user: User = Depends(get_current_user),
 ):
     """Get metrics in Prometheus format."""
-    return _telemetry_exporter.get_prometheus_metrics()
+    return PlainTextResponse(content=_telemetry_exporter.get_prometheus_metrics())
 
 
-@router.post("/sessions")
+@router.post("/sessions", response_model=SessionCreateResponse, status_code=status.HTTP_200_OK)
 async def create_session(
     session_id: str = Query(..., description="Session ID"),
     agent_id: str = Query(..., description="Agent ID"),
@@ -422,14 +515,14 @@ async def create_session(
         stated_intent=stated_intent,
     )
 
-    return {
-        "session_id": context.session_id,
-        "agent_id": context.agent_id,
-        "created_at": context.created_at.isoformat(),
-    }
+    return SessionCreateResponse(
+        session_id=context.session_id,
+        agent_id=context.agent_id,
+        created_at=context.created_at.isoformat(),
+    )
 
 
-@router.get("/sessions/{session_id}")
+@router.get("/sessions/{session_id}", response_model=SessionSummaryResponse)
 async def get_session(
     session_id: str,
     current_user: User = Depends(get_current_user),
@@ -440,10 +533,11 @@ async def get_session(
     if not context:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    return _context_accumulator.get_session_summary(session_id)
+    summary = _context_accumulator.get_session_summary(session_id)
+    return SessionSummaryResponse(**summary)
 
 
-@router.delete("/sessions/{session_id}")
+@router.delete("/sessions/{session_id}", response_model=SessionCloseResponse)
 async def close_session(
     session_id: str,
     current_user: User = Depends(get_current_user),
@@ -454,4 +548,4 @@ async def close_session(
     if not context:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    return {"session_id": session_id, "status": "closed"}
+    return SessionCloseResponse(session_id=session_id, status="closed")

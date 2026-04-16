@@ -4087,6 +4087,16 @@ export interface components {
             comment: string;
         };
         /**
+         * ApprovalActionResponse
+         * @description Response for approve/deny action on an approval request.
+         */
+        ApprovalActionResponse: {
+            /** Status */
+            status: string;
+            /** Request Id */
+            request_id: string;
+        };
+        /**
          * ApprovalCreate
          * @description Payload for creating a new approval request.
          */
@@ -6956,6 +6966,86 @@ export interface components {
             /** Outputs */
             outputs?: components["schemas"]["ReasoningTemplateOutputResponse"][];
         };
+        /**
+         * ReceiptResponse
+         * @description Response for a single action receipt.
+         */
+        ReceiptResponse: {
+            /**
+             * Receipt Id
+             * @default
+             */
+            receipt_id: string;
+            /**
+             * Action Id
+             * @default
+             */
+            action_id: string;
+            /**
+             * Action Hash
+             * @default
+             */
+            action_hash: string;
+            /**
+             * Session Id
+             * @default
+             */
+            session_id: string;
+            /**
+             * Tool Name
+             * @default
+             */
+            tool_name: string;
+            /** Tool Args */
+            tool_args?: Record<string, never>;
+            /**
+             * Agent Id
+             * @default
+             */
+            agent_id: string;
+            /**
+             * User Id
+             * @default
+             */
+            user_id: string;
+            /**
+             * Policy Decision
+             * @default
+             */
+            policy_decision: string;
+            /** Policy Rule Id */
+            policy_rule_id?: string | null;
+            /** Policy Rule Name */
+            policy_rule_name?: string | null;
+            /**
+             * Decision Reason
+             * @default
+             */
+            decision_reason: string;
+            /**
+             * Outcome
+             * @default
+             */
+            outcome: string;
+            /**
+             * Outcome Detail
+             * @default
+             */
+            outcome_detail: string;
+            /**
+             * Timestamp
+             * @default
+             */
+            timestamp: string;
+            /** Duration Ms */
+            duration_ms?: number | null;
+            /** Signature */
+            signature?: string | null;
+            /** Signed By */
+            signed_by?: string | null;
+            /** Metadata */
+            metadata?: Record<string, never>;
+        };
         /** RefreshRequest */
         RefreshRequest: {
             /** Refresh Token */
@@ -7583,10 +7673,89 @@ export interface components {
             /** Detail */
             detail?: string | null;
         };
+        /**
+         * SessionCloseResponse
+         * @description Response for closing a session.
+         */
+        SessionCloseResponse: {
+            /** Session Id */
+            session_id: string;
+            /** Status */
+            status: string;
+        };
+        /**
+         * SessionCreateResponse
+         * @description Response for creating a security session.
+         */
+        SessionCreateResponse: {
+            /** Session Id */
+            session_id: string;
+            /** Agent Id */
+            agent_id: string;
+            /** Created At */
+            created_at: string;
+        };
         /** SessionListResponse */
         SessionListResponse: {
             /** Sessions */
             sessions: Record<string, never>[];
+        };
+        /**
+         * SessionReceiptListResponse
+         * @description Response for listing receipts in a session.
+         */
+        SessionReceiptListResponse: {
+            /** Session Id */
+            session_id: string;
+            /** Count */
+            count: number;
+            /** Receipts */
+            receipts?: Record<string, never>[];
+        };
+        /**
+         * SessionSummaryResponse
+         * @description Response for getting a session summary.
+         */
+        SessionSummaryResponse: {
+            /** Session Id */
+            session_id: string;
+            /** Agent Id */
+            agent_id: string;
+            /**
+             * Duration Seconds
+             * @default 0
+             */
+            duration_seconds: number;
+            /**
+             * Total Actions
+             * @default 0
+             */
+            total_actions: number;
+            /**
+             * Permits
+             * @default 0
+             */
+            permits: number;
+            /**
+             * Denials
+             * @default 0
+             */
+            denials: number;
+            /**
+             * Defers
+             * @default 0
+             */
+            defers: number;
+            /**
+             * Errors
+             * @default 0
+             */
+            errors: number;
+            /**
+             * Intent Alignment
+             * @default unknown
+             */
+            intent_alignment: string;
         };
         /** StarterDeploymentCreate */
         StarterDeploymentCreate: {
@@ -12336,7 +12505,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ApprovalActionResponse"];
                 };
             };
             /** @description Validation Error */
@@ -12373,7 +12542,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ApprovalActionResponse"];
                 };
             };
             /** @description Validation Error */
@@ -12437,7 +12606,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ReceiptResponse"];
                 };
             };
             /** @description Validation Error */
@@ -12472,7 +12641,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["SessionReceiptListResponse"];
                 };
             };
             /** @description Validation Error */
@@ -12564,9 +12733,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": unknown;
-                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -12607,7 +12774,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["SessionCreateResponse"];
                 };
             };
             /** @description Validation Error */
@@ -12640,7 +12807,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["SessionSummaryResponse"];
                 };
             };
             /** @description Validation Error */
@@ -12673,7 +12840,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["SessionCloseResponse"];
                 };
             };
             /** @description Validation Error */
