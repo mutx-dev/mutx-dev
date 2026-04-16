@@ -1,6 +1,9 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
+
+import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const PLANS = [
   {
@@ -75,6 +78,7 @@ const PLANS = [
 
 export function PicoPricingPage() {
   const [loading, setLoading] = useState<string | null>(null)
+  const pricingRobot = picoRobotArtById.coins
 
   async function handleCheckout(planId: string, priceId: string | null) {
     if (!priceId) return
@@ -117,6 +121,25 @@ export function PicoPricingPage() {
       padding: '4rem 1.5rem 6rem',
     }}>
       <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+          <div style={{
+            width: 'min(12rem, 44vw)',
+            borderRadius: '1.75rem',
+            border: '1px solid rgba(164, 255, 92, 0.16)',
+            background: 'linear-gradient(180deg, rgba(6, 12, 7, 0.94), rgba(3, 7, 4, 0.98))',
+            boxShadow: '0 20px 44px rgba(0, 0, 0, 0.28)',
+            padding: '1rem',
+          }}>
+            <Image
+              src={pricingRobot.src}
+              alt={pricingRobot.alt}
+              width={320}
+              height={320}
+              style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'contain' }}
+              sizes="(max-width: 640px) 44vw, 12rem"
+            />
+          </div>
+        </div>
         <h1 style={{
           fontFamily: 'var(--pico-font-display)',
           fontSize: 'clamp(2rem, 5vw, 3.2rem)',

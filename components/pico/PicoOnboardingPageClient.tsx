@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -20,6 +21,7 @@ import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
 import { getLessonBySlug, PICO_TRACKS } from '@/lib/pico/academy'
 import { usePicoHref } from '@/lib/pico/navigation'
+import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const activationChecklist = [
   {
@@ -164,6 +166,7 @@ export function PicoOnboardingPageClient() {
   }, [setup.onboarding])
 
   const currentBinding = setup.runtime?.current_binding ?? setup.runtime?.bindings[0] ?? null
+  const onboardingRobot = picoRobotArtById.guide
 
   const runtimeDraftDirty = useMemo(() => {
     const runtime = setup.runtime
@@ -350,6 +353,25 @@ export function PicoOnboardingPageClient() {
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 The premium version of onboarding is narrow on purpose. No browsing, no stack tourism, no decorative busywork before one real artifact exists.
               </p>
+            </div>
+
+            <div className={picoInset('overflow-hidden p-0')}>
+              <div className="border-b border-[color:var(--pico-border)] p-5">
+                <p className={picoClasses.label}>Guide marker</p>
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  The operator should feel guided, not crowded. One clear mascot cue is enough while the first proof is still forming.
+                </p>
+              </div>
+              <div className="flex items-center justify-center p-6">
+                <Image
+                  src={onboardingRobot.src}
+                  alt={onboardingRobot.alt}
+                  width={220}
+                  height={220}
+                  className="h-auto w-full max-w-[11rem] object-contain drop-shadow-[0_12px_28px_rgba(164,255,92,0.18)]"
+                  sizes="176px"
+                />
+              </div>
             </div>
 
             <div className={picoInset('p-5')}>

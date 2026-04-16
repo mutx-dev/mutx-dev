@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function PicoWipPage() {
@@ -8,23 +9,14 @@ export default function PicoWipPage() {
       <div className="pico-wip-pulse" />
       <div className="pico-wip-content">
         <div className="pico-wip-icon">
-          <svg
-            width="64"
-            height="64"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--pico-accent)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 6V2H8" />
-            <path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z" />
-            <path d="M2 12h2" />
-            <path d="M9 11v2" />
-            <path d="M15 11v2" />
-            <path d="M20 12h2" />
-          </svg>
+          <Image
+            src="/pico/robot/celebrate.png"
+            alt="PicoMUTX robot celebrating an upcoming release"
+            width={320}
+            height={320}
+            className="pico-wip-robot"
+            priority
+          />
         </div>
         <h1 className="pico-wip-title">Coming Soon</h1>
         <p className="pico-wip-subtitle">
@@ -79,6 +71,19 @@ export default function PicoWipPage() {
         .pico-wip-icon {
           margin: 0 auto 1.5rem;
           opacity: 0.9;
+        }
+
+        .pico-wip-robot {
+          display: block;
+          width: min(14rem, 44vw);
+          height: auto;
+          padding: 0.65rem;
+          border-radius: 1.6rem;
+          border: 1px solid rgba(164, 255, 92, 0.18);
+          background:
+            radial-gradient(circle at 50% 14%, rgba(164, 255, 92, 0.18), transparent 48%),
+            linear-gradient(180deg, rgba(5, 10, 5, 0.98), rgba(2, 4, 2, 1));
+          box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
         }
 
         .pico-wip-title {

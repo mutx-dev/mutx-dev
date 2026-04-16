@@ -11,6 +11,7 @@ import s from './PicoLanding.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
+import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const HOW_ICONS = ['path', 'support', 'shield', 'expert'] as const
 
@@ -54,6 +55,7 @@ export function PicoLandingPage() {
   const prefersReducedMotion = useReducedMotion()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
+  const heroRobot = picoRobotArtById.heroWave
 
   const openForm = useCallback((interest?: string) => {
     setFormInterest(interest)
@@ -91,18 +93,21 @@ export function PicoLandingPage() {
       <main className={s.main}>
         <section className={s.hero}>
           <div className={s.heroAmbient} aria-hidden="true" />
-          <div className={s.heroGrid}>
-            <div className={s.heroMascotWrap}>
+          <div className={s.heroRobotStage} aria-hidden="true">
+            <div className={s.heroRobotGlow} />
+            <div className={s.heroRobotFrame}>
               <Image
-                src="/pico/mascot/pico-hero.svg"
-                alt="PicoMUTX mascot"
-                width={180}
-                height={180}
+                src={heroRobot.src}
+                alt=""
+                width={1536}
+                height={1024}
                 priority
-                className={s.heroMascot}
+                className={s.heroRobotImage}
+                sizes="(max-width: 768px) 78vw, 36rem"
               />
             </div>
-
+          </div>
+          <div className={s.heroGrid}>
             <SiteReveal delay={0.05}>
               <span className={s.heroBadge}>{t('hero.badge')}</span>
             </SiteReveal>
@@ -185,9 +190,7 @@ export function PicoLandingPage() {
                 <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
                 <p className={s.sectionBody}>{t('platform.body')}</p>
               </div>
-              <p className={s.launchNote}>
-                {t('beforeAfter.close')}
-              </p>
+              <p className={s.launchNote}>{t('beforeAfter.close')}</p>
             </div>
             <ol className={s.launchSteps}>
               {Array.from({ length: 4 }, (_, i) => (
@@ -333,9 +336,7 @@ export function PicoLandingPage() {
                     key={tier}
                     className={`${s.pricingCard} ${isRecommended ? s.pricingCardRecommended : ''}`}
                   >
-                    {isRecommended && (
-                      <span className={s.pricingBadge}>Recommended</span>
-                    )}
+                    {isRecommended && <span className={s.pricingBadge}>Recommended</span>}
                     <h3 className={s.pricingName}>{t(`pricing.tiers.${tier}.name`)}</h3>
                     <div className={s.pricingPrice}>
                       <span className={s.pricingAmount}>{t(`pricing.tiers.${tier}.price`)}</span>

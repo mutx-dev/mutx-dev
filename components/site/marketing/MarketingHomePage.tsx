@@ -11,6 +11,7 @@ import {
   type MarketingActionTone,
   type MarketingHomepage,
 } from '@/lib/marketingContent'
+import { picoRobotMarketingHighlights } from '@/lib/picoRobotArt'
 
 import core from './MarketingCore.module.css'
 import { MarketingHeroBackdrop } from './MarketingHeroBackdrop'
@@ -251,6 +252,7 @@ function ActiveDemoMedia({ activeDemo }: { activeDemo: MarketingDemoItem }) {
 
 export function MarketingHomePage() {
   const demoTabs = marketingHomepage.salesSections.demo.tabs
+  const picoHighlights = picoRobotMarketingHighlights
   const prefersReducedMotion = useReducedMotion()
   const [activeDemoId, setActiveDemoId] = useState(demoTabs[0]?.id)
   const demoSectionRef = useRef<HTMLElement | null>(null)
@@ -586,6 +588,57 @@ export function MarketingHomePage() {
                   </div>
                 </HoverCard>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className={home.picoSection} data-testid="homepage-pico-robot-section">
+          <div className={core.shell}>
+            <div className={home.picoSectionGrid}>
+              <MarketingReveal className={home.picoIntro} distance={22}>
+                <p className={home.sectionEyebrow}>Meet PicoMUTX</p>
+                <h2 className={home.sectionTitle}>The guided operator now shows up in the platform.</h2>
+                <p className={home.sectionBody}>
+                  PicoMUTX carries the same control language into onboarding, tutoring, and
+                  live autopilot, with a visual system that feels like part of MUTX instead of
+                  an orphaned side project.
+                </p>
+                <div className={home.picoActions}>
+                  <ActionLink
+                    action={{ label: 'Open PicoMUTX', href: '/pico', tone: 'secondary' }}
+                    className={core.buttonPrimary}
+                  />
+                  <ActionLink
+                    action={{ label: 'See Autopilot', href: '/pico/autopilot', tone: 'ghost' }}
+                    className={home.secondaryAction}
+                  />
+                </div>
+              </MarketingReveal>
+
+              <div className={home.picoHighlights}>
+                {picoHighlights.map((item, index) => (
+                  <HoverCard
+                    key={item.id}
+                    className={home.picoCard}
+                    delay={index * 0.08}
+                    distance={18}
+                  >
+                    <div className={home.picoCardMedia}>
+                      <img
+                        src={item.src}
+                        alt={item.alt}
+                        className={home.picoCardImage}
+                        decoding="async"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className={home.picoCardCopy}>
+                      <p className={home.picoCardTitle}>{item.title}</p>
+                      <p className={home.picoCardBody}>{item.caption}</p>
+                    </div>
+                  </HoverCard>
+                ))}
+              </div>
             </div>
           </div>
         </section>

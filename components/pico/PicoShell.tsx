@@ -15,6 +15,7 @@ import {
 } from '@/components/pico/picoTheme'
 import { PicoFooter } from '@/components/pico/PicoFooter'
 import { PicoWelcomeTour } from '@/components/pico/PicoWelcomeTour'
+import { getPicoRouteRobot } from '@/lib/picoRobotArt'
 import { picoHref } from '@/lib/pico/navigation'
 import { cn } from '@/lib/utils'
 
@@ -88,6 +89,40 @@ function PicoWordmark({ pathname }: { pathname: string }) {
   )
 }
 
+function ShellRobotCard({
+  title,
+  caption,
+  src,
+  alt,
+}: {
+  title: string
+  caption: string
+  src: string
+  alt: string
+}) {
+  return (
+    <div className={picoCodexInset('overflow-hidden p-4 lg:p-5')}>
+      <p className={picoClasses.label}>Pico signal</p>
+      <div className="mt-4 overflow-hidden rounded-[22px] border border-[rgba(var(--pico-accent-rgb),0.2)] bg-[radial-gradient(circle_at_50%_14%,rgba(var(--pico-accent-rgb),0.18),transparent_52%),linear-gradient(180deg,rgba(6,12,6,0.98),rgba(2,4,2,1))]">
+        <Image
+          src={src}
+          alt={alt}
+          width={512}
+          height={512}
+          className="h-auto w-full p-3"
+          sizes="(max-width: 1024px) 100vw, 20rem"
+        />
+      </div>
+      <p className="mt-4 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+        {title}
+      </p>
+      <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+        {caption}
+      </p>
+    </div>
+  )
+}
+
 function ShellHelpLane({
   pathname,
   currentItem,
@@ -154,6 +189,7 @@ export function PicoShell({
   const [tourOpen, setTourOpen] = useState(false)
   const academyMode = mode === 'academy'
   const currentItem = navItems.find((item) => routeIsActive(pathname, item.href)) ?? navItems[0]
+  const routeRobot = getPicoRouteRobot(pathname, academyMode)
   const currentIndex = navItems.findIndex((item) => item.href === currentItem.href)
   const previousItem = currentIndex > 0 ? navItems[currentIndex - 1] : null
   const nextItem = currentIndex < navItems.length - 1 ? navItems[currentIndex + 1] : null
@@ -252,18 +288,26 @@ export function PicoShell({
                 </p>
               </div>
 
-              <div className={picoCodexInset('grid gap-3 p-4 lg:p-5')}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className={picoClasses.label}>Route mode</p>
-                  <span className={picoCodex.stamp}>{currentItem.label}</span>
+              <div className="grid gap-4">
+                <div className={picoCodexInset('grid gap-3 p-4 lg:p-5')}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className={picoClasses.label}>Route mode</p>
+                    <span className={picoCodex.stamp}>{currentItem.label}</span>
+                  </div>
+                  <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {currentItem.note}. {railCollapsed ? 'Focus mode is active.' : 'The map stays open.'}
+                  </p>
+                  <div className="grid gap-1 text-[11px] uppercase tracking-[0.22em] text-[color:var(--pico-text-muted)]">
+                    <span>{previousItem ? `Previous: ${previousItem.label}` : 'Start of sequence'}</span>
+                    <span>{nextItem ? `Next: ${nextItem.label}` : 'Final chapter'}</span>
+                  </div>
                 </div>
-                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  {currentItem.note}. {railCollapsed ? 'Focus mode is active.' : 'The map stays open.'}
-                </p>
-                <div className="grid gap-1 text-[11px] uppercase tracking-[0.22em] text-[color:var(--pico-text-muted)]">
-                  <span>{previousItem ? `Previous: ${previousItem.label}` : 'Start of sequence'}</span>
-                  <span>{nextItem ? `Next: ${nextItem.label}` : 'Final chapter'}</span>
-                </div>
+                <ShellRobotCard
+                  title={routeRobot.title}
+                  caption={routeRobot.caption}
+                  src={routeRobot.src}
+                  alt={routeRobot.alt}
+                />
               </div>
             </div>
 
@@ -464,6 +508,12 @@ export function PicoShell({
                 </div>
 
                 <div className="grid min-w-0 gap-4">
+                  <ShellRobotCard
+                    title={routeRobot.title}
+                    caption={routeRobot.caption}
+                    src={routeRobot.src}
+                    alt={routeRobot.alt}
+                  />
                   <div className={picoCodexInset('p-5')}>
                     <p className={picoClasses.label}>Chapter note</p>
                     <p className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">

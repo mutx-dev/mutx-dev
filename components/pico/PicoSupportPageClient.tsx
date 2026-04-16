@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
@@ -20,6 +21,7 @@ import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
 import { usePicoHref } from '@/lib/pico/navigation'
+import { picoRobotArtById } from '@/lib/picoRobotArt'
 import { cn } from '@/lib/utils'
 
 const supportLanes = [
@@ -62,6 +64,7 @@ export function PicoSupportPageClient() {
   const [formOpen, setFormOpen] = useState(false)
   const [interest, setInterest] = useState<string | undefined>()
   const [copied, setCopied] = useState(false)
+  const supportRobot = picoRobotArtById.coffee
   const recoveryLesson = derived.nextLesson
   const recoveryWorkspace = usePicoLessonWorkspace(recoveryLesson?.slug ?? 'support', recoveryLesson?.steps.length ?? 0, {
     progress,
@@ -255,6 +258,24 @@ export function PicoSupportPageClient() {
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   Premium support starts with a clean packet. The best escalation reads like an operator handoff, not a panic dump.
                 </p>
+              </div>
+              <div className={picoInset('overflow-hidden p-0')}>
+                <div className="border-b border-[color:var(--pico-border)] p-5">
+                  <p className={picoClasses.label}>Desk tone</p>
+                  <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    Support should lower the temperature without slowing the route back into action.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center p-6">
+                  <Image
+                    src={supportRobot.src}
+                    alt={supportRobot.alt}
+                    width={220}
+                    height={220}
+                    className="h-auto w-full max-w-[11rem] object-contain drop-shadow-[0_12px_28px_rgba(164,255,92,0.18)]"
+                    sizes="176px"
+                  />
+                </div>
               </div>
               <div className={picoInset('p-5')}>
                 <p className={picoClasses.label}>Best first move</p>
