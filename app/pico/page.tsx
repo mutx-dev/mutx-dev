@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 
 import { PicoLandingSurface } from '@/components/pico/PicoLandingSurface'
-import { DEFAULT_X_HANDLE, getPageOgImageUrl } from '@/lib/seo'
 
-const TITLE = 'PicoMUTX — Pre-register for access'
+const TITLE = 'PicoMUTX — Real Operator Guidance For Live Agent Stacks'
 const DESCRIPTION =
-  'PicoMUTX is currently closed. Pre-register on the waitlist to get first access when the product reopens.'
+  'PicoMUTX turns live stack research, guided lessons, and operator support into one safer path for Hermes, OpenClaw, NanoClaw, and PicoClaw.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -17,38 +16,14 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     url: 'https://pico.mutx.dev',
-    images: [getPageOgImageUrl(TITLE, DESCRIPTION, { path: '/pico' })],
   },
   twitter: {
     card: 'summary_large_image',
-    creator: DEFAULT_X_HANDLE,
     title: TITLE,
     description: DESCRIPTION,
-    images: [getPageOgImageUrl(TITLE, DESCRIPTION, { path: '/pico' })],
   },
 }
 
 export default function PicoPage() {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebPage',
-            name: 'PicoMUTX',
-            url: 'https://pico.mutx.dev',
-            description: DESCRIPTION,
-            isPartOf: {
-              '@type': 'WebSite',
-              name: 'PicoMUTX',
-              url: 'https://pico.mutx.dev',
-            },
-          }),
-        }}
-      />
-      <PicoLandingSurface />
-    </>
-  )
+  return <PicoLandingSurface />
 }
