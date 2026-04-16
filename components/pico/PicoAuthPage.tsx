@@ -3,22 +3,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import {
-  AlertCircle,
-  ArrowRight,
-  CheckCircle2,
-  Loader2,
-} from 'lucide-react'
 
 import { extractApiErrorMessage } from '@/components/app/http'
-import {
-  picoClasses,
-  picoPanel,
-  picoEmber,
-  picoNote,
-} from '@/components/pico/picoTheme'
 import { buildOAuthStartHref, oauthProviders } from '@/lib/auth/oauth'
 import { resolveRedirectPath } from '@/lib/auth/redirects'
+
+/* ------------------------------------------------------------------ */
+/*  Constants                                                          */
+/* ------------------------------------------------------------------ */
 
 type AuthMode = 'login' | 'register'
 
@@ -30,34 +22,98 @@ type PicoAuthPageProps = {
   initialEmail?: string | null
 }
 
-const contentByMode = {
+const copy = {
   login: {
     title: 'Enter the current Pico build',
     subtitle: 'Use a provider or email to open the preview and save your place.',
-    submitLabel: 'Enter Pico',
-    loadingLabel: 'Opening Pico',
-    togglePrompt: 'Need access?',
-    toggleAction: 'Create one',
+    submit: 'Enter Pico',
+    loading: 'Opening\u2026',
+    toggleQ: 'Need access?',
+    toggleA: 'Create one',
     toggleMode: 'register' as AuthMode,
   },
   register: {
     title: 'Create your Pico preview account',
-    subtitle:
-      'Sign up once, save your place, and keep following the product as it improves.',
-    submitLabel: 'Create preview account',
-    loadingLabel: 'Creating preview account',
-    togglePrompt: 'Already have an account?',
-    toggleAction: 'Sign in',
+    subtitle: 'Sign up once, save your place, and keep following the product as it improves.',
+    submit: 'Create preview account',
+    loading: 'Creating\u2026',
+    toggleQ: 'Already have an account?',
+    toggleA: 'Sign in',
     toggleMode: 'login' as AuthMode,
   },
 }
 
-function buildAuthHref(mode: AuthMode, nextPath: string) {
-  return `/${mode}?next=${encodeURIComponent(nextPath)}`
+/* ---- Pico design tokens (hardcoded so this page works anywhere) ---- */
+
+const c = {
+  bg: '#030804',
+  bgGrad: 'radial-gradient(circle at 16% -6%, rgba(164,255,92,0.16), transparent 26%), radial-gradient(circle at 84% 2%, rgba(115,239,190,0.1), transparent 22%), linear-gradient(180deg, #071008 0%, #040905 38%, #020603 100%)',
+  panelBg: 'rgba(6,13,8,0.86)',
+  panelShadow: '0 28px 90px rgba(0,0,0,0.34), 0 0 0 1px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.04)',
+  text: '#f5ffe9',
+  text2: 'rgba(221,239,211,0.8)',
+  muted: 'rgba(157,188,145,0.62)',
+  accent: '#a4ff5c',
+  accentRgb: '164,255,92',
+  accentContrast: '#051103',
+  border: 'rgba(164,255,92,0.14)',
+  borderHover: 'rgba(164,255,92,0.32)',
+  inputBg: 'rgba(8,14,9,0.96)',
+  red: '#ff8c72',
+  radius: '1.2rem',
+  radiusSm: '0.75rem',
+  radiusFull: '999px',
+  fontMono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+  fontDisplay: 'ui-serif, Georgia, Cambria, Times New Roman, serif',
 }
 
-const inputClass =
-  'w-full rounded-[14px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-2.5 text-sm text-[color:var(--pico-text)] placeholder:text-[color:var(--pico-text-muted)] outline-none transition duration-200 focus:border-[color:var(--pico-border-hover)] focus:shadow-[0_0_0_3px_rgba(var(--pico-accent-rgb),0.12)]'
+/* ---- OAuth provider SVG icons ---- */
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  )
+}
+
+function GitHubIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+    </svg>
+  )
+}
+
+function DiscordIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+    </svg>
+  )
+}
+
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+    </svg>
+  )
+}
+
+const providerIcons: Record<string, () => React.ReactElement> = {
+  google: GoogleIcon,
+  github: GitHubIcon,
+  discord: DiscordIcon,
+  apple: AppleIcon,
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 
 export function PicoAuthPage({
   mode,
@@ -67,7 +123,7 @@ export function PicoAuthPage({
   initialEmail,
 }: PicoAuthPageProps) {
   const router = useRouter()
-  const content = contentByMode[mode]
+  const text = copy[mode]
   const isRegister = mode === 'register'
   const redirectPath = resolveRedirectPath(nextPath, fallbackPath)
 
@@ -78,22 +134,18 @@ export function PicoAuthPage({
   const [error, setError] = useState(initialError ?? '')
   const [notice, setNotice] = useState('')
   const [loading, setLoading] = useState(false)
-  const [resendingVerification, setResendingVerification] = useState(false)
+  const [resending, setResending] = useState(false)
 
   const verificationError = /verification/i.test(error)
 
-  /* ------------------------------------------------------------------ */
-  /*  Auth logic — identical to AuthPage.tsx lines 159–266               */
-  /* ------------------------------------------------------------------ */
+  /* ---- Submit ---- */
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
     if (isRegister && password !== confirmPassword) {
       setError('Passwords do not match')
       return
     }
-
     if (isRegister && password.length < 8) {
       setError('Password must be at least 8 characters')
       return
@@ -104,161 +156,210 @@ export function PicoAuthPage({
     setNotice('')
 
     try {
-      const payload =
-        mode === 'login' ? { email, password } : { email, password, name }
+      const payload = mode === 'login' ? { email, password } : { email, password, name }
+      const res = await fetch(mode === 'login' ? '/api/auth/login' : '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
 
-      const response = await fetch(
-        mode === 'login' ? '/api/auth/login' : '/api/auth/register',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        },
-      )
-
-      const responsePayload = await response.json().catch(() => ({
-        detail:
-          mode === 'login' ? 'Failed to sign in' : 'Failed to create account',
+      const data = await res.json().catch(() => ({
+        detail: mode === 'login' ? 'Failed to sign in' : 'Failed to create account',
       }))
 
-      if (!response.ok) {
-        throw new Error(
-          extractApiErrorMessage(
-            responsePayload,
-            mode === 'login' ? 'Failed to sign in' : 'Failed to create account',
-          ),
-        )
+      if (!res.ok) {
+        throw new Error(extractApiErrorMessage(data, mode === 'login' ? 'Failed to sign in' : 'Failed to create account'))
       }
 
-      if (isRegister && responsePayload.requires_email_verification) {
-        const verificationParams = new URLSearchParams({
-          email,
-          next: redirectPath,
-        })
-        router.replace(`/verify-email?${verificationParams.toString()}`)
+      if (isRegister && data.requires_email_verification) {
+        const params = new URLSearchParams({ email, next: redirectPath })
+        router.replace(`/verify-email?${params.toString()}`)
         router.refresh()
         return
       }
 
       router.replace(redirectPath)
       router.refresh()
-    } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : mode === 'login'
-            ? 'Failed to sign in'
-            : 'Failed to create account',
-      )
+    } catch (err) {
+      setError(err instanceof Error ? err.message : mode === 'login' ? 'Failed to sign in' : 'Failed to create account')
     } finally {
       setLoading(false)
     }
   }
 
-  async function handleResendVerification() {
-    if (!email) {
-      setError('Enter your email address first')
-      return
-    }
+  /* ---- Resend ---- */
 
-    setResendingVerification(true)
+  async function handleResend() {
+    if (!email) { setError('Enter your email address first'); return }
+    setResending(true)
     setNotice('')
-
     try {
-      const response = await fetch('/api/auth/resend-verification', {
+      const res = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-
-      const payload = await response.json().catch(() => ({
-        detail: 'Failed to resend verification email',
-      }))
-
-      if (!response.ok) {
-        throw new Error(
-          extractApiErrorMessage(
-            payload,
-            'Failed to resend verification email',
-          ),
-        )
-      }
-
-      setNotice(payload.message || 'Verification email sent')
-    } catch (resendError) {
-      setError(
-        resendError instanceof Error
-          ? resendError.message
-          : 'Failed to resend verification email',
-      )
+      const data = await res.json().catch(() => ({ detail: 'Failed to resend' }))
+      if (!res.ok) throw new Error(extractApiErrorMessage(data, 'Failed to resend'))
+      setNotice(data.message || 'Verification email sent')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to resend')
     } finally {
-      setResendingVerification(false)
+      setResending(false)
     }
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Render                                                             */
-  /* ------------------------------------------------------------------ */
+  /* ---- Shared inline styles ---- */
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.7rem 1rem',
+    borderRadius: c.radiusSm,
+    border: `1px solid ${c.border}`,
+    background: c.inputBg,
+    color: c.text,
+    fontSize: '0.9rem',
+    outline: 'none',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
+  }
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontFamily: c.fontMono,
+    fontSize: '0.7rem',
+    fontWeight: 600,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.12em',
+    color: c.muted,
+    marginBottom: '0.4rem',
+  }
+
+  /* ---- Render ---- */
 
   return (
-    <div className="pico-root min-h-screen flex flex-col">
-      {/* ---- Minimal top nav ---- */}
-      <header className="w-full px-6 py-5">
-        <div className="mx-auto flex max-w-7xl items-center">
-          <Link
-            href="/"
-            className="font-[family:var(--font-site-display)] text-lg tracking-[-0.04em] text-[color:var(--pico-text)] transition duration-200 hover:text-[color:var(--pico-accent)]"
-          >
+    <div style={{
+      minHeight: '100vh',
+      background: c.bgGrad,
+      backgroundColor: c.bg,
+      color: c.text,
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      {/* Header */}
+      <header style={{ width: '100%', padding: '1.25rem 1.5rem' }}>
+        <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
+          <Link href="/" style={{
+            fontFamily: c.fontDisplay,
+            fontSize: '1.15rem',
+            fontWeight: 700,
+            letterSpacing: '-0.04em',
+            color: c.text,
+            textDecoration: 'none',
+            transition: 'color 0.2s',
+          }}>
             PicoMUTX
           </Link>
         </div>
       </header>
 
-      {/* ---- Centered auth panel ---- */}
-      <main className="flex flex-1 items-start justify-center px-4 pb-16 pt-8 sm:pt-14">
-        <div className="w-full max-w-md">
-          {/* Heading */}
-          <div className="mb-8 text-center">
-            <p className={picoClasses.monoLabel}>Pico preview access</p>
-            <h1
-              className={`${picoClasses.title} mt-3 text-2xl leading-tight sm:text-3xl`}
-            >
-              {content.title}
+      {/* Main */}
+      <main style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '2rem 1rem 4rem' }}>
+        <div style={{ width: '100%', maxWidth: '420px' }}>
+          {/* Title */}
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <p style={{
+              fontFamily: c.fontMono,
+              fontSize: '0.65rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              color: c.muted,
+              marginBottom: '0.75rem',
+            }}>
+              Pico preview access
+            </p>
+            <h1 style={{
+              fontFamily: c.fontDisplay,
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              color: c.text,
+              marginBottom: '0.5rem',
+            }}>
+              {text.title}
             </h1>
-            <p className={`${picoClasses.body} mt-3`}>{content.subtitle}</p>
+            <p style={{ color: c.text2, fontSize: '0.9rem', lineHeight: 1.6 }}>
+              {text.subtitle}
+            </p>
           </div>
 
-          {/* Card */}
-          <div className={picoPanel('p-6 sm:p-8')}>
-            {/* OAuth providers — 2x2 grid on desktop */}
-            <div className="grid grid-cols-2 gap-2.5">
-              {oauthProviders.map((provider) => (
-                <Link
-                  key={provider.id}
-                  href={buildOAuthStartHref(provider.id, mode, redirectPath)}
-                  prefetch={false}
-                  className={picoClasses.secondaryButton}
-                >
-                  {provider.label}
-                  <ArrowRight className="h-3.5 w-3.5 opacity-60" />
-                </Link>
-              ))}
+          {/* Panel */}
+          <div style={{
+            background: c.panelBg,
+            borderRadius: c.radius,
+            boxShadow: c.panelShadow,
+            padding: '1.75rem',
+          }}>
+            {/* OAuth buttons */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+              {oauthProviders.map((provider) => {
+                const Icon = providerIcons[provider.id] ?? null
+                return (
+                  <a
+                    key={provider.id}
+                    href={buildOAuthStartHref(provider.id, mode, redirectPath)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      padding: '0.65rem 0.75rem',
+                      borderRadius: c.radiusSm,
+                      border: `1px solid ${c.border}`,
+                      background: 'transparent',
+                      color: c.text2,
+                      fontSize: '0.82rem',
+                      fontWeight: 500,
+                      fontFamily: c.fontMono,
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.2s, background 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = c.borderHover
+                      e.currentTarget.style.background = `rgba(${c.accentRgb}, 0.05)`
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = c.border
+                      e.currentTarget.style.background = 'transparent'
+                    }}
+                  >
+                    {Icon && <Icon />}
+                    {provider.label}
+                  </a>
+                )
+              })}
             </div>
 
             {/* Divider */}
-            <div className="my-6 flex items-center gap-3">
-              <span className="h-px flex-1 bg-[color:var(--pico-border)]" />
-              <span className={picoClasses.monoLabel}>Or use email</span>
-              <span className="h-px flex-1 bg-[color:var(--pico-border)]" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.5rem 0' }}>
+              <span style={{ flex: 1, height: '1px', background: c.border }} />
+              <span style={{
+                fontFamily: c.fontMono,
+                fontSize: '0.6rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.18em',
+                color: c.muted,
+              }}>
+                Or use email
+              </span>
+              <span style={{ flex: 1, height: '1px', background: c.border }} />
             </div>
 
-            {/* Email / password form */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              {isRegister ? (
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="pico-name" className={picoClasses.label}>
-                    Name
-                  </label>
+            {/* Form */}
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+              {isRegister && (
+                <div>
+                  <label htmlFor="pico-name" style={labelStyle}>Name</label>
                   <input
                     id="pico-name"
                     type="text"
@@ -267,15 +368,15 @@ export function PicoAuthPage({
                     placeholder="Your name"
                     required
                     autoComplete="name"
-                    className={inputClass}
+                    style={inputStyle}
+                    onFocus={(e) => { e.target.style.borderColor = c.borderHover; e.target.style.boxShadow = `0 0 0 3px rgba(${c.accentRgb},0.12)` }}
+                    onBlur={(e) => { e.target.style.borderColor = c.border; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
-              ) : null}
+              )}
 
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="pico-email" className={picoClasses.label}>
-                  Email address
-                </label>
+              <div>
+                <label htmlFor="pico-email" style={labelStyle}>Email address</label>
                 <input
                   id="pico-email"
                   type="email"
@@ -284,133 +385,144 @@ export function PicoAuthPage({
                   placeholder="you@company.com"
                   required
                   autoComplete="email"
-                  className={inputClass}
+                  style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = c.borderHover; e.target.style.boxShadow = `0 0 0 3px rgba(${c.accentRgb},0.12)` }}
+                  onBlur={(e) => { e.target.style.borderColor = c.border; e.target.style.boxShadow = 'none' }}
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="pico-password" className={picoClasses.label}>
-                  Password
-                </label>
+              <div>
+                <label htmlFor="pico-password" style={labelStyle}>Password</label>
                 <input
                   id="pico-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter at least 8 characters"
                   required
-                  autoComplete={
-                    isRegister ? 'new-password' : 'current-password'
-                  }
-                  className={inputClass}
+                  autoComplete={isRegister ? 'new-password' : 'current-password'}
+                  style={inputStyle}
+                  onFocus={(e) => { e.target.style.borderColor = c.borderHover; e.target.style.boxShadow = `0 0 0 3px rgba(${c.accentRgb},0.12)` }}
+                  onBlur={(e) => { e.target.style.borderColor = c.border; e.target.style.boxShadow = 'none' }}
                 />
               </div>
 
-              {isRegister ? (
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="pico-confirm-password"
-                    className={picoClasses.label}
-                  >
-                    Confirm password
-                  </label>
+              {isRegister && (
+                <div>
+                  <label htmlFor="pico-confirm" style={labelStyle}>Confirm password</label>
                   <input
-                    id="pico-confirm-password"
+                    id="pico-confirm"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Enter at least 8 characters"
                     required
                     autoComplete="new-password"
-                    className={inputClass}
+                    style={inputStyle}
+                    onFocus={(e) => { e.target.style.borderColor = c.borderHover; e.target.style.boxShadow = `0 0 0 3px rgba(${c.accentRgb},0.12)` }}
+                    onBlur={(e) => { e.target.style.borderColor = c.border; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
-              ) : null}
+              )}
 
-              {/* Success notice */}
-              {notice ? (
-                <div
-                  className={picoNote('flex items-start gap-2.5')}
-                  role="status"
-                >
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--pico-accent)]" />
-                  <span>{notice}</span>
+              {/* Notice */}
+              {notice && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: c.radiusSm,
+                  background: `rgba(${c.accentRgb}, 0.08)`,
+                  border: `1px solid rgba(${c.accentRgb}, 0.2)`,
+                  color: c.text2,
+                  fontSize: '0.85rem',
+                  lineHeight: 1.5,
+                }}>
+                  <span style={{ color: c.accent, flexShrink: 0 }}>&#10003;</span>
+                  {notice}
                 </div>
-              ) : null}
+              )}
 
-              {/* Error alert */}
-              {error ? (
-                <div
-                  className={picoEmber('flex items-start gap-2.5 px-4 py-3.5')}
-                  role="alert"
-                >
-                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--pico-accent)]" />
-                  <span className="text-sm leading-6 text-[color:var(--pico-text)]">
-                    {error}
-                  </span>
+              {/* Error */}
+              {error && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: c.radiusSm,
+                  background: 'rgba(255,140,114,0.08)',
+                  border: '1px solid rgba(255,140,114,0.2)',
+                  color: c.text,
+                  fontSize: '0.85rem',
+                  lineHeight: 1.5,
+                }}>
+                  <span style={{ color: c.red, flexShrink: 0 }}>&#9888;</span>
+                  {error}
                 </div>
-              ) : null}
+              )}
 
               {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
-                className={`${picoClasses.primaryButton} mt-1 disabled:cursor-not-allowed disabled:opacity-60`}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1.25rem',
+                  borderRadius: c.radiusFull,
+                  border: 'none',
+                  background: `linear-gradient(135deg, ${c.accent}, ${c.accent}dd)`,
+                  color: c.accentContrast,
+                  fontFamily: c.fontMono,
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.6 : 1,
+                  marginTop: '0.25rem',
+                  transition: 'opacity 0.2s, transform 0.15s',
+                  boxShadow: `0 0 20px rgba(${c.accentRgb}, 0.2)`,
+                }}
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {content.loadingLabel}
-                  </>
-                ) : (
-                  <>
-                    {content.submitLabel}
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
+                {loading ? text.loading : text.submit}
               </button>
             </form>
 
             {/* Utility links */}
-            <div className="mt-6 flex flex-col items-center gap-2 text-sm text-[color:var(--pico-text-muted)]">
-              {mode === 'login' ? (
-                <>
-                  <Link href="/forgot-password" className={picoClasses.link}>
-                    Forgot password?
-                  </Link>
-                  {verificationError ? (
-                    <button
-                      type="button"
-                      onClick={() => void handleResendVerification()}
-                      disabled={resendingVerification}
-                      className={picoClasses.link}
-                    >
-                      {resendingVerification
-                        ? 'Sending verification…'
-                        : 'Resend verification'}
-                    </button>
-                  ) : null}
-                  <p>
-                    {content.togglePrompt}{' '}
-                    <Link
-                      href={buildAuthHref(content.toggleMode, redirectPath)}
-                      className={picoClasses.link}
-                    >
-                      {content.toggleAction}
-                    </Link>
-                  </p>
-                </>
-              ) : (
-                <p>
-                  {content.togglePrompt}{' '}
-                  <Link
-                    href={buildAuthHref(content.toggleMode, redirectPath)}
-                    className={picoClasses.link}
-                  >
-                    {content.toggleAction}
-                  </Link>
-                </p>
+            <div style={{
+              marginTop: '1.5rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.82rem',
+              color: c.muted,
+            }}>
+              {mode === 'login' && (
+                <Link href="/forgot-password" style={{ color: c.muted, textDecoration: 'none', transition: 'color 0.2s' }}>
+                  Forgot password?
+                </Link>
               )}
+              {mode === 'login' && verificationError && (
+                <button
+                  type="button"
+                  onClick={() => void handleResend()}
+                  disabled={resending}
+                  style={{ background: 'none', border: 'none', color: c.muted, cursor: 'pointer', fontSize: '0.82rem', padding: 0, textDecoration: 'underline' }}
+                >
+                  {resending ? 'Sending\u2026' : 'Resend verification'}
+                </button>
+              )}
+              <p style={{ margin: 0 }}>
+                {text.toggleQ}{' '}
+                <Link
+                  href={`/${text.toggleMode}?next=${encodeURIComponent(redirectPath)}`}
+                  style={{ color: c.accent, textDecoration: 'none', fontWeight: 600 }}
+                >
+                  {text.toggleA}
+                </Link>
+              </p>
             </div>
           </div>
         </div>
