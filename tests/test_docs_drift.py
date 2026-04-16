@@ -149,7 +149,7 @@ def test_quickstart_redirect_points_to_canonical_doc() -> None:
     quickstart_redirect = read_text("docs/quickstart.md")
 
     assert "Deployment Quickstart" in quickstart_redirect
-    assert "./deployment/quickstart.md" in quickstart_redirect
+    assert "/docs/deployment/quickstart" in quickstart_redirect
 
 
 def test_readme_uses_access_token_config_shape() -> None:
