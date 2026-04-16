@@ -1075,22 +1075,32 @@
 
 .prosePanel {
   display: grid;
-  gap: 2rem;
-  padding: clamp(1.5rem, 3vw, 2rem);
+  gap: 2.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: 1.4rem;
+  border: 1px solid var(--marketing-border);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8), transparent 60%),
+    rgba(255, 255, 255, 0.65);
+  box-shadow: 0 12px 40px rgba(2, 2, 5, 0.06);
 }
 
 .routeLegalGrid {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: 1fr min(22rem, 36%);
+  gap: 1.5rem;
+  align-items: start;
 }
 
 .routeMetaPanel {
   display: grid;
   gap: 1rem;
   align-content: start;
+  position: sticky;
+  top: 2rem;
   background:
-    radial-gradient(circle at 20% 0%, rgba(212, 171, 115, 0.1), transparent 20rem),
-    rgba(255, 255, 255, 0.92);
+    radial-gradient(circle at 20% 0%, rgba(212, 171, 115, 0.08), transparent 20rem),
+    rgba(255, 255, 255, 0.88);
 }
 
 .routeMetaList {
@@ -1140,6 +1150,17 @@
   margin: 0;
   color: var(--marketing-text-soft);
   line-height: 1.6;
+  max-width: 38rem;
+}
+
+@media (max-width: 768px) {
+  .routeLegalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .routeMetaPanel {
+    position: static;
+  }
 }
 
 .footer {
