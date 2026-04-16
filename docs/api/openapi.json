@@ -10318,6 +10318,64 @@
         }
       }
     },
+    "/v1/pico/generate-package": {
+      "post": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Generate Package",
+        "description": "Generate an agent config ZIP from onboarding data.",
+        "operationId": "pico_generate_package_v1_pico_generate_package_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneratePackageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/runtime/providers/{provider}": {
       "get": {
         "tags": [
@@ -18175,6 +18233,44 @@
           "email"
         ],
         "title": "ForgotPasswordRequest"
+      },
+      "GeneratePackageRequest": {
+        "properties": {
+          "agent_name": {
+            "type": "string",
+            "title": "Agent Name"
+          },
+          "pain_points": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pain Points"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_name"
+        ],
+        "title": "GeneratePackageRequest"
       },
       "HTTPValidationError": {
         "properties": {

@@ -2516,6 +2516,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/pico/generate-package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pico Generate Package
+         * @description Generate an agent config ZIP from onboarding data.
+         */
+        post: operations["pico_generate_package_v1_pico_generate_package_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runtime/providers/{provider}": {
         parameters: {
             query?: never;
@@ -5387,6 +5407,15 @@ export interface components {
             email: string;
             /** Email Link Origin */
             email_link_origin?: string | null;
+        };
+        /** GeneratePackageRequest */
+        GeneratePackageRequest: {
+            /** Agent Name */
+            agent_name: string;
+            /** Pain Points */
+            pain_points?: string[] | null;
+            /** Model */
+            model?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -13921,6 +13950,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PicoTutorOpenAIConnectionStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pico_generate_package_v1_pico_generate_package_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GeneratePackageRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
