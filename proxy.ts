@@ -18,7 +18,7 @@ const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
 const PICO_AUTH_PATHS = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'])
-const PICO_WHITELISTED_PATHS = new Set(['/onboarding', '/academy', '/support', '/tutor', '/autopilot'])
+const PICO_WHITELISTED_PATHS = new Set(['/onboarding', '/academy', '/support', '/tutor', '/autopilot', '/pricing'])
 const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, (typeof PICO_LOCALES)[number]>> = {
   JP: 'ja',

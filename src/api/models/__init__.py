@@ -51,6 +51,20 @@ from src.api.models.plan_tiers import (
     DEFAULT_PLAN,
 )
 
+from src.api.models.subscription import (
+    Subscription,
+    Payment,
+)
+
+from src.api.models.payment_schemas import (
+    CheckoutSessionRequest,
+    CheckoutSessionResponse,
+    SubscriptionStatus,
+    CustomerPortalRequest,
+    CustomerPortalResponse,
+    PaymentResponse,
+)
+
 __all__ = [
     "User",
     "ExternalAuthIdentity",
@@ -96,4 +110,12 @@ __all__ = [
     "MutxCost",
     "MutxProvenance",
     "MutxEvalResult",
+    "Subscription",
+    "Payment",
+    "CheckoutSessionRequest",
+    "CheckoutSessionResponse",
+    "SubscriptionStatus",
+    "CustomerPortalRequest",
+    "CustomerPortalResponse",
+    "PaymentResponse",
 ]

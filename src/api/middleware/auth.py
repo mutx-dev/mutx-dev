@@ -344,3 +344,38 @@ def require_auth(func):
         return await func(*args, **kwargs)
 
     return wrapper
+
+
+# Plan hierarchy: each plan includes access to all lower tiers
+_PLAN_HIERARCHY: dict[str, int] = {
+    "FREE": 0,
+    "STARTER": 1,
+    "PRO": 2,
+    "ENTERPRISE": 3,
+}
+
+
+def require_plan(min_plan: str):
+    """FastAPI dependency factory that enforces minimum plan tier.
+
+    Usage:
+        @router.post("/feature", dependencies=[Depends(require_plan("pro"))])
+        async def feature(...): ...
+
+    Returns 402 with upgrade_url if user's plan is insufficient.
+    """
+    min_level = _PLAN_HIERARCHY.get(min_plan.upper(), 0)
+
+    async def _check_plan(
+        user: User = Depends(get_current_user),
+    ) -> User:
+        user_level = _PLAN_HIERARCHY.get((user.plan or "FREE").upper(), 0)
+        if user_level < min_level:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail=f"This feature requires the {min_plan} plan or higher",
+                headers={"Upgrade-URL": "/pricing"},
+            )
+        return user
+
+    return _check_plan

@@ -500,3 +500,145 @@ async def get_budget(
         reset_date=reset_date,
         usage_percentage=round((credits_used / credits_total) * 100, 2) if credits_total > 0 else 0,
     )
+
+
+# ── Revenue & Subscription Analytics (internal) ─────────────────────
+
+
+@router.get("/revenue")
+async def get_revenue_overview(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Revenue overview — MRR, active subs, payments. Internal users only."""
+    from src.api.middleware.auth import assert_internal_user
+    assert_internal_user(current_user)
+
+    from src.api.models.subscription import Subscription, Payment
+
+    now = datetime.now(timezone.utc)
+    month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
+
+    # Active subscriptions count by plan
+    active_subs = await db.execute(
+        select(Subscription.plan, func.count(Subscription.id))
+        .where(Subscription.status.in_(["active", "trialing"]))
+        .group_by(Subscription.plan)
+    )
+    subs_by_plan = {plan: count for plan, count in active_subs.all()}
+
+    # MRR: sum payments this month
+    mrr_result = await db.execute(
+        select(func.sum(Payment.amount_cents))
+        .where(Payment.status == "paid", Payment.created_at >= month_start)
+    )
+    mrr_cents = mrr_result.scalar_one() or 0
+
+    # Total payments this month
+    payment_count = await db.execute(
+        select(func.count(Payment.id))
+        .where(Payment.status == "paid", Payment.created_at >= month_start)
+    )
+    total_payments = payment_count.scalar_one() or 0
+
+    # Total users
+    total_users = await db.execute(select(func.count(User.id)))
+
+    # New users this month
+    new_users = await db.execute(
+        select(func.count(User.id)).where(User.created_at >= month_start)
+    )
+
+    return {
+        "mrr_cents": mrr_cents,
+        "mrr_usd": round(mrr_cents / 100, 2),
+        "active_subscriptions": subs_by_plan,
+        "total_active_subs": sum(subs_by_plan.values()),
+        "payments_this_month": total_payments,
+        "total_users": total_users.scalar_one() or 0,
+        "new_users_this_month": new_users.scalar_one() or 0,
+    }
+
+
+@router.get("/subscriptions")
+async def get_subscriptions_list(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    status_filter: Optional[str] = Query(None, alias="status"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List subscriptions with user info. Internal users only."""
+    from src.api.middleware.auth import assert_internal_user
+    assert_internal_user(current_user)
+
+    from src.api.models.subscription import Subscription
+
+    query = (
+        select(Subscription, User.email, User.name)
+        .join(User, Subscription.user_id == User.id)
+        .order_by(Subscription.created_at.desc())
+    )
+    if status_filter:
+        query = query.where(Subscription.status == status_filter)
+
+    query = query.offset(skip).limit(limit)
+    result = await db.execute(query)
+
+    rows = result.all()
+    return {
+        "subscriptions": [
+            {
+                "id": str(sub.id),
+                "user_email": email,
+                "user_name": name,
+                "plan": sub.plan,
+                "status": sub.status,
+                "stripe_customer_id": sub.stripe_customer_id,
+                "current_period_end": sub.current_period_end.isoformat() if sub.current_period_end else None,
+                "cancel_at_period_end": sub.cancel_at_period_end,
+                "created_at": sub.created_at.isoformat() if sub.created_at else None,
+            }
+            for sub, email, name in rows
+        ],
+        "count": len(rows),
+    }
+
+
+@router.get("/payments")
+async def get_payments_list(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List recent payments. Internal users only."""
+    from src.api.middleware.auth import assert_internal_user
+    assert_internal_user(current_user)
+
+    from src.api.models.subscription import Payment
+
+    result = await db.execute(
+        select(Payment, User.email)
+        .join(User, Payment.user_id == User.id)
+        .order_by(Payment.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+
+    rows = result.all()
+    return {
+        "payments": [
+            {
+                "id": str(pay.id),
+                "user_email": email,
+                "stripe_invoice_id": pay.stripe_invoice_id,
+                "amount_cents": pay.amount_cents,
+                "currency": pay.currency,
+                "status": pay.status,
+                "created_at": pay.created_at.isoformat() if pay.created_at else None,
+            }
+            for pay, email in rows
+        ],
+        "count": len(rows),
+    }
