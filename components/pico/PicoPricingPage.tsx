@@ -75,7 +75,8 @@ export function PicoPricingPage() {
         throw new Error(err.error || 'Checkout failed')
       }
 
-      const { url } = await res.json()
+      const data = await res.json()
+      const url = data.url || data.checkout_url
       if (url) {
         window.location.href = url
         return
