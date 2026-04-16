@@ -11,7 +11,7 @@ import {
   resolveRedirectPath,
 } from "@/lib/auth/redirects";
 
-const OAUTH_COOKIE_PREFIX = "mutx_oauth";
+const OAUTH_COOKIE_PREFIX="***";
 const SUPPORTED_PROVIDERS = new Set(["google", "github", "discord", "apple"]);
 
 function resolveProvider(value: string) {
@@ -38,13 +38,21 @@ function clearOAuthCookies(response: NextResponse, request: NextRequest) {
   }
 }
 
+function getPublicOrigin(request: NextRequest): string {
+  const forwardedHost = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+  return forwardedHost
+    ? `${forwardedProto}://${forwardedHost.split(",")[0].trim()}`
+    : request.nextUrl.origin;
+}
+
 function buildAuthRedirect(
   request: NextRequest,
   intent: string,
   nextPath: string,
   error: string,
 ) {
-  const url = new URL(`/${intent}`, request.nextUrl.origin);
+  const url = new URL(`/${intent}`, getPublicOrigin(request));
   url.searchParams.set("next", nextPath);
   url.searchParams.set("error", error);
   return url;
@@ -96,10 +104,7 @@ export async function GET(
     return fail("OAuth session expired. Start sign-in again.");
   }
 
-  const redirectUri = new URL(
-    `/api/auth/oauth/${provider}/callback`,
-    request.nextUrl.origin,
-  ).toString();
+  const redirectUri = `${getPublicOrigin(request)}/api/auth/oauth/${provider}/callback`;
   const response = await fetch(
     `${getApiBaseUrl()}/v1/auth/oauth/${provider}/exchange`,
     {
@@ -124,7 +129,7 @@ export async function GET(
   }
 
   const successResponse = NextResponse.redirect(
-    new URL(nextPath, request.nextUrl.origin),
+    new URL(nextPath, getPublicOrigin(request)),
   );
   applyAuthCookies(successResponse, request, payload);
   clearOAuthCookies(successResponse, request);
@@ -184,10 +189,7 @@ export async function POST(
     return fail("OAuth session expired. Start sign-in again.");
   }
 
-  const redirectUri = new URL(
-    `/api/auth/oauth/${provider}/callback`,
-    request.nextUrl.origin,
-  ).toString();
+  const redirectUri = `${getPublicOrigin(request)}/api/auth/oauth/${provider}/callback`;
   const response = await fetch(
     `${getApiBaseUrl()}/v1/auth/oauth/${provider}/exchange`,
     {
@@ -212,7 +214,7 @@ export async function POST(
   }
 
   const successResponse = NextResponse.redirect(
-    new URL(nextPath, request.nextUrl.origin),
+    new URL(nextPath, getPublicOrigin(request)),
   );
   applyAuthCookies(successResponse, request, payload);
   clearOAuthCookies(successResponse, request);
