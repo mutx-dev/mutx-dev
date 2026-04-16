@@ -42,8 +42,7 @@ def _serialize_webhook(
         secret=None,
         has_secret=bool(webhook.secret),
         is_active=webhook.is_active,
-        circuit_open=getattr(webhook, "consecutive_failures", 0)
-        >= 5,  # CIRCUIT_BREAKER_THRESHOLD
+        circuit_open=getattr(webhook, "consecutive_failures", 0) >= 5,  # CIRCUIT_BREAKER_THRESHOLD
         consecutive_failures=getattr(webhook, "consecutive_failures", 0),
         created_at=webhook.created_at,
         total_deliveries=total_deliveries,
@@ -361,9 +360,7 @@ async def retry_webhook_delivery(
     """
     # Find the original delivery
     result = await db.execute(
-        select(WebhookDeliveryLog).where(
-            WebhookDeliveryLog.id == request.delivery_id
-        )
+        select(WebhookDeliveryLog).where(WebhookDeliveryLog.id == request.delivery_id)
     )
     original = result.scalar_one_or_none()
 

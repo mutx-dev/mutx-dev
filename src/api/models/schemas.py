@@ -1090,9 +1090,7 @@ class WebhookDelivery(BaseModel):
 class WebhookRetryRequest(BaseModel):
     """Request body for manually retrying a delivery."""
 
-    delivery_id: uuid.UUID = Field(
-        ..., description="ID of the original delivery to retry"
-    )
+    delivery_id: uuid.UUID = Field(..., description="ID of the original delivery to retry")
 
 
 class WebhookListResponse(BaseModel):
