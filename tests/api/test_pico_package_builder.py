@@ -2,6 +2,7 @@
 
 import io
 import zipfile
+from pathlib import Path
 
 import pytest
 
@@ -19,6 +20,19 @@ def _extract_zip(zip_bytes: bytes) -> dict[str, str]:
     buf = io.BytesIO(zip_bytes)
     with zipfile.ZipFile(buf, "r") as zf:
         return {name: zf.read(name).decode("utf-8") for name in zf.namelist()}
+
+
+KNOWLEDGE_ROOT = Path(__file__).resolve().parents[2] / "src" / "api" / "knowledge" / "pico-builder-pack"
+STACK_KB_DOCS = {
+    "hermes": "HERMES.md",
+    "openclaw": "OPENCLAW.md",
+    "nanoclaw": "NANOCLAW.md",
+    "picoclaw": "PICOCLAW.md",
+}
+
+
+def _read_knowledge_doc(name: str) -> str:
+    return (KNOWLEDGE_ROOT / name).read_text("utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +161,19 @@ class TestHermesPackage:
         env = files[".env.template"]
         assert "TELEGRAM_BOT_TOKEN" in env
         assert "DISCORD_BOT_TOKEN" in env
+
+    def test_contains_current_builder_kb_docs(self, files):
+        assert files["kb/INSTALL_FLOW.md"] == _read_knowledge_doc("INSTALL_FLOW.md")
+        assert files["kb/UPDATE_NOTES.md"] == _read_knowledge_doc("UPDATE_NOTES.md")
+        assert files["kb/HERMES.md"] == _read_knowledge_doc("HERMES.md")
+        assert files["kb/TAILSCALE_PLAYBOOK.md"] == _read_knowledge_doc("TAILSCALE_PLAYBOOK.md")
+
+    def test_readme_points_to_included_builder_kb(self, files):
+        readme = files["README.md"]
+        assert "kb/INSTALL_FLOW.md" in readme
+        assert "kb/HERMES.md" in readme
+        assert "kb/UPDATE_NOTES.md" in readme
+        assert "kb/TAILSCALE_PLAYBOOK.md" in readme
 
 
 # ---------------------------------------------------------------------------
@@ -385,3 +412,23 @@ class TestCrossStackValidation:
             )
             _, filename = build_onboarding_package(state)
             assert filename == f"{stack}-setup.zip"
+
+    @pytest.mark.parametrize(
+        "stack,expected_doc",
+        [
+            ("hermes", "HERMES.md"),
+            ("openclaw", "OPENCLAW.md"),
+            ("nanoclaw", "NANOCLAW.md"),
+            ("picoclaw", "PICOCLAW.md"),
+        ],
+    )
+    def test_zip_contains_current_stack_specific_kb_doc(self, stack, expected_doc):
+        state = OnboardingState(
+            stack=stack, os="linux", provider="openai", goal="install"
+        )
+        zip_bytes, _ = build_onboarding_package(state)
+        files = _extract_zip(zip_bytes)
+
+        assert files["kb/INSTALL_FLOW.md"] == _read_knowledge_doc("INSTALL_FLOW.md")
+        assert files["kb/UPDATE_NOTES.md"] == _read_knowledge_doc("UPDATE_NOTES.md")
+        assert files[f"kb/{expected_doc}"] == _read_knowledge_doc(expected_doc)

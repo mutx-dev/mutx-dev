@@ -2,6 +2,7 @@
 
 import io
 import zipfile
+from pathlib import Path
 
 import pytest
 import pytest_asyncio
@@ -9,6 +10,8 @@ from httpx import AsyncClient
 
 from src.api.models.pico_onboarding import OnboardingState
 from src.api.routes import pico as pico_routes
+
+KNOWLEDGE_ROOT = Path(__file__).resolve().parents[2] / "src" / "api" / "knowledge" / "pico-builder-pack"
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -129,6 +132,7 @@ async def test_generate_package_requires_existing_ready_session(client: AsyncCli
             os="macos",
             provider="openai",
             goal="install",
+            networking="tailscale",
         ),
     }
 
@@ -139,3 +143,31 @@ async def test_generate_package_requires_existing_ready_session(client: AsyncCli
 
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/zip"
+
+    with zipfile.ZipFile(io.BytesIO(response.content)) as zf:
+        names = set(zf.namelist())
+        assert "README.md" in names
+        assert "install.sh" in names
+        assert "kb/INSTALL_FLOW.md" in names
+        assert "kb/UPDATE_NOTES.md" in names
+        assert "kb/HERMES.md" in names
+        assert "kb/TAILSCALE_PLAYBOOK.md" in names
+
+        assert zf.read("kb/INSTALL_FLOW.md").decode() == (
+            KNOWLEDGE_ROOT / "INSTALL_FLOW.md"
+        ).read_text("utf-8")
+        assert zf.read("kb/UPDATE_NOTES.md").decode() == (
+            KNOWLEDGE_ROOT / "UPDATE_NOTES.md"
+        ).read_text("utf-8")
+        assert zf.read("kb/HERMES.md").decode() == (
+            KNOWLEDGE_ROOT / "HERMES.md"
+        ).read_text("utf-8")
+        assert zf.read("kb/TAILSCALE_PLAYBOOK.md").decode() == (
+            KNOWLEDGE_ROOT / "TAILSCALE_PLAYBOOK.md"
+        ).read_text("utf-8")
+
+        readme = zf.read("README.md").decode()
+        assert "kb/INSTALL_FLOW.md" in readme
+        assert "kb/HERMES.md" in readme
+        assert "kb/UPDATE_NOTES.md" in readme
+        assert "kb/TAILSCALE_PLAYBOOK.md" in readme

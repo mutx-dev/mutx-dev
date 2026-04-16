@@ -161,13 +161,13 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('rewrites pico /start to the canonical onboarding flow instead of the WIP shell', () => {
+  it('redirects pico /start back to the waitlist root while Pico is closed', () => {
     const response = proxy(
       mockRequest('https://pico.mutx.dev/start?ref=hero', { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }),
     )
 
-    expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico/onboarding?ref=hero')
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/?ref=hero')
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
@@ -215,6 +215,47 @@ describe('host-aware UI routing proxy', () => {
     )
 
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=es')
+  })
+
+  it('prefers an explicit locale query over saved cookies on the pico host', () => {
+    const response = proxy(
+      mockRequest(
+        'https://pico.mutx.dev/onboarding?locale=fr',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
+        'GET',
+        { ...authCookies, NEXT_LOCALE: 'es', mutx_user_locale: 'de' },
+      ),
+    )
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/?locale=fr')
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=fr')
+  })
+
+  it('redirects direct pico product routes back to the waitlist root', () => {
+    const response = proxy(
+      mockRequest(
+        'https://pico.mutx.dev/academy/install-hermes-locally',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
+      ),
+    )
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/')
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
+  })
+
+  it('prefers the saved authenticated locale over the guest locale cookie', () => {
+    const response = proxy(
+      mockRequest(
+        'https://pico.mutx.dev/',
+        { host: 'pico.mutx.dev' },
+        'GET',
+        { ...authCookies, NEXT_LOCALE: 'es', mutx_user_locale: 'de' },
+      ),
+    )
+
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=de')
   })
 
   it('falls back to accept-language for pico when geo headers are missing', () => {
