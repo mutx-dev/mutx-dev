@@ -134,50 +134,33 @@
       "eyebrow": "간단한 가격",
       "title": "경로를 선택하세요",
       "tiers": {
-        "basic": {
-          "name": "베이직",
-          "price": "$0",
-          "period": "영구 무료",
-          "description": "온보딩 + 아카데미 + 커뮤니티",
-          "features": [
-            "가이드 온보딩 위저드",
-            "PicoMUTX 아카데미 접근",
-            "커뮤니티 Discord 접근",
-            "에이전트 템플릿 1개"
-          ],
-          "cta": "시작하기",
-          "ctaHref": "/pico/onboarding"
+        "starter": {
+          "name": "Starter",
+          "price": "€9",
+          "period": "/월",
+          "description": "완전한 학습 경험",
+          "features": ["월 1,000 크레딧", "전체 튜터 접근", "모든 아카데미 강의", "오토파일럿 모드", "7일 무료 체험"],
+          "cta": "7일 체험 시작하기",
+          "ctaHref": "/pico/pricing"
         },
         "pro": {
-          "name": "프로",
-          "price": "$100",
+          "name": "Pro",
+          "price": "€29",
           "period": "/월",
-          "description": "AI 에이전트 + 세미나 + 라이브러리",
+          "description": "진지하게 만드는 분을 위해",
           "recommended": true,
-          "features": [
-            "베이직의 모든 기능",
-            "프로덕션 AI 에이전트 1개",
-            "라이브 세미나 및 워크샵",
-            "전체 패턴 라이브러리",
-            "우선 지원"
-          ],
-          "cta": "시작하기",
-          "ctaHref": "/pico/onboarding"
+          "features": ["월 10,000 크레딧", "전체 튜터 + BYOK", "API 접근", "우선 지원", "7일 무료 체험"],
+          "cta": "7일 체험 시작하기",
+          "ctaHref": "/pico/pricing"
         },
-        "premium": {
-          "name": "프리미엄",
-          "price": "$1,000",
-          "period": "/월 또는 $300/시간",
-          "description": "Mario와 1:1",
-          "features": [
-            "프로의 모든 기능",
-            "주간 1:1 세션",
-            "맞춤 에이전트 아키텍처",
-            "직접 Slack 접근",
-            "프리미엄 온보딩"
-          ],
-          "cta": "통화 예약",
-          "ctaHref": "#pre-register"
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "맞춤",
+          "period": "",
+          "description": "전담 지원 및 확장",
+          "features": ["월 100K+ 크레딧", "SSO 및 팀 관리", "SLA 및 전담 지원", "맞춤 워크플로", "창립자에게 직접 접근"],
+          "cta": "통화 예약하기",
+          "ctaHref": "https://calendly.com/mutxdev"
         }
       }
     },

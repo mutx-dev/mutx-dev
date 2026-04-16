@@ -134,50 +134,33 @@
       "eyebrow": "Precios simples",
       "title": "Elige tu camino",
       "tiers": {
-        "basic": {
-          "name": "Básico",
-          "price": "$0",
-          "period": "para siempre",
-          "description": "Onboarding + Academia + Comunidad",
-          "features": [
-            "Asistente de onboarding guiado",
-            "Acceso a PicoMUTX Academy",
-            "Acceso a Discord comunitario",
-            "1 plantilla de agente"
-          ],
-          "cta": "Comenzar",
-          "ctaHref": "/pico/onboarding"
+        "starter": {
+          "name": "Starter",
+          "price": "€9",
+          "period": "/mes",
+          "description": "Experiencia completa de aprendizaje",
+          "features": ["1.000 créditos mensuales", "Acceso completo al tutor", "Todas las lecciones de la academia", "Modo Autopilot", "Prueba gratuita de 7 días"],
+          "cta": "Iniciar prueba de 7 días",
+          "ctaHref": "/pico/pricing"
         },
         "pro": {
           "name": "Pro",
-          "price": "$100",
+          "price": "€29",
           "period": "/mes",
-          "description": "Agente IA + Seminarios + Biblioteca",
+          "description": "Para creadores serios",
           "recommended": true,
-          "features": [
-            "Todo lo del plan Básico",
-            "1 agente IA en producción",
-            "Seminarios y talleres en vivo",
-            "Biblioteca completa de patrones",
-            "Soporte prioritario"
-          ],
-          "cta": "Comenzar",
-          "ctaHref": "/pico/onboarding"
+          "features": ["10.000 créditos mensuales", "Tutor completo + BYOK", "Acceso a la API", "Soporte prioritario", "Prueba gratuita de 7 días"],
+          "cta": "Iniciar prueba de 7 días",
+          "ctaHref": "/pico/pricing"
         },
-        "premium": {
-          "name": "Premium",
-          "price": "$1,000",
-          "period": "/mes o $300/hr",
-          "description": "1-a-1 con Mario",
-          "features": [
-            "Todo lo del plan Pro",
-            "Sesiones 1-a-1 semanales",
-            "Arquitectura de agente personalizada",
-            "Acceso directo por Slack",
-            "Onboarding personalizado"
-          ],
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "Personalizado",
+          "period": "",
+          "description": "Soporte dedicado y escalabilidad",
+          "features": ["100K+ créditos mensuales", "SSO y gestión de equipos", "SLA y soporte dedicado", "Flujos de trabajo personalizados", "Acceso directo a los fundadores"],
           "cta": "Reservar llamada",
-          "ctaHref": "#pre-register"
+          "ctaHref": "https://calendly.com/mutxdev"
         }
       }
     },

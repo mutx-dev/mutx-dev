@@ -125,9 +125,9 @@ export function PicoLandingPage() {
                     {t('hero.cta')}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href="/pricing" className={s.heroCtaSecondary}>
+                  <a href="#pricing" className={s.heroCtaSecondary}>
                     {t('hero.ctaSecondary') || 'See pricing'}
-                  </Link>
+                  </a>
                 </div>
               </div>
             </SiteReveal>
@@ -302,14 +302,14 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        <section className={`${s.section} ${s.sectionDark}`}>
+        <section id="pricing" className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
               <span className={s.eyebrow}>{t('pricing.eyebrow')}</span>
               <h2 className={s.sectionTitle}>{t('pricing.title')}</h2>
             </div>
             <div className={s.pricingGrid}>
-              {(['basic', 'pro', 'premium'] as const).map((tier) => {
+              {(['starter', 'pro', 'enterprise'] as const).map((tier) => {
                 const isRecommended = tier === 'pro'
                 return (
                   <div

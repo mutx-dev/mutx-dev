@@ -134,50 +134,33 @@
       "eyebrow": "Einfache Preise",
       "title": "Wählen Sie Ihren Weg",
       "tiers": {
-        "basic": {
-          "name": "Basis",
-          "price": "0 $",
-          "period": "für immer",
-          "description": "Onboarding + Akademie + Community",
-          "features": [
-            "Geführter Onboarding-Assistent",
-            "PicoMUTX Academy Zugang",
-            "Community Discord Zugang",
-            "1 Agent-Vorlage"
-          ],
-          "cta": "Loslegen",
-          "ctaHref": "/pico/onboarding"
+        "starter": {
+          "name": "Starter",
+          "price": "€9",
+          "period": "/Monat",
+          "description": "Vollständiges LernErlebnis",
+          "features": ["1.000 monatliche Credits", "Voller Tutor-Zugang", "Alle Akademie-Lektionen", "Autopilot-Modus", "7 Tage kostenlose Testversion"],
+          "cta": "7-Tage-Test starten",
+          "ctaHref": "/pico/pricing"
         },
         "pro": {
           "name": "Pro",
-          "price": "100 $",
+          "price": "€29",
           "period": "/Monat",
-          "description": "KI-Agent + Seminare + Bibliothek",
+          "description": "Für ernsthafte Entwickler",
           "recommended": true,
-          "features": [
-            "Alles im Basis-Plan",
-            "1 Produktions-KI-Agent",
-            "Live-Seminare & Workshops",
-            "Vollständige Musterbibliothek",
-            "Prioritäts-Support"
-          ],
-          "cta": "Loslegen",
-          "ctaHref": "/pico/onboarding"
+          "features": ["10.000 monatliche Credits", "Voller Tutor + BYOK", "API-Zugang", "Prioritäts-Support", "7 Tage kostenlose Testversion"],
+          "cta": "7-Tage-Test starten",
+          "ctaHref": "/pico/pricing"
         },
-        "premium": {
-          "name": "Premium",
-          "price": "1.000 $",
-          "period": "/Monat oder 300 $/Std.",
-          "description": "1-zu-1 mit Mario",
-          "features": [
-            "Alles im Pro-Plan",
-            "Wöchentliche 1-zu-1-Sitzungen",
-            "Individuelle Agent-Architektur",
-            "Direkter Slack-Zugang",
-            "Premium-Onboarding"
-          ],
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "Individuell",
+          "period": "",
+          "description": "Dedizierter Support & Skalierung",
+          "features": ["100K+ monatliche Credits", "SSO & Teamverwaltung", "SLA & dedizierter Support", "Individuelle Workflows", "Direkter Zugang zu den Gründern"],
           "cta": "Gespräch buchen",
-          "ctaHref": "#pre-register"
+          "ctaHref": "https://calendly.com/mutxdev"
         }
       }
     },

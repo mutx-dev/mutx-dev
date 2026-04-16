@@ -134,50 +134,33 @@
       "eyebrow": "シンプルな料金プラン",
       "title": "あなたに合ったプランを選ぶ",
       "tiers": {
-        "basic": {
-          "name": "ベーシック",
-          "price": "¥0",
-          "period": "永久無料",
-          "description": "オンボーディング + アカデミー + コミュニティ",
-          "features": [
-            "ガイド付きオンボーディング",
-            "PicoMUTXアカデミーアクセス",
-            "コミュニティDiscordアクセス",
-            "1つのエージェントテンプレート"
-          ],
-          "cta": "始める",
-          "ctaHref": "/pico/onboarding"
+        "starter": {
+          "name": "Starter",
+          "price": "€9",
+          "period": "/月",
+          "description": "完全な学習体験",
+          "features": ["月1,000クレジット", "フルチューターアクセス", "アカデミーの全レッスン", "オートパイロットモード", "7日間無料トライアル"],
+          "cta": "7日間トライアルを開始",
+          "ctaHref": "/pico/pricing"
         },
         "pro": {
-          "name": "プロ",
-          "price": "$100",
+          "name": "Pro",
+          "price": "€29",
           "period": "/月",
-          "description": "AIエージェント + セミナー + ライブラリ",
+          "description": "本気で作る人向け",
           "recommended": true,
-          "features": [
-            "ベーシックの全機能",
-            "本番AIエージェント1つ",
-            "ライブセミナー＆ワークショップ",
-            "フルパターンライブラリ",
-            "優先サポート"
-          ],
-          "cta": "始める",
-          "ctaHref": "/pico/onboarding"
+          "features": ["月10,000クレジット", "フルチューター + BYOK", "APIアクセス", "優先サポート", "7日間無料トライアル"],
+          "cta": "7日間トライアルを開始",
+          "ctaHref": "/pico/pricing"
         },
-        "premium": {
-          "name": "プレミアム",
-          "price": "$1,000",
-          "period": "/月または$300/時間",
-          "description": "Marioとの1対1",
-          "features": [
-            "プロの全機能",
-            "週次1対1セッション",
-            "カスタムエージェントアーキテクチャ",
-            "直接Slackアクセス",
-            "ホワイトグローブオンボーディング"
-          ],
-          "cta": "予約する",
-          "ctaHref": "#pre-register"
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "カスタム",
+          "period": "",
+          "description": "専用サポートとスケール",
+          "features": ["月100K+クレジット", "SSO・チーム管理", "SLA・専用サポート", "カスタムワークフロー", "創業者への直接アクセス"],
+          "cta": "通話を予約する",
+          "ctaHref": "https://calendly.com/mutxdev"
         }
       }
     },

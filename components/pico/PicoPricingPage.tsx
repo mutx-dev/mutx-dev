@@ -54,6 +54,23 @@ const PLANS = [
     priceId: 'price_1TMrdKLqNfXHzKqS15LrJt9C',
     highlight: false,
   },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 'Custom',
+    period: '',
+    description: 'Dedicated support & scale',
+    features: [
+      '100K+ monthly credits',
+      'SSO & team management',
+      'SLA & dedicated support',
+      'Custom workflows',
+      'Direct access to founders',
+    ],
+    cta: 'Book a Call',
+    priceId: null,
+    highlight: false,
+  },
 ]
 
 export function PicoPricingPage() {
@@ -231,8 +248,11 @@ export function PicoPricingPage() {
             </ul>
 
             <button
-              onClick={() => handleCheckout(plan.id, plan.priceId)}
-              disabled={loading === plan.id || !plan.priceId}
+              onClick={() => plan.id === 'enterprise'
+                ? window.location.href = 'https://calendly.com/mutxdev'
+                : handleCheckout(plan.id, plan.priceId)
+              }
+              disabled={loading === plan.id || (!plan.priceId && plan.id !== 'enterprise')}
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem',
@@ -240,7 +260,7 @@ export function PicoPricingPage() {
                 fontFamily: 'var(--pico-font-accent)',
                 fontSize: '0.85rem',
                 fontWeight: 600,
-                cursor: plan.priceId ? 'pointer' : 'default',
+                cursor: plan.priceId || plan.id === 'enterprise' ? 'pointer' : 'default',
                 border: plan.highlight
                   ? '1px solid var(--pico-accent)'
                   : '1px solid var(--pico-border)',
