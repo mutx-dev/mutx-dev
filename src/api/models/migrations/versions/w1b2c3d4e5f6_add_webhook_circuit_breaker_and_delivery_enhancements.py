@@ -1,6 +1,6 @@
 """Add webhook circuit breaker and delivery enhancements
 
-Revision ID: a1b2c3d4e5f6
+Revision ID: w1b2c3d4e5f6
 Revises: f7e2a1c8d9b4
 Create Date: 2026-04-16
 
@@ -17,7 +17,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
 
-revision: str = "a1b2c3d4e5f6"
+revision: str = "w1b2c3d4e5f6"
 down_revision: Union[str, None] = "f7e2a1c8d9b4"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
