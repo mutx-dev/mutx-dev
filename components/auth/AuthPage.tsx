@@ -64,7 +64,7 @@ const authContent = {
       mediaWidth: 1536,
       mediaHeight: 1024,
       highlights: [
-        "Google, GitHub, and Discord all terminate on real MUTX sessions.",
+        "Google, GitHub, Discord, and Apple all terminate on real MUTX sessions.",
         "Password registration sends a verification email to the active host, not a hardcoded marketing domain.",
         "If email confirmation is required, the UI moves into a verification state instead of pretending the dashboard is ready.",
       ],

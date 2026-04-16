@@ -124,6 +124,22 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("DISCORD_CLIENT_SECRET"),
     )
+    apple_client_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("APPLE_CLIENT_ID"),
+    )
+    apple_team_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("APPLE_TEAM_ID"),
+    )
+    apple_key_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("APPLE_KEY_ID"),
+    )
+    apple_private_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("APPLE_PRIVATE_KEY"),
+    )
     database_required_on_startup: bool = Field(
         default=False,
         validation_alias=AliasChoices(

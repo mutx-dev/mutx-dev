@@ -246,7 +246,7 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
             <span className={picoClasses.chip}>pico host auth</span>
           </div>
           <p className="mt-4 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            The Pico platform routes are live here, but the hosted session is not attached yet on this domain. Sign in on Pico to persist progress, read live runs, and use the backend onboarding/runtime state. Google, GitHub, Discord, password signup, and email confirmation all terminate on this host now.
+            The Pico platform routes are live here, but the hosted session is not attached yet on this domain. Sign in on Pico to persist progress, read live runs, and use the backend onboarding/runtime state. Google, GitHub, Discord, Apple, password signup, and email confirmation all terminate on this host now.
           </p>
           <div className={anonymousRailClass}>
             <div className={picoInset('snap-start p-4')}>

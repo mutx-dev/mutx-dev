@@ -14,7 +14,7 @@ import {
 
 const OAUTH_COOKIE_PREFIX = "mutx_oauth";
 const OAUTH_MAX_AGE_SECONDS = 60 * 10;
-const SUPPORTED_PROVIDERS = new Set(["google", "github", "discord"]);
+const SUPPORTED_PROVIDERS = new Set(["google", "github", "discord", "apple"]);
 
 function resolveProvider(value: string) {
   return SUPPORTED_PROVIDERS.has(value) ? value : null;

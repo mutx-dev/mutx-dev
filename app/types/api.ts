@@ -6467,7 +6467,7 @@ export interface components {
          * OAuthProvider
          * @enum {string}
          */
-        OAuthProvider: "google" | "github" | "discord";
+        OAuthProvider: "google" | "github" | "discord" | "apple";
         /** OnboardingStateResponse */
         OnboardingStateResponse: {
             /**

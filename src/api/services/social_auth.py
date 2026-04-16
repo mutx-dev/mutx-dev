@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import time
 from enum import Enum
 from typing import Any
 from urllib.parse import urlencode
 
 import httpx
+from jose import jwt
 from pydantic import BaseModel
 
 from src.api.config import get_settings
@@ -16,6 +18,7 @@ class OAuthProvider(str, Enum):
     GOOGLE = "google"
     GITHUB = "github"
     DISCORD = "discord"
+    APPLE = "apple"
 
 
 class SocialAuthError(Exception):
@@ -87,6 +90,16 @@ def build_authorization_url(
         )
         return f"https://discord.com/oauth2/authorize?{urlencode(params)}"
 
+    if provider == OAuthProvider.APPLE:
+        params.update(
+            {
+                "response_type": "code",
+                "scope": "name email",
+                "response_mode": "form_post",
+            }
+        )
+        return f"https://appleid.apple.com/auth/authorize?{urlencode(params)}"
+
     raise SocialAuthError(f"Unsupported OAuth provider: {provider.value}")
 
 
@@ -104,6 +117,10 @@ async def exchange_code_for_user_profile(
             f"{provider.value.title()} OAuth is not configured on the backend.",
             status_code=500,
         )
+
+    # For Apple, client_secret must be a dynamically-generated JWT
+    if provider == OAuthProvider.APPLE:
+        client_secret = _generate_apple_client_secret()
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
@@ -127,6 +144,15 @@ async def exchange_code_for_user_profile(
 
             if provider == OAuthProvider.DISCORD:
                 return await _exchange_discord_code(
+                    client,
+                    code=code,
+                    redirect_uri=redirect_uri,
+                    client_id=client_id,
+                    client_secret=client_secret,
+                )
+
+            if provider == OAuthProvider.APPLE:
+                return await _exchange_apple_code(
                     client,
                     code=code,
                     redirect_uri=redirect_uri,
@@ -313,6 +339,110 @@ async def _exchange_discord_code(
         username=str(profile.get("username")) if isinstance(profile.get("username"), str) else None,
         avatar_url=avatar_url,
         profile=profile,
+    )
+
+
+def _generate_apple_client_secret() -> str:
+    """Generate a JWT client secret for Apple Sign In.
+
+    Apple requires the client secret to be a JWT signed with the ES256
+    algorithm using the .p8 private key provisioned from the Apple
+    Developer portal.  The JWT is short-lived (5 minutes) and generated
+    fresh on every exchange request.
+    """
+    _settings = get_settings()
+
+    team_id = _settings.apple_team_id
+    key_id = _settings.apple_key_id
+    client_id = _settings.apple_client_id
+    private_key = _settings.apple_private_key
+
+    if not all([team_id, key_id, client_id, private_key]):
+        raise SocialAuthError(
+            "Apple Sign In is not fully configured. "
+            "APPLE_CLIENT_ID, APPLE_TEAM_ID, APPLE_KEY_ID, and APPLE_PRIVATE_KEY are all required.",
+            status_code=500,
+        )
+
+    now = int(time.time())
+    claims = {
+        "iss": team_id,
+        "iat": now,
+        "exp": now + 300,  # 5-minute expiry
+        "aud": "https://appleid.apple.com",
+        "sub": client_id,
+    }
+
+    return jwt.encode(claims, private_key, algorithm="ES256", headers={"kid": key_id})
+
+
+async def _exchange_apple_code(
+    client: httpx.AsyncClient,
+    *,
+    code: str,
+    redirect_uri: str,
+    client_id: str,
+    client_secret: str,
+) -> OAuthUserProfile:
+    """Exchange an Apple authorization code for a user profile.
+
+    Apple returns user info inside the ``id_token`` JWT from the token
+    endpoint.  The ``user`` JSON (with name) is only sent on the very
+    first authorization and is not available here — we fall back to the
+    email prefix as a display name when the name is absent.
+    """
+    token_response = await client.post(
+        "https://appleid.apple.com/auth/token",
+        data={
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    _raise_for_provider_error(token_response, "Apple token exchange failed")
+
+    token_payload = token_response.json()
+    id_token_raw = token_payload.get("id_token")
+    if not isinstance(id_token_raw, str) or not id_token_raw:
+        raise SocialAuthError("Apple did not return an id_token.")
+
+    # Decode the id_token without strict verification — Apple's id_token
+    # is a standard JWT signed by Apple's own keys.  We trust it because
+    # it arrived over the TLS-protected token exchange.
+    try:
+        claims = jwt.decode(id_token_raw, options={"verify_signature": False})
+    except Exception as exc:
+        raise SocialAuthError("Could not decode Apple id_token.") from exc
+
+    apple_user_id = claims.get("sub")
+    if not isinstance(apple_user_id, str) or not apple_user_id:
+        raise SocialAuthError("Apple id_token did not contain a subject (sub).")
+
+    email = claims.get("email")
+    if not isinstance(email, str) or not email:
+        raise SocialAuthError("Apple did not return an email address.")
+
+    email_verified = claims.get("email_verified")
+    if isinstance(email_verified, str):
+        email_verified = email_verified.lower() == "true"
+    email_verified = bool(email_verified)
+
+    display_name = str(email.split("@")[0])
+
+    return OAuthUserProfile(
+        provider=OAuthProvider.APPLE,
+        provider_user_id=apple_user_id,
+        email=email.lower(),
+        email_verified=email_verified,
+        display_name=display_name,
+        username=None,
+        avatar_url=None,
+        profile={
+            "id_token_claims": claims,
+        },
     )
 
 

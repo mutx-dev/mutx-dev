@@ -16,6 +16,11 @@ export const oauthProviders = [
     label: 'Discord',
     buttonLabel: 'Continue with Discord',
   },
+  {
+    id: 'apple',
+    label: 'Apple',
+    buttonLabel: 'Continue with Apple',
+  },
 ] as const
 
 export type OAuthProviderId = (typeof oauthProviders)[number]['id']
