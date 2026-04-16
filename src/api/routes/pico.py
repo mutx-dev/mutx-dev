@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +16,7 @@ from src.api.models.pico_tutor import (
     PicoTutorRequest,
     PicoTutorResponse,
 )
+from src.api.services.pico_package_generator import generate_package_zip
 from src.api.services.pico_progress import get_pico_progress, upsert_pico_progress
 from src.api.services.pico_tutor import generate_pico_tutor_reply
 from src.api.services.pico_tutor_openai import (
@@ -98,3 +100,34 @@ async def pico_tutor_openai_disconnect(
     current_user: User = Depends(get_current_user),
 ):
     return await disconnect_pico_tutor_openai(db, user=current_user)
+
+
+class GeneratePackageRequest(BaseModel):
+    agent_name: str
+    pain_points: list[str] | None = None
+    model: str | None = None
+
+
+@router.post("/generate-package")
+async def pico_generate_package(
+    payload: GeneratePackageRequest,
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    """Generate an agent config ZIP from onboarding data."""
+    if not payload.agent_name.strip():
+        raise HTTPException(status_code=422, detail="agent_name is required")
+
+    zip_bytes = generate_package_zip(
+        agent_name=payload.agent_name.strip(),
+        pain_points=payload.pain_points,
+        model=payload.model,
+        user_email=current_user.email if hasattr(current_user, "email") else None,
+    )
+
+    return Response(
+        content=zip_bytes,
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f'attachment; filename="{payload.agent_name.strip()}.zip"',
+        },
+    )
