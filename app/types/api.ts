@@ -3131,8 +3131,10 @@ export interface paths {
          * List Approvals
          * @description List approval requests visible to the authenticated user.
          *
-         *     - ``status``: filter by status (e.g. PENDING)
+         *     - ``status``: filter by status (PENDING, APPROVED, REJECTED, EXPIRED).
+         *       Omit to return all statuses.
          *     - ``agent_id``: filter by agent
+         *     - ``skip`` / ``limit``: pagination controls
          */
         get: operations["list_approvals_v1_approvals_get"];
         put?: never;
@@ -4100,6 +4102,24 @@ export interface components {
              * @default {}
              */
             payload: Record<string, never>;
+        };
+        /**
+         * ApprovalListResponse
+         * @description Paginated response for listing approval requests.
+         */
+        ApprovalListResponse: {
+            /** Items */
+            items?: components["schemas"]["ApprovalRequest"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Status */
+            status?: string | null;
+            /** Agent Id */
+            agent_id?: string | null;
         };
         /**
          * ApprovalRequest
@@ -14875,6 +14895,8 @@ export interface operations {
             query?: {
                 status?: components["schemas"]["ApprovalStatus"] | null;
                 agent_id?: string | null;
+                skip?: number;
+                limit?: number;
             };
             header?: {
                 authorization?: string | null;
@@ -14890,7 +14912,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApprovalRequest"][];
+                    "application/json": components["schemas"]["ApprovalListResponse"];
                 };
             };
             /** @description Validation Error */

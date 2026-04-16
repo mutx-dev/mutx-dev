@@ -12651,7 +12651,7 @@
           "approvals"
         ],
         "summary": "List Approvals",
-        "description": "List approval requests visible to the authenticated user.\n\n- ``status``: filter by status (e.g. PENDING)\n- ``agent_id``: filter by agent",
+        "description": "List approval requests visible to the authenticated user.\n\n- ``status``: filter by status (PENDING, APPROVED, REJECTED, EXPIRED).\n  Omit to return all statuses.\n- ``agent_id``: filter by agent\n- ``skip`` / ``limit``: pagination controls",
         "operationId": "list_approvals_v1_approvals_get",
         "parameters": [
           {
@@ -12687,6 +12687,29 @@
             }
           },
           {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
             "name": "authorization",
             "in": "header",
             "required": false,
@@ -12709,11 +12732,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ApprovalRequest"
-                  },
-                  "title": "Response List Approvals V1 Approvals Get"
+                  "$ref": "#/components/schemas/ApprovalListResponse"
                 }
               }
             }
@@ -14930,6 +14949,59 @@
         ],
         "title": "ApprovalCreate",
         "description": "Payload for creating a new approval request."
+      },
+      "ApprovalListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ApprovalRequest"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "ApprovalListResponse",
+        "description": "Paginated response for listing approval requests."
       },
       "ApprovalRequest": {
         "properties": {
