@@ -141,7 +141,7 @@
           "description": "Vollständiges LernErlebnis",
           "features": ["1.000 monatliche Credits", "Voller Tutor-Zugang", "Alle Akademie-Lektionen", "Autopilot-Modus", "7 Tage kostenlose Testversion"],
           "cta": "7-Tage-Test starten",
-          "ctaHref": "/pico/pricing"
+          "ctaHref": "/pricing"
         },
         "pro": {
           "name": "Pro",
@@ -151,7 +151,7 @@
           "recommended": true,
           "features": ["10.000 monatliche Credits", "Voller Tutor + BYOK", "API-Zugang", "Prioritäts-Support", "7 Tage kostenlose Testversion"],
           "cta": "7-Tage-Test starten",
-          "ctaHref": "/pico/pricing"
+          "ctaHref": "/pricing"
         },
         "enterprise": {
           "name": "Enterprise",

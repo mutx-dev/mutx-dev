@@ -141,7 +141,7 @@
           "description": "完全な学習体験",
           "features": ["月1,000クレジット", "フルチューターアクセス", "アカデミーの全レッスン", "オートパイロットモード", "7日間無料トライアル"],
           "cta": "7日間トライアルを開始",
-          "ctaHref": "/pico/pricing"
+          "ctaHref": "/pricing"
         },
         "pro": {
           "name": "Pro",
@@ -151,7 +151,7 @@
           "recommended": true,
           "features": ["月10,000クレジット", "フルチューター + BYOK", "APIアクセス", "優先サポート", "7日間無料トライアル"],
           "cta": "7日間トライアルを開始",
-          "ctaHref": "/pico/pricing"
+          "ctaHref": "/pricing"
         },
         "enterprise": {
           "name": "Enterprise",

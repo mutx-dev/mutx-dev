@@ -382,9 +382,15 @@ export function proxy(request: NextRequest) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
+    // Strip /pico prefix on pico hosts (users may type /pico/pricing directly)
+    let picoPath = normalizedPath
+    if (picoPath.startsWith('/pico')) {
+      picoPath = picoPath.slice('/pico'.length) || '/'
+    }
+
     const locale = getLocaleFromRequest(request)
 
-    if (normalizedPath === '/') {
+    if (picoPath === '/') {
       // Root -> landing page (public, no auth required)
       const rewrite = rewriteWithinHost(request, '/pico')
       rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
@@ -392,16 +398,16 @@ export function proxy(request: NextRequest) {
     }
 
     // Whitelisted page paths -> serve their real /pico/{path} component
-    if (PICO_WHITELISTED_PATHS.has(normalizedPath)) {
-      const rewrite = rewriteWithinHost(request, `/pico${normalizedPath}`)
+    if (PICO_WHITELISTED_PATHS.has(picoPath)) {
+      const rewrite = rewriteWithinHost(request, `/pico${picoPath}`)
       rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
       return finalizeResponse(rewrite, host, normalizedPath)
     }
 
     // Sub-paths of whitelisted routes (e.g. /academy/some-lesson)
-    const firstSegment = '/' + normalizedPath.split('/')[1]
+    const firstSegment = '/' + picoPath.split('/')[1]
     if (PICO_WHITELISTED_PATHS.has(firstSegment)) {
-      const rewrite = rewriteWithinHost(request, `/pico${normalizedPath}`)
+      const rewrite = rewriteWithinHost(request, `/pico${picoPath}`)
       rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
       return finalizeResponse(rewrite, host, normalizedPath)
     }

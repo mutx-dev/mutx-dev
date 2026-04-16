@@ -141,7 +141,7 @@
           "description": "Experiência completa de aprendizado",
           "features": ["1.000 créditos mensais", "Acesso completo ao tutor", "Todas as lições da academia", "Modo Autopilot", "Teste grátis de 7 dias"],
           "cta": "Iniciar teste de 7 dias",
-          "ctaHref": "/pico/pricing"
+          "ctaHref": "/pricing"
         },
         "pro": {
           "name": "Pro",
@@ -151,7 +151,7 @@
           "recommended": true,
           "features": ["10.000 créditos mensais", "Tutor completo + BYOK", "Acesso à API", "Suporte prioritário", "Teste grátis de 7 dias"],
           "cta": "Iniciar teste de 7 dias",
-          "ctaHref": "/pico/pricing"
+          "ctaHref": "/pricing"
         },
         "enterprise": {
           "name": "Enterprise",
