@@ -233,17 +233,22 @@ def _serialize_task(task: dict[str, Any]) -> SchedulerTaskResponse:
 # --- Routes ---
 
 
-@router.get("", response_model=dict)
+class SchedulerListResponse(BaseModel):
+    tasks: list[SchedulerTaskResponse]
+    total: int
+
+
+@router.get("", response_model=SchedulerListResponse)
 async def get_scheduler(
     current_user: User = Depends(get_current_internal_user),
-) -> dict:
+) -> SchedulerListResponse:
     """List all scheduled tasks for the admin user."""
     _ensure_scheduler_running()
 
     async with _scheduler_lock:
-        tasks = [_serialize_task(t).model_dump() for t in _task_store.values()]
+        tasks = [_serialize_task(t) for t in _task_store.values()]
 
-    return {"tasks": tasks, "total": len(tasks)}
+    return SchedulerListResponse(tasks=tasks, total=len(tasks))
 
 
 @router.post("", response_model=SchedulerTaskResponse, status_code=201)

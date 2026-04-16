@@ -3503,6 +3503,16 @@ export interface components {
             /** Config */
             config?: Record<string, never> | string | null;
         };
+        /** AgentDeployResponse */
+        AgentDeployResponse: {
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /** Status */
+            status: string;
+        };
         /** AgentDetailResponse */
         AgentDetailResponse: {
             /**
@@ -3875,6 +3885,11 @@ export interface components {
             node_id?: string | null;
             /** Error Message */
             error_message?: string | null;
+        };
+        /** AgentStopResponse */
+        AgentStopResponse: {
+            /** Status */
+            status: string;
         };
         /**
          * AgentType
@@ -7549,6 +7564,13 @@ export interface components {
              */
             expires_in: number;
         };
+        /** SchedulerListResponse */
+        SchedulerListResponse: {
+            /** Tasks */
+            tasks: components["schemas"]["SchedulerTaskResponse"][];
+            /** Total */
+            total: number;
+        };
         /** SchedulerTaskCreate */
         SchedulerTaskCreate: {
             /** Name */
@@ -8601,7 +8623,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["AgentDeployResponse"];
                 };
             };
             /** @description Validation Error */
@@ -8634,7 +8656,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["AgentStopResponse"];
                 };
             };
             /** @description Validation Error */
@@ -13810,7 +13832,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["SchedulerListResponse"];
                 };
             };
             /** @description Validation Error */
