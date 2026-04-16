@@ -129,6 +129,57 @@
         "4": "Früher Einblick in Preise und Zugangsbedingungen"
       }
     },
+    "pricing": {
+      "eyebrow": "Einfache Preise",
+      "title": "Wählen Sie Ihren Weg",
+      "tiers": {
+        "basic": {
+          "name": "Basis",
+          "price": "0 $",
+          "period": "für immer",
+          "description": "Onboarding + Akademie + Community",
+          "features": [
+            "Geführter Onboarding-Assistent",
+            "PicoMUTX Academy Zugang",
+            "Community Discord Zugang",
+            "1 Agent-Vorlage"
+          ],
+          "cta": "Loslegen",
+          "ctaHref": "/pico/onboarding"
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "100 $",
+          "period": "/Monat",
+          "description": "KI-Agent + Seminare + Bibliothek",
+          "recommended": true,
+          "features": [
+            "Alles im Basis-Plan",
+            "1 Produktions-KI-Agent",
+            "Live-Seminare & Workshops",
+            "Vollständige Musterbibliothek",
+            "Prioritäts-Support"
+          ],
+          "cta": "Loslegen",
+          "ctaHref": "/pico/onboarding"
+        },
+        "premium": {
+          "name": "Premium",
+          "price": "1.000 $",
+          "period": "/Monat oder 300 $/Std.",
+          "description": "1-zu-1 mit Mario",
+          "features": [
+            "Alles im Pro-Plan",
+            "Wöchentliche 1-zu-1-Sitzungen",
+            "Individuelle Agent-Architektur",
+            "Direkter Slack-Zugang",
+            "Premium-Onboarding"
+          ],
+          "cta": "Gespräch buchen",
+          "ctaHref": "#pre-register"
+        }
+      }
+    },
     "faq": {
       "eyebrow": "Fragen",
       "title": "Fragen, die sich viele stellen, bevor sie beitreten",

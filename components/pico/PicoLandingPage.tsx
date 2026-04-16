@@ -286,6 +286,54 @@ export function PicoLandingPage() {
           </div>
         </section>
 
+        <section className={`${s.section} ${s.sectionDark}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{t('pricing.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('pricing.title')}</h2>
+            </div>
+            <div className={s.pricingGrid}>
+              {(['basic', 'pro', 'premium'] as const).map((tier) => {
+                const isRecommended = tier === 'pro'
+                return (
+                  <div
+                    key={tier}
+                    className={`${s.pricingCard} ${isRecommended ? s.pricingCardRecommended : ''}`}
+                  >
+                    {isRecommended && (
+                      <span className={s.pricingBadge}>
+                        {t('pricing.tiers.pro.recommended') ? 'RECOMMENDED' : ''}
+                      </span>
+                    )}
+                    <h3 className={s.pricingName}>{t(`pricing.tiers.${tier}.name`)}</h3>
+                    <div className={s.pricingPrice}>
+                      <span className={s.pricingAmount}>{t(`pricing.tiers.${tier}.price`)}</span>
+                      <span className={s.pricingPeriod}>{t(`pricing.tiers.${tier}.period`)}</span>
+                    </div>
+                    <p className={s.pricingAgents}>{t(`pricing.tiers.${tier}.description`)}</p>
+                    <ul className={s.pricingFeatures}>
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <li key={i} className={s.pricingFeature}>
+                          <span className={s.pricingFeatureCheck}>
+                            <Check className="h-3 w-3" />
+                          </span>
+                          <span>{t(`pricing.tiers.${tier}.features.${i}`)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={t(`pricing.tiers.${tier}.ctaHref`)}
+                      className={`${s.pricingCta} ${isRecommended ? s.pricingCtaPrimary : ''}`}
+                    >
+                      {t(`pricing.tiers.${tier}.cta`)}
+                    </Link>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
         <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
             <div className={s.ctaPanel}>

@@ -129,6 +129,57 @@
         "4": "第一时间了解价格和访问条款"
       }
     },
+    "pricing": {
+      "eyebrow": "简洁定价",
+      "title": "选择您的方案",
+      "tiers": {
+        "basic": {
+          "name": "基础版",
+          "price": "$0",
+          "period": "永久免费",
+          "description": "入门引导 + 学院 + 社区",
+          "features": [
+            "引导式入门向导",
+            "PicoMUTX学院访问权限",
+            "社区Discord访问权限",
+            "1个智能体模板"
+          ],
+          "cta": "开始使用",
+          "ctaHref": "/pico/onboarding"
+        },
+        "pro": {
+          "name": "专业版",
+          "price": "$100",
+          "period": "/月",
+          "description": "AI智能体 + 研讨会 + 资源库",
+          "recommended": true,
+          "features": [
+            "基础版全部功能",
+            "1个生产环境AI智能体",
+            "直播研讨会和工作坊",
+            "完整模式库",
+            "优先支持"
+          ],
+          "cta": "开始使用",
+          "ctaHref": "/pico/onboarding"
+        },
+        "premium": {
+          "name": "高级版",
+          "price": "$1,000",
+          "period": "/月或$300/小时",
+          "description": "与Mario一对一",
+          "features": [
+            "专业版全部功能",
+            "每周一对一会议",
+            "自定义智能体架构",
+            "直接Slack沟通",
+            "白手套入门服务"
+          ],
+          "cta": "预约通话",
+          "ctaHref": "#pre-register"
+        }
+      }
+    },
     "faq": {
       "eyebrow": "常见问题",
       "title": "加入前大家通常会问的问题",

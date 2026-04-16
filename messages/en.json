@@ -129,6 +129,57 @@
         "4": "First visibility into pricing and access terms"
       }
     },
+    "pricing": {
+      "eyebrow": "Simple pricing",
+      "title": "Choose your path",
+      "tiers": {
+        "basic": {
+          "name": "Basic",
+          "price": "$0",
+          "period": "forever",
+          "description": "Onboarding + Academy + Community",
+          "features": [
+            "Guided onboarding wizard",
+            "PicoMUTX Academy access",
+            "Community Discord access",
+            "1 agent template"
+          ],
+          "cta": "Get Started",
+          "ctaHref": "/pico/onboarding"
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "$100",
+          "period": "/month",
+          "description": "AI agent + Seminars + Library",
+          "recommended": true,
+          "features": [
+            "Everything in Basic",
+            "1 production AI agent",
+            "Live seminars & workshops",
+            "Full pattern library",
+            "Priority support"
+          ],
+          "cta": "Get Started",
+          "ctaHref": "/pico/onboarding"
+        },
+        "premium": {
+          "name": "Premium",
+          "price": "$1,000",
+          "period": "/month or $300/hr",
+          "description": "1-on-1 with Mario",
+          "features": [
+            "Everything in Pro",
+            "Weekly 1-on-1 sessions",
+            "Custom agent architecture",
+            "Direct Slack access",
+            "White-glove onboarding"
+          ],
+          "cta": "Book a Call",
+          "ctaHref": "#pre-register"
+        }
+      }
+    },
     "faq": {
       "eyebrow": "Questions",
       "title": "Questions people usually have before joining",

@@ -129,6 +129,57 @@
         "4": "Visibilità anticipata su prezzi e condizioni di accesso"
       }
     },
+    "pricing": {
+      "eyebrow": "Prezzi semplici",
+      "title": "Scegli il tuo percorso",
+      "tiers": {
+        "basic": {
+          "name": "Base",
+          "price": "$0",
+          "period": "per sempre",
+          "description": "Onboarding + Accademia + Community",
+          "features": [
+            "Wizard di onboarding guidato",
+            "Accesso a PicoMUTX Academy",
+            "Accesso alla community Discord",
+            "1 template agente"
+          ],
+          "cta": "Inizia",
+          "ctaHref": "/pico/onboarding"
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "$100",
+          "period": "/mese",
+          "description": "Agente IA + Seminari + Libreria",
+          "recommended": true,
+          "features": [
+            "Tutto del piano Base",
+            "1 agente IA in produzione",
+            "Seminari e workshop dal vivo",
+            "Libreria completa di pattern",
+            "Supporto prioritario"
+          ],
+          "cta": "Inizia",
+          "ctaHref": "/pico/onboarding"
+        },
+        "premium": {
+          "name": "Premium",
+          "price": "$1.000",
+          "period": "/mese o $300/ora",
+          "description": "1-a-1 con Mario",
+          "features": [
+            "Tutto del piano Pro",
+            "Sessioni 1-a-1 settimanali",
+            "Architettura agente personalizzata",
+            "Accesso Slack diretto",
+            "Onboarding premium"
+          ],
+          "cta": "Prenota una chiamata",
+          "ctaHref": "#pre-register"
+        }
+      }
+    },
     "faq": {
       "eyebrow": "Domande",
       "title": "Le domande che le persone si pongono di solito prima di iscriversi",

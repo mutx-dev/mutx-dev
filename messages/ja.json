@@ -129,6 +129,57 @@
         "4": "価格やアクセス条件をいち早く把握できる"
       }
     },
+    "pricing": {
+      "eyebrow": "シンプルな料金プラン",
+      "title": "あなたに合ったプランを選ぶ",
+      "tiers": {
+        "basic": {
+          "name": "ベーシック",
+          "price": "¥0",
+          "period": "永久無料",
+          "description": "オンボーディング + アカデミー + コミュニティ",
+          "features": [
+            "ガイド付きオンボーディング",
+            "PicoMUTXアカデミーアクセス",
+            "コミュニティDiscordアクセス",
+            "1つのエージェントテンプレート"
+          ],
+          "cta": "始める",
+          "ctaHref": "/pico/onboarding"
+        },
+        "pro": {
+          "name": "プロ",
+          "price": "$100",
+          "period": "/月",
+          "description": "AIエージェント + セミナー + ライブラリ",
+          "recommended": true,
+          "features": [
+            "ベーシックの全機能",
+            "本番AIエージェント1つ",
+            "ライブセミナー＆ワークショップ",
+            "フルパターンライブラリ",
+            "優先サポート"
+          ],
+          "cta": "始める",
+          "ctaHref": "/pico/onboarding"
+        },
+        "premium": {
+          "name": "プレミアム",
+          "price": "$1,000",
+          "period": "/月または$300/時間",
+          "description": "Marioとの1対1",
+          "features": [
+            "プロの全機能",
+            "週次1対1セッション",
+            "カスタムエージェントアーキテクチャ",
+            "直接Slackアクセス",
+            "ホワイトグローブオンボーディング"
+          ],
+          "cta": "予約する",
+          "ctaHref": "#pre-register"
+        }
+      }
+    },
     "faq": {
       "eyebrow": "よくある質問",
       "title": "参加前によく出る質問",
