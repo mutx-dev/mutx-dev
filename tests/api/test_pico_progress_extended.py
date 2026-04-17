@@ -175,3 +175,21 @@ async def test_pico_progress_partial_updates_preserve_existing_nested_fields(cli
     assert (
         get_response.json()["lessonWorkspaces"]["install-hermes-locally"]["notes"] == "final notes"
     )
+
+
+@pytest.mark.asyncio
+async def test_pico_progress_invalid_counter_types_are_coerced_instead_of_500(client: AsyncClient):
+    response = await client.post(
+        "/v1/pico/progress",
+        json={
+            "tutorQuestions": "oops",
+            "supportRequests": {"count": 2},
+            "helpfulResponses": [1],
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["tutorQuestions"] == 0
+    assert data["supportRequests"] == 0
+    assert data["helpfulResponses"] == 0

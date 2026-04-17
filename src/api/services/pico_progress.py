@@ -162,9 +162,21 @@ def _normalize_progress(payload: dict[str, Any] | None) -> dict[str, Any]:
     progress["sharedProjects"] = _dedupe_string_list(progress.get("sharedProjects"))
     progress["lessonWorkspaces"] = _normalize_lesson_workspaces(progress.get("lessonWorkspaces"))
     progress["platform"] = _normalize_platform_state(progress.get("platform"))
-    progress["tutorQuestions"] = max(int(progress.get("tutorQuestions") or 0), 0)
-    progress["supportRequests"] = max(int(progress.get("supportRequests") or 0), 0)
-    progress["helpfulResponses"] = max(int(progress.get("helpfulResponses") or 0), 0)
+    progress["tutorQuestions"] = _coerce_int(
+        progress.get("tutorQuestions"),
+        default=0,
+        minimum=0,
+    )
+    progress["supportRequests"] = _coerce_int(
+        progress.get("supportRequests"),
+        default=0,
+        minimum=0,
+    )
+    progress["helpfulResponses"] = _coerce_int(
+        progress.get("helpfulResponses"),
+        default=0,
+        minimum=0,
+    )
 
     autopilot = progress.get("autopilot") if isinstance(progress.get("autopilot"), dict) else {}
     normalized_autopilot = deepcopy(DEFAULT_PICO_PROGRESS["autopilot"])
