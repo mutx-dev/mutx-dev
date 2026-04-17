@@ -694,6 +694,25 @@ export function MarketingHomePage() {
             </MarketingReveal>
           </div>
         </section>
+        <section className={home.dataUseSection} data-testid="homepage-data-use">
+          <div className={core.shell}>
+            <div className={home.dataUseInner}>
+              <div className={home.dataUseCopy}>
+                <p className={home.sectionEyebrow}>Sign-in &amp; data use</p>
+                <h2 className={home.sectionTitle}>How MUTX uses your account data.</h2>
+                <p className={home.sectionBody}>
+                  MUTX offers Google, GitHub, and Discord sign-in so you can authenticate without
+                  creating a separate password. When you sign in with Google, we request your
+                  basic profile (name and avatar) and email address solely to create your account,
+                  identify you in audit trails, and send critical product notifications. We do not
+                  access your Google Drive, Calendar, contacts, or any other Google service. Your
+                  Google credentials never pass through or are stored by MUTX. For full details, see
+                  our <Link href="/privacy-policy" className={home.dataUseLink}>privacy policy</Link>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   )

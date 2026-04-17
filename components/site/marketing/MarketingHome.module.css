@@ -481,6 +481,38 @@
     linear-gradient(180deg, rgba(7, 9, 13, 1), rgba(5, 6, 9, 1));
 }
 
+.dataUseSection {
+  position: relative;
+  padding: clamp(4rem, 7vw, 6rem) 0;
+  border-top: 1px solid rgba(247, 244, 239, 0.06);
+  color: rgba(247, 244, 239, 0.72);
+  background: rgba(5, 6, 9, 1);
+}
+
+.dataUseInner {
+  max-width: 42rem;
+}
+
+.dataUseCopy {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.dataUseSection .sectionEyebrow {
+  border-color: rgba(247, 244, 239, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dataUseLink {
+  color: rgba(120, 180, 255, 0.92);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dataUseLink:hover {
+  color: rgba(160, 210, 255, 1);
+}
+
 .demoIntro,
 .examplesIntro,
 .proofIntro,
