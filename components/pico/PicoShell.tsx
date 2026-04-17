@@ -524,7 +524,7 @@ export function PicoShell({
                       {currentItem.note}
                     </p>
                     <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      This surface should reduce uncertainty immediately and point to the next irreversible action.
+                      Use this chapter to cut uncertainty quickly and identify the next irreversible action.
                     </p>
                   </div>
                   {actions ? (

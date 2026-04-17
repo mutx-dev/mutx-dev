@@ -320,7 +320,7 @@ export function PicoOnboardingPageClient() {
                 {heroEyebrow}
               </p>
               <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                This fold should read like a launch console, not a brochure.
+                Track the install, the first proof artifact, and the next move from one place.
               </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
@@ -460,27 +460,32 @@ export function PicoOnboardingPageClient() {
       onToggleHelpLane={() =>
         actions.setPlatform({ helpLaneOpen: !progress.platform.helpLaneOpen })
       }
-      actions={
-        <div className="grid gap-3 sm:flex sm:flex-wrap">
-          <Link
+        actions={
+          <div className="grid gap-3 sm:flex sm:flex-wrap">
+            <Link
             href={
               firstRunDone && !derived.nextLesson
                 ? toHref('/autopilot')
                 : toHref(`/academy/${activationLessonSlug}`)
             }
             className={picoClasses.primaryButton}
-          >
-            {!installDone
-              ? 'Install Hermes now'
-              : !firstRunDone
-                ? 'Run your first agent'
-                : derived.nextLesson
-                  ? `Continue with ${derived.nextLesson.title}`
-                  : 'Open Autopilot'}
-          </Link>
-
-        </div>
-      }
+            >
+              {!installDone
+                ? 'Install Hermes now'
+                : !firstRunDone
+                  ? 'Run your first agent'
+                  : derived.nextLesson
+                    ? `Continue with ${derived.nextLesson.title}`
+                    : 'Open Autopilot'}
+            </Link>
+            <Link href={toHref(`/tutor?lesson=${activationLessonSlug}`)} className={picoClasses.secondaryButton}>
+              Ask tutor about this step
+            </Link>
+            <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
+              Open support lane
+            </Link>
+          </div>
+        }
     >
       <PicoSessionBanner session={session} nextPath={pathname} />
       <PicoSurfaceCompass
@@ -556,7 +561,7 @@ export function PicoOnboardingPageClient() {
             <div className={picoEmber('p-5')}>
               <p className={picoClasses.label}>Chapter posture</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                The premium version of onboarding is narrow on purpose. No browsing, no stack tourism, no decorative busywork before one real artifact exists.
+                Keep Chapter 01 narrow on purpose. No browsing, no stack tourism, and no extra setup theater before one real artifact exists.
               </p>
             </div>
 
@@ -564,7 +569,7 @@ export function PicoOnboardingPageClient() {
               <div className="border-b border-[color:var(--pico-border)] p-5">
                 <p className={picoClasses.label}>Guide marker</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  The operator should feel guided, not crowded. One clear mascot cue is enough while the first proof is still forming.
+                  One clear guide cue is enough while the first proof is still forming.
                 </p>
               </div>
               <div className="flex items-center justify-center p-6">
@@ -726,7 +731,7 @@ export function PicoOnboardingPageClient() {
               Three visible moves to clear Chapter 01
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              The opening sequence should read like a clean launch ritual, not a pile of setup advice. These are the only moves that count before the surface earns the right to get wider.
+              These are the only moves that count before the surface earns the right to get wider.
             </p>
           </div>
           <span className={picoClasses.chip}>first win protocol</span>
@@ -891,7 +896,7 @@ export function PicoOnboardingPageClient() {
               Keep hosted kickoff and runtime truth in one place
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              This is the single operator record for Chapter 01: hosted onboarding state, runtime state, and the next activation move. The page should stop feeling like three tools pretending not to know about each other.
+              Keep the hosted onboarding state, runtime truth, and next activation move in one operator record for Chapter 01.
             </p>
           </div>
           {session.status === 'authenticated' ? (

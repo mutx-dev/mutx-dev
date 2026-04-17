@@ -73,6 +73,26 @@ export function PicoSupportPageClient() {
     recoveryLesson && recoveryWorkspace.workspace.activeStepIndex >= 0
       ? recoveryLesson.steps[recoveryWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
       : 'not set'
+  const runtimeSignal =
+    session.status !== 'authenticated'
+      ? 'local only'
+      : setup.loading
+        ? 'checking'
+        : setup.runtime?.status ?? 'not attached'
+  const packetState = copied
+    ? 'copied'
+    : recoveryWorkspace.workspace.evidence.trim()
+      ? 'proof attached'
+      : session.status === 'authenticated'
+        ? 'context ready'
+        : 'needs proof'
+  const returnRouteLabel = recoveryLesson?.title ?? 'academy'
+  const packetPreview = [
+    `Route ${pathname}`,
+    `Runtime ${runtimeSignal}`,
+    `Return ${returnRouteLabel}`,
+    `Packet ${packetState}`,
+  ].join('\n')
 
   useEffect(() => {
     if (progress.platform.activeSurface !== 'support') {
@@ -165,7 +185,111 @@ export function PicoSupportPageClient() {
       <PicoShell
         eyebrow="Human help"
         title="Get a human when the product path stops being enough"
-        description="This route should triage the messy edge fast. Keep the escalation clean, attach the runtime truth, and send the operator back into motion."
+        description="Triage the messy edge fast, attach the real signal, and get back to the next honest move without turning support into a maze."
+        heroContent={
+          <div
+            className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(9,15,10,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+            data-testid="pico-support-hero-signal"
+          >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_30%,transparent_72%,rgba(255,255,255,0.02))]"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.14)] blur-3xl"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[rgba(var(--pico-accent-rgb),0.1)] blur-3xl"
+            />
+            <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
+              <div className="grid gap-5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={picoClasses.chip}>Escalation pulse</span>
+                  <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
+                    {formOpen ? 'desk open' : 'triage mode'}
+                  </span>
+                </div>
+                <h2 className="font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
+                  Send the blocker with enough proof to fix it fast.
+                </h2>
+                <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  Name the route, attach the signal, and point to the return lane. That gives support enough context to answer without slowing the next move down.
+                </p>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className={picoSoft('p-4')}>
+                    <p className={picoClasses.label}>Packet state</p>
+                    <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {packetState}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {copied ? 'ready to paste' : 'route and evidence first'}
+                    </p>
+                  </div>
+
+                  <div className={picoSoft('p-4')}>
+                    <p className={picoClasses.label}>Runtime truth</p>
+                    <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {runtimeSignal}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {setup.runtime?.gateway_url ? 'gateway attached' : 'attach the signal if it matters'}
+                    </p>
+                  </div>
+
+                  <div className={picoSoft('p-4')}>
+                    <p className={picoClasses.label}>Return lane</p>
+                    <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {returnRouteLabel}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {recoveryFocusedStep}
+                    </p>
+                  </div>
+                </div>
+
+                <div className={picoInset('grid gap-3 p-4 sm:grid-cols-[auto,minmax(0,1fr)] sm:items-center')}>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-[rgba(var(--pico-accent-rgb),0.24)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.18),rgba(7,13,8,0.5))] shadow-[0_18px_40px_rgba(var(--pico-accent-rgb),0.12)]">
+                    <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className={picoClasses.label}>Shortest clean handoff</p>
+                    <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {recoveryLesson ? `Resume ${recoveryLesson.title}` : 'Route back into academy'}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {recoveryLesson
+                        ? `${recoveryWorkspace.completedStepCount}/${recoveryLesson.steps.length} steps clear`
+                        : 'If the blocker is still fundamentally sequence-related, return there first.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className={picoInset('grid gap-4 overflow-hidden border-[color:rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_20%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
+                <div className="overflow-hidden rounded-[24px] border border-[rgba(var(--pico-accent-rgb),0.2)] bg-[linear-gradient(180deg,rgba(6,12,6,0.98),rgba(2,4,2,1))]">
+                  <Image
+                    src={supportRobot.src}
+                    alt={supportRobot.alt}
+                    width={320}
+                    height={320}
+                    className="h-auto w-full p-4"
+                    sizes="(max-width: 1024px) 100vw, 18rem"
+                  />
+                </div>
+
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Packet preview</p>
+                  <pre className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    <code>{packetPreview}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
         railCollapsed={progress.platform.railCollapsed}
         helpLaneOpen={progress.platform.helpLaneOpen}
         onToggleRail={() =>
@@ -185,8 +309,15 @@ export function PicoSupportPageClient() {
             </button>
             <button
               type="button"
-              onClick={() => openEscalation('other')}
+              onClick={() => void copyDiagnosticPacket()}
               className={picoClasses.secondaryButton}
+            >
+              {copied ? 'Copied packet' : 'Copy packet'}
+            </button>
+            <button
+              type="button"
+              onClick={() => openEscalation('other')}
+              className={picoClasses.tertiaryButton}
             >
               Request office hours
             </button>
@@ -255,7 +386,7 @@ export function PicoSupportPageClient() {
               <div className={picoEmber('p-5')}>
                 <p className={picoClasses.label}>Packet posture</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Premium support starts with a clean packet. The best escalation reads like an operator handoff, not a panic dump.
+                  Strong support starts with a clean packet. The best escalation reads like an operator handoff, not a panic dump.
                 </p>
               </div>
               <div className={picoInset('overflow-hidden p-0')}>

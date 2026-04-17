@@ -917,6 +917,24 @@ test.describe('mutx.dev QA', () => {
     expect(new URL(page.url()).pathname).toBe('/pico/pricing');
   });
 
+  test('pico support route keeps triage, packet, and return lane in one surface', async ({
+    page,
+  }) => {
+    await stubPicoProductApis(page)
+    await page.goto('/pico/support', { waitUntil: 'domcontentloaded' })
+
+    await expect(page.getByTestId('pico-support-hero-signal')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: /send the blocker with enough proof to fix it fast\./i }),
+    ).toBeVisible()
+    await expect(page.getByTestId('pico-support-escalation-standards')).toBeVisible()
+    await expect(page.getByTestId('pico-support-return-map')).toBeVisible()
+    await expect(
+      page.getByText(/name the route, attach the signal, and point to the return lane/i),
+    ).toBeVisible()
+    expect(new URL(page.url()).pathname).toBe('/pico/support')
+  })
+
   test('pico product routes render live surfaces and linked lesson flows stay inside /pico', async ({ page }) => {
     await stubPicoProductApis(page);
 
