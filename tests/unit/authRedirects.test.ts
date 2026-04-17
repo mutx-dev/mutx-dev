@@ -1,6 +1,7 @@
 import {
   getDefaultRedirectPathForHost,
   isPicoHost,
+  mergeRedirectPathWithSearch,
   resolveRedirectPath,
 } from '../../lib/auth/redirects'
 
@@ -27,5 +28,23 @@ describe('auth redirect helpers', () => {
 
   it('falls back to the host-specific default when next is missing', () => {
     expect(resolveRedirectPath(undefined, getDefaultRedirectPathForHost('pico.mutx.dev'))).toBe('/')
+  })
+
+  it('preserves tutor lesson query when the banner only knows the pathname', () => {
+    expect(mergeRedirectPathWithSearch('/tutor', 'lesson=install-hermes-locally')).toBe(
+      '/tutor?lesson=install-hermes-locally',
+    )
+    expect(
+      resolveRedirectPath(
+        mergeRedirectPathWithSearch('/tutor', 'lesson=install-hermes-locally'),
+        getDefaultRedirectPathForHost('pico.mutx.dev'),
+      ),
+    ).toBe('/tutor?lesson=install-hermes-locally')
+  })
+
+  it('does not duplicate a query that is already present on the redirect path', () => {
+    expect(
+      mergeRedirectPathWithSearch('/tutor?lesson=install-hermes-locally', 'lesson=other-lesson'),
+    ).toBe('/tutor?lesson=install-hermes-locally')
   })
 })

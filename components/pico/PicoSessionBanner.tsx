@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import { buildOAuthStartHref, oauthProviders } from '@/lib/auth/oauth'
 import { picoClasses, picoEmber, picoInset, picoPanel, picoSoft } from '@/components/pico/picoTheme'
 import { type PicoSessionState } from '@/components/pico/usePicoSession'
-import { resolveRedirectPath } from '@/lib/auth/redirects'
+import { mergeRedirectPathWithSearch, resolveRedirectPath } from '@/lib/auth/redirects'
 
 type PicoSessionBannerProps = {
   session: PicoSessionState
@@ -20,7 +21,11 @@ type HostedReadinessState = {
 }
 
 export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps) {
-  const redirectPath = resolveRedirectPath(nextPath, '/pico/onboarding')
+  const searchParams = useSearchParams()
+  const redirectPath = resolveRedirectPath(
+    mergeRedirectPathWithSearch(nextPath, searchParams.toString()),
+    '/pico/onboarding',
+  )
   const [readiness, setReadiness] = useState<HostedReadinessState>({
     webhookCount: null,
     loading: false,
