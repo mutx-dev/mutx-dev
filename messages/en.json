@@ -132,35 +132,58 @@
       }
     },
     "pricing": {
-      "eyebrow": "Simple pricing",
-      "title": "Choose the plan depth that matches the work",
-      "recommendedLabel": "Recommended",
+      "eyebrow": "Offers",
+      "title": "Lock the founding-member window before the public price resets.",
+      "lead": "Start with a 14-day free trial. If you join during the founding-member window, the solo plan lands at $9 instead of the standard $97.",
+      "recommendedLabel": "Founding now",
       "tiers": {
         "starter": {
-          "name": "Starter",
-          "price": "€9",
-          "period": "/mo",
-          "description": "For your first serious build",
-          "features": ["1,000 monthly credits", "Full tutor access", "All academy lessons", "Autopilot mode", "7-day free trial"],
+          "name": "Solo build",
+          "price": "$9",
+          "anchorPrice": "$97",
+          "period": "/mo now",
+          "description": "For founders who want to build with AI handling the onboarding, install flow, and support loop.",
+          "priceNote": "14-day free trial first. Lock the founding-member rate before public pricing returns to $97/mo.",
+          "recommended": true,
+          "features": [
+            "AI-led onboarding and install flow",
+            "Custom skill setup handled with AI",
+            "AI support desk plus build materials",
+            "Monthly masterclass and member community",
+            "Backstage call plus live case implementation"
+          ],
           "cta": "See pricing",
           "ctaHref": "/pricing"
         },
         "pro": {
-          "name": "Pro",
-          "price": "€29",
+          "name": "Guided group",
+          "price": "$297",
           "period": "/mo",
-          "description": "For operators shipping real workflows",
-          "recommended": true,
-          "features": ["10,000 monthly credits", "Full tutor + BYOK", "API access", "Priority support", "7-day free trial"],
+          "description": "For operators who want weekly coaching, tighter accountability, and a group support layer while building.",
+          "priceNote": "This replaces the old underpriced middle tier with the actual guided-group offer.",
+          "features": [
+            "Everything in Solo build",
+            "Premium onboarding",
+            "Skills center and performance materials",
+            "Weekly coaching and implementation Q&A",
+            "Group support room while you ship"
+          ],
           "cta": "See pricing",
           "ctaHref": "/pricing"
         },
         "enterprise": {
-          "name": "Enterprise",
-          "price": "Custom",
-          "period": "",
-          "description": "For teams planning private rollout, security review, or multi-seat adoption",
-          "features": ["Private rollout planning", "Security and approval review", "Team onboarding design", "Custom operating requirements", "Direct access to the founders"],
+          "name": "Pico Pilot",
+          "price": "From $1,000",
+          "period": "/bundle",
+          "description": "For objective-based implementation packages where we help build the agent package with you.",
+          "priceNote": "Scoped packages start at $1k. Bespoke custom projects start at $10k+.",
+          "features": [
+            "Implementation packages by business objective",
+            "Examples: social lead capture or sales workflows",
+            "Performance-skill combinations matched to the package",
+            "Individual follow-through built into delivery",
+            "Custom client projects from $10k+"
+          ],
           "cta": "Book a planning call",
           "ctaHref": "https://calendly.com/mutxdev"
         }
@@ -187,60 +210,65 @@
         "stacksLabel": "Tracked stacks"
       },
       "accessPlans": {
-        "label": "Founding access",
-        "title": "Choose the access lane that matches how fast you want to move",
-        "body": "These are the honest entry points right now. They control onboarding priority, support depth, and how quickly we help you get one real agent into motion.",
-        "recommended": "Most direct",
-        "meta": "Founding access stays human. We reply with the right lane, not a generic nurture sequence.",
+        "label": "Offers",
+        "title": "Lock the founding-member window before the public price resets.",
+        "body": "Choose the support model first. The founding offer starts with a 14-day trial, locks $9 instead of $97 on Solo build, and then steps up into guided group or implementation bundles when the work is heavier.",
+        "recommended": "Founding now",
+        "meta": "This layer is the offer ladder. The deeper live-billing surface below stays separate until the product path is real.",
         "noteLabel": "Why this section exists",
-        "note": "The landing and pricing route should say the same thing: access comes first, billing comes after the product path is real.",
+        "note": "Solo build is for doing the work with AI support. Guided group adds weekly coaching. Pico Pilot is for scoped implementation packages. Custom projects start at $10k+.",
         "truths": [
-          "Early access before the public opening",
-          "Priority onboarding when the workflow is already real",
-          "A clear route into support when rollout gets messy"
+          "14-day trial before the founding plan bills",
+          "Founding members lock $9 instead of $97 on Solo build",
+          "Group and implementation offers step up only when the work needs them"
         ],
         "tiers": {
           "starter": {
-            "name": "Starter lane",
-            "price": "Free",
-            "period": "waitlist",
-            "description": "For founders making the first serious build.",
+            "name": "Solo build",
+            "price": "$9",
+            "anchorPrice": "$97",
+            "period": "/mo now",
+            "description": "For founders who want to build with AI handling the onboarding, install flow, and support loop.",
+            "priceNote": "14-day free trial first. Lock the founding-member rate before public pricing returns to $97/mo.",
+            "recommended": true,
             "features": [
-              "Free early-access request",
-              "Core build path access",
-              "Launch lessons and templates",
-              "Human reply when the path gets unclear",
-              "Best fit for first-time operators"
+              "AI-led onboarding and install flow",
+              "Custom skill setup handled with AI",
+              "AI support desk plus build materials",
+              "Monthly masterclass and member community",
+              "Backstage call plus live case implementation"
             ],
-            "cta": "Join the waitlist"
+            "cta": "Lock founding rate"
           },
           "pro": {
-            "name": "Priority lane",
-            "price": "Priority",
-            "period": "onboarding",
-            "description": "For operators who want the fastest path with tighter support.",
+            "name": "Guided group",
+            "price": "$297",
+            "period": "/mo",
+            "description": "For operators who want weekly coaching, tighter accountability, and a group support layer while building.",
+            "priceNote": "This replaces the old underpriced middle tier with the actual guided-group offer.",
             "features": [
-              "Earlier onboarding window",
-              "Higher-touch product feedback loop",
-              "Priority support while building",
-              "Faster escalation when context gets messy",
-              "Best fit for live workflow owners"
+              "Everything in Solo build",
+              "Premium onboarding",
+              "Skills center and performance materials",
+              "Weekly coaching and implementation Q&A",
+              "Group support room while you ship"
             ],
-            "cta": "Request priority access"
+            "cta": "Request group seat"
           },
           "enterprise": {
-            "name": "Enterprise",
-            "price": "Custom",
-            "period": "rollout",
-            "description": "For teams planning private rollout, security review, or multi-seat adoption.",
+            "name": "Pico Pilot",
+            "price": "From $1,000",
+            "period": "/bundle",
+            "description": "For objective-based implementation packages where we help build the agent package with you.",
+            "priceNote": "Scoped packages start at $1k. Bespoke custom projects start at $10k+.",
             "features": [
-              "Private rollout planning",
-              "Security, approval, and workflow review",
-              "Team onboarding design",
-              "Custom operating requirements",
-              "Direct access to the founders"
+              "Implementation packages by business objective",
+              "Examples: social lead capture or sales workflows",
+              "Performance-skill combinations matched to the package",
+              "Individual follow-through built into delivery",
+              "Custom client projects from $10k+"
             ],
-            "cta": "Open support lane"
+            "cta": "Talk through implementation"
           }
         }
       },

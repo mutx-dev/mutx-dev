@@ -978,6 +978,14 @@
   font-size: clamp(1.9rem, 3.5vw, 3rem);
 }
 
+.pricingLead {
+  margin: 0;
+  max-width: 32rem;
+  color: var(--pico-text-secondary);
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
 .pricingTiers {
   display: grid;
   gap: 0;
@@ -1027,6 +1035,21 @@
   letter-spacing: 0.18em;
 }
 
+.pricingPriceStack {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.pricingAnchor {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(var(--pico-accent-rgb), 0.7);
+}
+
 .pricingPrice {
   display: flex;
   align-items: baseline;
@@ -1046,6 +1069,13 @@
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.18em;
+}
+
+.pricingPriceNote {
+  margin: 0;
+  color: var(--pico-accent-bright);
+  font-size: 0.78rem;
+  line-height: 1.55;
 }
 
 .pricingDescription {

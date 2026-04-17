@@ -916,7 +916,9 @@ test.describe('mutx.dev QA', () => {
     await expect(
       page.getByRole('heading', { name: /see the access lane first\. see the billing layer second\./i }),
     ).toBeVisible();
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/priority lane/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/solo build/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/\$9/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/guided group/i);
     await expect(page.getByTestId('pico-pricing-live-plans')).toContainText(
       /live product plans once pico is already in play/i,
     );

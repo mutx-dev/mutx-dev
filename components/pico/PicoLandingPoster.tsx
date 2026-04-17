@@ -16,6 +16,19 @@ import { picoRobotArtById } from '@/lib/picoRobotArt'
 const STEP_ICONS = [Map, MessageSquare, ShieldCheck, Sparkles] as const
 const PRICING_TIERS = ['starter', 'pro', 'enterprise'] as const
 
+type LandingPricingTierContent = {
+  name: string
+  price: string
+  period: string
+  description: string
+  features: string[]
+  cta: string
+  ctaHref: string
+  anchorPrice?: string
+  priceNote?: string
+  recommended?: boolean
+}
+
 export function PicoLandingPoster() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
@@ -404,11 +417,15 @@ export function PicoLandingPoster() {
                 <div className={s.pricingHeader}>
                   <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
                   <h3 className={s.pricingTitle}>{t('pricing.title')}</h3>
+                  <p className={s.pricingLead}>{t('pricing.lead')}</p>
                 </div>
 
                 <div className={s.pricingTiers}>
                   {PRICING_TIERS.map((tier) => {
-                    const isRecommended = tier === 'pro'
+                    const pricingTier = t.raw(
+                      `pricing.tiers.${tier}`,
+                    ) as LandingPricingTierContent
+                    const isRecommended = pricingTier.recommended ?? false
 
                     return (
                       <motion.div
@@ -418,21 +435,27 @@ export function PicoLandingPoster() {
                         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <div className={s.pricingTop}>
-                          <p className={s.pricingName}>{t(`pricing.tiers.${tier}.name`)}</p>
-                          <div className={s.pricingPrice}>
-                            <span className={s.pricingAmount}>{t(`pricing.tiers.${tier}.price`)}</span>
-                            <span className={s.pricingPeriod}>{t(`pricing.tiers.${tier}.period`)}</span>
+                          <p className={s.pricingName}>{pricingTier.name}</p>
+                          <div className={s.pricingPriceStack}>
+                            {pricingTier.anchorPrice ? (
+                              <span className={s.pricingAnchor}>{pricingTier.anchorPrice}</span>
+                            ) : null}
+                            <div className={s.pricingPrice}>
+                              <span className={s.pricingAmount}>{pricingTier.price}</span>
+                              <span className={s.pricingPeriod}>{pricingTier.period}</span>
+                            </div>
                           </div>
-                          <p className={s.pricingDescription}>
-                            {t(`pricing.tiers.${tier}.description`)}
-                          </p>
+                          {pricingTier.priceNote ? (
+                            <p className={s.pricingPriceNote}>{pricingTier.priceNote}</p>
+                          ) : null}
+                          <p className={s.pricingDescription}>{pricingTier.description}</p>
                         </div>
 
                         <ul className={s.pricingFeatures}>
-                          {Array.from({ length: 5 }, (_, index) => (
-                            <li key={index} className={s.pricingFeature}>
+                          {pricingTier.features.map((feature) => (
+                            <li key={feature} className={s.pricingFeature}>
                               <Check className={s.pricingFeatureCheck} />
-                              <span>{t(`pricing.tiers.${tier}.features.${index}`)}</span>
+                              <span>{feature}</span>
                             </li>
                           ))}
                         </ul>

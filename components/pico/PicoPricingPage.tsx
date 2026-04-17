@@ -34,6 +34,9 @@ type AccessTierContent = {
   description: string
   features: string[]
   cta: string
+  anchorPrice?: string
+  priceNote?: string
+  recommended?: boolean
 }
 
 type LivePlanId = 'free' | 'starter' | 'pro' | 'enterprise'
@@ -391,7 +394,7 @@ export function PicoPricingPage() {
 
                 <div className="grid gap-4 xl:grid-cols-3">
                   {accessPlans.map((plan) => {
-                    const isHighlighted = plan.id === 'pro'
+                    const isHighlighted = plan.recommended ?? false
 
                     return (
                       <article
@@ -412,14 +415,27 @@ export function PicoPricingPage() {
                             ) : null}
                           </div>
 
-                          <div className="flex items-end gap-2">
-                            <span className="font-[family:var(--font-site-display)] text-5xl leading-none tracking-[-0.07em] text-[color:var(--pico-text)]">
-                              {plan.price}
-                            </span>
-                            <span className="pb-1 text-sm text-[color:var(--pico-text-muted)]">
-                              {plan.period}
-                            </span>
+                          <div className="grid gap-1">
+                            {plan.anchorPrice ? (
+                              <span className="text-sm font-semibold tracking-[0.01em] text-[rgba(255,255,255,0.48)] [text-decoration:line-through] [text-decoration-color:rgba(var(--pico-accent-rgb),0.7)]">
+                                {plan.anchorPrice}
+                              </span>
+                            ) : null}
+                            <div className="flex items-end gap-2">
+                              <span className="font-[family:var(--font-site-display)] text-5xl leading-none tracking-[-0.07em] text-[color:var(--pico-text)]">
+                                {plan.price}
+                              </span>
+                              <span className="pb-1 text-sm text-[color:var(--pico-text-muted)]">
+                                {plan.period}
+                              </span>
+                            </div>
                           </div>
+
+                          {plan.priceNote ? (
+                            <p className="text-xs leading-5 text-[color:var(--pico-accent-bright)]">
+                              {plan.priceNote}
+                            </p>
+                          ) : null}
 
                           <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                             {plan.description}
