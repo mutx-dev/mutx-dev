@@ -23,11 +23,74 @@ import { usePicoHref } from '@/lib/pico/navigation'
 import { normalizeTutorReplyPayload, type PicoTutorReply } from '@/lib/pico/tutor'
 import { cn } from '@/lib/utils'
 
-const examplePrompts = [
+const defaultExamplePrompts = [
   'Hermes launches locally but dies on the VPS. What should I check first?',
   'How do I keep the agent alive after I close SSH?',
   'I want approval before any outbound send. Which lesson do I follow?',
 ] as const
+
+const lessonExamplePrompts: Record<string, string[]> = {
+  'install-hermes-locally': [
+    'The curl install script finished but hermes is not found in a new shell. What went wrong?',
+    'Hermes opens but setup does not complete. Where do I check?',
+    'I have two providers half-configured. Which one should I finish first?',
+  ],
+  'run-your-first-agent': [
+    'Hermes responds but the answer is obviously wrong. Is the model configured correctly?',
+    'The first prompt hangs with no output. What should I check first?',
+    'How do I know the agent actually used my configured provider and not a fallback?',
+  ],
+  'deploy-hermes-on-a-vps': [
+    'Hermes works locally but the VPS install fails at the curl step. What should I check?',
+    'I can SSH in and run hermes, but it dies when I close the terminal. How do I keep it alive?',
+    'The VPS has less RAM than my laptop. Does that matter for Hermes?',
+  ],
+  'keep-your-agent-alive': [
+    'I set up systemd but the service keeps restarting. Where do I look?',
+    'Hermes runs under tmux but stops responding after a few hours. What is happening?',
+    'How do I confirm the agent survived a server reboot without manually checking?',
+  ],
+  'connect-a-messaging-layer': [
+    'The Telegram bot token is set but Hermes never responds to messages. What should I check?',
+    'Discord integration keeps disconnecting. Is there a reconnection pattern?',
+    'I want messages to go to a specific channel, not DMs. How do I route that?',
+  ],
+  'add-your-first-skill': [
+    'The skill file is in the right folder but Hermes does not list it. What am I missing?',
+    'How do I test a skill without giving it access to real tools first?',
+    'The skill loads but always returns an error. How do I debug the handler?',
+  ],
+  'create-a-scheduled-workflow': [
+    'The cron job runs but the output is empty. Is the prompt being passed correctly?',
+    'How do I verify a scheduled workflow actually ran while I was asleep?',
+    'Can a scheduled workflow depend on the output of a previous run?',
+  ],
+  'see-your-agent-activity': [
+    'The activity page is empty even though I know the agent has been running. Why?',
+    'I see runs in the log but no structured output. Is the telemetry configured?',
+    'How far back does the activity history go on the free plan?',
+  ],
+  'set-a-cost-threshold': [
+    'I set a cost threshold but never got an alert when spending exceeded it. Why?',
+    'What units does the cost threshold use? Per day, per month, per run?',
+    'Can I set different thresholds for different agents or workflows?',
+  ],
+  'add-an-approval-gate': [
+    'The approval gate fires on every action, even safe reads. How do I narrow it?',
+    'How do I test the approval flow end-to-end without sending a real message?',
+    'Can approvals route to a Slack channel instead of in-app?',
+  ],
+  'build-a-lead-response-agent': [
+    'The agent drafts a reply but it sounds nothing like our brand voice. How do I fix that?',
+    'Leads come in but the agent does not pick them up. Is the trigger configured?',
+    'How do I make sure the agent never sends without human approval first?',
+  ],
+  'build-a-document-processing-agent': [
+    'The agent ingests files but the extracted text is garbled. What format works best?',
+    'Tagging works on plain text but fails on PDFs. Is there a preprocessing step?',
+    'How do I route processed documents to different queues based on their tags?',
+  ],
+}
 
 const questionProtocol = [
   'Say what step you were on.',
@@ -437,7 +500,7 @@ export function PicoTutorPageClient() {
         </div>
       }
     >
-      <PicoSessionBanner session={session} nextPath={pathname} />
+      <PicoSessionBanner session={session} nextPath={searchParams.toString() ? `${pathname}?${searchParams.toString()}` : pathname} />
       <PicoSurfaceCompass
         title="The tutor should end in motion, not another loop"
         body="Use tutor only to recover one grounded next move. Return to the lesson when the answer is sufficient, inspect Autopilot when the runtime is the real blocker, and escalate only when neither route can tell the truth."
@@ -667,7 +730,7 @@ export function PicoTutorPageClient() {
               </div>
 
               <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap">
-                {examplePrompts.map((prompt) => (
+                {(selectedLesson && lessonExamplePrompts[selectedLesson.slug] ? lessonExamplePrompts[selectedLesson.slug] : defaultExamplePrompts).map((prompt) => (
                   <button
                     key={prompt}
                     type="button"
