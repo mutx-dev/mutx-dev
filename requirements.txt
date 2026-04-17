@@ -18,7 +18,7 @@ botocore==1.34.25
 # Security
 python-jose[cryptography]==3.5.0
 passlib==1.7.4
-Authlib==1.6.9
+Authlib==1.6.11
 python-multipart==0.0.26
 email-validator==2.1.0
 # Agent & AI
