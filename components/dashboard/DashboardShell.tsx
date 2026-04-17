@@ -19,8 +19,10 @@ import {
 } from "lucide-react";
 
 import { DesktopWindowShell } from "@/components/desktop/DesktopWindowShell";
+import { DashboardSpaContent } from "@/components/dashboard/DashboardSpaContent";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
 import { useDesktopWindow } from "@/components/desktop/useDesktopWindow";
+import { getDashboardPanelForPath } from "@/lib/dashboardPanels";
 import { panelHref, useNavigateToPanel, usePrefetchPanel } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +35,7 @@ import {
 
 interface DashboardShellProps {
   children: ReactNode;
+  spaShellEnabled?: boolean;
 }
 
 interface DashboardNavProps {
@@ -48,6 +51,13 @@ const DASHBOARD_NAV_PANELS: Partial<Record<(typeof ALL_DASHBOARD_NAV_ITEMS)[numb
   sessions: "chat",
   analytics: "tokens",
   control: "settings",
+}
+
+const PANEL_FALLBACK_META: Record<string, { title: string; group: string }> = {
+  activity: { title: "Activity", group: "support" },
+  cron: { title: "Autonomy", group: "execution" },
+  notifications: { title: "Notifications", group: "support" },
+  standup: { title: "Standup", group: "support" },
 }
 
 function getDashboardNavPanel(key: (typeof ALL_DASHBOARD_NAV_ITEMS)[number]["key"]) {
@@ -119,7 +129,7 @@ function DashboardNav({ navigateToPanel, onNavigate, pathname, prefetchPanel }: 
   );
 }
 
-export function DashboardShell({ children }: DashboardShellProps) {
+export function DashboardShell({ children, spaShellEnabled = false }: DashboardShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const navigateToPanel = useNavigateToPanel();
@@ -257,10 +267,31 @@ export function DashboardShell({ children }: DashboardShellProps) {
   );
 
   const activeItem = useMemo(
-    () =>
-      ALL_DASHBOARD_NAV_ITEMS.find((item) => isDashboardNavItemActive(pathname, item)) ??
-      ALL_DASHBOARD_NAV_ITEMS[0],
+    () => {
+      const matchedItem = ALL_DASHBOARD_NAV_ITEMS.find((item) =>
+        isDashboardNavItemActive(pathname, item),
+      )
+      if (matchedItem) {
+        return matchedItem
+      }
+
+      const activePanel = getDashboardPanelForPath(pathname)
+      if (activePanel && PANEL_FALLBACK_META[activePanel]) {
+        return {
+          key: activePanel,
+          title: PANEL_FALLBACK_META[activePanel].title,
+          group: PANEL_FALLBACK_META[activePanel].group,
+        }
+      }
+
+      return ALL_DASHBOARD_NAV_ITEMS[0]
+    },
     [pathname],
+  );
+  const mainContent = spaShellEnabled ? (
+    <DashboardSpaContent fallback={children} pathname={pathname} />
+  ) : (
+    children
   );
   const showHomeAction = pathname !== "/dashboard";
   const showSetupAction = !isDesktop && pathname !== "/dashboard/control";
@@ -607,7 +638,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 ) : null}
               </header>
 
-              <main className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">{children}</main>
+              <main className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">{mainContent}</main>
 
               <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[rgba(191,219,254,0.08)] bg-[#0f1728] px-4 py-2.5 text-[11px] text-[#7f97bf]">
                 <div className="flex min-w-0 flex-wrap items-center gap-3">

@@ -24,6 +24,18 @@ export type DashboardStatus = 'idle' | 'running' | 'success' | 'error' | 'warnin
 export type RunFlowStatus = 'pending' | 'running' | 'completed' | 'failed' | 'awaiting_owner'
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug'
 export type InterfaceMode = 'essential' | 'full'
+export type SubscriptionPlan = 'free' | 'starter' | 'pro' | 'enterprise'
+export type BootStepStatus = 'pending' | 'running' | 'success' | 'error' | 'skipped'
+export type BootStepKey =
+  | 'auth'
+  | 'capabilities'
+  | 'config'
+  | 'connect'
+  | 'agents'
+  | 'sessions'
+  | 'projects'
+  | 'memory'
+  | 'skills'
 
 export interface CurrentUser {
   id: string
@@ -221,6 +233,117 @@ export interface FlowStage {
   maxCount: number
 }
 
+export type BootStepState = Record<BootStepKey, BootStepStatus>
+
+function createInitialBootSteps(): BootStepState {
+  return {
+    auth: 'pending',
+    capabilities: 'pending',
+    config: 'pending',
+    connect: 'pending',
+    agents: 'pending',
+    sessions: 'pending',
+    projects: 'pending',
+    memory: 'pending',
+    skills: 'pending',
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
+function pickString(source: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = source[key]
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value
+    }
+  }
+
+  return null
+}
+
+function normalizeCurrentUser(payload: unknown): CurrentUser | null {
+  if (!isRecord(payload)) {
+    return null
+  }
+
+  const user = isRecord(payload.user) ? payload.user : payload
+  const id = pickString(user, ['id', 'user_id', 'sub'])
+  const username = pickString(user, ['username', 'email', 'display_name', 'name'])
+
+  if (!id || !username) {
+    return null
+  }
+
+  return {
+    id,
+    username,
+    display_name: pickString(user, ['display_name', 'name', 'username']) || username,
+    role: (pickString(user, ['role']) as CurrentUser['role'] | null) || 'operator',
+    workspace_id: pickString(user, ['workspace_id', 'workspace']) ?? undefined,
+    tenant_id: pickString(user, ['tenant_id', 'organization_id']) ?? undefined,
+    provider: pickString(user, ['provider']) ?? undefined,
+    email: pickString(user, ['email']) ?? undefined,
+    avatar_url: pickString(user, ['avatar_url', 'avatar']) ?? undefined,
+  }
+}
+
+function normalizeSubscription(payload: unknown): MissionControlState['subscription'] {
+  const normalizePlan = (plan: string | null | undefined): SubscriptionPlan | null => {
+    if (!plan) {
+      return null
+    }
+
+    const normalized = plan.trim().toLowerCase()
+    if (
+      normalized === 'free' ||
+      normalized === 'starter' ||
+      normalized === 'pro' ||
+      normalized === 'enterprise'
+    ) {
+      return normalized
+    }
+
+    return null
+  }
+
+  if (typeof payload === 'string') {
+    return normalizePlan(payload)
+  }
+
+  if (!isRecord(payload)) {
+    return null
+  }
+
+  if (typeof payload.subscription === 'string') {
+    return normalizePlan(payload.subscription)
+  }
+
+  const source = isRecord(payload.subscription) ? payload.subscription : payload
+  const plan = pickString(source, ['plan', 'tier', 'status'])
+
+  return normalizePlan(plan)
+}
+
+function normalizeInterfaceMode(payload: unknown): InterfaceMode | null {
+  if (!isRecord(payload)) {
+    return null
+  }
+
+  const value = pickString(payload, ['interfaceMode', 'interface_mode'])
+  return value === 'essential' || value === 'full' ? value : null
+}
+
+function normalizeOrgName(payload: unknown) {
+  if (!isRecord(payload)) {
+    return null
+  }
+
+  return pickString(payload, ['orgName', 'org_name'])
+}
+
 // ---------------------------------------------------------------------------
 // Store State Shape
 // ---------------------------------------------------------------------------
@@ -234,11 +357,16 @@ export interface MissionControlState {
   lastMessage: unknown | null
 
   // -- Boot --
+  bootStarted: boolean
+  booting: boolean
   bootComplete: boolean
+  bootSteps: BootStepState
+  bootErrors: Partial<Record<BootStepKey, string>>
   capabilitiesChecked: boolean
   dashboardMode: 'local' | 'gateway'
   interfaceMode: InterfaceMode
-  subscription: 'free' | 'pro' | 'enterprise' | null
+  subscription: SubscriptionPlan | null
+  orgName: string | null
 
   // -- Agents --
   agents: Agent[]
@@ -307,11 +435,19 @@ export interface MissionControlActions {
   setLastMessage: (msg: unknown) => void
 
   // -- Boot --
+  setBootStarted: (started: boolean) => void
+  setBooting: (booting: boolean) => void
   setBootComplete: (complete: boolean) => void
+  setBootStepStatus: (
+    step: BootStepKey,
+    status: BootStepStatus,
+    error?: string | null
+  ) => void
   setCapabilitiesChecked: (checked: boolean) => void
   setDashboardMode: (mode: 'local' | 'gateway') => void
   setInterfaceMode: (mode: InterfaceMode) => void
-  setSubscription: (sub: 'free' | 'pro' | 'enterprise' | null) => void
+  setSubscription: (sub: SubscriptionPlan | null) => void
+  setOrgName: (name: string | null) => void
 
   // -- Agents --
   setAgents: (agents: Agent[]) => void
@@ -437,11 +573,16 @@ export const useMissionControl = create<MissionControlStore>()(
     lastMessage: null,
 
     // Boot
+    bootStarted: false,
+    booting: false,
     bootComplete: false,
+    bootSteps: createInitialBootSteps(),
+    bootErrors: {},
     capabilitiesChecked: false,
     dashboardMode: 'local',
-    interfaceMode: 'full',
+    interfaceMode: loadFromLocalStorage<InterfaceMode>('interface-mode', 'full'),
     subscription: null,
+    orgName: null,
 
     // Agents
     agents: [],
@@ -510,14 +651,36 @@ export const useMissionControl = create<MissionControlStore>()(
     setLastMessage: (msg) => set({ lastMessage: msg }),
 
     // -- Boot --
+    setBootStarted: (started) => set({ bootStarted: started }),
+    setBooting: (booting) => set({ booting }),
     setBootComplete: (complete) => set({ bootComplete: complete }),
+    setBootStepStatus: (step, status, error) =>
+      set((state) => ({
+        bootSteps: { ...state.bootSteps, [step]: status },
+        bootErrors:
+          error === undefined
+            ? state.bootErrors
+            : error
+              ? { ...state.bootErrors, [step]: error }
+              : Object.fromEntries(
+                  Object.entries(state.bootErrors).filter(([key]) => key !== step)
+                ) as Partial<Record<BootStepKey, string>>,
+      })),
     setCapabilitiesChecked: (checked) => set({ capabilitiesChecked: checked }),
     setDashboardMode: (mode) => set({ dashboardMode: mode }),
     setInterfaceMode: (mode) => {
       saveToLocalStorage('interface-mode', mode)
       set({ interfaceMode: mode })
+      void fetch('/api/settings', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ interface_mode: mode }),
+      }).catch(() => undefined)
     },
     setSubscription: (sub) => set({ subscription: sub }),
+    setOrgName: (name) => set({ orgName: name }),
 
     // -- Agents --
     setAgents: (agents) => set({ agents }),
@@ -764,32 +927,137 @@ export const useMissionControl = create<MissionControlStore>()(
     },
 
     // ===== Boot sequence =====
-    // Parallel data preload — mirrors MC's 9-step Promise.allSettled pattern.
+    // Progress-tracked boot flow for the SPA shell.
     boot: async () => {
       const state = get()
-      if (state.bootComplete) return
+      if (state.booting || state.bootComplete) return
 
-      const results = await Promise.allSettled([
-        get().fetchAgents(),
-        get().fetchSessions(),
-        get().fetchRuns(),
-        get().fetchOverview(),
-        get().fetchAnalyticsSummary(),
-        get().fetchMonitoringAlerts(),
-        get().fetchBudgets(),
-        get().fetchDeployments(),
-      ])
+      set({
+        bootStarted: true,
+        booting: true,
+        bootComplete: false,
+        bootSteps: createInitialBootSteps(),
+        bootErrors: {},
+      })
 
-      // Log any failures (but don't crash the app)
-      const failed = results.filter((r) => r.status === 'rejected')
-      if (failed.length > 0 && typeof window !== 'undefined') {
-        console.warn(
-          `[MUTX Store] Boot completed with ${failed.length} failed fetch(es)`,
-          failed.map((f) => (f as PromiseRejectedResult).reason)
-        )
+      const runStep = async (step: BootStepKey, action: () => Promise<void>) => {
+        get().setBootStepStatus(step, 'running', null)
+
+        try {
+          await action()
+          get().setBootStepStatus(step, 'success', null)
+        } catch (error) {
+          get().setBootStepStatus(
+            step,
+            'error',
+            error instanceof Error ? error.message : 'Boot step failed'
+          )
+        }
       }
 
-      set({ bootComplete: true })
+      try {
+        await runStep('auth', async () => {
+          const response = await fetch('/api/auth/me', { cache: 'no-store' })
+          if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+              set({ currentUser: null })
+              return
+            }
+
+            throw new Error('Failed to load operator session')
+          }
+
+          const payload = await response.json().catch(() => null)
+          set({ currentUser: normalizeCurrentUser(payload) })
+        })
+
+        await runStep('capabilities', async () => {
+          const desktopMode =
+            typeof window !== 'undefined' && Boolean(window.mutxDesktop?.isDesktop)
+              ? 'local'
+              : 'gateway'
+
+          set({
+            dashboardMode: desktopMode,
+            capabilitiesChecked: true,
+          })
+        })
+
+        await runStep('config', async () => {
+          const response = await fetch('/api/settings', { cache: 'no-store' })
+          if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+              return
+            }
+
+            throw new Error('Failed to load dashboard settings')
+          }
+
+          const payload = await response.json().catch(() => null)
+          if (!isRecord(payload)) {
+            return
+          }
+
+          const interfaceMode = normalizeInterfaceMode(payload)
+          if (interfaceMode) {
+            saveToLocalStorage('interface-mode', interfaceMode)
+            set({ interfaceMode })
+          }
+
+          get().setSubscription(normalizeSubscription(payload))
+          set({
+            orgName: normalizeOrgName(payload),
+          })
+        })
+
+        await runStep('connect', async () => {
+          set((currentState) => ({
+            connection: {
+              ...currentState.connection,
+              isConnected: false,
+              sseConnected: false,
+            },
+          }))
+        })
+
+        const results = await Promise.allSettled([
+          runStep('agents', async () => {
+            await get().fetchAgents()
+          }),
+          runStep('sessions', async () => {
+            await get().fetchSessions()
+          }),
+          runStep('projects', async () => {
+            const response = await fetch('/api/dashboard/projects', { cache: 'no-store' })
+            if (!response.ok) {
+              throw new Error('Failed to preload projects')
+            }
+          }),
+          runStep('memory', async () => {
+            const response = await fetch('/api/dashboard/memory', { cache: 'no-store' })
+            if (!response.ok) {
+              throw new Error('Failed to preload memory state')
+            }
+          }),
+          runStep('skills', async () => {
+            await Promise.allSettled([
+              fetch('/api/dashboard/clawhub/skills', { cache: 'no-store' }),
+              fetch('/api/dashboard/clawhub/bundles', { cache: 'no-store' }),
+              fetch('/api/dashboard/assistant/overview', { cache: 'no-store' }),
+            ])
+          }),
+        ])
+
+        const failed = results.filter((result) => result.status === 'rejected')
+        if (failed.length > 0 && typeof window !== 'undefined') {
+          console.warn(`[MUTX Store] Boot finished with ${failed.length} rejected step promise(s)`)
+        }
+      } finally {
+        set({
+          booting: false,
+          bootComplete: true,
+        })
+      }
     },
   }))
 )

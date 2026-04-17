@@ -85,6 +85,37 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
 
+  it('proxies settings reads to the real backend settings contract', async () => {
+    proxyJson.mockResolvedValue({ status: 200 } as never)
+    const { GET } = await import('../../app/api/settings/route')
+    const request = mockRequest('http://localhost:3000/api/settings')
+
+    await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(request, 'http://localhost:8000/v1/settings', {
+      fallbackMessage: 'Failed to load settings',
+    })
+  })
+
+  it('proxies settings updates to the real backend settings contract', async () => {
+    proxyJson.mockResolvedValue({ status: 200 } as never)
+    const { PATCH } = await import('../../app/api/settings/route')
+    const request = {
+      text: jest.fn().mockResolvedValue('{"interface_mode":"essential"}'),
+    } as unknown as NextRequest
+
+    await PATCH(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(request, 'http://localhost:8000/v1/settings', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: '{"interface_mode":"essential"}',
+      fallbackMessage: 'Failed to update settings',
+    })
+  })
+
   it('preserves successful list responses for dashboard agents proxy', async () => {
     hasAuthSession.mockReturnValue(true)
     authenticatedFetch.mockResolvedValue({
