@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -24,22 +24,17 @@ export const metadata: Metadata = {
     "ai agent budget controls",
     "runaway agent costs",
   ],
-  alternates: { canonical: getCanonicalUrl("/ai-agent-cost") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Cost Management — Per-Run Spend Tracking, Budgets, Attribution | MUTX",
     description:
+      "Track AI agent costs by run, model, provider, and workflow. MUTX attributes spend in real time, enforces budgets at the control plane, and catches runaway agents before the invoice lands.",
+    path: "/ai-agent-cost",
+    socialDescription:
       "Track AI agent costs by run, model, provider, and workflow. Budgets and attribution built into the control plane.",
-    url: getCanonicalUrl("/ai-agent-cost"),
-    images: [getPageOgImageUrl("AI Agent Cost Management — Per-Run Spend Tracking, Budgets, Attribution | MUTX", "Track AI agent costs by run, model, provider, and workflow. Budgets and attribution built into the control plane.", { path: "/ai-agent-cost" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Cost Management | MUTX",
-    description:
+    twitterTitle: "AI Agent Cost Management | MUTX",
+    twitterDescription:
       "Track AI agent costs by run, model, provider, and workflow. Catch runaway spend before the invoice lands.",
-    images: [getPageTwitterImageUrl("AI Agent Cost Management — Per-Run Spend Tracking, Budgets, Attribution | MUTX", "Track AI agent costs by run, model, provider, and workflow. Budgets and attribution built into the control plane.", { path: "/ai-agent-cost" })],
-  },
+  }),
 };
 
 const faqItems = [

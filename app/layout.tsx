@@ -1,20 +1,27 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 import { appFontVariables } from "@/app/fonts/app";
 import { AppDomainDemoIntro } from "@/components/app/AppDomainDemoIntro";
+import { GlobalLangSwitcher } from "@/components/i18n/GlobalLangSwitcher";
 import {
-  DEFAULT_OG_IMAGE_ALT,
-  DEFAULT_X_HANDLE,
-  getCanonicalUrl,
-  getOgImageUrl,
+  buildPageMetadata,
   getSiteUrl,
-  getTwitterImageUrl,
 } from "@/lib/seo";
 
 const siteUrl = getSiteUrl();
-const ogImageUrl = getOgImageUrl();
-const twitterImageUrl = getTwitterImageUrl();
+const rootSocialMetadata = buildPageMetadata({
+  title: "MUTX | Open Control Plane for AI Agents",
+  description:
+    "Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.",
+  path: "/",
+  socialDescription:
+    "MUTX is the open control plane for agents that have to survive real deployments, auth boundaries, webhooks, and runtime operations.",
+  twitterDescription:
+    "Operate deployed agents across auth, deployments, traces, webhooks, and runtime posture.",
+});
 
 export const viewport = {
   width: 'device-width',
@@ -25,9 +32,7 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: getCanonicalUrl(),
-  },
+  ...rootSocialMetadata,
   title: "MUTX | Open Control Plane for AI Agents",
   description:
     "Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.",
@@ -58,32 +63,6 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-  openGraph: {
-    locale: "en_US",
-    title: "MUTX | Open Control Plane for AI Agents",
-    description:
-      "MUTX is the open control plane for agents that have to survive real deployments, auth boundaries, webhooks, and runtime operations.",
-    url: siteUrl,
-    siteName: "MUTX",
-    images: [
-      {
-        url: ogImageUrl,
-        width: 1200,
-        height: 630,
-        alt: DEFAULT_OG_IMAGE_ALT,
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    creator: DEFAULT_X_HANDLE,
-    card: "summary_large_image",
-    site: DEFAULT_X_HANDLE,
-    title: "MUTX | Open Control Plane for AI Agents",
-    description:
-      "Operate deployed agents across auth, deployments, traces, webhooks, and runtime posture.",
-    images: [twitterImageUrl],
-  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -94,14 +73,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
+    <html lang={locale} className="h-full" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{if(window.sessionStorage.getItem('mutx-home-loader-played')==='1'){document.documentElement.setAttribute('data-home-loader-played','1');}}catch(_error){}})();",
+              "(function(){try{if(window.sessionStorage.getItem('mutx-home-loader-played')==='1'){document.documentElement.setAttribute('data-home-loader-played','1');document.documentElement.setAttribute('data-loader-state','complete');}}catch(_error){}})();",
           }}
         />
         <script
@@ -122,8 +104,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#09080b" />
       </head>
       <body className={`${appFontVariables} h-full min-h-screen antialiased`}>
-        {children}
-        <AppDomainDemoIntro />
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <GlobalLangSwitcher />
+          {children}
+          <AppDomainDemoIntro />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

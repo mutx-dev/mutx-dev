@@ -1,7 +1,16 @@
 import type { MetadataRoute } from 'next'
+import { headers } from 'next/headers'
 
 import { getDocSitemapRoutes } from '@/lib/docs'
-import { PUBLIC_MARKETING_ROUTES, toAbsoluteSiteUrl } from '@/lib/seo'
+import { PICO_LESSONS } from '@/lib/pico/academy'
+import {
+  PUBLIC_MARKETING_ROUTES,
+  getAppUrl,
+  getPicoUrl,
+  resolveSeoSurface,
+  toAbsoluteSiteUrl,
+  toAbsoluteUrl,
+} from '@/lib/seo'
 
 const routePriorities: Record<string, number> = {
   '/': 1,
@@ -28,8 +37,43 @@ const monthlyRoutes = new Set<string>([
   '/infrastructure',
 ])
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
+  const requestHeaders = await headers()
+  const requestHost = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
+  const surface = resolveSeoSurface(requestHost)
+
+  if (surface === 'app') {
+    return [
+      {
+        url: toAbsoluteUrl(getAppUrl(), '/control'),
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.9,
+      },
+    ]
+  }
+
+  if (surface === 'pico') {
+    const picoRoutes = [
+      '/',
+      '/academy',
+      '/autopilot',
+      '/onboarding',
+      '/pricing',
+      '/support',
+      '/tutor',
+      ...PICO_LESSONS.map((lesson) => `/academy/${lesson.slug}`),
+    ]
+
+    return picoRoutes.map((route) => ({
+      url: toAbsoluteUrl(getPicoUrl(), route),
+      lastModified: now,
+      changeFrequency: route.startsWith('/academy/') ? 'weekly' : 'monthly',
+      priority: route === '/' ? 1 : route === '/academy' ? 0.9 : 0.72,
+    }))
+  }
+
   const routes = [...PUBLIC_MARKETING_ROUTES, ...getDocSitemapRoutes()].filter(
     (route, index, allRoutes) => allRoutes.indexOf(route) === index,
   )

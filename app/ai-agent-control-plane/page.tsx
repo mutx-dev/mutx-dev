@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX",
   description:
     "The control plane isn&rsquo;t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-control-plane") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX",
     description:
+      "The control plane isn&rsquo;t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
+    path: "/ai-agent-control-plane",
+    socialDescription:
       "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.",
-    url: getCanonicalUrl("/ai-agent-control-plane"),
-    images: [getPageOgImageUrl("AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX", "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.", { path: "/ai-agent-control-plane" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Control Plane | MUTX",
-    description:
+    twitterTitle: "AI Agent Control Plane | MUTX",
+    twitterDescription:
       "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and operator surfaces — built in from day one.",
-    images: [getPageTwitterImageUrl("AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX", "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.", { path: "/ai-agent-control-plane" })],
-  },
+  }),
 };
 
 const structuredData = {

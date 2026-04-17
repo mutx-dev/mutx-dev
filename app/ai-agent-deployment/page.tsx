@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Deployment — Repeatable Envs, Audit Trails, Rollback | MUTX",
   description:
     "Agents that deploy like services, not science projects. MUTX gives you repeatable runtime environments, deployment records with audit trails, and one-click rollback.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-deployment") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Deployment — Repeatable Envs, Audit Trails, Rollback | MUTX",
     description:
+      "Agents that deploy like services, not science projects. MUTX gives you repeatable runtime environments, deployment records with audit trails, and one-click rollback.",
+    path: "/ai-agent-deployment",
+    socialDescription:
       "Agents that deploy like services. Repeatable environments, deployment records, and rollback paths — built into the control plane.",
-    url: getCanonicalUrl("/ai-agent-deployment"),
-    images: [getPageOgImageUrl("AI Agent Deployment — Repeatable Envs, Audit Trails, Rollback | MUTX", "Agents that deploy like services. Repeatable environments, deployment records, and rollback paths — built into the control plane.", { path: "/ai-agent-deployment" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Deployment | MUTX",
-    description:
+    twitterTitle: "AI Agent Deployment | MUTX",
+    twitterDescription:
       "Agents that deploy like services. Repeatable environments and deployment records built into the control plane.",
-    images: [getPageTwitterImageUrl("AI Agent Deployment — Repeatable Envs, Audit Trails, Rollback | MUTX", "Agents that deploy like services. Repeatable environments, deployment records, and rollback paths — built into the control plane.", { path: "/ai-agent-deployment" })],
-  },
+  }),
 };
 
 const structuredData = {

@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX",
   description:
     "Agents without guardrails will find every edge case — including the ones you didn't anticipate. MUTX enforces safety policies at runtime and surfaces violations as first-class events, not buried log lines.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-guardrails") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX",
     description:
+      "Agents without guardrails will find every edge case — including the ones you didn't anticipate. MUTX enforces safety policies at runtime and surfaces violations as first-class events, not buried log lines.",
+    path: "/ai-agent-guardrails",
+    socialDescription:
       "Runtime safety policies enforced by the control plane. Guardrail violations surface as first-class events.",
-    url: getCanonicalUrl("/ai-agent-guardrails"),
-    images: [getPageOgImageUrl("AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX", "Runtime safety policies enforced by the control plane. Guardrail violations surface as first-class events.", { path: "/ai-agent-guardrails" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Guardrails | MUTX",
-    description:
+    twitterTitle: "AI Agent Guardrails | MUTX",
+    twitterDescription:
       "Safety policies enforced at runtime by the control plane. Violations surface as first-class events.",
-    images: [getPageTwitterImageUrl("AI Agent Guardrails — Runtime Policy Enforcement & Safety Boundaries | MUTX", "Runtime safety policies enforced by the control plane. Guardrail violations surface as first-class events.", { path: "/ai-agent-guardrails" })],
-  },
+  }),
 };
 
 const structuredData = {

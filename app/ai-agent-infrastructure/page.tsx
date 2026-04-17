@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX",
   description:
     "Stop guessing where your agents run. MUTX surfaces compute, secrets, and storage as explicit control plane properties — auditable, versioned, and visible.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-infrastructure") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX",
     description:
+      "Stop guessing where your agents run. MUTX surfaces compute, secrets, and storage as explicit control plane properties — auditable, versioned, and visible.",
+    path: "/ai-agent-infrastructure",
+    socialDescription:
       "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.",
-    url: getCanonicalUrl("/ai-agent-infrastructure"),
-    images: [getPageOgImageUrl("AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX", "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.", { path: "/ai-agent-infrastructure" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Infrastructure | MUTX",
-    description:
+    twitterTitle: "AI Agent Infrastructure | MUTX",
+    twitterDescription:
       "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.",
-    images: [getPageTwitterImageUrl("AI Agent Infrastructure — Compute, Secrets, Storage, Network | MUTX", "Stop guessing where your agents run. Compute, secrets, and storage as explicit control plane properties.", { path: "/ai-agent-infrastructure" })],
-  },
+  }),
 };
 
 const structuredData = {

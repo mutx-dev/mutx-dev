@@ -18,30 +18,18 @@ import {
   buildReleaseNotesUrl,
   fetchLatestStableDesktopRelease,
 } from "@/lib/desktopRelease";
-import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
+import { buildPageMetadata, buildWebPageStructuredData } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Releases | MUTX",
   description:
     "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
-  alternates: {
-    canonical: getCanonicalUrl("/releases"),
-  },
-  openGraph: {
+  ...buildPageMetadata({
     title: "Releases | MUTX",
     description:
       "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
-    url: getCanonicalUrl("/releases"),
-    images: [getPageOgImageUrl("Releases | MUTX", "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.", { path: "/releases" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "Releases | MUTX",
-    description:
-      "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
-    images: [getPageTwitterImageUrl("Releases | MUTX", "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.", { path: "/releases" })],
-  },
+    path: "/releases",
+  }),
 };
 
 export const revalidate = 900;

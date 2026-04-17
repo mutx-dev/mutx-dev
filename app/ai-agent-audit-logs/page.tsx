@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX",
   description:
     "Complete trace history for every agent decision. MUTX records actions, policy evaluations, and operator overrides — so you can answer what happened and why, with the full execution context.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-audit-logs") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX",
     description:
+      "Complete trace history for every agent decision. MUTX records actions, policy evaluations, and operator overrides — so you can answer what happened and why, with the full execution context.",
+    path: "/ai-agent-audit-logs",
+    socialDescription:
       "Complete trace history for every agent decision. Records built for compliance and operator investigation.",
-    url: getCanonicalUrl("/ai-agent-audit-logs"),
-    images: [getPageOgImageUrl("AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX", "Complete trace history for every agent decision. Records built for compliance and operator investigation.", { path: "/ai-agent-audit-logs" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Audit Logs | MUTX",
-    description:
+    twitterTitle: "AI Agent Audit Logs | MUTX",
+    twitterDescription:
       "Complete trace history for every agent decision. Records built for compliance and operator investigation.",
-    images: [getPageTwitterImageUrl("AI Agent Audit Logs — Decision Records, Policy Traces, Compliance Exports | MUTX", "Complete trace history for every agent decision. Records built for compliance and operator investigation.", { path: "/ai-agent-audit-logs" })],
-  },
+  }),
 };
 
 const structuredData = {

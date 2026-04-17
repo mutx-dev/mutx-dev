@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { MarketingHomePage } from "@/components/site/marketing/MarketingHomePage";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildPageMetadata, getSiteUrl } from "@/lib/seo";
 
 const homeTitle = "MUTX | See What Your AI Agents Are Doing";
 const homeDescription =
@@ -12,22 +12,11 @@ const homeDescription =
 export const metadata: Metadata = {
   title: homeTitle,
   description: homeDescription,
-  alternates: {
-    canonical: getCanonicalUrl(),
-  },
-  openGraph: {
+  ...buildPageMetadata({
     title: homeTitle,
     description: homeDescription,
-    url: getSiteUrl(),
-    images: [getPageOgImageUrl(homeTitle, homeDescription, { path: "/" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: homeTitle,
-    description: homeDescription,
-    images: [getPageOgImageUrl(homeTitle, homeDescription, { path: "/" })],
-  },
+    path: "/",
+  }),
 };
 
 const homepageStructuredData = {

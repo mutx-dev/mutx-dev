@@ -10,9 +10,8 @@ import { SectionLanding } from "@/components/site/docs/SectionLanding";
 import { PrevNextNav } from "@/components/site/docs/PrevNextNav";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl,
-  getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import { type DocNavItem, parseSummary } from "@/lib/docs";
@@ -324,23 +323,13 @@ export async function generateMetadata({
     description: seo.description,
     category: "documentation",
     keywords: seo.keywords,
-    alternates: {
-      canonical: getCanonicalUrl(normalizedPath),
-    },
-    openGraph: {
+    ...buildPageMetadata({
       title: seo.metaTitle,
       description: seo.description,
-      url: getCanonicalUrl(normalizedPath),
+      path: normalizedPath,
       siteName: "MUTX Docs",
-      images: [getPageOgImageUrl(seo.metaTitle, seo.description, { path: normalizedPath })],
-    },
-    twitter: {
-      card: "summary_large_image",
-      creator: DEFAULT_X_HANDLE,
-      title: seo.metaTitle,
-      description: seo.description,
-      images: [getPageTwitterImageUrl(seo.metaTitle, seo.description, { path: normalizedPath })],
-    },
+      badge: "DOCS",
+    }),
   };
 }
 
