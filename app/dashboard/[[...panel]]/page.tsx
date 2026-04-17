@@ -48,8 +48,8 @@ import { SecurityPageClient } from "@/components/dashboard/SecurityPageClient";
 import { SessionsPageClient } from "@/components/dashboard/SessionsPageClient";
 import { SkillsPageClient } from "@/components/dashboard/SkillsPageClient";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
-import { useDesktopWindow } from "@/components/desktop/useDesktopWindow";
 import {
+  ESSENTIAL_PANELS,
   isSpaShellEnabled,
   useMissionControl,
   type BootStepKey,
@@ -772,7 +772,6 @@ export default function DashboardSpaShellPage() {
   const params = useParams<{ panel?: string[] }>();
   const _router = useRouter();
   const { status: _status, isDesktop, platformReady } = useDesktopStatus();
-  const { currentWindow: _currentWindow, updateCurrentWindow: _updateCurrentWindow } = useDesktopWindow();
 
   const tabFromUrl = resolveTabFromParams(params);
 
@@ -819,37 +818,39 @@ export default function DashboardSpaShellPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [bootComplete, setActiveTab, store]);
 
-  // ── Desktop branch ──────────────────────────────────────────────────────
-  if (platformReady && isDesktop) {
-    return (
-      <SpaShellGuard>
-        {booting && <BootOverlay steps={bootSteps} />}
-        <ErrorBoundary key={activeTab}>
-          {interfaceMode === "essential" && !["overview", "agents", "tasks", "chat", "activity", "logs", "settings"].includes(activeTab) ? (
-            <EssentialModeUpgradeNudge tab={activeTab} />
-          ) : (
-            <ContentRouter tab={activeTab} />
-          )}
-        </ErrorBoundary>
-      </SpaShellGuard>
-    );
+  // Determine whether a given tab is restricted in essential mode.
+  function isEssentialRestricted(tab: TabId): boolean {
+    return !ESSENTIAL_PANELS.includes(tab);
   }
 
-  // ── Web shell ───────────────────────────────────────────────────────────
-  return (
-    <SpaShellGuard>
+  // ── Render ───────────────────────────────────────────────────────────────
+
+  const errorBoundaryKey = activeTab;
+  const showUpgradeNudge = interfaceMode === "essential" && isEssentialRestricted(activeTab);
+
+  // Boot overlay + ErrorBoundary wrapping applies in both desktop and web shells.
+  const shellContent = (
+    <>
       {booting && <BootOverlay steps={bootSteps} />}
-      <ErrorBoundary key={activeTab}>
-        {interfaceMode === "essential" && !["overview", "agents", "tasks", "chat", "activity", "logs", "settings"].includes(activeTab) ? (
+      <ErrorBoundary key={errorBoundaryKey}>
+        {showUpgradeNudge ? (
           <EssentialModeUpgradeNudge tab={activeTab} />
         ) : (
           <ContentRouter tab={activeTab} />
         )}
       </ErrorBoundary>
-    </SpaShellGuard>
+    </>
   );
+
+  // ── Desktop branch ──────────────────────────────────────────────────────
+  if (platformReady && isDesktop) {
+    return <SpaShellGuard>{shellContent}</SpaShellGuard>;
+  }
+
+  // ── Web shell ───────────────────────────────────────────────────────────
+  return <SpaShellGuard>{shellContent}</SpaShellGuard>;
 }
 
 // ---------------------------------------------------------------------------
