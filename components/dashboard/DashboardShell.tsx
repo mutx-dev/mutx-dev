@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Activity,
   FolderOpen,
@@ -21,7 +21,12 @@ import {
 import { DesktopWindowShell } from "@/components/desktop/DesktopWindowShell";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
 import { useDesktopWindow } from "@/components/desktop/useDesktopWindow";
-import { panelHref, useNavigateToPanel, usePrefetchPanel } from "@/lib/navigation";
+import {
+  panelHref,
+  useDashboardPathname,
+  useNavigateToPanel,
+  usePrefetchPanel,
+} from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
 import {
@@ -120,8 +125,8 @@ function DashboardNav({ navigateToPanel, onNavigate, pathname, prefetchPanel }: 
   );
 }
 
-export function DashboardShell({ children }: DashboardShellProps) {
-  const pathname = usePathname();
+export function DashboardShell({ children, spaShellEnabled }: DashboardShellProps) {
+  const pathname = useDashboardPathname(Boolean(spaShellEnabled));
   const router = useRouter();
   const navigateToPanel = useNavigateToPanel();
   const prefetchPanel = usePrefetchPanel();
