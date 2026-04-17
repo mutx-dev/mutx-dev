@@ -58,8 +58,6 @@ export function PicoLandingPoster() {
 
   const heroRobot = picoRobotArtById.heroWave
   const guideRobot = picoRobotArtById.guide
-  const builderRobot = picoRobotArtById.builder
-  const coinsRobot = picoRobotArtById.coins
   const celebrateRobot = picoRobotArtById.celebrate
 
   function openForm(interest?: string) {
@@ -168,11 +166,6 @@ export function PicoLandingPoster() {
                 className={s.heroVisual}
                 style={{ y: heroVisualY, scale: heroVisualScale }}
               >
-                <div className={s.heroVisualHeader}>
-                  <span className={s.heroVisualKicker}>{t('platform.eyebrow')}</span>
-                  <span className={s.heroVisualSignal}>{t('trustBar.items.1')}</span>
-                </div>
-
                 <div className={s.heroRobotStage} aria-hidden="true">
                   <div className={s.heroRobotGlow} />
                   <Image
@@ -263,27 +256,6 @@ export function PicoLandingPoster() {
                   </div>
 
                   <p className={s.pathVisualNote}>{t('beforeAfter.close')}</p>
-
-                  <div className={s.pathGallery} aria-hidden="true">
-                    <div className={s.pathGalleryCell}>
-                      <Image
-                        src={builderRobot.src}
-                        alt=""
-                        width={256}
-                        height={256}
-                        className={s.pathGalleryImage}
-                      />
-                    </div>
-                    <div className={s.pathGalleryCell}>
-                      <Image
-                        src={coinsRobot.src}
-                        alt=""
-                        width={256}
-                        height={256}
-                        className={s.pathGalleryImage}
-                      />
-                    </div>
-                  </div>
                 </div>
               </SiteReveal>
 
@@ -295,7 +267,7 @@ export function PicoLandingPoster() {
                     <SiteReveal key={index} delay={0.08 + index * 0.06}>
                       <motion.li
                         className={s.pathItem}
-                        whileHover={prefersReducedMotion ? undefined : { y: -4 }}
+                        whileHover={prefersReducedMotion ? undefined : { x: 6 }}
                         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <div className={s.pathItemTop}>
@@ -356,7 +328,8 @@ export function PicoLandingPoster() {
               <SiteReveal className={s.pricingBoard} delay={0.12}>
                 <div className={s.pricingHeader}>
                   <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
-                  <h3 className={s.pricingTitle}>{t('pricing.title')}</h3>
+                  <p className={s.pricingLead}>{t('pricingPage.accessPlans.body')}</p>
+                  <p className={s.pricingMeta}>{t('pricingPage.accessPlans.meta')}</p>
                 </div>
 
                 <div className={s.pricingTiers}>
@@ -366,11 +339,9 @@ export function PicoLandingPoster() {
                     const isRecommended = tier === 'pro'
 
                     return (
-                      <motion.div
+                      <div
                         key={tier}
                         className={`${s.pricingTier} ${isRecommended ? s.pricingTierRecommended : ''}`}
-                        whileHover={prefersReducedMotion ? undefined : { y: -4 }}
-                        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <div className={s.pricingTop}>
                           <div className={s.pricingTierHeader}>
@@ -415,7 +386,7 @@ export function PicoLandingPoster() {
                             {t(`pricing.tiers.${tier}.cta`)}
                           </button>
                         )}
-                      </motion.div>
+                      </div>
                     )
                   })}
                 </div>
