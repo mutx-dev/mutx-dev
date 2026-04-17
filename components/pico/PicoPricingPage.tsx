@@ -1,15 +1,33 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { ArrowRight, Check, ExternalLink } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { PicoContactForm } from '@/components/pico/PicoContactForm'
+import { PicoFooter } from '@/components/pico/PicoFooter'
+import { PicoSessionBanner } from '@/components/pico/PicoSessionBanner'
+import {
+  picoClasses,
+  picoCodex,
+  picoCodexFrame,
+  picoCodexNote,
+  picoCodexSheet,
+  picoEmber,
+  picoInset,
+  picoPanel,
+  picoSoft,
+} from '@/components/pico/picoTheme'
+import { usePicoSession } from '@/components/pico/usePicoSession'
 import { PICO_GENERATED_CONTENT } from '@/lib/pico/generatedContent'
+import { usePicoHref } from '@/lib/pico/navigation'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
+import { cn } from '@/lib/utils'
 
-type PricingTierId = 'free' | 'starter' | 'pro' | 'enterprise'
-
-type PricingTierContent = {
+type AccessTierContent = {
   name: string
   price: string
   period: string
@@ -18,8 +36,21 @@ type PricingTierContent = {
   cta: string
 }
 
-const PLAN_CONFIG: Array<{
-  id: PricingTierId
+type LivePlanId = 'free' | 'starter' | 'pro' | 'enterprise'
+
+type LivePlanContent = {
+  name: string
+  price: string
+  period: string
+  description: string
+  features: string[]
+  cta: string
+}
+
+const ACCESS_TIER_IDS = ['starter', 'pro', 'enterprise'] as const
+
+const LIVE_PLAN_CONFIG: Array<{
+  id: LivePlanId
   priceId: string | null
   highlight: boolean
   supportHref?: string
@@ -47,6 +78,27 @@ const PLAN_CONFIG: Array<{
   },
 ]
 
+const PRICING_INTEREST_OPTIONS = [
+  { value: 'building-first', label: 'Founding access' },
+  { value: 'evaluating', label: 'Priority onboarding' },
+  { value: 'other', label: 'Enterprise rollout' },
+] as const
+
+const PRICING_CONTACT_COPY = {
+  title: 'Tell us what kind of access you actually need',
+  subtitle: 'We will reply with the honest lane, rollout shape, and next step.',
+  interestLabel: 'What are you optimizing for?',
+  messageLabel: 'What are you trying to ship?',
+  messageOptional: '(context helps)',
+  messagePlaceholder: 'Share the workflow, urgency, or rollout shape you are trying to make real.',
+  submit: 'Request access guidance',
+  submitting: 'Sending request...',
+  disclaimer: 'No generic nurture funnel. A human will reply with the right route.',
+  successTitle: 'Access request sent.',
+  successBody: 'We got the context. Expect a human reply that points you to the right lane.',
+  successBack: 'Back to pricing',
+} as const
+
 function formatShortDate(value?: string | null) {
   if (!value) return 'Unavailable'
 
@@ -72,19 +124,42 @@ function formatCompactNumber(value?: number | null) {
 }
 
 export function PicoPricingPage() {
-  const t = useTranslations('pico')
+  const pathname = usePathname()
   const pageT = useTranslations('pico.pricingPage')
+  const session = usePicoSession()
+  const toHref = usePicoHref()
+  const [formOpen, setFormOpen] = useState(false)
+  const [formInterest, setFormInterest] = useState<string | undefined>()
   const [loading, setLoading] = useState<string | null>(null)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const pricingRobot = picoRobotArtById.coins
   const generated = PICO_GENERATED_CONTENT
-  const plans = PLAN_CONFIG.map((plan) => ({
-    ...plan,
-    ...(t.raw(`pricing.tiers.${plan.id}`) as PricingTierContent),
+  const packSnapshot = generated.packSnapshot
+  const currentPlanId =
+    session.status === 'authenticated' ? session.user.plan?.toLowerCase() ?? null : null
+
+  const accessPlans = ACCESS_TIER_IDS.map((id) => ({
+    id,
+    ...(pageT.raw(`accessPlans.tiers.${id}`) as AccessTierContent),
   }))
 
-  async function handleCheckout(planId: string, priceId: string | null) {
-    if (!priceId) return
+  const accessTruths = pageT.raw('accessPlans.truths') as string[]
+
+  const livePlans = LIVE_PLAN_CONFIG.map((plan) => ({
+    ...plan,
+    ...(pageT.raw(`livePlans.tiers.${plan.id}`) as LivePlanContent),
+  }))
+
+  const liveTruths = pageT.raw('livePlans.truths') as string[]
+
+  function openPricingForm(interest?: string) {
+    setFormInterest(interest)
+    setFormOpen(true)
+  }
+
+  async function handleCheckout(planId: string, priceId: string) {
     setLoading(planId)
+    setCheckoutError(null)
 
     try {
       const res = await fetch('/api/pico/checkout', {
@@ -94,386 +169,547 @@ export function PicoPricingPage() {
       })
 
       if (res.status === 401) {
-        window.location.href = '/login?next=' + encodeURIComponent('/pricing')
+        window.location.href = `/login?next=${encodeURIComponent('/pico/pricing')}`
         return
       }
 
+      const payload = await res.json().catch(() => null)
+
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: pageT('checkoutError') }))
-        throw new Error(err.error || err.detail || pageT('checkoutError'))
+        throw new Error(
+          typeof payload?.error === 'string' && payload.error
+            ? payload.error
+            : typeof payload?.detail === 'string' && payload.detail
+              ? payload.detail
+              : pageT('livePlans.checkoutError'),
+        )
       }
 
-      const data = await res.json()
-      const url = data.url || data.checkout_url
+      const url =
+        typeof payload?.url === 'string'
+          ? payload.url
+          : typeof payload?.checkout_url === 'string'
+            ? payload.checkout_url
+            : null
+
       if (url) {
         window.location.href = url
         return
       }
-    } catch (err) {
-      console.error('Checkout error:', err)
+
+      setCheckoutError(pageT('livePlans.checkoutError'))
+    } catch (error) {
+      setCheckoutError(
+        error instanceof Error && error.message ? error.message : pageT('livePlans.checkoutError'),
+      )
     } finally {
       setLoading(null)
     }
   }
 
+  const sessionChip =
+    session.status === 'authenticated'
+      ? pageT('routeState.sessionAttached')
+      : session.status === 'loading'
+        ? pageT('routeState.sessionLoading')
+        : pageT('routeState.sessionMissing')
+
+  const sessionPlan =
+    session.status === 'authenticated' && session.user.plan
+      ? session.user.plan.toLowerCase()
+      : pageT('routeState.planFallback')
+
   return (
-    <div style={{
-      maxWidth: 'var(--pico-shell)',
-      margin: '0 auto',
-      padding: '4rem 1.5rem 6rem',
-    }}>
-      <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
-          <div style={{
-            width: 'min(12rem, 44vw)',
-            borderRadius: '1.75rem',
-            border: '1px solid rgba(164, 255, 92, 0.16)',
-            background: 'linear-gradient(180deg, rgba(6, 12, 7, 0.94), rgba(3, 7, 4, 0.98))',
-            boxShadow: '0 20px 44px rgba(0, 0, 0, 0.28)',
-            padding: '1rem',
-          }}>
-            <Image
-              src={pricingRobot.src}
-              alt={pricingRobot.alt}
-              width={320}
-              height={320}
-              style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'contain' }}
-              sizes="(max-width: 640px) 44vw, 12rem"
-            />
-          </div>
-        </div>
-        <h1 style={{
-          fontFamily: 'var(--pico-font-display)',
-          fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-          fontWeight: 700,
-          color: 'var(--pico-text)',
-          marginBottom: '0.75rem',
-          letterSpacing: '-0.02em',
-        }}>
-          {pageT('title')}
-        </h1>
-        <p style={{
-          color: 'var(--pico-text-secondary)',
-          fontSize: '1.1rem',
-          maxWidth: '32rem',
-          margin: '0 auto',
-          lineHeight: 1.6,
-        }}>
-          {pageT('subtitle')}
-        </p>
-      </div>
+    <>
+      <PicoContactForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        defaultInterest={formInterest}
+        source="pico-pricing"
+        copy={PRICING_CONTACT_COPY}
+        interestOptions={PRICING_INTEREST_OPTIONS}
+      />
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '1.5rem',
-        alignItems: 'start',
-      }}>
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            style={{
-              background: plan.highlight
-                ? 'var(--pico-bg-surface)'
-                : 'var(--pico-bg-raised)',
-              border: plan.highlight
-                ? '1px solid var(--pico-accent)'
-                : '1px solid var(--pico-border)',
-              borderRadius: 'var(--pico-radius)',
-              padding: '2rem',
-              position: 'relative',
-              transition: 'border-color 0.2s',
-            }}
-          >
-            {plan.highlight && (
-              <div style={{
-                position: 'absolute',
-                top: '-0.75rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'var(--pico-accent)',
-                color: 'var(--pico-accent-contrast)',
-                fontFamily: 'var(--pico-font-accent)',
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                padding: '0.25rem 0.75rem',
-                borderRadius: 'var(--pico-radius-full)',
-              }}>
-                {pageT('badgePopular')}
-              </div>
-            )}
+      <div
+        className="relative min-h-screen overflow-hidden bg-[color:var(--pico-bg)] text-[color:var(--pico-text)]"
+        data-testid="pico-pricing-route"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(var(--pico-accent-rgb),0.16),transparent_24%),radial-gradient(circle_at_82%_12%,rgba(115,239,190,0.08),transparent_18%),linear-gradient(180deg,#081108_0%,#030603_100%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:linear-gradient(180deg,rgba(0,0,0,0.95),transparent_92%)]"
+        />
 
-            <h2 style={{
-              fontFamily: 'var(--pico-font-accent)',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: plan.highlight ? 'var(--pico-accent)' : 'var(--pico-text-muted)',
-              marginBottom: '0.5rem',
-            }}>
-              {plan.name}
-            </h2>
-
-            <div style={{ marginBottom: '0.5rem' }}>
-              <span style={{
-                fontFamily: 'var(--pico-font-display)',
-                fontSize: '2.8rem',
-                fontWeight: 700,
-                color: 'var(--pico-text)',
-                lineHeight: 1,
-              }}>
-                {plan.price}
-              </span>
-              <span style={{
-                color: 'var(--pico-text-muted)',
-                fontSize: '0.95rem',
-                marginLeft: '0.25rem',
-              }}>
-                {plan.period}
-              </span>
-            </div>
-
-            <p style={{
-              color: 'var(--pico-text-secondary)',
-              fontSize: '0.9rem',
-              marginBottom: '1.5rem',
-              lineHeight: 1.5,
-            }}>
-              {plan.description}
-            </p>
-
-            <ul style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: '0 0 1.75rem 0',
-            }}>
-              {plan.features.map((feature) => (
-                <li key={feature} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  padding: '0.35rem 0',
-                  color: 'var(--pico-text-secondary)',
-                  fontSize: '0.88rem',
-                }}>
-                  <span style={{
-                    color: 'var(--pico-accent)',
-                    fontSize: '0.75rem',
-                    flexShrink: 0,
-                  }}>
-                    ✓
+        <div className="relative mx-auto max-w-[106rem] px-4 py-5 pb-16 sm:px-6 lg:px-8">
+          <header className={picoCodexFrame('overflow-hidden')}>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--pico-border)] px-6 py-4 sm:px-7">
+              <Link href={toHref('/')} className="inline-flex items-center gap-3">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-[16px] border border-[color:var(--pico-border)] bg-[linear-gradient(145deg,rgba(var(--pico-accent-rgb),0.1),rgba(8,18,10,0.82))] shadow-[0_18px_36px_rgba(0,0,0,0.28),0_0_28px_rgba(var(--pico-accent-rgb),0.12)]">
+                  <Image src="/pico/logo.png" alt="PicoMUTX logo" width={24} height={24} priority />
+                </span>
+                <span className="grid gap-0.5">
+                  <span className={picoClasses.label}>PicoMUTX</span>
+                  <span className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    access atlas
                   </span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
+                </span>
+              </Link>
 
-            <button
-              onClick={() => plan.id === 'enterprise'
-                ? window.location.href = (plan.supportHref ?? '/pico/support')
-                : handleCheckout(plan.id, plan.priceId)
-              }
-              disabled={loading === plan.id || (!plan.priceId && plan.id !== 'enterprise')}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                borderRadius: 'var(--pico-radius-sm)',
-                fontFamily: 'var(--pico-font-accent)',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: plan.priceId || plan.id === 'enterprise' ? 'pointer' : 'default',
-                border: plan.highlight
-                  ? '1px solid var(--pico-accent)'
-                  : '1px solid var(--pico-border)',
-                background: plan.highlight
-                  ? 'var(--pico-accent)'
-                  : 'transparent',
-                color: plan.highlight
-                  ? 'var(--pico-accent-contrast)'
-                  : 'var(--pico-text-secondary)',
-                opacity: loading === plan.id ? 0.6 : 1,
-                transition: 'all 0.2s',
-              }}
-            >
-              {loading === plan.id ? pageT('loading') : plan.cta}
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <section style={{ marginTop: '4rem' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '1rem',
-          marginBottom: '1.5rem',
-        }}>
-          {generated.pricing.truthStrip.map((item) => (
-            <div
-              key={item}
-              style={{
-                borderRadius: '1.15rem',
-                border: '1px solid var(--pico-border)',
-                background: 'var(--pico-bg-surface)',
-                padding: '1rem 1.1rem',
-                color: 'var(--pico-text-secondary)',
-                lineHeight: 1.55,
-              }}
-            >
-              {item}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={picoClasses.chip}>{pageT('eyebrow')}</span>
+                <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
+                  {pageT('secondaryCta')}
+                </Link>
+              </div>
             </div>
-          ))}
-        </div>
 
-        <div style={{
-          borderRadius: '1.6rem',
-          border: '1px solid rgba(164, 255, 92, 0.18)',
-          background: 'linear-gradient(180deg, rgba(7, 14, 8, 0.96), rgba(4, 8, 5, 0.98))',
-          padding: '1.5rem',
-          marginBottom: '1.5rem',
-        }}>
-          <p style={{
-            margin: 0,
-            fontFamily: 'var(--pico-font-accent)',
-            fontSize: '0.74rem',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: 'var(--pico-accent)',
-          }}>
-            Live content footing
-          </p>
-          <h2 style={{
-            margin: '0.85rem 0 0',
-            fontFamily: 'var(--pico-font-display)',
-            fontSize: 'clamp(1.5rem, 4vw, 2.3rem)',
-            color: 'var(--pico-text)',
-            letterSpacing: '-0.03em',
-          }}>
-            Pricing now sits on the same tracked stack truth as the rest of Pico
-          </h2>
-          <p style={{
-            margin: '0.85rem 0 0',
-            maxWidth: '48rem',
-            color: 'var(--pico-text-secondary)',
-            lineHeight: 1.65,
-          }}>
-            Builder-pack docs last refreshed {formatShortDate(generated.packSnapshot.refreshedAt)} now feed
-            the product copy, while live repo metadata keeps the stack briefings honest instead of frozen.
-          </p>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '1rem',
-        }}>
-          {generated.stacks.map((stack) => (
-            <article
-              key={stack.id}
-              style={{
-                borderRadius: '1.5rem',
-                border: '1px solid var(--pico-border)',
-                background: 'var(--pico-bg-raised)',
-                padding: '1.25rem',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
-                <div>
-                  <p style={{
-                    margin: 0,
-                    fontFamily: 'var(--pico-font-accent)',
-                    fontSize: '0.72rem',
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: 'var(--pico-accent)',
-                  }}>
-                    {stack.name}
+            <div className="grid gap-6 px-6 py-6 sm:px-7 lg:grid-cols-[minmax(0,1.06fr),22rem]">
+              <div className="grid gap-5">
+                <div className="grid gap-3">
+                  <p className={picoClasses.label}>{pageT('eyebrow')}</p>
+                  <h1 className="max-w-[11ch] font-[family:var(--font-site-display)] text-[clamp(2.8rem,10vw,4.8rem)] leading-[0.92] tracking-[-0.065em] text-[color:var(--pico-text)] sm:max-w-[11ch]">
+                    {pageT('title')}
+                  </h1>
+                  <p className="max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
+                    {pageT('subtitle')}
                   </p>
-                  <h3 style={{
-                    margin: '0.55rem 0 0',
-                    fontFamily: 'var(--pico-font-display)',
-                    fontSize: '1.45rem',
-                    color: 'var(--pico-text)',
-                    letterSpacing: '-0.03em',
-                  }}>
-                    {stack.live?.latestRef?.label ?? 'Tracked repo'}
-                  </h3>
                 </div>
-                <div style={{ textAlign: 'right', color: 'var(--pico-text-muted)', fontSize: '0.8rem' }}>
-                  <div>{formatCompactNumber(stack.live?.stars)} stars</div>
-                  <div>{formatShortDate(stack.live?.latestRef?.publishedAt ?? stack.live?.pushedAt)}</div>
+
+                <div className="grid gap-3 sm:flex sm:flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => openPricingForm('evaluating')}
+                    className={picoClasses.primaryButton}
+                  >
+                    {pageT('primaryCta')}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <Link href={toHref('/support')} className={picoClasses.secondaryButton}>
+                    {pageT('secondaryCta')}
+                  </Link>
+                  <Link href="/pico#pricing" className={picoClasses.tertiaryButton}>
+                    {pageT('returnToLanding')}
+                  </Link>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {accessTruths.map((item, index) => (
+                    <div key={item} className={picoInset('p-4')}>
+                      <p className={picoClasses.label}>0{index + 1}</p>
+                      <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        {item}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-sm leading-6 text-[color:var(--pico-text-muted)]">
+                  {pageT('accessPlans.meta')}
+                </p>
+              </div>
+
+              <div className="grid gap-4">
+                <div className={picoCodexSheet('overflow-hidden p-4 sm:p-5')}>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className={picoClasses.label}>{pageT('routeState.signalLabel')}</p>
+                    <span className={picoCodex.stamp}>{sessionChip}</span>
+                  </div>
+                  <div className="mt-4 overflow-hidden rounded-[24px] border border-[rgba(var(--pico-accent-rgb),0.2)] bg-[radial-gradient(circle_at_50%_14%,rgba(var(--pico-accent-rgb),0.18),transparent_52%),linear-gradient(180deg,rgba(6,12,6,0.98),rgba(2,4,2,1))]">
+                    <Image
+                      src={pricingRobot.src}
+                      alt={pricingRobot.alt}
+                      width={512}
+                      height={512}
+                      className="h-auto w-full p-3"
+                      sizes="(max-width: 1024px) 100vw, 20rem"
+                    />
+                  </div>
+                </div>
+
+                <div className={picoSoft('grid gap-4 p-4 sm:p-5')}>
+                  <div>
+                    <p className={picoClasses.label}>{pageT('routeState.label')}</p>
+                    <p className="mt-3 font-[family:var(--font-site-display)] text-2xl leading-[1.02] tracking-[-0.05em] text-[color:var(--pico-text)]">
+                      {pageT('routeState.title')}
+                    </p>
+                  </div>
+                  <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {pageT('routeState.body')}
+                  </p>
+                  <div className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                    <div className="flex items-center justify-between gap-3 border-b border-[color:var(--pico-border)] pb-2">
+                      <span>{pageT('routeState.planLabel')}</span>
+                      <span className="text-[color:var(--pico-text)]">{sessionPlan}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 border-b border-[color:var(--pico-border)] pb-2">
+                      <span>{pageT('routeState.docsLabel')}</span>
+                      <span className="text-[color:var(--pico-text)]">
+                        {packSnapshot.visibleDocCount} docs
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span>{pageT('routeState.stacksLabel')}</span>
+                      <span className="text-[color:var(--pico-text)]">
+                        {generated.stacks.length} tracked
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main className="mt-6 space-y-6">
+            <PicoSessionBanner session={session} nextPath={pathname} />
+
+            <section
+              className={picoPanel('overflow-hidden')}
+              data-testid="pico-pricing-access-lanes"
+            >
+              <div className="grid gap-6 px-6 py-6 sm:px-7 lg:grid-cols-[minmax(0,0.82fr),minmax(0,1.18fr)]">
+                <div className="grid gap-4">
+                  <div>
+                    <p className={picoClasses.label}>{pageT('accessPlans.label')}</p>
+                    <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+                      {pageT('accessPlans.title')}
+                    </h2>
+                    <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
+                      {pageT('accessPlans.body')}
+                    </p>
+                  </div>
+
+                  <div className={picoCodexNote('p-4 sm:p-5')}>
+                    <p className={picoClasses.label}>{pageT('accessPlans.noteLabel')}</p>
+                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      {pageT('accessPlans.note')}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 xl:grid-cols-3">
+                  {accessPlans.map((plan) => {
+                    const isHighlighted = plan.id === 'pro'
+
+                    return (
+                      <article
+                        key={plan.id}
+                        className={cn(
+                          picoInset('flex h-full flex-col gap-5 p-5'),
+                          isHighlighted &&
+                            'border-[color:var(--pico-border-hover)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.16),rgba(10,19,11,0.34))] shadow-[0_24px_56px_rgba(var(--pico-accent-rgb),0.08)]',
+                        )}
+                      >
+                        <div className="grid gap-4">
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <p className="text-sm font-semibold text-[color:var(--pico-text)]">
+                              {plan.name}
+                            </p>
+                            {isHighlighted ? (
+                              <span className={picoClasses.chip}>{pageT('accessPlans.recommended')}</span>
+                            ) : null}
+                          </div>
+
+                          <div className="flex items-end gap-2">
+                            <span className="font-[family:var(--font-site-display)] text-5xl leading-none tracking-[-0.07em] text-[color:var(--pico-text)]">
+                              {plan.price}
+                            </span>
+                            <span className="pb-1 text-sm text-[color:var(--pico-text-muted)]">
+                              {plan.period}
+                            </span>
+                          </div>
+
+                          <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                            {plan.description}
+                          </p>
+                        </div>
+
+                        <ul className="grid gap-3">
+                          {plan.features.map((feature) => (
+                            <li
+                              key={feature}
+                              className="flex items-start gap-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]"
+                            >
+                              <Check className="mt-1 h-4 w-4 flex-shrink-0 text-[color:var(--pico-accent)]" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <div className="mt-auto pt-2">
+                          {plan.id === 'enterprise' ? (
+                            <Link href={toHref('/support')} className={picoClasses.secondaryButton}>
+                              {plan.cta}
+                            </Link>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openPricingForm(plan.id === 'starter' ? 'building-first' : 'evaluating')
+                              }
+                              className={cn(
+                                'w-full',
+                                isHighlighted ? picoClasses.primaryButton : picoClasses.secondaryButton,
+                              )}
+                            >
+                              {plan.cta}
+                            </button>
+                          )}
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              </div>
+            </section>
+
+            <section className={picoPanel('overflow-hidden')} data-testid="pico-pricing-live-plans">
+              <div className="border-b border-[color:var(--pico-border)] px-6 py-4 sm:px-7">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className={picoClasses.label}>{pageT('livePlans.label')}</p>
+                    <h2 className="mt-3 max-w-4xl font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+                      {pageT('livePlans.title')}
+                    </h2>
+                    <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
+                      {pageT('livePlans.body')}
+                    </p>
+                  </div>
+                  <span className={picoClasses.chip}>{pageT('livePlans.badge')}</span>
                 </div>
               </div>
 
-              <p style={{
-                margin: '0.9rem 0 0',
-                color: 'var(--pico-text-secondary)',
-                lineHeight: 1.65,
-                fontSize: '0.94rem',
-              }}>
-                {stack.productProfile}
-              </p>
+              <div className="grid gap-6 px-6 py-6 sm:px-7 xl:grid-cols-[18rem,minmax(0,1fr)]">
+                <div className="grid content-start gap-3">
+                  {liveTruths.map((item) => (
+                    <div key={item} className={picoInset('p-4')}>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item}</p>
+                    </div>
+                  ))}
 
-              <ul style={{
-                listStyle: 'none',
-                margin: '1rem 0 0',
-                padding: 0,
-                display: 'grid',
-                gap: '0.45rem',
-                color: 'var(--pico-text-secondary)',
-                fontSize: '0.88rem',
-              }}>
-                {stack.strengths.slice(0, 3).map((item) => (
-                  <li key={item} style={{ display: 'flex', gap: '0.6rem' }}>
-                    <span style={{ color: 'var(--pico-accent)' }}>•</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+                  {checkoutError ? (
+                    <div className={picoEmber('p-4')}>
+                      <p className={picoClasses.label}>Checkout status</p>
+                      <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text)]">
+                        {checkoutError}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
 
-              <div style={{
-                display: 'flex',
-                gap: '0.75rem',
-                flexWrap: 'wrap',
-                marginTop: '1rem',
-                fontSize: '0.86rem',
-              }}>
-                {stack.docsUrl ? (
-                  <a href={stack.docsUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--pico-accent)' }}>
-                    Docs
-                  </a>
-                ) : null}
-                {stack.repoUrl ? (
-                  <a href={stack.repoUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--pico-text-secondary)' }}>
-                    Repo
-                  </a>
-                ) : null}
-                {stack.live?.latestRef?.url ? (
-                  <a href={stack.live.latestRef.url} target="_blank" rel="noreferrer" style={{ color: 'var(--pico-text-secondary)' }}>
-                    Latest ship
-                  </a>
-                ) : null}
+                <div className="grid gap-4 lg:grid-cols-2">
+                  {livePlans.map((plan) => {
+                    const isCurrent = currentPlanId === plan.id
+
+                    return (
+                      <article
+                        key={plan.id}
+                        className={cn(
+                          picoInset('flex h-full flex-col gap-5 p-5'),
+                          plan.highlight &&
+                            'border-[color:var(--pico-border-hover)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.12),rgba(10,19,11,0.26))] shadow-[0_20px_52px_rgba(var(--pico-accent-rgb),0.07)]',
+                        )}
+                      >
+                        <div className="grid gap-4">
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <p className="text-sm font-semibold text-[color:var(--pico-text)]">
+                              {plan.name}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {plan.highlight ? (
+                                <span className={picoClasses.chip}>{pageT('livePlans.badgePopular')}</span>
+                              ) : null}
+                              {isCurrent ? (
+                                <span className={picoClasses.chip}>{pageT('livePlans.currentPlan')}</span>
+                              ) : null}
+                            </div>
+                          </div>
+
+                          <div className="flex items-end gap-2">
+                            <span className="font-[family:var(--font-site-display)] text-5xl leading-none tracking-[-0.07em] text-[color:var(--pico-text)]">
+                              {plan.price}
+                            </span>
+                            <span className="pb-1 text-sm text-[color:var(--pico-text-muted)]">
+                              {plan.period}
+                            </span>
+                          </div>
+
+                          <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                            {plan.description}
+                          </p>
+                        </div>
+
+                        <ul className="grid gap-3">
+                          {plan.features.map((feature) => (
+                            <li
+                              key={feature}
+                              className="flex items-start gap-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]"
+                            >
+                              <Check className="mt-1 h-4 w-4 flex-shrink-0 text-[color:var(--pico-accent)]" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <div className="mt-auto pt-2">
+                          {plan.priceId ? (
+                            <button
+                              type="button"
+                              onClick={() => handleCheckout(plan.id, plan.priceId!)}
+                              disabled={loading === plan.id}
+                              className={cn(
+                                'w-full',
+                                plan.highlight ? picoClasses.primaryButton : picoClasses.secondaryButton,
+                                loading === plan.id && 'opacity-70',
+                              )}
+                            >
+                              {loading === plan.id ? pageT('livePlans.loading') : plan.cta}
+                            </button>
+                          ) : plan.supportHref ? (
+                            <a
+                              href={plan.supportHref}
+                              target="_blank"
+                              rel="noreferrer"
+                              className={picoClasses.secondaryButton}
+                            >
+                              {plan.cta}
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          ) : (
+                            <Link
+                              href={
+                                session.status === 'authenticated'
+                                  ? toHref('/onboarding')
+                                  : `/login?next=${encodeURIComponent('/pico/onboarding')}`
+                              }
+                              className={picoClasses.secondaryButton}
+                            >
+                              {plan.cta}
+                            </Link>
+                          )}
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
               </div>
-            </article>
-          ))}
+            </section>
+
+            <section className="grid gap-6 xl:grid-cols-[minmax(0,0.78fr),minmax(0,1.22fr)]">
+              <div className={picoPanel('p-6 sm:p-7')}>
+                <p className={picoClasses.label}>{pageT('stackLabel')}</p>
+                <h2 className="mt-3 max-w-2xl font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+                  {pageT('stackTitle')}
+                </h2>
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
+                  {pageT('stackBody')}
+                </p>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  {generated.pricing.truthStrip.map((item) => (
+                    <div key={item} className={picoInset('p-4')}>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-4 text-sm leading-6 text-[color:var(--pico-text-muted)]">
+                  {pageT('stackFooterPrefix')}{' '}
+                  <span className="text-[color:var(--pico-text)]">
+                    {formatShortDate(packSnapshot.refreshedAt)}
+                  </span>{' '}
+                  {pageT('stackFooterMiddle')}{' '}
+                  <span className="text-[color:var(--pico-text)]">{packSnapshot.visibleDocCount}</span>{' '}
+                  {pageT('stackFooterDocs')}{' '}
+                  <span className="text-[color:var(--pico-text)]">{generated.stacks.length}</span>{' '}
+                  {pageT('stackFooterStacks')}
+                </p>
+              </div>
+
+              <div className={picoPanel('p-6 sm:p-7')}>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {generated.stacks.slice(0, 4).map((stack) => (
+                    <article key={stack.id} className={picoInset('grid gap-4 p-4')}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className={picoClasses.label}>{stack.name}</p>
+                          <h3 className="mt-2 font-[family:var(--font-site-display)] text-2xl leading-[1.02] tracking-[-0.05em] text-[color:var(--pico-text)]">
+                            {stack.live?.latestRef?.label ?? 'Tracked repo'}
+                          </h3>
+                        </div>
+                        <div className="text-right text-xs leading-5 text-[color:var(--pico-text-muted)]">
+                          <div>{formatCompactNumber(stack.live?.stars)} stars</div>
+                          <div>{formatShortDate(stack.live?.latestRef?.publishedAt ?? stack.live?.pushedAt)}</div>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                        {stack.strengths.slice(0, 2).map((item) => (
+                          <div key={item} className="flex gap-2">
+                            <span className="text-[color:var(--pico-accent)]">•</span>
+                            <span>{item}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 text-sm">
+                        {stack.docsUrl ? (
+                          <a
+                            href={stack.docsUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[color:var(--pico-accent-bright)] transition hover:text-[color:var(--pico-accent)]"
+                          >
+                            Docs
+                          </a>
+                        ) : null}
+                        {stack.repoUrl ? (
+                          <a
+                            href={stack.repoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[color:var(--pico-text-secondary)] transition hover:text-[color:var(--pico-text)]"
+                          >
+                            Repo
+                          </a>
+                        ) : null}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className={picoCodexFrame('overflow-hidden p-6 sm:p-7')}>
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr),auto] lg:items-end">
+                <div>
+                  <p className={picoClasses.label}>{pageT('finalLabel')}</p>
+                  <h2 className="mt-3 max-w-3xl font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+                    {pageT('finalTitle')}
+                  </h2>
+                  <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
+                    {pageT('finalBody')}
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:flex sm:flex-wrap">
+                  <Link href={toHref('/support')} className={picoClasses.primaryButton}>
+                    {pageT('finalPrimary')}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/pico" className={picoClasses.secondaryButton}>
+                    {pageT('finalSecondary')}
+                  </Link>
+                </div>
+              </div>
+            </section>
+          </main>
         </div>
-      </section>
 
-      <p style={{
-        textAlign: 'center',
-        color: 'var(--pico-text-muted)',
-        fontSize: '0.8rem',
-        marginTop: '2.5rem',
-      }}>
-        {pageT('enterpriseSupport')}{' '}
-        <a href="/pico/support" style={{ color: 'var(--pico-accent)' }}>
-          {pageT('enterpriseSupportCta')}
-        </a>{' '}
-        {pageT('enterpriseSupportBody')}
-      </p>
-    </div>
+        <PicoFooter />
+      </div>
+    </>
   )
 }

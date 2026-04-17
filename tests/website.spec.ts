@@ -900,6 +900,23 @@ test.describe('mutx.dev QA', () => {
     expect(new URL(page.url()).pathname).toBe('/pico');
   });
 
+  test('pico pricing route keeps access lanes and live billing in one honest surface', async ({
+    page,
+  }) => {
+    await page.goto('/pico/pricing', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByTestId('pico-pricing-route')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /see the access lane first\. see the billing layer second\./i }),
+    ).toBeVisible();
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/priority lane/i);
+    await expect(page.getByTestId('pico-pricing-live-plans')).toContainText(
+      /live product plans once pico is already in play/i,
+    );
+    await expect(page.getByText(/founding access is the front door\./i)).toBeVisible();
+    expect(new URL(page.url()).pathname).toBe('/pico/pricing');
+  });
+
   test('pico product routes render live surfaces and linked lesson flows stay inside /pico', async ({ page }) => {
     await stubPicoProductApis(page);
 
