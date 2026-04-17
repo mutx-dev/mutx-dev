@@ -23,8 +23,7 @@
   position: relative;
 }
 
-.sectionShell,
-.trustStrip {
+.sectionShell {
   width: var(--landing-shell);
   margin: 0 auto;
 }
@@ -180,6 +179,11 @@
   white-space: nowrap;
 }
 
+.navCtaLabelMobile {
+  display: none;
+  white-space: nowrap;
+}
+
 .navCtaIcon {
   width: 1rem;
   height: 1rem;
@@ -239,12 +243,12 @@
   display: grid;
   gap: 1.15rem;
   align-content: center;
-  max-width: 38rem;
+  max-width: 40rem;
 }
 
 .heroPrelude {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.45rem;
   justify-items: start;
 }
 
@@ -255,9 +259,7 @@
 .heroVisualSignal,
 .pathVisualLabel,
 .pathVisualRule,
-.shiftLabels,
-.pricingName,
-.pricingPeriod {
+.shiftLabels {
   font-family: var(--pico-font-accent);
   text-transform: uppercase;
 }
@@ -290,24 +292,15 @@
   flex-shrink: 0;
 }
 
-.heroWordmark {
-  margin: 0;
-  font-family: var(--pico-font-display);
-  font-size: clamp(3.5rem, 10vw, 7.5rem);
-  line-height: 0.82;
-  letter-spacing: -0.09em;
-  text-wrap: balance;
-}
-
 .heroTitle {
   margin: 0;
   display: grid;
   gap: 0.12em;
   font-family: var(--pico-font-display);
-  font-size: clamp(2.4rem, 5vw, 4.55rem);
+  font-size: clamp(2.6rem, 5.2vw, 4.95rem);
   line-height: 0.9;
   letter-spacing: -0.065em;
-  max-width: 10.2ch;
+  max-width: 10.6ch;
   text-wrap: balance;
 }
 
@@ -536,45 +529,12 @@
   line-height: 1.45;
 }
 
-.trustStrip {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 0;
-  margin-top: clamp(1.35rem, 3vw, 2rem);
-  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.14);
-  border-bottom: 1px solid rgba(var(--pico-accent-rgb), 0.14);
-  background: linear-gradient(180deg, rgba(7, 14, 9, 0.78), rgba(5, 10, 7, 0.58));
-  backdrop-filter: blur(18px);
-}
-
-.trustItem {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 1rem 1.1rem;
-  color: var(--pico-text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.45;
-}
-
-.trustDash {
-  width: 0.55rem;
-  height: 0.55rem;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--pico-accent);
-  box-shadow: 0 0 14px rgba(var(--pico-accent-rgb), 0.65);
-}
-
 .qualifySection,
 .pathSection,
-.shiftSection,
 .accessSection,
-.faqSection,
 .finalSection {
   position: relative;
-  padding: clamp(4.5rem, 8vw, 7rem) 0;
+  padding: clamp(4rem, 7vw, 6rem) 0;
 }
 
 .qualifySection,
@@ -622,6 +582,10 @@
 }
 
 .sectionTitle,
+.pricingTitle {
+  font-size: clamp(2rem, 4.2vw, 3.65rem);
+}
+
 .finalTitle {
   font-size: clamp(2.2rem, 4.8vw, 4.1rem);
 }
@@ -831,6 +795,63 @@
   gap: 0.9rem;
 }
 
+.pathOutcomeBand {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  padding: 1.15rem 1.2rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  border-radius: 1.65rem;
+  background:
+    radial-gradient(circle at 16% 16%, rgba(var(--pico-accent-rgb), 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0));
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.pathOutcomeIntro {
+  display: grid;
+  gap: 0.65rem;
+  max-width: 42rem;
+}
+
+.pathOutcomeLead,
+.pathOutcomeText {
+  margin: 0;
+  color: var(--pico-text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.pathOutcomeLead {
+  color: var(--pico-text);
+}
+
+.pathOutcomeList {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.pathOutcomeItem {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+}
+
+.pathOutcomeIndex {
+  color: var(--pico-text-muted);
+  font-family: var(--pico-font-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding-top: 0.28rem;
+}
+
 .pathItem {
   display: grid;
   gap: 1rem;
@@ -989,10 +1010,6 @@
   gap: 0.55rem;
 }
 
-.pricingTitle {
-  font-size: clamp(1.9rem, 3.5vw, 3rem);
-}
-
 .pricingTiers {
   display: grid;
   gap: 0;
@@ -1034,12 +1051,34 @@
   gap: 0.45rem;
 }
 
+.pricingTierHeader {
+  display: grid;
+  gap: 0.55rem;
+  justify-items: start;
+}
+
 .pricingName {
   margin: 0;
-  color: var(--pico-accent-bright);
-  font-size: 0.72rem;
+  color: var(--pico-text);
+  font-size: 0.94rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: -0.01em;
+}
+
+.pricingBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.18);
+  background: rgba(var(--pico-accent-rgb), 0.1);
+  color: var(--pico-accent-bright);
+  font-family: var(--pico-font-accent);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .pricingPrice {
@@ -1058,9 +1097,9 @@
 
 .pricingPeriod {
   color: var(--pico-text-muted);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: -0.01em;
 }
 
 .pricingDescription {
@@ -1093,10 +1132,6 @@
   box-shadow:
     0 18px 44px rgba(var(--pico-accent-rgb), 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.faqSection {
-  background: radial-gradient(circle at 80% 22%, rgba(115, 239, 190, 0.05), transparent 22%), rgba(3, 8, 4, 0.18);
 }
 
 .faqStack {
@@ -1186,6 +1221,13 @@
   max-width: 34rem;
 }
 
+.finalAside {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+}
+
 .finalEyebrow {
   padding-right: 1rem;
 }
@@ -1225,6 +1267,40 @@
   padding: 0 1.4rem;
 }
 
+.finalFaq {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.finalFaqLabel {
+  margin: 0;
+  color: var(--pico-text);
+  font-family: var(--pico-font-display);
+  font-size: clamp(1.1rem, 2.3vw, 1.55rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.finalFaq .faqStack {
+  margin-top: 0;
+  border-radius: 1.5rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0));
+}
+
+.finalFaq .faqSummary {
+  padding: 0.95rem 1rem;
+}
+
+.finalFaq .faqQuestion {
+  font-size: clamp(1.1rem, 1.9vw, 1.35rem);
+  line-height: 1.05;
+}
+
+.finalFaq .faqAnswer {
+  padding: 0 1rem 1rem;
+  font-size: 0.94rem;
+}
+
 .finalRobotFrame {
   min-height: 18rem;
 }
@@ -1244,14 +1320,6 @@
 }
 
 @media (min-width: 760px) {
-  .trustStrip {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .trustItem + .trustItem {
-    border-left: 1px solid rgba(var(--pico-accent-rgb), 0.1);
-  }
-
   .whoBoard {
     grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   }
@@ -1276,6 +1344,10 @@
 
   .pathGrid {
     grid-template-columns: minmax(18rem, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .pathOutcomeList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .pathSticky {
@@ -1343,13 +1415,18 @@
   }
 
   .navCta {
-    min-width: 2.7rem;
-    padding: 0;
+    min-width: auto;
+    padding: 0 0.9rem;
     flex-shrink: 0;
   }
 
   .navCtaLabel {
     display: none;
+  }
+
+  .navCtaLabelMobile {
+    display: inline;
+    font-size: 0.84rem;
   }
 
   .hero {
@@ -1376,10 +1453,6 @@
     letter-spacing: 0.14em;
   }
 
-  .heroWordmark {
-    display: none;
-  }
-
   .heroTitle {
     font-size: clamp(1.72rem, 9.8vw, 3rem);
     line-height: 0.92;
@@ -1394,6 +1467,10 @@
   .heroActions {
     gap: 0.7rem;
     padding-top: 0.2rem;
+  }
+
+  .heroSecondary {
+    display: none;
   }
 
   .heroMeta {
@@ -1426,13 +1503,13 @@
     padding-top: 0.9rem;
   }
 
+  .heroSignal:nth-child(n + 2) {
+    display: none;
+  }
+
   .heroSignalText {
     font-size: 0.9rem;
     line-height: 1.4;
-  }
-
-  .trustStrip {
-    margin-top: 1rem;
   }
 
   .scenarioItem,
@@ -1454,6 +1531,17 @@
     padding: 1.2rem 1rem 1.05rem;
   }
 
+  .pricingName,
+  .pricingPeriod {
+    font-size: 0.84rem;
+  }
+
+  .pricingBadge,
+  .heroVisualKicker,
+  .heroVisualSignal {
+    letter-spacing: 0.12em;
+  }
+
   .pathGallery,
   .finalVisual {
     display: none;
@@ -1461,6 +1549,19 @@
 
   .finalPanel {
     gap: 1rem;
+  }
+
+  .pathOutcomeBand {
+    padding: 1rem;
+    gap: 0.85rem;
+  }
+
+  .pathOutcomeList {
+    gap: 0.7rem;
+  }
+
+  .pathOutcomeItem {
+    padding-top: 0.7rem;
   }
 
   .whoDivider {
@@ -1543,6 +1644,10 @@
 
   .finalButton {
     width: 100%;
+  }
+
+  .finalFaq .faqQuestion {
+    font-size: 1.02rem;
   }
 }
 

@@ -7,13 +7,14 @@
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Pre-register"
+      "cta": "Pre-register",
+      "ctaMobile": "Join"
     },
     "hero": {
       "badge": "Founding Access · Open Now",
       "title": "Build and deploy AI agents ",
       "titleAccent": "without hiring a developer.",
-      "subtitle": "PicoMUTX takes you from AI-agent idea to a working, reviewable system with one guided build path, grounded support, and guardrails before launch.",
+      "subtitle": "PicoMUTX turns an AI-agent idea into one working, reviewable system with a guided build path, real support, and guardrails before launch.",
       "cta": "Pre-Register for Early Access",
       "ctaSecondary": "See pricing",
       "meta": "Free to pre-register · No credit card required · Human reply, not a nurture funnel"
@@ -132,34 +133,35 @@
     },
     "pricing": {
       "eyebrow": "Access lanes",
-      "title": "Choose the level of support and velocity you need",
+      "title": "Choose the access lane that matches how fast you want to move",
+      "recommendedLabel": "Most direct",
       "tiers": {
         "starter": {
-          "name": "Starter",
-          "price": "€9",
-          "period": "/mo",
-          "description": "For your first serious build",
-          "features": ["1,000 monthly credits", "Full tutor access", "All academy lessons", "Autopilot mode", "7-day free trial"],
-          "cta": "Start 7-Day Trial",
+          "name": "Starter lane",
+          "price": "Free",
+          "period": "waitlist",
+          "description": "For founders making the first serious build",
+          "features": ["Free early-access request", "Core build path access", "Launch lessons and templates", "Human reply when the path gets unclear", "Best fit for first-time operators"],
+          "cta": "Join the waitlist",
           "ctaHref": "/pricing"
         },
         "pro": {
-          "name": "Pro",
-          "price": "€29",
-          "period": "/mo",
-          "description": "For operators shipping real workflows",
+          "name": "Priority lane",
+          "price": "Priority",
+          "period": "onboarding",
+          "description": "For operators who want the fastest path with tighter support",
           "recommended": true,
-          "features": ["10,000 monthly credits", "Full tutor + BYOK", "API access", "Priority support", "7-day free trial"],
-          "cta": "Start 7-Day Trial",
+          "features": ["Earlier onboarding window", "Higher-touch product feedback loop", "Priority support while building", "Faster escalation when context gets messy", "Best fit for live workflow owners"],
+          "cta": "Request priority access",
           "ctaHref": "/pricing"
         },
         "enterprise": {
           "name": "Enterprise",
           "price": "Custom",
           "period": "",
-          "description": "For teams rolling this out across the business",
-          "features": ["100K+ monthly credits", "SSO & team management", "SLA & dedicated support", "Custom workflows", "Direct access to founders"],
-          "cta": "Book a Call",
+          "description": "For teams planning private rollout, security review, or multi-seat adoption",
+          "features": ["Private rollout planning", "Security, approval, and workflow review", "Team onboarding design", "Custom operating requirements", "Direct access to the founders"],
+          "cta": "Book a planning call",
           "ctaHref": "https://calendly.com/mutxdev"
         }
       }
@@ -194,6 +196,7 @@
       "eyebrow": "Founding Access · Limited Spots",
       "title": "Stop leaving the agent in planning mode.",
       "body": "If the use case matters, the next step is not another tab. It is a path that gets one working system into the open with less risk, less drift, and less wasted motion.",
+      "faqLabel": "Still deciding? Clear the last few blockers.",
       "formHeadline": "Get into the first PicoMUTX wave",
       "formSubline": "Join the list and get the earliest onboarding window we can offer.",
       "ctaButton": "Pre-Register Now",
