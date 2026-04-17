@@ -594,15 +594,8 @@ export function proxy(request: NextRequest) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
-    if (normalizedPath === '/control') {
-      return finalizeResponse(redirectWithinHost(request, '/dashboard'), host, normalizedPath)
-    }
-    if (normalizedPath.startsWith('/control/')) {
-      return finalizeResponse(
-        redirectWithinHost(request, `/dashboard${normalizedPath.slice('/control'.length)}`),
-        host,
-        normalizedPath,
-      )
+    if (normalizedPath === '/control' || normalizedPath.startsWith('/control/')) {
+      return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
     if (normalizedPath === '/app' || normalizedPath.startsWith('/app/')) {

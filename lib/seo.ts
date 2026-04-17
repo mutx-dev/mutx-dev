@@ -110,8 +110,16 @@ function normalizeHostname(value?: string | null) {
     return null
   }
 
-  const host = value.includes('://') ? new URL(value).hostname : value.split(':')[0]
-  return host.toLowerCase()
+  const firstValue = value.split(',')[0]?.trim()
+  if (!firstValue) {
+    return null
+  }
+
+  try {
+    return new URL(firstValue).hostname.toLowerCase()
+  } catch {
+    return firstValue.split(':')[0].toLowerCase()
+  }
 }
 
 function getSiteNameForSurface(surface: SeoSurface) {

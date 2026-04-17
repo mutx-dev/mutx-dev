@@ -281,6 +281,8 @@ describe('surface resolution helpers', () => {
   it('resolves app and pico hosts explicitly', () => {
     expect(resolveSeoSurface('app.mutx.dev')).toBe('app')
     expect(resolveSeoSurface('pico.mutx.dev')).toBe('pico')
+    expect(resolveSeoSurface('app.mutx.dev, proxy.internal')).toBe('app')
+    expect(resolveSeoSurface('https://pico.mutx.dev:443, proxy.internal')).toBe('pico')
     expect(resolveSeoSurface('mutx.dev')).toBe('marketing')
   })
 

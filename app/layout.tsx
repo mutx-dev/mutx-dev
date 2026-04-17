@@ -5,7 +5,6 @@ import { getLocale, getMessages } from "next-intl/server";
 
 import { appFontVariables } from "@/app/fonts/app";
 import { AppDomainDemoIntro } from "@/components/app/AppDomainDemoIntro";
-import { GlobalLangSwitcher } from "@/components/i18n/GlobalLangSwitcher";
 import {
   buildPageMetadata,
   getSiteUrl,
@@ -105,7 +104,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={`${appFontVariables} h-full min-h-screen antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <GlobalLangSwitcher />
           {children}
           <AppDomainDemoIntro />
         </NextIntlClientProvider>
