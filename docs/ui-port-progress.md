@@ -16,7 +16,7 @@ Last updated: 2026-04-16
 
 ### MUTX Current Architecture
 - **Routing**: Next.js App Router with 28 separate page routes under `app/dashboard/` — each is a full page load
-- **State**: Pure React Context/hooks — **no Zustand, no global store**. State is local to component trees
+- **State**: Hybrid provider + Zustand model — `lib/store.ts` now carries boot, connection, navigation, and dashboard entity state alongside the existing desktop providers
 - **Design Tokens**: CSS custom-property token system (`components/dashboard/tokens.ts`) — 30+ tokens + statusTokens; uses `var()` with hardcoded fallbacks
 - **Navigation**: `DashboardShell` (592 LOC) with inline `DashboardNav`, grouped sidebar from `dashboardNav.ts`; has `components/ui/nav-rail.tsx` (17KB, partially implemented)
 - **Polling**: **None** — no smart polling or adaptive refresh pattern exists
@@ -28,7 +28,7 @@ Last updated: 2026-04-16
 | Aspect | Mission-Control | MUTX | Gap |
 |--------|----------------|------|-----|
 | Routing | Single catch-all, panel switch | 28 separate page routes | L — needs SPA shell |
-| State management | Zustand single store | React Context only | L — needs store layer |
+| State management | Zustand single store | Desktop providers + `lib/store.ts` | M — store foundation landed, adoption still incomplete |
 | Design tokens | HSL triplets + helpers | CSS var tokens | S — similar, needs alignment |
 | Real-time | WS + SSE + smart poll | None | L — needs full real-time layer |
 | Boot sequence | 9-step parallel init | Desktop provider chain | M — needs data boot |
@@ -41,14 +41,14 @@ Last updated: 2026-04-16
 
 ### 1. Zustand Store (`useMissionControl`)
 - **MC Source**: `src/store/index.ts` (~1100 LOC)
-- **MUTX Equivalent**: **MISSING** — no global store exists
-- **Gap**: Entire state management layer absent. MUTX uses scattered React Context providers (DesktopStatusProvider, DesktopWindowProvider, DesktopJobProvider) with no centralized state.
-- **Port Scope**: **L** — Create new `lib/store.ts` with Zustand. Must define 15+ domain interfaces (Session, LogEntry, CronJob, Agent, Task, Activity, Notification, etc.), 20+ actions, connection state, boot state, navigation state. Adapt MC's store shape to use MUTX API endpoints (`/v1/*` routes).
+- **MUTX Equivalent**: `lib/store.ts`
+- **Gap**: Foundation landed, but the dashboard still mixes direct page-local data fetching with the shared store instead of using the store end to end.
+- **Port Scope**: **L** — Continue migrating dashboard surfaces onto the existing Zustand store and remove duplicate page-local fetch logic where the shared store now covers the same ground.
 - **Dependencies**: None (this is the foundation)
 - **API Surface**: All MUTX `/v1/*` endpoints — agents, sessions, tasks, activities, notifications, cron, memory, skills, settings, auth/me
 - **Design Details**: Uses `subscribeWithSelector` middleware for fine-grained subscriptions. Task has 9-status workflow + 5 priority levels + GitHub sync fields.
 - **Priority**: **critical** — blocks all other porting work
-- **Status**: spec'd
+- **Status**: foundation landed
 
 ### 2. SPA Shell & Panel Router (`ContentRouter`)
 - **MC Source**: `src/app/[[...panel]]/page.tsx` — ContentRouter component
@@ -75,13 +75,13 @@ Last updated: 2026-04-16
 ### 4. Navigation System
 - **MC Source**: `src/lib/navigation.ts` — panelHref, useNavigateToPanel, usePrefetchPanel
 - **MUTX Equivalent**: `components/dashboard/dashboardNav.ts` — nav config + helpers; `components/ui/nav-rail.tsx` — nav rail UI
-- **Gap**: MUTX has nav config and sidebar rendering but lacks: (1) prefetch system, (2) `panelHref` URL helper, (3) `useNavigateToPanel` hook with transition wrapping, (4) route deduplication, (5) navigation timing.
-- **Port Scope**: **M** — Create `lib/navigation.ts` with `panelHref()`, `useNavigateToPanel()`, `usePrefetchPanel()`. Add default prefetch panel list. Integrate with store for `activeTab` sync.
+- **Gap**: Core dashboard navigation hooks now exist in `lib/navigation.ts`, but only the dashboard shell uses them and there is still no navigation timing layer or catch-all panel router.
+- **Port Scope**: **M** — Keep expanding `lib/navigation.ts` usage beyond the shell, and wire any future SPA shell work into the same route normalization + prefetch path instead of reintroducing one-off link logic.
 - **Dependencies**: Zustand store (#1)
 - **API Surface**: N/A (internal routing)
 - **Design Details**: `panelHref()` normalizes 'overview' → '/'. `useNavigateToPanel()` uses `startTransition()` + `router.push(href, { scroll: false })`. Dedup via `PREFETCHED_ROUTES` Set. Default prefetch: overview, chat, tasks, agents, activity, notifications, tokens.
 - **Priority**: **high** — UX performance
-- **Status**: spec'd
+- **Status**: landed in shell
 
 ### 5. Smart Polling Hook
 - **MC Source**: `src/lib/use-smart-poll.ts` — useSmartPoll
@@ -113,8 +113,7 @@ Last updated: 2026-04-16
 1. **Zustand Store** (`lib/store.ts`) — Foundation for everything else. Define all interfaces, state shape, actions. Wire to MUTX `/v1/*` API endpoints.
 2. **Design Token Alignment** (`components/dashboard/tokens.ts`) — Add HSL helpers, surface scale, accent palette. No dependencies, can be done in parallel.
 3. **Smart Poll Hook** (`lib/use-smart-poll.ts`) — Needs store for connection state. Low risk, high value.
-4. **Navigation System** (`lib/navigation.ts`) — Needs store for activeTab. Enables SPA-like transitions.
-5. **SPA Shell / ContentRouter** — Needs store + navigation + tokens. Largest change. Consider feature flag to switch between old multi-page and new SPA modes.
+4. **SPA Shell / ContentRouter** — Needs the existing store + navigation foundations to be adopted consistently. Largest change. Consider feature flag to switch between old multi-page and new SPA modes.
 
 ## Engineering Notes
 

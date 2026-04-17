@@ -21,6 +21,7 @@ import {
 import { DesktopWindowShell } from "@/components/desktop/DesktopWindowShell";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
 import { useDesktopWindow } from "@/components/desktop/useDesktopWindow";
+import { panelHref, useNavigateToPanel, usePrefetchPanel } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
 import {
@@ -35,11 +36,25 @@ interface DashboardShellProps {
 }
 
 interface DashboardNavProps {
+  navigateToPanel: (panel: string) => void;
+  prefetchPanel: (panel: string) => void;
   onNavigate?: () => void;
   pathname: string;
 }
 
-function DashboardNav({ onNavigate, pathname }: DashboardNavProps) {
+const DASHBOARD_NAV_PANELS: Partial<Record<(typeof ALL_DASHBOARD_NAV_ITEMS)[number]["key"], string>> = {
+  home: "overview",
+  agents: "agents",
+  sessions: "chat",
+  analytics: "tokens",
+  control: "settings",
+}
+
+function getDashboardNavPanel(key: (typeof ALL_DASHBOARD_NAV_ITEMS)[number]["key"]) {
+  return DASHBOARD_NAV_PANELS[key] ?? key
+}
+
+function DashboardNav({ navigateToPanel, onNavigate, pathname, prefetchPanel }: DashboardNavProps) {
   return (
     <nav className="space-y-3">
       {DASHBOARD_NAV_GROUPS.map((group) => (
@@ -52,13 +67,25 @@ function DashboardNav({ onNavigate, pathname }: DashboardNavProps) {
 
           {group.items.map((item) => {
             const isActive = isDashboardNavItemActive(pathname, item);
-            const href = getDashboardNavHref(pathname, item);
+            const panel = getDashboardNavPanel(item.key);
+            const href = pathname.startsWith("/dashboard")
+              ? panelHref(panel)
+              : getDashboardNavHref(pathname, item);
 
             return (
               <Link
                 key={`${group.key}-${item.title}`}
                 href={href}
-                onClick={onNavigate}
+                onClick={(event) => {
+                  if (pathname.startsWith("/dashboard")) {
+                    event.preventDefault();
+                    navigateToPanel(panel);
+                  }
+
+                  onNavigate?.();
+                }}
+                onFocus={() => prefetchPanel(panel)}
+                onMouseEnter={() => prefetchPanel(panel)}
                 title={item.description}
                 className={cn(
                   "group relative flex items-center gap-3 rounded-[16px] px-3.5 py-3 text-[13px] transition-all duration-150",
@@ -95,6 +122,8 @@ function DashboardNav({ onNavigate, pathname }: DashboardNavProps) {
 export function DashboardShell({ children }: DashboardShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const navigateToPanel = useNavigateToPanel();
+  const prefetchPanel = usePrefetchPanel();
   const { status, isDesktop, platformReady, refetch } = useDesktopStatus();
   const { currentWindow, openPreferences, updateCurrentWindow } = useDesktopWindow();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -411,7 +440,12 @@ export function DashboardShell({ children }: DashboardShellProps) {
             </div>
 
             <div className="flex-1 overflow-y-auto px-3 py-3">
-              <DashboardNav pathname={pathname} onNavigate={() => setMobileOpen(false)} />
+              <DashboardNav
+                navigateToPanel={navigateToPanel}
+                pathname={pathname}
+                onNavigate={() => setMobileOpen(false)}
+                prefetchPanel={prefetchPanel}
+              />
             </div>
             {sidebarFooter}
           </aside>
@@ -462,7 +496,11 @@ export function DashboardShell({ children }: DashboardShellProps) {
             <aside className="hidden w-[290px] shrink-0 flex-col border-r border-[rgba(191,219,254,0.08)] bg-[linear-gradient(180deg,#101722_0%,#0a0f18_100%)] lg:flex">
               <div className="border-b border-[rgba(191,219,254,0.08)] px-4 py-5">{sidebarBrand}</div>
               <div className="flex-1 overflow-y-auto px-3 py-3">
-                <DashboardNav pathname={pathname} />
+                <DashboardNav
+                  navigateToPanel={navigateToPanel}
+                  pathname={pathname}
+                  prefetchPanel={prefetchPanel}
+                />
               </div>
               {sidebarFooter}
             </aside>
