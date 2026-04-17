@@ -12,10 +12,11 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   return withErrorHandling(async () => {
     const body = await request.json().catch(() => ({}))
-    const question = typeof body.question === 'string' ? body.question : ''
-    const lessonSlug = typeof body.lessonSlug === 'string' ? body.lessonSlug : null
+    const question = typeof body.question === 'string' ? body.question.trim() : ''
+    const normalizedLessonSlug = typeof body.lessonSlug === 'string' ? body.lessonSlug.trim() : ''
+    const lessonSlug = normalizedLessonSlug || null
 
-    if (!question.trim()) {
+    if (!question) {
       return badRequest('Question is required')
     }
 

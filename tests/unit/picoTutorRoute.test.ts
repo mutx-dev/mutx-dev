@@ -94,6 +94,43 @@ describe('pico tutor route', () => {
     })
   })
 
+  it('trims the forwarded question and normalizes a blank lesson slug before proxying upstream', async () => {
+    const { POST } = await import('../../app/api/pico/tutor/route')
+    const request = mockJsonRequest({
+      question: '  How do I deploy my starter agent?  ',
+      lessonSlug: '   ',
+      progress: { completedLessons: ['run-your-first-agent'] },
+    })
+
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 200,
+        json: async () => ({ answer: 'ok' }),
+      },
+      tokenRefreshed: false,
+    })
+
+    const response = await POST(request as never)
+
+    expect(response.status).toBe(200)
+    expect(authenticatedFetch).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/pico/tutor',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: 'How do I deploy my starter agent?',
+          lessonSlug: null,
+          progress: { completedLessons: ['run-your-first-agent'] },
+          setupContext: undefined,
+        }),
+      },
+    )
+  })
+
   it('rejects empty questions', async () => {
     const { POST } = await import('../../app/api/pico/tutor/route')
 
