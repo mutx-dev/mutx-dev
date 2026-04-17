@@ -47,6 +47,7 @@ import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { SecurityPageClient } from "@/components/dashboard/SecurityPageClient";
 import { SessionsPageClient } from "@/components/dashboard/SessionsPageClient";
 import { SkillsPageClient } from "@/components/dashboard/SkillsPageClient";
+import { DesktopControlDeck } from "@/components/desktop/DesktopControlDeck";
 import { DesktopWindowShell } from "@/components/desktop/DesktopWindowShell";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
 import {
@@ -646,17 +647,7 @@ function ContentRouter({ tab }: { tab: TabId }) {
       );
 
     case "settings":
-      return (
-        <DemoRoutePage
-          title="Advanced"
-          description="Bridge diagnostics, runtime repair, governance control, and desktop environment inspection."
-          badge="advanced diagnostics"
-          notes={[
-            "The Advanced/Control page is currently served directly via DesktopControlDeck.",
-            "SPA shell preserves the existing component for the settings tab.",
-          ]}
-        />
-      );
+      return <DesktopControlDeck />;
 
     case "tokens":
       return (
