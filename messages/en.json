@@ -1,21 +1,21 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer",
-      "description": "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access."
+      "title": "PicoMUTX — From first agent to one you actually trust",
+      "description": "PicoMUTX is the guided academy, tutor, and autopilot layer that takes you from first agent to a production workflow you can actually trust."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Pre-register"
+      "cta": "Talk to us"
     },
     "hero": {
-      "badge": "Early Access · Limited Spots",
-      "title": "Build and deploy AI agents ",
-      "titleAccent": "without hiring a developer.",
-      "subtitle": "PicoMUTX gives you a safe, guided path to a working AI agent — whether you are starting from scratch, fixing an agent that is not working, or trying to avoid another expensive mistake.",
-      "cta": "Pre-Register for Early Access",
-      "meta": "Free to pre-register · No credit card required · Founding spots limited"
+      "badge": "Shipped beta · Real product",
+      "title": "Build one useful agent, ",
+      "titleAccent": "then learn how to trust it.",
+      "subtitle": "PicoMUTX gives you a guided academy, grounded tutor, and autopilot layer so you can get a real agent running without wandering through fifteen tabs of bullshit.",
+      "cta": "Talk to the team",
+      "meta": "Open workspace now · Guided lessons · Real operator signals"
     },
     "trustBar": {
       "items": {
@@ -118,15 +118,15 @@
       "close": "The goal is not to “learn AI someday.” The goal is to get your agent live — safely, clearly, and with less friction."
     },
     "earlyAccess": {
-      "eyebrow": "Early Access",
-      "title": "PicoMUTX is opening in stages. Founding access won't stay open forever.",
-      "body": "Pre-registering now puts you ahead of the public rollout and inside the group that helps shape the platform early. Early users get a closer line to the product, earlier onboarding, and more influence over what gets prioritized.",
+      "eyebrow": "Beta access",
+      "title": "The product is live. The sharp edges are honest.",
+      "body": "PicoMUTX is now a real guided product, not a waitlist fantasy. Open the workspace, follow the lessons, use the tutor when you get blocked, and escalate when the problem is messy enough to need a human.",
       "benefits": {
-        "0": "Early access before public release",
-        "1": "Priority consideration for founding member spots",
-        "2": "Early onboarding and launch updates",
-        "3": "The ability to influence early use cases and rollout priorities",
-        "4": "First visibility into pricing and access terms"
+        "0": "Open the workspace now",
+        "1": "Follow guided onboarding and academy tracks",
+        "2": "Use a grounded tutor instead of guessing",
+        "3": "See real autopilot signals from the control layer",
+        "4": "Talk to the team when the path needs human judgment"
       }
     },
     "faq": {
@@ -146,8 +146,8 @@
           "a": "Practical ones — the kind that save time, support operations, improve workflows, and help businesses run better. The focus is usefulness, not toy demos."
         },
         "3": {
-          "q": "Is pre-registration free?",
-          "a": "Yes. Pre-registration is free and does not require payment. You will be among the first to hear when access opens and when founding spots become available."
+          "q": "Can I use the workspace now?",
+          "a": "Yes. The beta product is live. Use the workspace, follow the lessons, and contact the team if you need a human hand on a messy edge case."
         },
         "4": {
           "q": "Is this for enterprises?",
@@ -156,19 +156,19 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Early Access · Limited Spots",
+      "eyebrow": "Workspace live",
       "title": "Your agent does not need to stay an unfinished idea.",
-      "body": "You do not need more tabs open. You do not need another tutorial. You need a clearer path to something that works. PicoMUTX is built for that moment.",
-      "formHeadline": "Pre-register for PicoMUTX",
-      "formSubline": "Join the early access list. Be first when we open.",
-      "ctaButton": "Pre-Register Now",
-      "formCtaMeta": "Free to pre-register · No credit card required · Early users get priority access"
+      "body": "You do not need more tabs open. You need a clearer path, a grounded tutor, and real operator signals. PicoMUTX is built for that moment.",
+      "formHeadline": "Talk to the PicoMUTX team",
+      "formSubline": "Tell us what you are building or where it hurts. We will point you to the right path.",
+      "ctaButton": "Send message",
+      "formCtaMeta": "Open workspace now · Human reply when needed · No fake onboarding theater"
     },
     "contactForm": {
       "dialogLabel": "Contact form",
       "closeLabel": "Close",
-      "title": "Pre-register for early access",
-      "subtitle": "Tell us where you are. We'll get you in.",
+      "title": "Talk to the PicoMUTX team",
+      "subtitle": "Tell us what you are building or where it is stuck. We'll route you fast.",
       "emailLabel": "Work email",
       "emailPlaceholder": "you@company.com",
       "nameLabel": "Name",
@@ -187,9 +187,9 @@
       "messageOptional": "(optional)",
       "messagePlaceholder": "E.g. I run a small SaaS and want to automate customer support...",
       "submitting": "Sending...",
-      "submit": "Join the early access list",
+      "submit": "Send message",
       "disclaimer": "No spam. No sales calls. Just a human reply.",
-      "successTitle": "You're on the list.",
+      "successTitle": "Message sent.",
       "successBody": "We read every message. Expect a personal reply within 24 hours.",
       "successBack": "Back to the page",
       "errorFallback": "Something went wrong. Please try again.",
@@ -198,28 +198,12 @@
     "preRegForm": {
       "emailLabel": "Work email",
       "emailPlaceholder": "you@company.com",
-      "submitting": "Joining…",
-      "submit": "Pre-Register Now",
-      "privacy": "No spam. No payment required. Just early access updates and launch details.",
-      "successTitle": "You are on the list.",
-      "successBody": "We will be in touch when PicoMUTX access opens. No spam, no payment required.",
+      "submitting": "Sending...",
+      "submit": "Send message",
+      "privacy": "No spam. No sales calls. Just a human reply.",
+      "successTitle": "Message sent.",
+      "successBody": "We read every message. Expect a personal reply within 24 hours.",
       "errorFallback": "Something went wrong. Please try again."
-    },
-    "waitlistForm": {
-      "submit": "Request access",
-      "submitting": "Submitting...",
-      "success": "You're on the list.",
-      "successCheckInbox": "You're on the list. Check your inbox.",
-      "alreadyJoined": "You're already on the list!",
-      "successNote": "We'll be in touch soon.",
-      "joinFailed": "Failed to join waitlist",
-      "verificationLoading": "Loading verification challenge...",
-      "verificationLoadingTryAgain": "Verification is still loading. Please try again in a moment.",
-      "verificationUnavailable": "Waitlist verification is unavailable right now. Please try again later.",
-      "verificationRequired": "Please complete the verification challenge.",
-      "verificationFailedRefresh": "Verification failed. Please refresh the challenge and try again.",
-      "verificationExpired": "Verification expired. Please complete the challenge again.",
-      "verificationTimedOut": "Verification timed out. Please complete the challenge again."
     },
     "footer": {
       "links": {
