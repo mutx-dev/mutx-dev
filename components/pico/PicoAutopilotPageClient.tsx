@@ -605,12 +605,139 @@ export function PicoAutopilotPageClient() {
     derived.nextLesson && recoveryWorkspace.workspace.activeStepIndex >= 0
       ? derived.nextLesson.steps[recoveryWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
       : 'not set'
+  const heroRunSignal = authRequired
+    ? 'auth required'
+    : latestRun
+      ? humanizeRunStatus(latestRun.status).toLowerCase()
+      : 'no live run'
+  const heroBudgetSignal = authRequired
+    ? 'offline'
+    : budget
+      ? formatPercent(budget.usage_percentage)
+      : 'pending'
+  const heroGateSignal =
+    pendingApprovals.length > 0
+      ? `${pendingApprovals.length} waiting`
+      : progress.autopilot.approvalGateEnabled
+        ? 'armed'
+        : 'off'
+  const autopilotPacketPreview = [
+    `Run ${latestRun ? latestRun.id.slice(0, 8) : 'none yet'}`,
+    `Budget ${heroBudgetSignal}`,
+    `Gate ${heroGateSignal}`,
+    `Recovery ${recoveryFocusedStep}`,
+  ].join('\n')
 
   return (
     <PicoShell
       eyebrow="Autopilot bridge"
       title="Trust the runtime because the surface tells the truth"
-      description="First inspect the latest run. Then tighten the threshold. Then decide which risky actions deserve a gate. That is how trust gets earned here."
+      description="Inspect the latest run, compare it to live spend, then decide which risky actions deserve a gate. That is how trust gets earned here."
+      heroContent={
+        <div
+          className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(8,14,9,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+          data-testid="pico-autopilot-hero-signal"
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_30%,transparent_72%,rgba(255,255,255,0.02))]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-10 top-8 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.12)] blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[rgba(var(--pico-accent-rgb),0.1)] blur-3xl"
+          />
+          <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
+            <div className="grid gap-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={picoClasses.chip}>Runtime pulse</span>
+                <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
+                  {loadStateLabel}
+                </span>
+              </div>
+              <h2 className="font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
+                Keep the run, spend, and gate in the same frame.
+              </h2>
+              <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                Start with the latest execution, compare it to the current budget line, then decide whether a human gate belongs in the way. That order keeps the control room honest.
+              </p>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Run state</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {heroRunSignal}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {latestRunTimestamp ? formatTimestamp(latestRunTimestamp) : 'trigger a real task first'}
+                  </p>
+                </div>
+
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Budget line</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {heroBudgetSignal}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {budget
+                      ? `threshold ${formatPercent(progress.autopilot.costThresholdPercent)}`
+                      : 'waiting for live spend'}
+                  </p>
+                </div>
+
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Gate state</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {heroGateSignal}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {progress.autopilot.approvalGateEnabled ? 'human review stays visible' : 'enable before risky action'}
+                  </p>
+                </div>
+              </div>
+
+              <div className={picoInset('grid gap-3 p-4 sm:grid-cols-[auto,minmax(0,1fr)] sm:items-center')}>
+                <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-[rgba(var(--pico-accent-rgb),0.24)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.18),rgba(7,13,8,0.5))] shadow-[0_18px_40px_rgba(var(--pico-accent-rgb),0.12)]">
+                  <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
+                </div>
+                <div className="min-w-0">
+                  <p className={picoClasses.label}>Next operator check</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {latestRun ? `Inspect run ${latestRun.id.slice(0, 8)}` : 'Create the first live run'}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {latestRun
+                      ? describeRunDetail(latestRun, latestRunTraces)
+                      : 'No run is visible yet, so the honest move is still back on the lesson path.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className={picoInset('grid gap-4 overflow-hidden border-[color:rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_20%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
+              <div className={picoSoft('p-4')}>
+                <p className={picoClasses.label}>Control packet</p>
+                <pre className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  <code>{autopilotPacketPreview}</code>
+                </pre>
+              </div>
+              <div className={picoSoft('p-4')}>
+                <p className={picoClasses.label}>Decision line</p>
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  {thresholdBreached
+                    ? 'Spend is already across the line. Decide whether the next risky action needs a human gate.'
+                    : pendingApprovals.length > 0
+                      ? 'The queue is holding risky actions in view. Review them before the surface gets noisier.'
+                      : 'If the line is still clear, keep reading the run until the next decision becomes obvious.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
       railCollapsed={progress.platform.railCollapsed}
       helpLaneOpen={progress.platform.helpLaneOpen}
       onToggleRail={() =>
@@ -714,7 +841,7 @@ export function PicoAutopilotPageClient() {
             <div className={picoEmber('p-5')}>
               <p className={picoClasses.label}>Control room posture</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                This surface should feel like an operator review room, not a dashboard that celebrates motion for its own sake.
+                Use this room to review live state, not to celebrate movement for its own sake.
               </p>
             </div>
 
@@ -766,7 +893,7 @@ export function PicoAutopilotPageClient() {
                 Read the runtime before you trust the automation
               </h2>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
-                Autopilot only earns trust when the last run, the live spend, and the risky actions are visible in one surface. This page should feel like a control room, not a dashboard collage.
+                Autopilot earns trust when the last run, the live spend, and the risky actions stay visible in one control surface.
               </p>
 
               <div className={picoEmber('mt-6 p-5')}>
@@ -781,7 +908,7 @@ export function PicoAutopilotPageClient() {
                 </div>
                 <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
                   {authRequired
-                    ? 'Until a MUTX session is attached, this surface should refuse to invent truth. Use the academy to finish the setup path, then come back to read the real runtime.'
+                    ? 'Until a MUTX session is attached, this surface refuses to invent truth. Use the academy to finish the setup path, then come back to read the real runtime.'
                     : latestRun
                       ? `Latest run ${latestRun.id.slice(0, 8)} is ${humanizeRunStatus(latestRun.status).toLowerCase()}${latestRunTimestamp ? ` as of ${formatTimestamp(latestRunTimestamp)}` : ''}. ${describeRunDetail(latestRun, latestRunTraces)}`
                       : 'No live run is visible yet. The next honest move is to finish the academy path, trigger one real task, and return here only once the runtime has something to say.'}

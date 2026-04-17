@@ -193,6 +193,36 @@ export function PicoTutorPageClient() {
         },
       ]
     : []
+  const tutorSignal = reply
+    ? 'answer ready'
+    : loading
+      ? 'reviewing blocker'
+      : selectedLesson
+        ? 'lesson attached'
+        : 'awaiting blocker'
+  const connectionSignal =
+    session.status !== 'authenticated'
+      ? 'local only'
+      : openAIConnectionLoading
+        ? 'checking'
+        : openAIConnection?.status === 'connected'
+          ? 'openai connected'
+          : openAIConnection?.status === 'platform'
+            ? 'platform access'
+            : 'grounded mode'
+  const lessonSignal = selectedLesson
+    ? `${lessonWorkspace.completedStepCount}/${selectedLesson.steps.length} steps`
+    : 'attach lesson'
+  const focusedStepLabel =
+    selectedLesson && lessonWorkspace.workspace.activeStepIndex >= 0
+      ? selectedLesson.steps[lessonWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
+      : 'not set'
+  const tutorPacketPreview = [
+    `Lane ${selectedLesson?.title ?? 'none attached'}`,
+    `State ${tutorSignal}`,
+    `Focus ${focusedStepLabel}`,
+    `Output one grounded move`,
+  ].join('\n')
 
   useEffect(() => {
     setLessonSlug(defaultLessonSlug)
@@ -408,7 +438,106 @@ export function PicoTutorPageClient() {
     <PicoShell
       eyebrow="Grounded tutor"
       title="Ask for the exact next step"
-      description="Treat this like an operator desk, not a chat toy. One concrete blocker in, one grounded move out, then back to the lesson."
+      description="Bring one concrete blocker, get one grounded move back, and return to the lesson or runtime route that can move the work."
+      heroContent={
+        <div
+          className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(8,14,9,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+          data-testid="pico-tutor-hero-signal"
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_30%,transparent_72%,rgba(255,255,255,0.02))]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-10 top-8 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.12)] blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[rgba(var(--pico-accent-rgb),0.1)] blur-3xl"
+          />
+          <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
+            <div className="grid gap-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={picoClasses.chip}>Crit pulse</span>
+                <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
+                  {tutorSignal}
+                </span>
+              </div>
+              <h2 className="font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
+                Attach the blocked lesson and narrow the answer to one move.
+              </h2>
+              <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                Route the question through the actual lesson, command, or runtime edge that failed. That keeps the reply grounded enough to send you back into action.
+              </p>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Lesson lane</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {lessonSignal}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {selectedLesson ? selectedLesson.title : 'Connect the blocked lesson'}
+                  </p>
+                </div>
+
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Reply state</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {tutorSignal}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {reply ? 'ready to act on' : 'waiting for a precise blocker'}
+                  </p>
+                </div>
+
+                <div className={picoSoft('p-4')}>
+                  <p className={picoClasses.label}>Connection</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {connectionSignal}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    {session.status === 'authenticated' ? 'hosted context available' : 'hosted context missing'}
+                  </p>
+                </div>
+              </div>
+
+              <div className={picoInset('grid gap-3 p-4 sm:grid-cols-[auto,minmax(0,1fr)] sm:items-center')}>
+                <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-[rgba(var(--pico-accent-rgb),0.24)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.18),rgba(7,13,8,0.5))] shadow-[0_18px_40px_rgba(var(--pico-accent-rgb),0.12)]">
+                  <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
+                </div>
+                <div className="min-w-0">
+                  <p className={picoClasses.label}>Focused step</p>
+                  <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                    {focusedStepLabel}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    If the answer does not make this step clearer, leave tutor and use the cleaner route.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className={picoInset('grid gap-4 overflow-hidden border-[color:rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_20%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
+              <div className={picoSoft('p-4')}>
+                <p className={picoClasses.label}>Crit packet preview</p>
+                <pre className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  <code>{tutorPacketPreview}</code>
+                </pre>
+              </div>
+              <div className={picoSoft('p-4')}>
+                <p className={picoClasses.label}>Recent pressure</p>
+                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  {recentQuestions[0]
+                    ? recentQuestions[0]
+                    : 'No recent question saved yet. Bring the first blocked step instead of a broad description of the whole project.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
       railCollapsed={progress.platform.railCollapsed}
       helpLaneOpen={progress.platform.helpLaneOpen}
       onToggleRail={() =>
@@ -442,7 +571,7 @@ export function PicoTutorPageClient() {
               ? 'lesson context attached'
               : 'awaiting blocker'
         }
-        aside="A good tutor answer collapses uncertainty into one move. If the answer does not create motion, this page should push the operator out of the loop immediately."
+        aside="A good tutor answer ends in one move. If it does not, leave the loop and return to the lesson, the runtime, or support."
         items={[
           {
             href: selectedLesson
@@ -507,7 +636,7 @@ export function PicoTutorPageClient() {
             <div className={picoEmber('p-5')}>
               <p className={picoClasses.label}>Desk posture</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                The premium version of this page is not a friendly chatbot. It is a sharp review desk that narrows ambiguity into one next move.
+                This is not a general chat surface. Use it as a review desk that narrows ambiguity into one next move.
               </p>
             </div>
             <div className={picoInset('p-5')}>

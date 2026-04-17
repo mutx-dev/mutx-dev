@@ -935,6 +935,37 @@ test.describe('mutx.dev QA', () => {
     expect(new URL(page.url()).pathname).toBe('/pico/support')
   })
 
+  test('pico tutor route keeps the crit packet and grounded next move visible', async ({
+    page,
+  }) => {
+    await stubPicoProductApis(page)
+    await page.goto('/pico/tutor?lesson=install-hermes-locally', { waitUntil: 'domcontentloaded' })
+
+    await expect(page.getByTestId('pico-tutor-hero-signal')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: /attach the blocked lesson and narrow the answer to one move\./i }),
+    ).toBeVisible()
+    await expect(page.getByTestId('pico-tutor-crit-desk')).toBeVisible()
+    await expect(page.getByText(/this is not a general chat surface/i)).toBeVisible()
+    expect(new URL(page.url()).pathname).toBe('/pico/tutor')
+  })
+
+  test('pico autopilot route keeps run, spend, and gate in one control surface', async ({
+    page,
+  }) => {
+    await stubPicoProductApis(page)
+    await page.goto('/pico/autopilot', { waitUntil: 'domcontentloaded' })
+
+    await expect(page.getByTestId('pico-autopilot-hero-signal')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: /keep the run, spend, and gate in the same frame\./i }),
+    ).toBeVisible()
+    await expect(page.getByTestId('pico-autopilot-operator-doctrine')).toBeVisible()
+    await expect(page.getByTestId('pico-autopilot-control-protocol')).toBeVisible()
+    await expect(page.getByText(/autopilot earns trust when the last run, the live spend, and the risky actions stay visible/i)).toBeVisible()
+    expect(new URL(page.url()).pathname).toBe('/pico/autopilot')
+  })
+
   test('pico product routes render live surfaces and linked lesson flows stay inside /pico', async ({ page }) => {
     await stubPicoProductApis(page);
 

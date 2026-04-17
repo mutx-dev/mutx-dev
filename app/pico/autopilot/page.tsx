@@ -4,7 +4,8 @@ import { PicoAutopilotPageClient } from '@/components/pico/PicoAutopilotPageClie
 
 export const metadata: Metadata = {
   title: 'Autopilot — PicoMUTX',
-  description: 'Automate your workflow with PicoMUTX Autopilot.',
+  description:
+    'Inspect live runs, spend, alerts, and approvals in one PicoMUTX control room before you trust the automation.',
 }
 
 export default function PicoAutopilotPage() {

@@ -4,7 +4,8 @@ import { PicoTutorPageClient } from '@/components/pico/PicoTutorPageClient'
 
 export const metadata: Metadata = {
   title: 'Tutor — PicoMUTX',
-  description: 'Get guided help from the PicoMUTX AI tutor.',
+  description:
+    'Bring one blocked Pico step, get one grounded next move, and return to the lesson, runtime, or support route with better context.',
 }
 
 export default function PicoTutorPage() {
