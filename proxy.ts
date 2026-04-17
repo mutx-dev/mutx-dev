@@ -469,6 +469,25 @@ export function proxy(request: NextRequest) {
       picoPath = picoPath.slice('/pico'.length) || '/'
     }
 
+    // Canonical Pico product routes that serve real pages
+    const PICO_ROUTES = new Set([
+      '/',
+      '/start',
+      '/onboarding',
+      '/academy',
+      '/tutor',
+      '/support',
+      '/autopilot',
+      '/pricing',
+      '/opengraph-image',
+      '/twitter-image',
+    ])
+    const PICO_ROUTE_PREFIXES = ['/academy/']
+
+    const isPicoRoute =
+      PICO_ROUTES.has(picoPath) ||
+      PICO_ROUTE_PREFIXES.some((prefix) => picoPath.startsWith(prefix))
+
     if (picoPath === '/') {
       // Root -> landing page (public, no auth required)
       return finalizeResponse(
@@ -478,10 +497,41 @@ export function proxy(request: NextRequest) {
       )
     }
 
-    // While Pico is closed, every non-root, non-auth path on the Pico host
-    // canonicalizes back to the waitlist landing.
+    if (picoPath === '/start') {
+      // /start -> /pico/onboarding (canonical product entry alias)
+      return finalizeResponse(
+        applyPicoLocale(
+          rewriteWithinHost(request, '/pico/onboarding', picoRequestHeaders),
+          locale,
+        ),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (picoPath === '/opengraph-image' || picoPath === '/twitter-image') {
+      return finalizeResponse(
+        applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (isPicoRoute) {
+      // Rewrite /<pico-route> -> /pico/<pico-route>
+      return finalizeResponse(
+        applyPicoLocale(
+          rewriteWithinHost(request, '/pico' + picoPath, picoRequestHeaders),
+          locale,
+        ),
+        host,
+        normalizedPath,
+      )
+    }
+
+    // Unknown paths -> WIP animation
     return finalizeResponse(
-      applyPicoLocale(redirectWithinHost(request, '/'), locale),
+      applyPicoLocale(rewriteWithinHost(request, '/pico/wip', picoRequestHeaders), locale),
       host,
       normalizedPath,
     )
@@ -544,15 +594,8 @@ export function proxy(request: NextRequest) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
-    if (normalizedPath === '/control') {
-      return finalizeResponse(redirectWithinHost(request, '/dashboard'), host, normalizedPath)
-    }
-    if (normalizedPath.startsWith('/control/')) {
-      return finalizeResponse(
-        redirectWithinHost(request, `/dashboard${normalizedPath.slice('/control'.length)}`),
-        host,
-        normalizedPath,
-      )
+    if (normalizedPath === '/control' || normalizedPath.startsWith('/control/')) {
+      return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
     if (normalizedPath === '/app' || normalizedPath.startsWith('/app/')) {

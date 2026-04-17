@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 import { appFontVariables } from "@/app/fonts/app";
 import { ErrorBoundary } from "@/components/app/ErrorBoundary";
@@ -7,12 +9,18 @@ import { DesktopRouteListener } from "@/components/desktop/DesktopRouteListener"
 import { DesktopStatusProvider } from "@/components/desktop/useDesktopStatus";
 import { DesktopWindowProvider } from "@/components/desktop/useDesktopWindow";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { buildPageMetadata, getAppUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: "https://app.mutx.dev",
-  },
-  metadataBase: new URL("https://app.mutx.dev"),
+  metadataBase: new URL(getAppUrl()),
+  ...buildPageMetadata({
+    title: "Dashboard - MUTX",
+    description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
+    path: "/",
+    host: getAppUrl(),
+    siteName: "MUTX App",
+    badge: "APP",
+  }),
   robots: {
     index: false,
     follow: false,
@@ -30,37 +38,31 @@ export const metadata: Metadata = {
     "runs",
     "audit trail",
   ],
-  openGraph: {
-    title: "Dashboard - MUTX",
-    description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
-    url: "https://app.mutx.dev",
-    images: ["https://app.mutx.dev/opengraph-image?title=Dashboard%20-%20MUTX&description=Operator%20dashboard%20for%20agents%2C%20deployments%2C%20runs%2C%20budgets%2C%20webhooks%2C%20and%20governance."],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Dashboard - MUTX",
-    description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
-    images: ["https://app.mutx.dev/twitter-image?title=Dashboard%20-%20MUTX&description=Operator%20dashboard%20for%20agents%2C%20deployments%2C%20runs%2C%20budgets%2C%20webhooks%2C%20and%20governance."],
-  },
 };
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const spaShellEnabled = process.env.NEXT_PUBLIC_SPA_SHELL === "true";
+
   return (
-    <div className={`${appFontVariables} h-full font-[family:var(--font-site-body)]`}>
-      <ErrorBoundary>
-        <DesktopStatusProvider>
-          <DesktopWindowProvider>
-            <DesktopJobProvider>
-              <DesktopRouteListener />
-              <DashboardShell>{children}</DashboardShell>
-            </DesktopJobProvider>
-          </DesktopWindowProvider>
-        </DesktopStatusProvider>
-      </ErrorBoundary>
-    </div>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <div className={`${appFontVariables} h-full font-[family:var(--font-site-body)]`}>
+        <ErrorBoundary>
+          <DesktopStatusProvider>
+            <DesktopWindowProvider>
+              <DesktopJobProvider>
+                <DesktopRouteListener />
+                <DashboardShell spaShellEnabled={spaShellEnabled}>{children}</DashboardShell>
+              </DesktopJobProvider>
+            </DesktopWindowProvider>
+          </DesktopStatusProvider>
+        </ErrorBoundary>
+      </div>
+    </NextIntlClientProvider>
   );
 }

@@ -4,12 +4,9 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { resolvePicoLocale } from '@/lib/pico/locale'
 import {
-  DEFAULT_X_HANDLE,
-  getPageOgImageUrl,
-  getPageTwitterImageUrl,
+  buildPageMetadata,
+  getPicoUrl,
 } from '@/lib/seo'
-
-const PICO_HOST = 'https://pico.mutx.dev'
 
 export async function buildPicoPageMetadata(
   namespace: string,
@@ -20,30 +17,38 @@ export async function buildPicoPageMetadata(
   const t = await getTranslations({ locale, namespace })
   const title = t('title', values)
   const description = t('description', values)
-  const url = pathname === '/' ? PICO_HOST : `${PICO_HOST}${pathname}`
+  const picoHost = getPicoUrl()
+  const pageMetadata = buildPageMetadata({
+    title,
+    description,
+    path: pathname,
+    host: picoHost,
+    siteName: 'PicoMUTX',
+  })
+  const url = pathname === '/' ? picoHost : `${picoHost}${pathname}`
 
   return {
     title,
     description,
+    robots:
+      pathname === '/wip'
+        ? {
+            index: false,
+            follow: false,
+            nocache: true,
+          }
+        : undefined,
     alternates: {
-      canonical: url,
+      canonical: pageMetadata.alternates?.canonical ?? url,
       languages: Object.fromEntries(
         routing.locales.map((supportedLocale) => [supportedLocale, url]),
       ),
     },
     openGraph: {
-      title,
-      description,
-      url,
+      ...pageMetadata.openGraph,
       locale,
-      images: [getPageOgImageUrl(title, description, { path: pathname, host: PICO_HOST })],
+      url,
     },
-    twitter: {
-      card: 'summary_large_image',
-      creator: DEFAULT_X_HANDLE,
-      title,
-      description,
-      images: [getPageTwitterImageUrl(title, description, { path: pathname, host: PICO_HOST })],
-    },
+    twitter: pageMetadata.twitter,
   }
 }

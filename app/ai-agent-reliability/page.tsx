@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX",
   description:
     "Agents that survive production. MUTX runs health probes, enforces circuit breakers, and routes around failures — so operators catch degradation before users do.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-reliability") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX",
     description:
+      "Agents that survive production. MUTX runs health probes, enforces circuit breakers, and routes around failures — so operators catch degradation before users do.",
+    path: "/ai-agent-reliability",
+    socialDescription:
       "Agents that survive production. Health checks, circuit breakers, and operator visibility — built into the control plane.",
-    url: getCanonicalUrl("/ai-agent-reliability"),
-    images: [getPageOgImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX", "Agents that survive production. Health checks, circuit breakers, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Reliability | MUTX",
-    description:
+    twitterTitle: "AI Agent Reliability | MUTX",
+    twitterDescription:
       "Agents that survive production. Health checks and circuit breakers built into the control plane.",
-    images: [getPageTwitterImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Failover | MUTX", "Agents that survive production. Health checks, circuit breakers, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
-  },
+  }),
 };
 
 const structuredData = {

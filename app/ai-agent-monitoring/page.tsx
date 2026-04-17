@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX",
   description:
     "See what agents actually did — not what they said they'd do. MUTX captures execution traces, tool call chains, and outcomes so your team can investigate incidents and fix behavior in production.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-monitoring") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX",
     description:
+      "See what agents actually did — not what they said they'd do. MUTX captures execution traces, tool call chains, and outcomes so your team can investigate incidents and fix behavior in production.",
+    path: "/ai-agent-monitoring",
+    socialDescription:
       "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.",
-    url: getCanonicalUrl("/ai-agent-monitoring"),
-    images: [getPageOgImageUrl("AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Monitoring | MUTX",
-    description:
+    twitterTitle: "AI Agent Monitoring | MUTX",
+    twitterDescription:
       "See what agents actually did, not what they said they'd do. Runtime traces and tool call history in the control plane.",
-    images: [getPageTwitterImageUrl("AI Agent Monitoring — Execution Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
-  },
+  }),
 };
 
 const structuredData = {

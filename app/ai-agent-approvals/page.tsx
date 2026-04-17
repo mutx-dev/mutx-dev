@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -24,22 +24,17 @@ export const metadata: Metadata = {
     "operator authorization",
     "approval gates for ai agents",
   ],
-  alternates: { canonical: getCanonicalUrl("/ai-agent-approvals") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Approval Workflows — Human-in-the-Loop Gates & Operator Authorization | MUTX",
     description:
+      "Most agent approval systems are advisory — they suggest a review but don't block the action. MUTX approval gates are enforced by the control plane. The agent waits for a decision, and every decision is on the record.",
+    path: "/ai-agent-approvals",
+    socialDescription:
       "Enforced approval gates for AI agents. The agent waits for a human decision, the decision is recorded, and the record travels with the trace.",
-    url: getCanonicalUrl("/ai-agent-approvals"),
-    images: [getPageOgImageUrl("AI Agent Approval Workflows — Human-in-the-Loop Gates & Operator Authorization | MUTX", "Enforced approval gates for AI agents. The agent waits for a human decision, the decision is recorded, and the record travels with the trace.", { path: "/ai-agent-approvals" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Approval Workflows | MUTX",
-    description:
+    twitterTitle: "AI Agent Approval Workflows | MUTX",
+    twitterDescription:
       "Human-in-the-loop gates enforced by the control plane. Agents wait for operator decisions — no advisory-only approvals.",
-    images: [getPageTwitterImageUrl("AI Agent Approval Workflows — Human-in-the-Loop Gates & Operator Authorization | MUTX", "Enforced approval gates for AI agents. The agent waits for a human decision, the decision is recorded, and the record travels with the trace.", { path: "/ai-agent-approvals" })],
-  },
+  }),
 };
 
 const faqItems = [

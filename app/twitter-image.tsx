@@ -1,5 +1,12 @@
-import { getSiteUrl } from '@/lib/seo'
+import { headers } from 'next/headers'
+
 import { buildOgImageResponseWithCache } from '@/lib/og-image'
+import {
+  getDefaultSocialBadge,
+  getSurfaceUrl,
+  resolveSeoSurfaceForPath,
+  resolveSocialSection,
+} from '@/lib/seo'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -19,7 +26,12 @@ export default async function Image({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const requestHeaders = await headers()
   const query = (await searchParams) ?? {}
+  const requestHost = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
+  const path = typeof query.path === 'string' ? query.path : '/'
+  const surface = resolveSeoSurfaceForPath(path, requestHost)
+  const section = resolveSocialSection(path, requestHost)
   const title = trim(
     typeof query.title === 'string' ? query.title : 'MUTX | Open Control Plane for AI Agents',
     96,
@@ -30,12 +42,17 @@ export default async function Image({
       : 'Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.',
     180,
   )
-  const badge = trim(typeof query.badge === 'string' ? query.badge.toUpperCase() : 'MUTX', 24)
+  const badge = trim(
+    typeof query.badge === 'string' ? query.badge.toUpperCase() : getDefaultSocialBadge(path, requestHost),
+    24,
+  )
 
   return buildOgImageResponseWithCache({
     title,
     description,
     badge,
-    host: getSiteUrl(),
+    host: getSurfaceUrl(surface),
+    surface,
+    section,
   })
 }

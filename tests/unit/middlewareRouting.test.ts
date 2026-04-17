@@ -68,13 +68,14 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('x-content-type-options')).toBe('nosniff')
   })
 
-  it('redirects /control paths to /dashboard on the app host', () => {
+  it('keeps /control paths on the app host so the public control demo stays indexable', () => {
     const response = proxy(
       mockRequest('https://app.mutx.dev/control/agents', { host: 'app.mutx.dev' }),
     )
 
-    expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://app.mutx.dev/dashboard/agents')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('location')).toBeNull()
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
   })
 
   it('redirects app host legacy /app pages to canonical dashboard routes', () => {
@@ -161,13 +162,15 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('redirects pico /start back to the waitlist root while Pico is closed', () => {
+  it('rewrites pico /start into the onboarding entrypoint', () => {
     const response = proxy(
       mockRequest('https://pico.mutx.dev/start?ref=hero', { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }),
     )
 
-    expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/?ref=hero')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://pico.mutx.dev/pico/onboarding?ref=hero',
+    )
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
@@ -227,12 +230,14 @@ describe('host-aware UI routing proxy', () => {
       ),
     )
 
-    expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/?locale=fr')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://pico.mutx.dev/pico/onboarding?locale=fr',
+    )
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=fr')
   })
 
-  it('redirects direct pico product routes back to the waitlist root', () => {
+  it('rewrites direct pico product routes into the pico app tree', () => {
     const response = proxy(
       mockRequest(
         'https://pico.mutx.dev/academy/install-hermes-locally',
@@ -240,8 +245,10 @@ describe('host-aware UI routing proxy', () => {
       ),
     )
 
-    expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://pico.mutx.dev/pico/academy/install-hermes-locally',
+    )
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 

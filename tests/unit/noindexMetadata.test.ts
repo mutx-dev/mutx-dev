@@ -1,4 +1,13 @@
+import type { ReactNode } from 'react'
+
 jest.mock('../../app/fonts/app', () => ({ appFontVariables: 'font-vars' }))
+jest.mock('next-intl', () => ({
+  NextIntlClientProvider: ({ children }: { children: ReactNode }) => children,
+}))
+jest.mock('next-intl/server', () => ({
+  getLocale: jest.fn(async () => 'en'),
+  getMessages: jest.fn(async () => ({})),
+}))
 
 import { metadata as dashboardMetadata } from '../../app/dashboard/layout'
 import { metadata as forgotPasswordMetadata } from '../../app/forgot-password/layout'

@@ -6,8 +6,8 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
+  buildPageMetadata,
   getCanonicalUrl,
-  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -17,22 +17,17 @@ export const metadata: Metadata = {
   title: "AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX",
   description:
     "Agent access is a minefield of implicit permissions and undocumented API keys. MUTX bakes auth boundaries, operator access controls, and compliance audit trails into the control plane — so what every agent can do is explicit, versioned, and enforced.",
-  alternates: { canonical: getCanonicalUrl("/ai-agent-governance") },
-  openGraph: {
+  ...buildPageMetadata({
     title: "AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX",
     description:
+      "Agent access is a minefield of implicit permissions and undocumented API keys. MUTX bakes auth boundaries, operator access controls, and compliance audit trails into the control plane — so what every agent can do is explicit, versioned, and enforced.",
+    path: "/ai-agent-governance",
+    socialDescription:
       "Auth boundaries, operator access controls, and compliance audit trails baked into the control plane. No implicit permissions.",
-    url: getCanonicalUrl("/ai-agent-governance"),
-    images: [getPageOgImageUrl("AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX", "Auth boundaries, operator access controls, and compliance audit trails baked into the control plane. No implicit permissions.", { path: "/ai-agent-governance" })],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: DEFAULT_X_HANDLE,
-    title: "AI Agent Governance | MUTX",
-    description:
+    twitterTitle: "AI Agent Governance | MUTX",
+    twitterDescription:
       "Auth boundaries and compliance guardrails baked into the control plane. Agent access stays explicit and auditable.",
-    images: [getPageTwitterImageUrl("AI Agent Governance — Auth Boundaries, Access Control & Audit Compliance | MUTX", "Auth boundaries, operator access controls, and compliance audit trails baked into the control plane. No implicit permissions.", { path: "/ai-agent-governance" })],
-  },
+  }),
 };
 
 const structuredData = {

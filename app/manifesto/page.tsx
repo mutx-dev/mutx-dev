@@ -5,28 +5,18 @@ import matter from "gray-matter";
 import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
+import { buildPageMetadata, buildWebPageStructuredData } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const source = fs.readFileSync(path.join(process.cwd(), "docs/manifesto.md"), "utf-8");
   const { data } = matter(source);
+  const title = `${data.title || "Manifesto"} — MUTX`;
+  const description = data.description as string;
+
   return {
-    title: `${data.title || "Manifesto"} — MUTX`,
-    description: data.description as string,
-    alternates: { canonical: getCanonicalUrl("/manifesto") },
-    openGraph: {
-      title: `${data.title || "Manifesto"} — MUTX`,
-      description: data.description as string,
-      url: getCanonicalUrl("/manifesto"),
-      images: [getPageOgImageUrl(`${data.title || "Manifesto"} — MUTX`, data.description as string, { path: "/manifesto" })],
-    },
-    twitter: {
-      card: "summary_large_image",
-      creator: DEFAULT_X_HANDLE,
-      title: `${data.title || "Manifesto"} — MUTX`,
-      description: data.description as string,
-      images: [getPageTwitterImageUrl(`${data.title || "Manifesto"} — MUTX`, data.description as string, { path: "/manifesto" })],
-    },
+    title,
+    description,
+    ...buildPageMetadata({ title, description, path: "/manifesto" }),
   };
 }
 

@@ -33,6 +33,7 @@ import {
 
 interface DashboardShellProps {
   children: ReactNode;
+  spaShellEnabled?: boolean;
 }
 
 interface DashboardNavProps {
