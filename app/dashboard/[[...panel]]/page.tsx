@@ -47,6 +47,7 @@ import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { SecurityPageClient } from "@/components/dashboard/SecurityPageClient";
 import { SessionsPageClient } from "@/components/dashboard/SessionsPageClient";
 import { SkillsPageClient } from "@/components/dashboard/SkillsPageClient";
+import { DesktopWindowShell } from "@/components/desktop/DesktopWindowShell";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
 import {
   ESSENTIAL_PANELS,
@@ -845,8 +846,10 @@ export default function DashboardSpaShellPage() {
   );
 
   // ── Desktop branch ──────────────────────────────────────────────────────
+  // DashboardShell is bypassed when SPA shell is active (layout.tsx), so this
+  // branch must provide DesktopWindowShell directly to preserve desktop chrome.
   if (platformReady && isDesktop) {
-    return <SpaShellGuard>{shellContent}</SpaShellGuard>;
+    return <DesktopWindowShell>{shellContent}</DesktopWindowShell>;
   }
 
   // ── Web shell ───────────────────────────────────────────────────────────
