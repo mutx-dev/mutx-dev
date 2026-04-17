@@ -887,7 +887,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('button', { name: /reset password/i })).toBeVisible();
   });
 
-  test('pico root stays on the landing page and points directly into the live Pico flow', async ({ page }) => {
+  test('pico root stays on the landing page without pricing or onboarding CTA drift', async ({ page }) => {
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('pico-landing')).toBeVisible();
@@ -896,11 +896,12 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByTestId('pico-footer')).toBeVisible();
     await expect(page.getByRole('heading', { name: /get to your first working agent fast/i })).toHaveCount(0);
     await expect(page.getByTestId('pico-surface-compass')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: /open onboarding/i }).first()).toHaveAttribute(
-      'href',
-      '/pico/onboarding',
-    );
-    await expect(page.locator('main')).not.toContainText(
+    await expect(page.locator('a[href*="/pico/onboarding"], a[href*="/onboarding"]')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /see pricing/i })).toHaveCount(0);
+    await expect(
+      page.locator('#pricing button, #pricing a[href="/pricing"], #pricing a[href="https://calendly.com/mutxdev"]'),
+    ).toHaveCount(0);
+    await expect(page.locator('main')).toContainText(
       /pre-register|early access|waitlist|preregistrati|accesso anticipato/i,
     );
     expect(new URL(page.url()).pathname).toBe('/pico');
