@@ -51,8 +51,9 @@ import { DesktopControlDeck } from "@/components/desktop/DesktopControlDeck";
 import { DesktopWindowShell } from "@/components/desktop/DesktopWindowShell";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
 import {
-  ESSENTIAL_PANELS,
+  isEssentialRestricted,
   isSpaShellEnabled,
+  resolveTabFromParams,
   useMissionControl,
   type BootStepKey,
   type ConnectionState,
@@ -251,33 +252,6 @@ const PANEL_BY_TAB: Record<TabId, PanelMeta> = PANELS.reduce(
   (acc, p) => ({ ...acc, [p.tab]: p }),
   {} as Record<TabId, PanelMeta>
 );
-
-const PANEL_BY_SEGMENTS: Record<string, TabId> = PANELS.reduce(
-  (acc, p) => {
-    if (p.pathSegments.length > 0) {
-      acc[p.pathSegments[0]] = p.tab;
-    }
-    return acc;
-  },
-  {} as Record<string, TabId>
-);
-
-// ---------------------------------------------------------------------------
-// URL → TabId resolver
-// ---------------------------------------------------------------------------
-
-function resolveTabFromParams(params: { panel?: string[] }): TabId {
-  const segments = params.panel ?? [];
-
-  if (segments.length === 0) return "overview";
-
-  const first = segments[0];
-  if (first && first in PANEL_BY_SEGMENTS) {
-    return PANEL_BY_SEGMENTS[first];
-  }
-
-  return "overview";
-}
 
 // ---------------------------------------------------------------------------
 // Boot sequence types (BootStepKey imported from @/lib/store)
@@ -811,11 +785,6 @@ export default function DashboardSpaShellPage() {
       cancelled = true;
     };
   }, [bootComplete, setActiveTab, store]);
-
-  // Determine whether a given tab is restricted in essential mode.
-  function isEssentialRestricted(tab: TabId): boolean {
-    return !ESSENTIAL_PANELS.includes(tab);
-  }
 
   // ── Render ───────────────────────────────────────────────────────────────
 

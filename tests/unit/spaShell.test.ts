@@ -8,6 +8,9 @@
  *   - ESSENTIAL_PANELS constant
  *   - isSpaShellEnabled() feature-flag function
  *   - STEP_KEYS array
+ *   - resolveTabFromParams() — URL segment → TabId resolver
+ *   - isEssentialRestricted() — essential-mode gating predicate
+ *   - PANEL_BY_SEGMENTS — URL→TabId lookup table
  *
  * Uses top-level imports so ESLint @typescript-eslint/no-require-imports
  * is satisfied.
@@ -15,8 +18,12 @@
 
 import {
   ESSENTIAL_PANELS,
+  isEssentialRestricted,
   isSpaShellEnabled,
+  PANEL_BY_SEGMENTS,
+  resolveTabFromParams,
   STEP_KEYS,
+  type TabId,
 } from "../../lib/store";
 
 describe("SPA shell — ESSENTIAL_PANELS constant", () => {
@@ -151,5 +158,162 @@ describe("SPA shell — ContentRouter tab inventory", () => {
       expect(typeof tab).toBe("string");
       expect(tab.length).toBeGreaterThan(0);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// resolveTabFromParams — catch-all route URL→TabId resolver
+// ---------------------------------------------------------------------------
+
+describe("SPA shell — resolveTabFromParams catch-all routing", () => {
+  it("empty params returns overview (dashboard root)", () => {
+    expect(resolveTabFromParams({})).toBe("overview");
+    expect(resolveTabFromParams({ panel: undefined })).toBe("overview");
+    expect(resolveTabFromParams({ panel: [] })).toBe("overview");
+  });
+
+  it('["agents"] resolves to "agents" tab', () => {
+    expect(resolveTabFromParams({ panel: ["agents"] })).toBe("agents");
+  });
+
+  it('["orchestration"] resolves to "tasks" tab (backward-compat)', () => {
+    expect(resolveTabFromParams({ panel: ["orchestration"] })).toBe("tasks");
+  });
+
+  it('["sessions"] resolves to "chat" tab', () => {
+    expect(resolveTabFromParams({ panel: ["sessions"] })).toBe("chat");
+  });
+
+  it('["history"] resolves to "activity" tab', () => {
+    expect(resolveTabFromParams({ panel: ["history"] })).toBe("activity");
+  });
+
+  it('["logs"] resolves to "logs" tab', () => {
+    expect(resolveTabFromParams({ panel: ["logs"] })).toBe("logs");
+  });
+
+  it('["autonomy"] resolves to "cron" tab', () => {
+    expect(resolveTabFromParams({ panel: ["autonomy"] })).toBe("cron");
+  });
+
+  it('["memory"] resolves to "memory" tab', () => {
+    expect(resolveTabFromParams({ panel: ["memory"] })).toBe("memory");
+  });
+
+  it('["skills"] resolves to "skills" tab', () => {
+    expect(resolveTabFromParams({ panel: ["skills"] })).toBe("skills");
+  });
+
+  it('["control"] resolves to "settings" tab (preserves /dashboard/control backward-compat)', () => {
+    expect(resolveTabFromParams({ panel: ["control"] })).toBe("settings");
+  });
+
+  it('["analytics"] resolves to "tokens" tab', () => {
+    expect(resolveTabFromParams({ panel: ["analytics"] })).toBe("tokens");
+  });
+
+  it('["budgets"] resolves to "cost-tracker" tab', () => {
+    expect(resolveTabFromParams({ panel: ["budgets"] })).toBe("cost-tracker");
+  });
+
+  it('["webhooks"] resolves to "webhooks" tab', () => {
+    expect(resolveTabFromParams({ panel: ["webhooks"] })).toBe("webhooks");
+  });
+
+  it('["security"] resolves to "security" tab', () => {
+    expect(resolveTabFromParams({ panel: ["security"] })).toBe("security");
+  });
+
+  it("unknown segment falls back to overview (safe fallback)", () => {
+    expect(resolveTabFromParams({ panel: ["unknown"] })).toBe("overview");
+    expect(resolveTabFromParams({ panel: ["foobar"] })).toBe("overview");
+  });
+
+  it("multi-segment params resolve from first segment only", () => {
+    // The catch-all only looks at the first segment
+    expect(resolveTabFromParams({ panel: ["agents", "detail"] })).toBe("agents");
+    expect(resolveTabFromParams({ panel: ["security", "keys", "list"] })).toBe("security");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PANEL_BY_SEGMENTS — URL→TabId lookup table
+// ---------------------------------------------------------------------------
+
+describe("SPA shell — PANEL_BY_SEGMENTS lookup table", () => {
+  const expectedKeys = [
+    "agents",
+    "orchestration",
+    "sessions",
+    "history",
+    "logs",
+    "autonomy",
+    "memory",
+    "skills",
+    "control",
+    "analytics",
+    "budgets",
+    "webhooks",
+    "security",
+  ];
+
+  it("PANEL_BY_SEGMENTS has exactly 13 known URL segments (overview has no segment)", () => {
+    expect(Object.keys(PANEL_BY_SEGMENTS)).toHaveLength(13);
+  });
+
+  it("every key in PANEL_BY_SEGMENTS maps to a valid TabId", () => {
+    for (const seg of Object.keys(PANEL_BY_SEGMENTS)) {
+      const tab = PANEL_BY_SEGMENTS[seg as keyof typeof PANEL_BY_SEGMENTS];
+      // tab must be a known TabId string (non-empty)
+      expect(typeof tab).toBe("string");
+      expect(tab.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("PANEL_BY_SEGMENTS has no duplicate tab values", () => {
+    const values = Object.values(PANEL_BY_SEGMENTS);
+    const unique = new Set(values);
+    expect(unique.size).toBe(values.length);
+  });
+
+  it.each(expectedKeys)('segment "%s" is present in PANEL_BY_SEGMENTS', (key) => {
+    expect(PANEL_BY_SEGMENTS).toHaveProperty(key);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// isEssentialRestricted — essential mode gating
+// ---------------------------------------------------------------------------
+
+describe("SPA shell — isEssentialRestricted essential mode gating", () => {
+  it("essential tabs are NOT restricted (ESSENTIAL_PANELS)", () => {
+    for (const tab of ESSENTIAL_PANELS) {
+      expect(isEssentialRestricted(tab)).toBe(false);
+    }
+  });
+
+  it("non-essential tabs ARE restricted", () => {
+    const nonEssential: TabId[] = [
+      "security",
+      "cron",
+      "memory",
+      "skills",
+      "webhooks",
+      "cost-tracker",
+      "tokens",
+    ];
+    for (const tab of nonEssential) {
+      expect(isEssentialRestricted(tab)).toBe(true);
+    }
+  });
+
+  it("isEssentialRestricted returns a boolean for every TabId", () => {
+    const allTabs = Object.keys(PANEL_BY_SEGMENTS) as Array<keyof typeof PANEL_BY_SEGMENTS>;
+    for (const seg of allTabs) {
+      const tab = PANEL_BY_SEGMENTS[seg] as TabId;
+      expect(typeof isEssentialRestricted(tab)).toBe("boolean");
+    }
+    // overview is the root tab
+    expect(typeof isEssentialRestricted("overview")).toBe("boolean");
   });
 });

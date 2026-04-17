@@ -552,3 +552,72 @@ export function isSpaShellEnabled(): boolean {
   if (typeof window === "undefined") return false;
   return process.env.NEXT_PUBLIC_SPA_SHELL === "true";
 }
+
+// ---------------------------------------------------------------------------
+// SPA shell URL → TabId routing
+// ---------------------------------------------------------------------------
+
+/**
+ * Lookup table: URL path segment → TabId.
+ * Built from the 14-tab panel registry in [[...panel]]/page.tsx.
+ * Each key must match the first segment of the corresponding URL.
+ *
+ * URL segment → TabId mapping:
+ *   "agents"        → "agents"
+ *   "orchestration" → "tasks"
+ *   "sessions"      → "chat"
+ *   "history"       → "activity"
+ *   "logs"          → "logs"
+ *   "autonomy"      → "cron"
+ *   "memory"        → "memory"
+ *   "skills"        → "skills"
+ *   "control"       → "settings"   ← preserves /dashboard/control backward-compat
+ *   "analytics"     → "tokens"
+ *   "budgets"       → "cost-tracker"
+ *   "webhooks"      → "webhooks"
+ *   "security"      → "security"
+ */
+export const PANEL_BY_SEGMENTS: Record<string, TabId> = {
+  agents: "agents",
+  orchestration: "tasks",
+  sessions: "chat",
+  history: "activity",
+  logs: "logs",
+  autonomy: "cron",
+  memory: "memory",
+  skills: "skills",
+  control: "settings",
+  analytics: "tokens",
+  budgets: "cost-tracker",
+  webhooks: "webhooks",
+  security: "security",
+};
+
+/**
+ * Resolves Next.js catch-all params to a TabId for the SPA shell ContentRouter.
+ *
+ * - Empty/missing panel segments → "overview" (dashboard root)
+ * - Unknown segment → "overview" (safe fallback)
+ * - Known segment → mapped TabId (see PANEL_BY_SEGMENTS)
+ *
+ * This function is the authoritative URL→tab resolver; it must stay in sync
+ * with the PANELS array in app/dashboard/[[...panel]]/page.tsx.
+ */
+export function resolveTabFromParams(params: { panel?: string[] }): TabId {
+  const segments = params.panel ?? [];
+  if (segments.length === 0) return "overview";
+  const first = segments[0];
+  if (first && first in PANEL_BY_SEGMENTS) {
+    return PANEL_BY_SEGMENTS[first];
+  }
+  return "overview";
+}
+
+/**
+ * Returns true when a tab is restricted in essential mode and requires a
+ * full-mode subscription.  Tabs not in ESSENTIAL_PANELS are gated behind an
+ * upgrade nudge rendered by EssentialModeUpgradeNudge in [[...panel]]/page.tsx.
+ */
+export function isEssentialRestricted(tab: TabId): boolean {
+  return !ESSENTIAL_PANELS.includes(tab);
+}
