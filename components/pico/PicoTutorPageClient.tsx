@@ -15,6 +15,7 @@ import {
   picoPanel,
   picoSoft,
 } from '@/components/pico/picoTheme'
+import { getPicoTutorPromptChips } from '@/components/pico/picoTutorPrompts'
 import { usePicoLessonWorkspace } from '@/components/pico/usePicoLessonWorkspace'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
@@ -193,6 +194,10 @@ export function PicoTutorPageClient() {
         },
       ]
     : []
+  const promptChips = useMemo(
+    () => getPicoTutorPromptChips(selectedLesson, examplePrompts),
+    [selectedLesson],
+  )
   const tutorSignal = reply
     ? 'answer ready'
     : loading
@@ -798,18 +803,20 @@ export function PicoTutorPageClient() {
                 </button>
               </div>
 
-              <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap">
-                {examplePrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    onClick={() => setQuestion(prompt)}
-                    className={picoClasses.tertiaryButton}
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
+              {promptChips.length ? (
+                <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap">
+                  {promptChips.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => setQuestion(prompt)}
+                      className={picoClasses.tertiaryButton}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </form>
 
             <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">

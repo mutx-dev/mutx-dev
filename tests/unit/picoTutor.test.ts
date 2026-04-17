@@ -1,3 +1,5 @@
+import { getPicoTutorPromptChips } from '../../components/pico/picoTutorPrompts'
+import { PICO_LESSONS } from '../../lib/pico/academy'
 import { normalizeTutorReplyPayload } from '../../lib/pico/tutor'
 
 describe('Pico tutor payload normalization', () => {
@@ -54,5 +56,23 @@ describe('Pico tutor payload normalization', () => {
       title: 'Support lane',
     })
     expect(reply?.skillLevel).toBe('intermediate')
+  })
+})
+
+describe('Pico tutor prompt chips', () => {
+  const fallbackPrompts = [
+    'My lesson is blocked at the first step. What should I check next?',
+    'I pasted the command and still get a mismatch. Where is the break?',
+  ]
+
+  it('hides generic prompt chips when a lesson is attached', () => {
+    const lesson = PICO_LESSONS.find((item) => item.slug === 'install-hermes-locally')
+
+    expect(lesson).toBeTruthy()
+    expect(getPicoTutorPromptChips(lesson ?? null, fallbackPrompts)).toEqual([])
+  })
+
+  it('keeps generic prompt chips when no lesson is attached', () => {
+    expect(getPicoTutorPromptChips(null, fallbackPrompts)).toEqual(fallbackPrompts)
   })
 })
