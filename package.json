@@ -134,7 +134,8 @@
     "sharp": "^0.34.5",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.4.0",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.3.0",
