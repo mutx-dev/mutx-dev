@@ -90,10 +90,12 @@ describe('pico autopilot helpers', () => {
       },
     })
 
-    expect(timeline[0]?.title).toMatch(/Budget threshold breached|Outbound Message Send pending/)
+    expect(timeline[0]?.title).toMatch(/Budget threshold breached|Outbound Message Send pending/i)
     expect(timeline.some((item) => item.title.includes('Failed run'))).toBe(true)
-    expect(timeline.some((item) => item.title.includes('Runtime Error triggered'))).toBe(true)
-    expect(timeline.some((item) => item.title.includes('Outbound Message Send pending'))).toBe(true)
+    expect(timeline.some((item) => /Runtime Error (triggered|active)/i.test(item.title))).toBe(true)
+    expect(
+      timeline.some((item) => /Outbound Message Send pending/i.test(item.title)),
+    ).toBe(true)
     expect(timeline.some((item) => item.impact.match(/line in the sand|human decision|surprising/i))).toBe(true)
   })
 

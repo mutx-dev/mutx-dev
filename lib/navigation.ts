@@ -1,30 +1,17 @@
 'use client'
 
-import { startTransition, useEffect } from 'react'
+import { startTransition, useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
+import {
+  DASHBOARD_SPA_EVENT,
+  normalizeDashboardPanel,
+  panelHref as buildPanelHref,
+} from '@/lib/dashboardPanels'
 import { useMissionControl } from '@/lib/store'
 
 const PREFETCHED_ROUTES = new Set<string>()
 let lastDefaultPrefetchPath = ''
-
-const PANEL_ROUTE_MAP: Record<string, string> = {
-  overview: '/dashboard',
-  agents: '/dashboard/agents',
-  tasks: '/dashboard/orchestration',
-  chat: '/dashboard/sessions',
-  activity: '/dashboard/history',
-  notifications: '/dashboard/monitoring',
-  tokens: '/dashboard/analytics',
-  logs: '/dashboard/logs',
-  cron: '/dashboard/autonomy',
-  memory: '/dashboard/memory',
-  skills: '/dashboard/skills',
-  settings: '/dashboard/control',
-  'cost-tracker': '/dashboard/budgets',
-  webhooks: '/dashboard/webhooks',
-  security: '/dashboard/security',
-}
 
 const DEFAULT_PREFETCH_PANELS = [
   'overview',
@@ -35,10 +22,6 @@ const DEFAULT_PREFETCH_PANELS = [
   'notifications',
   'tokens',
 ]
-
-function normalizePanel(panel: string): string {
-  return panel.trim().toLowerCase().replace(/^\/+|\/+$/g, '')
-}
 
 function normalizePathname(pathname: string | null | undefined): string {
   if (!pathname || pathname === '/') {
@@ -67,13 +50,37 @@ function prefetchHref(router: ReturnType<typeof useRouter>, href: string) {
 }
 
 export function panelHref(panel: string): string {
-  const normalizedPanel = normalizePanel(panel)
+  return buildPanelHref(panel)
+}
+export function useDashboardPathname(spaShellEnabled = false): string {
+  const pathname = usePathname()
+  const normalizedPathname = normalizePathname(pathname)
+  const [spaPathname, setSpaPathname] = useState(normalizedPathname)
 
-  if (!normalizedPanel || normalizedPanel === 'overview') {
-    return '/dashboard'
-  }
+  useEffect(() => {
+    setSpaPathname(normalizedPathname)
+  }, [normalizedPathname])
 
-  return PANEL_ROUTE_MAP[normalizedPanel] ?? `/dashboard/${normalizedPanel}`
+  useEffect(() => {
+    if (!spaShellEnabled || typeof window === 'undefined') {
+      return
+    }
+
+    const syncPathname = () => {
+      setSpaPathname(normalizePathname(window.location.pathname))
+    }
+
+    syncPathname()
+    window.addEventListener('popstate', syncPathname)
+    window.addEventListener(DASHBOARD_SPA_EVENT, syncPathname)
+
+    return () => {
+      window.removeEventListener('popstate', syncPathname)
+      window.removeEventListener(DASHBOARD_SPA_EVENT, syncPathname)
+    }
+  }, [spaShellEnabled])
+
+  return spaShellEnabled ? spaPathname : normalizedPathname
 }
 
 export function usePrefetchPanel(): (panel: string) => void {
@@ -102,14 +109,15 @@ export function usePrefetchPanel(): (panel: string) => void {
 }
 
 export function useNavigateToPanel(): (panel: string) => void {
-  const pathname = usePathname()
   const router = useRouter()
   const setActiveTab = useMissionControl((state) => state.setActiveTab)
   const setChatPanelOpen = useMissionControl((state) => state.setChatPanelOpen)
   const prefetchPanel = usePrefetchPanel()
+  const spaShellEnabled = process.env.NEXT_PUBLIC_SPA_SHELL === 'true'
+  const pathname = useDashboardPathname(spaShellEnabled)
 
   return (panel: string) => {
-    const normalizedPanel = normalizePanel(panel) || 'overview'
+    const normalizedPanel = normalizeDashboardPanel(panel) || 'overview'
     const href = panelHref(normalizedPanel)
 
     if (normalizePathname(pathname) === href) {
@@ -122,6 +130,12 @@ export function useNavigateToPanel(): (panel: string) => void {
 
     if (normalizedPanel === 'chat') {
       setChatPanelOpen(false)
+    }
+
+    if (spaShellEnabled && typeof window !== 'undefined' && href.startsWith('/dashboard')) {
+      window.history.pushState({ panel: normalizedPanel }, '', href)
+      window.dispatchEvent(new Event(DASHBOARD_SPA_EVENT))
+      return
     }
 
     startTransition(() => {

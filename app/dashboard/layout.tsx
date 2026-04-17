@@ -8,6 +8,7 @@ import { DesktopJobProvider } from "@/components/desktop/useDesktopJob";
 import { DesktopRouteListener } from "@/components/desktop/DesktopRouteListener";
 import { DesktopStatusProvider } from "@/components/desktop/useDesktopStatus";
 import { DesktopWindowProvider } from "@/components/desktop/useDesktopWindow";
+import { DashboardRouteSurface } from "@/components/dashboard/DashboardRouteSurface";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { buildPageMetadata, getAppUrl } from "@/lib/seo";
 
@@ -57,7 +58,11 @@ export default async function DashboardLayout({
             <DesktopWindowProvider>
               <DesktopJobProvider>
                 <DesktopRouteListener />
-                <DashboardShell spaShellEnabled={spaShellEnabled}>{children}</DashboardShell>
+                <DashboardShell spaShellEnabled={spaShellEnabled}>
+                  <DashboardRouteSurface spaShellEnabled={spaShellEnabled}>
+                    {children}
+                  </DashboardRouteSurface>
+                </DashboardShell>
               </DesktopJobProvider>
             </DesktopWindowProvider>
           </DesktopStatusProvider>

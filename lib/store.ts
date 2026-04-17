@@ -440,7 +440,7 @@ export const useMissionControl = create<MissionControlStore>()(
     bootComplete: false,
     capabilitiesChecked: false,
     dashboardMode: 'local',
-    interfaceMode: 'full',
+    interfaceMode: loadFromLocalStorage<InterfaceMode>('interface-mode', 'full'),
     subscription: null,
 
     // Agents
@@ -486,7 +486,7 @@ export const useMissionControl = create<MissionControlStore>()(
     activeTab: 'overview',
     sidebarExpanded: loadFromLocalStorage('sidebar-expanded', true),
     collapsedGroups: loadFromLocalStorage<string[]>('sidebar-groups', []),
-    liveFeedOpen: loadFromLocalStorage('livefeed-open', false),
+    liveFeedOpen: loadFromLocalStorage('livefeed-open', true),
     chatPanelOpen: false,
     headerDensity: loadFromLocalStorage<MissionControlState['headerDensity']>(
       'header-density',
