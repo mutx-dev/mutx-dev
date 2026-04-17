@@ -180,6 +180,11 @@
   white-space: nowrap;
 }
 
+.navCtaLabelMobile {
+  display: none;
+  white-space: nowrap;
+}
+
 .navCtaIcon {
   width: 1rem;
   height: 1rem;
@@ -1358,13 +1363,17 @@
   }
 
   .navCta {
-    min-width: 2.7rem;
-    padding: 0;
+    min-width: 0;
+    padding: 0 0.8rem;
     flex-shrink: 0;
   }
 
   .navCtaLabel {
     display: none;
+  }
+
+  .navCtaLabelMobile {
+    display: inline;
   }
 
   .hero {

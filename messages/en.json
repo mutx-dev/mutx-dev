@@ -7,17 +7,17 @@
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Pre-register",
-      "ctaMobile": "Join"
+      "cta": "Book founder call",
+      "ctaMobile": "Book call"
     },
     "hero": {
       "badge": "Founding Access · Open Now",
       "title": "Build and deploy AI agents ",
       "titleAccent": "without hiring a developer.",
       "subtitle": "PicoMUTX turns an AI-agent idea into one working, reviewable system with a guided build path, real support, and guardrails before launch.",
-      "cta": "Pre-Register for Early Access",
+      "cta": "Book founder call",
       "ctaSecondary": "See pricing",
-      "meta": "Free to pre-register · No credit card required · Human reply, not a nurture funnel"
+      "meta": "Waitlist is open · Founding members can still lock $9 instead of $97 · Founder calls only"
     },
     "trustBar": {
       "items": {
@@ -122,19 +122,19 @@
     "earlyAccess": {
       "eyebrow": "Early Access",
       "title": "Founding access is open now. It will not stay that way.",
-      "body": "Pre-register now to get into the first release wave while the product is still being shaped with early operators. That means earlier onboarding, tighter feedback loops, and a clearer line into what gets built next.",
+      "body": "The waitlist is open now, and founder review calls are how the first serious builds get placed. That keeps the release wave tight, matches each team to the right lane, and lets founding members lock the current pricing before the public reset.",
       "benefits": {
         "0": "Get in before the public opening",
-        "1": "Priority for founding-member seats",
+        "1": "Lock founding-member pricing before the reset",
         "2": "Earlier onboarding windows",
-        "3": "Influence over early workflows and use cases",
-        "4": "First visibility into final pricing and access terms"
+        "3": "Priority for founder review calls",
+        "4": "Influence over early workflows and use cases"
       }
     },
     "pricing": {
       "eyebrow": "Offers",
       "title": "Lock the founding-member window before the public price resets.",
-      "lead": "Start with a 14-day free trial. If you join during the founding-member window, the solo plan lands at $9 instead of the standard $97.",
+      "lead": "This landing keeps it simple: see the lanes, understand the founding-member pricing, and book a founder call if you want help choosing the right one.",
       "recommendedLabel": "Founding now",
       "tiers": {
         "starter": {
@@ -374,8 +374,8 @@
           "a": "Practical ones: support agents, internal copilots, workflow automations, and business systems that remove real manual work. The focus is operational usefulness, not toy demos."
         },
         "3": {
-          "q": "Is pre-registration free?",
-          "a": "Yes. Pre-registration is free and requires no payment. You join the first release queue and hear first when founding access opens."
+          "q": "Is there a free way to start?",
+          "a": "Yes. Solo build starts with a 14-day trial. The landing stays in waitlist mode for now, and founder calls are how we place the first serious builds into the right lane."
         },
         "4": {
           "q": "Is this for enterprises?",
@@ -384,14 +384,14 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Founding Access · Limited Spots",
-      "title": "Stop leaving the agent in planning mode.",
-      "body": "If the use case matters, the next step is not another tab. It is a path that gets one working system into the open with less risk, less drift, and less wasted motion.",
+      "eyebrow": "Founding Member Window",
+      "title": "If you want a founder seat, book the call now.",
+      "body": "This page is the waitlist and pricing surface. The founder call is where we place serious builders into the right lane before the public opening and before the founding-member window closes.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
-      "formHeadline": "Get into the first PicoMUTX wave",
-      "formSubline": "Join the list and get the earliest onboarding window we can offer.",
-      "ctaButton": "Pre-Register Now",
-      "formCtaMeta": "Free to pre-register · No credit card required · Early replies come from a human"
+      "formHeadline": "Best fit for founders with a real use case",
+      "formSubline": "Bring the use case, current blocker, or rollout goal. We will point you to the honest lane.",
+      "ctaButton": "Book founder call",
+      "formCtaMeta": "Founding-member pricing is limited · Solo build locks at $9 before it returns to $97 · Pico Pilot starts at $1k"
     },
     "contactForm": {
       "dialogLabel": "Contact form",

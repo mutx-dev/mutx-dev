@@ -2,19 +2,19 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowRight, Check, Map, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
-import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const STEP_ICONS = [Map, MessageSquare, ShieldCheck, Sparkles] as const
 const PRICING_TIERS = ['starter', 'pro', 'enterprise'] as const
+const FOUNDER_CALL_URL = 'https://calendly.com/mutxdev'
 
 type LandingPricingTierContent = {
   name: string
@@ -32,8 +32,6 @@ type LandingPricingTierContent = {
 export function PicoLandingPoster() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
-  const [formOpen, setFormOpen] = useState(false)
-  const [formInterest, setFormInterest] = useState<string | undefined>()
   const heroRef = useRef<HTMLElement | null>(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -74,19 +72,8 @@ export function PicoLandingPoster() {
   const coinsRobot = picoRobotArtById.coins
   const celebrateRobot = picoRobotArtById.celebrate
 
-  function openForm(interest?: string) {
-    setFormInterest(interest)
-    setFormOpen(true)
-  }
-
   return (
     <div data-testid="pico-landing" className={s.page}>
-      <PicoContactForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        defaultInterest={formInterest}
-      />
-
       <header className={s.nav}>
         <div className={s.navInner}>
           <Link href="/pico" className={s.navBrand}>
@@ -113,10 +100,16 @@ export function PicoLandingPoster() {
 
           <div className={s.navActions}>
             <PicoLangSwitcher />
-            <button type="button" className={s.navCta} onClick={() => openForm()}>
+            <a
+              href={FOUNDER_CALL_URL}
+              target="_blank"
+              rel="noreferrer"
+              className={s.navCta}
+            >
               <span className={s.navCtaLabel}>{t('nav.cta')}</span>
+              <span className={s.navCtaLabelMobile}>{t('nav.ctaMobile')}</span>
               <ArrowRight className={s.navCtaIcon} />
-            </button>
+            </a>
           </div>
         </div>
       </header>
@@ -156,14 +149,15 @@ export function PicoLandingPoster() {
 
               <SiteReveal delay={0.25}>
                 <div className={s.heroActions}>
-                  <button
-                    type="button"
+                  <a
+                    href={FOUNDER_CALL_URL}
+                    target="_blank"
+                    rel="noreferrer"
                     className={s.heroPrimary}
-                    onClick={() => openForm('building-first')}
                   >
                     {t('hero.cta')}
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </a>
                 </div>
               </SiteReveal>
 
@@ -512,10 +506,15 @@ export function PicoLandingPoster() {
                   <p className={s.finalFormSubline}>{t('finalCta.formSubline')}</p>
                 </div>
                 <div className={s.finalActions}>
-                  <button type="button" className={s.finalButton} onClick={() => openForm()}>
+                  <a
+                    href={FOUNDER_CALL_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={s.finalButton}
+                  >
                     {t('finalCta.ctaButton')}
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </a>
                   <p className={s.finalMeta}>{t('finalCta.formCtaMeta')}</p>
                 </div>
               </SiteReveal>
