@@ -174,6 +174,21 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
+  it('rewrites pico /tutor into the real tutor surface and preserves lesson context', () => {
+    const response = proxy(
+      mockRequest(
+        'https://pico.mutx.dev/tutor?lesson=install-hermes-locally',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
+      ),
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://pico.mutx.dev/pico/tutor?lesson=install-hermes-locally',
+    )
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
+  })
+
   it('maps pico geolocation headers to supported locales on first authenticated visit', () => {
     const jpResponse = proxy(
       mockRequest(

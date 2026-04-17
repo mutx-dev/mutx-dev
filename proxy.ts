@@ -462,6 +462,14 @@ export function proxy(request: NextRequest) {
       )
     }
 
+    if (normalizedPath === '/tutor') {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, '/pico/tutor', picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/opengraph-image' || normalizedPath === '/twitter-image') {
       return finalizeResponse(
         applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
