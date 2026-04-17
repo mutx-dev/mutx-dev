@@ -471,7 +471,7 @@ export function proxy(request: NextRequest) {
     }
 
     return finalizeResponse(
-      applyPicoLocale(redirectWithinHost(request, '/'), locale),
+      applyPicoLocale(rewriteWithinHost(request, '/pico/wip', picoRequestHeaders), locale),
       host,
       normalizedPath,
     )
