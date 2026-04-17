@@ -9,9 +9,16 @@ import {
   resolveSeoSurface,
 } from '@/lib/seo'
 
-const PICO_BLOCKED_CRAWL_PREFIXES = BLOCKED_CRAWL_PREFIXES.filter(
-  (prefix) => prefix !== '/onboarding',
-)
+const PICO_BLOCKED_CRAWL_PREFIXES: string[] = [...BLOCKED_CRAWL_PREFIXES, 
+  '/academy',
+  '/autopilot',
+  '/pricing',
+  '/support',
+  '/tutor',
+  '/start',
+  '/wip',
+  '/pico',
+]
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const requestHeaders = await headers()
@@ -42,8 +49,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       rules: [
         {
           userAgent: '*',
-          allow: '/',
-          disallow: [...PICO_BLOCKED_CRAWL_PREFIXES, '/wip'],
+          allow: ['/', '/opengraph-image', '/twitter-image'],
+          disallow: PICO_BLOCKED_CRAWL_PREFIXES,
         },
       ],
       sitemap: `${picoUrl}/sitemap.xml`,

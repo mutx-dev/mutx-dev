@@ -7,17 +7,17 @@
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Book founder call",
-      "ctaMobile": "Book call"
+      "cta": "Join waitlist",
+      "ctaMobile": "Waitlist"
     },
     "hero": {
       "badge": "Founding Access · Open Now",
       "title": "Build and deploy AI agents ",
       "titleAccent": "without hiring a developer.",
       "subtitle": "PicoMUTX turns an AI-agent idea into one working, reviewable system with a guided build path, real support, and guardrails before launch.",
-      "cta": "Book founder call",
-      "ctaSecondary": "See pricing",
-      "meta": "Waitlist is open · Founding members can still lock $9 instead of $97 · Founder calls only"
+      "cta": "Join waitlist",
+      "ctaSecondary": "Book founder call",
+      "meta": "Waitlist open now · Solo build is $9 instead of $97 for founding members · Founder calls available"
     },
     "trustBar": {
       "items": {
@@ -134,7 +134,7 @@
     "pricing": {
       "eyebrow": "Offers",
       "title": "Lock the founding-member window before the public price resets.",
-      "lead": "This landing keeps it simple: see the lanes, understand the founding-member pricing, and book a founder call if you want help choosing the right one.",
+      "lead": "This page is the whole public Pico surface now: join the waitlist, see the pricing, and book a founder call if you want help choosing the right lane.",
       "recommendedLabel": "Founding now",
       "tiers": {
         "starter": {
@@ -385,19 +385,20 @@
     },
     "finalCta": {
       "eyebrow": "Founding Member Window",
-      "title": "If you want a founder seat, book the call now.",
-      "body": "This page is the waitlist and pricing surface. The founder call is where we place serious builders into the right lane before the public opening and before the founding-member window closes.",
+      "title": "Join the waitlist or book a founder call.",
+      "body": "Pico is a waitlist-first landing now. Join the list if you want the founding-member window reserved. Book the founder call if you want help picking the right lane before the public reset.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
-      "formHeadline": "Best fit for founders with a real use case",
-      "formSubline": "Bring the use case, current blocker, or rollout goal. We will point you to the honest lane.",
-      "ctaButton": "Book founder call",
-      "formCtaMeta": "Founding-member pricing is limited · Solo build locks at $9 before it returns to $97 · Pico Pilot starts at $1k"
+      "formHeadline": "Waitlist for the first serious builds",
+      "formSubline": "Tell us the use case, blocker, or rollout goal. We will place you in the right wave and point you to the honest lane.",
+      "ctaButton": "Join waitlist",
+      "secondaryButton": "Book founder call",
+      "formCtaMeta": "Solo build is $9 now instead of $97 · Guided group is $297 · Pico Pilot starts at $1k"
     },
     "contactForm": {
       "dialogLabel": "Contact form",
       "closeLabel": "Close",
-      "title": "Pre-register for early access",
-      "subtitle": "Tell us where you are. We'll get you in.",
+      "title": "Join the Pico waitlist",
+      "subtitle": "Tell us what you want to build. We will place you in the right release wave.",
       "emailLabel": "Work email",
       "emailPlaceholder": "you@company.com",
       "nameLabel": "Name",
@@ -416,10 +417,10 @@
       "messageOptional": "(optional)",
       "messagePlaceholder": "E.g. I run a small SaaS and want to automate customer support...",
       "submitting": "Sending...",
-      "submit": "Join the early access list",
-      "disclaimer": "No spam. No sales calls. Just a human reply.",
+      "submit": "Join waitlist",
+      "disclaimer": "No spam. No hard sell. Just a human reply.",
       "successTitle": "You're on the list.",
-      "successBody": "We read every message. Expect a personal reply within 24 hours.",
+      "successBody": "We have your spot request. Expect a personal reply within 24 hours.",
       "successBack": "Back to the page",
       "errorFallback": "Something went wrong. Please try again.",
       "networkError": "Network error. Please try again."

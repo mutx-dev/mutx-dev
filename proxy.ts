@@ -27,7 +27,6 @@ const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
-const PICO_AUTH_PATHS = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'])
 const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
   JP: 'ja',
@@ -455,41 +454,7 @@ export function proxy(request: NextRequest) {
     const locale = getLocaleFromRequest(request)
     const picoRequestHeaders = buildPicoRequestHeaders(request, locale)
 
-    if (PICO_AUTH_PATHS.has(normalizedPath)) {
-      return finalizeResponse(
-        applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    // Strip /pico prefix on pico hosts (users may type /pico/pricing directly)
-    let picoPath = normalizedPath
-    if (picoPath.startsWith('/pico')) {
-      picoPath = picoPath.slice('/pico'.length) || '/'
-    }
-
-    // Canonical Pico product routes that serve real pages
-    const PICO_ROUTES = new Set([
-      '/',
-      '/start',
-      '/onboarding',
-      '/academy',
-      '/tutor',
-      '/support',
-      '/autopilot',
-      '/pricing',
-      '/opengraph-image',
-      '/twitter-image',
-    ])
-    const PICO_ROUTE_PREFIXES = ['/academy/']
-
-    const isPicoRoute =
-      PICO_ROUTES.has(picoPath) ||
-      PICO_ROUTE_PREFIXES.some((prefix) => picoPath.startsWith(prefix))
-
-    if (picoPath === '/') {
-      // Root -> landing page (public, no auth required)
+    if (normalizedPath === '/') {
       return finalizeResponse(
         applyPicoLocale(rewriteWithinHost(request, '/pico', picoRequestHeaders), locale),
         host,
@@ -497,19 +462,7 @@ export function proxy(request: NextRequest) {
       )
     }
 
-    if (picoPath === '/start') {
-      // /start -> /pico/onboarding (canonical product entry alias)
-      return finalizeResponse(
-        applyPicoLocale(
-          rewriteWithinHost(request, '/pico/onboarding', picoRequestHeaders),
-          locale,
-        ),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (picoPath === '/opengraph-image' || picoPath === '/twitter-image') {
+    if (normalizedPath === '/opengraph-image' || normalizedPath === '/twitter-image') {
       return finalizeResponse(
         applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
         host,
@@ -517,21 +470,8 @@ export function proxy(request: NextRequest) {
       )
     }
 
-    if (isPicoRoute) {
-      // Rewrite /<pico-route> -> /pico/<pico-route>
-      return finalizeResponse(
-        applyPicoLocale(
-          rewriteWithinHost(request, '/pico' + picoPath, picoRequestHeaders),
-          locale,
-        ),
-        host,
-        normalizedPath,
-      )
-    }
-
-    // Unknown paths -> WIP animation
     return finalizeResponse(
-      applyPicoLocale(rewriteWithinHost(request, '/pico/wip', picoRequestHeaders), locale),
+      applyPicoLocale(redirectWithinHost(request, '/'), locale),
       host,
       normalizedPath,
     )

@@ -2,13 +2,14 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowRight, Check, Map, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
+import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
@@ -32,6 +33,8 @@ type LandingPricingTierContent = {
 export function PicoLandingPoster() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
+  const [formOpen, setFormOpen] = useState(false)
+  const [formInterest, setFormInterest] = useState<string | undefined>()
   const heroRef = useRef<HTMLElement | null>(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -72,8 +75,20 @@ export function PicoLandingPoster() {
   const coinsRobot = picoRobotArtById.coins
   const celebrateRobot = picoRobotArtById.celebrate
 
+  function openForm(interest?: string) {
+    setFormInterest(interest)
+    setFormOpen(true)
+  }
+
   return (
     <div data-testid="pico-landing" className={s.page}>
+      <PicoContactForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        defaultInterest={formInterest}
+        source="pico-waitlist"
+      />
+
       <header className={s.nav}>
         <div className={s.navInner}>
           <Link href="/pico" className={s.navBrand}>
@@ -100,16 +115,11 @@ export function PicoLandingPoster() {
 
           <div className={s.navActions}>
             <PicoLangSwitcher />
-            <a
-              href={FOUNDER_CALL_URL}
-              target="_blank"
-              rel="noreferrer"
-              className={s.navCta}
-            >
+            <button type="button" className={s.navCta} onClick={() => openForm()}>
               <span className={s.navCtaLabel}>{t('nav.cta')}</span>
               <span className={s.navCtaLabelMobile}>{t('nav.ctaMobile')}</span>
               <ArrowRight className={s.navCtaIcon} />
-            </a>
+            </button>
           </div>
         </div>
       </header>
@@ -149,14 +159,21 @@ export function PicoLandingPoster() {
 
               <SiteReveal delay={0.25}>
                 <div className={s.heroActions}>
+                  <button
+                    type="button"
+                    className={s.heroPrimary}
+                    onClick={() => openForm('building-first')}
+                  >
+                    {t('hero.cta')}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
                   <a
                     href={FOUNDER_CALL_URL}
                     target="_blank"
                     rel="noreferrer"
-                    className={s.heroPrimary}
+                    className={s.heroSecondary}
                   >
-                    {t('hero.cta')}
-                    <ArrowRight className="h-4 w-4" />
+                    {t('hero.ctaSecondary')}
                   </a>
                 </div>
               </SiteReveal>
@@ -506,14 +523,17 @@ export function PicoLandingPoster() {
                   <p className={s.finalFormSubline}>{t('finalCta.formSubline')}</p>
                 </div>
                 <div className={s.finalActions}>
+                  <button type="button" className={s.finalButton} onClick={() => openForm()}>
+                    {t('finalCta.ctaButton')}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
                   <a
                     href={FOUNDER_CALL_URL}
                     target="_blank"
                     rel="noreferrer"
-                    className={s.finalButton}
+                    className={s.heroSecondary}
                   >
-                    {t('finalCta.ctaButton')}
-                    <ArrowRight className="h-4 w-4" />
+                    {t('finalCta.secondaryButton')}
                   </a>
                   <p className={s.finalMeta}>{t('finalCta.formCtaMeta')}</p>
                 </div>

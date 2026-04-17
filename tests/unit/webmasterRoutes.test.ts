@@ -7,7 +7,6 @@ jest.mock('next/headers', () => ({
 import manifest from '../../app/manifest'
 import robots from '../../app/robots'
 import sitemap from '../../app/sitemap'
-import { PICO_LESSONS } from '../../lib/pico/academy'
 import { BLOCKED_CRAWL_PREFIXES, PUBLIC_MARKETING_ROUTES } from '../../lib/seo'
 
 describe('webmaster route contracts', () => {
@@ -41,19 +40,27 @@ describe('webmaster route contracts', () => {
     expect(result.sitemap).toBe('https://app.mutx.dev/sitemap.xml')
   })
 
-  it('robots.txt keeps pico public while excluding the wip lane', async () => {
+  it('robots.txt keeps pico landing-only while excluding the old product lanes', async () => {
     mockHeaders.mockResolvedValue(new Headers({ host: 'pico.mutx.dev' }))
 
     const result = await robots()
     const firstRule = Array.isArray(result.rules) ? result.rules[0] : result.rules
 
+    expect(firstRule?.allow).toEqual(['/', '/opengraph-image', '/twitter-image'])
     expect(firstRule?.disallow).toEqual(
       expect.arrayContaining([
         ...BLOCKED_CRAWL_PREFIXES.filter((prefix) => prefix !== '/onboarding'),
+        '/academy',
+        '/autopilot',
+        '/pricing',
+        '/support',
+        '/tutor',
+        '/start',
         '/wip',
+        '/pico',
       ]),
     )
-    expect(firstRule?.disallow).not.toContain('/onboarding')
+    expect(firstRule?.disallow).toContain('/onboarding')
     expect(result.host).toBe('https://pico.mutx.dev')
     expect(result.sitemap).toBe('https://pico.mutx.dev/sitemap.xml')
   })
@@ -83,15 +90,14 @@ describe('webmaster route contracts', () => {
     ])
   })
 
-  it('pico sitemap publishes public pico routes and academy lessons', async () => {
+  it('pico sitemap publishes only the landing page', async () => {
     mockHeaders.mockResolvedValue(new Headers({ host: 'pico.mutx.dev' }))
 
     const result = await sitemap()
     const urls = result.map((entry) => entry.url)
 
     expect(urls).toContain('https://pico.mutx.dev')
-    expect(urls).toContain('https://pico.mutx.dev/academy')
-    expect(urls).toContain(`https://pico.mutx.dev/academy/${PICO_LESSONS[0].slug}`)
+    expect(urls).toHaveLength(1)
     expect(urls).not.toContain('https://pico.mutx.dev/wip')
   })
 

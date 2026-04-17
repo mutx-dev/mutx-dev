@@ -2,7 +2,6 @@ import type { MetadataRoute } from 'next'
 import { headers } from 'next/headers'
 
 import { getDocSitemapRoutes } from '@/lib/docs'
-import { PICO_LESSONS } from '@/lib/pico/academy'
 import {
   PUBLIC_MARKETING_ROUTES,
   getAppUrl,
@@ -55,23 +54,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   if (surface === 'pico') {
-    const picoRoutes = [
-      '/',
-      '/academy',
-      '/autopilot',
-      '/onboarding',
-      '/pricing',
-      '/support',
-      '/tutor',
-      ...PICO_LESSONS.map((lesson) => `/academy/${lesson.slug}`),
+    return [
+      {
+        url: toAbsoluteUrl(getPicoUrl(), '/'),
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 1,
+      },
     ]
-
-    return picoRoutes.map((route) => ({
-      url: toAbsoluteUrl(getPicoUrl(), route),
-      lastModified: now,
-      changeFrequency: route.startsWith('/academy/') ? 'weekly' : 'monthly',
-      priority: route === '/' ? 1 : route === '/academy' ? 0.9 : 0.72,
-    }))
   }
 
   const routes = [...PUBLIC_MARKETING_ROUTES, ...getDocSitemapRoutes()].filter(

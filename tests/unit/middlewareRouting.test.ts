@@ -162,15 +162,13 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('rewrites pico /start into the onboarding entrypoint', () => {
+  it('redirects pico /start back to the landing page', () => {
     const response = proxy(
       mockRequest('https://pico.mutx.dev/start?ref=hero', { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }),
     )
 
-    expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBe(
-      'https://pico.mutx.dev/pico/onboarding?ref=hero',
-    )
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/?ref=hero')
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
@@ -220,24 +218,22 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=es')
   })
 
-  it('prefers an explicit locale query over saved cookies on the pico host', () => {
+  it('prefers an explicit locale query over saved cookies while redirecting pico routes to landing', () => {
     const response = proxy(
       mockRequest(
-        'https://pico.mutx.dev/onboarding?locale=fr',
+        'https://pico.mutx.dev/pricing?locale=fr',
         { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
         'GET',
         { ...authCookies, NEXT_LOCALE: 'es', mutx_user_locale: 'de' },
       ),
     )
 
-    expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBe(
-      'https://pico.mutx.dev/pico/onboarding?locale=fr',
-    )
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/?locale=fr')
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=fr')
   })
 
-  it('rewrites direct pico product routes into the pico app tree', () => {
+  it('redirects direct pico product routes back to the landing page', () => {
     const response = proxy(
       mockRequest(
         'https://pico.mutx.dev/academy/install-hermes-locally',
@@ -245,10 +241,8 @@ describe('host-aware UI routing proxy', () => {
       ),
     )
 
-    expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBe(
-      'https://pico.mutx.dev/pico/academy/install-hermes-locally',
-    )
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/')
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
@@ -278,25 +272,23 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=es')
   })
 
-  it('allows auth entry pages on the pico host without rewriting them into /pico/*', () => {
+  it('redirects pico auth entry pages back to the landing page', () => {
     const loginResponse = proxy(
       mockRequest('https://pico.mutx.dev/login?next=%2Fonboarding', { host: 'pico.mutx.dev' }),
     )
 
-    expect(loginResponse.status).toBe(200)
-    expect(loginResponse.headers.get('x-middleware-rewrite')).toBeNull()
-    expect(loginResponse.headers.get('location')).toBeNull()
+    expect(loginResponse.status).toBe(307)
+    expect(loginResponse.headers.get('location')).toBe('https://pico.mutx.dev/?next=%2Fonboarding')
 
     const registerResponse = proxy(
       mockRequest('https://pico.mutx.dev/register?next=%2Facademy', { host: 'pico.mutx.dev' }),
     )
 
-    expect(registerResponse.status).toBe(200)
-    expect(registerResponse.headers.get('x-middleware-rewrite')).toBeNull()
-    expect(registerResponse.headers.get('location')).toBeNull()
+    expect(registerResponse.status).toBe(307)
+    expect(registerResponse.headers.get('location')).toBe('https://pico.mutx.dev/?next=%2Facademy')
   })
 
-  it('allows verify-email on the pico host without forcing an authenticated session first', () => {
+  it('redirects verify-email on the pico host back to the landing page', () => {
     const response = proxy(
       mockRequest(
         'https://pico.mutx.dev/verify-email?token=test-token',
@@ -304,9 +296,17 @@ describe('host-aware UI routing proxy', () => {
       ),
     )
 
-    expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
-    expect(response.headers.get('location')).toBeNull()
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/?token=test-token')
+  })
+
+  it('redirects explicit /pico paths on the pico host back to the landing page root', () => {
+    const response = proxy(
+      mockRequest('https://pico.mutx.dev/pico/pricing', { host: 'pico.mutx.dev' }),
+    )
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/')
   })
 
   it('still applies rate-limit headers on protected auth endpoints', () => {
