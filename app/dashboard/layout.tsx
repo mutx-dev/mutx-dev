@@ -6,18 +6,7 @@ import { DesktopJobProvider } from "@/components/desktop/useDesktopJob";
 import { DesktopRouteListener } from "@/components/desktop/DesktopRouteListener";
 import { DesktopStatusProvider } from "@/components/desktop/useDesktopStatus";
 import { DesktopWindowProvider } from "@/components/desktop/useDesktopWindow";
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
-
-/**
- * Whether the SPA shell (issue #3690) is enabled.
- * When true, the catch-all route `app/dashboard/[[...panel]]/page.tsx` provides
- * its own shell via ContentRouter; the old DashboardShell is bypassed so the
- * two shells do not render simultaneously.
- */
-function isSpaShellLayoutActive(): boolean {
-  // Accessible on the server in both Node.js and Edge runtimes.
-  return process.env.NEXT_PUBLIC_SPA_SHELL === "true";
-}
+import { ShellRouter } from "./ShellRouter";
 
 export const metadata: Metadata = {
   alternates: {
@@ -60,8 +49,6 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const spaActive = isSpaShellLayoutActive();
-
   return (
     <div className={`${appFontVariables} h-full font-[family:var(--font-site-body)]`}>
       <ErrorBoundary>
@@ -69,15 +56,7 @@ export default function DashboardLayout({
           <DesktopWindowProvider>
             <DesktopJobProvider>
               <DesktopRouteListener />
-              {spaActive ? (
-                // SPA shell (NEXT_PUBLIC_SPA_SHELL=true): the catch-all page
-                // provides its own shell/nav via ContentRouter — bypass the old
-                // DashboardShell to prevent double-shell rendering.
-                children
-              ) : (
-                // Legacy multi-page shell: DashboardShell wraps every child route.
-                <DashboardShell>{children}</DashboardShell>
-              )}
+              <ShellRouter>{children}</ShellRouter>
             </DesktopJobProvider>
           </DesktopWindowProvider>
         </DesktopStatusProvider>
