@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { extractApiErrorMessage } from '@/components/app/http'
+import { picoAuthCopy, picoAuthEyebrow, type PicoAuthMode } from '@/components/pico/picoAuthCopy'
 import { buildOAuthStartHref, oauthProviders } from '@/lib/auth/oauth'
 import { resolveRedirectPath } from '@/lib/auth/redirects'
 
@@ -12,35 +13,12 @@ import { resolveRedirectPath } from '@/lib/auth/redirects'
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-type AuthMode = 'login' | 'register'
-
 type PicoAuthPageProps = {
-  mode: AuthMode
+  mode: PicoAuthMode
   nextPath?: string | null
   fallbackPath?: string
   initialError?: string | null
   initialEmail?: string | null
-}
-
-const copy = {
-  login: {
-    title: 'Enter the current Pico build',
-    subtitle: 'Use a provider or email to open the preview and save your place.',
-    submit: 'Enter Pico',
-    loading: 'Opening\u2026',
-    toggleQ: 'Need access?',
-    toggleA: 'Create one',
-    toggleMode: 'register' as AuthMode,
-  },
-  register: {
-    title: 'Create your Pico preview account',
-    subtitle: 'Sign up once, save your place, and keep following the product as it improves.',
-    submit: 'Create preview account',
-    loading: 'Creating\u2026',
-    toggleQ: 'Already have an account?',
-    toggleA: 'Sign in',
-    toggleMode: 'login' as AuthMode,
-  },
 }
 
 /* ---- Pico design tokens (hardcoded so this page works anywhere) ---- */
@@ -123,7 +101,7 @@ export function PicoAuthPage({
   initialEmail,
 }: PicoAuthPageProps) {
   const router = useRouter()
-  const text = copy[mode]
+  const text = picoAuthCopy[mode]
   const isRegister = mode === 'register'
   const redirectPath = resolveRedirectPath(nextPath, fallbackPath)
 
@@ -267,24 +245,28 @@ export function PicoAuthPage({
         <div style={{ width: '100%', maxWidth: '420px' }}>
           {/* Title */}
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <p style={{
-              fontFamily: c.fontMono,
-              fontSize: '0.65rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.2em',
-              color: c.muted,
-              marginBottom: '0.75rem',
-            }}>
-              Pico preview access
+            <p
+              style={{
+                fontFamily: c.fontMono,
+                fontSize: '0.65rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.2em',
+                color: c.muted,
+                marginBottom: '0.75rem',
+              }}
+            >
+              {picoAuthEyebrow}
             </p>
-            <h1 style={{
-              fontFamily: c.fontDisplay,
-              fontSize: 'clamp(1.5rem, 4vw, 2rem)',
-              fontWeight: 700,
-              lineHeight: 1.2,
-              color: c.text,
-              marginBottom: '0.5rem',
-            }}>
+            <h1
+              style={{
+                fontFamily: c.fontDisplay,
+                fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                fontWeight: 700,
+                lineHeight: 1.2,
+                color: c.text,
+                marginBottom: '0.5rem',
+              }}
+            >
               {text.title}
             </h1>
             <p style={{ color: c.text2, fontSize: '0.9rem', lineHeight: 1.6 }}>
