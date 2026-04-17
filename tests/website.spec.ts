@@ -887,16 +887,22 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('button', { name: /reset password/i })).toBeVisible();
   });
 
-  test('pico root is the landing page and keeps product routes deeper in /pico', async ({ page }) => {
+  test('pico root stays on the landing page and points directly into the live Pico flow', async ({ page }) => {
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('pico-waitlist-landing')).toBeVisible();
+    await expect(page.getByTestId('pico-landing')).toBeVisible();
     await expect(page.locator('main h1').first()).toBeVisible();
     await expect(page.locator('main')).toContainText(/PicoMUTX/i);
     await expect(page.getByTestId('pico-footer')).toBeVisible();
     await expect(page.getByRole('heading', { name: /get to your first working agent fast/i })).toHaveCount(0);
     await expect(page.getByTestId('pico-surface-compass')).toHaveCount(0);
-    await expect(page.locator('a[href="/pico/onboarding"]')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /open onboarding/i }).first()).toHaveAttribute(
+      'href',
+      '/pico/onboarding',
+    );
+    await expect(page.locator('main')).not.toContainText(
+      /pre-register|early access|waitlist|preregistrati|accesso anticipato/i,
+    );
     expect(new URL(page.url()).pathname).toBe('/pico');
   });
 

@@ -261,17 +261,17 @@ export function getPicoDefaultMessages() {
           stacksLabel: 'Tracked stacks',
         },
         accessPlans: {
-          label: 'Founding access',
-          title: 'Choose the access lane that matches how fast you want to move',
-          body: 'These are the honest entry points right now. They control onboarding priority, support depth, and how quickly we help you get one real agent into motion.',
+          label: 'Live product lanes',
+          title: 'Choose the Pico lane that matches the next real move',
+          body: 'These cards should point at live Pico routes, not a placeholder intake funnel. Use onboarding for the fastest start and pricing when you need plan detail.',
           recommended: 'Most direct',
-          meta: 'Founding access stays human. We reply with the right lane, not a generic nurture sequence.',
+          meta: 'The landing and pricing route should both keep the next move honest: start the product path first, then choose the plan depth you need.',
           noteLabel: 'Why this section exists',
-          note: 'The landing and pricing route should say the same thing: access comes first, billing comes after the product path is real.',
+          note: 'The landing and pricing route should say the same thing: open the real Pico flow, then choose the lane that fits the work.',
           truths: [
-            'Early access before the public opening',
-            'Priority onboarding when the workflow is already real',
-            'A clear route into support when rollout gets messy',
+            'Onboarding is the first real step',
+            'Pricing is live when plan detail matters',
+            'Support stays inside the same Pico product path'
           ],
           tiers: {
             starter: {

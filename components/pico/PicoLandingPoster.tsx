@@ -2,26 +2,28 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowRight, Check, Map, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
-import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
+import { getPicoDefaultMessages } from '@/lib/pico/defaultMessages'
+import { usePicoHref } from '@/lib/pico/navigation'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const STEP_ICONS = [Map, MessageSquare, ShieldCheck, Sparkles] as const
 const PRICING_TIERS = ['starter', 'pro', 'enterprise'] as const
 const FINAL_FAQ_ITEMS = [0, 1, 3] as const
+const landingTruth = getPicoDefaultMessages().pico
+const pricingRouteLabel = 'Open pricing'
 
 export function PicoLandingPoster() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
-  const [formOpen, setFormOpen] = useState(false)
-  const [formInterest, setFormInterest] = useState<string | undefined>()
+  const toHref = usePicoHref()
   const heroRef = useRef<HTMLElement | null>(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -60,19 +62,8 @@ export function PicoLandingPoster() {
   const guideRobot = picoRobotArtById.guide
   const celebrateRobot = picoRobotArtById.celebrate
 
-  function openForm(interest?: string) {
-    setFormInterest(interest)
-    setFormOpen(true)
-  }
-
   return (
-    <div data-testid="pico-waitlist-landing" className={s.page}>
-      <PicoContactForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        defaultInterest={formInterest}
-      />
-
+    <div data-testid="pico-landing" className={s.page}>
       <header className={s.nav}>
         <div className={s.navInner}>
           <Link href="/pico" className={s.navBrand}>
@@ -99,11 +90,11 @@ export function PicoLandingPoster() {
 
           <div className={s.navActions}>
             <PicoLangSwitcher />
-            <button type="button" className={s.navCta} onClick={() => openForm()}>
-              <span className={s.navCtaLabel}>{t('nav.cta')}</span>
-              <span className={s.navCtaLabelMobile}>{t('nav.ctaMobile')}</span>
+            <Link href={toHref('/onboarding')} className={s.navCta}>
+              <span className={s.navCtaLabel}>{landingTruth.nav.cta}</span>
+              <span className={s.navCtaLabelMobile}>{landingTruth.nav.cta}</span>
               <ArrowRight className={s.navCtaIcon} />
-            </button>
+            </Link>
           </div>
         </div>
       </header>
@@ -125,7 +116,7 @@ export function PicoLandingPoster() {
             <motion.div className={s.heroCopy} style={{ y: heroCopyY, opacity: heroCopyOpacity }}>
               <SiteReveal delay={0.04}>
                 <div className={s.heroPrelude}>
-                  <span className={s.heroBadge}>{t('hero.badge')}</span>
+                  <span className={s.heroBadge}>{landingTruth.hero.badge}</span>
                 </div>
               </SiteReveal>
 
@@ -142,14 +133,10 @@ export function PicoLandingPoster() {
 
               <SiteReveal delay={0.25}>
                 <div className={s.heroActions}>
-                  <button
-                    type="button"
-                    className={s.heroPrimary}
-                    onClick={() => openForm('building-first')}
-                  >
-                    {t('hero.cta')}
+                  <Link href={toHref('/onboarding')} className={s.heroPrimary}>
+                    {landingTruth.hero.cta}
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </Link>
                   <a href="#pricing" className={s.heroSecondary}>
                     {t('hero.ctaSecondary') || 'See pricing'}
                   </a>
@@ -157,7 +144,7 @@ export function PicoLandingPoster() {
               </SiteReveal>
 
               <SiteReveal delay={0.31}>
-                <p className={s.heroMeta}>{t('hero.meta')}</p>
+                <p className={s.heroMeta}>{landingTruth.hero.meta}</p>
               </SiteReveal>
             </motion.div>
 
@@ -311,15 +298,15 @@ export function PicoLandingPoster() {
           <div className={s.sectionShell}>
             <div className={s.accessGrid}>
               <SiteReveal className={s.accessIntro} delay={0.05}>
-                <p className={s.eyebrow}>{t('earlyAccess.eyebrow')}</p>
-                <h2 className={s.sectionTitle}>{t('earlyAccess.title')}</h2>
-                <p className={s.sectionBody}>{t('earlyAccess.body')}</p>
+                <p className={s.eyebrow}>{landingTruth.earlyAccess.eyebrow}</p>
+                <h2 className={s.sectionTitle}>{landingTruth.earlyAccess.title}</h2>
+                <p className={s.sectionBody}>{landingTruth.earlyAccess.body}</p>
 
                 <ul className={s.benefitsList}>
                   {Array.from({ length: 5 }, (_, index) => (
                     <li key={index} className={s.benefitItem}>
                       <Check className={s.benefitCheck} />
-                      <span>{t(`earlyAccess.benefits.${index}`)}</span>
+                      <span>{landingTruth.earlyAccess.benefits[String(index)]}</span>
                     </li>
                   ))}
                 </ul>
@@ -328,8 +315,8 @@ export function PicoLandingPoster() {
               <SiteReveal className={s.pricingBoard} delay={0.12}>
                 <div className={s.pricingHeader}>
                   <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
-                  <p className={s.pricingLead}>{t('pricingPage.accessPlans.body')}</p>
-                  <p className={s.pricingMeta}>{t('pricingPage.accessPlans.meta')}</p>
+                  <p className={s.pricingLead}>{landingTruth.pricingPage.accessPlans.body}</p>
+                  <p className={s.pricingMeta}>{landingTruth.pricingPage.accessPlans.meta}</p>
                 </div>
 
                 <div className={s.pricingTiers}>
@@ -378,13 +365,12 @@ export function PicoLandingPoster() {
                             {t(`pricing.tiers.${tier}.cta`)}
                           </a>
                         ) : (
-                          <button
-                            type="button"
-                            onClick={() => openForm(tier === 'starter' ? 'building-first' : 'fixing-existing')}
+                          <Link
+                            href={toHref('/pricing')}
                             className={`${s.pricingButton} ${isRecommended ? s.pricingButtonPrimary : ''}`}
                           >
-                            {t(`pricing.tiers.${tier}.cta`)}
-                          </button>
+                            {pricingRouteLabel}
+                          </Link>
                         )}
                       </div>
                     )
@@ -403,20 +389,20 @@ export function PicoLandingPoster() {
               <SiteReveal className={s.finalCopy} delay={0.05}>
                 <span className={s.finalEyebrow}>
                   <span className={s.finalEyebrowDot} />
-                  {t('finalCta.eyebrow')}
+                  {landingTruth.finalCta.eyebrow}
                 </span>
-                <h2 className={s.finalTitle}>{t('finalCta.title')}</h2>
-                <p className={s.finalBody}>{t('finalCta.body')}</p>
+                <h2 className={s.finalTitle}>{landingTruth.finalCta.title}</h2>
+                <p className={s.finalBody}>{landingTruth.finalCta.body}</p>
                 <div className={s.finalCallout}>
-                  <p className={s.finalFormHeadline}>{t('finalCta.formHeadline')}</p>
-                  <p className={s.finalFormSubline}>{t('finalCta.formSubline')}</p>
+                  <p className={s.finalFormHeadline}>{landingTruth.finalCta.formHeadline}</p>
+                  <p className={s.finalFormSubline}>{landingTruth.finalCta.formSubline}</p>
                 </div>
                 <div className={s.finalActions}>
-                  <button type="button" className={s.finalButton} onClick={() => openForm()}>
-                    {t('finalCta.ctaButton')}
+                  <Link href={toHref('/onboarding')} className={s.finalButton}>
+                    {landingTruth.finalCta.ctaButton}
                     <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <p className={s.finalMeta}>{t('finalCta.formCtaMeta')}</p>
+                  </Link>
+                  <p className={s.finalMeta}>{landingTruth.finalCta.formCtaMeta}</p>
                 </div>
               </SiteReveal>
 
@@ -441,12 +427,12 @@ export function PicoLandingPoster() {
                     {FINAL_FAQ_ITEMS.map((index) => (
                       <details key={index} className={s.faqItem}>
                         <summary className={s.faqSummary}>
-                          <h3 className={s.faqQuestion}>{t(`faq.items.${index}.q`)}</h3>
+                          <h3 className={s.faqQuestion}>{landingTruth.faq.items[String(index)].q}</h3>
                           <span className={s.faqMarker} aria-hidden="true">
                             +
                           </span>
                         </summary>
-                        <p className={s.faqAnswer}>{t(`faq.items.${index}.a`)}</p>
+                        <p className={s.faqAnswer}>{landingTruth.faq.items[String(index)].a}</p>
                       </details>
                     ))}
                   </div>

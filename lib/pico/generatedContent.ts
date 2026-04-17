@@ -302,16 +302,16 @@ export const PICO_GENERATED_CONTENT = {
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Pre-register"
+      "cta": "Start"
     },
     "hero": {
-      "badge": "Docs synced 2026-04-15 · 17 live playbooks",
+      "badge": "Product path live now",
       "title": "Build, deploy, and govern real ",
       "titleAccent": "Hermes, OpenClaw, NanoClaw, and PicoClaw stacks without stale guesswork.",
       "subtitle": "PicoMUTX is grounded in the official install, dashboard, security, and troubleshooting surfaces for Hermes, OpenClaw, NanoClaw, and PicoClaw. It gives founders and operators one guided path instead of another pile of tabs.",
-      "cta": "Pre-Register for Early Access",
+      "cta": "Open onboarding",
       "ctaSecondary": "See pricing",
-      "meta": "12 guided lessons · about 274 minutes of sequenced work · Tailscale-first remote access defaults"
+      "meta": "Live now: onboarding, academy, tutor, support, and autopilot in one Pico flow"
     },
     "trustItems": [
       "17 builder-pack docs mapped into one product surface",
@@ -412,15 +412,15 @@ export const PICO_GENERATED_CONTENT = {
       "close": "The point is not prettier filler. The point is a UI that stays attached to the stack reality underneath it."
     },
     "earlyAccess": {
-      "eyebrow": "Current Build State",
-      "title": "PicoMUTX is still opening in stages, but the content path is now live.",
-      "body": "Pre-registering now gets you into the release loop while the platform is being filled from the builder pack, Academy data, and current repo surfaces rather than placeholder text.",
+      "eyebrow": "Current Product Flow",
+      "title": "The landing now points into a real Pico product path.",
+      "body": "Start in onboarding, move into the academy, use tutor when the exact next step is unclear, open support when the blocker needs a human, and use autopilot when you need live run and budget visibility.",
       "benefits": [
-        "Early access to the guided stack map and tutorial flow",
-        "Faster feedback loops while the tutor and support surfaces are still sharpening",
-        "Visibility into how Hermes, OpenClaw, NanoClaw, and PicoClaw are evolving",
-        "A closer line to the product while the content system is still being shaped",
-        "First notice when additional surfaces move from placeholder to source-backed"
+        "Onboarding is live as the canonical first step",
+        "Academy lessons stay inside the same Pico surface",
+        "Tutor keeps the lesson and stack context attached",
+        "Support keeps the blocker packet and return lane visible",
+        "Autopilot shows live runs, spend, and gates when you sign in"
       ]
     },
     "faq": {
@@ -450,13 +450,13 @@ export const PICO_GENERATED_CONTENT = {
       ]
     },
     "finalCta": {
-      "eyebrow": "Early Access · Live Build",
-      "title": "Stop treating stack selection and setup drift like a side quest.",
-      "body": "PicoMUTX is being turned into a product surface that names the stacks, tracks the repos, and keeps the operator route visible from first install to safer runtime control.",
-      "formHeadline": "Pre-register for PicoMUTX",
-      "formSubline": "Join the list while the source-backed build fills in.",
-      "ctaButton": "Pre-Register Now",
-      "formCtaMeta": "Free to pre-register · No credit card required · Product updates arrive as the live build sharpens"
+      "eyebrow": "Open the real Pico flow",
+      "title": "Do not join a list. Start the product path.",
+      "body": "The fastest honest next step is onboarding. Pricing, tutor, support, and autopilot stay inside the same product surface after that.",
+      "formHeadline": "Open onboarding",
+      "formSubline": "Start with the first step now, then use tutor or human help only when the product path stops being enough.",
+      "ctaButton": "Open onboarding",
+      "formCtaMeta": "Live routes: onboarding, academy, tutor, support, and autopilot"
     }
   },
   "pricing": {
