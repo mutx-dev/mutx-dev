@@ -241,6 +241,9 @@
       "errorFallback": "Algo ha salido mal. Inténtalo de nuevo."
     },
     "footer": {
+      "brand": "PicoMUTX",
+      "logoAlt": "Logo de PicoMUTX",
+      "tagline": "PicoMUTX es una plataforma de aprendizaje y operaciones para creadores de agentes de IA.",
       "links": {
         "releases": "Lanzamientos",
         "docs": "Docs",
@@ -250,6 +253,9 @@
         "contact": "Contacto",
         "privacy": "Privacidad"
       },
+      "supportPrompt": "¿Necesitas más?",
+      "supportCta": "Contáctanos",
+      "supportBody": "para precios Enterprise (100K+ créditos, SSO, SLA).",
       "copyright": "© MUTX 2026. Control abierto para agentes desplegados."
     },
     "waitlistForm": {
@@ -267,6 +273,258 @@
       "verificationFailedRefresh": "La verificación ha fallado. Actualiza el desafío y vuelve a intentarlo.",
       "verificationExpired": "La verificación ha caducado. Completa el desafío de nuevo.",
       "verificationTimedOut": "Se agotó el tiempo de verificación. Completa el desafío de nuevo."
+    },
+    "localeSwitcher": {
+      "currentLanguage": "Idioma actual",
+      "listLabel": "Elegir idioma de la interfaz"
+    },
+    "pages": {
+      "onboarding": {
+        "meta": {
+          "title": "Comenzar — PicoMUTX",
+          "description": "Configura tu espacio de trabajo de PicoMUTX y empieza a aprender."
+        }
+      },
+      "pricing": {
+        "meta": {
+          "title": "Precios — PicoMUTX",
+          "description": "Los planes se corresponden con superficies reales del producto: 12 lecciones, tutoría guiada, contexto del runtime monitorizado e informes en vivo del stack en Hermes, OpenClaw, NanoClaw y PicoClaw."
+        }
+      },
+      "academy": {
+        "meta": {
+          "title": "Academia — PicoMUTX",
+          "description": "Explora lecciones, rutas y caminos de aprendizaje en la Academia PicoMUTX."
+        }
+      },
+      "lesson": {
+        "meta": {
+          "title": "{title} — Academia PicoMUTX",
+          "description": "{summary}"
+        }
+      },
+      "autopilot": {
+        "meta": {
+          "title": "Autopilot — PicoMUTX",
+          "description": "Automatiza tu flujo de trabajo con PicoMUTX Autopilot."
+        }
+      },
+      "tutor": {
+        "meta": {
+          "title": "Tutor — PicoMUTX",
+          "description": "Obtén ayuda guiada del tutor de IA de PicoMUTX."
+        }
+      },
+      "support": {
+        "meta": {
+          "title": "Soporte — PicoMUTX",
+          "description": "Obtén ayuda y soporte para PicoMUTX."
+        }
+      },
+      "wip": {
+        "meta": {
+          "title": "Registro de compilación en vivo — PicoMUTX",
+          "description": "Inspecciona los 17 documentos del pack de builders, las instantáneas de repositorios rastreados y los valores predeterminados de acceso remoto que ahora alimentan la experiencia de PicoMUTX."
+        },
+        "title": "Registro de compilación en vivo",
+        "subtitle": "Esta ruta dejó de existir para disculparse por estar inacabada. Ahora muestra el material fuente que alimenta activamente Pico: documentos del pack, lecciones de la Academia, repositorios rastreados y la postura de acceso remoto que implican.",
+        "backToPico": "Volver a Pico",
+        "mutxPlatform": "Plataforma MUTX",
+        "imageAlt": "Robot de PicoMUTX inspeccionando informes en vivo del stack"
+      }
+    },
+    "pricing": {
+      "eyebrow": "Profundidad operativa en vivo",
+      "title": "Elige la ruta del operador que mejor encaja con el trabajo",
+      "tiers": {
+        "free": {
+          "name": "Free",
+          "price": "$0",
+          "period": "para siempre",
+          "description": "Inspecciona el mapa del stack, el flujo de lecciones y la verdad del producto antes de gastar.",
+          "features": [
+            "100 créditos mensuales",
+            "Acceso limitado al tutor",
+            "Lecciones básicas de la Academia",
+            "Soporte de la comunidad"
+          ],
+          "cta": "Plan actual",
+          "ctaHref": null
+        },
+        "starter": {
+          "description": "Ejecuta una ruta de compilación seria con acceso completo a la Academia y tutoría guiada.",
+          "features": [
+            "1.000 créditos mensuales",
+            "Acceso completo al tutor",
+            "Todas las lecciones de la Academia",
+            "Modo Autopilot",
+            "Soporte prioritario"
+          ]
+        },
+        "pro": {
+          "description": "Opera varias rutas en vivo con BYOK, mayor visibilidad del runtime y una respuesta más rápida.",
+          "features": [
+            "10.000 créditos mensuales",
+            "Tutor completo + BYOK",
+            "Acceso a la API",
+            "Soporte prioritario",
+            "Flujos de trabajo personalizados",
+            "Acceso anticipado a nuevas funciones"
+          ]
+        },
+        "enterprise": {
+          "description": "Despliega para un equipo con SSO, expectativas de SLA y soporte directo."
+        }
+      }
+    },
+    "pricingPage": {
+      "title": "Elige la profundidad de producto que realmente necesitas",
+      "subtitle": "Los planes se corresponden con superficies reales del producto: 12 lecciones, tutoría guiada, contexto del runtime monitorizado e informes en vivo del stack en Hermes, OpenClaw, NanoClaw y PicoClaw.",
+      "badgePopular": "Más popular",
+      "loading": "Iniciando compra...",
+      "checkoutError": "La compra ha fallado. Vuelve a intentarlo.",
+      "footer": "La sincronización del contenido actual sigue 17 documentos de pack y 4 repositorios en vivo. Enterprise es para equipos que necesitan ayuda de despliegue más profunda, controles de identidad y soporte directo.",
+      "enterpriseSupport": "¿Necesitas más?",
+      "enterpriseSupportCta": "Contáctanos",
+      "enterpriseSupportBody": "para precios Enterprise (100K+ créditos, SSO, SLA)."
+    },
+    "auth": {
+      "eyebrow": "Autenticación del host de Pico",
+      "orUseEmail": "O usa correo",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "fields": {
+        "name": {
+          "label": "Nombre",
+          "placeholder": "Jane Smith"
+        },
+        "email": {
+          "label": "Correo",
+          "placeholder": "you@company.com"
+        },
+        "password": {
+          "label": "Contraseña",
+          "placeholder": "Introduce tu contraseña"
+        },
+        "confirmPassword": {
+          "label": "Confirmar contraseña",
+          "placeholder": "Confirma tu contraseña"
+        }
+      },
+      "modes": {
+        "login": {
+          "title": "Entra en la compilación actual de Pico",
+          "subtitle": "Usa un proveedor o correo para abrir la vista previa y guardar tu lugar.",
+          "submit": "Entrar en Pico",
+          "loading": "Abriendo...",
+          "toggleQuestion": "¿Necesitas acceso?",
+          "toggleAction": "Crear uno"
+        },
+        "register": {
+          "title": "Crea tu cuenta de vista previa de Pico",
+          "subtitle": "Regístrate una vez, guarda tu lugar y sigue el producto mientras mejora.",
+          "submit": "Crear cuenta de vista previa",
+          "loading": "Creando...",
+          "toggleQuestion": "¿Ya tienes una cuenta?",
+          "toggleAction": "Iniciar sesión"
+        }
+      },
+      "errors": {
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+        "loginFailed": "No se pudo iniciar sesión",
+        "registerFailed": "No se pudo crear la cuenta",
+        "emailRequired": "Introduce primero tu dirección de correo",
+        "resendFailed": "No se pudo reenviar"
+      },
+      "notice": {
+        "verificationSent": "Correo de verificación enviado",
+        "resending": "Enviando...",
+        "resendVerification": "Reenviar correo de verificación"
+      }
+    },
+    "authRecovery": {
+      "forgotPassword": {
+        "eyebrow": "Recuperación de contraseña",
+        "title": "Recupera el acceso de operador sin salir del plano de control.",
+        "description": "Usa el correo asociado a tu cuenta MUTX y te enviaremos un enlace de restablecimiento. Si la autenticación alojada no es la ruta que necesitas hoy, el panel, los docs y el flujo de instalación siguen disponibles.",
+        "asideEyebrow": "Notas de recuperación",
+        "asideTitle": "Mantén la ruta de autenticación práctica.",
+        "asideBody": "Los flujos de restablecimiento deben ser simples, honestos y fáciles de verificar. Si la cuenta no existe o la ruta alojada no está disponible, el resto de la superficie pública sigue diciendo la verdad.",
+        "highlights": [
+          "Usa el correo de trabajo vinculado a la cuenta de operador alojada.",
+          "Los enlaces de restablecimiento caducan, así que atiende el correo en cuanto llegue.",
+          "Los docs y el panel siguen disponibles si ahora solo necesitas la verdad del producto."
+        ],
+        "successTitle": "Revisa tu correo",
+        "successBody": "Hemos enviado las instrucciones de restablecimiento de contraseña a {email}.",
+        "successHint": "Si no aparece el correo, revisa spam o solicita otro enlace.",
+        "backToSignIn": "Volver a iniciar sesión",
+        "tryAgain": "Intentarlo de nuevo",
+        "sendTitle": "Enviar instrucciones de restablecimiento",
+        "sendBody": "Sin drama. Solo el correo y un enlace nuevo.",
+        "emailLabel": "Dirección de correo",
+        "emailPlaceholder": "you@company.com",
+        "sending": "Enviando...",
+        "sendLink": "Enviar enlace de restablecimiento"
+      },
+      "resetPassword": {
+        "eyebrow": "Restablecer contraseña",
+        "title": "Establece una nueva contraseña y vuelve a la ruta del operador.",
+        "description": "Usa una contraseña segura, confírmala con claridad y termina el restablecimiento sin adivinar si el flujo funcionó.",
+        "asideEyebrow": "Reglas de restablecimiento",
+        "asideTitle": "Mantén aburrida la ruta de recuperación.",
+        "asideBody": "Los restablecimientos de contraseña deben ser simples, rápidos y fáciles de verificar. Un buen estado del formulario importa más que el teatro ornamental de autenticación.",
+        "highlights": [
+          "Los enlaces de restablecimiento se basan en tokens, así que un token caducado o faltante debe fallar con honestidad.",
+          "Usa una contraseña que cumpla tu propio umbral de seguridad, no solo el validador mínimo.",
+          "Si la autenticación alojada no es tu ruta actual, los docs y el panel siguen visibles mientras la ruta se consolida."
+        ],
+        "invalidTitle": "Enlace de restablecimiento no válido",
+        "invalidBody": "Este enlace de restablecimiento de contraseña falta, no es válido o ya ha caducado.",
+        "requestNewLink": "Solicitar un nuevo enlace",
+        "backToSignIn": "Volver a iniciar sesión",
+        "completeTitle": "Restablecimiento completado",
+        "completeBody": "Tu contraseña se ha actualizado. La ruta de inicio de sesión ya puede usar las nuevas credenciales.",
+        "signIn": "Iniciar sesión",
+        "formTitle": "Elige una nueva contraseña",
+        "formBody": "Mantenla segura, confírmala una vez y el formulario hará el resto.",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "resetting": "Restableciendo...",
+        "resetPassword": "Restablecer contraseña",
+        "passwordsMismatch": "Las contraseñas no coinciden",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres"
+      },
+      "verifyEmail": {
+        "eyebrow": "Verificar correo",
+        "title": "Confirma la dirección antes de que la plataforma finja que ya estás listo.",
+        "description": "La verificación ya forma parte del límite de la cuenta. El flujo confirma el token con honestidad, puede reenviarse desde el host activo y mantiene estable la siguiente ruta en lugar de empujarte a un estado falso de éxito.",
+        "asideEyebrow": "Reglas de verificación",
+        "asideTitle": "Mantén explícita la confirmación.",
+        "asideBody": "La autenticación por proveedor puede saltarse esto porque la identidad de origen ya está verificada. El registro por contraseña sigue siendo responsable a través del flujo de confirmación por correo.",
+        "highlights": [
+          "Los enlaces de verificación terminan en el host frontend activo en lugar de una ruta de marketing codificada.",
+          "Los tokens caducados o no válidos fallan con honestidad y dejan una ruta clara de reenvío.",
+          "Tras la confirmación, la ruta de inicio de sesión puede devolverte directamente a la ruta de plataforma prevista."
+        ],
+        "verifying": "Verificando tu correo...",
+        "missingContext": "Esta ruta de verificación necesita un token o el correo que debe recibirlo.",
+        "sentTo": "Hemos enviado un enlace de verificación a {email}.",
+        "verificationComplete": "Verificación completada",
+        "verificationCompleteBody": "La cuenta ya puede iniciar sesión. Usa el mismo correo y continúa en la ruta prevista.",
+        "signIn": "Iniciar sesión",
+        "checkInbox": "Revisa tu bandeja de entrada",
+        "checkInboxBody": "Abre el enlace de verificación desde el mismo dispositivo si es posible. Si no llega, reenvíalo desde aquí.",
+        "resend": "Reenviar correo de verificación",
+        "resendSending": "Enviando...",
+        "resendNeedsEmail": "Introduce primero la dirección del formulario de registro para poder reenviar la verificación.",
+        "resendSent": "Hemos enviado otro enlace de verificación a {email}.",
+        "verifySuccess": "El correo se ha verificado correctamente.",
+        "verifyFailure": "No se pudo verificar el correo",
+        "resendFailure": "No se pudo reenviar el correo de verificación",
+        "verificationFailed": "La verificación ha fallado",
+        "verificationFailedBody": "Si el token ha caducado, solicita otro mensaje desde la dirección que posee la cuenta."
+      }
     }
   }
 }
