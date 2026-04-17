@@ -242,7 +242,7 @@ export const DESKTOP_ROUTE_META: Record<DesktopRouteKey, DesktopRouteMeta> = {
     title: "Security",
     path: "/dashboard/security",
     publicHref: "/access",
-    description: "Operator session posture, token state, key inventory, and trust boundaries.",
+    description: "Credential inventory, approvals, trust, lifecycle, discovery, attestations, and governed runtime controls.",
     badge: "admin",
     section: "admin",
     icon: ShieldCheck,

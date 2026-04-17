@@ -612,13 +612,13 @@ function getCompanionRoute(routeKey: DesktopRouteKey) {
     case "sessions":
       return { label: "Open Channels", href: "/dashboard/channels", detail: "Inspect the assistant communication contract." };
     case "apiKeys":
-      return { label: "Open Security", href: "/dashboard/security", detail: "See key posture alongside operator identity." };
+      return { label: "Open Security", href: "/dashboard/security", detail: "See keys alongside approvals, discovery, and governed runtime." };
     case "budgets":
       return { label: "Open Analytics", href: "/dashboard/analytics", detail: "Compare spend with run and latency trends." };
     case "webhooks":
       return { label: "Open Monitoring", href: "/dashboard/monitoring", detail: "Watch for failed deliveries and alert overlap." };
     case "security":
-      return { label: "Open API Keys", href: "/dashboard/api-keys", detail: "Operate directly on the current key ledger." };
+      return { label: "Open API Keys", href: "/dashboard/api-keys", detail: "Jump to the dedicated key ledger after reviewing the broader governance surface." };
     case "analytics":
       return { label: "Open Budgets", href: "/dashboard/budgets", detail: "Return to cost posture and usage events." };
     case "swarm":

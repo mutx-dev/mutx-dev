@@ -10,6 +10,7 @@ from pathlib import Path
 
 import click
 
+from cli.config import current_config, get_client
 from cli.faramesh_runtime import (
     FAREMESH_SOCKET_PATH,
     approve_defer,
@@ -29,6 +30,14 @@ from cli.faramesh_runtime import (
     start_faramesh_daemon,
     validate_policy,
 )
+
+
+def _get_control_plane_client():
+    config = current_config()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        raise SystemExit(1)
+    return get_client(config)
 
 
 def _ensure_faramesh() -> bool:
@@ -1241,3 +1250,273 @@ def supervise_status_command(agent_id: str, output_json: bool) -> None:
     except ImportError:
         click.echo("Error: Cannot import config client.", err=True)
         sys.exit(1)
+
+
+@governance_group.command(name="doctor")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def governance_doctor_command(output_json: bool) -> None:
+    """Summarize governed identity, discovery, and attestation posture."""
+    client = _get_control_plane_client()
+
+    try:
+        response = client.get("/v1/governance/attestations")
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        click.echo(f"Error fetching governance attestation: {exc}", err=True)
+        raise SystemExit(1)
+
+    if output_json:
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    summary = payload.get("summary", {})
+    coverage = payload.get("coverage", {})
+    compliance = payload.get("compliance", {})
+
+    click.echo("Governance Doctor")
+    click.echo("=" * 40)
+    click.echo(f"  Identities:          {summary.get('identities', 0)}")
+    click.echo(f"  Discovery items:     {summary.get('discovery_items', 0)}")
+    click.echo(f"  Credential backends: {summary.get('credential_backends', 0)}")
+    click.echo(f"  Supervised agents:   {summary.get('supervised_agents', 0)}")
+    click.echo(f"  Pending approvals:   {summary.get('pending_approvals', 0)}")
+    click.echo(
+        f"  Compliance:          {'satisfied' if compliance.get('overall_satisfied') else 'attention'}"
+    )
+    click.echo(
+        f"  Runtime guardrails:  {'present' if coverage.get('runtime_guardrail_presence') else 'missing'}"
+    )
+    click.echo(
+        f"  Receipt integrity:   {'passing' if coverage.get('receipt_integrity') else 'attention'}"
+    )
+
+
+@governance_group.command(name="verify")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def governance_verify_command(output_json: bool) -> None:
+    """Build a fresh governance attestation bundle."""
+    client = _get_control_plane_client()
+
+    try:
+        response = client.post("/v1/governance/attestations/verify")
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        click.echo(f"Error verifying governance posture: {exc}", err=True)
+        raise SystemExit(1)
+
+    if output_json:
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    summary = payload.get("summary", {})
+    click.echo(
+        f"Verified {summary.get('identities', 0)} identities, "
+        f"{summary.get('discovery_items', 0)} discovery items, "
+        f"{summary.get('credential_backends', 0)} credential backends."
+    )
+
+
+@governance_group.group(name="trust")
+def governance_trust_group() -> None:
+    """Inspect and update governance trust state."""
+    pass
+
+
+@governance_trust_group.command(name="list")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def governance_trust_list_command(output_json: bool) -> None:
+    client = _get_control_plane_client()
+
+    try:
+        response = client.get("/v1/governance/trust")
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        click.echo(f"Error fetching trust state: {exc}", err=True)
+        raise SystemExit(1)
+
+    if output_json:
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    items = payload.get("items", [])
+    if not items:
+        click.echo("No governed identities found.")
+        return
+
+    click.echo(f"{'AGENT':<24} {'TRUST':<10} {'TIER':<12} {'LIFECYCLE'}")
+    click.echo("-" * 64)
+    for item in items:
+        click.echo(
+            f"{str(item.get('agent_id', '-')):<24} "
+            f"{str(item.get('trust_score', '-')):<10} "
+            f"{str(item.get('trust_tier', '-')):<12} "
+            f"{str(item.get('lifecycle_status', '-'))}"
+        )
+
+
+@governance_trust_group.command(name="set")
+@click.argument("agent_id")
+@click.option("--score", type=int, default=None, help="Absolute trust score (0-1000)")
+@click.option("--delta", type=int, default=None, help="Relative trust score delta")
+@click.option("--reason", default="", help="Reason for this trust update")
+def governance_trust_set_command(
+    agent_id: str,
+    score: int | None,
+    delta: int | None,
+    reason: str,
+) -> None:
+    client = _get_control_plane_client()
+    payload: dict[str, object] = {"reason": reason}
+    if score is not None:
+        payload["score"] = score
+    if delta is not None:
+        payload["delta"] = delta
+
+    try:
+        response = client.post(f"/v1/governance/trust/{agent_id}", json=payload)
+        response.raise_for_status()
+        result = response.json()
+    except Exception as exc:
+        click.echo(f"Error updating trust state: {exc}", err=True)
+        raise SystemExit(1)
+
+    click.echo(
+        f"{result.get('agent_id')} trust set to {result.get('trust_score')} ({result.get('trust_tier')})"
+    )
+
+
+@governance_group.group(name="lifecycle")
+def governance_lifecycle_group() -> None:
+    """Inspect and update governance lifecycle state."""
+    pass
+
+
+@governance_lifecycle_group.command(name="list")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def governance_lifecycle_list_command(output_json: bool) -> None:
+    client = _get_control_plane_client()
+
+    try:
+        response = client.get("/v1/governance/lifecycle")
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        click.echo(f"Error fetching lifecycle state: {exc}", err=True)
+        raise SystemExit(1)
+
+    if output_json:
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    items = payload.get("items", [])
+    if not items:
+        click.echo("No governed identities found.")
+        return
+
+    click.echo(f"{'AGENT':<24} {'LIFECYCLE':<22} {'CREDENTIALS'}")
+    click.echo("-" * 64)
+    for item in items:
+        click.echo(
+            f"{str(item.get('agent_id', '-')):<24} "
+            f"{str(item.get('lifecycle_status', '-')):<22} "
+            f"{str(item.get('credential_status', '-'))}"
+        )
+
+
+@governance_lifecycle_group.command(name="set")
+@click.argument("agent_id")
+@click.argument("state")
+@click.option("--reason", default="", help="Reason for this lifecycle update")
+@click.option(
+    "--apply-runtime-action/--no-apply-runtime-action",
+    default=True,
+    help="Apply stop/restart behavior to supervised runtime when appropriate.",
+)
+def governance_lifecycle_set_command(
+    agent_id: str,
+    state: str,
+    reason: str,
+    apply_runtime_action: bool,
+) -> None:
+    client = _get_control_plane_client()
+
+    try:
+        response = client.post(
+            f"/v1/governance/lifecycle/{agent_id}",
+            json={
+                "state": state,
+                "reason": reason,
+                "apply_runtime_action": apply_runtime_action,
+            },
+        )
+        response.raise_for_status()
+        result = response.json()
+    except Exception as exc:
+        click.echo(f"Error updating lifecycle state: {exc}", err=True)
+        raise SystemExit(1)
+
+    click.echo(f"{result.get('agent_id')} lifecycle set to {result.get('lifecycle_status')}")
+
+
+@governance_group.group(name="discovery")
+def governance_discovery_group() -> None:
+    """Inspect and scan governance discovery inventory."""
+    pass
+
+
+@governance_discovery_group.command(name="inventory")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def governance_discovery_inventory_command(output_json: bool) -> None:
+    client = _get_control_plane_client()
+
+    try:
+        response = client.get("/v1/governance/discovery")
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        click.echo(f"Error fetching discovery inventory: {exc}", err=True)
+        raise SystemExit(1)
+
+    if output_json:
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    items = payload.get("items", [])
+    if not items:
+        click.echo("No discovery inventory yet.")
+        return
+
+    click.echo(f"{'ENTITY':<28} {'TYPE':<20} {'RISK':<12} {'REGISTRATION'}")
+    click.echo("-" * 80)
+    for item in items:
+        click.echo(
+            f"{str(item.get('entity_id', '-'))[:28]:<28} "
+            f"{str(item.get('entity_type', '-')):<20} "
+            f"{str(item.get('risk_level', '-')):<12} "
+            f"{str(item.get('registration_status', '-'))}"
+        )
+
+
+@governance_discovery_group.command(name="scan")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def governance_discovery_scan_command(output_json: bool) -> None:
+    client = _get_control_plane_client()
+
+    try:
+        response = client.post("/v1/governance/discovery/scan")
+        response.raise_for_status()
+        payload = response.json()
+    except Exception as exc:
+        click.echo(f"Error scanning discovery inventory: {exc}", err=True)
+        raise SystemExit(1)
+
+    if output_json:
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    click.echo(
+        f"Scanned {payload.get('count', 0)} entities at {payload.get('scanned_at', 'unknown time')}"
+    )

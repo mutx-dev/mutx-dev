@@ -12,12 +12,12 @@ export default function DashboardSecurityPage() {
         <div className="space-y-4">
           <RouteHeader
             title="Security"
-            description="Credential inventory, auth posture, and operator trust boundaries in the same surface as deployment and recovery."
+            description="Credential inventory, approvals, trust, lifecycle, discovery, attestations, and supervised runtime controls in Mission Control."
             icon={ShieldCheck}
             iconTone="text-amber-300 bg-amber-400/10"
             badge="security surface"
             stats={[
-              { label: "Scope", value: "Auth + keys" },
+              { label: "Scope", value: "Auth + governance + runtime" },
               { label: "Data", value: "Live API", tone: "success" },
             ]}
           />
