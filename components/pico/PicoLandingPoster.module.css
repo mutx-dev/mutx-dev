@@ -924,6 +924,21 @@
   border-top: 1px solid rgba(var(--pico-accent-rgb), 0.08);
 }
 
+.shiftCell {
+  display: grid;
+  gap: 0;
+}
+
+.shiftCellLabel {
+  display: none;
+  color: var(--pico-text-muted);
+  font-family: var(--pico-font-accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
 .shiftBefore,
 .shiftAfter {
   margin: 0;
@@ -1453,18 +1468,73 @@
     height: 1px;
   }
 
-  .shiftLabels,
-  .shiftRow {
-    grid-template-columns: 1fr;
+  .accessIntro {
+    gap: 0.85rem;
   }
 
-  .shiftLabels span:last-child {
-    text-align: left;
+  .benefitsList {
+    margin-top: 0.2rem;
+    gap: 0.7rem;
+  }
+
+  .benefitItem,
+  .pricingFeature {
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .pricingTitle {
+    font-size: clamp(1.8rem, 11vw, 2.7rem);
+  }
+
+  .pricingTier {
+    gap: 0.95rem;
+    padding: 1rem 0;
+  }
+
+  .shiftLabels {
+    display: none;
+  }
+
+  .shiftRow {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+
+  .shiftRow + .shiftRow {
+    border-top: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+  }
+
+  .shiftCell {
+    gap: 0.45rem;
+    padding: 0.85rem 0.9rem 0.95rem;
+    border: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+    border-radius: 1.15rem;
+    background: rgba(255, 255, 255, 0.015);
+  }
+
+  .shiftCell:last-child {
+    background: linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.11), rgba(255, 255, 255, 0));
+  }
+
+  .shiftCellLabel {
+    display: block;
+  }
+
+  .shiftBefore,
+  .shiftAfter {
+    padding: 0;
+    font-size: 0.98rem;
+    line-height: 1.58;
   }
 
   .shiftBefore {
     border-right: 0;
-    border-bottom: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+  }
+
+  .shiftAfter {
+    background: none;
   }
 
   .finalActions {

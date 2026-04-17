@@ -376,8 +376,14 @@ export function PicoLandingPoster() {
               {Array.from({ length: 4 }, (_, index) => (
                 <SiteReveal key={index} delay={0.08 + index * 0.05}>
                   <div className={s.shiftRow}>
-                    <p className={s.shiftBefore}>{t(`beforeAfter.items.${index}.before`)}</p>
-                    <p className={s.shiftAfter}>{t(`beforeAfter.items.${index}.after`)}</p>
+                    <div className={s.shiftCell}>
+                      <span className={s.shiftCellLabel}>{t('beforeAfter.beforeLabel')}</span>
+                      <p className={s.shiftBefore}>{t(`beforeAfter.items.${index}.before`)}</p>
+                    </div>
+                    <div className={s.shiftCell}>
+                      <span className={s.shiftCellLabel}>{t('beforeAfter.afterLabel')}</span>
+                      <p className={s.shiftAfter}>{t(`beforeAfter.items.${index}.after`)}</p>
+                    </div>
                   </div>
                 </SiteReveal>
               ))}
