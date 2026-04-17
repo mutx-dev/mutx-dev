@@ -14,6 +14,12 @@
  *
  * Uses top-level imports so ESLint @typescript-eslint/no-require-imports
  * is satisfied.
+ *
+ * Note on isSpaShellEnabled: the real implementation returns false in Node
+ * (no window) and only reads NEXT_PUBLIC_SPA_SHELL in a browser context.
+ * In Node test environments the server-guard short-circuits, so the
+ * env-variable variations all return false via the same code path.
+ * The single test below covers the actual exported function in Node.
  */
 
 import {
@@ -71,43 +77,19 @@ describe("SPA shell — ESSENTIAL_PANELS constant", () => {
 describe("SPA shell — isSpaShellEnabled feature flag", () => {
   const originalEnv = process.env;
 
-  beforeEach(() => {
-    jest.resetModules();
-    // Re-import after reset so the fresh module sees the mocked env
-    jest.doMock("../../lib/store", () => ({
-      ESSENTIAL_PANELS,
-      STEP_KEYS,
-      // Re-import the module to test the live function with mocked env
-      isSpaShellEnabled: (): boolean => {
-        if (typeof window === "undefined") return false;
-        return process.env.NEXT_PUBLIC_SPA_SHELL === "true";
-      },
-    }));
-  });
-
-  afterAll(() => {
+  afterEach(() => {
     process.env = originalEnv;
   });
 
-  it("returns false when NEXT_PUBLIC_SPA_SHELL is not set (Node test env)", () => {
+  it("returns false in Node (no window) — server-side guard short-circuits", () => {
+    // The real exported function: in Node, typeof window === "undefined" fires first
+    // and the env variable is never consulted. This is the actual exported function.
     delete process.env.NEXT_PUBLIC_SPA_SHELL;
-    // In Node (no window) the server guard fires first
     expect(isSpaShellEnabled()).toBe(false);
   });
 
-  it("returns false when NEXT_PUBLIC_SPA_SHELL=false string (not strictly 'true')", () => {
-    process.env.NEXT_PUBLIC_SPA_SHELL = "false";
-    expect(isSpaShellEnabled()).toBe(false);
-  });
-
-  it("returns false when NEXT_PUBLIC_SPA_SHELL=0", () => {
-    process.env.NEXT_PUBLIC_SPA_SHELL = "0";
-    expect(isSpaShellEnabled()).toBe(false);
-  });
-
-  it("returns false when NEXT_PUBLIC_SPA_SHELL is an empty string", () => {
-    process.env.NEXT_PUBLIC_SPA_SHELL = "";
-    expect(isSpaShellEnabled()).toBe(false);
+  it("isSpaShellEnabled is a function", () => {
+    expect(typeof isSpaShellEnabled).toBe("function");
   });
 });
 
@@ -224,6 +206,30 @@ describe("SPA shell — resolveTabFromParams catch-all routing", () => {
     expect(resolveTabFromParams({ panel: ["security"] })).toBe("security");
   });
 
+  it('["tasks"] resolves to "tasks" tab — "tasks" is NOT a URL segment; "orchestration" is', () => {
+    // "tasks" is the TabId; the URL segment is "orchestration"
+    // (already tested above as ["orchestration"] → tasks)
+    // This test documents that "tasks" is not a URL segment key.
+    expect("tasks" in PANEL_BY_SEGMENTS).toBe(false);
+    // Verify "orchestration" maps to "tasks"
+    expect(PANEL_BY_SEGMENTS.orchestration).toBe("tasks");
+  });
+
+  it('["settings"] resolves via "control" segment — "settings" is NOT a URL segment', () => {
+    expect("settings" in PANEL_BY_SEGMENTS).toBe(false);
+    expect(PANEL_BY_SEGMENTS.control).toBe("settings");
+  });
+
+  it('["tokens"] resolves via "analytics" segment — "tokens" is NOT a URL segment', () => {
+    expect("tokens" in PANEL_BY_SEGMENTS).toBe(false);
+    expect(PANEL_BY_SEGMENTS.analytics).toBe("tokens");
+  });
+
+  it('["cost-tracker"] is NOT a URL segment — "budgets" is', () => {
+    expect("cost-tracker" in PANEL_BY_SEGMENTS).toBe(false);
+    expect(PANEL_BY_SEGMENTS.budgets).toBe("cost-tracker");
+  });
+
   it("unknown segment falls back to overview (safe fallback)", () => {
     expect(resolveTabFromParams({ panel: ["unknown"] })).toBe("overview");
     expect(resolveTabFromParams({ panel: ["foobar"] })).toBe("overview");
@@ -315,5 +321,52 @@ describe("SPA shell — isEssentialRestricted essential mode gating", () => {
     }
     // overview is the root tab
     expect(typeof isEssentialRestricted("overview")).toBe("boolean");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Cross-reference — ESSENTIAL_PANELS subset / superset integrity
+// ---------------------------------------------------------------------------
+
+describe("SPA shell — ESSENTIAL_PANELS subset integrity", () => {
+  const allTabIds: TabId[] = [
+    "overview",
+    "agents",
+    "tasks",
+    "chat",
+    "activity",
+    "logs",
+    "cron",
+    "memory",
+    "skills",
+    "settings",
+    "tokens",
+    "cost-tracker",
+    "webhooks",
+    "security",
+  ];
+
+  it("every ESSENTIAL_PANELS entry is a valid TabId", () => {
+    for (const tab of ESSENTIAL_PANELS) {
+      expect(allTabIds).toContain(tab);
+    }
+  });
+
+  it("ESSENTIAL_PANELS is a strict subset of all TabIds", () => {
+    for (const tab of ESSENTIAL_PANELS) {
+      expect(isEssentialRestricted(tab)).toBe(false);
+    }
+    // The complement is all restricted tabs
+    const nonEssential = allTabIds.filter((t) => !ESSENTIAL_PANELS.includes(t));
+    for (const tab of nonEssential) {
+      expect(isEssentialRestricted(tab)).toBe(true);
+    }
+  });
+
+  it("every PANEL_BY_SEGMENTS value is a known TabId", () => {
+    const panelValues = Object.values(PANEL_BY_SEGMENTS);
+    for (const tab of panelValues) {
+      expect(allTabIds).toContain(tab);
+    }
   });
 });
