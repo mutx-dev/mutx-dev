@@ -47,7 +47,13 @@ describe('webmaster route contracts', () => {
     const result = await robots()
     const firstRule = Array.isArray(result.rules) ? result.rules[0] : result.rules
 
-    expect(firstRule?.disallow).toEqual(expect.arrayContaining([...BLOCKED_CRAWL_PREFIXES, '/wip']))
+    expect(firstRule?.disallow).toEqual(
+      expect.arrayContaining([
+        ...BLOCKED_CRAWL_PREFIXES.filter((prefix) => prefix !== '/onboarding'),
+        '/wip',
+      ]),
+    )
+    expect(firstRule?.disallow).not.toContain('/onboarding')
     expect(result.host).toBe('https://pico.mutx.dev')
     expect(result.sitemap).toBe('https://pico.mutx.dev/sitemap.xml')
   })
