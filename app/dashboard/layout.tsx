@@ -49,6 +49,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const spaShellEnabled = process.env.NEXT_PUBLIC_SPA_SHELL === "true";
+
   return (
     <div className={`${appFontVariables} h-full font-[family:var(--font-site-body)]`}>
       <ErrorBoundary>
@@ -56,7 +58,7 @@ export default function DashboardLayout({
           <DesktopWindowProvider>
             <DesktopJobProvider>
               <DesktopRouteListener />
-              <DashboardShell>{children}</DashboardShell>
+              <DashboardShell spaShellEnabled={spaShellEnabled}>{children}</DashboardShell>
             </DesktopJobProvider>
           </DesktopWindowProvider>
         </DesktopStatusProvider>
