@@ -131,7 +131,7 @@ export default function PrivacyPolicyPage() {
 
         <section className={styles.routeLightSection} data-route-surface="light">
           <div className={`${styles.shell} ${styles.routeLegalGrid}`}>
-            <div className={`${styles.panel} ${styles.prosePanel}`}>
+            <div className={styles.prosePanel}>
               {sections.map((section) => (
                 <section key={section.title} className={styles.proseSection}>
                   <h2>{section.title}</h2>
