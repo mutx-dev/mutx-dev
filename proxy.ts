@@ -24,9 +24,10 @@ type RateLimitState = {
 const SAFE_HTTP_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
 const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
 const APP_HOST = 'app.mutx.dev'
+const PICO_HOST = 'pico.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
-const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
+const PICO_HOSTS = new Set([PICO_HOST, 'pico.localhost'])
 const PICO_AUTH_PATHS = new Set([
   '/login',
   '/register',
@@ -34,6 +35,7 @@ const PICO_AUTH_PATHS = new Set([
   '/reset-password',
   '/verify-email',
 ])
+const PICO_PROTECTED_PATHS = new Set(['/start', '/onboarding', '/tutor', '/support', '/autopilot'])
 const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
   JP: 'ja',
@@ -217,6 +219,20 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
   return normalized
 }
 
+function mapAppHostPicoPathToCanonicalPicoPath(pathname: string): string | null {
+  const normalized = normalizePathname(pathname)
+
+  if (normalized === '/pico') {
+    return '/'
+  }
+
+  if (normalized.startsWith('/pico/')) {
+    return normalized.slice('/pico'.length)
+  }
+
+  return null
+}
+
 function internalDashboardPathToPublicPath(pathname: string): string {
   const normalized = normalizePathname(pathname)
 
@@ -268,6 +284,13 @@ function redirectWithinHost(request: NextRequest, pathname: string) {
   const url = new URL(request.url)
   url.pathname = pathname
   url.search = request.nextUrl.search
+  return NextResponse.redirect(url)
+}
+
+function redirectToPicoLogin(request: NextRequest, nextPath: string) {
+  const url = new URL(request.url)
+  url.pathname = '/login'
+  url.search = new URLSearchParams({ next: nextPath }).toString()
   return NextResponse.redirect(url)
 }
 
@@ -330,6 +353,18 @@ function buildPicoRequestHeaders(request: NextRequest, locale: PicoLocale) {
 
   requestHeaders.set('x-mutx-locale', locale)
   return requestHeaders
+}
+
+function hasAuthSession(request: NextRequest): boolean {
+  return Boolean(
+    request.cookies.get('access_token')?.value ||
+      request.cookies.get('refresh_token')?.value ||
+      request.headers.get('authorization')
+  )
+}
+
+function isProtectedPicoPath(pathname: string): boolean {
+  return PICO_PROTECTED_PATHS.has(pathname) || pathname === '/academy' || pathname.startsWith('/academy/')
 }
 
 function shouldDisableUiCaching(host: string, pathname: string): boolean {
@@ -477,6 +512,15 @@ export function proxy(request: NextRequest) {
       )
     }
 
+    if (isProtectedPicoPath(normalizedPath) && !hasAuthSession(request)) {
+      const nextPath = `${normalizedPath}${request.nextUrl.search}`
+      return finalizeResponse(
+        applyPicoLocale(redirectToPicoLogin(request, nextPath), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/start' || normalizedPath === '/onboarding') {
       return finalizeResponse(
         applyPicoLocale(rewriteWithinHost(request, '/pico/onboarding', picoRequestHeaders), locale),
@@ -593,6 +637,16 @@ export function proxy(request: NextRequest) {
   }
 
   if (APP_HOSTS.has(host)) {
+    const canonicalPicoPath = mapAppHostPicoPathToCanonicalPicoPath(normalizedPath)
+    if (canonicalPicoPath) {
+      const picoHost = host === 'app.localhost' ? 'pico.localhost' : PICO_HOST
+      return finalizeResponse(
+        redirectToHost(request, picoHost, canonicalPicoPath),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }

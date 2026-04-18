@@ -96,7 +96,7 @@ async def pico_tutor(
     payload: PicoTutorRequest,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    current_user: User | None = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
 ):
     return await generate_pico_tutor_reply(
         payload,
