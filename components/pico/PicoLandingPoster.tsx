@@ -14,7 +14,7 @@ import { PicoLangSwitcher } from './PicoLangSwitcher'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const STEP_ICONS = [Map, MessageSquare, ShieldCheck, Sparkles] as const
-const PRICING_TIERS = ['starter', 'pro', 'enterprise'] as const
+const PRICING_TIERS = ['trial', 'starter', 'pro', 'enterprise'] as const
 const FOUNDER_CALL_URL = 'https://calendly.com/mutxdev'
 
 type LandingPricingTierContent = {
@@ -80,8 +80,31 @@ export function PicoLandingPoster() {
     setFormOpen(true)
   }
 
+  function handlePricingAction(tier: (typeof PRICING_TIERS)[number], href: string) {
+    if (href.startsWith('http')) {
+      window.open(href, '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    if (tier === 'trial' || tier === 'starter') {
+      openForm('build')
+      return
+    }
+
+    if (tier === 'pro') {
+      openForm('fix')
+      return
+    }
+
+    openForm()
+  }
+
   return (
     <div data-testid="pico-landing" className={s.page}>
+      <a href="#main-content" className={s.skipLink}>
+        {t('nav.skipToMain')}
+      </a>
+
       <PicoContactForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
@@ -101,7 +124,7 @@ export function PicoLandingPoster() {
             </span>
           </Link>
 
-          <nav className={s.navLinks} aria-label="Page sections">
+          <nav className={s.navLinks} aria-label={t('nav.sectionsLabel')}>
             <a href="#fit" className={s.navLink}>
               {t('problem.eyebrow')}
             </a>
@@ -118,13 +141,13 @@ export function PicoLandingPoster() {
             <button type="button" className={s.navCta} onClick={() => openForm()}>
               <span className={s.navCtaLabel}>{t('nav.cta')}</span>
               <span className={s.navCtaLabelMobile}>{t('nav.ctaMobile')}</span>
-              <ArrowRight className={s.navCtaIcon} />
+              <ArrowRight className={s.navCtaIcon} aria-hidden="true" />
             </button>
           </div>
         </div>
       </header>
 
-      <main className={s.main}>
+      <main id="main-content" className={s.main}>
         <section ref={heroRef} className={s.hero}>
           <motion.div
             aria-hidden="true"
@@ -154,25 +177,20 @@ export function PicoLandingPoster() {
               </SiteReveal>
 
               <SiteReveal delay={0.18}>
-                <p className={s.heroSubtitle}>{t('hero.subtitle')}</p>
-              </SiteReveal>
+              <p className={s.heroSubtitle}>{t('hero.subtitle')}</p>
+            </SiteReveal>
 
-              <SiteReveal delay={0.25}>
-                <div className={s.heroActions}>
+            <SiteReveal delay={0.25}>
+              <div className={s.heroActions}>
                   <button
                     type="button"
                     className={s.heroPrimary}
-                    onClick={() => openForm('building-first')}
+                    onClick={() => openForm('build')}
                   >
                     {t('hero.cta')}
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
-                  <a
-                    href={FOUNDER_CALL_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={s.heroSecondary}
-                  >
+                  <a href="#path" className={s.heroSecondary}>
                     {t('hero.ctaSecondary')}
                   </a>
                 </div>
@@ -270,7 +288,7 @@ export function PicoLandingPoster() {
                   <ul className={s.whoList}>
                     {Array.from({ length: 5 }, (_, index) => (
                       <li key={index} className={s.whoItem}>
-                        <Check className={s.whoCheck} />
+                        <Check className={s.whoCheck} aria-hidden="true" />
                         <span>{t(`who.forYou.${index}`)}</span>
                       </li>
                     ))}
@@ -361,11 +379,11 @@ export function PicoLandingPoster() {
                         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <div className={s.pathItemTop}>
-                          <span className={s.pathNumber}>0{index + 1}</span>
-                          <span className={s.pathIcon}>
-                            <Icon className="h-5 w-5" />
-                          </span>
-                        </div>
+                        <span className={s.pathNumber}>0{index + 1}</span>
+                        <span className={s.pathIcon}>
+                            <Icon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                      </div>
                         <div className={s.pathItemCopy}>
                           <h3 className={s.pathItemTitle}>{t(`platform.howItWorks.${index}.title`)}</h3>
                           <p className={s.pathItemBody}>{t(`platform.howItWorks.${index}.body`)}</p>
@@ -417,7 +435,7 @@ export function PicoLandingPoster() {
                 <ul className={s.benefitsList}>
                   {Array.from({ length: 5 }, (_, index) => (
                     <li key={index} className={s.benefitItem}>
-                      <Check className={s.benefitCheck} />
+                      <Check className={s.benefitCheck} aria-hidden="true" />
                       <span>{t(`earlyAccess.benefits.${index}`)}</span>
                     </li>
                   ))}
@@ -446,6 +464,9 @@ export function PicoLandingPoster() {
                         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <div className={s.pricingTop}>
+                          {isRecommended ? (
+                            <span className={s.pricingTag}>{t('pricing.recommendedLabel')}</span>
+                          ) : null}
                           <p className={s.pricingName}>{pricingTier.name}</p>
                           <div className={s.pricingPriceStack}>
                             {pricingTier.anchorPrice ? (
@@ -465,11 +486,22 @@ export function PicoLandingPoster() {
                         <ul className={s.pricingFeatures}>
                           {pricingTier.features.map((feature) => (
                             <li key={feature} className={s.pricingFeature}>
-                              <Check className={s.pricingFeatureCheck} />
+                              <Check className={s.pricingFeatureCheck} aria-hidden="true" />
                               <span>{feature}</span>
                             </li>
                           ))}
                         </ul>
+
+                        <div className={s.pricingActions}>
+                          <button
+                            type="button"
+                            className={`${s.pricingButton} ${isRecommended ? s.pricingButtonPrimary : ''}`}
+                            onClick={() => handlePricingAction(tier, pricingTier.ctaHref)}
+                          >
+                            {pricingTier.cta}
+                            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                          </button>
+                        </div>
                       </motion.div>
                     )
                   })}
@@ -491,7 +523,7 @@ export function PicoLandingPoster() {
             <div className={s.faqStack}>
               {Array.from({ length: 5 }, (_, index) => (
                 <SiteReveal key={index} delay={0.08 + index * 0.04}>
-                  <details className={s.faqItem} open={index === 0}>
+                  <details className={s.faqItem}>
                     <summary className={s.faqSummary}>
                       <h3 className={s.faqQuestion}>{t(`faq.items.${index}.q`)}</h3>
                       <span className={s.faqMarker} aria-hidden="true">
@@ -525,7 +557,7 @@ export function PicoLandingPoster() {
                 <div className={s.finalActions}>
                   <button type="button" className={s.finalButton} onClick={() => openForm()}>
                     {t('finalCta.ctaButton')}
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
                   <a
                     href={FOUNDER_CALL_URL}

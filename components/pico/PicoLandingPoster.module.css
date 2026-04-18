@@ -19,6 +19,27 @@
   color: inherit;
 }
 
+.skipLink {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 120;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: var(--pico-accent);
+  color: var(--pico-accent-contrast);
+  font-family: var(--pico-font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 160ms ease;
+}
+
+.skipLink:focus-visible {
+  transform: translateY(0);
+}
+
 .main {
   position: relative;
 }
@@ -122,6 +143,12 @@
   color: var(--pico-text);
 }
 
+.navLink:focus-visible {
+  outline: none;
+  color: var(--pico-text);
+  text-shadow: 0 0 16px rgba(var(--pico-accent-rgb), 0.3);
+}
+
 .navActions {
   display: inline-flex;
   align-items: center;
@@ -169,6 +196,17 @@
     background 180ms ease,
     color 180ms ease;
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+.navCta:focus-visible,
+.heroPrimary:focus-visible,
+.heroSecondary:focus-visible,
+.pricingButton:focus-visible,
+.finalButton:focus-visible,
+.faqSummary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.22);
 }
 
 .navCta {
@@ -202,7 +240,7 @@
 
 .hero {
   position: relative;
-  padding: calc(var(--nav-height) + 2rem) 0 2rem;
+  padding: calc(var(--nav-height) + 1.05rem) 0 1.7rem;
   min-height: 100svh;
   overflow: clip;
 }
@@ -236,8 +274,9 @@
   z-index: 1;
   display: grid;
   gap: clamp(2rem, 5vw, 4.75rem);
-  align-items: center;
-  min-height: calc(100svh - var(--nav-height) - 4rem);
+  align-items: start;
+  min-height: calc(100svh - var(--nav-height) - 2.75rem);
+  padding-top: clamp(0.75rem, 1.8vw, 1.5rem);
 }
 
 .heroCopy {
@@ -1040,6 +1079,33 @@
   letter-spacing: 0.18em;
 }
 
+.pricingTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: start;
+  min-height: 1.7rem;
+  padding: 0 0.72rem;
+  border-radius: 999px;
+  background: rgba(var(--pico-accent-rgb), 0.12);
+  color: var(--pico-accent-bright);
+  font-family: var(--pico-font-accent);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.pricingTag::before {
+  content: '';
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--pico-accent);
+  box-shadow: 0 0 14px rgba(var(--pico-accent-rgb), 0.65);
+  flex-shrink: 0;
+}
+
 .pricingPriceStack {
   display: grid;
   gap: 0.15rem;
@@ -1094,6 +1160,10 @@
   margin-top: 0;
 }
 
+.pricingActions {
+  padding-top: 0.15rem;
+}
+
 .pricingButton {
   width: 100%;
   min-height: 3rem;
@@ -1141,6 +1211,7 @@
   list-style: none;
   cursor: pointer;
   padding: 1.2rem 1.25rem;
+  text-align: left;
 }
 
 .faqSummary::-webkit-details-marker {
@@ -1284,6 +1355,7 @@
 
   .heroShell {
     grid-template-columns: minmax(0, 0.9fr) minmax(27rem, 1.1fr);
+    min-height: clamp(40rem, 83svh, 50rem);
   }
 
   .heroVisual {
@@ -1308,7 +1380,7 @@
   }
 
   .pricingTiers {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .pricingTier {
@@ -1383,6 +1455,7 @@
   .heroShell {
     gap: 1.2rem;
     min-height: auto;
+    padding-top: 0;
   }
 
   .heroCopy {

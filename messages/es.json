@@ -1,244 +1,295 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Crea e implementa agentes de IA de forma segura sin contratar a un desarrollador",
-      "description": "PicoMUTX ayuda a fundadores, operadores y pequeños equipos a crear, implementar y gestionar agentes de IA de forma segura, con orientación paso a paso, salvaguardas integradas y soporte real. Prerregístrate ahora para obtener acceso anticipado."
+      "title": "PicoMUTX — Pon un agente de IA a funcionar y mantenlo bajo control",
+      "description": "PicoMUTX ayuda a fundadores, operadores y equipos pequeños a construir, recuperar y controlar agentes de IA en los que se pueda confiar en el trabajo real."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " por MUTX",
-      "cta": "Prerregístrate"
+      "cta": "Solicitar acceso",
+      "ctaMobile": "Acceso",
+      "sectionsLabel": "Secciones De La Página",
+      "skipToMain": "Saltar al contenido principal"
     },
     "hero": {
-      "badge": "Acceso anticipado · Plazas limitadas",
-      "title": "Crea e implementa agentes de IA ",
-      "titleAccent": "sin contratar a un desarrollador.",
-      "subtitle": "PicoMUTX te ofrece una ruta segura y guiada hacia un agente de IA funcional, tanto si empiezas desde cero como si estás corrigiendo un agente que no funciona o intentando evitar otro error costoso.",
-      "cta": "Prerregístrate para acceso anticipado",
-      "ctaSecondary": "Ver precios",
-      "meta": "Prerregistro gratuito · No se requiere tarjeta de crédito · Plazas de fundador limitadas"
+      "badge": "Acceso fundador · Bajo solicitud",
+      "title": "Haz que un agente de IA funcione ",
+      "titleAccent": "y confiar en él en trabajo real.",
+      "subtitle": "PicoMUTX te ayuda a construir, recuperar y controlar agentes de IA. Puedes empezar desde cero, desde un setup roto o desde un sistema en vivo en el que todavía no confías.",
+      "cta": "Solicitar acceso",
+      "ctaSecondary": "Ver Cómo Funciona",
+      "meta": "El acceso público sigue siendo request-first. Dentro, Pico diagnostica el bloqueo y te enruta a build, fix o control."
     },
     "trustBar": {
       "items": {
-        "0": "Para fundadores, operadores y pequeños equipos",
-        "1": "Orientación paso a paso",
-        "2": "Salvaguardas integradas desde el primer día"
+        "0": "Empieza desde cero, desde una build desordenada o desde un sistema en vivo",
+        "1": "Una sola capa de diagnóstico te enruta a construir, arreglar o controlar",
+        "2": "Visibilidad, aprobaciones y guardarraíles antes de asumir confianza"
       }
     },
     "problem": {
-      "eyebrow": "El problema",
-      "title": "El problema no es la idea.",
-      "titleLine2": "Es todo lo que viene después.",
-      "body": "La mayoría de las personas no se quedan atascadas por falta de ambición. Se quedan atascadas porque crear un agente de IA sigue sintiéndose como entrar en un mundo diseñado por ingenieros y para ingenieros.",
+      "eyebrow": "Por qué Pico",
+      "title": "La mayoría de los proyectos con agentes no fallan",
+      "titleLine2": "porque la idea fuera débil.",
+      "body": "Los proyectos se frenan cuando el camino se ensucia: demasiadas decisiones de stack, poca claridad operativa y ninguna ruta de recovery creíble cuando algo se rompe.",
       "scenarios": {
         "0": {
-          "label": "\"Quiero un agente de IA, pero no sé por dónde empezar.\"",
-          "body": "Hay demasiadas herramientas, demasiadas opiniones y demasiada gente que da por hecho que ya conoces lo básico. La distancia entre \"tengo una idea\" y \"tengo algo que funciona\" parece mayor de lo que debería."
+          "label": "\"Sé lo que quiero que haga el agente. Lo que me falta es la ruta más rápida y sensata para tener uno funcionando.\"",
+          "body": "Empezar desde cero no es el problema. El problema es elegir stack, secuencia y estándares sin convertir el trabajo en investigación infinita."
         },
         "1": {
-          "label": "\"Ya lo intenté y me quedé atascado.\"",
-          "body": "Avanzaste, te topaste con un muro y no tenías a nadie a quien preguntar que realmente pudiera ayudarte. La idea sigue en tu backlog en lugar de generar valor."
+          "label": "\"Ya construí una parte. Ahora necesito recuperar el setup, no empezar otra vez desde cero.\"",
+          "body": "Cuando una build se rompe a mitad de camino, perder impulso cuesta más que tiempo. Necesitas una vía de recuperación, no otro agujero de teoría."
         },
         "2": {
-          "label": "\"He gastado dinero y aun así sigue sin funcionar bien.\"",
-          "body": "Puede que hayas contratado a alguien. Puede que hayas pagado herramientas. Ahora no solo tienes dudas: también eres escéptico."
+          "label": "\"Ya hay algo en vivo, pero todavía no confío en el coste, la lógica o los modos de fallo.\"",
+          "body": "En ese punto no basta con que el agente exista. Tiene que ser legible, controlable y lo bastante seguro para tocar trabajo real."
         },
         "3": {
-          "label": "\"No quiero implementar algo en lo que no puedo confiar.\"",
-          "body": "Un agente que da respuestas incorrectas, se comporta de forma impredecible o genera costes ocultos no es un activo. Es un riesgo."
+          "label": "\"Necesito un sistema que pueda explicar, revisar y controlar antes de depender de él.\"",
+          "body": "Si no puedes ver ejecuciones, umbrales, aprobaciones y comportamiento bajo presión, todavía no tienes un activo operativo."
         }
       },
-      "close": "Precisamente por eso existe PicoMUTX."
+      "close": "PicoMUTX existe para convertir esa incertidumbre en el siguiente paso honesto."
     },
     "platform": {
-      "eyebrow": "Qué es PicoMUTX",
-      "title": "Donde los agentes de IA pasan de ser una \"idea interesante\" a un \"sistema en funcionamiento\".",
-      "body": "PicoMUTX es una plataforma guiada para personas que quieren crear y gestionar agentes de IA de forma segura, sin necesidad de convertirse en ingenieros a tiempo completo. Te ofrece la estructura, el soporte y las salvaguardas que suelen faltar cuando alguien intenta hacerlo por su cuenta. En lugar de montar todo desde cero, avanzas paso a paso: de la idea a la implementación, de la confusión a la claridad y del prototipo a algo que realmente puedes usar.",
+      "eyebrow": "Cómo funciona Pico",
+      "title": "Pico diagnostica el bloqueo y luego te enruta a build, fix o control.",
+      "body": "La promesa es simple: poner algo útil a funcionar y mantenerlo confiable. El diagnóstico va primero para que Pico sepa si necesitas construir, recuperar o añadir control.",
       "howItWorks": {
         "0": {
-          "title": "Rutas de implementación paso a paso",
-          "body": "Sigue recorridos estructurados según lo que quieras crear, desde agentes de atención al cliente hasta automatizaciones internas. Sin teoría genérica. Sin búsquedas interminables."
+          "title": "Describe el objetivo o conecta el agente",
+          "body": "Empieza con el trabajo, el bloqueo o el sistema en vivo que necesitas entender. Pico usa ese contexto para decidir qué ayuda es realmente relevante."
         },
         "1": {
-          "title": "Soporte guiado cuando te bloqueas",
-          "body": "Cuando algo falla o deja de estar claro, no tienes que resolverlo solo. PicoMUTX mantiene el impulso en marcha en lugar de dejar que los proyectos mueran en la confusión."
+          "title": "Recibe una ruta de construir, arreglar o controlar",
+          "body": "Los casos nuevos obtienen una ruta práctica hacia un agente útil. Los setups rotos obtienen pasos de recuperación. Los sistemas en vivo obtienen visibilidad, umbrales, aprobaciones y guardarraíles operativos."
         },
         "2": {
-          "title": "Seguridad integrada desde el primer día",
-          "body": "La visibilidad, el control de costes y las barreras de protección importan. Siempre sabes qué está haciendo tu agente, cuánto está costando y cuándo necesita atención."
+          "title": "Aplica cambios en un solo loop operativo",
+          "body": "Observa el comportamiento, aísla lo que va mal, aplica el siguiente cambio y sigue avanzando sin perder el hilo."
         },
         "3": {
-          "title": "Puntos de contacto con expertos en directo",
-          "body": "Hay cuestiones demasiado matizadas para la documentación estática. Son momentos de orientación real diseñados para ayudarte a desbloquearte más rápido y tomar mejores decisiones."
+          "title": "Escala cuando el borde complicado es real",
+          "body": "Cuando el sistema no puede cerrar el loop por sí solo, entra ayuda humana como prueba y calibración, no como producto entero."
         }
       }
     },
     "who": {
-      "eyebrow": "¿Es PicoMUTX para ti?",
+      "eyebrow": "Encaje",
       "title": "PicoMUTX no es para todo el mundo.",
       "forYouTitle": "Esto es para ti si…",
       "notForYouTitle": "Esto no es para ti si…",
       "forYou": {
-        "0": "Quieres crear un agente de IA, pero no quieres depender por completo de desarrolladores",
-        "1": "Ya lo has intentado antes y te has quedado a mitad de camino",
-        "2": "Ya has gastado dinero en herramientas o implementación y aun así no confías en el resultado",
-        "3": "Quieres una ruta práctica, no más teoría",
-        "4": "Quieres apoyo mientras construyes, no solo cuando algo sale mal"
+        "0": "Quieres sacar un agente útil sin montar todo el stack a base de intuición",
+        "1": "Ya tienes un setup a medias o roto y necesitas recuperar impulso",
+        "2": "Tienes algo vivo o casi vivo y necesitas más control antes de confiar",
+        "3": "Quieres ayuda orientada al resultado, no un curso ni más teoría",
+        "4": "Quieres un sistema que reduzca la dependencia de intervención experta ad hoc con el tiempo"
       },
       "notForYou": {
-        "0": "Buscas un atajo sin tener que aprender nada",
-        "1": "Ya gestionas una infraestructura madura de agentes empresariales y necesitas una gobernanza compleja",
-        "2": "Buscas más entretenimiento, tendencias o hype que ejecución",
-        "3": "No estás preparado para cambiar la forma en que opera realmente tu negocio",
-        "4": "Esperas que la IA sustituya el criterio, el liderazgo o la responsabilidad"
+        "0": "Buscas una herramienta no-code genérica que elimine el juicio del trabajo",
+        "1": "Ya necesitas infraestructura de gobernanza enterprise para una flota madura de agentes",
+        "2": "Buscas más educación, hype o tendencias que progreso operativo",
+        "3": "Esperas que la IA sustituya ownership, revisión o responsabilidad",
+        "4": "En realidad solo quieres comprar acceso al fundador en lugar de usar un producto"
       }
     },
     "beforeAfter": {
       "eyebrow": "El cambio",
-      "title": "Qué cambia cuando dejas de intentar resolverlo todo por tu cuenta",
+      "title": "Qué cambia cuando build, recovery y control viven en un mismo lugar",
       "beforeLabel": "Antes",
       "afterLabel": "Después",
       "items": {
         "0": {
-          "before": "Tienes una idea, pero no una ruta clara",
-          "after": "Tienes una forma estructurada de avanzar"
+          "before": "No sabes si primero tienes que construir, depurar o añadir controles",
+          "after": "Te enrutan al carril que corresponde al bloqueo real"
         },
         "1": {
-          "before": "Pierdes tiempo saltando entre herramientas, documentación y tutoriales",
-          "after": "Sigues recorridos de implementación guiados"
+          "before": "Cada problema te manda a una herramienta, documento u opinión distinta",
+          "after": "Construcción, recuperación y control viven dentro del mismo sistema operativo"
         },
         "2": {
-          "before": "Te bloqueas y pierdes impulso",
-          "after": "Obtienes apoyo antes de que el proyecto muera"
+          "before": "Un setup roto o un runtime opaco mata el impulso",
+          "after": "La siguiente acción es visible, revisable y concreta"
         },
         "3": {
-          "before": "Tu agente se queda en la teoría",
-          "after": "Tu agente se construye y se pone a trabajar"
+          "before": "Tienes un agente que no puedes explicar ni confiar del todo",
+          "after": "Tienes algo que puedes ejecutar, inspeccionar y mejorar con confianza"
         }
       },
-      "close": "El objetivo no es \"aprender IA algún día\". El objetivo es poner tu agente en marcha, de forma segura, clara y con menos fricción."
+      "close": "La meta no es aprender IA en abstracto. La meta es poner algo útil a funcionar y mantenerlo confiable."
     },
     "earlyAccess": {
-      "eyebrow": "Acceso anticipado",
-      "title": "PicoMUTX se abrirá por fases. El acceso para fundadores no estará disponible para siempre.",
-      "body": "Prerregistrarte ahora te sitúa por delante del lanzamiento público y dentro del grupo que ayudará a dar forma a la plataforma desde el principio. Los primeros usuarios obtendrán un acceso más cercano al producto, una incorporación más temprana y más influencia sobre lo que se prioriza.",
+      "eyebrow": "Acceso fundador",
+      "title": "Pico sigue siendo waitlist-first en público, pero el producto ya es real.",
+      "body": "El acceso se abre por olas para que los operadores serios entren en la lane correcta. Eso mantiene honesta la puerta de entrada mientras los workflows se endurecen con uso real.",
       "benefits": {
-        "0": "Acceso anticipado antes del lanzamiento público",
-        "1": "Consideración prioritaria para plazas de miembro fundador",
-        "2": "Incorporación anticipada y actualizaciones sobre el lanzamiento",
-        "3": "La posibilidad de influir en los primeros casos de uso y en las prioridades del despliegue",
-        "4": "Visibilidad temprana sobre precios y condiciones de acceso"
+        "0": "Empieza desde cero, desde un setup roto o desde un sistema en vivo en el que aún no confías",
+        "1": "Te enruta a build, fix o control",
+        "2": "Asegura el founding pricing mientras el acceso sigue siendo selectivo",
+        "3": "Usa input experto solo cuando el edge case sea real",
+        "4": "Ayuda a dar forma a los primeros case studies y operating patterns"
       }
     },
     "pricing": {
-      "eyebrow": "Precios simples",
-      "title": "Elige tu camino",
+      "eyebrow": "Acceso público",
+      "title": "La oferta pública trata de resultado, no de contenido.",
       "tiers": {
+        "free": {
+          "name": "Free",
+          "price": "$0",
+          "period": "para siempre",
+          "description": "Inspecciona el mapa del stack, el flujo de lecciones y la verdad del producto antes de gastar.",
+          "features": [
+            "100 créditos mensuales",
+            "Acceso limitado al tutor",
+            "Lecciones básicas de la Academia",
+            "Soporte de la comunidad"
+          ],
+          "cta": "Plan actual",
+          "ctaHref": null
+        },
         "starter": {
-          "name": "Starter",
-          "price": "€9",
+          "description": "Ejecución self-serve guiada por IA para operadores que quieren moverse con independencia.",
+          "features": [
+            "Intake diagnóstico con IA",
+            "Rutas guiadas de build, fix y control",
+            "Diseñado para ejecución independiente"
+          ],
+          "name": "Founding Tier",
+          "price": "€29",
           "period": "/mes",
-          "description": "Experiencia completa de aprendizaje",
-          "features": ["1.000 créditos mensuales", "Acceso completo al tutor", "Todas las lecciones de la academia", "Modo Autopilot", "Prueba gratuita de 7 días"],
-          "cta": "Iniciar prueba de 7 días",
+          "priceNote": "Cohorte fundadora limitada mientras el acceso siga siendo selectivo.",
+          "recommended": true,
+          "cta": "Solicitar Acceso Founding",
           "ctaHref": "/pricing"
         },
         "pro": {
-          "name": "Pro",
-          "price": "€29",
+          "description": "El mismo sistema con guía grupal cuando el trabajo se complica.",
+          "features": [
+            "Todo lo del Founding Tier",
+            "Troubleshooting grupal semanal",
+            "Accountability compartida entre operadores"
+          ],
+          "name": "Founding Supported",
+          "price": "€79",
           "period": "/mes",
-          "description": "Para creadores serios",
-          "recommended": true,
-          "features": ["10.000 créditos mensuales", "Tutor completo + BYOK", "Acceso a la API", "Soporte prioritario", "Prueba gratuita de 7 días"],
-          "cta": "Iniciar prueba de 7 días",
+          "cta": "Solicitar Acceso Con Soporte",
           "ctaHref": "/pricing"
         },
         "enterprise": {
-          "name": "Enterprise",
-          "price": "Personalizado",
-          "period": "",
-          "description": "Soporte dedicado y escalabilidad",
-          "features": ["100K+ créditos mensuales", "SSO y gestión de equipos", "SLA y soporte dedicado", "Flujos de trabajo personalizados", "Acceso directo a los fundadores"],
-          "cta": "Reservar llamada",
+          "description": "Implementación orientada a resultado para sistemas rotos, urgentes o más complejos.",
+          "name": "Pico Pilot",
+          "price": "€1,000+",
+          "period": "/proyecto",
+          "priceNote": "Los proyectos multiagente a medida y las integraciones más profundas empiezan en €10,000+.",
+          "features": [
+            "Diagnóstico e implementación acotados",
+            "Un sistema funcionando ligado a un resultado medible",
+            "Proyectos custom cuando la complejidad es real"
+          ],
+          "cta": "Reservar Llamada De Planning",
           "ctaHref": "https://calendly.com/mutxdev"
+        },
+        "trial": {
+          "name": "Prueba gratuita",
+          "price": "Gratis",
+          "period": "primer valor",
+          "description": "Llega al primer valor sobre un problema real antes de comprometerte.",
+          "priceNote": "Primer valor significa definir o conectar un problema real de agente.",
+          "features": [
+            "Describe una meta o conecta un agente",
+            "Te enruta a build, fix o control",
+            "Llega al primer valor antes de pagar"
+          ],
+          "cta": "Solicitar Acceso De Prueba",
+          "ctaHref": "/pricing"
         }
-      }
+      },
+      "lead": "Empieza por el primer valor. Pasa a ejecución self-serve cuando el trabajo ya es real. Añade soporte o implementación solo cuando la complejidad lo merezca.",
+      "recommendedLabel": "Mejor Punto De Entrada"
     },
     "faq": {
       "eyebrow": "Preguntas",
-      "title": "Preguntas que la gente suele tener antes de unirse",
+      "title": "Preguntas que conviene despejar antes de comprometerse",
       "items": {
         "0": {
           "q": "¿Necesito saber programar?",
-          "a": "No. PicoMUTX está pensado para personas que quieren crear agentes de IA útiles sin necesidad de contar con una experiencia técnica profunda."
+          "a": "No. PicoMUTX es para operadores que necesitan resultados sin convertirse en ingenieros de agentes a tiempo completo."
         },
         "1": {
-          "q": "¿Qué pasa si ya lo intenté y fracasé?",
-          "a": "Precisamente para ese perfil existe esto. PicoMUTX está diseñado para reducir la confusión y la fragmentación que normalmente hacen que la gente abandone a mitad de camino."
+          "q": "¿Y si ya lo intenté y fallé?",
+          "a": "Ese es uno de los puntos de entrada principales. PicoMUTX está diseñado para recuperar impulso después del primer bloqueo caro, confuso o que destruye la confianza."
         },
         "2": {
-          "q": "¿Qué tipo de agentes puedo crear?",
-          "a": "Agentes prácticos: de los que ahorran tiempo, apoyan las operaciones, mejoran los flujos de trabajo y ayudan a que las empresas funcionen mejor. El foco está en la utilidad, no en las demos de juguete."
+          "q": "¿Para qué tipo de trabajo con agentes sirve?",
+          "a": "Para sistemas de agentes prácticos: soporte, copilotos internos, captación de leads, seguimiento comercial y workflows operativos que necesitan construirse, recuperarse o controlarse en el mundo real."
         },
         "3": {
-          "q": "¿El prerregistro es gratuito?",
-          "a": "Sí. El prerregistro es gratuito y no requiere pago. Serás de las primeras personas en enterarte cuando se abra el acceso y cuando haya plazas de fundador disponibles."
+          "q": "¿Hay una forma gratuita de empezar?",
+          "a": "Sí. La escalera pública arranca con una prueba gratuita enfocada en el primer valor. El acceso público sigue siendo waitlist-first, pero la prueba y los tiers fundadores ya están definidos."
         },
         "4": {
-          "q": "¿Es esto para empresas?",
-          "a": "PicoMUTX encaja mejor con fundadores, operadores y pequeños equipos que quieren una forma guiada de crear e implementar agentes de IA. Las necesidades de gobernanza empresarial a mayor escala pertenecen al ecosistema más amplio de MUTX."
+          "q": "¿Esto es para empresas?",
+          "a": "PicoMUTX es la cuña comercial hacia MUTX, no la capa enterprise completa de gobernanza. La gobernanza pesada de varios equipos pertenece al stack MUTX más amplio."
         }
       }
     },
     "finalCta": {
-      "eyebrow": "Acceso anticipado · Plazas limitadas",
-      "title": "Tu agente no tiene por qué quedarse en una idea sin terminar.",
-      "body": "No necesitas más pestañas abiertas. No necesitas otro tutorial. Necesitas una ruta más clara hacia algo que funcione. PicoMUTX está diseñado para ese momento.",
-      "formHeadline": "Prerregístrate en PicoMUTX",
-      "formSubline": "Únete a la lista de acceso anticipado. Sé de los primeros cuando abramos.",
-      "ctaButton": "Prerregístrate ahora",
-      "formCtaMeta": "Prerregistro gratuito · No se requiere tarjeta de crédito · Los primeros usuarios obtienen acceso prioritario"
+      "eyebrow": "Acceso fundador",
+      "title": "Solicita acceso al carril que corresponde al trabajo.",
+      "body": "Pico hace un trabajo práctico: poner algo útil en marcha, recuperarlo cuando se rompe y mantenerlo bajo control cuando toca trabajo real.",
+      "formHeadline": "Empieza por el bloqueo real.",
+      "formSubline": "Cuéntanos si necesitas construir, arreglar o controlar. Te enroutaremos a la lane correcta y al siguiente paso honesto.",
+      "ctaButton": "Solicitar acceso",
+      "formCtaMeta": "Prueba gratis para primer valor · Founding €29 · Supported €79 · Pico Pilot desde €1.000+",
+      "secondaryButton": "Reservar Llamada De Planning"
     },
     "contactForm": {
       "dialogLabel": "Formulario de contacto",
       "closeLabel": "Cerrar",
-      "title": "Prerregístrate para acceso anticipado",
-      "subtitle": "Cuéntanos en qué punto estás. Nosotros nos encargamos del resto.",
-      "emailLabel": "Correo profesional",
+      "title": "Solicita acceso a Pico",
+      "subtitle": "Cuéntanos qué intentas construir, recuperar o controlar. Te guiaremos hacia el siguiente paso correcto.",
+      "emailLabel": "Correo de trabajo",
       "emailPlaceholder": "tu@empresa.com",
       "nameLabel": "Nombre",
       "namePlaceholder": "María García",
       "companyLabel": "Empresa",
       "companyPlaceholder": "Acme S.L.",
-      "interestLabel": "¿Qué te trae por aquí?",
+      "interestLabel": "¿Con qué necesitas ayuda primero?",
       "interestOptions": {
         "building-first": "Estoy creando mi primer agente de IA",
         "fixing-existing": "Estoy corrigiendo un agente que no funciona",
         "evaluating": "Estoy evaluando plataformas o herramientas",
         "spent-money": "Ya he gastado dinero y sigue sin funcionar",
-        "other": "Otra cosa"
+        "other": "Otra cosa",
+        "build": "Construir algo desde cero",
+        "fix": "Recuperar o reparar un setup",
+        "control": "Poner bajo control un agente ya en vivo"
       },
       "messageLabel": "¿Hay algo que debamos saber?",
       "messageOptional": "(opcional)",
-      "messagePlaceholder": "Ej.: Tengo un pequeño SaaS y quiero automatizar la atención al cliente…",
-      "submitting": "Enviando...",
-      "submit": "Unirme a la lista de acceso anticipado",
-      "disclaimer": "Sin spam. Sin llamadas comerciales. Solo una respuesta humana.",
-      "successTitle": "Ya estás en la lista.",
-      "successBody": "Leemos cada mensaje. Recibirás una respuesta personal en un plazo de 24 horas.",
+      "messagePlaceholder": "Describe la meta, el bloqueo o el sistema en vivo…",
+      "submitting": "Enviando…",
+      "submit": "Solicitar acceso",
+      "disclaimer": "Sin funnel genérico. Te responderá una persona con la ruta correcta.",
+      "successTitle": "Solicitud de acceso recibida.",
+      "successBody": "Ya tenemos el contexto. Recibirás una respuesta humana con el carril adecuado.",
       "successBack": "Volver a la página",
-      "errorFallback": "Algo ha salido mal. Inténtalo de nuevo.",
+      "errorFallback": "Algo salió mal. Inténtalo de nuevo.",
       "networkError": "Error de red. Inténtalo de nuevo."
     },
     "preRegForm": {
-      "emailLabel": "Correo profesional",
+      "emailLabel": "Correo de trabajo",
       "emailPlaceholder": "tu@empresa.com",
-      "submitting": "Uniéndote…",
-      "submit": "Prerregístrate ahora",
-      "privacy": "Sin spam. No se requiere pago. Solo actualizaciones sobre el acceso anticipado y detalles del lanzamiento.",
+      "submitting": "Enviando solicitud…",
+      "submit": "Solicitar acceso",
+      "privacy": "Sin spam. Sin pago necesario. Solo actualizaciones de acceso y siguientes pasos honestos.",
       "successTitle": "Ya estás en la lista.",
-      "successBody": "Nos pondremos en contacto contigo cuando se abra el acceso a PicoMUTX. Sin spam y sin pago requerido.",
-      "errorFallback": "Algo ha salido mal. Inténtalo de nuevo."
+      "successBody": "Te avisaremos cuando se abra tu ola de acceso a PicoMUTX. Sin spam y sin pago.",
+      "errorFallback": "Algo salió mal. Inténtalo de nuevo."
     },
     "footer": {
       "brand": "PicoMUTX",
@@ -333,60 +384,187 @@
         "imageAlt": "Robot de PicoMUTX inspeccionando informes en vivo del stack"
       }
     },
-    "pricing": {
-      "eyebrow": "Profundidad operativa en vivo",
-      "title": "Elige la ruta del operador que mejor encaja con el trabajo",
-      "tiers": {
-        "free": {
-          "name": "Free",
-          "price": "$0",
-          "period": "para siempre",
-          "description": "Inspecciona el mapa del stack, el flujo de lecciones y la verdad del producto antes de gastar.",
-          "features": [
-            "100 créditos mensuales",
-            "Acceso limitado al tutor",
-            "Lecciones básicas de la Academia",
-            "Soporte de la comunidad"
-          ],
-          "cta": "Plan actual",
-          "ctaHref": null
-        },
-        "starter": {
-          "description": "Ejecuta una ruta de compilación seria con acceso completo a la Academia y tutoría guiada.",
-          "features": [
-            "1.000 créditos mensuales",
-            "Acceso completo al tutor",
-            "Todas las lecciones de la Academia",
-            "Modo Autopilot",
-            "Soporte prioritario"
-          ]
-        },
-        "pro": {
-          "description": "Opera varias rutas en vivo con BYOK, mayor visibilidad del runtime y una respuesta más rápida.",
-          "features": [
-            "10.000 créditos mensuales",
-            "Tutor completo + BYOK",
-            "Acceso a la API",
-            "Soporte prioritario",
-            "Flujos de trabajo personalizados",
-            "Acceso anticipado a nuevas funciones"
-          ]
-        },
-        "enterprise": {
-          "description": "Despliega para un equipo con SSO, expectativas de SLA y soporte directo."
-        }
-      }
-    },
     "pricingPage": {
-      "title": "Elige la profundidad de producto que realmente necesitas",
-      "subtitle": "Los planes se corresponden con superficies reales del producto: 12 lecciones, tutoría guiada, contexto del runtime monitorizado e informes en vivo del stack en Hermes, OpenClaw, NanoClaw y PicoClaw.",
-      "badgePopular": "Más popular",
-      "loading": "Iniciando compra...",
-      "checkoutError": "La compra ha fallado. Vuelve a intentarlo.",
-      "footer": "La sincronización del contenido actual sigue 17 documentos de pack y 4 repositorios en vivo. Enterprise es para equipos que necesitan ayuda de despliegue más profunda, controles de identidad y soporte directo.",
-      "enterpriseSupport": "¿Necesitas más?",
-      "enterpriseSupportCta": "Contáctanos",
-      "enterpriseSupportBody": "para precios Enterprise (100K+ créditos, SSO, SLA)."
+      "eyebrow": "Ruta de precios",
+      "title": "Elige ahora el carril que necesitas. Mira la facturación del producto solo cuando importe.",
+      "subtitle": "Pico público sigue siendo access-first. Esta página muestra primero la escalera pública y luego la capa de facturación dentro del producto para equipos que ya operan dentro del sistema.",
+      "primaryCta": "Solicitar acceso",
+      "secondaryCta": "Hablar con soporte",
+      "returnToLanding": "Volver a la landing",
+      "routeState": {
+        "label": "Estado de la ruta",
+        "title": "El acceso público te mete en el carril correcto. La facturación del producto vive más adentro del sistema.",
+        "body": "Empieza por el carril que corresponde a tu bloqueo. Usa los planes live solo cuando ya necesites un workspace autenticado, checkout o planificación de rollout.",
+        "signalLabel": "Señal de acceso",
+        "sessionAttached": "Sesión alojada conectada",
+        "sessionLoading": "Comprobando sesión alojada",
+        "sessionMissing": "Todavía no hay sesión alojada",
+        "planLabel": "Plan alojado actual",
+        "planFallback": "todavía ninguno",
+        "docsLabel": "Base del builder pack",
+        "stacksLabel": "Stacks rastreados"
+      },
+      "accessPlans": {
+        "label": "Escalera de acceso público",
+        "title": "Empieza por el primer valor. Añade soporte solo cuando el trabajo lo pida de verdad.",
+        "body": "La oferta pública está diseñada para llevarte de la incertidumbre al resultado: definir o conectar un problema real del agente, ejecutar por tu cuenta cuando sea posible, añadir guía grupal cuando haga falta y pasar a implementación cuando la complejidad o la urgencia lo justifiquen.",
+        "recommended": "Mejor punto de partida",
+        "meta": "Esta es la escalera comercial pública. La capa de facturación live de abajo también es real, pero importa más tarde.",
+        "noteLabel": "Por qué existe esta sección",
+        "note": "La escalera es simple a propósito. La prueba gratuita te lleva al primer valor. €29 es la entrada para ejecutar por tu cuenta. €79 añade guía estructurada. Pico Pilot cubre implementación orientada a resultado y los proyectos multiagente a medida empiezan en €10,000+.",
+        "truths": [
+          "La prueba gratuita es para alcanzar el primer valor, no para pasear por funciones",
+          "€29 es la entrada para ejecución independiente",
+          "€79 añade guía sin convertir el producto en un servicio"
+        ],
+        "tiers": {
+          "starter": {
+            "name": "Founding Tier €29",
+            "price": "€29",
+            "anchorPrice": "$97",
+            "period": "/mes",
+            "description": "Ejecución self-serve con guía de IA para operadores que quieren avanzar de forma independiente.",
+            "priceNote": "Cohorte fundadora limitada mientras el acceso siga siendo selectivo.",
+            "recommended": true,
+            "features": [
+              "Onboarding y diagnóstico guiados por IA",
+              "Rutas guiadas de construir, arreglar y controlar",
+              "Plantillas y skills reutilizables",
+              "Soporte de IA para el siguiente paso",
+              "Diseñado para ejecución independiente"
+            ],
+            "cta": "Solicitar acceso fundador"
+          },
+          "pro": {
+            "name": "Founding Supported €79",
+            "price": "€79",
+            "period": "/mes",
+            "description": "El mismo producto con guía grupal estructurada y accountability.",
+            "priceNote": "Esto sustituye el antiguo nivel intermedio infravalorado por la oferta real de grupo guiado.",
+            "features": [
+              "Todo lo del Founding Tier",
+              "Onboarding más acompañado",
+              "Resolución grupal de bloqueos cada semana",
+              "Entorno compartido de soporte entre operadores",
+              "Menos fricción cuando la implementación se complica"
+            ],
+            "cta": "Solicitar acceso con soporte"
+          },
+          "enterprise": {
+            "name": "Pico Pilot",
+            "price": "€1,000+",
+            "period": "/resultado",
+            "description": "Implementación orientada a resultado cuando el sistema está roto, es urgente o demasiado complejo para recuperarlo solo.",
+            "priceNote": "Los proyectos multiagente a medida y las integraciones más profundas empiezan en €10,000+.",
+            "features": [
+              "Objetivo y diagnóstico con alcance definido",
+              "Fix o implementación hechos contigo",
+              "Sistema funcionando ligado a un resultado medible",
+              "Entrega pensada como prueba de valor",
+              "Proyectos custom disponibles para escenarios más complejos"
+            ],
+            "cta": "Hablar de implementación"
+          },
+          "trial": {
+            "name": "Prueba gratuita",
+            "price": "Gratis",
+            "period": "primer valor",
+            "description": "Define o conecta un problema real del agente y llega al primer momento útil antes de comprometerte.",
+            "features": [
+              "Describe un objetivo o conecta un agente existente",
+              "Recibe ruta de construir, arreglar o controlar",
+              "Llega al primer valor antes de pagar",
+              "La extensión depende de la activación",
+              "Mejor primer paso para demostrar seriedad"
+            ],
+            "cta": "Solicitar acceso de prueba"
+          }
+        }
+      },
+      "livePlans": {
+        "label": "Planes vivos del producto",
+        "title": "Planes vivos del producto cuando Pico ya está en juego",
+        "body": "Si ya tienes acceso, o necesitas entender la capa de facturación que sostiene el producto, estos son los planes que se activan más adentro de Pico.",
+        "badge": "Dentro de Pico",
+        "badgePopular": "Por defecto para operadores",
+        "currentPlan": "Actual",
+        "loading": "Iniciando checkout...",
+        "checkoutError": "El checkout ha fallado. Vuelve a intentarlo.",
+        "truths": [
+          "El checkout es para la app en vivo, no para la lista de espera",
+          "La sesión alojada desbloquea la sincronización del progreso y el estado del runtime",
+          "Enterprise empieza con planificación de despliegue, no con un cobro ciego de tarjeta"
+        ],
+        "tiers": {
+          "free": {
+            "name": "Free",
+            "price": "$0",
+            "period": "/mes",
+            "description": "Inspecciona onboarding, Academy y la forma real del producto antes de gastar.",
+            "features": [
+              "Abrir las superficies de onboarding y Academy",
+              "Ver la forma de Tutor y Autopilot",
+              "Usar progreso alojado al iniciar sesión",
+              "Encaja mejor para evaluar antes del checkout"
+            ],
+            "cta": "Abrir onboarding"
+          },
+          "starter": {
+            "name": "Starter",
+            "price": "$9",
+            "period": "/mes",
+            "description": "Un carril de construcción serio con acceso completo a Academy y tutoría fundamentada.",
+            "features": [
+              "1.000 créditos mensuales",
+              "Acceso completo a Academy",
+              "Soporte de Tutor fundamentado",
+              "Modo Autopilot",
+              "Mejor primer paso de pago"
+            ],
+            "cta": "Elegir starter"
+          },
+          "pro": {
+            "name": "Pro",
+            "price": "$29",
+            "period": "/mes",
+            "description": "Múltiples carriles en vivo con más visibilidad del runtime y una escalación más rápida para el operador.",
+            "features": [
+              "10.000 créditos mensuales",
+              "Tutor completo + BYOK",
+              "Acceso a la API",
+              "Soporte prioritario",
+              "Ideal para propietarios de flujos activos"
+            ],
+            "cta": "Elegir pro"
+          },
+          "enterprise": {
+            "name": "Enterprise",
+            "price": "Personalizado",
+            "period": "",
+            "description": "Planificación de despliegue en equipo con identidad, controles y soporte directo al operador.",
+            "features": [
+              "SSO y gestión de equipos",
+              "Planificación de despliegue dedicada",
+              "Soporte alineado a SLA",
+              "Diseño de workflows personalizados",
+              "Acceso directo a los fundadores"
+            ],
+            "cta": "Reservar llamada de planificación"
+          }
+        }
+      },
+      "stackLabel": "Verdad del stack",
+      "stackTitle": "Qué respalda la promesa de acceso",
+      "stackBody": "La oferta se apoya en documentación trazada del pack, lecciones secuenciadas y briefings en vivo del stack. Esta ruta debe mostrar lo que realmente sostiene el producto, no solo el logo de arriba.",
+      "stackFooterPrefix": "Última actualización del builder-pack",
+      "stackFooterMiddle": "en",
+      "stackFooterDocs": "docs visibles y",
+      "stackFooterStacks": "briefings de stack monitorizados.",
+      "finalLabel": "Siguiente movimiento",
+      "finalTitle": "¿Necesitas ayuda para elegir el carril honesto?",
+      "finalBody": "Si la pregunta es urgencia, encaje del plan o forma del despliegue, soporte debería responderla directamente y devolverte a la ruta adecuada de Pico.",
+      "finalPrimary": "Abrir carril de soporte",
+      "finalSecondary": "Volver a la landing"
     },
     "auth": {
       "eyebrow": "Autenticación del host de Pico",
@@ -524,6 +702,2428 @@
         "resendFailure": "No se pudo reenviar el correo de verificación",
         "verificationFailed": "La verificación ha fallado",
         "verificationFailedBody": "Si el token ha caducado, solicita otro mensaje desde la dirección que posee la cuenta."
+      }
+    },
+    "supportPage": {
+      "contact": {
+        "interest": {
+          "lessonBlocker": "Bloqueo de lección o comando",
+          "runtimeMismatch": "Desajuste del runtime en vivo o de Autopilot",
+          "sessionMismatch": "Desajuste de sesión alojada o de cuenta",
+          "billingPlan": "Pregunta sobre facturación, aprobaciones o plan",
+          "officeHours": "Horario de oficina o recorrido más profundo"
+        },
+        "title": "Cuéntanos dónde se rompió la ruta del producto",
+        "subtitle": "Comparte la ruta, el bloqueo y la prueba. Responderemos como personas, no como una lista de espera.",
+        "interestLabel": "¿Qué se rompió?",
+        "messageLabel": "¿Qué pasó?",
+        "messageOptional": "(incluye el paquete)",
+        "messagePlaceholder": "Pega el bloqueo exacto, la ruta, el comando o el desajuste del runtime.",
+        "submit": "Enviar solicitud de soporte",
+        "submitting": "Enviando solicitud de soporte...",
+        "disclaimer": "Sin lista de espera. Sin teatro de lanzamiento. Solo una respuesta humana.",
+        "successTitle": "Solicitud de soporte enviada.",
+        "successBody": "Recibimos el paquete. Espera una respuesta humana que te devuelva a la ruta del producto.",
+        "successBack": "Volver a soporte"
+      },
+      "shell": {
+        "eyebrow": "Ayuda humana",
+        "title": "Consigue a una persona cuando la ruta del producto deja de ser suficiente",
+        "description": "Haz triage del borde complicado con rapidez, adjunta la señal real y vuelve al siguiente movimiento honesto sin convertir el soporte en un laberinto."
+      },
+      "hero": {
+        "badge": "Pulso de escalación",
+        "mode": {
+          "open": "mesa abierta",
+          "triage": "modo de triage"
+        },
+        "title": "Envía el bloqueo con pruebas suficientes para resolverlo rápido.",
+        "body": "Nombra la ruta, adjunta la señal y apunta al carril de regreso. Eso le da al soporte suficiente contexto para responder sin frenar el siguiente movimiento.",
+        "packetState": {
+          "label": "Estado del paquete",
+          "readyToPaste": "listo para pegar",
+          "routeAndEvidenceFirst": "primero la ruta y la evidencia"
+        },
+        "runtimeTruth": {
+          "label": "Verdad del runtime",
+          "gatewayAttached": "gateway conectado",
+          "attachSignal": "adjunta la señal si importa"
+        },
+        "returnLane": {
+          "label": "Carril de regreso"
+        },
+        "handoff": {
+          "label": "Transferencia limpia más corta",
+          "returnAcademy": "Volver a la Academy",
+          "sequenceFallback": "Si el bloqueo sigue siendo, en el fondo, un problema de secuencia, vuelve allí primero."
+        },
+        "packetPreview": {
+          "label": "Vista previa del paquete"
+        }
+      },
+      "actions": {
+        "getHumanHelp": "Obtener ayuda humana",
+        "copyPacket": "Copiar paquete",
+        "copiedPacket": "Paquete copiado",
+        "requestOfficeHours": "Solicitar horario de oficina"
+      },
+      "compass": {
+        "title": "El soporte solo existe para devolver al operador al producto",
+        "body": "Escala con limpieza, adjunta el paquete y vuelve a la superficie que puede mover el trabajo otra vez. Academy es para problemas de secuencia, Tutor es para un siguiente paso conocible y Autopilot es para la verdad del runtime en vivo.",
+        "status": {
+          "open": "escalación abierta",
+          "standby": "ayuda humana en espera"
+        },
+        "aside": "La ayuda humana debe resolver el borde complicado, no sustituir al producto. La mejor interacción de soporte termina con una ruta más clara de vuelta a Pico.",
+        "academy": {
+          "return": "Volver a Academy",
+          "caption": "Vuelve aquí cuando el bloqueo siga siendo, en el fondo, un problema de secuencia de lección.",
+          "note": "Secuencia"
+        },
+        "tutor": {
+          "label": "Pregunta primero a Tutor",
+          "caption": "Úsalo cuando el producto probablemente todavía conoce la respuesta, pero necesitas el siguiente paso exacto.",
+          "note": "Conocible"
+        },
+        "autopilot": {
+          "label": "Reentrar en Autopilot",
+          "caption": "Abre la sala de control cuando el bloqueo dependa de ejecuciones en vivo, presupuesto, alertas o aprobaciones.",
+          "note": "Runtime"
+        }
+      },
+      "standards": {
+        "label": "Estándares de escalación",
+        "title": "Transfiere el problema como un operador preciso",
+        "chip": "ruta • evidencia • regreso",
+        "cards": [
+          {
+            "label": "01 • Ruta",
+            "title": "Nombra la pila y la superficie",
+            "body": "Di si el problema pertenece a Hermes, OpenClaw, NanoClaw, PicoClaw, Tutor, Academy, Autopilot o al carril de la cuenta alojada."
+          },
+          {
+            "label": "02 • Evidencia",
+            "title": "Adjunta el paquete de pruebas",
+            "body": "Trae el comando, el estado del panel, el estado del launcher o la señal de aprobación que muestre exactamente dónde se detuvo la ruta."
+          },
+          {
+            "label": "03 • Regreso",
+            "title": "Pide la ruta de vuelta al movimiento",
+            "body": "Una buena escalación debería terminar con la ruta más corta de vuelta a una lección, a una respuesta de Tutor o a una acción de control en vivo."
+          }
+        ],
+        "packetPosture": {
+          "label": "Postura del paquete",
+          "body": "Un soporte sólido empieza con un paquete limpio. La mejor escalación se lee como una transferencia de operador, no como una descarga de pánico."
+        },
+        "deskTone": {
+          "label": "Tono de la mesa",
+          "body": "El soporte debe bajar la temperatura sin ralentizar la ruta de vuelta a la acción."
+        },
+        "bestFirstMove": {
+          "label": "Mejor primer movimiento",
+          "body": "Copia el paquete, elige el carril correcto y pide la ruta más corta de vuelta a Academy, Tutor o Autopilot."
+        }
+      },
+      "desk": {
+        "label": "Mesa de soporte",
+        "title": "Envía contexto, no ruido",
+        "body": "La ayuda humana es para la parte que el producto no puede cerrar con honestidad por sí solo. Cuanto más rápido enmarques el bloqueo, más rápido el soporte podrá devolverte a la ruta del producto.",
+        "callout": {
+          "title": "Si el siguiente movimiento sigue siendo obvio, vuelve y hazlo.",
+          "body": "El soporte existe para el borde complicado, no para saltarse la lección, Tutor o la superficie de control en vivo."
+        },
+        "lanes": [
+          {
+            "id": "fixing-existing",
+            "title": "Bloqueo de pila o runtime",
+            "body": "Úsalo cuando una instalación, lección, panel, launcher o paso de aprobación real se detuvo de una forma que el producto no puede cerrar solo.",
+            "cta": "Iniciar escalación"
+          },
+          {
+            "id": "other",
+            "title": "Recorrido guiado del operador",
+            "body": "Úsalo cuando necesites una sesión guiada a través de varias superficies en lugar de una sola corrección aislada.",
+            "cta": "Reservar horario de oficina"
+          }
+        ]
+      },
+      "rail": {
+        "label": "Rail del operador",
+        "supportRequests": "Solicitudes de soporte",
+        "tutorQuestions": "Preguntas a Tutor",
+        "plan": {
+          "label": "Plan",
+          "unknown": "desconocido",
+          "signIn": "iniciar sesión"
+        },
+        "activeSurface": {
+          "label": "Superficie activa",
+          "none": "ninguna"
+        },
+        "tryTheseFirst": "Prueba esto primero",
+        "tryTutorFirst": "Prueba primero con Tutor",
+        "returnAcademy": "Volver a Academy",
+        "openAutopilot": "Abrir Autopilot",
+        "directLine": "Línea directa"
+      },
+      "packet": {
+        "label": "Paquete de diagnóstico",
+        "title": "Paquete del operador",
+        "chip": "contexto en vivo",
+        "preview": {
+          "route": "Ruta",
+          "runtime": "Runtime",
+          "return": "Regreso",
+          "packet": "Paquete"
+        },
+        "diagnostic": {
+          "title": "Paquete de diagnóstico de Pico",
+          "route": "Ruta:",
+          "hostedSession": "Sesión alojada:",
+          "hostedPlan": "Plan alojado:",
+          "selectedTrack": "Track seleccionado:",
+          "completedLessons": "Lecciones completadas:",
+          "nextLesson": "Siguiente lección:",
+          "recoveryWorkspace": "Workspace de la lección de recuperación:",
+          "recoveryFocusedStep": "Paso enfocado de la lección de recuperación:",
+          "recoveryProof": "Prueba de la lección de recuperación:",
+          "activeSurface": "Superficie activa:",
+          "lastOpenedLesson": "Última lección abierta:",
+          "railCollapsed": "Rail colapsado:",
+          "helpLaneOpen": "Carril de ayuda abierto:",
+          "supportRequestsSent": "Solicitudes de soporte enviadas:",
+          "tutorQuestionsAsked": "Preguntas a Tutor realizadas:",
+          "approvalGateEnabled": "Puerta de aprobación activada:",
+          "hostedOnboardingStatus": "Estado del onboarding alojado:",
+          "hostedOnboardingStep": "Paso del onboarding alojado:",
+          "hostedWorkspace": "Workspace alojado:",
+          "runtimeStatus": "Estado del runtime:",
+          "gatewayUrl": "URL del gateway:",
+          "runtimeBindings": "Bindings del runtime:",
+          "values": {
+            "unknown": "desconocido",
+            "na": "n/d",
+            "none": "ninguno",
+            "notAvailable": "no disponible",
+            "captured": "capturado",
+            "missing": "faltante",
+            "yes": "sí",
+            "no": "no"
+          }
+        },
+        "problemLabel": "Problema:",
+        "openFormWithPacket": "Abrir formulario con paquete"
+      },
+      "state": {
+        "label": "Estado del operador en vivo",
+        "hostedOnboarding": "Onboarding alojado",
+        "runtimeStatus": "Estado del runtime",
+        "currentTrack": "Track actual",
+        "currentTrackNotChosenYet": "aún no elegido",
+        "nextLesson": "Siguiente lección",
+        "nextLessonNone": "ninguna",
+        "lessonWorkspace": "Workspace de la lección",
+        "focusedStep": "Paso enfocado"
+      },
+      "returnMap": {
+        "label": "Mapa de regreso",
+        "title": "La ayuda humana debe terminar en una ruta más limpia de vuelta a Pico",
+        "chip": "mapa de regreso del operador",
+        "model": {
+          "label": "Modelo de regreso de soporte",
+          "cards": [
+            {
+              "title": "1. Enruta el bloqueo rápido",
+              "body": "No envíes una historia de vida. Empieza por la superficie exacta que se rompió."
+            },
+            {
+              "title": "2. Adjunta la evidencia",
+              "body": "Envía el comando, el hecho del runtime o el estado de aprobación que demuestre qué falló."
+            },
+            {
+              "title": "3. Regresa al producto",
+              "body": "La respuesta debe restaurar el impulso, no crear un laberinto de soporte."
+            }
+          ]
+        },
+        "anatomy": {
+          "label": "Anatomía del paquete",
+          "body": "Un paquete de escalación premium siempre se lee en el mismo orden: ruta, evidencia, carril de regreso.",
+          "cards": [
+            {
+              "title": "Ruta primero",
+              "body": "Nombra la superficie exacta que se rompió."
+            },
+            {
+              "title": "Evidencia después",
+              "body": "Adjunta la señal que demuestra el fallo."
+            },
+            {
+              "title": "Regreso tercero",
+              "body": "Pide la forma más limpia de volver al movimiento."
+            }
+          ]
+        },
+        "paths": {
+          "lesson": {
+            "label": "Ruta de lección",
+            "title": "Retomar el carril de Academy",
+            "body": "Úsalo cuando el bloqueo seguía siendo, en el fondo, un problema de lección o de secuencia de configuración."
+          },
+          "tutor": {
+            "label": "Respuesta fundamentada",
+            "title": "Pregunta a Tutor si el siguiente movimiento sigue siendo conocible",
+            "body": "Vuelve aquí cuando el producto probablemente todavía conoce la respuesta, pero necesitas el siguiente paso exacto.",
+            "cta": "Abrir Tutor"
+          },
+          "autopilot": {
+            "label": "Verdad del runtime",
+            "title": "Volver a entrar en la sala de control",
+            "body": "Usa Autopilot cuando el bloqueo dependa de ejecuciones en vivo, presupuesto, aprobaciones o estado de alertas.",
+            "cta": "Abrir Autopilot"
+          }
+        }
+      },
+      "shared": {
+        "stepNotSet": "no establecido",
+        "runtime": {
+          "localOnly": "solo local",
+          "checking": "comprobando",
+          "notAttached": "no conectado"
+        },
+        "packetState": {
+          "copied": "copiado",
+          "proofAttached": "prueba adjunta",
+          "contextReady": "contexto listo",
+          "needsProof": "necesita prueba"
+        },
+        "returnAcademy": "academy",
+        "resumeLesson": "Reanudar {lessonTitle}",
+        "openLesson": "Abrir {lessonTitle}",
+        "stepsClear": "{completed}/{total} pasos claros"
+      }
+    },
+    "autopilotPage": {
+      "shared": {
+        "loadState": {
+          "authRequired": "Autenticación requerida",
+          "loading": "Cargando datos en vivo",
+          "partial": "Datos en vivo parciales",
+          "offline": "Sin conexión",
+          "ready": "Datos en vivo listos"
+        },
+        "validation": {
+          "thresholdRange": "Introduce un umbral entre 1 y 100."
+        },
+        "error": {
+          "partialSignals": "No se pudieron cargar algunas señales en vivo de MUTX. Lo que se muestra es parcial, no inventado.",
+          "loadLiveData": "No se pudieron cargar los datos en vivo de Autopilot",
+          "resolveRequest": "No se pudo {action} la solicitud",
+          "createApprovalRequiredFields": "agente, sesión y tipo de acción son obligatorios antes de crear una solicitud de aprobación",
+          "createApproval": "No se pudo crear la solicitud de aprobación"
+        },
+        "label": {
+          "whyItMatters": "Por qué importa: {impact}"
+        },
+        "action": {
+          "jumpToDetail": "Ir a la sección de detalle",
+          "openLesson": "Abrir {lessonTitle}",
+          "returnToAcademy": "Volver a Academy"
+        },
+        "statusLabels": {
+          "FAILED": "Fallido",
+          "ERROR": "Error",
+          "CANCELLED": "Cancelado",
+          "RUNNING": "En ejecución",
+          "QUEUED": "En cola",
+          "PENDING": "Pendiente",
+          "AWAITING_OWNER": "Esperando al propietario",
+          "COMPLETED": "Completado",
+          "SUCCEEDED": "Con éxito",
+          "SUCCESS": "Éxito",
+          "APPROVED": "Aprobado",
+          "REJECTED": "Rechazado"
+        },
+        "syncStateLabels": {
+          "idle": "inactivo",
+          "loading": "cargando",
+          "saving": "guardando",
+          "synced": "sincronizado",
+          "offline": "sin conexión"
+        },
+        "timelineSources": {
+          "runs": "Ejecuciones",
+          "alerts": "Alertas",
+          "approvals": "Aprobaciones"
+        },
+        "time": {
+          "unknown": "Hora desconocida",
+          "unknownRelative": "hora desconocida"
+        },
+        "runDetail": {
+          "failedNoMessage": "La ejecución se detuvo sin un mensaje de error guardado.",
+          "inFlight": "La ejecución sigue avanzando por el pipeline.",
+          "awaitingOwner": "La ejecución está en pausa; espera la intervención del propietario para continuar.",
+          "completedNoSummary": "La ejecución terminó sin un resumen breve."
+        },
+        "runImpact": {
+          "failed": "Este flujo no terminó limpiamente. Revisa el error y las trazas antes de confiar en el siguiente intento.",
+          "active": "El trabajo sigue en curso. Vigila bloqueos, reintentos o silencios demasiado largos.",
+          "awaitingOwner": "La ejecución está en pausa esperando una acción del propietario. Responde para desbloquear el pipeline.",
+          "completed": "Esta ejecución terminó. Verifica que la salida sea realmente útil antes de automatizarla más."
+        },
+        "alertImpact": {
+          "resolved": "La alerta está resuelta, pero la causa raíz sigue teniendo que tener sentido.",
+          "active": "Esto es dolor operativo activo. Si lo ignoras, el runtime seguirá sorprendiéndote."
+        },
+        "approvalImpact": {
+          "pending": "Una acción riesgosa espera una decisión humana. Nada debería pasar esta puerta todavía.",
+          "approved": "La puerta se abrió. Asegúrate de que la acción aprobada coincida realmente con la solicitud que querías permitir.",
+          "rejected": "La acción riesgosa fue bloqueada. Bien. Ahora decide si la solicitud estaba mal o si la barrera es demasiado estricta.",
+          "changed": "Esta aprobación cambió de estado y debe revisarse si afecta el comportamiento en vivo."
+        },
+        "timeline": {
+          "runTitle": "Ejecución {status} {runId}",
+          "alertTitle": "{type} {state}",
+          "alertResolved": "resuelta",
+          "alertTriggered": "activada",
+          "alertNoMessage": "Alerta registrada sin mensaje.",
+          "approvalRequestedBy": "Solicitado por {requester}.",
+          "approvalTitle": "{action} {status}",
+          "approvalStatus": {
+            "pending": "pendiente",
+            "approved": "aprobada",
+            "rejected": "rechazada"
+          }
+        }
+      },
+      "emptyStates": {
+        "runs": {
+          "noAgent": {
+            "title": "Todavía no existe ningún agente monitorizado",
+            "body": "Pico aún no tiene un agente real de MUTX al que conectarse. Crea o despliega primero un agente real y vuelve luego para ver el historial de ejecuciones."
+          },
+          "noHistory": {
+            "title": "Existe un agente, pero todavía no ha corrido nada",
+            "body": "MUTX conoce al menos un agente, pero todavía no hay historial de ejecuciones. Activa una tarea real o espera el primer tick programado y luego vuelve aquí."
+          },
+          "openAcademy": "Abrir Academy"
+        },
+        "alerts": {
+          "noRuns": {
+            "title": "No hay alertas porque todavía no se está ejecutando nada",
+            "body": "Un feed de alertas vacío no significa nada hasta que el agente haya ejecutado trabajo real. Haz que llegue una ejecución real a MUTX primero."
+          },
+          "none": {
+            "title": "No hay alertas en vivo ahora mismo",
+            "body": "Bien. El feed de monitorización está en silencio ahora mismo. Sigue observando la siguiente ejecución real y la ruta de fallo."
+          },
+          "inspectRecentRuns": "Inspeccionar ejecuciones recientes",
+          "getFirstRunLive": "Conseguir la primera ejecución en vivo"
+        },
+        "usage": {
+          "noBudget": {
+            "title": "Todavía no hay instantánea de presupuesto en vivo",
+            "body": "Todavía no existe una instantánea de presupuesto de MUTX con la que comparar. Hasta que exista, la conciencia de costes está incompleta."
+          },
+          "empty": {
+            "title": "El presupuesto existe, pero el uso está vacío",
+            "body": "La superficie de presupuesto está en vivo, pero no llegaron eventos de uso en la ventana actual. O el agente todavía no ha gastado nada o falta la emisión de uso."
+          },
+          "triggerRealUsage": "Activar uso real",
+          "setupBudgetVisibility": "Configurar visibilidad del presupuesto"
+        },
+        "approvals": {
+          "noAgent": {
+            "title": "Aún no existe ningún agente al que poner puerta",
+            "body": "Las colas de aprobación solo importan cuando un agente real puede hacer algo arriesgado. Crea o despliega primero el agente."
+          },
+          "gateOff": {
+            "title": "Existe historial de aprobaciones, pero la puerta está desactivada localmente",
+            "body": "MUTX ya tiene registros de aprobación, pero Pico todavía dice que la puerta está deshabilitada. Actívala aquí para que el estado local del producto coincida con la realidad del plano de control."
+          },
+          "none": {
+            "title": "Todavía no hay registros de aprobación",
+            "body": "Nada arriesgado ha pasado aún por la cola de aprobación real. Ejecuta una acción real con puerta antes de llamar a esto gobernado."
+          },
+          "runGatedAction": "Ejecutar una acción con puerta",
+          "configureApprovalGate": "Configurar puerta de aprobación"
+        }
+      },
+      "shell": {
+        "eyebrow": "Puente de Autopilot",
+        "title": "Confía en el runtime porque la superficie dice la verdad",
+        "description": "Inspecciona la última ejecución, compárala con el gasto en vivo y luego decide qué acciones riesgosas merecen una puerta. Así es como se gana la confianza aquí."
+      },
+      "hero": {
+        "runtimePulse": "Pulso del runtime",
+        "headline": "Mantén la ejecución, el gasto y la puerta en el mismo marco.",
+        "body": "Empieza por la ejecución más reciente, compárala con la línea de presupuesto actual y luego decide si una puerta humana debe interponerse. Ese orden mantiene honesta la sala de control.",
+        "runState": {
+          "label": "Estado de la ejecución",
+          "authRequired": "autenticación requerida",
+          "noLiveRun": "sin ejecución en vivo",
+          "triggerTaskFirst": "activa primero una tarea real"
+        },
+        "budgetLine": {
+          "label": "Línea de presupuesto",
+          "offline": "sin conexión",
+          "pending": "pendiente",
+          "threshold": "umbral {percent}",
+          "waitingForSpend": "esperando gasto en vivo"
+        },
+        "gateState": {
+          "label": "Estado de la puerta",
+          "waiting": "{count} en espera",
+          "armed": "armada",
+          "off": "apagada",
+          "reviewVisible": "la revisión humana sigue visible",
+          "enableBeforeRisk": "actívala antes de una acción riesgosa"
+        },
+        "nextCheck": {
+          "label": "Siguiente comprobación del operador",
+          "inspectRun": "Inspeccionar ejecución {runId}",
+          "createFirstRun": "Crear la primera ejecución en vivo",
+          "noRunBody": "Todavía no hay ninguna ejecución visible, así que el movimiento honesto sigue estando en la ruta de la lección."
+        },
+        "packet": {
+          "label": "Paquete de control",
+          "run": "Ejecución {value}",
+          "runNone": "todavía ninguna",
+          "budget": "Presupuesto {value}",
+          "gate": "Puerta {value}",
+          "recovery": "Recuperación {value}",
+          "recoveryNotSet": "sin definir"
+        },
+        "decisionLine": {
+          "label": "Línea de decisión",
+          "thresholdBreached": "El gasto ya está por encima de la línea. Decide si la siguiente acción riesgosa necesita una puerta humana.",
+          "pendingQueue": "La cola mantiene las acciones riesgosas a la vista. Revísalas antes de que la superficie se vuelva más ruidosa.",
+          "clear": "Si la línea sigue despejada, sigue leyendo la ejecución hasta que la siguiente decisión se vuelva obvia."
+        },
+        "primaryAction": {
+          "finishLesson": "Termina primero {lessonTitle}",
+          "goBackToAcademy": "Volver a Academy",
+          "inspectRun": "Inspeccionar ejecución {runId}"
+        }
+      },
+      "surfaceCompass": {
+        "title": "Quédate aquí solo cuando el runtime en vivo sea la fuente real de verdad",
+        "body": "Autopilot sirve para leer la ejecución actual, el gasto, las alertas y las aprobaciones. Si el producto todavía necesita una respuesta de lección, vuelve a Academy o Tutor. Si la verdad del runtime es visible pero aun así no basta, escala con la evidencia adjunta.",
+        "status": {
+          "hostedSessionRequired": "sesión alojada requerida",
+          "runtimeVisible": "runtime visible",
+          "waitingForFirstRun": "esperando la primera ejecución"
+        },
+        "aside": "Una sala de control no debería pedir fe. Si no hay señal en vivo, sal y crea una. Si la señal existe, úsala para decidir el siguiente movimiento de inmediato.",
+        "items": {
+          "finishLesson": "Terminar {lessonTitle}",
+          "goBackToAcademy": "Volver a Academy",
+          "backToLaneNote": "Volver al carril",
+          "lessonCaption": "Vuelve aquí cuando el bloqueo real siga estando en la ruta de la lección y no en el runtime.",
+          "askTutor": "Pregunta a Tutor por el siguiente movimiento",
+          "askTutorCaption": "Usa Tutor cuando el producto probablemente todavía conoce la respuesta y el problema no es el estado del runtime en vivo.",
+          "askTutorNote": "Conocible",
+          "stayOnRecentRuns": "Quedarse en ejecuciones recientes",
+          "stayOnRecentRunsCaption": "Quédate aquí cuando la ejecución más reciente, la traza o el feed de alertas sean la superficie real de decisión.",
+          "stayHereNote": "Quédate aquí",
+          "escalateWithEvidence": "Escalar con evidencia",
+          "escalateCaption": "Escala solo después de tener el paquete, el contexto de la ejecución y la señal en vivo que demuestre dónde se rompió la verdad.",
+          "messyEdgeNote": "Borde complicado"
+        }
+      },
+      "banner": {
+        "authRequired": "Autopilot en vivo necesita una sesión autenticada de MUTX. Hasta entonces no hay ninguna ejecución, alerta, presupuesto ni feed de aprobación honesto que mostrarte."
+      },
+      "operatorDoctrine": {
+        "sectionLabel": "Doctrina del operador",
+        "title": "Leer, juzgar y luego intervenir",
+        "chip": "señal • línea • puerta",
+        "step": {
+          "read": {
+            "label": "01 • Leer",
+            "title": "Empieza con la señal en vivo más fuerte",
+            "authRequired": "Sin una sesión alojada, esta sala debería negarse a improvisar. Conecta primero el feed en vivo.",
+            "withRun": "La ejecución {runId} es lo primero que hay que leer. {detail}",
+            "noRun": "Todavía no existe ninguna ejecución en vivo. El movimiento honesto es activar una tarea real antes de ajustar cualquier otra cosa."
+          },
+          "judge": {
+            "label": "02 • Juzgar",
+            "title": "Haz explícita la línea de decisión",
+            "authRequired": "La revisión del presupuesto no está disponible hasta que la cuenta en vivo esté conectada.",
+            "withBudget": "{usage} de uso frente a un umbral de {threshold}. Esa línea debería decirte cuándo entra una persona.",
+            "noBudget": "Todavía no hay instantánea de presupuesto en vivo. No finjas que un umbral importa hasta que se encuentre con gasto real."
+          },
+          "intervene": {
+            "label": "03 • Intervenir",
+            "title": "Mantén revisables las acciones riesgosas",
+            "pending": "{count} elemento{pluralSuffix} de aprobación está esperando. Bien. El trabajo peligroso sigue visible.",
+            "configured": "La puerta está configurada, pero ahora mismo no hay nada esperando. Mantenla revisable y aburrida.",
+            "off": "La puerta sigue apagada. Enciéndela antes de que una acción riesgosa se convierta en un efecto secundario invisible."
+          }
+        },
+        "postureLabel": "Postura de la sala de control",
+        "postureBody": "Usa esta sala para revisar el estado en vivo, no para celebrar movimiento por sí mismo.",
+        "decisionLineLabel": "Línea de decisión",
+        "decisionLineBody": "Empieza con la última ejecución, compárala con la línea de presupuesto y luego decide si la puerta necesita una llamada humana. Ese orden importa.",
+        "operatorCuesLabel": "Señales del operador"
+      },
+      "controlBrief": {
+        "sectionLabel": "Resumen de control",
+        "title": "Lee el runtime antes de confiar en la automatización",
+        "body": "Autopilot se gana la confianza cuando la última ejecución, el gasto en vivo y las acciones riesgosas siguen visibles en una sola superficie de control.",
+        "chip": {
+          "hostedSessionRequired": "Sesión alojada requerida",
+          "liveFeed": "Feed en vivo del plano de control",
+          "gateConfigured": "Puerta configurada en Pico",
+          "gateOff": "Puerta todavía apagada en Pico"
+        },
+        "summary": {
+          "authRequired": "Hasta que se conecte una sesión de MUTX, esta superficie se niega a inventar verdad. Usa Academy para terminar la ruta de configuración y luego vuelve a leer el runtime real.",
+          "withRun": "La última ejecución {runId} está {status}{asOfClause}. {detail}",
+          "withRunAsOf": " a fecha de {timestamp}",
+          "noRun": "Todavía no hay ninguna ejecución en vivo visible. El siguiente movimiento honesto es terminar la ruta de Academy, activar una tarea real y volver aquí solo cuando el runtime tenga algo que decir."
+        }
+      },
+      "operatorRail": {
+        "sectionLabel": "Rail del operador",
+        "sessionStatusLabel": "Estado de la sesión",
+        "sessionStatus": {
+          "authRequired": "autenticación requerida",
+          "attached": "conectada"
+        },
+        "progressSyncLabel": "Sincronización del progreso",
+        "budgetLineLabel": "Línea de presupuesto",
+        "gateStateLabel": "Estado de la puerta",
+        "gateState": {
+          "enabled": "activada",
+          "off": "apagada"
+        },
+        "activeSurfaceLabel": "Superficie activa",
+        "activeSurfaceNone": "ninguna",
+        "helpLaneLabel": "Carril de ayuda",
+        "helpLane": {
+          "open": "abierto",
+          "closed": "cerrado"
+        },
+        "jumpToSubsystem": "Ir al subsistema",
+        "jump": {
+          "timeline": "Cronología",
+          "recentRuns": "Ejecuciones recientes",
+          "alerts": "Alertas",
+          "approvalQueue": "Cola de aprobación"
+        },
+        "emptyFeedLabel": "Si el feed está vacío",
+        "emptyFeedBody": "No disfraces la ausencia de datos del runtime. Termina la ruta de Academy, activa una acción real y vuelve solo cuando MUTX tenga algo que informar."
+      },
+      "stats": {
+        "runs": {
+          "label": "Ejecuciones",
+          "noAgent": "Todavía no hay ningún agente conectado a MUTX.",
+          "hasRuns": "Ejecuciones recientes extraídas de MUTX.",
+          "noRunsYet": "Existe un agente, pero todavía no ha llegado ninguna ejecución.",
+          "offline": "Inicia sesión para leer el historial de ejecuciones en vivo."
+        },
+        "failures": {
+          "label": "Fallos",
+          "hasFailures": "Los fallos son visibles aquí. Bien. Los fallos ocultos son peores.",
+          "none": "No hay ejecuciones fallidas en la ventana actual.",
+          "offline": "Inicia sesión para ver el conteo de fallos."
+        },
+        "alerts": {
+          "label": "Alertas",
+          "hasAlerts": "Dolor operativo sin resolver desde el feed de monitorización.",
+          "noneWithRuns": "No hay alertas sin resolver ahora mismo.",
+          "noneNoRuns": "Todavía no hay alertas porque nada se ha ejecutado.",
+          "offline": "Inicia sesión para leer alertas en vivo."
+        },
+        "budget": {
+          "label": "Presupuesto",
+          "noSnapshot": "Todavía no se devolvió ninguna instantánea de presupuesto en vivo.",
+          "hasUsage": "Umbral de {threshold} frente al gasto en vivo.",
+          "noUsage": "El presupuesto existe, pero el uso está vacío en la ventana actual.",
+          "offline": "Inicia sesión para leer el uso del presupuesto."
+        },
+        "approvals": {
+          "label": "Aprobaciones",
+          "pending": "Hay acciones riesgosas pendientes esperando una decisión humana.",
+          "historyGateOff": "Existe historial de aprobaciones, pero la puerta de Pico sigue apagada localmente.",
+          "none": "No hay acciones riesgosas bloqueadas ahora mismo.",
+          "offline": "Inicia sesión para ver aprobaciones en vivo."
+        }
+      },
+      "sidebar": {
+        "latestRunLabel": "Última ejecución",
+        "latestRun": {
+          "unavailable": "no disponible",
+          "noneYet": "todavía ninguna"
+        },
+        "thresholdLineLabel": "Línea de umbral",
+        "thresholdLine": {
+          "breached": "superada",
+          "clear": "despejada"
+        },
+        "recoveryLessonLabel": "Lección de recuperación",
+        "workspaceProofLabel": "Prueba del workspace",
+        "stepsProgress": "{completed}/{total} pasos",
+        "stepsWithFocus": "{completed}/{total} pasos • {stepTitle}",
+        "evidence": {
+          "captured": "capturada",
+          "missing": "faltante"
+        },
+        "askTutor": "Pregunta a Tutor por el siguiente movimiento",
+        "escalateHumanHelp": "Escalar a ayuda humana",
+        "body": "Quédate aquí cuando el runtime sea la fuente de verdad. Si el workspace de la lección todavía está incompleto, Academy sigue siendo la ruta más limpia de vuelta a una respuesta real."
+      },
+      "controlProtocol": {
+        "sectionLabel": "Protocolo de control",
+        "title": "Tres comprobaciones del operador antes de que la automatización se gane la confianza",
+        "body": "La sala de control debe poner las primeras decisiones a plena vista. Lee la última ejecución, lee la línea de gasto y mantén expuestas las acciones riesgosas antes de tocar algo más abstracto.",
+        "chip": "lista de comprobación del operador en vivo",
+        "cardLabel": "Comprobación del operador",
+        "steps": [
+          {
+            "id": "01",
+            "title": "Empieza por la última ejecución",
+            "body": "Si la ejecución más reciente no tiene sentido, el resto de esta superficie es solo decoración.",
+            "action": "Abrir ejecuciones recientes"
+          },
+          {
+            "id": "02",
+            "title": "El presupuesto te dice cuándo parar",
+            "body": "Los umbrales solo son útiles cuando están anclados al gasto en vivo y no a la intuición.",
+            "action": "Ajustar la barrera de gasto"
+          },
+          {
+            "id": "03",
+            "title": "Las acciones riesgosas siguen visibles",
+            "body": "Las aprobaciones deben sobrevivir a los reinicios, seguir siendo revisables y leerse como decisiones reales.",
+            "action": "Abrir cola de aprobación"
+          }
+        ]
+      },
+      "timeline": {
+        "sectionLabel": "Narrativa de señales",
+        "title": "Lee la historia en vivo antes de tocar la configuración",
+        "body": "Esta es la narrativa del operador. Si la cronología está vacía, la respuesta correcta es que todavía no ha pasado nada significativo.",
+        "authRequired": "No hay cronología sin acceso en vivo al plano de control. Esa es la respuesta honesta.",
+        "olderSignalsHidden": "{count} señal{pluralSuffix} más antigua quedó fuera de vista a propósito. Empieza por las cuatro más fuertes."
+      },
+      "runs": {
+        "sectionLabel": "Revisión de ejecuciones",
+        "title": "Revisión de ejecución reciente",
+        "body": "Empieza aquí. Lee la última ejecución antes de tocar umbrales o aprobaciones.",
+        "refresh": "Actualizar datos en vivo",
+        "authRequired": "Inicia sesión y luego vuelve aquí para inspeccionar la primera ejecución real.",
+        "card": {
+          "title": "Ejecución {runId}",
+          "operatorReadLabel": "Lectura del operador",
+          "operatorRead": {
+            "failed": "Este trabajo falló. Si todavía confías en el agente, debería ser porque entiendes este fallo.",
+            "active": "Este trabajo sigue activo. Un silencio largo puede significar que el runtime está atascado.",
+            "finished": "El trabajo terminó. Ahora verifica que la salida sea útil, no solo técnicamente completa."
+          },
+          "factsLabel": "Hechos de la ejecución",
+          "agent": "Agente: {agentId}",
+          "agentUnknown": "desconocido",
+          "traceCount": "Cantidad de trazas: {count}",
+          "started": "Iniciada {timestamp}",
+          "startUnavailable": "Hora de inicio no disponible",
+          "traceSignalsLabel": "Señales de traza",
+          "noTraces": "No se devolvieron trazas para esta ejecución."
+        },
+        "olderRunsHidden": "{count} ejecución{pluralSuffix} más antigua está oculta para que la revisión siga centrada primero en las decisiones más recientes."
+      },
+      "spend": {
+        "sectionLabel": "Revisión de gasto",
+        "title": "Gasto en vivo y tu línea en la arena",
+        "usageLabel": "Uso",
+        "thresholdStatus": {
+          "above": "por encima del umbral",
+          "within": "dentro del umbral"
+        },
+        "summary": {
+          "authRequired": "El presupuesto en vivo requiere autenticación.",
+          "withBudget": "{used} usados de {total}. Reinicio {reset}.",
+          "resetUnknown": "desconocido",
+          "noSnapshot": "No se devolvió ninguna instantánea de presupuesto en vivo."
+        },
+        "thresholdLabel": "Umbral",
+        "thresholdBody": "Pico guarda aquí la línea de presupuesto local. La entrega real de alertas sigue el ajuste de monitorización en vivo de MUTX, así que esta superficie se niega a fingir que el enrutamiento por correo o webhook está activo cuando no lo está.",
+        "thresholdInputLabel": "Porcentaje de umbral de coste",
+        "saveThreshold": "Guardar umbral",
+        "sync": "sincronización {state}",
+        "breachedWarning": "Umbral superado. El uso en vivo está por encima del límite que configuraste.",
+        "topSpendersLabel": "Mayores consumidores",
+        "usageDriversLabel": "Impulsores de uso",
+        "breakdownAuthRequired": "Inicia sesión para leer el desglose de uso.",
+        "breakdownRow": "{credits} créditos en {events} eventos"
+      },
+      "alerts": {
+        "sectionLabel": "Alertas",
+        "title": "Eventos de monitorización significativos",
+        "body": "Este es el feed de alertas en vivo. Sin insignias de advertencia falsas, sin incidentes sintéticos.",
+        "authRequired": "Inicia sesión para cargar alertas en vivo.",
+        "card": {
+          "resolvedTitle": "Alerta resuelta",
+          "activeTitle": "Alerta activa",
+          "agent": "Agente: {agentId}",
+          "resolvedStatus": "Resuelta",
+          "activeStatus": "Sigue activa"
+        },
+        "hiddenCount": "{count} alerta{pluralSuffix} adicional está ocultada para que el feed siga siendo editorial y no se convierta en una pared de insignias."
+      },
+      "approvals": {
+        "sectionLabel": "Aprobaciones",
+        "title": "Acciones riesgosas y sus decisiones",
+        "body": "Esta cola es ahora la fuente de verdad de aprobación para Pico. No debería desaparecer porque un proceso se reinicie.",
+        "authRequired": "Inicia sesión para cargar solicitudes de aprobación en vivo.",
+        "gateMismatch": "Ya existen registros de aprobación en MUTX, pero Pico todavía muestra la puerta como apagada localmente. Enciéndela aquí para que el estado del producto coincida con la realidad del plano de control.",
+        "card": {
+          "pendingLabel": "Pendiente",
+          "fallbackSummary": "{requester} solicitó esta acción para el agente {agentId}.",
+          "approve": "Aprobar",
+          "reject": "Rechazar",
+          "working": "Trabajando..."
+        },
+        "hiddenPending": "{count} aprobación{pluralSuffix} pendiente más quedó fuera de vista para que la cola mantenga arriba las decisiones más agudas."
+      },
+      "composer": {
+        "sectionLabel": "Crear una acción con puerta",
+        "body": "Ejercita aquí la cola de aprobación en vivo en lugar de esperar a que otra superficie cree primero la solicitud.",
+        "chip": "escritura en cola en vivo",
+        "agentIdLabel": "ID del agente",
+        "agentIdPlaceholder": "agent-founder-lab",
+        "sessionOrRunIdLabel": "ID de sesión o ejecución",
+        "sessionOrRunIdPlaceholder": "ses-pico-approval",
+        "actionTypeLabel": "Tipo de acción",
+        "actionTypePlaceholder": "OUTBOUND_SEND",
+        "summaryLabel": "Por qué esta acción necesita una puerta",
+        "summaryPlaceholder": "Describe la acción riesgosa con claridad.",
+        "summaryDefault": "El envío saliente requiere una decisión humana antes de que el runtime cruce la línea.",
+        "create": "Crear solicitud de aprobación",
+        "creating": "Creando solicitud...",
+        "reset": "Restablecer borrador"
+      },
+      "gateStatus": {
+        "sectionLabel": "Estado de la puerta",
+        "pendingActions": "Acciones pendientes",
+        "decisionHistory": "Historial de decisiones",
+        "configuredLocally": "Configurada localmente",
+        "yes": "sí",
+        "no": "no"
+      },
+      "recentDecisions": {
+        "sectionLabel": "Decisiones recientes",
+        "hiddenOlder": "{count} decisión{pluralSuffix} más antigua está oculta para que el registro reciente siga siendo legible."
+      }
+    },
+    "sessionBanner": {
+      "errors": {
+        "loadWebhookRoutes": "No se pudieron cargar las rutas de webhook"
+      },
+      "authenticated": {
+        "chips": {
+          "sessionAttached": "sesión alojada conectada",
+          "plan": "plan {plan}",
+          "planUnknown": "plan desconocido",
+          "verificationPending": "verificación pendiente",
+          "emailVerified": "correo verificado",
+          "emailStatusUnknown": "estado del correo desconocido",
+          "loadingWebhooks": "cargando webhooks",
+          "webhookCount": "{count} webhook{pluralSuffix}",
+          "webhooksUnavailable": "webhooks no disponibles"
+        },
+        "body": "Sesión iniciada como {identity}. La sincronización del progreso, el estado del onboarding, las aprobaciones y los datos del runtime en vivo ya pueden usar la cuenta alojada de MUTX en este host.",
+        "rails": {
+          "identity": "Identidad",
+          "operator": "operador",
+          "plan": "Plan",
+          "emailState": "Estado del correo",
+          "webhookRoutes": "Rutas de webhook",
+          "unknown": "desconocido",
+          "pending": "pendiente",
+          "verified": "verificado",
+          "loading": "cargando",
+          "na": "n/d"
+        },
+        "verificationNote": "Las cuentas con contraseña siguen limitadas hasta que se confirme el enlace del correo. Termina eso antes de tratar la sesión alojada como lista para producción.",
+        "productTruth": {
+          "label": "Verdad del producto",
+          "body": "Ahora el producto puede decir la verdad sobre el progreso, el estado del runtime, las aprobaciones y la configuración alojada. Si esta cuenta todavía no está lista para producción, arréglalo aquí antes de confiar en el resto de la superficie.",
+          "progressSync": "Sincronización del progreso",
+          "runtimeTruth": "Verdad del runtime",
+          "approvalConfidence": "Confianza de aprobación",
+          "live": "en vivo",
+          "checking": "comprobando",
+          "grounded": "fundamentado",
+          "partial": "parcial",
+          "limited": "limitado",
+          "usable": "utilizable"
+        },
+        "finishEmailVerification": "Terminar verificación del correo"
+      },
+      "loading": {
+        "label": "Sesión alojada",
+        "body": "Comprobando si este host de Pico tiene una sesión de operador conectada."
+      },
+      "anonymous": {
+        "chips": {
+          "sessionRequired": "sesión alojada requerida",
+          "picoHostAuth": "autenticación del host de Pico"
+        },
+        "body": "Las rutas de la plataforma Pico están activas aquí, pero la sesión alojada todavía no está conectada en este dominio. Inicia sesión en Pico para persistir el progreso, leer ejecuciones en vivo y usar el estado de onboarding/runtime del backend. Google, GitHub, Discord, Apple, registro con contraseña y confirmación por correo ya terminan en este host.",
+        "rails": {
+          "progress": "Progreso",
+          "runtimeTruth": "Verdad del runtime",
+          "approvals": "Aprobaciones",
+          "wontPersist": "no persistirá",
+          "limited": "limitado",
+          "readOnlyFeeling": "sensación de solo lectura"
+        },
+        "withoutSession": {
+          "label": "Sin sesión",
+          "progressSync": "Sincronización del progreso",
+          "runtimeTruth": "Verdad del runtime",
+          "approvalsAndWebhooks": "Aprobaciones + webhooks",
+          "localOnly": "solo local",
+          "notTrustworthyYet": "todavía no es confiable",
+          "blocked": "bloqueado",
+          "body": "Conecta la cuenta de Pico en este host antes de confiar en el progreso, el estado del runtime en vivo o el comportamiento de aprobación.",
+          "signIn": "Iniciar sesión",
+          "createAccount": "Crear cuenta",
+          "continueWithProvider": "Continuar con {provider}"
+        }
+      }
+    },
+    "platformSurface": {
+      "syncState": {
+        "hydrating": "hidratando",
+        "live": "en vivo",
+        "saving": "guardando",
+        "localOnly": "solo local"
+      },
+      "shared": {
+        "notRecorded": "sin registrar"
+      },
+      "surfaceOptions": {
+        "onboarding": {
+          "label": "Onboarding",
+          "note": "Memoria del hangar de lanzamiento"
+        },
+        "academy": {
+          "label": "Academy",
+          "note": "Columna principal de aprendizaje"
+        },
+        "lesson": {
+          "label": "Lección",
+          "note": "Memoria del paso activo"
+        },
+        "tutor": {
+          "label": "Tutor",
+          "note": "Ayuda fundamentada para el siguiente paso"
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "note": "Sala de control del runtime"
+        },
+        "support": {
+          "label": "Soporte",
+          "note": "Carril de escalación humana"
+        },
+        "activeNow": "activo ahora",
+        "setRoute": "establecer ruta"
+      },
+      "header": {
+        "label": "Mesa de plataforma",
+        "title": "Identidad, memoria de ruta y límites en un solo lugar",
+        "body": "Este es el escritorio de control orientado al operador para la cuenta de Pico. Debe decir la verdad sobre los límites del plan, dónde estaba trabajando por última vez el operador y si la interfaz del producto está afinada para foco o recuperación."
+      },
+      "summary": {
+        "plan": "Plan",
+        "verification": "Verificación",
+        "workspaceSaves": "Guardados del workspace",
+        "verificationState": {
+          "pending": "pendiente",
+          "verified": "verificado",
+          "unknown": "desconocido",
+          "signIn": "iniciar sesión"
+        }
+      },
+      "routeMemory": {
+        "label": "Memoria de ruta",
+        "body": "La superficie actual debe coincidir con lo que el operador está haciendo de verdad. Mantén esto actualizado cuando el producto cambie de carril.",
+        "activeSurfaceNotRecorded": "sin registrar",
+        "currentSurface": {
+          "label": "Superficie actual",
+          "body": "La memoria de ruta debería seguir al operador por Pico en lugar de reiniciarse cada vez que cambia la página."
+        },
+        "lastLessonContext": {
+          "label": "Último contexto de lección",
+          "body": "Este es el punto de recuperación cuando el operador necesita volver a entrar en la columna de lecciones."
+        }
+      },
+      "toggles": {
+        "collapseRail": {
+          "label": "Colapsar rail",
+          "body": "Usa una interfaz más compacta cuando el operador ya conoce la ruta y necesita más espacio para la superficie en vivo."
+        },
+        "keepHelpLaneOpen": {
+          "label": "Mantener abierto el carril de ayuda",
+          "body": "Mantén visible la guía de recuperación cuando el operador todavía está aprendiendo las rutas del producto."
+        }
+      },
+      "actions": {
+        "resumeLastLesson": "Reanudar la última lección",
+        "openAcademy": "Abrir Academy",
+        "clearLessonMemory": "Borrar memoria de la lección",
+        "resetPlatformMemory": "Restablecer memoria de plataforma",
+        "openLiveControlRoom": "Abrir sala de control en vivo"
+      },
+      "entitlements": {
+        "label": "Permisos",
+        "featureLabels": {
+          "academy": "Academy",
+          "tutor": "Tutor",
+          "project_limit": "Límite de proyectos",
+          "monitored_agents": "Agentes monitorizados",
+          "alerts": "Alertas",
+          "approvals": "Aprobaciones",
+          "retention": "Retención"
+        }
+      },
+      "routeLedger": {
+        "label": "Libro de ruta",
+        "currentPath": "Ruta actual",
+        "platformStateUpdated": "Estado de la plataforma actualizado",
+        "syncConfidence": "Confianza de sincronización"
+      },
+      "operatorTruth": {
+        "label": "Verdad del operador",
+        "body": "El producto debería recordar la ruta y el contexto de la lección sin fingir que sabe más de lo que sabe. `activeSurface`, `lastOpenedLessonSlug`, el estado del rail y el carril de ayuda son la memoria persistida mínima necesaria para que Pico se sienta como una sola plataforma."
+      }
+    },
+    "onboardingPage": {
+      "hero": {
+        "chip": "Pulso de la primera victoria",
+        "eyebrow": "Haz que la primera prueba sea imposible de pasar por alto.",
+        "subtitle": "Sigue la instalación, el primer artefacto de prueba y el siguiente movimiento desde un solo lugar.",
+        "shellEyebrow": "Onboarding",
+        "shellTitle": "Consigue rápido tu primer agente funcional",
+        "shellDescription": "Ignora todo excepto la primera victoria local. Instala Hermes, ejecuta un prompt, ve una respuesta real y sigue avanzando.",
+        "chapterPulse": "Pulso del capítulo",
+        "proofState": "Estado de la prueba",
+        "proofArtifactLogged": "artefacto registrado",
+        "proofArtifactMissing": "aún falta el artefacto",
+        "runtimeTruth": "Verdad del runtime",
+        "nextIrreversibleMove": "Siguiente movimiento irreversible",
+        "proof": "Prueba",
+        "runtime": "Runtime",
+        "focus": "Foco",
+        "sync": "Sincronización",
+        "signalCore": "Núcleo de señal",
+        "firstWinPulse": "Pulso de la primera victoria",
+        "trackInstallPrompt": "Instala Hermes ahora",
+        "installDone": "la instalación está hecha",
+        "proofCaptured": "prueba capturada",
+        "runtimeNotAttached": "no conectado",
+        "nextMove": "Siguiente movimiento",
+        "visibleSuccess": "Éxito visible"
+      },
+      "labels": {
+        "chapterPulse": "Pulso del capítulo",
+        "proofState": "Estado de la prueba",
+        "runtimeTruth": "Verdad del runtime",
+        "nextIrreversibleMove": "Siguiente movimiento irreversible",
+        "chapterPosture": "Postura del capítulo",
+        "guideMarker": "Marcador de guía",
+        "trackChecklist": "Checklist del track",
+        "chapterBrief": "Resumen del capítulo 01",
+        "fastestPath": "Ruta más rápida al valor",
+        "trackLocked": "Track bloqueado",
+        "visibleSuccess": "Éxito visible",
+        "studioLedger": "Libro del estudio",
+        "completedLessons": "Lecciones completadas",
+        "hostedSync": "Sincronización alojada",
+        "runtimeStatus": "Estado del runtime",
+        "workspace": "Workspace",
+        "jumpStraightTo": "Ir directo a",
+        "operatingRule": "Regla operativa",
+        "currentPressure": "Presión actual",
+        "install": "Instalar",
+        "firstPrompt": "Primer prompt",
+        "proofProtocol": "Protocolo de prueba",
+        "visibleMoves": "Tres movimientos visibles para completar el capítulo 01",
+        "doThisNow": "Haz esto ahora",
+        "visibleMove": "Movimiento visible",
+        "liveStackRadar": "Radar de stack en vivo",
+        "missionBoard": "Tablero de misión",
+        "mission01": "Misión 01",
+        "mission02": "Misión 02",
+        "focusedStep": "Paso enfocado",
+        "proofCaptured": "Prueba capturada",
+        "operatorRecord": "Registro del operador",
+        "refreshSync": "Actualizar sincronización",
+        "currentBinding": "Binding actual",
+        "assistant": "Asistente",
+        "model": "Modelo",
+        "hostedActions": "Acciones alojadas",
+        "updateStep": "Actualizando paso...",
+        "completeStep": "Marcar el paso actual como completado",
+        "checklistDismissed": "Checklist descartada",
+        "checklistVisible": "Checklist visible",
+        "completeWizard": "Completar asistente",
+        "resetWizard": "Restablecer asistente",
+        "hostedRuntimeEditor": "Editor de runtime alojado",
+        "runtimeLabel": "Etiqueta del runtime",
+        "runtimeStatusField": "Estado del runtime",
+        "installMethod": "Método de instalación",
+        "gatewayUrl": "URL del gateway",
+        "assistantName": "Nombre del asistente",
+        "workspaceField": "Workspace",
+        "modelField": "Modelo",
+        "saveSnapshot": "Guardar instantánea del runtime",
+        "openInstallLesson": "Abrir lección de instalación",
+        "saveOnlyTruth": "Guarda solo lo que sea verdad en el host del operador ahora mismo: URL del gateway, salud del runtime y el asistente enlazado.",
+        "currentBindingTitle": "Binding actual",
+        "noHostedState": "Todavía no se ha registrado ningún estado de onboarding alojado.",
+        "operatorHostSnapshot": "Instantánea del host del operador",
+        "gateway": "Gateway",
+        "lastSeen": "Visto por última vez",
+        "bindings": "Bindings",
+        "noRuntimeSnapshot": "Todavía no se ha sincronizado ninguna instantánea del runtime.",
+        "gatewayHealth": "Salud del gateway",
+        "noDoctorSummary": "Todavía no se ha sincronizado ningún resumen de doctor.",
+        "activationTrack": "Track de activación",
+        "doThisFirst": "Haz esto primero",
+        "outcomeDriven": "Orientado al resultado",
+        "outcome": "Resultado:",
+        "installLesson": "Lección de instalación",
+        "firstPromptLesson": "Lección del primer prompt",
+        "askTutor": "Preguntar a Tutor",
+        "currentPressureInstall": "hecho",
+        "currentPressureFirstPrompt": "prueba capturada"
+      },
+      "compass": {
+        "title": "Usa la ruta más corta que mantenga honesto al producto",
+        "body": "Mantén estrecha la primera victoria. Sigue el camino de la lección cuando la secuencia esté clara, usa Tutor para un solo comando bloqueado, abre Autopilot solo cuando el estado del runtime en vivo sea la pregunta real y escala al final.",
+        "statusFirstWinCleared": "primera victoria completada",
+        "statusInstallCleared": "instalación completada",
+        "statusColdStart": "inicio en frío",
+        "aside": "Este capítulo existe para comprimir el mundo, no para ensancharlo. La primera prueba debería ocurrir antes de preferencias, debates de arquitectura o recorridos de herramientas.",
+        "openInstallLesson": "Abrir lección de instalación",
+        "runFirstPrompt": "Ejecutar primer prompt",
+        "continueAcademyLane": "Continuar por el carril de Academy",
+        "askTutorAboutStep": "Preguntar a Tutor sobre este paso",
+        "inspectLiveControlRoom": "Inspeccionar sala de control en vivo",
+        "escalateToHumanHelp": "Escalar a ayuda humana",
+        "nextMove": "Siguiente movimiento",
+        "blocked": "Bloqueado",
+        "runtime": "Runtime",
+        "messyEdge": "Borde complicado"
+      },
+      "doctrine": {
+        "label": "Doctrina de arranque",
+        "title": "Empieza como un estudio preciso, no como un proyecto hobby",
+        "chip": "resumen • entregable • revisión",
+        "brief": "Haz que el runtime se abra limpiamente",
+        "deliverable": "Produce un artefacto obvio que valga la pena guardar",
+        "reviewLine": "No ensanches la superficie demasiado pronto",
+        "postTitle": "Postura del capítulo",
+        "postBody": "Mantén el capítulo 01 estrecho a propósito. Sin navegar, sin turismo de stack y sin teatro extra de configuración antes de que exista un artefacto real.",
+        "trackTitle": "Checklist del track",
+        "trackBody": "Una sola señal guía clara basta mientras la primera prueba todavía se está formando."
+      },
+      "protocol": {
+        "title": "Protocolo de prueba",
+        "body": "Estos son los únicos movimientos que cuentan antes de que la superficie se gane el derecho a ensancharse.",
+        "chip": "protocolo de primera victoria"
+      },
+      "runtime": {
+        "signInFirst": "Inicia sesión primero. La instantánea del runtime es por cuenta de operador.",
+        "loading": "Cargando el estado de onboarding y runtime del backend.",
+        "noHostedState": "Todavía no se ha registrado ningún estado de onboarding alojado.",
+        "currentProvider": "proveedor actual",
+        "availableSoon": "disponible pronto",
+        "locked": "bloqueado",
+        "ready": "listo",
+        "later": "más tarde",
+        "wizardProgress": "Progreso del asistente",
+        "currentStep": "Paso actual",
+        "notStarted": "no iniciado",
+        "notRecorded": "sin registrar",
+        "checklistDismissed": "checklist descartada",
+        "checklistVisible": "checklist visible",
+        "failed": "fallido",
+        "done": "hecho",
+        "active": "activo",
+        "pending": "pendiente",
+        "currentBindingNotRecorded": "sin registrar",
+        "hostedKickoffReview": "Revisión de arranque alojada",
+        "operatorHostSnapshot": "Instantánea del host del operador",
+        "gateway": "Gateway",
+        "installMethod": "Método de instalación",
+        "lastSeen": "Visto por última vez",
+        "bindings": "Bindings",
+        "unknown": "desconocido",
+        "noRuntimeSnapshot": "Todavía no se ha sincronizado ninguna instantánea del runtime.",
+        "gatewayHealth": "Salud del gateway",
+        "noDoctorSummary": "Todavía no se ha sincronizado ningún resumen de doctor."
+      },
+      "mission": {
+        "firstWinProtocol": "protocolo de primera victoria",
+        "doThisNow": "Haz esto ahora",
+        "visibleMove": "Movimiento visible",
+        "installHermes": "Instalar Hermes",
+        "runBoundedPrompt": "Ejecutar un prompt acotado",
+        "focusedStep": "Paso enfocado",
+        "proofState": "Estado de la prueba",
+        "captured": "capturada",
+        "completed": "completada",
+        "missing": "faltante",
+        "resumeInstall": "Reanudar misión de instalación",
+        "resumePrompt": "Reanudar misión de prompt"
+      }
+    },
+    "tutorPage": {
+      "shell": {
+        "eyebrow": "Tutor fundamentado",
+        "title": "Pide el siguiente paso exacto",
+        "description": "Trae un bloqueo concreto, recibe un movimiento fundamentado y vuelve a la ruta de lección o runtime que puede mover el trabajo."
+      },
+      "hero": {
+        "badge": "Pulso de crítica",
+        "title": "Adjunta la lección bloqueada y reduce la respuesta a un solo movimiento.",
+        "body": "Enruta la pregunta a través de la lección, el comando o el borde del runtime que falló de verdad. Eso mantiene la respuesta lo bastante fundamentada como para devolverte a la acción.",
+        "lessonLane": {
+          "label": "Carril de lección",
+          "connectBlockedLesson": "Conecta la lección bloqueada"
+        },
+        "replyState": {
+          "label": "Estado de respuesta",
+          "readyToActOn": "lista para actuar",
+          "waitingForPreciseBlocker": "esperando un bloqueo preciso"
+        },
+        "connection": {
+          "label": "Conexión",
+          "hostedContextAvailable": "contexto alojado disponible",
+          "hostedContextMissing": "contexto alojado ausente"
+        },
+        "focusedStep": {
+          "label": "Paso enfocado",
+          "body": "Si la respuesta no hace este paso más claro, sal de Tutor y usa la ruta más limpia."
+        },
+        "packetPreview": {
+          "label": "Vista previa del paquete de crítica",
+          "lane": "Carril {value}",
+          "state": "Estado {value}",
+          "focus": "Foco {value}",
+          "output": "Salida {value}",
+          "noneAttached": "ninguno adjunto",
+          "groundedMove": "un movimiento fundamentado"
+        },
+        "recentPressure": {
+          "label": "Presión reciente",
+          "empty": "Todavía no se ha guardado ninguna pregunta reciente. Trae el primer paso bloqueado en lugar de una descripción amplia de todo el proyecto."
+        },
+        "signal": {
+          "answerReady": "respuesta lista",
+          "reviewingBlocker": "revisando bloqueo",
+          "lessonAttached": "lección adjunta",
+          "awaitingBlocker": "esperando bloqueo",
+          "localOnly": "solo local",
+          "checking": "comprobando",
+          "openaiConnected": "openai conectado",
+          "platformAccess": "acceso a la plataforma",
+          "groundedMode": "modo fundamentado",
+          "attachLesson": "adjuntar lección",
+          "notSet": "sin definir",
+          "lessonSteps": "{completed}/{total} pasos"
+        }
+      },
+      "actions": {
+        "backToLesson": "Volver a la lección",
+        "openAcademy": "Abrir Academy",
+        "escalateToHumanHelp": "Escalar a ayuda humana"
+      },
+      "compass": {
+        "title": "Tutor debería terminar en movimiento, no en otro bucle",
+        "body": "Usa Tutor solo para recuperar un siguiente movimiento fundamentado. Vuelve a la lección cuando la respuesta sea suficiente, inspecciona Autopilot cuando el runtime sea el bloqueo real y escala solo cuando ninguna ruta pueda decir la verdad.",
+        "status": {
+          "answerReady": "respuesta lista",
+          "lessonContextAttached": "contexto de lección adjunto",
+          "awaitingBlocker": "esperando bloqueo"
+        },
+        "aside": "Una buena respuesta de Tutor termina en un movimiento. Si no lo hace, sal del bucle y vuelve a la lección, al runtime o al soporte.",
+        "items": {
+          "returnToBlockedLesson": "Volver a la lección bloqueada",
+          "returnToAcademy": "Volver a Academy",
+          "returnCaption": "Vuelve aquí cuando la respuesta de Tutor siga manteniendo honesta la ruta de la lección.",
+          "resumeLane": "Reanudar carril",
+          "inspectLiveControlRoom": "Inspeccionar sala de control en vivo",
+          "inspectCaption": "Abre esto cuando el problema haya pasado de una lógica de lección conocible a estado de runtime.",
+          "runtime": "Runtime",
+          "openSupportLane": "Abrir carril de soporte",
+          "escalateCaption": "Escala solo cuando la respuesta de Tutor todavía no dé un movimiento concreto.",
+          "escalate": "Escalar"
+        }
+      },
+      "method": {
+        "label": "Método de la mesa de crítica",
+        "title": "Trata cada pregunta como una crítica de estudio",
+        "chip": "marco • evidencia • salida",
+        "cards": {
+          "frame": {
+            "label": "01 • Marco",
+            "title": "Trae un paso bloqueado",
+            "bodyWithLesson": "Vincula la pregunta a {lessonTitle}. La mesa funciona mejor cuando la ruta de la lección ya está adjunta.",
+            "bodyWithoutLesson": "Nombra el paso exacto, el comando o el estado de aprobación que se rompió. La ansiedad amplia no basta."
+          },
+          "evidence": {
+            "label": "02 • Evidencia",
+            "title": "Trae lo que realmente ocurrió",
+            "body": "Pega el comando, la transcripción, el error o la señal de runtime. Esta mesa revisa evidencia, no vibras."
+          },
+          "exit": {
+            "label": "03 • Salida",
+            "title": "Sal con un movimiento",
+            "body": "Una buena respuesta de Tutor da una acción siguiente, una línea de verificación y una transferencia limpia si la evidencia sigue siendo fina."
+          }
+        },
+        "deskPosture": {
+          "label": "Postura de la mesa",
+          "body": "Esta no es una superficie de chat general. Úsala como una mesa de revisión que reduzca la ambigüedad a un solo siguiente movimiento."
+        },
+        "attachedLane": {
+          "label": "Carril adjunto",
+          "bodyWithLesson": "{lessonTitle} está adjunta, así que Tutor puede responder contra el resumen real de la lección en lugar de adivinar.",
+          "bodyWithoutLesson": "Todavía no hay ninguna lección adjunta. Conecta la lección bloqueada si quieres que Tutor se mantenga fundamentado en la ruta real."
+        },
+        "lessonReviewBoard": {
+          "lessonBrief": "Resumen de la lección",
+          "deliverable": "Entregable",
+          "critiqueLine": "Línea de crítica"
+        }
+      },
+      "form": {
+        "label": "Mesa de crítica",
+        "mascotAlt": "Mascota del tutor de PicoMUTX",
+        "title": "Trae un bloqueo a la mesa",
+        "body": "Pregunta solo cuando la ruta de la lección esté bloqueada. La respuesta debería devolverte a la acción, no a otro bucle de lectura.",
+        "authAttached": "Identidad alojada y contexto de runtime adjuntos",
+        "readOnlyMode": "Modo Tutor de solo lectura. Falta el contexto de sesión alojada hasta que inicies sesión.",
+        "whereYouAre": {
+          "label": "Dónde estás",
+          "body": "Estás preguntando sobre {lessonTitle}. Mantén la pregunta atada al paso que de verdad está bloqueado.",
+          "lessonSteps": "Pasos de la lección",
+          "focusedStep": "Paso enfocado",
+          "backToLesson": "Volver a la lección"
+        },
+        "packet": {
+          "label": "Paquete de crítica",
+          "body": "Trae solo el contexto suficiente para una respuesta precisa: ruta, fallo y expectativa exacta.",
+          "chip": "ruta • fallo • expectativa",
+          "currentTrack": "Track actual",
+          "currentTrackNotChosenYet": "aún no elegido",
+          "nextLesson": "Siguiente lección",
+          "nextLessonNone": "ninguna",
+          "hostedOnboardingStep": "Paso de onboarding alojado",
+          "sessionRequired": "sesión requerida",
+          "runtimeStatus": "Estado del runtime",
+          "notSynced": "no sincronizado"
+        },
+        "questionPlaceholder": "Describe el bloqueo, el paso exacto y lo que esperabas que ocurriera.",
+        "blockedLessonLabel": "Lección bloqueada",
+        "noLessonSelected": "Ninguna lección seleccionada",
+        "submitLoading": "Buscando el siguiente paso...",
+        "submitIdle": "Obtener el siguiente paso"
+      },
+      "rail": {
+        "label": "Rail del operador",
+        "questionsAsked": "Preguntas realizadas",
+        "liveAnswerState": "Estado de respuesta en vivo",
+        "thinking": "pensando",
+        "waiting": "esperando",
+        "recentQuestions": "Preguntas recientes",
+        "connection": {
+          "label": "Conexión con OpenAI",
+          "authPrompt": "Inicia sesión para conectar tu propia clave de OpenAI. Tutor sigue funcionando en modo de solo lectura sin una conexión personal.",
+          "checking": "Comprobando si tu clave de OpenAI ya está conectada.",
+          "connectPrompt": "Conecta una clave de OpenAI si quieres tu propia cuota de Tutor en vivo y acceso a modelos.",
+          "connectedAs": "Conectado como {maskedKey}",
+          "connectedKey": "Clave conectada",
+          "connectedBody": "Las respuestas en vivo de Tutor ahora prefieren tu propio acceso a OpenAI antes que cualquier respaldo de plataforma.",
+          "source": "fuente: {value}",
+          "disconnecting": "Desconectando...",
+          "disconnect": "Desconectar OpenAI",
+          "bringYourOwnKey": "Trae tu propia clave de OpenAI",
+          "apiKeyPlaceholder": "sk-proj-...",
+          "connecting": "Conectando OpenAI...",
+          "connect": "Conectar OpenAI",
+          "platformHint": "El acceso de plataforma ya está disponible. Conectar tu propia clave solo reemplaza el presupuesto de modelo de Tutor y la ruta de propiedad para esta cuenta."
+        },
+        "escalationRule": {
+          "label": "Regla de escalación",
+          "body": "Si la respuesta todavía no te da un movimiento concreto, deja de dar vueltas y abre soporte con el contexto de la lección adjunto.",
+          "cta": "Abrir carril de soporte"
+        }
+      },
+      "critique": {
+        "label": "Crítica de estudio",
+        "chips": {
+          "confidence": "{value} de confianza",
+          "officialFallback": "respaldo oficial",
+          "humanEscalationLikely": "escalación humana probable"
+        },
+        "singleNextMove": "Único siguiente movimiento",
+        "situation": "Situación",
+        "diagnosis": "Diagnóstico",
+        "steps": "Pasos",
+        "commands": "Comandos",
+        "reviewLine": "Línea de revisión",
+        "fallbackRoute": "Ruta de respaldo",
+        "empty": "Pregunta por un bloqueo, no por toda una historia. Pico Tutor fundamentará la respuesta en las lecciones, el paquete curado del operador y la documentación oficial cuando la pregunta sea sensible a la versión.",
+        "emptyHowItWorks": "Cómo funciona: indica el paso que falla, el resultado esperado y el fallo exacto. La respuesta debería darte un movimiento concreto, un paso de verificación y una ruta limpia de escalación si la evidencia sigue siendo fina."
+      },
+      "matches": {
+        "label": "Coincidencias de lección fundamentadas",
+        "bestMatch": "mejor coincidencia",
+        "alternative": "alt"
+      },
+      "evidence": {
+        "label": "Evidencia de la crítica",
+        "openSource": "Abrir fuente"
+      },
+      "officialLinks": {
+        "label": "Enlaces oficiales"
+      },
+      "exitRoute": {
+        "label": "Ruta de salida",
+        "returnToBlockedLesson": "Volver a la lección bloqueada",
+        "returnToAcademy": "Volver a Academy",
+        "openAutopilot": "Abrir Autopilot",
+        "openSupportLane": "Abrir carril de soporte",
+        "body": "Tutor debería terminar en movimiento. Vuelve a la lección si la ruta sigue clara, abre Autopilot si el runtime es ahora el cuello de botella y escala solo cuando la ruta del producto haya dejado de ser veraz."
+      },
+      "escalationNote": {
+        "label": "Nota de escalación",
+        "getHumanHelp": "Obtener ayuda humana"
+      },
+      "nextQuestion": {
+        "label": "Si la respuesta sigue borrosa"
+      },
+      "errors": {
+        "loadOpenAIConnection": "No se pudo cargar la conexión con OpenAI",
+        "tutorRequestFailed": "La solicitud a Tutor falló",
+        "malformedResponse": "La respuesta de Tutor volvió mal formada",
+        "pasteOpenAIKeyFirst": "Pega primero una clave de API de OpenAI",
+        "connectOpenAIKey": "No se pudo conectar la clave de OpenAI",
+        "disconnectOpenAIKey": "No se pudo desconectar la clave de OpenAI"
+      },
+      "shared": {
+        "openLesson": "Abrir {lessonTitle}"
+      }
+    },
+    "academyPage": {
+      "shell": {
+        "eyebrow": "Códice del aprendiz",
+        "title": "Academy",
+        "description": "Una misión. Una prueba. Un siguiente movimiento honesto."
+      },
+      "lessonState": {
+        "cleared": "superada",
+        "current": "actual",
+        "ready": "lista",
+        "locked": "bloqueada"
+      },
+      "syncState": {
+        "hydrating": "hidratando",
+        "live": "en vivo",
+        "saving": "guardando",
+        "localOnly": "solo local"
+      },
+      "shared": {
+        "notRecorded": "sin registrar",
+        "operator": "operador",
+        "openAutopilot": "Abrir Autopilot",
+        "installHermesNow": "Instalar Hermes ahora",
+        "runFirstAgent": "Ejecuta tu primer agente",
+        "openNextChapter": "Abrir el siguiente capítulo",
+        "continueWithNextLesson": "Continuar con {title}",
+        "askTutorNextStep": "Pide a Tutor el siguiente paso exacto",
+        "askTutorRouteCorrection": "Pide a Tutor corrección de ruta",
+        "verifyHost": "verificar host",
+        "hostedAttached": "alojado conectado",
+        "authError": "error de autenticación",
+        "checking": "comprobando",
+        "signInToPersist": "inicia sesión para persistir",
+        "readingHostState": "leyendo estado del host",
+        "captured": "capturada",
+        "missing": "faltante",
+        "inProgress": "en progreso",
+        "ready": "lista",
+        "controlRoom": "sala de control",
+        "open": "abierta",
+        "locked": "bloqueada",
+        "live": "en vivo",
+        "updated": "Actualizado {timestamp}",
+        "steps": "{completed}/{total} pasos",
+        "lessons": "{completed}/{total} lecciones",
+        "clearedCount": "{completed}/{total} superadas",
+        "level": "nivel {level}",
+        "track": "Track {number}",
+        "stop": "Parada {number}",
+        "plan": "plan {plan}",
+        "cleared": "superada",
+        "previewStep": "Elige el siguiente paso visible",
+        "resumeMission": "Reanudar misión",
+        "askTutor": "Preguntar a Tutor",
+        "ok": "ok",
+        "resumeBody": "Abre la ruta de la lección y mantén corto el carril de prueba.",
+        "noProofLogged": "Todavía no se ha registrado ninguna prueba. Guarda el único artefacto que demuestre que la misión realmente funcionó."
+      },
+      "billboard": {
+        "chapterLabel": "Capítulo del códice",
+        "trackLabel": "Track",
+        "stopOf": "Parada {current} de {total}",
+        "currentMission": "Misión actual",
+        "validationPrefix": "Validación:"
+      },
+      "mission": {
+        "titleFallback": "Abrir Autopilot",
+        "summaryFallback": "Entra en la sala de control en vivo cuando el carril de la lección esté despejado.",
+        "validationFallback": "Usa el runtime cuando la pregunta ya no sea sobre leer la lección.",
+        "primary": {
+          "openAutopilot": "Abrir Autopilot",
+          "installHermesNow": "Instalar Hermes ahora",
+          "runFirstAgent": "Ejecuta tu primer agente",
+          "openNextChapter": "Abrir el siguiente capítulo"
+        }
+      },
+      "strip": {
+        "missionState": "Estado de la misión",
+        "trackProgress": "Progreso del track",
+        "proof": "Prueba",
+        "hosted": "Alojado",
+        "currentMission": "Misión actual"
+      },
+      "studio": {
+        "label": "Método de estudio",
+        "title": "Aprende como envía un estudio boutique",
+        "stamp": "resumen • entregable • crítica",
+        "steps": [
+          {
+            "label": "01 • Resumen",
+            "title": "Lee la misión como un resumen de cliente"
+          },
+          {
+            "label": "02 • Entregable",
+            "title": "Haz un artefacto que valga la pena conservar"
+          },
+          {
+            "label": "03 • Crítica",
+            "title": "Usa la validación como revisión de estudio"
+          }
+        ]
+      },
+      "standards": {
+        "label": "Estándares del track",
+        "trackOutcome": "Resultado del track",
+        "levelReward": "Recompensa de nivel",
+        "nextStandard": "Siguiente estándar",
+        "levelRewardFallback": "Entrega un resultado real para el operador.",
+        "nextStandardFallback": "Mantén el capítulo estrecho y honesto."
+      },
+      "chapterLedger": {
+        "label": "Libro del capítulo",
+        "title": "Un capítulo dominante, con el resto del mapa en silencio.",
+        "body": "El track actual recibe el tratamiento editorial completo. El resto del atlas sigue visible, pero comprimido, para que la ruta siga sintiéndose autoral en lugar de igual de ruidosa en todas partes.",
+        "focusMode": "modo foco",
+        "guidedAtlas": "atlas guiado",
+        "trackLabel": "Track",
+        "routeState": "Estado de la ruta",
+        "nextDominantStop": "Siguiente parada dominante",
+        "missionCorrection": "Corrección de misión",
+        "missionCorrectionBody": "El atlas solo sigue siendo útil si te empuja de vuelta a la misión actual.",
+        "otherChapters": "Otros capítulos",
+        "chapterChecklist": "Checklist del capítulo",
+        "dominantStop": "Parada dominante",
+        "openAutopilot": "Abrir Autopilot",
+        "stopLevel": "Parada {number} • nivel {level}",
+        "cleared": "superada",
+        "mascotAlt": "Mascota de academy de PicoMUTX"
+      },
+      "referenceAnnex": {
+        "label": "Anexo de referencia",
+        "title": "La capacidad, el archivo y la memoria de plataforma se mantienen debajo de la ruta a propósito",
+        "body": "La memoria de plataforma sigue disponible, pero se queda debajo del códice a propósito. Academy lidera con ruta y prueba, y expone la configuración solo cuando la necesitas.",
+        "setup": "Configuración",
+        "locked": "bloqueado"
+      },
+      "capabilities": {
+        "label": "Capacidades desbloqueadas",
+        "body": "Las piezas que importan después de que la misión ya es real.",
+        "live": "en vivo",
+        "firstUnlockEmpty": "El primer desbloqueo de capacidad llega solo después de que las primeras lecciones se hayan superado de verdad.",
+        "nextUnlock": "Siguiente desbloqueo",
+        "patternArchive": "Archivo de patrones",
+        "openPatternLesson": "Abrir lección de patrón",
+        "fieldNotes": "Notas de campo",
+        "controlAnnex": "Anexo de control",
+        "liveSuffix": "en vivo"
+      },
+      "workspace": {
+        "activeProofLane": "Carril de prueba activo",
+        "resumeFromHere": "Reanudar desde aquí",
+        "proofState": "Estado de la prueba",
+        "capturedProof": "Prueba capturada",
+        "hostedNote": "Nota alojada",
+        "proofCaptured": "capturada",
+        "proofMissing": "faltante"
+      }
+    },
+    "lessonPage": {
+      "shell": {
+        "eyebrow": "Capítulo {number} • carril de lección"
+      },
+      "shared": {
+        "difficulty": {
+          "setup": "configuración",
+          "operator": "operador",
+          "builder": "constructor"
+        },
+        "hostedStamp": {
+          "verifyHost": "verificar host",
+          "hostedAttached": "alojado conectado",
+          "localOnly": "solo local",
+          "authError": "error de autenticación",
+          "checking": "comprobando"
+        },
+        "chapterState": {
+          "blocked": "bloqueado",
+          "sealed": "sellado",
+          "active": "activo",
+          "ready": "listo"
+        },
+        "proofState": {
+          "captured": "capturada",
+          "pending": "pendiente"
+        },
+        "stepState": {
+          "done": "hecho",
+          "active": "activo"
+        },
+        "reviewState": {
+          "sealed": "sellado",
+          "ready": "listo",
+          "pending": "pendiente"
+        }
+      },
+      "actions": {
+        "completePrerequisiteFirst": "Completa primero {lessonTitle}",
+        "openAutopilot": "Abrir Autopilot",
+        "runYourFirstAgentNow": "Ejecuta ahora tu primer agente",
+        "openLesson": "Abrir {lessonTitle}",
+        "openLiveApprovalSetup": "Abrir configuración de aprobación en vivo",
+        "completeLabel": {
+          "installHermesLocally": "Hermes está instalado",
+          "runYourFirstAgent": "Holy shit, it works",
+          "default": "Sellar este capítulo"
+        },
+        "askTutorAboutLesson": "Preguntar a Tutor sobre esta lección",
+        "resetWorkspace": "Restablecer workspace",
+        "reopenStep": "Reabrir paso",
+        "markStepDone": "Marcar paso como hecho",
+        "askTutor": "Preguntar a Tutor",
+        "inspectAutopilot": "Inspeccionar Autopilot",
+        "openSupportLane": "Abrir carril de soporte",
+        "previousLesson": "Lección anterior",
+        "backToAcademyMap": "Volver al mapa de Academy"
+      },
+      "hero": {
+        "lessonLabel": "Lección",
+        "trackLabel": "Track",
+        "trackUnmapped": "Sin mapear",
+        "trackNotMapped": "sin mapear",
+        "missionBrief": "Resumen de la misión",
+        "expectedResult": "Resultado esperado: {value}",
+        "metrics": {
+          "state": "Estado",
+          "stateHintBlocked": "termina primero el prerrequisito",
+          "stateHintActive": "un carril de ruta",
+          "proof": "Prueba",
+          "proofStepFallback": "Elige un paso",
+          "progress": "Progreso",
+          "stepsCleared": "pasos completados",
+          "telemetry": "Telemetría",
+          "telemetryDetail": "{xp} xp • {difficulty}"
+        }
+      },
+      "studio": {
+        "label": "Tablero de revisión del estudio",
+        "title": "Resumen, entregable, crítica",
+        "stamp": "una lección real cada vez",
+        "cards": {
+          "brief": {
+            "label": "01 • Resumen",
+            "title": "El resultado que el estudio persigue"
+          },
+          "deliverable": {
+            "label": "02 • Entregable",
+            "title": "Qué debería demostrar el artefacto terminado"
+          },
+          "critique": {
+            "label": "03 • Crítica",
+            "title": "La línea de revisión antes de avanzar"
+          }
+        },
+        "context": {
+          "title": "Contexto del capítulo",
+          "trackArc": "Arco del track",
+          "trackArcFallback": "Construye un resultado real para el operador.",
+          "lessonOutcome": "Resultado de la lección",
+          "timeAndWeight": "Tiempo y peso",
+          "timeAndWeightValue": "{minutes}m • {xp} xp • {difficulty}"
+        },
+        "posture": {
+          "title": "Postura del estudio",
+          "body": "Mantén este capítulo estrecho. El objetivo no es sentirse ocupado ni avanzado. El objetivo es producir un artefacto en el que un operador preciso seguiría confiando mañana."
+        }
+      },
+      "chapterSpine": {
+        "title": "Columna del capítulo"
+      },
+      "workspace": {
+        "label": "Workspace del estudio",
+        "selectStep": "Selecciona un paso",
+        "studioBrief": "Resumen del estudio",
+        "chooseStepBody": "Elige un paso de la columna del capítulo para iniciar el carril.",
+        "deliverableArtifact": "Artefacto entregable",
+        "deliverablePlaceholder": "Pega la salida, la nota de la transcripción o el artefacto que demuestre que este capítulo funcionó.",
+        "benchNotes": "Notas de banco",
+        "benchNotesPlaceholder": "Captura el bloqueo, la ruta del archivo o la variación del comando que importó.",
+        "reviewState": {
+          "label": "Estado de revisión",
+          "sealedBody": "El capítulo está sellado. Sigue avanzando mientras la ruta siga fresca.",
+          "readyBody": "La prueba existe. Sella el capítulo y sigue avanzando.",
+          "pendingBody": "No selles el capítulo hasta que la prueba diga algo real."
+        },
+        "chapterCompletion": "Compleción del capítulo",
+        "creativeDirection": {
+          "title": "Dirección creativa",
+          "body": "Termina el paso en vivo, registra un artefacto de prueba y luego sella el capítulo o entrégalo a la siguiente superficie."
+        }
+      },
+      "helpLane": {
+        "label": "Notas de campo",
+        "stayHereWhen": "Quédate aquí cuando",
+        "stayHereBody": "la respuesta sigue estando en el paso actual y la ruta todavía no necesita escalación.",
+        "exactBlocker": "Bloqueo exacto",
+        "runtimeTruth": "Verdad del runtime",
+        "messyEdge": "Borde complicado"
+      },
+      "surfaceCompass": {
+        "title": "Mantén la lección estrecha hasta que la prueba sea real",
+        "body": "Usa Tutor para un bloqueo fundamentado, cambia a Autopilot cuando importe la verdad del runtime en vivo y escala a soporte solo cuando ambos dejen de bastar.",
+        "status": {
+          "blockedByPrerequisite": "bloqueado por prerrequisito",
+          "chapterSealed": "capítulo sellado",
+          "routeLaneActive": "carril de ruta activo",
+          "readyToExecute": "listo para ejecutar"
+        },
+        "aside": "La recuperación pertenece debajo del carril de prueba, no dentro de él.",
+        "items": {
+          "askTutorLabel": "Preguntar a Tutor sobre esta lección",
+          "askTutorCaption": "Úsalo cuando falle un comando, una ruta de archivo o una comprobación de validación.",
+          "blocked": "Bloqueado",
+          "returnToAcademyMap": "Volver al mapa de Academy",
+          "returnCaption": "Da un paso atrás hacia la ruta mapeada cuando el problema sea la secuencia misma.",
+          "backtrack": "Retroceder",
+          "runtimeCaption": "Cambia aquí cuando el bloqueo dependa del runtime en vivo o de las aprobaciones.",
+          "runtime": "Runtime",
+          "supportCaption": "Escala solo después de que la lección, Tutor y las vistas del runtime dejen de ser suficientes.",
+          "messyEdge": "Borde complicado"
+        }
+      },
+      "troubleshooting": {
+        "label": "Apéndice de resolución de problemas",
+        "title": "Las notas pequeñas que solo lees cuando la ruta se tuerce",
+        "stepsCount": "{count} pasos",
+        "nextCapability": "Siguiente capacidad",
+        "routeMemory": "Memoria de ruta"
+      }
+    },
+    "shell": {
+      "nav": {
+        "onboarding": {
+          "label": "Inicio",
+          "note": "primera victoria visible"
+        },
+        "academy": {
+          "label": "Lecciones",
+          "note": "la ruta que funciona"
+        },
+        "tutor": {
+          "label": "Tutor",
+          "note": "una respuesta fundamentada"
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "note": "sala de control en vivo"
+        },
+        "support": {
+          "label": "Ayuda humana",
+          "note": "el borde complicado"
+        }
+      },
+      "wordmark": {
+        "logoAlt": "Logo de PicoMUTX",
+        "atlas": "atlas del operador"
+      },
+      "robotCard": {
+        "signalLabel": "Señal de Pico"
+      },
+      "helpLane": {
+        "stayHereWhen": "Quédate aquí cuando",
+        "stayHereBody": "el siguiente movimiento siga dentro de {chapter}.",
+        "recoveryRoute": "Ruta de recuperación",
+        "openSupportLane": "Abrir carril de soporte",
+        "recoveryBody": "Usa esto cuando la ruta del producto ya no sea honesta sobre el bloqueo.",
+        "continueSequence": "Continuar secuencia",
+        "humanHelp": "Ayuda humana",
+        "continueBody": "Mantén el impulso si el siguiente capítulo ya es la herramienta correcta."
+      },
+      "academyMode": {
+        "chapter": "Capítulo {chapter}",
+        "howThisWorks": "Cómo funciona",
+        "map": "Mapa",
+        "help": "Ayuda",
+        "routeMode": "Modo ruta",
+        "focusModeActive": "El modo foco está activo.",
+        "mapStaysOpen": "El mapa permanece abierto.",
+        "previous": "Anterior: {label}",
+        "startOfSequence": "Inicio de la secuencia",
+        "next": "Siguiente: {label}",
+        "finalChapter": "Capítulo final",
+        "backToMap": "Volver al mapa",
+        "proof": "Prueba"
+      },
+      "defaultMode": {
+        "currentChapter": "Capítulo actual",
+        "chapter": "Capítulo {chapter}",
+        "quickHelp": "Ayuda rápida",
+        "previousChapter": "Capítulo anterior",
+        "previousChapterAria": "Ir al capítulo anterior: {label}",
+        "nextChapter": "Siguiente capítulo",
+        "nextChapterAria": "Ir al siguiente capítulo: {label}",
+        "goToOnboarding": "Ir a onboarding",
+        "goToSupport": "Ir a soporte",
+        "hideRecovery": "Ocultar recuperación",
+        "showRecovery": "Mostrar recuperación",
+        "chapterNote": "Nota del capítulo",
+        "chapterNoteBody": "Usa este capítulo para recortar la incertidumbre rápido e identificar la siguiente acción irreversible.",
+        "prev": "Ant.",
+        "next": "Sig.",
+        "openAcademyMap": "Abrir mapa de Academy",
+        "openHelpLane": "Abrir carril de ayuda",
+        "map": "Mapa",
+        "help": "Ayuda",
+        "openMission": "Abrir misión"
+      },
+      "footer": {
+        "logoAlt": "Logo de PicoMUTX",
+        "links": {
+          "releases": "Releases",
+          "docs": "Docs",
+          "github": "GitHub",
+          "download": "Descargar",
+          "privacy": "Privacidad"
+        },
+        "copyright": "© {year} MUTX. PicoMUTX es una plataforma de aprendizaje y operaciones para quienes construyen agentes de IA."
+      }
+    },
+    "content": {
+      "levels": {
+        "0": {
+          "title": "Configuración",
+          "objective": "Instala Hermes y demuestra que el runtime responde a un prompt real.",
+          "projectOutcome": "Un agente local funcional que responde bajo demanda.",
+          "completionState": "Hermes se ejecuta localmente y devuelve una respuesta coherente.",
+          "badge": "Primera chispa",
+          "recommendedNextStep": "Despliega el mismo runtime en algún lugar persistente."
+        },
+        "1": {
+          "title": "Despliegue",
+          "objective": "Saca el agente del portátil y mantenlo vivo.",
+          "projectOutcome": "Un agente persistente en un VPS o en una máquina siempre encendida.",
+          "completionState": "El agente sobrevive al cierre de la shell y acepta tráfico remoto.",
+          "badge": "Explorador del runtime",
+          "recommendedNextStep": "Añade una capacidad útil."
+        },
+        "2": {
+          "title": "Capacidad",
+          "objective": "Enseña al agente una habilidad concreta con un trabajo acotado.",
+          "projectOutcome": "Una habilidad útil o una llamada a herramienta ligada a una tarea real.",
+          "completionState": "El agente completa un paso útil de un flujo de trabajo.",
+          "badge": "Forjador de habilidades",
+          "recommendedNextStep": "Automatiza la cadencia."
+        },
+        "3": {
+          "title": "Automatización",
+          "objective": "Haz que el agente se ejecute con una programación repetible.",
+          "projectOutcome": "Un flujo programado que se activa sin supervisión constante.",
+          "completionState": "El flujo se ejecuta por reloj y registra el resultado.",
+          "badge": "Constructor de bucles",
+          "recommendedNextStep": "Activa la visibilidad."
+        },
+        "4": {
+          "title": "Producción",
+          "objective": "Ve el historial de ejecuciones y detecta pronto los modos de fallo.",
+          "projectOutcome": "Un usuario puede inspeccionar ejecuciones, fallos y estado del runtime.",
+          "completionState": "La actividad de ejecución aparece en la capa de control.",
+          "badge": "Cazador de señales",
+          "recommendedNextStep": "Añade controles de coste y aprobaciones."
+        },
+        "5": {
+          "title": "Control",
+          "objective": "Añade umbrales de coste, alertas y una puerta para acciones riesgosas.",
+          "projectOutcome": "El agente puede ser vigilado e interrumpido antes de causar daños.",
+          "completionState": "Los umbrales y las aprobaciones están configurados.",
+          "badge": "Guardián",
+          "recommendedNextStep": "Entrega un patrón más profundo."
+        },
+        "6": {
+          "title": "Sistemas",
+          "objective": "Entrega un patrón de producción reutilizable, no una demo de juguete.",
+          "projectOutcome": "Un flujo serio que un fundador podría ejecutar en producción.",
+          "completionState": "Se entrega un patrón más sólido con un artefacto real y una superficie de control.",
+          "badge": "Operador de patrones",
+          "recommendedNextStep": "Pasa de un agente a una flota gobernada."
+        }
+      },
+      "tracks": {
+        "first-agent": {
+          "title": "Track A — Primer agente",
+          "outcome": "Hermes se ejecuta y responde a prompts reales.",
+          "intro": "Esta es la ruta rápida de cero a un runtime local funcional.",
+          "checklist": [
+            "Hermes instalado",
+            "Modelo/proveedor configurado",
+            "Una respuesta correcta capturada"
+          ]
+        },
+        "deployed-agent": {
+          "title": "Track B — Agente desplegado",
+          "outcome": "El runtime sigue vivo en algún lugar persistente.",
+          "intro": "Pasa de una demo en portátil a un proceso que sobrevive al reposo y a los reinicios.",
+          "checklist": [
+            "VPS o máquina persistente en línea",
+            "El servicio reinicia limpiamente",
+            "Entrada de mensajería conectada"
+          ]
+        },
+        "useful-workflow": {
+          "title": "Track C — Flujo útil",
+          "outcome": "El agente realiza un trabajo acotado que importa.",
+          "intro": "Ahora deja de jugar con prompts y construye una capacidad útil.",
+          "checklist": [
+            "Al menos una habilidad personalizada instalada",
+            "Un flujo programado configurado",
+            "Un flujo repetible completado sin supervisión manual constante"
+          ]
+        },
+        "controlled-agent": {
+          "title": "Track D — Agente controlado",
+          "outcome": "El runtime es visible y está gobernado.",
+          "intro": "Aquí es donde el problema de necesitar niñera se sustituye por herramientas de operador.",
+          "checklist": [
+            "Actividad reciente visible",
+            "Umbral de coste guardado",
+            "Flujo de solicitud de aprobación probado"
+          ]
+        },
+        "production-pattern": {
+          "title": "Track E — Patrón de producción",
+          "outcome": "Un flujo más sólido y reutilizable está en vivo.",
+          "intro": "Toma los fundamentos y entrega un patrón por el que alguien realmente pagaría.",
+          "checklist": [
+            "Un flujo de negocio acepta entrada estructurada real",
+            "Entrada estructurada aceptada",
+            "Salida validada",
+            "Ejecuciones visibles desde la capa de control"
+          ]
+        }
+      },
+      "lessons": {
+        "install-hermes-locally": {
+          "title": "Instala Hermes localmente",
+          "summary": "Instala Hermes, demuestra que el comando funciona desde una shell nueva y termina esta lección con un runtime local funcional.",
+          "objective": "Logra una instalación local limpia de Hermes de principio a fin.",
+          "outcome": "Un CLI local de Hermes que se abre limpiamente desde una shell nueva.",
+          "expectedResult": "Ejecutar `command -v hermes && hermes` desde una shell nueva funciona.",
+          "validation": "Abre una shell completamente nueva y ejecuta `command -v hermes && hermes`. Si el comando no existe o el CLI falla inmediatamente, esta lección no está terminada.",
+          "steps": [
+            {
+              "title": "Instala Hermes",
+              "body": "Ejecuta el comando de instalación exactamente una vez. No compares gestores de paquetes. No te desvíes hacia herramientas extra.",
+              "command": "curl -fsSL https://hermes.nousresearch.com/install.sh | bash"
+            },
+            {
+              "title": "Verifica el binario desde una shell nueva",
+              "body": "Cierra la shell, abre una nueva y demuestra que el binario está realmente en PATH.",
+              "command": "command -v hermes"
+            },
+            {
+              "title": "Abre Hermes y termina una configuración de proveedor",
+              "body": "Lanza el CLI y completa exactamente una ruta de proveedor hasta que el CLI sea utilizable. No salgas de esta lección con dos proveedores a medio configurar.",
+              "command": "hermes"
+            }
+          ],
+          "troubleshooting": [
+            "Si `command -v hermes` no devuelve nada, reinicia la shell y comprueba que la ruta de instalación se añadió a PATH.",
+            "Si `hermes` se abre y falla de inmediato por credenciales ausentes, termina primero una configuración de proveedor antes de seguir.",
+            "Si el script de instalación falla en una máquina restringida, cambia a una ruta de instalación local del usuario y repite el paso de verificación."
+          ]
+        },
+        "run-your-first-agent": {
+          "title": "Ejecuta tu primer agente",
+          "summary": "Ejecuta un prompt real, obtén una respuesta visible y guarda la transcripción como prueba.",
+          "objective": "Demuestra que el runtime puede responder a un prompt acotado con el proveedor que acabas de configurar.",
+          "outcome": "Una transcripción guardada del prompt y la respuesta.",
+          "expectedResult": "Hermes responde a un prompt pequeño y la transcripción se guarda en un archivo que puedes volver a abrir.",
+          "validation": "Ejecuta un prompt acotado y guarda tanto el prompt como la respuesta en un archivo como `~/pico-first-run.txt`.",
+          "steps": [
+            {
+              "title": "Inicia Hermes desde una shell limpia",
+              "body": "Lanza el runtime desde una shell nueva para saber que estás probando la instalación real.",
+              "command": "hermes"
+            },
+            {
+              "title": "Envía un prompt acotado",
+              "body": "Usa un prompt pequeño con una respuesta obvia. No pruebes creatividad. Prueba que el runtime funciona.",
+              "command": "Prompt: Give me exactly 3 next steps to test this runtime locally."
+            },
+            {
+              "title": "Guarda la transcripción",
+              "body": "Escribe el prompt y la respuesta en un único archivo para que el artefacto sobreviva cuando se cierre el terminal.",
+              "command": "printf \"Prompt: Give me exactly 3 next steps to test this runtime locally.\\nAnswer: <paste the actual answer here>\\n\" > ~/pico-first-run.txt"
+            }
+          ],
+          "troubleshooting": [
+            "Si la respuesta agota el tiempo, cambia primero a un modelo más rápido y repite el mismo prompt acotado.",
+            "Si la respuesta es absurda, confirma qué proveedor y modelo está usando realmente Hermes antes de cambiar el prompt.",
+            "Si el CLI no arranca, vuelve a la lección de instalación. Esta lección depende de un binario funcional."
+          ]
+        },
+        "deploy-hermes-on-a-vps": {
+          "title": "Despliega Hermes en un VPS",
+          "summary": "Pon Hermes en un host siempre encendido y demuestra que el runtime remoto también se abre allí.",
+          "objective": "Mover el runtime del portátil a una máquina persistente que controlas.",
+          "outcome": "Una caja remota donde Hermes se abre limpiamente por SSH.",
+          "expectedResult": "Puedes entrar por SSH al host y ejecutar `hermes` correctamente.",
+          "validation": "Desde tu máquina entra por SSH al host y ejecuta `command -v hermes && hermes`. Si eso falla, el despliegue no está terminado.",
+          "steps": [
+            {
+              "title": "Accede al host por SSH",
+              "body": "Usa una sola máquina que controles y demuestra que SSH funciona antes de tocar Hermes.",
+              "command": "ssh user@your-box"
+            },
+            {
+              "title": "Instala Hermes en el host",
+              "body": "Ejecuta la misma ruta de instalación en la máquina remota. Mantén el entorno aburrido.",
+              "command": "curl -fsSL https://hermes.nousresearch.com/install.sh | bash"
+            },
+            {
+              "title": "Verifica el runtime remoto",
+              "body": "Desde la sesión SSH demuestra que el binario existe y que el CLI se abre.",
+              "command": "command -v hermes && hermes"
+            }
+          ],
+          "troubleshooting": [
+            "Si SSH es inestable, arregla primero el host. Hermes todavía no es el problema.",
+            "Si la instalación funciona localmente pero no en remoto, compara PATH y las variables de entorno antes de cambiar comandos.",
+            "Si al host remoto le faltan credenciales del proveedor, añade solo la configuración mínima para el mismo proveedor que ya probaste localmente."
+          ]
+        },
+        "keep-your-agent-alive": {
+          "title": "Mantén tu agente vivo entre sesiones",
+          "summary": "Crea una definición de servicio real para que cerrar sesión no mate el runtime.",
+          "objective": "Convertir el runtime remoto en un proceso que sobreviva a desconexiones y reinicios.",
+          "outcome": "Una definición de servicio guardada o un comando tmux que mantiene Hermes vivo.",
+          "expectedResult": "Puedes desconectarte, volver a conectarte y encontrar el runtime todavía en ejecución.",
+          "validation": "Inicia el servicio, desconéctate, vuelve a conectarte y verifica que el proceso de Hermes siga existiendo.",
+          "steps": [
+            {
+              "title": "Escribe el archivo de unidad systemd",
+              "body": "Crea ahora el archivo del servicio. Si al final de la lección no existe ningún archivo, no has entregado nada.",
+              "command": "sudo nano /etc/systemd/system/hermes.service",
+              "note": "[Unit]\\nDescription=Hermes Runtime\\nAfter=network.target\\n\\n[Service]\\nUser=<your-user>\\nWorkingDirectory=/home/<your-user>\\nExecStart=/home/<your-user>/.local/bin/hermes\\nRestart=always\\nRestartSec=5\\n\\n[Install]\\nWantedBy=multi-user.target"
+            },
+            {
+              "title": "Activa e inicia el servicio",
+              "body": "Recarga systemd, habilita la unidad e iníciala una vez.",
+              "command": "sudo systemctl daemon-reload && sudo systemctl enable --now hermes"
+            },
+            {
+              "title": "Demuestra que sobrevive sin tu shell",
+              "body": "Comprueba el estado, desconéctate, vuelve a entrar y compruébalo otra vez.",
+              "command": "sudo systemctl status hermes --no-pager"
+            }
+          ],
+          "troubleshooting": [
+            "Si la unidad falla bajo systemd pero funciona manualmente, compara PATH, WorkingDirectory y las variables de entorno del proveedor.",
+            "Si el servicio se reinicia sin parar, arregla primero el comando de Hermes en lugar de aumentar los reintentos.",
+            "Si no puedes usar systemd, usa una única sesión tmux con nombre y documenta el nombre exacto de esa sesión antes de continuar."
+          ]
+        },
+        "connect-a-messaging-layer": {
+          "title": "Conecta una capa de mensajería",
+          "summary": "Dale al runtime una ruta real de entrada para que puedas alcanzarlo sin SSH.",
+          "objective": "Adjuntar un canal real de entrada al agente en ejecución.",
+          "outcome": "Una ruta de entrada probada hacia el runtime.",
+          "expectedResult": "Una entrada real llega al runtime desde el canal elegido y produce una respuesta visible.",
+          "validation": "Envía una prueba real a través de la entrada elegida y registra la respuesta exacta.",
+          "steps": [
+            {
+              "title": "Elige el único canal del que ya tengas credenciales",
+              "body": "Usa una sola entrada. El objetivo es una ruta de entrada funcional, no cobertura de canales.",
+              "command": "Example surfaces: Telegram bot token, Discord bot token, Slack app token, or one webhook endpoint."
+            },
+            {
+              "title": "Guarda las credenciales mínimas en el host del runtime",
+              "body": "Pon solo los secretos necesarios en la máquina y mantenlos fuera de los registros de chat.",
+              "command": "export CHANNEL_TOKEN=<your-token>"
+            },
+            {
+              "title": "Envía una prueba real de entrada",
+              "body": "Dispara la entrada una vez y verifica que el runtime responda exactamente una vez en el lugar esperado.",
+              "command": "Send one short real message through the selected channel, then record the reply text."
+            }
+          ],
+          "troubleshooting": [
+            "Si el canal está en silencio, verifica la validez del token y la accesibilidad del webhook antes de cambiar la lógica del agente.",
+            "Si obtienes respuestas duplicadas, detén el runtime duplicado o el webhook duplicado antes de seguir.",
+            "Si el canal llega al runtime pero no vuelve ninguna respuesta, inspecciona primero los registros del servicio en ejecución."
+          ]
+        },
+        "add-your-first-skill": {
+          "title": "Añade tu primera habilidad/herramienta",
+          "summary": "Instala una capacidad estrecha que el agente pueda reutilizar sin supervisión humana.",
+          "objective": "Enseñar a Hermes una tarea acotada que pueda ejecutar bajo demanda.",
+          "outcome": "Una habilidad o herramienta funcional que el agente puede invocar repetidamente.",
+          "expectedResult": "El agente usa la habilidad una vez con una entrada real y devuelve un resultado útil.",
+          "validation": "Activa la habilidad una vez y guarda la entrada y la salida exactas que produjo.",
+          "steps": [
+            {
+              "title": "Elige un único trabajo estrecho",
+              "body": "Elige una tarea repetida de bajo riesgo y con éxito obvio cuando funciona.",
+              "command": "Example jobs: summarize one note, classify one lead, extract one field set, or rewrite one reply."
+            },
+            {
+              "title": "Instala o crea la habilidad",
+              "body": "Usa el flujo de habilidades existente de Hermes y mantén el alcance brutalmente pequeño.",
+              "command": "Use the single Hermes skill path you already trust. Do not bundle multiple skills into this lesson."
+            },
+            {
+              "title": "Ejecuta la habilidad con una entrada de aspecto real",
+              "body": "Llama a la habilidad con una entrada que se parezca a producción y guarda el resultado.",
+              "command": "Run the skill once and write the resulting artifact to ~/pico-first-skill.txt"
+            }
+          ],
+          "troubleshooting": [
+            "Si la habilidad falla, prueba primero el comando o la API subyacente fuera de Hermes.",
+            "Si la salida es ruidosa, recorta el alcance de la habilidad en lugar de añadir más texto al prompt.",
+            "Si la tarea puede enviar o mutar algo arriesgado, mantén la habilidad en modo de solo lectura hasta la lección de aprobaciones."
+          ]
+        },
+        "create-a-scheduled-workflow": {
+          "title": "Crea un flujo programado",
+          "summary": "Pon el trabajo útil en un reloj y demuestra que una ejecución programada deja una traza visible.",
+          "objective": "Convertir la habilidad funcional en un trabajo programado y repetible.",
+          "outcome": "Una programación guardada que ejecuta el trabajo sin arranque manual.",
+          "expectedResult": "Se dispara una ejecución programada y deja un resultado visible que puedas señalar más tarde.",
+          "validation": "Dispara un tick programado y captura el log, archivo de salida o registro de ejecución resultante.",
+          "steps": [
+            {
+              "title": "Elige una cadencia razonable",
+              "body": "Escoge una programación que encaje con el trabajo. Diaria es suficiente salvo que puedas defender algo más agresivo.",
+              "command": "Example cron: 0 9 * * *"
+            },
+            {
+              "title": "Guarda el comando programado",
+              "body": "Crea ahora la entrada exacta de cron o del programador. Una programación que solo existe en tu cabeza es falsa.",
+              "command": "(crontab -l 2>/dev/null; echo \"0 9 * * * /home/<your-user>/.local/bin/hermes\") | crontab -"
+            },
+            {
+              "title": "Fuerza una ejecución y captura el resultado",
+              "body": "No esperes todo el día. Activa el flujo una vez y guarda dónde queda la salida.",
+              "command": "/home/<your-user>/.local/bin/hermes"
+            }
+          ],
+          "troubleshooting": [
+            "Si la programación nunca se ejecuta, verifica la zona horaria y la propiedad del crontab antes de tocar Hermes.",
+            "Si el trabajo se dispara dos veces, elimina la entrada duplicada del planificador antes de continuar.",
+            "Si el planificador no ve los secretos, expórtalos explícitamente en el entorno de ejecución."
+          ]
+        },
+        "see-your-agent-activity": {
+          "title": "Ve la actividad de tu agente",
+          "summary": "Abre la superficie de control, inspecciona una ejecución real o la verdad de un estado vacío y registra la primera señal del operador.",
+          "objective": "Salir de la capa de control con una señal concreta que luego puedas nombrar.",
+          "outcome": "Una señal de operador registrada: un id de ejecución, un tipo de alerta o un hecho honesto de estado vacío.",
+          "expectedResult": "Puedes señalar una señal concreta del runtime en lugar de decir “parece que va bien”.",
+          "validation": "Abre Autopilot y anota una señal en un archivo como `~/pico-operator-checkpoint.txt`.",
+          "steps": [
+            {
+              "title": "Abre Autopilot",
+              "body": "Ve a la superficie de control y empieza por las ejecuciones. No navegues todavía por toda la página.",
+              "command": "Open /pico/autopilot"
+            },
+            {
+              "title": "Inspecciona una señal",
+              "body": "Captura un id de ejecución, un tipo de alerta o un hecho de estado vacío. Una sola basta para esta lección.",
+              "command": "Example artifact line: run_id=<paste>, alert_type=<paste>, or empty_state=no_live_agent"
+            },
+            {
+              "title": "Guarda el checkpoint",
+              "body": "Guarda esa señal en un archivo para poder comparar estados posteriores con algo concreto.",
+              "command": "printf \"checkpoint=<paste your first operator signal here>\\n\" > ~/pico-operator-checkpoint.txt"
+            }
+          ],
+          "troubleshooting": [
+            "Si no aparecen ejecuciones, verifica que el flujo programado se ejecutó realmente antes de culpar a la superficie de control.",
+            "Si la autenticación bloquea la vista, inicia sesión primero. Esta lección depende del plano de control real.",
+            "Si la página está vacía, registra honestamente la verdad del estado vacío. Vacío también es señal."
+          ]
+        },
+        "set-a-cost-threshold": {
+          "title": "Define un umbral de coste",
+          "summary": "Guarda una línea roja presupuestaria y verifica que sobreviva a la recarga.",
+          "objective": "Definir un umbral de coste que estés dispuesto a tolerar antes de que el runtime se vuelva ruidoso.",
+          "outcome": "Un umbral guardado ligado a la superficie de control.",
+          "expectedResult": "El umbral guardado persiste tras la recarga y aparece en el estado del producto.",
+          "validation": "Guarda un umbral, recarga la página y confirma que el mismo valor siga ahí.",
+          "steps": [
+            {
+              "title": "Elige un valor de umbral",
+              "body": "Elige un número que puedas defender ahora mismo. Usa 75 si no tienes una razón mejor.",
+              "command": "Threshold: 75"
+            },
+            {
+              "title": "Guárdalo en Autopilot",
+              "body": "Introduce el número y guárdalo una vez. No lo estés retocando durante la lección.",
+              "command": "Open /pico/autopilot and click Save threshold"
+            },
+            {
+              "title": "Recarga y verifica la persistencia",
+              "body": "Recarga la página y confirma que sigue apareciendo el mismo umbral.",
+              "command": "Reload /pico/autopilot and verify the threshold field still shows your saved value."
+            }
+          ],
+          "troubleshooting": [
+            "Si el umbral desaparece tras recargar, arregla la persistencia antes de confiar en cualquier control de costes.",
+            "Si todavía no existe un presupuesto en vivo, guarda igualmente el umbral, pero considera incompleta la conciencia de costes.",
+            "Si estás adivinando demasiado, elige un umbral más bajo y sigue."
+          ]
+        },
+        "add-an-approval-gate": {
+          "title": "Añade una puerta de aprobación",
+          "summary": "Crea un checkpoint de aprobación real y resuélvelo a propósito.",
+          "objective": "Probar la puerta para acciones riesgosas antes de confiar al runtime algo con consecuencias.",
+          "outcome": "Una solicitud de aprobación funcional y una resolución deliberada.",
+          "expectedResult": "Existe una aprobación pendiente y puedes aprobarla o rechazarla de forma intencionada.",
+          "validation": "Crea una solicitud de aprobación y resuélvela desde la cola.",
+          "steps": [
+            {
+              "title": "Elige una acción riesgosa que merezca puerta",
+              "body": "Usa un envío saliente, una publicación o una acción que cambie estado. Si la acción es inocua, esta lección es falsa.",
+              "command": "Example gated action: outbound_message_send"
+            },
+            {
+              "title": "Crea la solicitud de aprobación",
+              "body": "Empuja la acción a la cola de aprobaciones en lugar de ejecutarla inmediatamente.",
+              "command": "Open /pico/autopilot and create one approval request for the risky action."
+            },
+            {
+              "title": "Resuelve la solicitud de forma intencionada",
+              "body": "Aprueba o rechaza la solicitud una vez y registra qué muestra la cola después de la acción.",
+              "command": "Use the Approve or Reject action in /pico/autopilot and record the final status."
+            }
+          ],
+          "troubleshooting": [
+            "Si las aprobaciones no están disponibles, dilo claramente. El runtime todavía no está gobernado.",
+            "Si cualquiera puede aprobarlo todo, la puerta existe pero la política es débil. Registra esa brecha y sigue.",
+            "Si pones puerta a ruido trivial, la cola se convierte en spam y los operadores dejan de confiar en ella."
+          ]
+        },
+        "build-a-lead-response-agent": {
+          "title": "Crea un agente de respuesta a leads",
+          "summary": "Convierte un lead entrante en un borrador de respuesta y mantén el envío detrás de una aprobación.",
+          "objective": "Entregar un flujo que un fundador usaría realmente esta semana.",
+          "outcome": "Un flujo de respuesta a leads con un paso saliente protegido por aprobación.",
+          "expectedResult": "Los datos del lead se convierten en un borrador de respuesta o en un resumen estructurado para el operador, y el envío riesgoso sigue protegido.",
+          "validation": "Haz pasar un lead por el flujo de extremo a extremo y guarda el resultado redactado.",
+          "steps": [
+            {
+              "title": "Crea una carga de lead",
+              "body": "Usa la forma mínima útil y mantenla fija durante toda la lección.",
+              "command": "printf \"name=Alex\\nsource=website\\nintent=book demo\\nnext_step=send reply\\n\" > ~/pico-lead.txt"
+            },
+            {
+              "title": "Genera un borrador de respuesta",
+              "body": "Ejecuta el flujo sobre esa carga de lead y produce un borrador de respuesta o un resumen estructurado.",
+              "command": "Feed ~/pico-lead.txt into your Hermes lead workflow and save the result to ~/pico-lead-draft.txt"
+            },
+            {
+              "title": "Pon la acción saliente detrás de una aprobación",
+              "body": "No envíes automáticamente. Fuerza una vez el flujo a pasar por la cola de aprobaciones.",
+              "command": "Create one approval request for the outbound send using the drafted reply as payload."
+            }
+          ],
+          "troubleshooting": [
+            "Si el borrador es genérico, afina la carga del lead antes de tocar el prompt.",
+            "Si el flujo es lento, elimina pasos extra antes de optimizar modelos.",
+            "Si todavía no necesitas el envío saliente, detente en un borrador protegido y toma eso como artefacto."
+          ]
+        },
+        "build-a-document-processing-agent": {
+          "title": "Crea un agente de procesamiento documental",
+          "summary": "Ingiere un documento, extrae los pocos campos que importan y muestra un artefacto de salida revisado.",
+          "objective": "Entregar un patrón de producción más sólido sobre entrada no estructurada.",
+          "outcome": "Un flujo de procesamiento documental con una salida estructurada guardada.",
+          "expectedResult": "Un documento real se convierte en un resumen estructurado, una checklist o un registro etiquetado que puedes inspeccionar.",
+          "validation": "Procesa un documento real y guarda el artefacto de salida extraído.",
+          "steps": [
+            {
+              "title": "Elige un documento y fija el esquema",
+              "body": "Usa un único tipo de archivo real y decide exactamente qué campos necesitas antes de empezar la extracción.",
+              "command": "Example output schema: title, owner, due_date, summary, next_action"
+            },
+            {
+              "title": "Ejecuta la extracción una vez",
+              "body": "Extrae solo los campos que importan aguas abajo. Ignora cualquier campo “nice to have”.",
+              "command": "Run the workflow on one real document and save the structured output to ~/pico-document-output.txt"
+            },
+            {
+              "title": "Revisa la salida guardada",
+              "body": "Lee la salida y confirma que sea utilizable sin más limpieza.",
+              "command": "cat ~/pico-document-output.txt"
+            }
+          ],
+          "troubleshooting": [
+            "Si la calidad de extracción es débil, reduce la variedad documental antes de añadir más prompting.",
+            "Si la salida es difícil de inspeccionar, el esquema es demasiado ancho. Recorta campos.",
+            "Si no puedes decir si el resultado es utilizable, el flujo no está listo para automatizarse más."
+          ]
+        }
+      },
+      "releaseNotes": [
+        {
+          "title": "La shell de Pico aterriza dentro de MUTX",
+          "body": "Academy, Tutor, soporte y Autopilot ahora viven en una sola superficie en lugar de en una landing puramente de marketing."
+        },
+        {
+          "title": "La persistencia del progreso cambió a ajustes de usuario",
+          "body": "Los usuarios autenticados sincronizan el progreso con el backend, mientras que los usuarios anónimos mantienen un respaldo local."
+        },
+        {
+          "title": "Autopilot ahora lee señales reales de MUTX",
+          "body": "Ejecuciones, alertas, presupuestos y aprobaciones se obtienen de rutas en vivo de MUTX. Nada de teatro de telemetría falsa."
+        }
+      ],
+      "showcasePatterns": [
+        {
+          "title": "Operador de respuesta a leads",
+          "summary": "Toma un lead entrante, redacta la primera respuesta y espera aprobación antes del envío riesgoso."
+        },
+        {
+          "title": "Carril de triaje documental",
+          "summary": "Ingiere archivos, extrae las partes útiles, etiqueta el resultado y expone las ejecuciones para revisión."
+        },
+        {
+          "title": "Bucle diario de flujo de trabajo",
+          "summary": "Convierte un prompt útil en un hábito operativo repetible con registros y cadencia."
+        }
+      ],
+      "badgeLabels": {
+        "first-spark": "Primera chispa",
+        "runtime-ranger": "Explorador del runtime",
+        "skillsmith": "Forjador de habilidades",
+        "loop-builder": "Constructor de bucles",
+        "gatekeeper": "Guardián",
+        "pattern-operator": "Operador de patrones"
+      },
+      "capabilities": {
+        "cap-deploy-runtime": {
+          "title": "Runtime persistente desbloqueado",
+          "description": "Ya demostraste el bucle local. Siguiente paso: lleva el mismo agente a una máquina que permanezca despierta.",
+          "actionLabel": "Desplegar el runtime"
+        },
+        "cap-live-runs": {
+          "title": "Visibilidad de ejecuciones en vivo desbloqueada",
+          "description": "Ahora existe una ejecución real. Abre Autopilot e inspecciona el resultado antes de fingir que el bucle es estable.",
+          "actionLabel": "Inspeccionar actividad en vivo"
+        },
+        "cap-ingress": {
+          "title": "Entrada remota desbloqueada",
+          "description": "El runtime vive ya en algún lugar persistente. Dale una ruta real de entrada para que pueda hacer trabajo útil.",
+          "actionLabel": "Conectar una capa de mensajería"
+        },
+        "cap-scheduling": {
+          "title": "Programación desbloqueada",
+          "description": "Ya hay una habilidad útil en su sitio. Ahora ejecútala con cadencia para que el producto se convierta en hábito.",
+          "actionLabel": "Programar el flujo"
+        },
+        "cap-monitoring": {
+          "title": "Monitorización desbloqueada",
+          "description": "Ahora hay un flujo en marcha. Es hora de vigilarlo en lugar de esperar que se porte bien.",
+          "actionLabel": "Ver la actividad del agente"
+        },
+        "cap-cost-controls": {
+          "title": "Control de costes desbloqueado",
+          "description": "Ya puedes ver el historial de ejecuciones. Define una barrera de gasto antes de que el volumen se convierta en arrepentimiento.",
+          "actionLabel": "Definir un umbral de coste"
+        },
+        "cap-approvals": {
+          "title": "Puertas de aprobación desbloqueadas",
+          "description": "La conciencia presupuestaria ya está viva. Añade una parada humana antes de que las acciones salientes riesgosas ocurran de verdad.",
+          "actionLabel": "Añadir una puerta de aprobación"
+        },
+        "cap-production-pattern": {
+          "title": "Patrón de producción desbloqueado",
+          "description": "La barrera ya está colocada. Entrega un flujo que parezca un producto, no un truco de prompt.",
+          "actionLabel": "Entregar el patrón de producción"
+        }
+      },
+      "planMatrix": {
+        "free": {
+          "academy": "Acceso completo a Academy",
+          "tutor": "Tutor fundamentado con uso diario ligero",
+          "project_limit": "1 carril de proyecto activo",
+          "monitored_agents": "Solo vista previa",
+          "alerts": "Alertas de umbral dentro de la app",
+          "approvals": "Vista previa del flujo de aprobación",
+          "retention": "Memoria de producto de 7 días"
+        },
+        "starter": {
+          "academy": "Acceso completo a Academy",
+          "tutor": "Enrutamiento prioritario de Tutor",
+          "project_limit": "3 carriles de proyecto activos",
+          "monitored_agents": "1 agente monitorizado",
+          "alerts": "Configuración dentro de la app y lista para correo",
+          "approvals": "Una puerta de aprobación",
+          "retention": "30 días de historial de ejecuciones y alertas"
+        },
+        "pro": {
+          "academy": "Acceso completo a Academy",
+          "tutor": "Enrutamiento prioritario de Tutor",
+          "project_limit": "Carriles de proyecto ilimitados",
+          "monitored_agents": "Varios agentes monitorizados",
+          "alerts": "Enrutamiento de alertas más sólido",
+          "approvals": "Múltiples puertas de aprobación",
+          "retention": "90 días de historial de ejecuciones y alertas"
+        }
       }
     }
   }

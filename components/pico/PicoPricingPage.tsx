@@ -50,7 +50,7 @@ type LivePlanContent = {
   cta: string
 }
 
-const ACCESS_TIER_IDS = ['starter', 'pro', 'enterprise'] as const
+const ACCESS_TIER_IDS = ['trial', 'starter', 'pro', 'enterprise'] as const
 
 const LIVE_PLAN_CONFIG: Array<{
   id: LivePlanId
@@ -80,27 +80,6 @@ const LIVE_PLAN_CONFIG: Array<{
     supportHref: 'https://calendly.com/mutxdev',
   },
 ]
-
-const PRICING_INTEREST_OPTIONS = [
-  { value: 'building-first', label: 'Founding access' },
-  { value: 'evaluating', label: 'Priority onboarding' },
-  { value: 'other', label: 'Enterprise rollout' },
-] as const
-
-const PRICING_CONTACT_COPY = {
-  title: 'Tell us what kind of access you actually need',
-  subtitle: 'We will reply with the honest lane, rollout shape, and next step.',
-  interestLabel: 'What are you optimizing for?',
-  messageLabel: 'What are you trying to ship?',
-  messageOptional: '(context helps)',
-  messagePlaceholder: 'Share the workflow, urgency, or rollout shape you are trying to make real.',
-  submit: 'Request access guidance',
-  submitting: 'Sending request...',
-  disclaimer: 'No generic nurture funnel. A human will reply with the right route.',
-  successTitle: 'Access request sent.',
-  successBody: 'We got the context. Expect a human reply that points you to the right lane.',
-  successBack: 'Back to pricing',
-} as const
 
 function formatShortDate(value?: string | null) {
   if (!value) return 'Unavailable'
@@ -172,7 +151,7 @@ export function PicoPricingPage() {
       })
 
       if (res.status === 401) {
-        window.location.href = `/login?next=${encodeURIComponent('/pico/pricing')}`
+        window.location.href = `/login?next=${encodeURIComponent(toHref('/pricing'))}`
         return
       }
 
@@ -229,8 +208,6 @@ export function PicoPricingPage() {
         onClose={() => setFormOpen(false)}
         defaultInterest={formInterest}
         source="pico-pricing"
-        copy={PRICING_CONTACT_COPY}
-        interestOptions={PRICING_INTEREST_OPTIONS}
       />
 
       <div
@@ -284,7 +261,7 @@ export function PicoPricingPage() {
                 <div className="grid gap-3 sm:flex sm:flex-wrap">
                   <button
                     type="button"
-                    onClick={() => openPricingForm('evaluating')}
+                    onClick={() => openPricingForm('build')}
                     className={picoClasses.primaryButton}
                   >
                     {pageT('primaryCta')}
@@ -293,7 +270,7 @@ export function PicoPricingPage() {
                   <Link href={toHref('/support')} className={picoClasses.secondaryButton}>
                     {pageT('secondaryCta')}
                   </Link>
-                  <Link href="/pico#pricing" className={picoClasses.tertiaryButton}>
+                  <Link href={`${toHref('/')}#pricing`} className={picoClasses.tertiaryButton}>
                     {pageT('returnToLanding')}
                   </Link>
                 </div>
@@ -392,7 +369,7 @@ export function PicoPricingPage() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 xl:grid-cols-3">
+                <div className="grid gap-4 xl:grid-cols-4">
                   {accessPlans.map((plan) => {
                     const isHighlighted = plan.recommended ?? false
 
@@ -462,9 +439,14 @@ export function PicoPricingPage() {
                           ) : (
                             <button
                               type="button"
-                              onClick={() =>
-                                openPricingForm(plan.id === 'starter' ? 'building-first' : 'evaluating')
-                              }
+                              onClick={() => {
+                                if (plan.id === 'trial' || plan.id === 'starter') {
+                                  openPricingForm('build')
+                                  return
+                                }
+
+                                openPricingForm('fix')
+                              }}
                               className={cn(
                                 'w-full',
                                 isHighlighted ? picoClasses.primaryButton : picoClasses.secondaryButton,
@@ -598,7 +580,7 @@ export function PicoPricingPage() {
                               href={
                                 session.status === 'authenticated'
                                   ? toHref('/onboarding')
-                                  : `/login?next=${encodeURIComponent('/pico/onboarding')}`
+                                  : `/login?next=${encodeURIComponent(toHref('/onboarding'))}`
                               }
                               className={picoClasses.secondaryButton}
                             >
@@ -715,7 +697,7 @@ export function PicoPricingPage() {
                     {pageT('finalPrimary')}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href="/pico" className={picoClasses.secondaryButton}>
+                  <Link href={toHref('/')} className={picoClasses.secondaryButton}>
                     {pageT('finalSecondary')}
                   </Link>
                 </div>

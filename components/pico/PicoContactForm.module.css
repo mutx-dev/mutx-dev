@@ -139,7 +139,6 @@
   font-family: var(--pico-font-body);
   font-size: 0.88rem;
   line-height: 1.5;
-  outline: none;
   transition: border-color 160ms, box-shadow 160ms;
 }
 
@@ -148,10 +147,11 @@
   color: var(--pico-text-muted);
 }
 
-.input:focus,
-.textarea:focus {
+.input:focus-visible,
+.textarea:focus-visible {
   border-color: rgba(var(--pico-accent-rgb), 0.42);
   box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
+  outline: none;
 }
 
 /* --- Radix Select ------------------------------------------------- */
@@ -169,7 +169,6 @@
   font-family: var(--pico-font-body);
   font-size: 0.88rem;
   line-height: 1.5;
-  outline: none;
   cursor: pointer;
   transition: border-color 160ms, box-shadow 160ms;
 }
@@ -179,9 +178,10 @@
 }
 
 .selectTrigger[data-state="open"],
-.selectTrigger:focus {
+.selectTrigger:focus-visible {
   border-color: rgba(var(--pico-accent-rgb), 0.42);
   box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
+  outline: none;
 }
 
 .selectIcon {
@@ -223,10 +223,17 @@
   font-size: 0.85rem;
   line-height: 1.4;
   color: var(--pico-text-secondary);
-  outline: none;
   cursor: pointer;
   position: relative;
   transition: background 120ms, color 120ms;
+}
+
+.closeBtn:focus-visible,
+.selectItem:focus-visible,
+.submit:focus-visible,
+.successBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.16);
 }
 
 .selectItem[data-highlighted] {

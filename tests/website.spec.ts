@@ -887,7 +887,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('button', { name: /reset password/i })).toBeVisible();
   });
 
-  test('pico root stays on the landing page with waitlist and founder-call CTAs only', async ({ page }) => {
+  test('pico root stays on the landing page with access-first CTAs only', async ({ page }) => {
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('pico-landing')).toBeVisible();
@@ -898,17 +898,19 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByTestId('pico-surface-compass')).toHaveCount(0);
     await expect(page.locator('a[href*="/pico/onboarding"], a[href*="/onboarding"]')).toHaveCount(0);
     await expect(page.getByRole('link', { name: /see pricing/i })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /join waitlist/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /book founder call/i }).first()).toBeVisible();
-    await expect(
-      page.locator('#pricing button, #pricing a[href="/pricing"], #pricing a[href="https://calendly.com/mutxdev"]'),
-    ).toHaveCount(0);
-    await expect(page.locator('main')).toContainText(/founding access|founding member|waitlist/i);
+    await expect(page.getByRole('button', { name: /request access/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /see how it works/i }).first()).toBeVisible();
+    await expect(page.locator('#pricing button')).toHaveCount(4);
+    await expect(page.locator('#pricing')).toContainText(/request trial access/i);
+    await expect(page.locator('#pricing')).toContainText(/request founding access/i);
+    await expect(page.locator('#pricing')).toContainText(/request supported access/i);
+    await expect(page.locator('#pricing')).toContainText(/book a planning call/i);
+    await expect(page.locator('main')).toContainText(/founding access|waitlist-first|request access/i);
     await expect(page.locator('main')).not.toContainText(/pre-register/i);
 
-    await page.getByRole('button', { name: /join waitlist/i }).first().click();
+    await page.getByRole('button', { name: /request access/i }).first().click();
     await expect(page.getByRole('dialog', { name: /contact form/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /join the pico waitlist/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /request pico access/i })).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico');
   });
 
@@ -919,15 +921,16 @@ test.describe('mutx.dev QA', () => {
 
     await expect(page.getByTestId('pico-pricing-route')).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /see the access lane first\. see the billing layer second\./i }),
+      page.getByRole('heading', { name: /choose the lane you need now\. see product billing only when it matters\./i }),
     ).toBeVisible();
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/solo build/i);
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/\$9/i);
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/guided group/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/free trial/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€29/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€79/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/pico pilot/i);
     await expect(page.getByTestId('pico-pricing-live-plans')).toContainText(
       /live product plans once pico is already in play/i,
     );
-    await expect(page.getByText(/founding access is the front door\./i)).toBeVisible();
+    await expect(page.getByText(/public access gets you into the right lane\./i)).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/pricing');
   });
 
