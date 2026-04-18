@@ -16,10 +16,10 @@
       "badge": "Accès fondateur · Sur demande",
       "title": "Mettez un agent IA en marche ",
       "titleAccent": "et lui faire confiance dans le vrai travail.",
-      "subtitle": "PicoMUTX vous aide à construire, récupérer et contrôler des agents IA. Vous pouvez partir de zéro, d’un setup cassé ou d’un système live auquel vous ne faites pas encore confiance.",
+      "subtitle": "Partez de zéro, récupérez un setup cassé ou reprenez le contrôle d’un agent live. Pico vous oriente vers la bonne voie : construire, réparer ou contrôler.",
       "cta": "Demander l’accès",
       "ctaSecondary": "Voir Comment Ça Marche",
-      "meta": "L’accès public reste request-first. À l’intérieur, Pico diagnostique le blocage et vous oriente vers build, fix ou control."
+      "meta": "À l’extérieur, l’accès reste sur demande. À l’intérieur, Pico diagnostique le blocage et vous oriente vers construire, réparer ou contrôler."
     },
     "trustBar": {
       "items": {
@@ -32,7 +32,7 @@
       "eyebrow": "Pourquoi Pico",
       "title": "La plupart des projets d’agents ne cassent pas",
       "titleLine2": "parce que l’idée était faible.",
-      "body": "Les projets coincent quand le chemin devient brouillon : trop de choix de stack, trop peu de clarté opérationnelle et aucune vraie route de recovery quand quelque chose casse.",
+      "body": "Les projets bloquent quand le chemin se brouille : trop de choix de stack, aucune voie de récupération et pas assez de clarté opérationnelle quand quelque chose casse.",
       "scenarios": {
         "0": {
           "label": "\"Je sais ce que je veux que l’agent fasse. Il me manque surtout le chemin le plus rapide et le plus sain pour en avoir un qui tourne.\"",
@@ -51,12 +51,12 @@
           "body": "Si vous ne voyez pas les runs, les seuils, les validations et le comportement sous pression, vous n’avez pas encore un actif opérationnel."
         }
       },
-      "close": "PicoMUTX existe pour transformer cette incertitude en prochaine action honnête."
+      "close": "Pico transforme cette incertitude en prochaine action honnête."
     },
     "platform": {
       "eyebrow": "Comment Pico fonctionne",
-      "title": "Pico diagnostique le blocage, puis vous oriente vers build, fix ou control.",
-      "body": "La promesse est simple : mettre quelque chose d’utile en marche et le garder fiable. Le diagnostic vient d’abord pour que Pico sache s’il faut construire, récupérer ou ajouter du contrôle.",
+      "title": "Pico diagnostique le blocage, puis vous oriente vers construire, réparer ou contrôler.",
+      "body": "Mettez quelque chose d’utile en marche et gardez-le fiable. Pico commence par le diagnostic pour que la prochaine action colle au vrai blocage.",
       "howItWorks": {
         "0": {
           "title": "Décrivez l’objectif ou connectez l’agent",
@@ -123,8 +123,8 @@
     },
     "earlyAccess": {
       "eyebrow": "Accès fondateur",
-      "title": "Pico reste waitlist-first en public, mais le produit est déjà réel.",
-      "body": "L’accès s’ouvre par vagues pour que les opérateurs sérieux entrent dans la bonne lane. Cela garde la porte d’entrée honnête pendant que les workflows se durcissent sur du vrai usage.",
+      "title": "À l’extérieur, une waitlist. Dessous, un vrai produit.",
+      "body": "L’accès s’ouvre par vagues pour que les opérateurs sérieux arrivent dans la bonne voie pendant que les workflows se durcissent sur du vrai usage.",
       "benefits": {
         "0": "Partez de zéro, d’un setup cassé ou d’un système live auquel vous ne faites pas encore confiance",
         "1": "Vous êtes orienté vers build, fix ou control",
@@ -135,7 +135,7 @@
     },
     "pricing": {
       "eyebrow": "Accès public",
-      "title": "L’offre publique parle de résultat, pas de contenu.",
+      "title": "Vous payez le progrès, pas le contenu.",
       "tiers": {
         "starter": {
           "name": "Founding Tier",
@@ -195,7 +195,7 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "Commencez par la première valeur. Passez en exécution self-serve quand le travail devient réel. Ajoutez du support ou de l’implémentation seulement quand la complexité le mérite.",
+      "lead": "Atteignez une première valeur. Passez ensuite en self-serve. Ajoutez support ou implémentation seulement quand le travail le mérite.",
       "recommendedLabel": "Meilleur Point De Départ"
     },
     "faq": {
@@ -226,12 +226,12 @@
     },
     "finalCta": {
       "eyebrow": "Accès fondateur",
-      "title": "Demandez l’accès à la voie qui correspond au travail.",
-      "body": "Pico fait un travail pratique : mettre quelque chose d’utile en marche, le récupérer quand il casse et le garder sous contrôle quand il touche du vrai travail.",
+      "title": "Demandez l’accès à la bonne voie.",
+      "body": "Pico vous aide à mettre quelque chose d’utile en marche, à le récupérer quand il casse et à le garder sous contrôle dans le vrai travail.",
       "formHeadline": "Commencez par le vrai blocage.",
-      "formSubline": "Dites-nous si vous devez construire, réparer ou contrôler. Nous vous orienterons vers la bonne lane et la prochaine action honnête.",
+      "formSubline": "Dites-nous si vous devez construire, réparer ou contrôler. Nous vous orienterons vers la bonne voie.",
       "ctaButton": "Demander l’accès",
-      "formCtaMeta": "Essai gratuit pour la première valeur · Founding €29 · Supported €79 · Pico Pilot à partir de €1.000+",
+      "formCtaMeta": "Essai gratuit · Founding 29 € · Supported 79 € · Pico Pilot à partir de 1.000 €",
       "secondaryButton": "Réserver Un Call De Planning"
     },
     "contactForm": {

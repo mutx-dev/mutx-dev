@@ -16,10 +16,10 @@
       "badge": "Founding Access · Request-Only",
       "title": "Get an AI agent working ",
       "titleAccent": "and trust it in real work.",
-      "subtitle": "PicoMUTX helps you build, recover, and control AI agents. Start from zero, a broken setup, or a live system you do not trust yet.",
+      "subtitle": "Start from zero, recover a broken setup, or take control of a live agent. Pico routes you into build, fix, or control.",
       "cta": "Request access",
       "ctaSecondary": "See How It Works",
-      "meta": "Public access is still request-first. Inside, Pico diagnoses the blocker and routes you into build, fix, or control."
+      "meta": "Request-first outside. Inside, Pico diagnoses the blocker and routes you into build, fix, or control."
     },
     "trustBar": {
       "items": {
@@ -32,7 +32,7 @@
       "eyebrow": "Why Pico",
       "title": "Most agent projects do not fail",
       "titleLine2": "because the idea was weak.",
-      "body": "Projects stall when the path gets messy: too many stack choices, too little operational clarity, and no grounded recovery path once something breaks.",
+      "body": "Projects stall when the path gets messy: too many stack decisions, no recovery path, and no operational clarity once something breaks.",
       "scenarios": {
         "0": {
           "label": "\"I know what I want the agent to do. I still need the fastest sane path to get one working.\"",
@@ -51,12 +51,12 @@
           "body": "If you cannot see runs, thresholds, approvals, and behavior under pressure, you do not have an operational asset yet."
         }
       },
-      "close": "PicoMUTX exists to turn that uncertainty into one honest next move."
+      "close": "Pico turns that uncertainty into one honest next move."
     },
     "platform": {
       "eyebrow": "How Pico Works",
-      "title": "Pico diagnoses the blocker, then routes you into build, fix, or control.",
-      "body": "The promise is simple: get something useful working and keep it trustworthy. Diagnosis comes first so Pico knows whether you need to build, recover, or add control.",
+      "title": "Pico diagnoses the blocker, then routes you to build, fix, or control.",
+      "body": "Get something useful working and keep it trustworthy. Pico starts with diagnosis so the next move matches the real blocker.",
       "howItWorks": {
         "0": {
           "title": "Describe the goal or connect the agent",
@@ -123,8 +123,8 @@
     },
     "earlyAccess": {
       "eyebrow": "Founding Access",
-      "title": "Public Pico is still waitlist-first, but the product is already real.",
-      "body": "Access opens in waves so serious operators land in the right lane. That keeps the front door honest while workflows harden around real use.",
+      "title": "Waitlist-first outside. Real product underneath.",
+      "body": "Access opens in waves so serious operators land in the right lane while workflows harden on real use.",
       "benefits": {
         "0": "Start from zero, a broken setup, or a live system you do not trust yet",
         "1": "Get routed into build, fix, or control",
@@ -135,8 +135,8 @@
     },
     "pricing": {
       "eyebrow": "Public Access",
-      "title": "The public offer is about outcome, not content.",
-      "lead": "Start with first value. Move to self-serve execution when the work is real. Add support or implementation only when the complexity earns it.",
+      "title": "Pay for progress, not content.",
+      "lead": "Reach first value. Move into self-serve. Add support or implementation only when the work earns it.",
       "recommendedLabel": "Best Starting Point",
       "tiers": {
         "trial": {
@@ -405,14 +405,14 @@
     },
     "finalCta": {
       "eyebrow": "Founding Access",
-      "title": "Request access to the lane that matches the work.",
-      "body": "Pico does one practical job: get something useful working, recover it when it breaks, and keep it under control once it touches real work.",
+      "title": "Request access to the right lane.",
+      "body": "Pico helps you get something useful working, recover it when it breaks, and keep it under control in real work.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
       "formHeadline": "Start with the real blocker.",
-      "formSubline": "Tell us whether you need to build, fix, or control. We will route you to the right lane and the next honest move.",
+      "formSubline": "Tell us whether you need to build, fix, or control. We will route you to the right lane.",
       "ctaButton": "Request access",
       "secondaryButton": "Book a Planning Call",
-      "formCtaMeta": "Free trial for first value · €29 founding · €79 supported · Pico Pilot from €1,000+"
+      "formCtaMeta": "Free trial · €29 founding · €79 supported · Pico Pilot from €1,000+"
     },
     "contactForm": {
       "dialogLabel": "Contact form",

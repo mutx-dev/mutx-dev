@@ -16,10 +16,10 @@
       "badge": "창립 액세스 · 신청 기반",
       "title": "AI 에이전트를 실제로 돌아가게 만들고",
       "titleAccent": "실전 업무에서 믿을 수 있게 하세요.",
-      "subtitle": "PicoMUTX는 AI 에이전트를 build, recover, control 할 수 있게 돕습니다. 처음부터, 망가진 setup 에서, 아직 신뢰하지 못하는 live system 에서 시작할 수 있습니다.",
+      "subtitle": "처음부터 시작해도 되고, 망가진 설정을 복구해도 되고, 이미 돌아가는 에이전트를 다시 통제해도 됩니다. Pico는 막힌 지점을 보고 구축, 복구, 제어 가운데 어디로 가야 하는지 안내합니다.",
       "cta": "액세스 요청",
       "ctaSecondary": "작동 방식을 보기",
-      "meta": "공개 액세스는 아직 request-first 입니다. 안에서는 Pico가 blocker 를 진단하고 build, fix, control 로 보냅니다."
+      "meta": "바깥에서는 아직 신청제로 운영됩니다. 안에서는 Pico가 막힌 지점을 진단하고 구축, 복구, 제어 가운데 어디로 가야 하는지 안내합니다."
     },
     "trustBar": {
       "items": {
@@ -32,7 +32,7 @@
       "eyebrow": "왜 Pico인가",
       "title": "대부분의 에이전트 프로젝트는",
       "titleLine2": "아이디어가 약해서 망하지 않습니다.",
-      "body": "프로젝트는 경로가 엉키는 순간 멈춥니다. stack 선택은 너무 많고, 운영 명확성은 부족하고, 뭔가가 깨졌을 때 믿을 만한 recovery path 가 없기 때문입니다.",
+      "body": "프로젝트가 멈추는 이유는 아이디어가 약해서가 아닙니다. 스택 결정은 너무 많고, 복구 경로는 없고, 뭔가 깨졌을 때 운영 가시성도 없기 때문입니다.",
       "scenarios": {
         "0": {
           "label": "\"에이전트가 무엇을 해야 하는지는 안다. 지금 필요한 건 가장 빠르고 가장 멀쩡한 실행 경로다.\"",
@@ -51,12 +51,12 @@
           "body": "실행 기록, 임계값, 승인, 압박 상황에서의 행동이 보이지 않는다면 아직 운영 자산이 아닙니다."
         }
       },
-      "close": "PicoMUTX는 그 불확실함을 다음의 정직한 한 걸음으로 바꾸기 위해 존재합니다."
+      "close": "Pico는 그 불확실함을 다음의 정직한 한 걸음으로 바꿉니다."
     },
     "platform": {
       "eyebrow": "Pico가 작동하는 방식",
-      "title": "Pico는 blocker 를 진단한 뒤 build, fix, control 로 보냅니다.",
-      "body": "약속은 단순합니다. 쓸모 있는 것을 실제로 돌리고 계속 믿을 수 있게 만드는 것. 먼저 진단하기 때문에 build 가 필요한지, recover 가 필요한지, control 을 더해야 하는지 알 수 있습니다.",
+      "title": "Pico는 막힌 지점을 진단한 뒤 구축, 복구, 제어로 라우팅합니다.",
+      "body": "쓸모 있는 것을 실제로 돌리고 계속 믿을 수 있게 만드는 것. Pico는 먼저 진단해서 다음 행동이 진짜 문제와 맞도록 만듭니다.",
       "howItWorks": {
         "0": {
           "title": "목표를 설명하거나 에이전트를 연결하기",
@@ -123,8 +123,8 @@
     },
     "earlyAccess": {
       "eyebrow": "창립 액세스",
-      "title": "공개 Pico 는 아직 waitlist-first 이지만, 뒤의 제품은 이미 real 합니다.",
-      "body": "액세스는 wave 단위로 열립니다. serious operator 를 맞는 lane 으로 넣기 위해서입니다. 그동안 front door 는 honest 하게 유지되고 workflow 는 real use 위에서 단단해집니다.",
+      "title": "겉은 대기 명단, 안은 이미 실제 제품입니다.",
+      "body": "액세스는 순차적으로 열립니다. 진지한 운영자를 맞는 경로에 넣고, 그 사이 워크플로를 실제 사용 위에서 단단하게 만들기 위해서입니다.",
       "benefits": {
         "0": "처음부터, 망가진 setup 에서, 아직 못 믿는 live system 에서 시작할 수 있습니다",
         "1": "build, fix, control 중 맞는 곳으로 라우팅됩니다",
@@ -135,7 +135,7 @@
     },
     "pricing": {
       "eyebrow": "공개 액세스",
-      "title": "공개 offer 는 content 가 아니라 outcome 을 위한 것입니다.",
+      "title": "콘텐츠가 아니라 진전에 비용을 냅니다.",
       "tiers": {
         "starter": {
           "name": "창립 Tier",
@@ -195,7 +195,7 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "먼저 first value 에 도달합니다. 일이 real 해지면 self-serve execution 으로 갑니다. support 나 implementation 은 complexity 가 그만큼 커질 때만 붙입니다.",
+      "lead": "먼저 첫 가치를 얻고, 그다음 셀프서브로 갑니다. 지원이나 구현은 일이 정말 필요로 할 때만 붙습니다.",
       "recommendedLabel": "가장 좋은 시작점"
     },
     "faq": {
@@ -226,12 +226,12 @@
     },
     "finalCta": {
       "eyebrow": "창립 액세스",
-      "title": "지금 필요한 일에 맞는 lane 으로 액세스를 요청하세요.",
-      "body": "Pico가 하는 실무는 하나입니다. 쓸모 있는 것을 돌리고, 깨지면 recover 하고, real work 에 닿으면 control 아래 두는 것입니다.",
+      "title": "맞는 경로에 대한 액세스를 요청하세요.",
+      "body": "Pico는 쓸모 있는 것을 돌리고, 깨지면 되살리고, 실제 업무 안에서는 통제 가능한 상태로 유지하도록 돕습니다.",
       "formHeadline": "진짜 blocker 부터 시작하세요.",
-      "formSubline": "build, fix, control 중 무엇이 필요한지 알려주세요. 맞는 lane 과 다음 honest move 로 안내하겠습니다.",
+      "formSubline": "구축, 복구, 제어 중 무엇이 필요한지 알려 주세요. 맞는 경로로 안내하겠습니다.",
       "ctaButton": "액세스 요청",
-      "formCtaMeta": "first value 용 무료 체험 · Founding €29 · Supported €79 · Pico Pilot €1,000+",
+      "formCtaMeta": "무료 체험 · Founding €29 · Supported €79 · Pico Pilot €1,000+부터",
       "secondaryButton": "플래닝 콜 예약"
     },
     "contactForm": {

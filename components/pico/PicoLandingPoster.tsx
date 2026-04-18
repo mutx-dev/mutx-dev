@@ -70,10 +70,6 @@ export function PicoLandingPoster() {
   )
 
   const heroRobot = picoRobotArtById.heroWave
-  const guideRobot = picoRobotArtById.guide
-  const builderRobot = picoRobotArtById.builder
-  const coinsRobot = picoRobotArtById.coins
-  const celebrateRobot = picoRobotArtById.celebrate
 
   function openForm(interest?: string) {
     setFormInterest(interest)
@@ -165,7 +161,6 @@ export function PicoLandingPoster() {
               <SiteReveal delay={0.04}>
                 <div className={s.heroPrelude}>
                   <span className={s.heroBadge}>{t('hero.badge')}</span>
-                  <p className={s.heroWordmark}>{t('nav.brand')}</p>
                 </div>
               </SiteReveal>
 
@@ -177,11 +172,11 @@ export function PicoLandingPoster() {
               </SiteReveal>
 
               <SiteReveal delay={0.18}>
-              <p className={s.heroSubtitle}>{t('hero.subtitle')}</p>
-            </SiteReveal>
+                <p className={s.heroSubtitle}>{t('hero.subtitle')}</p>
+              </SiteReveal>
 
-            <SiteReveal delay={0.25}>
-              <div className={s.heroActions}>
+              <SiteReveal delay={0.25}>
+                <div className={s.heroActions}>
                   <button
                     type="button"
                     className={s.heroPrimary}
@@ -236,16 +231,6 @@ export function PicoLandingPoster() {
             </SiteReveal>
           </div>
 
-          <SiteReveal delay={0.34}>
-            <div className={s.trustStrip}>
-              {Array.from({ length: 3 }, (_, index) => (
-                <div key={index} className={s.trustItem}>
-                  <span className={s.trustDash} aria-hidden="true" />
-                  <span>{t(`trustBar.items.${index}`)}</span>
-                </div>
-              ))}
-            </div>
-          </SiteReveal>
         </section>
 
         <section id="fit" className={s.qualifySection}>
@@ -322,48 +307,7 @@ export function PicoLandingPoster() {
                   <p className={s.eyebrow}>{t('platform.eyebrow')}</p>
                   <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
                   <p className={s.sectionBody}>{t('platform.body')}</p>
-                </div>
-
-                <div className={s.pathVisual}>
-                  <div className={s.pathVisualHeader}>
-                    <span className={s.pathVisualLabel}>{t('beforeAfter.eyebrow')}</span>
-                    <span className={s.pathVisualRule}>{t('trustBar.items.2')}</span>
-                  </div>
-
-                  <div className={s.pathRobotWrap}>
-                    <div className={s.pathRobotGlow} aria-hidden="true" />
-                    <Image
-                      src={guideRobot.src}
-                      alt=""
-                      width={1536}
-                      height={1024}
-                      className={s.pathRobotImage}
-                      sizes="(max-width: 1024px) 60vw, 24rem"
-                    />
-                  </div>
-
-                  <p className={s.pathVisualNote}>{t('beforeAfter.close')}</p>
-
-                  <div className={s.pathGallery} aria-hidden="true">
-                    <div className={s.pathGalleryCell}>
-                      <Image
-                        src={builderRobot.src}
-                        alt=""
-                        width={256}
-                        height={256}
-                        className={s.pathGalleryImage}
-                      />
-                    </div>
-                    <div className={s.pathGalleryCell}>
-                      <Image
-                        src={coinsRobot.src}
-                        alt=""
-                        width={256}
-                        height={256}
-                        className={s.pathGalleryImage}
-                      />
-                    </div>
-                  </div>
+                  <p className={s.sectionClose}>{t('beforeAfter.close')}</p>
                 </div>
               </SiteReveal>
 
@@ -379,13 +323,15 @@ export function PicoLandingPoster() {
                         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                       >
                         <div className={s.pathItemTop}>
-                        <span className={s.pathNumber}>0{index + 1}</span>
-                        <span className={s.pathIcon}>
+                          <span className={s.pathNumber}>0{index + 1}</span>
+                          <span className={s.pathIcon}>
                             <Icon className="h-5 w-5" aria-hidden="true" />
-                        </span>
-                      </div>
+                          </span>
+                        </div>
                         <div className={s.pathItemCopy}>
-                          <h3 className={s.pathItemTitle}>{t(`platform.howItWorks.${index}.title`)}</h3>
+                          <h3 className={s.pathItemTitle}>
+                            {t(`platform.howItWorks.${index}.title`)}
+                          </h3>
                           <p className={s.pathItemBody}>{t(`platform.howItWorks.${index}.body`)}</p>
                         </div>
                       </motion.li>
@@ -568,19 +514,6 @@ export function PicoLandingPoster() {
                     {t('finalCta.secondaryButton')}
                   </a>
                   <p className={s.finalMeta}>{t('finalCta.formCtaMeta')}</p>
-                </div>
-              </SiteReveal>
-
-              <SiteReveal className={s.finalVisual} delay={0.14}>
-                <div className={s.finalRobotFrame} aria-hidden="true">
-                  <Image
-                    src={celebrateRobot.src}
-                    alt=""
-                    width={1536}
-                    height={1024}
-                    className={s.finalRobotImage}
-                    sizes="(max-width: 900px) 70vw, 28rem"
-                  />
                 </div>
               </SiteReveal>
             </div>
