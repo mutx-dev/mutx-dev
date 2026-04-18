@@ -56,20 +56,31 @@ export function PicoContactForm({
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const honeypotRef = useRef<HTMLInputElement>(null)
+  const usesStructuredIntake =
+    t.has('interestOptions.build') &&
+    t.has('interestOptions.fix') &&
+    t.has('interestOptions.control')
 
-  const defaultInterestOptions: PicoContactFormOption[] = [
-    { value: 'building-first', label: t('interestOptions.building-first') },
-    { value: 'fixing-existing', label: t('interestOptions.fixing-existing') },
-    { value: 'evaluating', label: t('interestOptions.evaluating') },
-    { value: 'spent-money', label: t('interestOptions.spent-money') },
-    { value: 'other', label: t('interestOptions.other') },
-  ]
+  const defaultInterestOptions: PicoContactFormOption[] = usesStructuredIntake
+    ? [
+        { value: 'build', label: t('interestOptions.build') },
+        { value: 'fix', label: t('interestOptions.fix') },
+        { value: 'control', label: t('interestOptions.control') },
+        { value: 'other', label: t('interestOptions.other') },
+      ]
+    : [
+        { value: 'building-first', label: t('interestOptions.building-first') },
+        { value: 'fixing-existing', label: t('interestOptions.fixing-existing') },
+        { value: 'evaluating', label: t('interestOptions.evaluating') },
+        { value: 'spent-money', label: t('interestOptions.spent-money') },
+        { value: 'other', label: t('interestOptions.other') },
+      ]
   const resolvedInterestOptions =
     interestOptions && interestOptions.length > 0 ? [...interestOptions] : defaultInterestOptions
   const resolvedDefaultInterest =
     defaultInterest && resolvedInterestOptions.some((option) => option.value === defaultInterest)
       ? defaultInterest
-      : resolvedInterestOptions[0]?.value ?? 'building-first'
+      : resolvedInterestOptions[0]?.value ?? (usesStructuredIntake ? 'build' : 'building-first')
   const resolvedCopy = {
     title: copy?.title ?? t('title'),
     subtitle: copy?.subtitle ?? t('subtitle'),
@@ -176,13 +187,13 @@ export function PicoContactForm({
               aria-label={t('closeLabel')}
               type='button'
             >
-              <X className='h-4 w-4' />
+              <X className='h-4 w-4' aria-hidden='true' />
             </button>
 
             {state === 'success' ? (
-              <div className={s.successState}>
+              <div className={s.successState} role='status' aria-live='polite'>
                 <span className={s.successIcon}>
-                  <Check className='h-6 w-6' />
+                  <Check className='h-6 w-6' aria-hidden='true' />
                 </span>
                 <h2 className={s.successTitle}>{resolvedCopy.successTitle}</h2>
                 <p className={s.successBody}>{resolvedCopy.successBody}</p>
@@ -219,6 +230,10 @@ export function PicoContactForm({
                         placeholder={t('emailPlaceholder')}
                         className={s.input}
                         autoComplete='email'
+                        inputMode='email'
+                        spellCheck={false}
+                        autoCapitalize='none'
+                        autoCorrect='off'
                       />
                     </label>
                   </div>
@@ -254,7 +269,7 @@ export function PicoContactForm({
                       <Select.Trigger className={s.selectTrigger}>
                         <Select.Value />
                         <Select.Icon className={s.selectIcon}>
-                          <ChevronDown className='h-3.5 w-3.5' />
+                          <ChevronDown className='h-3.5 w-3.5' aria-hidden='true' />
                         </Select.Icon>
                       </Select.Trigger>
                       <Select.Portal>
@@ -270,7 +285,7 @@ export function PicoContactForm({
                               <Select.Item key={option.value} value={option.value} className={s.selectItem}>
                                 <Select.ItemText>{option.label}</Select.ItemText>
                                 <Select.ItemIndicator className={s.selectIndicator}>
-                                  <Check className='h-3 w-3' />
+                                  <Check className='h-3 w-3' aria-hidden='true' />
                                 </Select.ItemIndicator>
                               </Select.Item>
                             ))}
@@ -295,7 +310,11 @@ export function PicoContactForm({
                     />
                   </label>
 
-                  {errorMsg && <p className={s.error}>{errorMsg}</p>}
+                  {errorMsg && (
+                    <p className={s.error} role='status' aria-live='polite'>
+                      {errorMsg}
+                    </p>
+                  )}
 
                   <button
                     type='submit'
@@ -307,7 +326,7 @@ export function PicoContactForm({
                     ) : (
                       <>
                         {resolvedCopy.submit}
-                        <ArrowRight className='h-4 w-4' />
+                        <ArrowRight className='h-4 w-4' aria-hidden='true' />
                       </>
                     )}
                   </button>

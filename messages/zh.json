@@ -1,231 +1,269 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX - 无需雇佣开发者，也能安全构建和部署 AI 智能体",
-      "description": "PicoMUTX 帮助创始人、运营者和小团队安全地构建、部署并运行 AI 智能体，提供分步指导、内置护栏和真实支持。现在预注册，抢先获得早期访问资格。"
+      "title": "PicoMUTX — 让 AI 智能体真正跑起来，并保持在可控范围内",
+      "description": "PicoMUTX 帮助创始人、运营者和小团队构建、修复并控制 AI 智能体，让它们在真实工作中也值得信任。"
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "预注册"
+      "cta": "申请访问",
+      "ctaMobile": "访问",
+      "sectionsLabel": "页面分区",
+      "skipToMain": "跳到主要内容"
     },
     "hero": {
-      "badge": "早期访问 · 名额有限",
-      "title": "安全构建和部署 AI 智能体，",
-      "titleAccent": "无需雇佣开发者。",
-      "subtitle": "无论你是从零开始、正在修复一个跑不通的智能体，还是想避免再犯一次昂贵错误，PicoMUTX 都能为你提供一条安全、清晰、有人引导的落地路径。",
-      "cta": "立即预注册，获取早期访问",
-      "ctaSecondary": "查看定价",
-      "meta": "免费预注册 · 无需信用卡 · 创始席位有限"
+      "badge": "创始访问 · 申请制",
+      "title": "让 AI 智能体真正跑起来，",
+      "titleAccent": "并在真实工作里敢用它。",
+      "subtitle": "你可以从零开始、救回一个坏掉的设置，或重新管住一个已经在跑的智能体。Pico 会先判断卡点，再把你送到搭建、修复或控制这条正确路径上。",
+      "cta": "申请访问",
+      "ctaSecondary": "看它如何运作",
+      "meta": "外面仍然是申请制。进来之后，Pico 会先诊断卡点，再把你送到搭建、修复或控制。"
     },
     "trustBar": {
       "items": {
-        "0": "面向创始人、运营者和小团队",
-        "1": "分步指导",
-        "2": "从第一天起就有内置护栏"
+        "0": "可以从零开始、从一团糟的 build 开始，或从已经在线的系统开始",
+        "1": "一层诊断逻辑会把你分流到 build、fix、control 之一",
+        "2": "在谈信任之前，先把可见性、审批和护栏放上去"
       }
     },
     "problem": {
-      "eyebrow": "问题所在",
-      "title": "问题不在想法本身。",
-      "titleLine2": "而在于之后发生的一切。",
-      "body": "大多数人卡住，并不是因为没有野心，而是因为构建 AI 智能体这件事，依然像在进入一个由工程师为工程师设计的世界。",
+      "eyebrow": "为什么是 Pico",
+      "title": "大多数智能体项目失败，",
+      "titleLine2": "并不是因为想法太弱。",
+      "body": "项目卡住，通常不是因为点子不行，而是因为技术选择太多、没有恢复路径、出了问题也看不清系统到底在怎么跑。",
       "scenarios": {
         "0": {
-          "label": "\"我想做一个 AI 智能体，但不知道该从哪里开始。\"",
-          "body": "工具太多，观点太多，太多人默认你已经懂基础。从\"我有个想法\"到\"我有个能跑的东西\"之间的落差，本不该这么大。"
+          "label": "“我知道我想让这个智能体做什么。我缺的是一条最快、最稳妥、能把它跑起来的路。”",
+          "body": "从零开始本身不是问题。真正的问题是，你得在不把自己拖进无穷研究的前提下决定 stack、顺序和标准。"
         },
         "1": {
-          "label": "\"我已经试过了，但卡住了。\"",
-          "body": "你确实推进过，也确实撞过墙，但身边没有一个真正能帮你解决问题的人。结果，这个想法躺进了待办列表，没有产生任何价值。"
+          "label": "“我已经做了一部分。现在我需要的是把 setup 救回来，而不是全部重来。”",
+          "body": "当一条 build 在中途断掉时，损失的不只是时间。你需要的是 recovery lane，不是再掉进一个理论黑洞。"
         },
         "2": {
-          "label": "\"我已经花过钱了，可它还是跑不好。\"",
-          "body": "也许你雇过人，也许你买过工具。现在你不只是拿不准，而是已经开始怀疑这一切。"
+          "label": "“已经有东西在线上跑，但我还不信任它的成本、逻辑和失败模式。”",
+          "body": "到这一步，仅仅存在已经不够了。它必须可读、可控，而且足够安全，才能碰真正的工作。"
         },
         "3": {
-          "label": "\"我不想部署一个自己都不信任的东西。\"",
-          "body": "会给错答案、行为不可预测、还带来隐性成本的智能体，不是资产，而是负债。"
+          "label": "“如果一个系统我无法解释、复查和控制，我就不想依赖它。”",
+          "body": "如果你看不到运行、阈值、审批和高压下的行为，那它还不是一个运营资产。"
         }
       },
-      "close": "这正是 PicoMUTX 存在的原因。"
+      "close": "Pico 会把这种不确定，变成下一步诚实而清晰的动作。"
     },
     "platform": {
-      "eyebrow": "PicoMUTX 是什么",
-      "title": "让 AI 智能体从“有趣的想法”变成“真正能运行的系统”。",
-      "body": "PicoMUTX 是一个面向非全职工程师的引导式平台，帮助你安全地构建和运行 AI 智能体。它补上了大多数人独自推进时最缺的东西：结构、支持和护栏。你不需要从零拼装一切，而是可以一步一步前进：从想法到实现，从混乱到清晰，从原型到真正能投入使用的系统。",
+      "eyebrow": "Pico 怎么工作",
+      "title": "Pico 先诊断卡点，再把你送到搭建、修复或控制。",
+      "body": "把有用的东西跑起来，并一直让它值得信任。Pico 先做诊断，让下一步真正对准眼前的问题。",
       "howItWorks": {
         "0": {
-          "title": "分步实施路径",
-          "body": "根据你想构建的东西，沿着结构化路径推进：从客服智能体到内部自动化。没有空泛理论，没有无休止搜索。"
+          "title": "描述目标，或连接现有智能体",
+          "body": "从你想完成的工作、卡住的地方，或你需要理解的线上系统开始。Pico 用这些上下文来判断哪种帮助才真正相关。"
         },
         "1": {
-          "title": "卡住时有引导支持",
-          "body": "当某个环节坏掉了，或者事情开始变得不清楚时，你不用一个人硬扛。PicoMUTX 的目标，是让项目继续向前，而不是死在混乱里。"
+          "title": "被路由到 build、fix 或 control",
+          "body": "新项目会得到一条通往第一个有用智能体的实战路径。坏掉的 setup 会得到恢复步骤。线上系统会得到可见性、阈值、审批和运营护栏。"
         },
         "2": {
-          "title": "从第一天起就具备安全性",
-          "body": "成本感知、可见性和护栏都很重要。你始终知道智能体在做什么、花了多少钱，以及什么时候需要你介入。"
+          "title": "在同一个运营循环里应用变化",
+          "body": "观察行为、隔离问题、应用下一次修改，然后不丢线地继续推进。"
         },
         "3": {
-          "title": "真人专家触点",
-          "body": "有些问题不是靠静态文档就能解决的。这里设计了真实的引导触点，帮助你更快解除阻塞，做出更好的决策。"
+          "title": "只有边界情况真的出现时才升级给人",
+          "body": "当系统自己无法闭环时，人类支持进来是为了提供证据和校准，而不是代替整个产品。"
         }
       }
     },
     "who": {
-      "eyebrow": "PicoMUTX 适合你吗？",
-      "title": "PicoMUTX 不是给所有人的。",
+      "eyebrow": "适配度",
+      "title": "PicoMUTX 并不适合所有人。",
       "forYouTitle": "如果你符合这些情况，它适合你……",
       "notForYouTitle": "如果你符合这些情况，它不适合你……",
       "forYou": {
-        "0": "你想构建 AI 智能体，但不想完全依赖开发者",
-        "1": "你之前尝试过，但中途卡住了",
-        "2": "你已经在工具或实现上花过钱，但依然不信任结果",
-        "3": "你想要的是实用路径，而不是更多理论",
-        "4": "你希望在构建过程中得到支持，而不是等出问题后再补救"
+        "0": "你想把一个有用的智能体真正落地，而不是靠拍脑袋拼完整套 stack",
+        "1": "你已经有一个半成品或坏掉的 setup，需要把节奏找回来",
+        "2": "你已经有东西在线上或接近上线，但在信任之前还需要更强的控制",
+        "3": "你想要的是结果导向的帮助，而不是一门课或更多理论",
+        "4": "你想要一个会随着时间减少临时专家依赖的系统"
       },
       "notForYou": {
-        "0": "你只想找一个零学习成本的捷径",
-        "1": "你已经在运行成熟的企业级智能体体系，只差复杂治理基础设施",
-        "2": "你追求的是热点、趋势和噱头，而不是落地执行",
-        "3": "你还没准备好真正改变业务的运作方式",
-        "4": "你希望 AI 取代判断力、领导力或责任"
+        "0": "你想找一个不需要判断力的通用 no-code 玩具",
+        "1": "你已经需要面向成熟 agent fleet 的 enterprise 级治理基础设施",
+        "2": "你追求的是教育内容、热点或 hype，而不是运营推进",
+        "3": "你期待 AI 替代责任、review 或 ownership",
+        "4": "你真正想买的是创始人 access，而不是一个产品"
       }
     },
     "beforeAfter": {
-      "eyebrow": "转变",
-      "title": "当你不再独自摸索，会发生什么变化",
+      "eyebrow": "变化",
+      "title": "当 build、recovery、control 放在一个地方时，会发生什么变化",
       "beforeLabel": "之前",
       "afterLabel": "之后",
       "items": {
         "0": {
-          "before": "你有一个想法，但没有清晰路径",
-          "after": "你拥有一条结构化的前进路线"
+          "before": "你不知道自己现在该先 build、debug，还是先加 control",
+          "after": "你会被送进真正匹配阻塞点的 lane"
         },
         "1": {
-          "before": "你在工具、文档和教程之间来回跳，浪费大量时间",
-          "after": "你沿着引导式实施路径推进"
+          "before": "每个问题都把你丢进不同的 tool、文档或意见回路",
+          "after": "构建、恢复和控制都放进了同一个 operating system"
         },
         "2": {
-          "before": "你一旦卡住，就会失去 momentum",
-          "after": "你会在项目夭折前得到支持"
+          "before": "坏掉的 setup 或不透明的 runtime 会杀死节奏",
+          "after": "下一步动作变得可见、可复查、而且站得住"
         },
         "3": {
-          "before": "你的智能体一直停留在理论阶段",
-          "after": "你的智能体会被真正构建出来并投入使用"
+          "before": "你手里有一个自己都解释不清、也不敢信的 agent",
+          "after": "你得到一个可以运行、检查并有信心持续改进的东西"
         }
       },
-      "close": "目标不是“以后某天再学 AI”。目标是把你的智能体真正上线 - 更安全、更清晰、阻力更小。"
+      "close": "目标不是抽象地学习 AI。目标是把有用的东西跑起来，并让它持续可信。"
     },
     "earlyAccess": {
-      "eyebrow": "早期访问",
-      "title": "PicoMUTX 将分阶段开放。创始访问资格不会一直敞开。",
-      "body": "现在预注册，你就能比公开发布更早进入，并加入帮助塑造平台早期方向的那批人。早期用户会更靠近产品，更早开始上手，也对优先级拥有更大影响力。",
+      "eyebrow": "创始访问",
+      "title": "外面是候补名单，里面已经是真产品。",
+      "body": "访问会分批开放，让认真的操作者进入正确路径，同时把流程在真实使用里打磨扎实。",
       "benefits": {
-        "0": "公开发布前优先获得访问资格",
-        "1": "优先考虑创始成员席位",
-        "2": "更早获取上手引导和上线更新",
-        "3": "有机会影响早期使用场景和发布优先级",
-        "4": "第一时间了解价格和访问条款"
+        "0": "可以从零开始，也可以从坏掉的 setup 或还不敢信任的 live system 开始",
+        "1": "会被路由到 build、fix、control 中正确的一条",
+        "2": "在访问仍然 selective 时锁定 founding pricing",
+        "3": "只有 edge case 真的出现时才使用 expert input",
+        "4": "一起塑造最早的 case studies 和 operating patterns"
       }
     },
     "pricing": {
-      "eyebrow": "简洁定价",
-      "title": "选择您的方案",
+      "eyebrow": "公开访问",
+      "title": "你付费买的是进展，不是内容。",
       "tiers": {
         "starter": {
-          "name": "Starter",
-          "price": "€9",
+          "name": "创始 Tier",
+          "price": "29欧元",
           "period": "/月",
-          "description": "完整的学习体验",
-          "features": ["每月 1,000 积分", "完整导师访问", "所有学院课程", "自动驾驶模式", "7天免费试用"],
-          "cta": "开始7天试用",
-          "ctaHref": "/pricing"
+          "description": "给想独立推进的 operator 的 AI-guided self-serve execution。",
+          "features": [
+            "AI 诊断入口",
+            "guided build、fix、control 路径",
+            "为 independent execution 而设计"
+          ],
+          "cta": "申请 Founding 访问",
+          "ctaHref": "/pricing",
+          "priceNote": "在访问仍然筛选期间，创始 cohort 数量有限。",
+          "recommended": true
         },
         "pro": {
-          "name": "Pro",
-          "price": "€29",
+          "name": "创始 Supported",
+          "price": "79欧元",
           "period": "/月",
-          "description": "面向认真的构建者",
+          "description": "当工作变得更 messy 时，在同一套系统上加上 group guidance。",
           "recommended": true,
-          "features": ["每月 10,000 积分", "完整导师 + BYOK", "API 访问", "优先支持", "7天免费试用"],
-          "cta": "开始7天试用",
+          "features": [
+            "包含 Founding Tier 的全部内容",
+            "每周 group troubleshooting",
+            "shared operator accountability"
+          ],
+          "cta": "申请 Supported 访问",
           "ctaHref": "/pricing"
         },
         "enterprise": {
-          "name": "Enterprise",
-          "price": "定制",
-          "period": "",
-          "description": "专属支持与规模化",
-          "features": ["每月 100K+ 积分", "SSO 和团队管理", "SLA 与专属支持", "自定义工作流", "直接联系创始人"],
-          "cta": "预约通话",
-          "ctaHref": "https://calendly.com/mutxdev"
+          "name": "Pico 领航",
+          "price": "1,000欧元+",
+          "period": "/项目",
+          "description": "面向坏掉、紧急或更复杂系统的 outcome-based implementation。",
+          "features": [
+            "scoped diagnosis 与 implementation",
+            "绑定到可衡量 outcome 的 working system",
+            "当 complexity 真的上来时的 custom project"
+          ],
+          "cta": "预约规划通话",
+          "ctaHref": "https://calendly.com/mutxdev",
+          "priceNote": "定制 multi-agent 项目和更深层 integration 从 €10,000+ 起。"
+        },
+        "trial": {
+          "name": "免费试用",
+          "price": "免费",
+          "period": "第一价值",
+          "description": "在真正承诺之前，先在一个 real agent problem 上拿到 first value。",
+          "priceNote": "first value 指的是定义或连接一个 real agent problem。",
+          "features": [
+            "描述一个 goal，或连接一个 agent",
+            "被路由到 build、fix、control",
+            "在付费前拿到 first value"
+          ],
+          "cta": "申请试用访问",
+          "ctaHref": "/pricing"
         }
-      }
+      },
+      "lead": "先拿到第一个价值，再进入自助执行。只有当工作真的复杂起来时，才加支持或代做。",
+      "recommendedLabel": "最佳起点"
     },
     "faq": {
-      "eyebrow": "常见问题",
-      "title": "加入前大家通常会问的问题",
+      "eyebrow": "问题",
+      "title": "在承诺之前值得先搞清楚的问题",
       "items": {
         "0": {
           "q": "我需要会写代码吗？",
-          "a": "不需要。PicoMUTX 就是为那些想构建有用 AI 智能体、但不具备深度技术背景的人设计的。"
+          "a": "不需要。PicoMUTX 面向的是想拿到结果、但不想变成全职 agent engineer 的 operator。"
         },
         "1": {
-          "q": "如果我之前试过并且失败了怎么办？",
-          "a": "那正是我们重点服务的人群之一。PicoMUTX 的设计目标，就是减少通常会让人半路放弃的混乱和碎片化。"
+          "q": "如果我已经试过并失败了怎么办？",
+          "a": "那正是主要入口之一。PicoMUTX 就是为在第一次高成本、混乱、失去信心的阻塞之后重新找回节奏而设计的。"
         },
         "2": {
-          "q": "我能构建什么类型的智能体？",
-          "a": "能真正带来价值的那种：节省时间、支持运营、改善工作流程、让业务运行得更顺的智能体。重点是实用，不是玩具演示。"
+          "q": "它适合什么类型的智能体工作？",
+          "a": "适合实用型 agent system：support、内部 copilot、lead capture、销售跟进，以及那些需要在现实世界里被构建、修复和控制的运营 workflow。"
         },
         "3": {
-          "q": "预注册是免费的吗？",
-          "a": "是的。预注册完全免费，不需要付款。访问开放或创始席位出现时，你会是第一批知道的人。"
+          "q": "有免费开始的方式吗？",
+          "a": "有。公开阶梯从一个聚焦第一价值的免费试用开始。公开入口目前仍然是候补名单优先，但试用和创始 tiers 已经定义好了。"
         },
         "4": {
-          "q": "这是给企业用的吗？",
-          "a": "PicoMUTX 更适合想通过引导式方式构建和部署 AI 智能体的创始人、运营者和小团队。更复杂的企业级治理需求属于更广泛的 MUTX 体系。"
+          "q": "这是给企业准备的吗？",
+          "a": "PicoMUTX 是通往 MUTX 的商业 wedge，不是完整的 enterprise governance 层。更重的多团队治理属于更大的 MUTX stack。"
         }
       }
     },
     "finalCta": {
-      "eyebrow": "早期访问 · 名额有限",
-      "title": "你的智能体没必要永远停留在未完成的想法阶段。",
-      "body": "你不需要再开更多标签页，也不需要再看另一篇教程。你真正需要的，是一条更清晰、能把东西做出来的路径。PicoMUTX 就是为这个时刻打造的。",
-      "formHeadline": "预注册 PicoMUTX",
-      "formSubline": "加入早期访问名单。开放时第一时间知道。",
-      "ctaButton": "立即预注册",
-      "formCtaMeta": "免费预注册 · 无需信用卡 · 早期用户优先访问"
+      "eyebrow": "创始访问",
+      "title": "申请进入最适合你的路径。",
+      "body": "Pico 帮你把有用的东西跑起来，坏了能救回来，进入真实工作后也能一直管得住。",
+      "formHeadline": "从真正的 blocker 开始。",
+      "formSubline": "告诉我们你需要搭建、修复还是控制，我们会把你送到正确路径。",
+      "ctaButton": "申请访问",
+      "formCtaMeta": "免费试用 · Founding €29 · Supported €79 · Pico Pilot €1,000+ 起",
+      "secondaryButton": "预约规划通话"
     },
     "contactForm": {
       "dialogLabel": "联系表单",
       "closeLabel": "关闭",
-      "title": "预注册，获取早期访问",
-      "subtitle": "告诉我们你的情况。我们会把你拉进来。",
+      "title": "申请 Pico 访问",
+      "subtitle": "告诉我们你想 build 什么、救回什么、控制什么。我们会把你引到正确的下一步。",
       "emailLabel": "工作邮箱",
       "emailPlaceholder": "you@company.com",
       "nameLabel": "姓名",
       "namePlaceholder": "张三",
       "companyLabel": "公司",
       "companyPlaceholder": "Acme Inc.",
-      "interestLabel": "你为什么来到这里？",
+      "interestLabel": "你最先需要帮助的是什么？",
       "interestOptions": {
         "building-first": "正在构建我的第一个 AI 智能体",
         "fixing-existing": "正在修复一个跑不通的智能体",
         "evaluating": "正在评估平台或工具",
         "spent-money": "已经花过钱了 - 还是没跑起来",
-        "other": "其他"
+        "other": "其他",
+        "build": "从零开始构建某个东西",
+        "fix": "救回或修复一个 setup",
+        "control": "把已经在线的 agent 纳入控制"
       },
-      "messageLabel": "还有什么我们需要知道的吗？",
+      "messageLabel": "还有什么我们应该知道的吗？",
       "messageOptional": "（可选）",
-      "messagePlaceholder": "例如：我在运营一个小型 SaaS，想把客服自动化……",
-      "submitting": "发送中...",
-      "submit": "加入早期访问名单",
-      "disclaimer": "不发垃圾邮件。不打销售电话。只会有人类亲自回复。",
-      "successTitle": "你已加入名单。",
-      "successBody": "我们会认真阅读每一条消息。预计 24 小时内收到人工回复。",
+      "messagePlaceholder": "描述你的 goal、blocker 或 live system…",
+      "submitting": "发送中…",
+      "submit": "申请访问",
+      "disclaimer": "没有泛化 nurture funnel。会有真人回复正确的 route。",
+      "successTitle": "已收到访问申请。",
+      "successBody": "我们已经拿到上下文。接下来会有真人回复，直接指出正确的 lane。",
       "successBack": "返回页面",
       "errorFallback": "出了点问题。请重试。",
       "networkError": "网络错误。请重试。"
@@ -233,11 +271,11 @@
     "preRegForm": {
       "emailLabel": "工作邮箱",
       "emailPlaceholder": "you@company.com",
-      "submitting": "加入中…",
-      "submit": "立即预注册",
-      "privacy": "不发垃圾邮件。无需付款。只发送早期访问更新和上线消息。",
-      "successTitle": "你已加入名单。",
-      "successBody": "PicoMUTX 开放访问时，我们会联系你。不发垃圾邮件，不要求付款。",
+      "submitting": "正在发送申请…",
+      "submit": "申请访问",
+      "privacy": "不发垃圾邮件，不要求付款。只会发送访问更新和诚实的下一步。",
+      "successTitle": "你已在名单中。",
+      "successBody": "当你的 PicoMUTX 访问波次开放时，我们会联系你。不发垃圾邮件，也不要求付款。",
       "errorFallback": "出了点问题。请重试。"
     },
     "footer": {
@@ -267,6 +305,2450 @@
       "verificationFailedRefresh": "验证失败，请刷新挑战后重试。",
       "verificationExpired": "验证已过期，请重新完成挑战。",
       "verificationTimedOut": "验证超时，请重新完成挑战。"
+    },
+    "supportPage": {
+      "contact": {
+        "interest": {
+          "lessonBlocker": "课程或命令卡住",
+          "runtimeMismatch": "实时运行时或 Autopilot 不一致",
+          "sessionMismatch": "托管会话或账户不一致",
+          "billingPlan": "计费、审批或套餐问题",
+          "officeHours": "办公时间或更深入的带练"
+        },
+        "title": "告诉我们产品路径是在哪里断掉的",
+        "subtitle": "把路径、阻塞点和证据发过来。我们会像人一样回答，而不是像等候名单。",
+        "interestLabel": "哪里坏了？",
+        "messageLabel": "发生了什么？",
+        "messageOptional": "（请附上数据包）",
+        "messagePlaceholder": "粘贴准确的阻塞点、路径、命令或运行时不一致。",
+        "submit": "发送支持请求",
+        "submitting": "正在发送支持请求...",
+        "disclaimer": "不是等候名单，不是发布秀。只有人工回复。",
+        "successTitle": "支持请求已发送。",
+        "successBody": "我们已收到数据包。接下来会有人工回复，把你重新带回产品路径。",
+        "successBack": "返回支持页"
+      },
+      "shell": {
+        "eyebrow": "人工支持",
+        "title": "当产品路径已经不够时，找真人介入",
+        "description": "快速分诊混乱边缘，附上真实信号，然后回到下一个诚实的动作，而不是把支持变成迷宫。"
+      },
+      "hero": {
+        "badge": "升级脉冲",
+        "mode": {
+          "open": "支持台开放",
+          "triage": "分诊模式"
+        },
+        "title": "带上足够的证据发送阻塞点，才能更快修好。",
+        "body": "说明路径，附上信号，并指出返回的那条路。这样支持才有足够上下文回答你，而不会拖慢下一步动作。",
+        "packetState": {
+          "label": "数据包状态",
+          "readyToPaste": "可直接粘贴",
+          "routeAndEvidenceFirst": "先给路径和证据"
+        },
+        "runtimeTruth": {
+          "label": "运行时真相",
+          "gatewayAttached": "网关已连接",
+          "attachSignal": "如果重要，就把信号附上"
+        },
+        "returnLane": {
+          "label": "返回路径"
+        },
+        "handoff": {
+          "label": "最短且干净的交接",
+          "returnAcademy": "回到 Academy 的路径",
+          "sequenceFallback": "如果阻塞点本质上仍然是顺序问题，请先回到那里。"
+        },
+        "packetPreview": {
+          "label": "数据包预览"
+        }
+      },
+      "actions": {
+        "getHumanHelp": "获取人工帮助",
+        "copyPacket": "复制数据包",
+        "copiedPacket": "已复制数据包",
+        "requestOfficeHours": "请求办公时间"
+      },
+      "compass": {
+        "title": "支持存在的唯一目的，是把操作员送回产品",
+        "body": "干净地升级，附上数据包，然后回到那个能重新推动工作的界面。Academy 用来处理顺序问题，Tutor 用来处理一个可知的下一步，Autopilot 用来处理实时运行时真相。",
+        "status": {
+          "open": "升级已打开",
+          "standby": "人工支持待命"
+        },
+        "aside": "人工支持应该解决混乱边缘，而不是取代产品。最好的支持互动，应该以一条更清晰的回到 Pico 的路径结束。",
+        "academy": {
+          "return": "返回 Academy",
+          "caption": "如果阻塞点本质上仍然是课程顺序问题，就回到这里。",
+          "note": "顺序"
+        },
+        "tutor": {
+          "label": "先问 Tutor",
+          "caption": "当产品大概率仍然知道答案，但你需要精确的下一步时，使用这里。",
+          "note": "可知"
+        },
+        "autopilot": {
+          "label": "重新进入 Autopilot",
+          "caption": "当阻塞点取决于实时运行、预算、告警或审批时，打开控制室。",
+          "note": "运行时"
+        }
+      },
+      "standards": {
+        "label": "升级标准",
+        "title": "像一个利落的操作员那样交接问题",
+        "chip": "路径 • 证据 • 返回",
+        "cards": [
+          {
+            "label": "01 • 路径",
+            "title": "说明栈和界面",
+            "body": "请明确问题属于 Hermes、OpenClaw、NanoClaw、PicoClaw、Tutor、Academy、Autopilot，还是托管账户通道。"
+          },
+          {
+            "label": "02 • 证据",
+            "title": "附上证据数据包",
+            "body": "把命令、仪表盘状态、启动器状态或审批信号带上，准确说明路径是在哪一步停下来的。"
+          },
+          {
+            "label": "03 • 返回",
+            "title": "询问怎样回到动作中",
+            "body": "好的升级，应该以一条回到课程、Tutor 回答或实时控制动作的最短路径结束。"
+          }
+        ],
+        "packetPosture": {
+          "label": "数据包姿态",
+          "body": "强支持始于一个干净的数据包。最好的升级读起来像操作员交接，而不是慌乱倾倒。"
+        },
+        "deskTone": {
+          "label": "支持台语气",
+          "body": "支持应该降温，但不能拖慢你重新回到动作中的路径。"
+        },
+        "bestFirstMove": {
+          "label": "最佳第一步",
+          "body": "复制数据包，选对通道，并请求一条回到 Academy、Tutor 或 Autopilot 的最短路径。"
+        }
+      },
+      "desk": {
+        "label": "支持台",
+        "title": "发送上下文，而不是噪音",
+        "body": "人工支持处理的是产品无法靠自己诚实地收口的那部分。你越快把阻塞点讲清楚，支持就越快把你送回产品路径。",
+        "callout": {
+          "title": "如果下一步仍然很明显，就回去直接做。",
+          "body": "支持是给混乱边缘用的，不是用来跳过课程、Tutor 或实时控制界面的。"
+        },
+        "lanes": [
+          {
+            "id": "fixing-existing",
+            "title": "栈或运行时阻塞",
+            "body": "当真实的安装、课程、仪表盘、启动器或审批步骤以产品无法单独解决的方式停住时，使用这里。",
+            "cta": "开始升级"
+          },
+          {
+            "id": "other",
+            "title": "操作员带练",
+            "body": "当你需要跨多个界面的引导式会话，而不是一个孤立修复时，使用这里。",
+            "cta": "预约办公时间"
+          }
+        ]
+      },
+      "rail": {
+        "label": "操作员侧栏",
+        "supportRequests": "支持请求",
+        "tutorQuestions": "Tutor 问题",
+        "plan": {
+          "label": "套餐",
+          "unknown": "未知",
+          "signIn": "登录"
+        },
+        "activeSurface": {
+          "label": "当前界面",
+          "none": "无"
+        },
+        "tryTheseFirst": "先试这些",
+        "tryTutorFirst": "先试 Tutor",
+        "returnAcademy": "返回 Academy",
+        "openAutopilot": "打开 Autopilot",
+        "directLine": "直达通道"
+      },
+      "packet": {
+        "label": "诊断数据包",
+        "title": "操作员数据包",
+        "chip": "实时上下文",
+        "preview": {
+          "route": "路径",
+          "runtime": "运行时",
+          "return": "返回",
+          "packet": "数据包"
+        },
+        "diagnostic": {
+          "title": "Pico 诊断数据包",
+          "route": "路径：",
+          "hostedSession": "托管会话：",
+          "hostedPlan": "托管套餐：",
+          "selectedTrack": "已选轨道：",
+          "completedLessons": "已完成课程：",
+          "nextLesson": "下一课：",
+          "recoveryWorkspace": "恢复课程工作区：",
+          "recoveryFocusedStep": "恢复课程聚焦步骤：",
+          "recoveryProof": "恢复课程证据：",
+          "activeSurface": "当前界面：",
+          "lastOpenedLesson": "上次打开的课程：",
+          "railCollapsed": "侧栏已折叠：",
+          "helpLaneOpen": "帮助通道已打开：",
+          "supportRequestsSent": "已发送支持请求：",
+          "tutorQuestionsAsked": "已提 Tutor 问题：",
+          "approvalGateEnabled": "审批闸门已开启：",
+          "hostedOnboardingStatus": "托管引导状态：",
+          "hostedOnboardingStep": "托管引导步骤：",
+          "hostedWorkspace": "托管工作区：",
+          "runtimeStatus": "运行时状态：",
+          "gatewayUrl": "网关 URL：",
+          "runtimeBindings": "运行时绑定：",
+          "values": {
+            "unknown": "未知",
+            "na": "不适用",
+            "none": "无",
+            "notAvailable": "不可用",
+            "captured": "已捕获",
+            "missing": "缺失",
+            "yes": "是",
+            "no": "否"
+          }
+        },
+        "problemLabel": "问题：",
+        "openFormWithPacket": "带着数据包打开表单"
+      },
+      "state": {
+        "label": "实时操作员状态",
+        "hostedOnboarding": "托管引导",
+        "runtimeStatus": "运行时状态",
+        "currentTrack": "当前轨道",
+        "currentTrackNotChosenYet": "尚未选择",
+        "nextLesson": "下一课",
+        "nextLessonNone": "无",
+        "lessonWorkspace": "课程工作区",
+        "focusedStep": "聚焦步骤"
+      },
+      "returnMap": {
+        "label": "返回地图",
+        "title": "人工支持应该以一条更干净的回到 Pico 的路径结束",
+        "chip": "操作员返回地图",
+        "model": {
+          "label": "支持返回模型",
+          "cards": [
+            {
+              "title": "1. 快速为阻塞点定路由",
+              "body": "不要发送人生故事。先说清楚是哪个界面坏了。"
+            },
+            {
+              "title": "2. 附上证据",
+              "body": "发送能证明失败的命令、运行时事实或审批状态。"
+            },
+            {
+              "title": "3. 回到产品",
+              "body": "回复应该恢复推进力，而不是制造支持迷宫。"
+            }
+          ]
+        },
+        "anatomy": {
+          "label": "数据包结构",
+          "body": "高质量的升级数据包，总是按同样的顺序读出来：路径、证据、返回通道。",
+          "cards": [
+            {
+              "title": "先写路径",
+              "body": "说明具体是哪个界面坏了。"
+            },
+            {
+              "title": "再给证据",
+              "body": "附上能证明失败的信号。"
+            },
+            {
+              "title": "最后写返回",
+              "body": "请求一条最干净的回到动作中的路径。"
+            }
+          ]
+        },
+        "paths": {
+          "lesson": {
+            "label": "课程路径",
+            "title": "恢复 Academy 通道",
+            "body": "当阻塞点本质上仍然是课程或设置顺序问题时，使用这里。"
+          },
+          "tutor": {
+            "label": "有依据的答案",
+            "title": "如果下一步仍然可知，就去问 Tutor",
+            "body": "当产品大概率仍然知道答案，但你需要精确的下一步时，回到这里。",
+            "cta": "打开 Tutor"
+          },
+          "autopilot": {
+            "label": "运行时真相",
+            "title": "重新进入控制室",
+            "body": "当阻塞点取决于实时运行、预算、审批或告警状态时，使用 Autopilot。",
+            "cta": "打开 Autopilot"
+          }
+        }
+      },
+      "shared": {
+        "stepNotSet": "未设置",
+        "runtime": {
+          "localOnly": "仅本地",
+          "checking": "检查中",
+          "notAttached": "未连接"
+        },
+        "packetState": {
+          "copied": "已复制",
+          "proofAttached": "已附证据",
+          "contextReady": "上下文已就绪",
+          "needsProof": "需要证据"
+        },
+        "returnAcademy": "academy",
+        "resumeLesson": "继续 {lessonTitle}",
+        "openLesson": "打开 {lessonTitle}",
+        "stepsClear": "{completed}/{total} 步已清除"
+      }
+    },
+    "autopilotPage": {
+      "shared": {
+        "loadState": {
+          "authRequired": "需要认证",
+          "loading": "正在加载实时数据",
+          "partial": "实时数据仅部分可用",
+          "offline": "离线",
+          "ready": "实时数据已就绪"
+        },
+        "validation": {
+          "thresholdRange": "请输入 1 到 100 之间的阈值。"
+        },
+        "error": {
+          "partialSignals": "部分实时 MUTX 信号加载失败。当前显示的是部分真实数据，而不是编造出来的。",
+          "loadLiveData": "加载实时 Autopilot 数据失败",
+          "resolveRequest": "处理 {action} 请求失败",
+          "createApprovalRequiredFields": "创建审批请求前需要 agent、session 和 action type",
+          "createApproval": "创建审批请求失败"
+        },
+        "label": {
+          "whyItMatters": "这为什么重要：{impact}"
+        },
+        "action": {
+          "jumpToDetail": "跳转到详情区块",
+          "openLesson": "打开 {lessonTitle}",
+          "returnToAcademy": "返回 Academy"
+        },
+        "statusLabels": {
+          "FAILED": "失败",
+          "ERROR": "错误",
+          "CANCELLED": "已取消",
+          "RUNNING": "运行中",
+          "QUEUED": "排队中",
+          "PENDING": "待处理",
+          "AWAITING_OWNER": "等待所有者",
+          "COMPLETED": "已完成",
+          "SUCCEEDED": "成功",
+          "SUCCESS": "成功",
+          "APPROVED": "已批准",
+          "REJECTED": "已拒绝"
+        },
+        "syncStateLabels": {
+          "idle": "空闲",
+          "loading": "加载中",
+          "saving": "保存中",
+          "synced": "已同步",
+          "offline": "离线"
+        },
+        "timelineSources": {
+          "runs": "运行",
+          "alerts": "告警",
+          "approvals": "审批"
+        },
+        "time": {
+          "unknown": "未知时间",
+          "unknownRelative": "未知时间"
+        },
+        "runDetail": {
+          "failedNoMessage": "这次运行在没有保存错误信息的情况下停止了。",
+          "inFlight": "这次运行仍在流水线中推进。",
+          "awaitingOwner": "这次运行已暂停，正在等待所有者输入后再继续。",
+          "completedNoSummary": "这次运行已完成，但没有简短摘要。"
+        },
+        "runImpact": {
+          "failed": "这个工作流没有干净地完成。在信任下一次尝试之前，请先检查错误和追踪。",
+          "active": "工作仍在进行中。请留意卡住、重试或持续太久的沉默。",
+          "awaitingOwner": "这次运行已暂停，正在等待所有者操作。请回应以解除流水线阻塞。",
+          "completed": "这次运行已完成。在进一步加强自动化之前，请先确认输出确实有用。"
+        },
+        "alertImpact": {
+          "resolved": "告警已经清除，但你仍然希望根因讲得通。",
+          "active": "这是操作员当前正在承受的真实痛点。如果忽略它，运行时会继续给你制造惊喜。"
+        },
+        "approvalImpact": {
+          "pending": "一个高风险动作正在等待人工决策。现在不应有任何东西越过这个闸门。",
+          "approved": "闸门已打开。请确认被批准的动作确实与你原本打算允许的请求一致。",
+          "rejected": "高风险动作已被拦下。很好。现在要判断，到底是请求错了，还是护栏太严格了。",
+          "changed": "这条审批状态已经变化。如果它会影响线上行为，就应该复查。"
+        },
+        "timeline": {
+          "runTitle": "{status} run {runId}",
+          "alertTitle": "{type} {state}",
+          "alertResolved": "已解决",
+          "alertTriggered": "已触发",
+          "alertNoMessage": "记录了一条没有消息的告警。",
+          "approvalRequestedBy": "由 {requester} 发起请求。",
+          "approvalTitle": "{action} {status}",
+          "approvalStatus": {
+            "pending": "待处理",
+            "approved": "已批准",
+            "rejected": "已拒绝"
+          }
+        }
+      },
+      "emptyStates": {
+        "runs": {
+          "noAgent": {
+            "title": "还没有被监控的智能体",
+            "body": "Pico 还没有可以连接的真实 MUTX 智能体。先创建或部署一个真实智能体，然后再回来查看运行历史。"
+          },
+          "noHistory": {
+            "title": "已经有智能体了，但还没有任何运行",
+            "body": "MUTX 至少已经知道有一个智能体存在，但目前还没有运行历史。先触发一个真实任务，或者等到第一个调度刻度，再回到这里。"
+          },
+          "openAcademy": "打开 Academy"
+        },
+        "alerts": {
+          "noRuns": {
+            "title": "还没有任何运行，所以没有告警",
+            "body": "在智能体执行真实工作之前，空的告警流没有任何意义。先把一次运行送进 MUTX。"
+          },
+          "none": {
+            "title": "当前没有实时告警",
+            "body": "很好。监控流现在很安静。继续盯住下一次真实运行和失败路径。"
+          },
+          "inspectRecentRuns": "查看最近运行",
+          "getFirstRunLive": "让第一次运行真正上线"
+        },
+        "usage": {
+          "noBudget": {
+            "title": "还没有实时预算快照",
+            "body": "还没有可用于对比的 MUTX 预算快照。在那之前，成本感知都是不完整的。"
+          },
+          "empty": {
+            "title": "预算存在，但使用量为空",
+            "body": "预算界面已经是实时的，但当前窗口没有任何使用事件落下来。要么是智能体还没花费任何东西，要么是使用量发射缺失。"
+          },
+          "triggerRealUsage": "触发真实使用量",
+          "setupBudgetVisibility": "设置预算可见性"
+        },
+        "approvals": {
+          "noAgent": {
+            "title": "还没有可以上闸门的智能体",
+            "body": "审批队列只有在真实智能体能执行高风险动作时才有意义。先创建或部署这个智能体。"
+          },
+          "gateOff": {
+            "title": "审批历史存在，但本地闸门还是关着的",
+            "body": "MUTX 已经有审批记录，但 Pico 仍然显示闸门已关闭。请在这里把闸门打开，让本地产品状态与 control-plane 现实一致。"
+          },
+          "none": {
+            "title": "还没有审批记录",
+            "body": "还没有任何高风险动作真正经过审批队列。先跑一次真实的闸门动作，再来谈治理。"
+          },
+          "runGatedAction": "执行一个闸门动作",
+          "configureApprovalGate": "配置审批闸门"
+        }
+      },
+      "shell": {
+        "eyebrow": "Autopilot 桥面",
+        "title": "因为界面说真话，所以你才能信任运行时",
+        "description": "检查最近一次运行，把它和实时花费对起来，然后决定哪些高风险动作值得加一道闸门。信任就是在这里建立起来的。"
+      },
+      "hero": {
+        "runtimePulse": "运行时脉冲",
+        "headline": "让运行、花费和闸门始终出现在同一个画面里。",
+        "body": "先从最新一次执行开始，把它与当前预算线对比，然后决定这条路上是否该有人工闸门。这个顺序能让控制室保持诚实。",
+        "runState": {
+          "label": "运行状态",
+          "authRequired": "需要认证",
+          "noLiveRun": "没有实时运行",
+          "triggerTaskFirst": "先触发一个真实任务"
+        },
+        "budgetLine": {
+          "label": "预算线",
+          "offline": "离线",
+          "pending": "待定",
+          "threshold": "阈值 {percent}",
+          "waitingForSpend": "等待实时花费"
+        },
+        "gateState": {
+          "label": "闸门状态",
+          "waiting": "{count} 项等待中",
+          "armed": "已武装",
+          "off": "关闭",
+          "reviewVisible": "人工审核仍然可见",
+          "enableBeforeRisk": "在高风险动作前先开启"
+        },
+        "nextCheck": {
+          "label": "下一个操作员检查点",
+          "inspectRun": "检查运行 {runId}",
+          "createFirstRun": "创建第一次实时运行",
+          "noRunBody": "现在还看不到任何运行，所以诚实的下一步仍然是回到课程路径。"
+        },
+        "packet": {
+          "label": "控制数据包",
+          "run": "运行 {value}",
+          "runNone": "还没有",
+          "budget": "预算 {value}",
+          "gate": "闸门 {value}",
+          "recovery": "恢复 {value}",
+          "recoveryNotSet": "未设置"
+        },
+        "decisionLine": {
+          "label": "决策线",
+          "thresholdBreached": "花费已经越过这条线。现在需要决定，下一个高风险动作是否该加人工闸门。",
+          "pendingQueue": "队列把高风险动作保留在视线里。在界面变得更嘈杂之前，先把它们审一遍。",
+          "clear": "如果这条线仍然干净，就继续读运行，直到下一个决策变得明显。"
+        },
+        "primaryAction": {
+          "finishLesson": "先完成 {lessonTitle}",
+          "goBackToAcademy": "回到 Academy",
+          "inspectRun": "检查运行 {runId}"
+        }
+      },
+      "surfaceCompass": {
+        "title": "只有当实时运行时才是真正的真相来源时，才留在这里",
+        "body": "Autopilot 用来阅读当前运行、花费、告警和审批。如果产品此刻仍然需要课程答案，就回到 Academy 或 Tutor。如果运行时真相已经可见但仍然不够，就带着证据升级。",
+        "status": {
+          "hostedSessionRequired": "需要托管会话",
+          "runtimeVisible": "运行时可见",
+          "waitingForFirstRun": "等待第一次运行"
+        },
+        "aside": "控制室不应该要求你凭信念相信什么。如果没有实时信号，就离开并先造出一个；如果信号存在，就用它立刻决定下一步。",
+        "items": {
+          "finishLesson": "完成 {lessonTitle}",
+          "goBackToAcademy": "回到 Academy",
+          "backToLaneNote": "回到通道",
+          "lessonCaption": "如果真正的阻塞点仍然在课程路径上，而不是在运行时里，就回到这里。",
+          "askTutor": "向 Tutor 询问下一步",
+          "askTutorCaption": "当产品大概率仍然知道答案，而问题并不是实时运行时状态时，使用这里。",
+          "askTutorNote": "可知",
+          "stayOnRecentRuns": "留在最近运行里",
+          "stayOnRecentRunsCaption": "当最新执行、追踪或告警流本身就是实际决策界面时，就留在这里。",
+          "stayHereNote": "留在这里",
+          "escalateWithEvidence": "带着证据升级",
+          "escalateCaption": "只有当你已经拿到数据包、运行上下文，以及能证明真相在哪里断裂的实时信号之后，才去升级。",
+          "messyEdgeNote": "混乱边缘"
+        }
+      },
+      "banner": {
+        "authRequired": "实时 Autopilot 需要一个已认证的 MUTX 会话。在那之前，没有任何诚实的运行、告警、预算或审批流可以展示给你。"
+      },
+      "operatorDoctrine": {
+        "sectionLabel": "操作员原则",
+        "title": "先读，再判，再介入",
+        "chip": "信号 • 线 • 闸门",
+        "step": {
+          "read": {
+            "label": "01 • 读",
+            "title": "从最强的实时信号开始",
+            "authRequired": "如果没有托管会话，这个房间就不该靠即兴补出来。先把实时流接上。",
+            "withRun": "首先要读的是运行 {runId}。{detail}",
+            "noRun": "还没有任何实时运行。此时诚实的动作，是在调整其他东西之前，先触发一个真实任务。"
+          },
+          "judge": {
+            "label": "02 • 判",
+            "title": "把决策线明确出来",
+            "authRequired": "在实时账户接入之前，预算审查不可用。",
+            "withBudget": "当前使用量 {usage}，对应阈值 {threshold}。这条线应该告诉你，什么时候该由人介入。",
+            "noBudget": "还没有实时预算快照。在它与真实花费相遇之前，不要假装阈值有意义。"
+          },
+          "intervene": {
+            "label": "03 • 介入",
+            "title": "让高风险动作保持可审查",
+            "pending": "有 {count} 个 approval item{pluralSuffix} 正在等待。很好。危险工作仍然是可见的。",
+            "configured": "闸门已经配置好了，但现在没有任何东西在等。让它保持可审查、平稳、无戏剧性。",
+            "off": "闸门还没打开。在高风险动作变成看不见的副作用之前，先把它打开。"
+          }
+        },
+        "postureLabel": "控制室姿态",
+        "postureBody": "这个房间是用来复核实时状态的，不是用来庆祝移动本身的。",
+        "decisionLineLabel": "决策线",
+        "decisionLineBody": "从最后一次运行开始，把它和预算线对齐，然后再决定闸门是否需要人工判断。这个顺序很重要。",
+        "operatorCuesLabel": "操作员提示"
+      },
+      "controlBrief": {
+        "sectionLabel": "控制简报",
+        "title": "在信任自动化之前，先读运行时",
+        "body": "Autopilot 获得信任的前提，是最后一次运行、实时花费和高风险动作能同时出现在同一个控制界面里。",
+        "chip": {
+          "hostedSessionRequired": "需要托管会话",
+          "liveFeed": "实时 control-plane 流",
+          "gateConfigured": "Pico 中已配置闸门",
+          "gateOff": "Pico 中闸门仍关闭"
+        },
+        "summary": {
+          "authRequired": "在 MUTX 会话接入之前，这个界面拒绝编造真相。先用 Academy 走完设置路径，再回来读取真实运行时。",
+          "withRun": "最近一次运行 {runId} 当前是 {status}{asOfClause}。{detail}",
+          "withRunAsOf": "，截至 {timestamp}",
+          "noRun": "现在还看不到任何实时运行。诚实的下一步，是先完成 Academy 路径、触发一个真实任务，再等运行时真的有话可说时再回来。"
+        }
+      },
+      "operatorRail": {
+        "sectionLabel": "操作员侧栏",
+        "sessionStatusLabel": "会话状态",
+        "sessionStatus": {
+          "authRequired": "需要认证",
+          "attached": "已连接"
+        },
+        "progressSyncLabel": "进度同步",
+        "budgetLineLabel": "预算线",
+        "gateStateLabel": "闸门状态",
+        "gateState": {
+          "enabled": "已启用",
+          "off": "关闭"
+        },
+        "activeSurfaceLabel": "当前界面",
+        "activeSurfaceNone": "无",
+        "helpLaneLabel": "帮助通道",
+        "helpLane": {
+          "open": "打开",
+          "closed": "关闭"
+        },
+        "jumpToSubsystem": "跳转到子系统",
+        "jump": {
+          "timeline": "时间线",
+          "recentRuns": "最近运行",
+          "alerts": "告警",
+          "approvalQueue": "审批队列"
+        },
+        "emptyFeedLabel": "如果流是空的",
+        "emptyFeedBody": "不要粉饰运行时数据缺失。先完成 Academy 路径，触发一个真实动作，等 MUTX 真有东西可报告时再回来。"
+      },
+      "stats": {
+        "runs": {
+          "label": "运行",
+          "noAgent": "还没有任何智能体连接到 MUTX。",
+          "hasRuns": "这是从 MUTX 拉回来的最近执行。",
+          "noRunsYet": "智能体已经存在，但还没有任何运行落地。",
+          "offline": "登录后才能读取实时运行历史。"
+        },
+        "failures": {
+          "label": "失败",
+          "hasFailures": "失败能在这里被看见，这是好事。隐藏失败更糟。",
+          "none": "当前窗口里没有失败运行。",
+          "offline": "登录后才能看到失败运行数。"
+        },
+        "alerts": {
+          "label": "告警",
+          "hasAlerts": "这是监控流里尚未解决的操作员痛点。",
+          "noneWithRuns": "当前没有未解决告警。",
+          "noneNoRuns": "因为还没有任何执行，所以还没有告警。",
+          "offline": "登录后才能读取实时告警。"
+        },
+        "budget": {
+          "label": "预算",
+          "noSnapshot": "还没有返回任何实时预算快照。",
+          "hasUsage": "相对于实时花费，阈值是 {threshold}。",
+          "noUsage": "预算存在，但当前窗口里的使用量为空。",
+          "offline": "登录后才能读取预算使用情况。"
+        },
+        "approvals": {
+          "label": "审批",
+          "pending": "待处理的高风险动作正在等待人工判断。",
+          "historyGateOff": "审批历史存在，但 Pico 的闸门在本地仍然是关闭的。",
+          "none": "当前没有高风险动作被拦住。",
+          "offline": "登录后才能看到实时审批。"
+        }
+      },
+      "sidebar": {
+        "latestRunLabel": "最近一次运行",
+        "latestRun": {
+          "unavailable": "不可用",
+          "noneYet": "还没有"
+        },
+        "thresholdLineLabel": "阈值线",
+        "thresholdLine": {
+          "breached": "已越线",
+          "clear": "清晰"
+        },
+        "recoveryLessonLabel": "恢复课程",
+        "workspaceProofLabel": "工作区证据",
+        "stepsProgress": "{completed}/{total} 步",
+        "stepsWithFocus": "{completed}/{total} 步 • {stepTitle}",
+        "evidence": {
+          "captured": "已捕获",
+          "missing": "缺失"
+        },
+        "askTutor": "向 Tutor 询问下一步",
+        "escalateHumanHelp": "升级给人工支持",
+        "body": "当真相来源是运行时时，就留在这里。如果课程工作区仍未完成，那么 Academy 仍然是返回真实答案的更干净路径。"
+      },
+      "controlProtocol": {
+        "sectionLabel": "控制协议",
+        "title": "自动化赢得信任之前的三个操作员检查",
+        "body": "控制室应该把最初的判断直接摆在明面上。先读最后一次运行，再读花费线，并让高风险动作保持暴露，然后再去碰更抽象的东西。",
+        "chip": "实时操作员检查清单",
+        "cardLabel": "操作员检查",
+        "steps": [
+          {
+            "id": "01",
+            "title": "从最后一次运行开始",
+            "body": "如果最近一次执行本身就讲不通，那么这个界面的其余部分都只是装饰。",
+            "action": "打开最近运行"
+          },
+          {
+            "id": "02",
+            "title": "预算会告诉你什么时候该停",
+            "body": "阈值只有在锚定到实时花费上，而不是锚定到直觉上时，才有意义。",
+            "action": "调整花费护栏"
+          },
+          {
+            "id": "03",
+            "title": "让高风险动作保持可见",
+            "body": "审批应该经得起重启、保持可审查，并且读起来像真实决策。",
+            "action": "打开审批队列"
+          }
+        ]
+      },
+      "timeline": {
+        "sectionLabel": "信号叙事",
+        "title": "在碰设置之前，先读实时故事",
+        "body": "这就是操作员叙事。如果时间线是空的，正确答案就是：还没有任何真正有意义的事发生。",
+        "authRequired": "没有实时 control-plane 访问，就没有时间线。这才是诚实的答案。",
+        "olderSignalsHidden": "我们有意隐藏了 {count} 条较早的 signal{pluralSuffix}。先看最强的四条。"
+      },
+      "runs": {
+        "sectionLabel": "运行复盘",
+        "title": "最近执行复盘",
+        "body": "从这里开始。在碰阈值或审批之前，先读最近一次运行。",
+        "refresh": "刷新实时数据",
+        "authRequired": "先登录，然后再回到这里检查第一次真实运行。",
+        "card": {
+          "title": "运行 {runId}",
+          "operatorReadLabel": "操作员解读",
+          "operatorRead": {
+            "failed": "这个任务失败了。如果你仍然信任这个智能体，那前提应该是你理解这次失败。",
+            "active": "这项工作仍在进行。长时间沉默可能意味着运行时卡住了。",
+            "finished": "任务结束了。现在要验证输出是否有用，而不只是技术上完成。"
+          },
+          "factsLabel": "运行事实",
+          "agent": "智能体：{agentId}",
+          "agentUnknown": "未知",
+          "traceCount": "追踪数：{count}",
+          "started": "开始于 {timestamp}",
+          "startUnavailable": "开始时间不可用",
+          "traceSignalsLabel": "追踪信号",
+          "noTraces": "这次运行没有返回任何追踪。"
+        },
+        "olderRunsHidden": "为了让复盘优先聚焦最近的判断，我们隐藏了 {count} 次较早的 run{pluralSuffix}。"
+      },
+      "spend": {
+        "sectionLabel": "花费复盘",
+        "title": "实时花费和你的底线",
+        "usageLabel": "使用量",
+        "thresholdStatus": {
+          "above": "超过阈值",
+          "within": "阈值以内"
+        },
+        "summary": {
+          "authRequired": "实时预算需要认证。",
+          "withBudget": "已使用 {used} / {total}。重置时间 {reset}。",
+          "resetUnknown": "未知",
+          "noSnapshot": "没有返回实时预算快照。"
+        },
+        "thresholdLabel": "阈值",
+        "thresholdBody": "Pico 在这里保存本地预算线。真实告警投递仍然遵循实时 MUTX 监控设置，所以当邮件或 webhook 路由并未真的启用时，这个界面不会假装它们已经生效。",
+        "thresholdInputLabel": "成本阈值百分比",
+        "saveThreshold": "保存阈值",
+        "sync": "同步 {state}",
+        "breachedWarning": "阈值已突破。实时使用量已经高于你配置的上限。",
+        "topSpendersLabel": "高花费来源",
+        "usageDriversLabel": "使用量驱动因素",
+        "breakdownAuthRequired": "登录后才能读取使用量明细。",
+        "breakdownRow": "{events} 个事件，共 {credits} 积分"
+      },
+      "alerts": {
+        "sectionLabel": "告警",
+        "title": "真正有意义的监控事件",
+        "body": "这就是实时告警流。没有假的警告徽章，也没有合成事故。",
+        "authRequired": "登录后才能加载实时告警。",
+        "card": {
+          "resolvedTitle": "已解决告警",
+          "activeTitle": "活动告警",
+          "agent": "智能体：{agentId}",
+          "resolvedStatus": "已解决",
+          "activeStatus": "仍然活跃"
+        },
+        "hiddenCount": "为了不让这个流变成一堵徽章墙，我们抑制了另外 {count} 条 alert{pluralSuffix}。"
+      },
+      "approvals": {
+        "sectionLabel": "审批",
+        "title": "高风险动作及其决策",
+        "body": "这个队列现在已经成为 Pico 的审批真相来源。它不应该因为进程重启就消失。",
+        "authRequired": "登录后才能加载实时审批请求。",
+        "gateMismatch": "MUTX 中已经存在审批记录，但 Pico 仍然显示本地闸门关闭。请在这里打开闸门，让产品状态与 control-plane 现实保持一致。",
+        "card": {
+          "pendingLabel": "待处理",
+          "fallbackSummary": "{requester} 为智能体 {agentId} 请求了这个动作。",
+          "approve": "批准",
+          "reject": "拒绝",
+          "working": "处理中..."
+        },
+        "hiddenPending": "为了让最尖锐的决策留在队列顶部，我们隐藏了另外 {count} 个 pending approval{pluralSuffix}。"
+      },
+      "composer": {
+        "sectionLabel": "创建一个闸门动作",
+        "body": "不要等别的界面先创建请求，直接在这里把实时审批队列跑起来。",
+        "chip": "实时队列写入",
+        "agentIdLabel": "智能体 ID",
+        "agentIdPlaceholder": "agent-founder-lab",
+        "sessionOrRunIdLabel": "会话或运行 ID",
+        "sessionOrRunIdPlaceholder": "ses-pico-approval",
+        "actionTypeLabel": "动作类型",
+        "actionTypePlaceholder": "OUTBOUND_SEND",
+        "summaryLabel": "这个动作为什么需要闸门",
+        "summaryPlaceholder": "请清楚描述这个高风险动作。",
+        "summaryDefault": "在运行时越线之前，对外发送需要人工决策。",
+        "create": "创建审批请求",
+        "creating": "正在创建审批请求...",
+        "reset": "重置草稿"
+      },
+      "gateStatus": {
+        "sectionLabel": "闸门状态",
+        "pendingActions": "待处理动作",
+        "decisionHistory": "决策历史",
+        "configuredLocally": "已在本地配置",
+        "yes": "是",
+        "no": "否"
+      },
+      "recentDecisions": {
+        "sectionLabel": "最近决策",
+        "hiddenOlder": "为了让最近记录保持可读，我们隐藏了 {count} 条较早的 decision{pluralSuffix}。"
+      }
+    },
+    "sessionBanner": {
+      "errors": {
+        "loadWebhookRoutes": "无法加载 webhook 路线"
+      },
+      "authenticated": {
+        "chips": {
+          "sessionAttached": "附主持会议",
+          "plan": "{plan} 计划",
+          "planUnknown": "计划未知",
+          "verificationPending": "待核实",
+          "emailVerified": "电子邮件已验证",
+          "emailStatusUnknown": "电子邮件状态未知",
+          "loadingWebhooks": "正在加载 webhooks",
+          "webhookCount": "{count} webhook{pluralSuffix}",
+          "webhooksUnavailable": "webhook 不可用"
+        },
+        "body": "以 {identity} 身份登录。进度同步、入职状态、批准和实时运行时数据现在可以使用此主机上托管的 MUTX 帐户。",
+        "rails": {
+          "identity": "身份",
+          "operator": "操作员",
+          "plan": "计划",
+          "emailState": "电子邮件状态",
+          "webhookRoutes": "Webhook 路线",
+          "unknown": "未知",
+          "pending": "待办的",
+          "verified": "已验证",
+          "loading": "加载中",
+          "na": "不适用"
+        },
+        "verificationNote": "在确认收件箱链接之前，密码帐户将受到限制。在将托管会话视为生产就绪之前完成此操作。",
+        "productTruth": {
+          "label": "产品真相",
+          "body": "该产品现在可以说出有关进度、运行时状态、批准和托管设置的真相。如果此帐户尚未准备好用于生产，请在信任表面的其余部分之前修复此问题。",
+          "progressSync": "进度同步",
+          "runtimeTruth": "运行时真相",
+          "approvalConfidence": "批准信心",
+          "live": "居住",
+          "checking": "检查",
+          "grounded": "接地气",
+          "partial": "部分的",
+          "limited": "有限的",
+          "usable": "可用的"
+        },
+        "finishEmailVerification": "完成电子邮件验证"
+      },
+      "loading": {
+        "label": "主持会议",
+        "body": "检查此 Pico 主机是否附加了操作员会话。"
+      },
+      "anonymous": {
+        "chips": {
+          "sessionRequired": "需要主持会议",
+          "picoHostAuth": "pico 主机验证"
+        },
+        "body": "Pico 平台路由已在此处生效，但托管会话尚未附加到该域上。在 Pico 上登录以保存进度、读取实时运行并使用后端载入/运行时状态。 Google、GitHub、Discord、Apple、密码注册和电子邮件确认现在均在此主机上终止。",
+        "rails": {
+          "progress": "进步",
+          "runtimeTruth": "运行时真相",
+          "approvals": "批准",
+          "wontPersist": "不会坚持",
+          "limited": "有限的",
+          "readOnlyFeeling": "只读的感觉"
+        },
+        "withoutSession": {
+          "label": "无会话",
+          "progressSync": "进度同步",
+          "runtimeTruth": "运行时真相",
+          "approvalsAndWebhooks": "批准 + webhooks",
+          "localOnly": "仅限本地",
+          "notTrustworthyYet": "还不值得信赖",
+          "blocked": "被阻止",
+          "body": "在您信任进度、实时运行时状态或批准行为之前，请在此主机上附加 Pico 帐户。",
+          "signIn": "登入",
+          "createAccount": "创建账户",
+          "continueWithProvider": "继续 {provider}"
+        }
+      }
+    },
+    "platformSurface": {
+      "syncState": {
+        "hydrating": "保湿",
+        "live": "居住",
+        "saving": "保存",
+        "localOnly": "仅限本地"
+      },
+      "shared": {
+        "notRecorded": "未记录"
+      },
+      "surfaceOptions": {
+        "onboarding": {
+          "label": "入职",
+          "note": "Launch bay memory"
+        },
+        "academy": {
+          "label": "Academy",
+          "note": "Primary learning spine"
+        },
+        "lesson": {
+          "label": "课",
+          "note": "Active step memory"
+        },
+        "tutor": {
+          "label": "Tutor",
+          "note": "Grounded next-step help"
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "note": "Runtime control room"
+        },
+        "support": {
+          "label": "支持",
+          "note": "Human escalation lane"
+        },
+        "activeNow": "现在活跃",
+        "setRoute": "设置路线"
+      },
+      "header": {
+        "label": "平台办公桌",
+        "title": "身份、路线记忆和限制集中于一处",
+        "body": "这是 Pico 帐户面向操作员的控制台。它应该说出有关计划限制、操作员上次工作的位置以及产品铬是否针对聚焦或恢复进行调整的真相。"
+      },
+      "summary": {
+        "plan": "计划",
+        "verification": "确认",
+        "workspaceSaves": "工作区保存",
+        "verificationState": {
+          "pending": "待办的",
+          "verified": "已验证",
+          "unknown": "未知",
+          "signIn": "登入"
+        }
+      },
+      "routeMemory": {
+        "label": "路线记忆",
+        "body": "当前表面应与操作员实际所做的相匹配。当产品改变车道时保持更新。",
+        "activeSurfaceNotRecorded": "未记录",
+        "currentSurface": {
+          "label": "当前表面",
+          "body": "路由内存应该跟随操作符通过 Pico 而不是每次页面更改时重置。"
+        },
+        "lastLessonContext": {
+          "label": "上一课的背景",
+          "body": "这是操作员需要重新进入课程脊柱时的恢复点。"
+        }
+      },
+      "toggles": {
+        "collapseRail": {
+          "label": "折叠轨道",
+          "body": "当操作员已经知道路线并且需要更多的活动表面空间时，请使用更紧密的镀铬。"
+        },
+        "keepHelpLaneOpen": {
+          "label": "保持救助通道畅通",
+          "body": "当操作员仍在学习产品路线时，请保持可见的恢复指导。"
+        }
+      },
+      "actions": {
+        "resumeLastLesson": "继续上一课",
+        "openAcademy": "开放学院",
+        "clearLessonMemory": "清晰的课程记忆",
+        "resetPlatformMemory": "重置平台内存",
+        "openLiveControlRoom": "打开直播控制室"
+      },
+      "entitlements": {
+        "label": "权利",
+        "featureLabels": {
+          "academy": "Academy",
+          "tutor": "Tutor",
+          "project_limit": "项目限额",
+          "monitored_agents": "受监控代理",
+          "alerts": "警报",
+          "approvals": "批准",
+          "retention": "保留"
+        }
+      },
+      "routeLedger": {
+        "label": "路由账本",
+        "currentPath": "当前路径",
+        "platformStateUpdated": "平台状态已更新",
+        "syncConfidence": "同步置信度"
+      },
+      "operatorTruth": {
+        "label": "算子真值",
+        "body": "产品应该记住路线和课程背景，而不是假装它知道的比它实际知道的更多。 `activeSurface`、`lastOpenedLessonSlug`、铁路状态和帮助通道是使 Pico 感觉像一个平台所需的最小持久内存。"
+      }
+    },
+    "onboardingPage": {
+      "hero": {
+        "chip": "先胜脉搏",
+        "eyebrow": "让第一个证据不容错过。",
+        "subtitle": "跟踪安装、第一个证明工件以及从一个地方进行的下一步操作。",
+        "shellEyebrow": "入职",
+        "shellTitle": "快速联系您的第一个工作代理",
+        "shellDescription": "除了第一个本地胜利之外，忽略一切。安装 Hermes，运行一个提示，看到真正的答案，然后继续前进。",
+        "chapterPulse": "章脉",
+        "proofState": "证明状态",
+        "proofArtifactLogged": "工件已记录",
+        "proofArtifactMissing": "神器仍下落不明",
+        "runtimeTruth": "运行时真相",
+        "nextIrreversibleMove": "下一个不可逆转的举动",
+        "proof": "证明",
+        "runtime": "运行时",
+        "focus": "重点",
+        "sync": "同步",
+        "signalCore": "信号核心",
+        "firstWinPulse": "先胜脉搏",
+        "trackInstallPrompt": "立即安装 Hermes",
+        "installDone": "安装完成",
+        "proofCaptured": "捕获的证据",
+        "runtimeNotAttached": "未附上",
+        "nextMove": "下一步行动",
+        "visibleSuccess": "看得见的成功"
+      },
+      "labels": {
+        "chapterPulse": "章脉",
+        "proofState": "证明状态",
+        "runtimeTruth": "运行时真相",
+        "nextIrreversibleMove": "下一个不可逆转的举动",
+        "chapterPosture": "章节姿势",
+        "guideMarker": "引导标记",
+        "trackChecklist": "跟踪清单",
+        "chapterBrief": "第01章 简介",
+        "fastestPath": "实现价值的最快路径",
+        "trackLocked": "轨道锁定",
+        "visibleSuccess": "看得见的成功",
+        "studioLedger": "工作室台账",
+        "completedLessons": "已完成课程",
+        "hostedSync": "托管同步",
+        "runtimeStatus": "运行时状态",
+        "workspace": "工作空间",
+        "jumpStraightTo": "直接跳到",
+        "operatingRule": "操作规则",
+        "currentPressure": "当前压力",
+        "install": "安装",
+        "firstPrompt": "第一个提示",
+        "proofProtocol": "证明协议",
+        "visibleMoves": "三个可见的动作来清除第01章",
+        "doThisNow": "现在就这样做",
+        "visibleMove": "看得见的举动",
+        "liveStackRadar": "实时堆栈雷达",
+        "missionBoard": "宣教委员会",
+        "mission01": "任务01",
+        "mission02": "任务02",
+        "focusedStep": "专注的步骤",
+        "proofCaptured": "捕获的证据",
+        "operatorRecord": "操作员记录",
+        "refreshSync": "刷新同步",
+        "currentBinding": "当前绑定",
+        "assistant": "助手",
+        "model": "模型",
+        "hostedActions": "主持行动",
+        "updateStep": "更新步骤...",
+        "completeStep": "将当前步骤标记为完成",
+        "checklistDismissed": "清单已被驳回",
+        "checklistVisible": "清单可见",
+        "completeWizard": "完整向导",
+        "resetWizard": "重置向导",
+        "hostedRuntimeEditor": "托管运行时编辑器",
+        "runtimeLabel": "运行时标签",
+        "runtimeStatusField": "运行时状态",
+        "installMethod": "安装方法",
+        "gatewayUrl": "网关 URL",
+        "assistantName": "助理姓名",
+        "workspaceField": "工作空间",
+        "modelField": "模型",
+        "saveSnapshot": "保存运行时快照",
+        "openInstallLesson": "打开安装课程",
+        "saveOnlyTruth": "仅保存当前操作员主机上的真实内容：网关 URL、运行时运行状况和绑定助手。",
+        "currentBindingTitle": "当前绑定",
+        "noHostedState": "尚未记录托管入职状态。",
+        "operatorHostSnapshot": "运营商主机快照",
+        "gateway": "网关",
+        "lastSeen": "最后一次见到",
+        "bindings": "绑定",
+        "noRuntimeSnapshot": "尚未同步运行时快照。",
+        "gatewayHealth": "网关健康状况",
+        "noDoctorSummary": "尚未同步医生摘要。",
+        "activationTrack": "激活轨迹",
+        "doThisFirst": "首先执行此操作",
+        "outcomeDriven": "结果驱动",
+        "outcome": "结果：",
+        "installLesson": "安装课",
+        "firstPromptLesson": "第一节即时课",
+        "askTutor": "询问导师",
+        "currentPressureInstall": "完毕",
+        "currentPressureFirstPrompt": "捕获的证据"
+      },
+      "compass": {
+        "title": "使用保持产品诚实的最短路线",
+        "body": "保持第一场胜利。当顺序清晰时继续课程路径，使用导师来处理一个被阻止的命令，仅当实时运行时状态是真正的问题时才打开 Autopilot，最后升级。",
+        "statusFirstWinCleared": "首胜已清除",
+        "statusInstallCleared": "安装清除",
+        "statusColdStart": "冷启动",
+        "aside": "本章的存在是为了压缩世界，而不是拓宽世界。第一个证明应该在偏好、架构辩论或工具之旅之前进行。",
+        "openInstallLesson": "打开安装课程",
+        "runFirstPrompt": "运行第一个提示",
+        "continueAcademyLane": "继续学院巷",
+        "askTutorAboutStep": "向导师询问此步骤",
+        "inspectLiveControlRoom": "检查现场控制室",
+        "escalateToHumanHelp": "升级为人工帮助",
+        "nextMove": "下一步行动",
+        "blocked": "被阻止",
+        "runtime": "运行时",
+        "messyEdge": "边缘凌乱"
+      },
+      "doctrine": {
+        "label": "开球原则",
+        "title": "像一个敏锐的工作室一样开始，而不是一个业余爱好项目",
+        "chip": "简要 • 可交付成果 • 审查",
+        "brief": "让运行时干净利索地打开",
+        "deliverable": "产生一个明显的证据工件",
+        "reviewLine": "不要过早拓宽表面",
+        "postTitle": "章节姿势",
+        "postBody": "故意缩小第一章的范围。在一件真正的文物存在之前，没有浏览，没有堆栈旅游，也没有额外的设置剧院。",
+        "trackTitle": "跟踪清单",
+        "trackBody": "当第一个证据仍在形成时，一个清晰的引导提示就足够了。"
+      },
+      "protocol": {
+        "title": "证明协议",
+        "body": "在地面获得变宽的权利之前，这些是唯一重要的动作。",
+        "chip": "先胜协议"
+      },
+      "runtime": {
+        "signInFirst": "首先登录。运行时快照是针对每个操作员帐户的。",
+        "loading": "加载后端载入和运行时状态。",
+        "noHostedState": "尚未记录托管入职状态。",
+        "currentProvider": "当前提供者",
+        "availableSoon": "即将推出",
+        "locked": "锁定",
+        "ready": "准备好",
+        "later": "之后",
+        "wizardProgress": "向导进度",
+        "currentStep": "当前步骤",
+        "notStarted": "未开始",
+        "notRecorded": "未记录",
+        "checklistDismissed": "清单已被驳回",
+        "checklistVisible": "清单可见",
+        "failed": "失败的",
+        "done": "完毕",
+        "active": "积极的",
+        "pending": "待办的",
+        "currentBindingNotRecorded": "未记录",
+        "hostedKickoffReview": "主持启动回顾",
+        "operatorHostSnapshot": "运营商主机快照",
+        "gateway": "网关",
+        "installMethod": "安装方法",
+        "lastSeen": "最后一次见到",
+        "bindings": "绑定",
+        "unknown": "未知",
+        "noRuntimeSnapshot": "尚未同步运行时快照。",
+        "gatewayHealth": "网关健康状况",
+        "noDoctorSummary": "尚未同步医生摘要。"
+      },
+      "mission": {
+        "firstWinProtocol": "先胜协议",
+        "doThisNow": "现在就这样做",
+        "visibleMove": "看得见的举动",
+        "installHermes": "安装 Hermes",
+        "runBoundedPrompt": "运行一个有界提示",
+        "focusedStep": "专注的步骤",
+        "proofState": "证明状态",
+        "captured": "被捕获",
+        "completed": "完全的",
+        "missing": "丢失的",
+        "resumeInstall": "恢复安装任务",
+        "resumePrompt": "恢复提示任务"
+      }
+    },
+    "tutorPage": {
+      "shell": {
+        "eyebrow": "接地气的导师",
+        "title": "询问具体的下一步",
+        "description": "带上一个混凝土阻挡器，返回一个接地移动，然后返回到可以移动工作的课程或运行路线。"
+      },
+      "hero": {
+        "badge": "暴击脉冲",
+        "title": "附加被阻止的课程并将答案缩小到一步。",
+        "body": "通过失败的实际课程、命令或运行时边缘来解决问题。这使得回复足够接地气，让你重新采取行动。",
+        "lessonLane": {
+          "label": "课程车道",
+          "connectBlockedLesson": "连接被阻止的课程"
+        },
+        "replyState": {
+          "label": "回复状态",
+          "readyToActOn": "准备采取行动",
+          "waitingForPreciseBlocker": "等待精准拦截者"
+        },
+        "connection": {
+          "label": "联系",
+          "hostedContextAvailable": "托管上下文可用",
+          "hostedContextMissing": "缺少托管上下文"
+        },
+        "focusedStep": {
+          "label": "专注的步骤",
+          "body": "如果答案没有使这一步变得更清晰，请离开导师并使用更清晰的路线。"
+        },
+        "packetPreview": {
+          "label": "暴击包预览",
+          "lane": "车道 {value}",
+          "state": "州 {value}",
+          "focus": "焦点{value}",
+          "output": "输出 {value}",
+          "noneAttached": "没有附加",
+          "groundedMove": "一举一动"
+        },
+        "recentPressure": {
+          "label": "最近的压力",
+          "empty": "尚未保存最近的问题。带来第一个被阻止的步骤，而不是整个项目的广泛描述。"
+        },
+        "signal": {
+          "answerReady": "回答准备好",
+          "reviewingBlocker": "审查拦截器",
+          "lessonAttached": "附课",
+          "awaitingBlocker": "等待拦截器",
+          "localOnly": "仅限本地",
+          "checking": "检查",
+          "openaiConnected": "开放连接",
+          "platformAccess": "平台接入",
+          "groundedMode": "接地模式",
+          "attachLesson": "附课",
+          "notSet": "未设置",
+          "lessonSteps": "{completed}/{total} 步骤"
+        }
+      },
+      "actions": {
+        "backToLesson": "回到课程",
+        "openAcademy": "开放学院",
+        "escalateToHumanHelp": "升级为人工帮助"
+      },
+      "compass": {
+        "title": "导师应该以运动结束，而不是另一个循环",
+        "body": "仅使用导师来恢复一项接地的下一步动作。当答案足够时返回课程，当运行时是真正的阻碍时检查 Autopilot，并且仅当两条路线都无法说出真相时才升级。",
+        "status": {
+          "answerReady": "回答准备好",
+          "lessonContextAttached": "附上课程背景",
+          "awaitingBlocker": "等待拦截器"
+        },
+        "aside": "一个好的导师答案一招就结束。如果没有，请离开循环并返回课程、运行时或支持。",
+        "items": {
+          "returnToBlockedLesson": "返回被阻止的课程",
+          "returnToAcademy": "返回学院",
+          "returnCaption": "当导师的回答仍然保持课程路径真实时，请返回此处。",
+          "resumeLane": "恢复车道",
+          "inspectLiveControlRoom": "检查现场控制室",
+          "inspectCaption": "当问题从已知的课程逻辑转移到运行时状态时打开此选项。",
+          "runtime": "运行时",
+          "openSupportLane": "打开支援通道",
+          "escalateCaption": "只有当导师的回答仍然没有给出具体行动时才升级。",
+          "escalate": "升级"
+        }
+      },
+      "method": {
+        "label": "暴击台法",
+        "title": "像工作室评论一样对待每个问题",
+        "chip": "框架•证据•退出",
+        "cards": {
+          "frame": {
+            "label": "01 • 框架",
+            "title": "带来一堵步",
+            "bodyWithLesson": "将问题与 {lessonTitle} 联系起来。当课程路线已连接时，桌子效果最佳。",
+            "bodyWithoutLesson": "列出发生故障的确切步骤、命令或批准状态。广泛的焦虑是不够的。"
+          },
+          "evidence": {
+            "label": "02 • 证据",
+            "title": "带来实际发生的事情",
+            "body": "粘贴命令、脚本、错误或运行时信号。这张桌子审查的是证据，而不是共鸣。"
+          },
+          "exit": {
+            "label": "03 • 退出",
+            "title": "一招离开",
+            "body": "一个好的导师答案会给出下一步行动、一条验证线，以及如果证据仍然薄弱的话干净的交接。"
+          }
+        },
+        "deskPosture": {
+          "label": "办公桌姿势",
+          "body": "这不是一般的聊天界面。将其用作审查台，将模糊性缩小到下一步行动。"
+        },
+        "attachedLane": {
+          "label": "附属车道",
+          "bodyWithLesson": "{lessonTitle} 已附上，因此导师可以根据真实的课程摘要进行回答，而不是猜测。",
+          "bodyWithoutLesson": "尚未附上任何课程。如果您希望导师扎根于实际路线，请连接已屏蔽的课程。"
+        },
+        "lessonReviewBoard": {
+          "lessonBrief": "课程简介",
+          "deliverable": "可交付成果",
+          "critiqueLine": "批评线"
+        }
+      },
+      "form": {
+        "label": "暴击台",
+        "mascotAlt": "PicoMUTX 导师吉祥物",
+        "title": "将一个拦截器带到办公桌上",
+        "body": "仅当课程路径受阻时才询问。答案应该让你重新开始行动，而不是进入另一个阅读循环。",
+        "authAttached": "附加托管身份和运行时上下文",
+        "readOnlyMode": "只读导师模式。在您登录之前，托管会话上下文会丢失。",
+        "whereYouAre": {
+          "label": "你在哪里",
+          "body": "您询问的是 {lessonTitle}。将问题与实际被阻止的步骤联系起来。",
+          "lessonSteps": "课程步骤",
+          "focusedStep": "专注的步骤",
+          "backToLesson": "回到课程"
+        },
+        "packet": {
+          "label": "暴击包",
+          "body": "提供足够的背景信息以获得明确的答案：路线、失败和确切的期望。",
+          "chip": "路线•失败•期望",
+          "currentTrack": "当前曲目",
+          "currentTrackNotChosenYet": "尚未选择",
+          "nextLesson": "下一课",
+          "nextLessonNone": "没有任何",
+          "hostedOnboardingStep": "托管入职步骤",
+          "sessionRequired": "需要会话",
+          "runtimeStatus": "运行时状态",
+          "notSynced": "未同步"
+        },
+        "questionPlaceholder": "描述阻止程序、确切步骤以及您期望发生的情况。",
+        "blockedLessonLabel": "堵塞的课程",
+        "noLessonSelected": "没有选择课程",
+        "submitLoading": "寻找下一步...",
+        "submitIdle": "获取下一步"
+      },
+      "rail": {
+        "label": "操作员轨道",
+        "questionsAsked": "提出的问题",
+        "liveAnswerState": "实时应答状态",
+        "thinking": "思维",
+        "waiting": "等待",
+        "recentQuestions": "最近的问题",
+        "connection": {
+          "label": "OpenAI 连接",
+          "authPrompt": "登录并附加您自己的 OpenAI key。在没有个人连接的情况下，Tutor 仍然可以在只读模式下工作。",
+          "checking": "检查您的 OpenAI key是否已连接。",
+          "connectPrompt": "如果您想要拥有自己的实时 Tutor 配额和模型访问权限，请连接 OpenAI 键。",
+          "connectedAs": "连接为 {maskedKey}",
+          "connectedKey": "连接钥匙",
+          "connectedBody": "在任何平台回退之前，实时 Tutor 答案现在更喜欢您自己的 OpenAI 访问权限。",
+          "source": "来源：{value}",
+          "disconnecting": "正在断开连接...",
+          "disconnect": "断开连接 OpenAI",
+          "bringYourOwnKey": "带上您自己的 OpenAI key",
+          "apiKeyPlaceholder": "sk-proj-...",
+          "connecting": "正在连接 OpenAI...",
+          "connect": "连接 OpenAI",
+          "platformHint": "平台访问已经可用。连接您自己的密钥只会覆盖此帐户的 Tutor 模型预算和所有权路径。"
+        },
+        "escalationRule": {
+          "label": "升级规则",
+          "body": "如果答案仍然没有给您一个具体的动作，请停止循环并打开支持并附上课程上下文。",
+          "cta": "打开支援通道"
+        }
+      },
+      "critique": {
+        "label": "工作室评论",
+        "chips": {
+          "confidence": "{value} 信心",
+          "officialFallback": "官方后备",
+          "humanEscalationLikely": "人为冲突可能升级"
+        },
+        "singleNextMove": "单一下一步行动",
+        "situation": "情况",
+        "diagnosis": "诊断",
+        "steps": "步骤",
+        "commands": "命令",
+        "reviewLine": "审查线",
+        "fallbackRoute": "后备路线",
+        "empty": "询问一个阻止者，而不是整个故事。当问题对版本敏感时，Pico Tutor 将在课程、精选操作包和官方文档中提供答案。",
+        "emptyHowItWorks": "其工作原理：说明失败的步骤、预期结果以及确切的失败。如果证据仍然薄弱，答案应该为您提供具体的行动、一个验证步骤以及一条清晰的升级路径。"
+      },
+      "matches": {
+        "label": "接地课程匹配",
+        "bestMatch": "最佳匹配",
+        "alternative": "替代"
+      },
+      "evidence": {
+        "label": "批评证据",
+        "openSource": "开源"
+      },
+      "officialLinks": {
+        "label": "官方链接"
+      },
+      "exitRoute": {
+        "label": "退出路线",
+        "returnToBlockedLesson": "返回被阻止的课程",
+        "returnToAcademy": "返回学院",
+        "openAutopilot": "打开 Autopilot",
+        "openSupportLane": "打开支援通道",
+        "body": "导师应该以运动结束。如果路径仍然清晰，请返回课程，如果运行时现在是瓶颈，则打开 Autopilot，并且仅当产品路径不再真实时才升级。"
+      },
+      "escalationNote": {
+        "label": "升级说明",
+        "getHumanHelp": "获得人工帮助"
+      },
+      "nextQuestion": {
+        "label": "如果答案仍然模糊"
+      },
+      "errors": {
+        "loadOpenAIConnection": "无法加载 OpenAI 连接",
+        "tutorRequestFailed": "Tutor 请求失败",
+        "malformedResponse": "Tutor 返回的响应格式错误",
+        "pasteOpenAIKeyFirst": "首先粘贴 OpenAI API 键",
+        "connectOpenAIKey": "无法连接 OpenAI 键",
+        "disconnectOpenAIKey": "无法断开 OpenAI 键"
+      },
+      "shared": {
+        "openLesson": "打开{lessonTitle}"
+      }
+    },
+    "academyPage": {
+      "shell": {
+        "eyebrow": "学徒法典",
+        "title": "Academy",
+        "description": "一项任务。一个证明。诚实的下一步行动。"
+      },
+      "lessonState": {
+        "cleared": "已清除",
+        "current": "当前的",
+        "ready": "准备好",
+        "locked": "锁定"
+      },
+      "syncState": {
+        "hydrating": "保湿",
+        "live": "居住",
+        "saving": "保存",
+        "localOnly": "仅限本地"
+      },
+      "shared": {
+        "notRecorded": "未记录",
+        "operator": "操作员",
+        "openAutopilot": "打开 Autopilot",
+        "installHermesNow": "立即安装 Hermes",
+        "runFirstAgent": "运行你的第一个代理",
+        "openNextChapter": "开启下一章",
+        "continueWithNextLesson": "继续 {title}",
+        "askTutorNextStep": "向导师询问下一步的具体步骤",
+        "askTutorRouteCorrection": "请导师修正路线",
+        "verifyHost": "验证主机",
+        "hostedAttached": "托管附加",
+        "authError": "授权错误",
+        "checking": "检查",
+        "signInToPersist": "登录以坚持",
+        "readingHostState": "读取主机状态",
+        "captured": "被捕获",
+        "missing": "丢失的",
+        "inProgress": "进行中",
+        "ready": "准备好",
+        "controlRoom": "控制室",
+        "open": "打开",
+        "locked": "锁定",
+        "live": "居住",
+        "updated": "已更新 {timestamp}",
+        "steps": "{completed}/{total} 步骤",
+        "lessons": "{completed}/{total} 课程",
+        "clearedCount": "{completed}/{total} 已清除",
+        "level": "级别 {level}",
+        "track": "轨道 {number}",
+        "stop": "停止{number}",
+        "plan": "{plan} 计划",
+        "cleared": "已清除",
+        "previewStep": "选择下一个可见步骤",
+        "resumeMission": "恢复任务",
+        "askTutor": "询问导师",
+        "ok": "好的",
+        "resumeBody": "打开课程路线并保持校样车道较短。",
+        "noProofLogged": "尚未记录任何证据。保存证明任务确实有效的单个工件。"
+      },
+      "billboard": {
+        "chapterLabel": "法典章节",
+        "trackLabel": "追踪",
+        "stopOf": "{total} 的 {current} 站",
+        "currentMission": "目前的使命",
+        "validationPrefix": "验证："
+      },
+      "mission": {
+        "titleFallback": "打开 Autopilot",
+        "summaryFallback": "当课程通道畅通时，步入实时控制室。",
+        "validationFallback": "当问题不再是关于阅读课程时，请使用运行时。",
+        "primary": {
+          "openAutopilot": "打开 Autopilot",
+          "installHermesNow": "立即安装 Hermes",
+          "runFirstAgent": "运行你的第一个代理",
+          "openNextChapter": "开启下一章"
+        }
+      },
+      "strip": {
+        "missionState": "任务状态",
+        "trackProgress": "跟踪进度",
+        "proof": "证明",
+        "hosted": "主办",
+        "currentMission": "目前的使命"
+      },
+      "studio": {
+        "label": "工作室法",
+        "title": "像精品工作室一样学习",
+        "stamp": "简短 • 可交付成果 • 批评",
+        "steps": [
+          {
+            "label": "01 • 简介",
+            "title": "像阅读客户简介一样阅读使命"
+          },
+          {
+            "label": "02 • 可交付成果",
+            "title": "打造一件值得保留的文物"
+          },
+          {
+            "label": "03 • 批评",
+            "title": "使用类似工作室审核的验证"
+          }
+        ]
+      },
+      "standards": {
+        "label": "赛道标准",
+        "trackOutcome": "跟踪结果",
+        "levelReward": "等级奖励",
+        "nextStandard": "下一个标准",
+        "levelRewardFallback": "交付一项真实的操作员成果。",
+        "nextStandardFallback": "保持章节范围狭窄且诚实。"
+      },
+      "chapterLedger": {
+        "label": "章账本",
+        "title": "一个占主导地位的章节，地图的其余部分保持安静。",
+        "body": "当前曲目得到了完整的编辑处理。地图集的其余部分仍然可见，但经过压缩，因此这条路线仍然感觉是作者创作的，而不是到处都同样响亮。",
+        "focusMode": "对焦模式",
+        "guidedAtlas": "引导图集",
+        "trackLabel": "追踪",
+        "routeState": "路线状态",
+        "nextDominantStop": "下一个主导站点",
+        "missionCorrection": "任务修正",
+        "missionCorrectionBody": "只有当地图集不断将你推回当前任务时，它才有用。",
+        "otherChapters": "其他章节",
+        "chapterChecklist": "章节清单",
+        "dominantStop": "主导停止",
+        "openAutopilot": "打开 Autopilot",
+        "stopLevel": "停止 {number} • 级别 {level}",
+        "cleared": "已清除",
+        "mascotAlt": "PicoMUTX 学院吉祥物"
+      },
+      "referenceAnnex": {
+        "label": "参考附件",
+        "title": "能力、存档和平台内存故意保持在路线下方",
+        "body": "平台内存保持可用，但它故意位于法典下方。 Academy 引导路由和证明，然后仅在需要时公开配置。",
+        "setup": "设置",
+        "locked": "锁定"
+      },
+      "capabilities": {
+        "label": "解锁功能",
+        "body": "任务结束后重要的部分已经是真实的。",
+        "live": "居住",
+        "firstUnlockEmpty": "只有在第一堂课真正完成后，第一个能力才能解锁土地。",
+        "nextUnlock": "下一步解锁",
+        "patternArchive": "图案档案",
+        "openPatternLesson": "开放式课程",
+        "fieldNotes": "现场笔记",
+        "controlAnnex": "控制附件",
+        "liveSuffix": "居住"
+      },
+      "workspace": {
+        "activeProofLane": "主动证明车道",
+        "resumeFromHere": "从这里继续",
+        "proofState": "证明状态",
+        "capturedProof": "捕获的证据",
+        "hostedNote": "主持笔记",
+        "proofCaptured": "被捕获",
+        "proofMissing": "丢失的"
+      }
+    },
+    "content": {
+      "levels": {
+        "0": {
+          "title": "设置",
+          "objective": "安装 Hermes 并证明运行时回答了真实的提示。",
+          "projectOutcome": "响应命令的工作本地代理。",
+          "completionState": "Hermes 在本地运行并返回一个正常的答案。",
+          "badge": "第一个火花",
+          "recommendedNextStep": "将相同的运行时部署在持久的地方。"
+        },
+        "1": {
+          "title": "部署",
+          "objective": "将代理从笔记本电脑上移走并保持其活动状态。",
+          "projectOutcome": "VPS 或始终在线的盒子上的持久代理。",
+          "completionState": "代理在 shell 退出后仍然存在并接受远程流量。",
+          "badge": "运行时游侠",
+          "recommendedNextStep": "添加一项有用的功能。"
+        },
+        "2": {
+          "title": "能力",
+          "objective": "教代理一项有界工作的具体技能。",
+          "projectOutcome": "与实际任务绑定的有用技能或工具调用。",
+          "completionState": "代理完成一项有用的工作流程步骤。",
+          "badge": "技能匠",
+          "recommendedNextStep": "自动化节奏。"
+        },
+        "3": {
+          "title": "自动化",
+          "objective": "按可重复的计划运行代理。",
+          "projectOutcome": "无需保姆即可触发的预定工作流程。",
+          "completionState": "工作流程在时钟上运行并记录结果。",
+          "badge": "循环生成器",
+          "recommendedNextStep": "打开可见性。"
+        },
+        "4": {
+          "title": "生产",
+          "objective": "查看运行历史记录并尽早发现故障模式。",
+          "projectOutcome": "用户可以检查运行、故障和运行时状态。",
+          "completionState": "运行活动出现在控制层中。",
+          "badge": "信号猎人",
+          "recommendedNextStep": "添加成本和审批控制。"
+        },
+        "5": {
+          "title": "控制",
+          "objective": "添加成本阈值、警报和风险操作门。",
+          "projectOutcome": "可以在代理造成损害之前对其进行监视和中断。",
+          "completionState": "配置阈值和批准。",
+          "badge": "看门人",
+          "recommendedNextStep": "发布更深层次的模式。"
+        },
+        "6": {
+          "title": "系统",
+          "objective": "交付可重复使用的生产模式，而不是玩具演示。",
+          "projectOutcome": "创始人可以在生产中运行的一个严肃的工作流程。",
+          "completionState": "更强大的模式附带真实的工件和控制面。",
+          "badge": "模式运算符",
+          "recommendedNextStep": "从一个代理转变为受管舰队。"
+        }
+      },
+      "tracks": {
+        "first-agent": {
+          "title": "赛道 A — 第一特工",
+          "outcome": "Hermes 运行并回答真实的提示。",
+          "intro": "这是从零到本地运行时的快速路径。",
+          "checklist": [
+            "已安装 Hermes",
+            "配置的型号/提供商",
+            "捕获一个成功的响应"
+          ]
+        },
+        "deployed-agent": {
+          "title": "轨道 B — 部署代理",
+          "outcome": "运行时在某个持久的地方保持活动状态。",
+          "intro": "从笔记本电脑演示转向可在睡眠和重新启动后继续存在的进程。",
+          "checklist": [
+            "VPS 或在线持久盒",
+            "服务干净地重新启动",
+            "消息入口已连接"
+          ]
+        },
+        "useful-workflow": {
+          "title": "轨道 C — 有用的工作流程",
+          "outcome": "代理执行一项重要的有限工作。",
+          "intro": "现在停止玩提示并构建一项有用的功能。",
+          "checklist": [
+            "至少安装一项自定义技能",
+            "配置了一个预定工作流程",
+            "无需人工照看即可完成一个可重复的工作流程"
+          ]
+        },
+        "controlled-agent": {
+          "title": "D轨——受控特工",
+          "outcome": "运行时是可见的并受管理的。",
+          "intro": "这就是保姆问题被操作员工具取代的地方。",
+          "checklist": [
+            "最近的活动可见",
+            "存储的成本阈值",
+            "已执行批准请求流程"
+          ]
+        },
+        "production-pattern": {
+          "title": "轨道 E — 生产模式",
+          "outcome": "更强大、可重用的工作流程已上线。",
+          "intro": "打好基础，打造出有人愿意花钱购买的模式。",
+          "checklist": [
+            "一种业务工作流程接受真实的结构化输入",
+            "接受结构化输入",
+            "输出已验证",
+            "从控制层可见运行"
+          ]
+        }
+      },
+      "lessons": {
+        "install-hermes-locally": {
+          "title": "本地安装 Hermes",
+          "summary": "安装 Hermes，证明该命令可以在新的 shell 中运行，并在本课中留下一个可以运行的本地运行时。",
+          "objective": "获取一个干净的本地 Hermes 安装，端到端工作。",
+          "outcome": "本地 Hermes CLI 从新鲜的外壳中干净地打开。",
+          "expectedResult": "从新 shell 运行 `command -v hermes && hermes` 成功。",
+          "validation": "打开一个全新的 shell 并运行 `command -v hermes && hermes`。如果命令丢失或立即出现 CLI 错误，则本课未完成。",
+          "steps": [
+            {
+              "title": "安装 Hermes",
+              "body": "仅运行一次安装命令。不要比较包管理器。不要分支到额外的工具。",
+              "command": "curl -fsSL https://hermes.nousresearch.com/install.sh | bash"
+            },
+            {
+              "title": "从新的 shell 验证二进制文件",
+              "body": "关闭 shell，打开一个新的 shell，然后证明二进制文件实际上位于 PATH 上。",
+              "command": "command -v hermes"
+            },
+            {
+              "title": "打开 Hermes 并完成一个提供商设置",
+              "body": "启动 CLI 并完成一个提供者路径，直到 CLI 可用。不要让本课程留给两个半配置的提供程序。",
+              "command": "hermes"
+            }
+          ],
+          "troubleshooting": [
+            "如果 `command -v hermes` 没有返回任何内容，请重新启动 shell 并检查安装路径是否已添加到 PATH。",
+            "如果 `hermes` 打开并立即因缺少凭据而出错，请先完成一个提供程序设置，然后再继续。",
+            "如果安装脚本在锁定计算机上失败，请切换到用户本地安装路径并重新运行验证步骤。"
+          ]
+        },
+        "run-your-first-agent": {
+          "title": "运行你的第一个代理",
+          "summary": "运行一个真实的提示，得到一个可见的答案，并将记录保存为证据。",
+          "objective": "证明运行时可以使用您刚刚配置的提供程序回答一个有界提示。",
+          "outcome": "一份保存的提示和回答记录。",
+          "expectedResult": "Hermes 回答一个小提示，记录将保存在您可以重新打开的文件中。",
+          "validation": "运行一个有界提示并将提示和答案保存在文件中，例如 `~/pico-first-run.txt`。",
+          "steps": [
+            {
+              "title": "从干净的 shell 启动 Hermes",
+              "body": "从新 shell 启动运行时，以便您知道您正在测试真正的安装。",
+              "command": "hermes"
+            },
+            {
+              "title": "发送一个有界提示",
+              "body": "使用一个带有明显答案的小提示。不要测试创造力。测试运行时是否有效。",
+              "command": "Prompt: Give me exactly 3 next steps to test this runtime locally."
+            },
+            {
+              "title": "保存成绩单",
+              "body": "将提示和答案写入一个文件，以便工件在终端关闭后仍然存在。",
+              "command": "printf \"Prompt: Give me exactly 3 next steps to test this runtime locally.\nAnswer: <paste the actual answer here>\n\" > ~/pico-first-run.txt"
+            }
+          ],
+          "troubleshooting": [
+            "如果答案超时，请先切换到更快的模型，然后重新运行相同的有界提示。",
+            "如果答案是无意义的，请在更改提示之前确认 Hermes 实际使用的是哪个提供商和模型。",
+            "如果 CLI 无法启动，请返回安装课程。本课程取决于工作的二进制文件。"
+          ]
+        },
+        "deploy-hermes-on-a-vps": {
+          "title": "在 VPS 上部署 Hermes",
+          "summary": "将 Hermes 放在始终在线的主机上，并证明远程运行时也在那里打开。",
+          "objective": "将运行时从您的笔记本电脑转移到您控制的一台持久计算机上。",
+          "outcome": "一个远程盒子，Hermes 在 SSH 上干净地打开。",
+          "expectedResult": "SSH 进入主机并成功运行 `hermes`。",
+          "validation": "从您的计算机 SSH 进入主机并运行 `command -v hermes && hermes`。如果失败，则部署未完成。",
+          "steps": [
+            {
+              "title": "在 SSH 后联系房东",
+              "body": "使用您控制的一个盒子并在触摸 Hermes 之前证明 SSH 有效。",
+              "command": "ssh user@your-box"
+            },
+            {
+              "title": "在主机上安装 Hermes",
+              "body": "在远程机器上运行相同的安装路径。让环境保持无聊。",
+              "command": "curl -fsSL https://hermes.nousresearch.com/install.sh | bash"
+            },
+            {
+              "title": "验证远程运行时",
+              "body": "从 SSH 会话证明二进制文件存在并且 CLI 打开。",
+              "command": "command -v hermes && hermes"
+            }
+          ],
+          "troubleshooting": [
+            "如果SSH不稳定，请先修复主机。 Hermes 还不是问题。",
+            "如果安装在本地运行但不能远程运行，请在更改命令之前比较 PATH 和环境变量。",
+            "如果远程主机缺少提供程序凭据，请仅添加您已在本地证明的同一提供程序所需的最低配置。"
+          ]
+        },
+        "keep-your-agent-alive": {
+          "title": "让您的代理在会话之间保持活力",
+          "summary": "创建一个真实的服务定义，这样注销就不会终止运行时。",
+          "objective": "将远程运行时变成一个可以在断开连接和重新启动后继续存在的进程。",
+          "outcome": "保存的服务定义或 tmux 命令，使 Hermes 保持活动状态。",
+          "expectedResult": "您可以断开连接、重新连接并发现运行时仍在运行。",
+          "validation": "启动服务，断开连接，重新连接，并验证 Hermes 进程是否仍然存在。",
+          "steps": [
+            {
+              "title": "写入systemd单元文件",
+              "body": "现在创建服务文件。如果课程结束时不存在文件，则您什么也没有发送。",
+              "command": "sudo nano /etc/systemd/system/hermes.service",
+              "note": "[Unit]\nDescription=Hermes Runtime\nAfter=network.target\n\n[Service]\nUser=<your-user>\nWorkingDirectory=/home/<your-user>\nExecStart=/home/<your-user>/.local/bin/hermes\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target"
+            },
+            {
+              "title": "启用并启动服务",
+              "body": "重新加载 systemd，启用该单元并启动一次。",
+              "command": "sudo systemctl daemon-reload && sudo systemctl enable --now hermes"
+            },
+            {
+              "title": "证明它在没有你的外壳的情况下也能生存",
+              "body": "检查状态，断开连接，重新连接，然后再次检查。",
+              "command": "sudo systemctl status hermes --no-pager"
+            }
+          ],
+          "troubleshooting": [
+            "如果该单元在 systemd 下失败，但可以手动工作，请比较 PATH、WorkingDirectory 和提供程序环境变量。",
+            "如果服务永久重新启动，请首先修复 Hermes 命令，而不是增加重新启动次数。",
+            "如果您无法使用 systemd，请使用名为 tmux 的会话，并在继续之前记录确切的会话名称。"
+          ]
+        },
+        "connect-a-messaging-layer": {
+          "title": "连接消息传递层",
+          "summary": "为运行时提供一个真实的入口路径，以便您无需 SSH 即可到达它。",
+          "objective": "将一个真实的入站通道附加到正在运行的代理。",
+          "outcome": "一种经过测试的运行时入口路径。",
+          "expectedResult": "真实的输入从所选通道到达运行时并产生一个可见的回复。",
+          "validation": "通过所选入口发送一个真实的测试输入并记录准确的回复。",
+          "steps": [
+            {
+              "title": "选择您已经拥有凭证的一个渠道",
+              "body": "仅使用一个入口。目标是有效的输入路径，而不是通道覆盖范围。",
+              "command": "Example surfaces: Telegram bot token, Discord bot token, Slack app token, or one webhook endpoint."
+            },
+            {
+              "title": "在运行时主机上存储最少的凭据",
+              "body": "仅将所需的秘密放在盒子上，并将其保留在聊天记录中。",
+              "command": "export CHANNEL_TOKEN=<your-token>"
+            },
+            {
+              "title": "发送一份真实的入站测试",
+              "body": "触发一次入口并验证运行时在预期位置准确回复一次。",
+              "command": "Send one short real message through the selected channel, then record the reply text."
+            }
+          ],
+          "troubleshooting": [
+            "如果通道静默，请在更改代理逻辑之前验证令牌有效性和 webhook 可访问性。",
+            "如果您收到重复的回复，请停止重复的运行时或重复 webhook，然后再继续。",
+            "如果通道到达运行时但没有回复，请先检查正在运行的服务日志。"
+          ]
+        },
+        "add-your-first-skill": {
+          "title": "添加您的第一个技能/工具",
+          "summary": "安装一种代理可以在无需人工干预的情况下重复使用的狭窄功能。",
+          "objective": "教 Hermes 它可以按需执行一项有界任务。",
+          "outcome": "代理可以重复调用的一项工作技能或工具。",
+          "expectedResult": "代理在实际输入时使用该技能一次并返回有用的结果。",
+          "validation": "触发一次技能并保存其产生的准确输入和输出。",
+          "steps": [
+            {
+              "title": "选择一项狭窄的工作",
+              "body": "选择一项风险低、有效且显而易见的重复任务。",
+              "command": "Example jobs: summarize one note, classify one lead, extract one field set, or rewrite one reply."
+            },
+            {
+              "title": "安装或创建技能",
+              "body": "使用现有的 Hermes 技能流程并保持范围极小。",
+              "command": "Use the single Hermes skill path you already trust. Do not bundle multiple skills into this lesson."
+            },
+            {
+              "title": "在真实形状的输入上运行技能",
+              "body": "使用看起来像生产的输入调用技能，然后保存结果。",
+              "command": "Run the skill once and write the resulting artifact to ~/pico-first-skill.txt"
+            }
+          ],
+          "troubleshooting": [
+            "如果技能失败，请首先测试 Hermes 之外的底层命令或 API。",
+            "如果输出有噪音，请缩小技能范围，而不是添加更多提示文本。",
+            "如果任务可能会发送或改变有风险的内容，请将该技能保持为只读，直到批准课程为止。"
+          ]
+        },
+        "create-a-scheduled-workflow": {
+          "title": "创建预定工作流程",
+          "summary": "将有用的工作放在时钟上，并证明一个预定的执行留下了可见的痕迹。",
+          "objective": "将工作技能转变为一项可重复的预定工作。",
+          "outcome": "一份保存的计划无需手动启动即可运行作业。",
+          "expectedResult": "计划的执行将触发并留下可见的结果，您可以稍后指出。",
+          "validation": "触发一个计划标记并捕获生成的日志、输出文件或运行记录。",
+          "steps": [
+            {
+              "title": "选择一种理智的节奏",
+              "body": "选择与工作相匹配的时间表。每天就足够了，除非你能防守得更紧。",
+              "command": "Example cron: 0 9 * * *"
+            },
+            {
+              "title": "保存预定的命令",
+              "body": "立即创建准确的 cron 或调度程序条目。只存在于你头脑中的时间表是假的。",
+              "command": "(crontab -l 2>/dev/null; echo \"0 9 * * * /home/<your-user>/.local/bin/hermes\") | crontab -"
+            },
+            {
+              "title": "强制执行一次并捕获结果",
+              "body": "不要整天等待。触发工作流程一次并保存输出位置。",
+              "command": "/home/<your-user>/.local/bin/hermes"
+            }
+          ],
+          "troubleshooting": [
+            "如果计划从未触发，请在触摸 Hermes 之前验证时区和 crontab 所有权。",
+            "如果作业触发两次，请在继续之前删除重复的调度程序条目。",
+            "如果调度程序看不到机密，请在执行环境中显式导出它们。"
+          ]
+        },
+        "see-your-agent-activity": {
+          "title": "查看您的代理活动",
+          "summary": "打开控制界面，检查一次实际运行或空状态真相，并记录第一个操作员信号。",
+          "objective": "为控制层留下一个具体信号，您可以稍后命名。",
+          "outcome": "一个记录的操作员信号：运行 ID、警报类型或诚实的空状态事实。",
+          "expectedResult": "您可以指向具体的运行时信号，而不是说“看起来不错”。",
+          "validation": "打开 Autopilot 并在文件中记下一个信号，例如 `~/pico-operator-checkpoint.txt`。",
+          "steps": [
+            {
+              "title": "打开 Autopilot",
+              "body": "转到控制界面并开始运行。暂时不要浏览整个页面。",
+              "command": "Open /pico/autopilot"
+            },
+            {
+              "title": "检查一个信号",
+              "body": "捕获一个运行 ID、警报类型或空状态事实。这节课一个就够了。",
+              "command": "Example artifact line: run_id=<paste>, alert_type=<paste>, or empty_state=no_live_agent"
+            },
+            {
+              "title": "保存检查点",
+              "body": "将该信号存储在文件中，以便您可以将以后的状态与具体的情况进行比较。",
+              "command": "printf \"checkpoint=<paste your first operator signal here>\n\" > ~/pico-operator-checkpoint.txt"
+            }
+          ],
+          "troubleshooting": [
+            "如果没有出现任何运行，请在指责控制界面之前验证计划的工作流程是否确实执行。",
+            "如果身份验证阻止视图，请先登录。本课程取决于实际的控制平面。",
+            "如果页面是空的，请诚实地记录空状态的真相。空仍然是信号。"
+          ]
+        },
+        "set-a-cost-threshold": {
+          "title": "设定成本阈值",
+          "summary": "将一条预算线存放在沙子中，并验证其能否重新加载。",
+          "objective": "在运行时变得嘈杂之前定义一个您愿意容忍的成本阈值。",
+          "outcome": "一个已保存的阈值与控制界面相关。",
+          "expectedResult": "重新加载后，保存的阈值仍然存在，并显示在产品状态中。",
+          "validation": "保存阈值，重新加载页面，并确认相同的值仍然存在。",
+          "steps": [
+            {
+              "title": "选择一个阈值",
+              "body": "选择一个你现在可以防守的号码。如果没有更好的理由，请使用 75。",
+              "command": "Threshold: 75"
+            },
+            {
+              "title": "将其保存在 Autopilot 中",
+              "body": "输入号码并保存一次。不要在课程中不断调整它。",
+              "command": "Open /pico/autopilot and click Save threshold"
+            },
+            {
+              "title": "重新加载并验证持久性",
+              "body": "重新加载页面并确认相同的阈值仍然出现。",
+              "command": "Reload /pico/autopilot and verify the threshold field still shows your saved value."
+            }
+          ],
+          "troubleshooting": [
+            "如果阈值在重新加载后消失，请在信任任何成本控制之前修复持久性。",
+            "如果尚不存在实时预算，仍保留阈值，但将成本意识视为不完整。",
+            "如果您胡乱猜测，请选择较低的阈值并继续。"
+          ]
+        },
+        "add-an-approval-gate": {
+          "title": "添加审批门",
+          "summary": "创建一个真正的审批检查点并有目的地解决它。",
+          "objective": "在您相信运行时会产生任何后果之前，请先执行危险操作门。",
+          "outcome": "一项工作批准请求和一项深思熟虑的决议。",
+          "expectedResult": "存在待审批，您可以有意批准或拒绝它。",
+          "validation": "创建一个批准请求并从队列中解决它。",
+          "steps": [
+            {
+              "title": "选择一项值得控制的危险行为",
+              "body": "使用一项出站发送、发布或状态更改操作。如果行为无害，那么这个教训就是假的。",
+              "command": "Example gated action: outbound_message_send"
+            },
+            {
+              "title": "创建批准请求",
+              "body": "将操作推入批准队列而不是立即运行。",
+              "command": "Open /pico/autopilot and create one approval request for the risky action."
+            },
+            {
+              "title": "有意解决请求",
+              "body": "批准或拒绝一次请求并记录操作后队列显示的内容。",
+              "command": "Use the Approve or Reject action in /pico/autopilot and record the final status."
+            }
+          ],
+          "troubleshooting": [
+            "如果无法获得批准，请明确说明。运行时尚未受到控制。",
+            "如果每个人都认可一切，那么门是存在的，但政策是弱的。记录下这个差距并继续前进。",
+            "如果你限制了微不足道的噪音，队列就会变成垃圾邮件，操作员就会不再信任它。"
+          ]
+        },
+        "build-a-lead-response-agent": {
+          "title": "建立领先响应代理",
+          "summary": "将一项入站线索转化为一份草稿回复，并保留发送后的批准。",
+          "objective": "本周发布创始人实际使用的一个工作流程。",
+          "outcome": "具有门控出站步骤的潜在客户响应工作流程。",
+          "expectedResult": "潜在客户数据变成草稿回复或结构化操作员摘要，并且有风险的发送保持关闭状态。",
+          "validation": "从头到尾运行一个潜在客户的工作流程并保存起草的结果。",
+          "steps": [
+            {
+              "title": "创建一个潜在客户负载",
+              "body": "使用最小的有用形状并在整个课程中保持固定。",
+              "command": "printf \"name=Alex\nsource=website\nintent=book demo\nnext_step=send reply\n\" > ~/pico-lead.txt"
+            },
+            {
+              "title": "生成一份草稿回复",
+              "body": "在该潜在客户负载上运行工作流程并生成一份草稿回复或一份结构化摘要。",
+              "command": "Feed ~/pico-lead.txt into your Hermes lead workflow and save the result to ~/pico-lead-draft.txt"
+            },
+            {
+              "title": "将出站操作置于审批之后",
+              "body": "不要自动发送。强制工作流通过批准队列一次。",
+              "command": "Create one approval request for the outbound send using the drafted reply as payload."
+            }
+          ],
+          "troubleshooting": [
+            "如果吃水是通用的，请在触摸提示之前拧紧铅有效载荷。",
+            "如果工作流程很慢，请在优化模型之前删除额外的步骤。",
+            "如果您还不需要出站发送，请停止在门控草稿上并将其称为工件。"
+          ]
+        },
+        "build-a-document-processing-agent": {
+          "title": "构建文档处理代理",
+          "summary": "摄取一份文档，提取几个重要的字段，并显示一份经过审查的输出工件。",
+          "objective": "围绕非结构化投入打造一种更强大的生产模式。",
+          "outcome": "一种具有保存的结构化输出的文档处理工作流程。",
+          "expectedResult": "真实的文档会成为您可以检查的结构化摘要、清单或标记记录。",
+          "validation": "处理一份真实文档并保存提取的输出工件。",
+          "steps": [
+            {
+              "title": "选择一个文档并冻结架构",
+              "body": "使用一种真实的文件类型，并在提取开始之前确定您需要的确切字段。",
+              "command": "Example output schema: title, owner, due_date, summary, next_action"
+            },
+            {
+              "title": "运行提取一次",
+              "body": "仅提取下游重要的字段。忽略每一个可有可无的领域。",
+              "command": "Run the workflow on one real document and save the structured output to ~/pico-document-output.txt"
+            },
+            {
+              "title": "查看保存的输出",
+              "body": "读取输出并确认其无需更多清理即可使用。",
+              "command": "cat ~/pico-document-output.txt"
+            }
+          ],
+          "troubleshooting": [
+            "如果提取质量较差，请先减少文档种类，然后再添加更多提示。",
+            "如果输出难以检查，则说明您的架构太宽。砍伐田地。",
+            "如果您无法判断结果是否可用，则工作流程尚未准备好进一步自动化。"
+          ]
+        }
+      },
+      "releaseNotes": [
+        {
+          "title": "Pico 炮弹落在 MUTX 内",
+          "body": "Academy、导师、支持和自动驾驶仪现在位于一个表面，而不是仅用于营销的登陆页面。"
+        },
+        {
+          "title": "进度持久性切换为用户设置",
+          "body": "经过身份验证的用户将进度同步到后端，而匿名用户则保留本地回退。"
+        },
+        {
+          "title": "Autopilot 现在读取真实的 MUTX 信号",
+          "body": "运行、警报、预算和批准均来自实时 MUTX 路线。没有假遥测剧场。"
+        }
+      ],
+      "showcasePatterns": [
+        {
+          "title": "引导响应操作员",
+          "summary": "获取入站线索，起草第一个回复，并在有风险的发送之前等待批准。"
+        },
+        {
+          "title": "文件分类通道",
+          "summary": "摄取文件，提取有用的部分，标记结果，并表面运行以供审查。"
+        },
+        {
+          "title": "每日工作流程循环",
+          "summary": "通过日志和计时，将一项有用的提示转变为可重复的操作员习惯。"
+        }
+      ],
+      "badgeLabels": {
+        "first-spark": "第一个火花",
+        "runtime-ranger": "运行时游侠",
+        "skillsmith": "技能匠",
+        "loop-builder": "循环生成器",
+        "gatekeeper": "看门人",
+        "pattern-operator": "模式运算符"
+      },
+      "capabilities": {
+        "cap-deploy-runtime": {
+          "title": "持久运行时已解锁",
+          "description": "你证明了局部循环。下一步：让同一个代理进入一个保持清醒的盒子。",
+          "actionLabel": "部署运行时"
+        },
+        "cap-live-runs": {
+          "title": "实时运行可见性已解锁",
+          "description": "现在存在真正的运行。在假装循环稳定之前，打开 Autopilot 并检查结果。",
+          "actionLabel": "检查实时活动"
+        },
+        "cap-ingress": {
+          "title": "远程入口已解锁",
+          "description": "运行时驻留在某个持久的地方。给它一个真实的输入路径，这样它就可以做有用的工作。",
+          "actionLabel": "连接消息传递层"
+        },
+        "cap-scheduling": {
+          "title": "日程安排已解锁",
+          "description": "一项有用的技能已经到位。现在按节奏运行它，使该产品成为一种习惯。",
+          "actionLabel": "安排工作流程"
+        },
+        "cap-monitoring": {
+          "title": "监控解锁",
+          "description": "工作流程现在正在运行。是时候观察事物而不是希望它表现出来了。",
+          "actionLabel": "查看代理活动"
+        },
+        "cap-cost-controls": {
+          "title": "成本控制解锁",
+          "description": "您可以查看运行历史记录。在交易量变成遗憾之前设置支出护栏。",
+          "actionLabel": "设定成本阈值"
+        },
+        "cap-approvals": {
+          "title": "审批之门已解锁",
+          "description": "预算意识是实时的。在危险的出境行为真正发生之前添加人工停留。",
+          "actionLabel": "添加审批门"
+        },
+        "cap-production-pattern": {
+          "title": "生产模式解锁",
+          "description": "护栏已就位。交付看起来像产品的工作流程，而不是提示技巧。",
+          "actionLabel": "出货生产模式"
+        }
+      },
+      "planMatrix": {
+        "free": {
+          "academy": "完整的学院访问权限",
+          "tutor": "接地导师，每日轻度使用",
+          "project_limit": "1 个活跃项目通道",
+          "monitored_agents": "仅预览",
+          "alerts": "应用内阈值警报",
+          "approvals": "预览审批流程",
+          "retention": "7天产品记忆"
+        },
+        "starter": {
+          "academy": "完整的学院访问权限",
+          "tutor": "优先导师路由",
+          "project_limit": "3 个活跃项目车道",
+          "monitored_agents": "1 名受监控代理",
+          "alerts": "应用内加电子邮件就绪配置",
+          "approvals": "一道审批门",
+          "retention": "30 天的运行和警报历史记录"
+        },
+        "pro": {
+          "academy": "完整的学院访问权限",
+          "tutor": "优先导师路由",
+          "project_limit": "无限的项目车道",
+          "monitored_agents": "多个受监控代理",
+          "alerts": "更强的警报路由",
+          "approvals": "多重审批关口",
+          "retention": "90 天的运行和警报历史记录"
+        }
+      }
+    },
+    "shell": {
+      "nav": {
+        "onboarding": {
+          "label": "开始",
+          "note": "第一个可见成果"
+        },
+        "academy": {
+          "label": "课程",
+          "note": "真正推进工作的路径"
+        },
+        "tutor": {
+          "label": "Tutor",
+          "note": "一个有根据的答案"
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "note": "实时 control room"
+        },
+        "support": {
+          "label": "人工帮助",
+          "note": "混乱边缘"
+        }
+      },
+      "wordmark": {
+        "logoAlt": "PicoMUTX 标志",
+        "atlas": "operator atlas"
+      },
+      "robotCard": {
+        "signalLabel": "Pico 信号"
+      },
+      "helpLane": {
+        "stayHereWhen": "在这种情况下留在这里",
+        "stayHereBody": "当下一步动作仍然在 {chapter} 之内时。",
+        "recoveryRoute": "恢复路径",
+        "openSupportLane": "打开 Support 通道",
+        "recoveryBody": "当产品路径已经无法诚实说明阻塞点时，请使用这里。",
+        "continueSequence": "继续序列",
+        "humanHelp": "人工帮助",
+        "continueBody": "如果下一个 chapter 已经是正确工具，就继续保持势头。"
+      },
+      "academyMode": {
+        "chapter": "第 {chapter} 章",
+        "howThisWorks": "使用方式",
+        "map": "地图",
+        "help": "帮助",
+        "routeMode": "路径模式",
+        "focusModeActive": "专注模式已启用。",
+        "mapStaysOpen": "地图保持打开。",
+        "previous": "上一项: {label}",
+        "startOfSequence": "序列起点",
+        "next": "下一项: {label}",
+        "finalChapter": "最后一章",
+        "backToMap": "返回地图",
+        "proof": "证据"
+      },
+      "defaultMode": {
+        "currentChapter": "当前章节",
+        "chapter": "第 {chapter} 章",
+        "quickHelp": "快速帮助",
+        "previousChapter": "上一章节",
+        "previousChapterAria": "前往上一章节: {label}",
+        "nextChapter": "下一章节",
+        "nextChapterAria": "前往下一章节: {label}",
+        "goToOnboarding": "前往 Onboarding",
+        "goToSupport": "前往 Support",
+        "hideRecovery": "隐藏恢复",
+        "showRecovery": "显示恢复",
+        "chapterNote": "章节说明",
+        "chapterNoteBody": "用这一章快速削减不确定性，并识别下一步不可逆的动作。",
+        "prev": "上一项",
+        "next": "下一项",
+        "openAcademyMap": "打开 Academy 地图",
+        "openHelpLane": "打开帮助通道",
+        "map": "地图",
+        "help": "帮助",
+        "openMission": "打开任务"
+      },
+      "footer": {
+        "logoAlt": "PicoMUTX 标志",
+        "links": {
+          "releases": "发布记录",
+          "docs": "Docs",
+          "github": "GitHub",
+          "download": "下载",
+          "privacy": "隐私"
+        },
+        "copyright": "© {year} MUTX. PicoMUTX 是面向 AI agent builder 的学习与运营平台。"
+      }
+    },
+    "pricingPage": {
+      "eyebrow": "价格路径",
+      "title": "先选你现在真正需要的 lane。产品计费等真的需要时再看。",
+      "subtitle": "公开的 Pico 目前仍然是 access-first。这一页先展示公开阶梯，再展示给已经在系统里运行的团队看的 product billing layer。",
+      "primaryCta": "申请访问",
+      "secondaryCta": "联系支持",
+      "returnToLanding": "返回 landing",
+      "routeState": {
+        "label": "路径状态",
+        "title": "公开访问会把你放进正确的 lane。产品计费层在系统更深处。",
+        "body": "从与你的 blocker 匹配的 lane 开始。只有当你真的需要认证 workspace、checkout 或 rollout planning 时，再看 live plans。",
+        "signalLabel": "访问信号",
+        "sessionAttached": "已连接托管会话",
+        "sessionLoading": "正在检查托管会话",
+        "sessionMissing": "还没有托管会话",
+        "planLabel": "当前托管方案",
+        "planFallback": "暂时没有",
+        "docsLabel": "builder pack 基座",
+        "stacksLabel": "已追踪 stack"
+      },
+      "accessPlans": {
+        "label": "公开访问阶梯",
+        "title": "从第一价值开始。只有工作真的需要时才加 support。",
+        "body": "公开 offer 的设计目标，是把你从不确定带到结果：定义或连接一个真实的 agent problem，能自走就自走，需要时加 group guidance，只有在复杂度或紧迫性足够高时才进入 implementation。",
+        "recommended": "最佳起点",
+        "meta": "这就是公开商业阶梯。下面的 live billing layer 也是真实的，但重要性会出现在后面。",
+        "noteLabel": "为什么有这一段",
+        "note": "这条阶梯故意保持简单。免费试用把你带到第一价值。€29 是独立执行的入口。€79 增加结构化 guidance。Pico Pilot 覆盖结果导向 implementation，而定制 multi-agent 项目从 €10,000+ 起。",
+        "truths": [
+          "免费试用是为了拿到第一价值，不是看功能展厅",
+          "€29 是独立执行的入口",
+          "€79 是在不把产品变成服务的前提下增加 guidance"
+        ],
+        "tiers": {
+          "trial": {
+            "name": "免费试用",
+            "price": "免费",
+            "period": "第一价值",
+            "description": "先定义或连接一个真实的 agent problem，再在真正承诺之前拿到第一个有用的时刻。",
+            "features": [
+              "描述目标或连接现有 agent",
+              "被引导到 build、fix 或 control",
+              "付费前先拿到第一价值",
+              "是否延长取决于 activation",
+              "是证明认真程度的最佳第一步"
+            ],
+            "cta": "申请试用访问"
+          },
+          "starter": {
+            "name": "创始 Tier €29",
+            "price": "29欧元",
+            "period": "/月",
+            "description": "给想独立推进的 operator 的 self-serve 执行层。",
+            "priceNote": "在访问仍然筛选期间开放的限量创始 cohort。",
+            "recommended": true,
+            "features": [
+              "AI 驱动的 onboarding 和诊断",
+              "build、fix、control 引导路径",
+              "可复用模板与技能",
+              "面向下一步的 AI 支持",
+              "为独立执行而设计"
+            ],
+            "cta": "申请创始访问"
+          },
+          "pro": {
+            "name": "创始 Supported €79",
+            "price": "79欧元",
+            "period": "/月",
+            "description": "在同一套产品上增加结构化 group guidance 和 accountability。",
+            "features": [
+              "包含创始 Tier 的全部内容",
+              "更贴身的 onboarding",
+              "每周 group troubleshooting",
+              "运营者共享 support 环境",
+              "在实现变复杂时降低摩擦"
+            ],
+            "cta": "申请支持型访问"
+          },
+          "enterprise": {
+            "name": "Pico 领航",
+            "price": "1,000欧元+",
+            "period": "/结果",
+            "description": "当系统坏了、很急，或复杂到无法独自救回时使用的结果导向 implementation。",
+            "priceNote": "定制 multi-agent 项目与更深层 integration 从 €10,000+ 起。",
+            "features": [
+              "定义清晰范围的目标与诊断",
+              "与你一起完成 fix 或 implementation",
+              "把运行中的 system 绑定到可衡量结果",
+              "让交付本身成为价值证明",
+              "可承接更复杂场景的 custom 项目"
+            ],
+            "cta": "聊聊 implementation"
+          }
+        }
+      }
+    },
+    "lessonPage": {
+      "shell": {
+        "eyebrow": "第 {number} 章 • 课程通道"
+      },
+      "shared": {
+        "difficulty": {
+          "setup": "设置",
+          "operator": "操作员",
+          "builder": "构建者"
+        },
+        "hostedStamp": {
+          "verifyHost": "验证主机",
+          "hostedAttached": "主机已连接",
+          "localOnly": "仅本地",
+          "authError": "认证错误",
+          "checking": "检查中"
+        },
+        "chapterState": {
+          "blocked": "受阻",
+          "sealed": "已封存",
+          "active": "进行中",
+          "ready": "就绪"
+        },
+        "proofState": {
+          "captured": "已捕获",
+          "pending": "待处理"
+        },
+        "stepState": {
+          "done": "已完成",
+          "active": "进行中"
+        },
+        "reviewState": {
+          "sealed": "已封存",
+          "ready": "就绪",
+          "pending": "待处理"
+        }
+      },
+      "actions": {
+        "completePrerequisiteFirst": "先完成 {lessonTitle}",
+        "openAutopilot": "打开 Autopilot",
+        "runYourFirstAgentNow": "现在运行第一个代理",
+        "openLesson": "打开 {lessonTitle}",
+        "openLiveApprovalSetup": "打开实时审批设置",
+        "askTutorAboutLesson": "就这节课询问 Tutor",
+        "resetWorkspace": "重置 workspace",
+        "reopenStep": "重新打开步骤",
+        "markStepDone": "将步骤标记为完成",
+        "askTutor": "询问 Tutor",
+        "inspectAutopilot": "检查 Autopilot",
+        "openSupportLane": "打开 Support 通道",
+        "previousLesson": "上一课",
+        "backToAcademyMap": "返回 Academy 地图"
+      },
+      "hero": {
+        "lessonLabel": "课程",
+        "trackLabel": "轨道",
+        "trackUnmapped": "未映射",
+        "trackNotMapped": "尚未映射",
+        "missionBrief": "任务简报",
+        "expectedResult": "预期结果：{value}",
+        "metrics": {
+          "state": "状态",
+          "stateHintBlocked": "先完成前置课",
+          "stateHintActive": "一条正在进行的路径",
+          "proof": "证据",
+          "proofStepFallback": "选择一个步骤",
+          "progress": "进度",
+          "stepsCleared": "已清除步骤",
+          "telemetry": "遥测",
+          "telemetryDetail": "{xp} xp • {difficulty}"
+        }
+      },
+      "studio": {
+        "label": "工作室评审板",
+        "title": "简报、交付物、评审",
+        "stamp": "一次只做一节真正的课"
+      },
+      "chapterSpine": {
+        "title": "章节主轴"
+      },
+      "workspace": {
+        "label": "工作室工作区",
+        "selectStep": "选择步骤",
+        "studioBrief": "工作室简报"
+      },
+      "helpLane": {
+        "label": "现场笔记"
+      },
+      "surfaceCompass": {
+        "title": "在证据成真之前，把这节课保持得足够窄",
+        "body": "单点阻塞先交给 Tutor，运行时真相开始主导时切到 Autopilot，只有两边都不够时才升级到 Support。"
+      },
+      "troubleshooting": {
+        "label": "排错附录",
+        "title": "只有路径歪掉时才需要看的小笔记"
+      }
     }
   }
 }
