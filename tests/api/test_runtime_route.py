@@ -10,6 +10,13 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
+async def test_get_runtime_provider_requires_auth(client_no_auth: AsyncClient):
+    """GET provider snapshot requires authentication."""
+    response = await client_no_auth.get("/v1/runtime/providers/openclaw")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_get_runtime_provider_returns_200(client: AsyncClient):
     """GET provider snapshot returns 200 with default state."""
     response = await client.get("/v1/runtime/providers/openclaw")
@@ -22,6 +29,16 @@ async def test_get_runtime_provider_returns_200(client: AsyncClient):
 # ---------------------------------------------------------------------------
 # PUT /v1/runtime/providers/{provider}  — upsert provider state
 # ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_upsert_runtime_provider_requires_auth(client_no_auth: AsyncClient):
+    """PUT provider snapshot requires authentication."""
+    response = await client_no_auth.put(
+        "/v1/runtime/providers/openclaw",
+        json={"label": "OpenClaw", "status": "healthy"},
+    )
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
