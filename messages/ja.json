@@ -134,14 +134,14 @@
       }
     },
     "pricing": {
-      "eyebrow": "公開アクセス",
-      "title": "支払うのはコンテンツではなく前進です。",
+      "eyebrow": "創業価格",
+      "title": "一般公開前に創業価格を確保。",
       "tiers": {
         "starter": {
           "name": "創設 Tier",
           "price": "€29",
           "period": "/月",
-          "description": "自走したい operator 向けの AI-guided self-serve execution。",
+          "description": "磨かれた公開 tier を待たずに、先に製品へ入りたいオペレーター向けのセルフサーブ実行。",
           "features": [
             "AI 診断 intake",
             "guided な build・fix・control path",
@@ -149,14 +149,15 @@
           ],
           "cta": "Founding アクセスを申請",
           "ctaHref": "/pricing",
-          "priceNote": "アクセスが選抜制のあいだだけの限定コホートです。",
-          "recommended": true
+          "priceNote": "創業メンバーは後の公開価格 €290/月ではなく、€29/月を固定できます。",
+          "recommended": true,
+          "anchorPrice": "€290"
         },
         "pro": {
           "name": "創設 Supported",
           "price": "€79",
           "period": "/月",
-          "description": "仕事がもっと messy になったときの group guidance 付き同一システム。",
+          "description": "すぐに custom へ飛ばず、実務的なガイダンスを求めるチーム向けの、より速いグループ支援つき同一プロダクト。",
           "recommended": true,
           "features": [
             "Founding Tier のすべて",
@@ -164,13 +165,15 @@
             "shared operator accountability"
           ],
           "cta": "Supported アクセスを申請",
-          "ctaHref": "/pricing"
+          "ctaHref": "/pricing",
+          "anchorPrice": "€790",
+          "priceNote": "創業メンバーは後の supported 価格 €790/月ではなく、€79/月を固定できます。"
         },
         "enterprise": {
           "name": "Pico Pilot",
           "price": "€1,000+",
           "period": "/案件",
-          "description": "壊れている、急ぎ、または複雑な system 向けの outcome-based implementation。",
+          "description": "壊れている、緊急、または当てずっぽうを続けるには高くつきすぎるシステム向けの hands-on 実装。",
           "features": [
             "scoped な diagnosis と implementation",
             "測定可能な outcome に結びついた working system",
@@ -178,14 +181,15 @@
           ],
           "cta": "Planning Call を予約",
           "ctaHref": "https://calendly.com/mutxdev",
-          "priceNote": "multi-agent の custom project や深い integration は €10,000+ からです。"
+          "priceNote": "創業期の Pico Pilot は €1,000+ から。後の custom 案件は €10,000+ からになります。",
+          "anchorPrice": "€10,000+"
         },
         "trial": {
           "name": "無料トライアル",
           "price": "無料",
           "period": "最初の価値",
           "description": "本当に取り組む前に、real な problem で first value に到達します。",
-          "priceNote": "first value とは、real な agent problem を定義するか接続することです。",
+          "priceNote": "実際のエージェント課題を定義または接続するまで無料。",
           "features": [
             "goal を説明するか、agent を接続する",
             "build・fix・control に振り分けられる",
@@ -195,8 +199,8 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "まず最初の価値に到達し、その後セルフサーブに進みます。サポートや実装は、本当に必要になったときだけ足します。",
-      "recommendedLabel": "最初の推奨"
+      "lead": "まずは無料で開始。今入れば、段階的にオンボーディングしている間も、後の公開価格より約90%安い創業価格を維持できます。",
+      "recommendedLabel": "創業価格 90%オフ"
     },
     "faq": {
       "eyebrow": "質問",
@@ -231,7 +235,7 @@
       "formHeadline": "real blocker から始めてください。",
       "formSubline": "構築・修復・制御のどれが必要か教えてください。適切なルートに案内します。",
       "ctaButton": "アクセスを申請",
-      "formCtaMeta": "無料トライアル · Founding €29 · Supported €79 · Pico Pilot は €1,000+ から",
+      "formCtaMeta": "Free trial · 創業価格は 90%オフ · €29 / €79 · Pico Pilot は €1,000+ から",
       "secondaryButton": "Planning Call を予約"
     },
     "contactForm": {
@@ -2580,24 +2584,24 @@
       "accessPlans": {
         "label": "公開アクセス ladder",
         "title": "最初の価値から始める。support は本当に必要なときだけ足す。",
-        "body": "公開 offer は、不確実さから結果までをつなぐためのものです。実際の agent problem を定義または接続し、可能なら自走し、必要なら group guidance を加え、複雑さや緊急度が高いときだけ implementation に進みます。",
+        "body": "公開オファーはシンプルです。無料で始め、実際のエージェント課題を証明し、その後は後の公開価格より約90%低い創業価格を、コホート制のオンボーディング期間中に固定します。",
         "recommended": "最初のおすすめ",
         "meta": "これは公開向けの商流 ladder です。下の live billing layer も本物ですが、重要になるのはあとです。",
         "noteLabel": "この section がある理由",
-        "note": "意図的に単純な ladder です。無料トライアルは最初の価値へ連れていきます。€29 は自走 execution の入口。€79 は構造化 guidance を追加します。Pico Pilot は成果ベース implementation を扱い、custom multi-agent project は €10,000+ からです。",
+        "note": "このラダーは意図的にシンプルです。Free trial は最初の価値まで連れていきます。その後は創業メンバーが後の公開価格に対して約90%オフを固定します。€29 は €290 の代わり、€79 は €790 の代わり、そして早期の Pico Pilot は €1,000+ からで、後の custom 作業は €10,000+ からになります。",
         "truths": [
           "無料トライアルは最初の価値のためであり、機能見学のためではない",
-          "€29 は independent execution の入口",
-          "€79 は product を service に変えずに guidance を足す"
+          "€29 は後の公開 tier €290/月の前に創業価格を固定する",
+          "€79 は後の supported tier €790/月の前に guided support を固定する"
         ],
         "tiers": {
           "starter": {
             "name": "創設 Tier €29",
             "price": "€29",
-            "anchorPrice": "$97",
+            "anchorPrice": "€290",
             "period": "/月",
-            "description": "自走したい operator 向けの self-serve 実行レイヤーです。",
-            "priceNote": "アクセスが選抜制のあいだだけの限定コホートです。",
+            "description": "磨かれた公開 tier を待たずに、先に製品へ入りたいオペレーター向けのセルフサーブ実行。",
+            "priceNote": "創業メンバーは後の公開価格 €290/月ではなく、€29/月を固定できます。",
             "recommended": true,
             "features": [
               "AI 主導の onboarding と診断",
@@ -2612,8 +2616,8 @@
             "name": "創設 Supported €79",
             "price": "€79",
             "period": "/月",
-            "description": "同じ product に、構造化された group guidance と accountability を加えたものです。",
-            "priceNote": "これは旧来の安すぎた中間 tier を、実際の guided-group オファーに置き換えるものです。",
+            "description": "すぐに custom へ飛ばず、実務的なガイダンスを求めるチーム向けの、より速いグループ支援つき同一プロダクト。",
+            "priceNote": "創業メンバーは後の supported 価格 €790/月ではなく、€79/月を固定できます。",
             "features": [
               "創設 Tier の内容をすべて含む",
               "より手厚い onboarding",
@@ -2621,14 +2625,15 @@
               "operator 同士の共有 support 環境",
               "実装が複雑になったときの摩擦を減らす"
             ],
-            "cta": "支援付きアクセスを申請"
+            "cta": "支援付きアクセスを申請",
+            "anchorPrice": "€790"
           },
           "enterprise": {
             "name": "Pico Pilot",
             "price": "€1,000+",
             "period": "/成果",
-            "description": "system が壊れている、急いでいる、または一人で立て直すには複雑すぎるときの成果ベース implementation です。",
-            "priceNote": "custom multi-agent project と深い integration は €10,000+ からです。",
+            "description": "壊れている、緊急、または当てずっぽうを続けるには高くつきすぎるシステム向けの hands-on 実装。",
+            "priceNote": "創業期の Pico Pilot は €1,000+ から。後の custom 案件は €10,000+ からになります。",
             "features": [
               "目的と診断を明確な scope で定義",
               "fix または implementation を一緒に進める",
@@ -2636,7 +2641,8 @@
               "納品自体が価値の証拠になるよう設計",
               "複雑な案件向けに custom project に対応"
             ],
-            "cta": "implementation を相談する"
+            "cta": "implementation を相談する",
+            "anchorPrice": "€10,000+"
           },
           "trial": {
             "name": "無料トライアル",
@@ -2650,7 +2656,8 @@
               "延長は activation に応じて決まる",
               "本気度を証明する最初の一歩として最適"
             ],
-            "cta": "トライアルアクセスを申請"
+            "cta": "トライアルアクセスを申請",
+            "priceNote": "実際のエージェント課題を定義または接続するまで無料。"
           }
         }
       },

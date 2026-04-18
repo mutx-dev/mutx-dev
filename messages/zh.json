@@ -134,14 +134,14 @@
       }
     },
     "pricing": {
-      "eyebrow": "公开访问",
-      "title": "你付费买的是进展，不是内容。",
+      "eyebrow": "创始价格",
+      "title": "在公开定价前锁定创始价格。",
       "tiers": {
         "starter": {
           "name": "创始 Tier",
           "price": "29欧元",
           "period": "/月",
-          "description": "给想独立推进的 operator 的 AI-guided self-serve execution。",
+          "description": "给想尽早进入产品、又不想等公开版更成熟之后再进来的运营者的自助执行层。",
           "features": [
             "AI 诊断入口",
             "guided build、fix、control 路径",
@@ -149,14 +149,15 @@
           ],
           "cta": "申请 Founding 访问",
           "ctaHref": "/pricing",
-          "priceNote": "在访问仍然筛选期间，创始 cohort 数量有限。",
-          "recommended": true
+          "priceNote": "创始成员锁定 €29/月，而不是之后公开价 €290/月。",
+          "recommended": true,
+          "anchorPrice": "原价 €290"
         },
         "pro": {
           "name": "创始 Supported",
           "price": "79欧元",
           "period": "/月",
-          "description": "当工作变得更 messy 时，在同一套系统上加上 group guidance。",
+          "description": "同一套产品，但提供更快的群组支持，适合想要实操指导、又不想直接跳到定制项目的团队。",
           "recommended": true,
           "features": [
             "包含 Founding Tier 的全部内容",
@@ -164,13 +165,15 @@
             "shared operator accountability"
           ],
           "cta": "申请 Supported 访问",
-          "ctaHref": "/pricing"
+          "ctaHref": "/pricing",
+          "anchorPrice": "原价 €790",
+          "priceNote": "创始成员锁定 €79/月，而不是之后支持价 €790/月。"
         },
         "enterprise": {
           "name": "Pico 领航",
           "price": "1,000欧元+",
           "period": "/项目",
-          "description": "面向坏掉、紧急或更复杂系统的 outcome-based implementation。",
+          "description": "当系统已经坏掉、事情很急，或者继续靠猜已经太贵时，直接进入 hands-on 实施。",
           "features": [
             "scoped diagnosis 与 implementation",
             "绑定到可衡量 outcome 的 working system",
@@ -178,14 +181,15 @@
           ],
           "cta": "预约规划通话",
           "ctaHref": "https://calendly.com/mutxdev",
-          "priceNote": "定制 multi-agent 项目和更深层 integration 从 €10,000+ 起。"
+          "priceNote": "创始期 Pico Pilot 从 €1,000+ 起，后续定制项目将从 €10,000+ 起。",
+          "anchorPrice": "后续原价 €10,000+"
         },
         "trial": {
           "name": "免费试用",
           "price": "免费",
           "period": "第一价值",
           "description": "在真正承诺之前，先在一个 real agent problem 上拿到 first value。",
-          "priceNote": "first value 指的是定义或连接一个 real agent problem。",
+          "priceNote": "在定义或接入真实代理问题之前免费。",
           "features": [
             "描述一个 goal，或连接一个 agent",
             "被路由到 build、fix、control",
@@ -195,8 +199,8 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "先拿到第一个价值，再进入自助执行。只有当工作真的复杂起来时，才加支持或代做。",
-      "recommendedLabel": "最佳起点"
+      "lead": "先免费开始。如果你现在加入，在我们分批开放期间，你可以一直保留比未来公开价格低约90%的创始价格。",
+      "recommendedLabel": "创始直降90%"
     },
     "faq": {
       "eyebrow": "问题",
@@ -231,7 +235,7 @@
       "formHeadline": "从真正的 blocker 开始。",
       "formSubline": "告诉我们你需要搭建、修复还是控制，我们会把你送到正确路径。",
       "ctaButton": "申请访问",
-      "formCtaMeta": "免费试用 · Founding €29 · Supported €79 · Pico Pilot €1,000+ 起",
+      "formCtaMeta": "Free trial · 创始价格直降90% · €29 / €79 · Pico Pilot €1,000+ 起",
       "secondaryButton": "预约规划通话"
     },
     "contactForm": {
@@ -2580,15 +2584,15 @@
       "accessPlans": {
         "label": "公开访问阶梯",
         "title": "从第一价值开始。只有工作真的需要时才加 support。",
-        "body": "公开 offer 的设计目标，是把你从不确定带到结果：定义或连接一个真实的 agent problem，能自走就自走，需要时加 group guidance，只有在复杂度或紧迫性足够高时才进入 implementation。",
+        "body": "公开报价很简单：先免费开始，证明这是一个真实的代理问题，然后在我们按批次开放期间，锁定比未来公开价格低约90%的创始价格。",
         "recommended": "最佳起点",
         "meta": "这就是公开商业阶梯。下面的 live billing layer 也是真实的，但重要性会出现在后面。",
         "noteLabel": "为什么有这一段",
-        "note": "这条阶梯故意保持简单。免费试用把你带到第一价值。€29 是独立执行的入口。€79 增加结构化 guidance。Pico Pilot 覆盖结果导向 implementation，而定制 multi-agent 项目从 €10,000+ 起。",
+        "note": "这套价格阶梯故意保持简单。Free trial 先帮你拿到第一价值。之后，创始成员可以锁定大约比未来公开价格低90%的价格：€29 代替 €290，€79 代替 €790，而早期 Pico Pilot 从 €1,000+ 起，之后的定制项目从 €10,000+ 起。",
         "truths": [
           "免费试用是为了拿到第一价值，不是看功能展厅",
-          "€29 是独立执行的入口",
-          "€79 是在不把产品变成服务的前提下增加 guidance"
+          "€29 让你在未来 €290/月的公开 tier 之前锁定创始价格",
+          "€79 让你在未来 €790/月的 supported tier 之前锁定引导支持价格"
         ],
         "tiers": {
           "trial": {
@@ -2603,14 +2607,15 @@
               "是否延长取决于 activation",
               "是证明认真程度的最佳第一步"
             ],
-            "cta": "申请试用访问"
+            "cta": "申请试用访问",
+            "priceNote": "在定义或接入真实代理问题之前免费。"
           },
           "starter": {
             "name": "创始 Tier €29",
             "price": "29欧元",
             "period": "/月",
-            "description": "给想独立推进的 operator 的 self-serve 执行层。",
-            "priceNote": "在访问仍然筛选期间开放的限量创始 cohort。",
+            "description": "给想尽早进入产品、又不想等公开版更成熟之后再进来的运营者的自助执行层。",
+            "priceNote": "创始成员锁定 €29/月，而不是之后公开价 €290/月。",
             "recommended": true,
             "features": [
               "AI 驱动的 onboarding 和诊断",
@@ -2619,13 +2624,14 @@
               "面向下一步的 AI 支持",
               "为独立执行而设计"
             ],
-            "cta": "申请创始访问"
+            "cta": "申请创始访问",
+            "anchorPrice": "原价 €290"
           },
           "pro": {
             "name": "创始 Supported €79",
             "price": "79欧元",
             "period": "/月",
-            "description": "在同一套产品上增加结构化 group guidance 和 accountability。",
+            "description": "同一套产品，但提供更快的群组支持，适合想要实操指导、又不想直接跳到定制项目的团队。",
             "features": [
               "包含创始 Tier 的全部内容",
               "更贴身的 onboarding",
@@ -2633,14 +2639,16 @@
               "运营者共享 support 环境",
               "在实现变复杂时降低摩擦"
             ],
-            "cta": "申请支持型访问"
+            "cta": "申请支持型访问",
+            "anchorPrice": "原价 €790",
+            "priceNote": "创始成员锁定 €79/月，而不是之后支持价 €790/月。"
           },
           "enterprise": {
             "name": "Pico 领航",
             "price": "1,000欧元+",
             "period": "/结果",
-            "description": "当系统坏了、很急，或复杂到无法独自救回时使用的结果导向 implementation。",
-            "priceNote": "定制 multi-agent 项目与更深层 integration 从 €10,000+ 起。",
+            "description": "当系统已经坏掉、事情很急，或者继续靠猜已经太贵时，直接进入 hands-on 实施。",
+            "priceNote": "创始期 Pico Pilot 从 €1,000+ 起，后续定制项目将从 €10,000+ 起。",
             "features": [
               "定义清晰范围的目标与诊断",
               "与你一起完成 fix 或 implementation",
@@ -2648,7 +2656,8 @@
               "让交付本身成为价值证明",
               "可承接更复杂场景的 custom 项目"
             ],
-            "cta": "聊聊 implementation"
+            "cta": "聊聊 implementation",
+            "anchorPrice": "后续原价 €10,000+"
           }
         }
       }

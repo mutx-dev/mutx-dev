@@ -891,14 +891,46 @@
 
 .accessGrid {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
   align-items: start;
 }
 
 .accessIntro {
   display: grid;
   gap: 1rem;
-  max-width: 35rem;
+}
+
+.accessHeader {
+  display: grid;
+  gap: 1rem;
+}
+
+.accessCopy {
+  display: grid;
+  gap: 0.8rem;
+  max-width: 34rem;
+}
+
+.accessHighlights {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.accessHighlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(7, 13, 8, 0.88);
+  color: var(--pico-text-secondary);
+  line-height: 1.55;
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .benefitsList {
@@ -907,73 +939,68 @@
 
 .pricingBoard {
   display: grid;
-  gap: 1.15rem;
-  padding: 1.2rem;
-  border-radius: 1.9rem;
-}
-
-.pricingHeader {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.pricingTitle {
-  font-size: clamp(1.9rem, 3.5vw, 3rem);
-}
-
-.pricingLead {
-  margin: 0;
-  max-width: 32rem;
-  color: var(--pico-text-secondary);
-  font-size: 0.96rem;
-  line-height: 1.65;
+  gap: 0.9rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .pricingTiers {
   display: grid;
-  gap: 0;
-  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  gap: 0.9rem;
+  border-top: 0;
 }
 
 .pricingTier {
+  position: relative;
   display: grid;
+  grid-template-rows: auto 1fr auto;
   gap: 1.15rem;
-  padding: 1.2rem 0;
+  min-height: 100%;
+  padding: 1.3rem 1.15rem 1.15rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(180deg, rgba(8, 15, 10, 0.94), rgba(4, 8, 5, 0.98)),
+    rgba(4, 8, 5, 0.98);
+  box-shadow:
+    0 24px 68px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .pricingTier + .pricingTier {
-  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.08);
+  border-top: 0;
 }
 
 .pricingTierRecommended {
-  position: relative;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.14);
-  border-radius: 1.55rem;
+  border-color: rgba(var(--pico-accent-rgb), 0.22);
   background:
+    radial-gradient(circle at 50% 0%, rgba(var(--pico-accent-rgb), 0.2), transparent 56%),
     linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.11), rgba(255, 255, 255, 0.02) 72%),
     rgba(7, 13, 8, 0.92);
   box-shadow:
-    0 18px 54px rgba(var(--pico-accent-rgb), 0.09),
+    0 22px 58px rgba(var(--pico-accent-rgb), 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .pricingTierRecommended::before {
   content: '';
   position: absolute;
-  inset: 0.9rem 1rem auto;
+  inset: 0.9rem 1.15rem auto;
   height: 1px;
   background: linear-gradient(90deg, var(--pico-accent), transparent 92%);
 }
 
 .pricingTop {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.62rem;
 }
 
 .pricingName {
   margin: 0;
   color: var(--pico-accent-bright);
-  font-size: 0.72rem;
+  font-size: 0.69rem;
   font-weight: 700;
   letter-spacing: 0.18em;
 }
@@ -1007,13 +1034,14 @@
 
 .pricingPriceStack {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.38rem;
 }
 
 .pricingAnchor {
   color: rgba(255, 255, 255, 0.46);
-  font-size: 1rem;
+  font-size: 1.08rem;
   font-weight: 600;
+  line-height: 1;
   letter-spacing: 0.01em;
   text-decoration: line-through;
   text-decoration-thickness: 1px;
@@ -1022,14 +1050,15 @@
 
 .pricingPrice {
   display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .pricingAmount {
   color: var(--pico-text);
   font-family: var(--pico-font-display);
-  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-size: clamp(2.55rem, 4.2vw, 3.45rem);
   line-height: 0.9;
   letter-spacing: -0.08em;
 }
@@ -1044,23 +1073,25 @@
 .pricingPriceNote {
   margin: 0;
   color: var(--pico-accent-bright);
-  font-size: 0.78rem;
-  line-height: 1.55;
+  font-size: 0.81rem;
+  line-height: 1.48;
 }
 
 .pricingDescription {
   margin: 0;
   color: var(--pico-text-secondary);
-  font-size: 0.98rem;
-  line-height: 1.55;
+  font-size: 0.95rem;
+  line-height: 1.52;
 }
 
 .pricingFeatures {
   margin-top: 0;
+  gap: 0.72rem;
 }
 
 .pricingActions {
-  padding-top: 0.15rem;
+  padding-top: 0.25rem;
+  margin-top: auto;
 }
 
 .pricingButton {
@@ -1251,7 +1282,16 @@
   }
 
   .accessGrid {
-    grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
+    gap: 1.35rem;
+  }
+
+  .accessHeader {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    align-items: end;
+  }
+
+  .accessHighlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .pricingTiers {
@@ -1259,19 +1299,11 @@
   }
 
   .pricingTier {
-    min-height: 100%;
-    padding: 1.35rem 1.1rem 0.2rem;
-    align-content: start;
+    padding: 1.35rem 1.15rem 1.1rem;
   }
 
   .pricingTier + .pricingTier {
-    border-top: 0;
-    border-left: 1px solid rgba(var(--pico-accent-rgb), 0.08);
-  }
-
-  .pricingTierRecommended {
-    top: -0.65rem;
-    padding: 1.45rem 1.15rem 0.95rem;
+    border-left: 0;
   }
 }
 
@@ -1396,7 +1428,6 @@
 
   .scenarioItem,
   .whoColumn,
-  .pricingBoard,
   .faqSummary,
   .faqAnswer,
   .finalPanel {
@@ -1408,8 +1439,12 @@
     border-radius: 1.55rem;
   }
 
-  .pricingTierRecommended {
-    padding: 1.2rem 1rem 1.05rem;
+  .accessHighlights {
+    grid-template-columns: 1fr;
+  }
+
+  .pricingTier {
+    padding: 1.15rem 1rem 1rem;
   }
 
   .finalPanel {

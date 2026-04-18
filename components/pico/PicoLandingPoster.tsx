@@ -374,27 +374,25 @@ export function PicoLandingPoster() {
           <div className={s.sectionShell}>
             <div className={s.accessGrid}>
               <SiteReveal className={s.accessIntro} delay={0.05}>
-                <p className={s.eyebrow}>{t('earlyAccess.eyebrow')}</p>
-                <h2 className={s.sectionTitle}>{t('earlyAccess.title')}</h2>
-                <p className={s.sectionBody}>{t('earlyAccess.body')}</p>
+                <div className={s.accessHeader}>
+                  <div className={s.accessCopy}>
+                    <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
+                    <h2 className={s.sectionTitle}>{t('pricing.title')}</h2>
+                    <p className={s.sectionBody}>{t('pricing.lead')}</p>
+                  </div>
 
-                <ul className={s.benefitsList}>
-                  {Array.from({ length: 5 }, (_, index) => (
-                    <li key={index} className={s.benefitItem}>
-                      <Check className={s.benefitCheck} aria-hidden="true" />
-                      <span>{t(`earlyAccess.benefits.${index}`)}</span>
-                    </li>
-                  ))}
-                </ul>
+                  <div className={s.accessHighlights}>
+                    {Array.from({ length: 3 }, (_, index) => (
+                      <div key={index} className={s.accessHighlight}>
+                        <Check className={s.benefitCheck} aria-hidden="true" />
+                        <span>{t(`earlyAccess.benefits.${index}`)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </SiteReveal>
 
               <SiteReveal className={s.pricingBoard} delay={0.12}>
-                <div className={s.pricingHeader}>
-                  <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
-                  <h3 className={s.pricingTitle}>{t('pricing.title')}</h3>
-                  <p className={s.pricingLead}>{t('pricing.lead')}</p>
-                </div>
-
                 <div className={s.pricingTiers}>
                   {PRICING_TIERS.map((tier) => {
                     const pricingTier = t.raw(

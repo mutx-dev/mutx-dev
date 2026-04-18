@@ -134,8 +134,8 @@
       }
     },
     "pricing": {
-      "eyebrow": "Acceso público",
-      "title": "Pagas por progreso, no por contenido.",
+      "eyebrow": "Precios Founding",
+      "title": "Bloquea el precio founding antes del precio público.",
       "tiers": {
         "free": {
           "name": "Free",
@@ -152,7 +152,7 @@
           "ctaHref": null
         },
         "starter": {
-          "description": "Ejecución self-serve guiada por IA para operadores que quieren moverse con independencia.",
+          "description": "Ejecución self-serve para operadores que quieren entrar pronto al producto sin esperar al tier público más pulido.",
           "features": [
             "Intake diagnóstico con IA",
             "Rutas guiadas de build, fix y control",
@@ -161,13 +161,14 @@
           "name": "Founding Tier",
           "price": "€29",
           "period": "/mes",
-          "priceNote": "Cohorte fundadora limitada mientras el acceso siga siendo selectivo.",
+          "priceNote": "Los founding members bloquean €29/mes en lugar de la futura tarifa pública de €290/mes.",
           "recommended": true,
           "cta": "Solicitar Acceso Founding",
-          "ctaHref": "/pricing"
+          "ctaHref": "/pricing",
+          "anchorPrice": "€290"
         },
         "pro": {
-          "description": "El mismo sistema con guía grupal cuando el trabajo se complica.",
+          "description": "El mismo producto con ayuda grupal más rápida para equipos que quieren guía práctica sin saltar directamente al trabajo a medida.",
           "features": [
             "Todo lo del Founding Tier",
             "Troubleshooting grupal semanal",
@@ -177,28 +178,31 @@
           "price": "€79",
           "period": "/mes",
           "cta": "Solicitar Acceso Con Soporte",
-          "ctaHref": "/pricing"
+          "ctaHref": "/pricing",
+          "anchorPrice": "€790",
+          "priceNote": "Los founding members bloquean €79/mes en lugar de la futura tarifa supported de €790/mes."
         },
         "enterprise": {
-          "description": "Implementación orientada a resultado para sistemas rotos, urgentes o más complejos.",
+          "description": "Implementación hands-on cuando el sistema está roto, es urgente o ya es demasiado caro seguir adivinando.",
           "name": "Pico Pilot",
           "price": "€1,000+",
           "period": "/proyecto",
-          "priceNote": "Los proyectos multiagente a medida y las integraciones más profundas empiezan en €10,000+.",
+          "priceNote": "El founding price de Pico Pilot empieza desde €1,000+ antes de que el trabajo custom posterior pase a €10,000+.",
           "features": [
             "Diagnóstico e implementación acotados",
             "Un sistema funcionando ligado a un resultado medible",
             "Proyectos custom cuando la complejidad es real"
           ],
           "cta": "Reservar Llamada De Planning",
-          "ctaHref": "https://calendly.com/mutxdev"
+          "ctaHref": "https://calendly.com/mutxdev",
+          "anchorPrice": "€10,000+"
         },
         "trial": {
           "name": "Prueba gratuita",
           "price": "Gratis",
           "period": "primer valor",
           "description": "Llega al primer valor sobre un problema real antes de comprometerte.",
-          "priceNote": "Primer valor significa definir o conectar un problema real de agente.",
+          "priceNote": "Gratis hasta definir o conectar un problema real de agente.",
           "features": [
             "Describe una meta o conecta un agente",
             "Te enruta a build, fix o control",
@@ -208,8 +212,8 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "Llega al primer valor. Pasa a self-serve. Añade soporte o implementación solo cuando el trabajo lo justifique.",
-      "recommendedLabel": "Mejor Punto De Entrada"
+      "lead": "Empieza gratis. Si entras ahora, conservas alrededor del 90 % de descuento frente al precio público futuro mientras abrimos por cohortes.",
+      "recommendedLabel": "Founding -90%"
     },
     "faq": {
       "eyebrow": "Preguntas",
@@ -244,7 +248,7 @@
       "formHeadline": "Empieza por el bloqueo real.",
       "formSubline": "Cuéntanos si necesitas construir, arreglar o controlar. Te llevaremos a la ruta correcta.",
       "ctaButton": "Solicitar acceso",
-      "formCtaMeta": "Prueba gratis · Founding €29 · Supported €79 · Pico Pilot desde €1.000+",
+      "formCtaMeta": "Free trial · Precios founding con 90 % de descuento · €29 / €79 · Pico Pilot desde €1,000+",
       "secondaryButton": "Reservar Llamada De Planning"
     },
     "contactForm": {
@@ -407,24 +411,24 @@
       "accessPlans": {
         "label": "Escalera de acceso público",
         "title": "Empieza por el primer valor. Añade soporte solo cuando el trabajo lo pida de verdad.",
-        "body": "La oferta pública está diseñada para llevarte de la incertidumbre al resultado: definir o conectar un problema real del agente, ejecutar por tu cuenta cuando sea posible, añadir guía grupal cuando haga falta y pasar a implementación cuando la complejidad o la urgencia lo justifiquen.",
+        "body": "La oferta pública es simple: empieza gratis, demuestra un problema real de agente y luego bloquea el founding pricing, alrededor de un 90 % por debajo del precio público futuro mientras abrimos por cohortes.",
         "recommended": "Mejor punto de partida",
         "meta": "Esta es la escalera comercial pública. La capa de facturación live de abajo también es real, pero importa más tarde.",
         "noteLabel": "Por qué existe esta sección",
-        "note": "La escalera es simple a propósito. La prueba gratuita te lleva al primer valor. €29 es la entrada para ejecutar por tu cuenta. €79 añade guía estructurada. Pico Pilot cubre implementación orientada a resultado y los proyectos multiagente a medida empiezan en €10,000+.",
+        "note": "La escalera es simple a propósito. El free trial te lleva al primer valor. Después, los founding members bloquean alrededor del 90 % de descuento sobre los precios públicos futuros: €29 en vez de €290, €79 en vez de €790 y Pico Pilot temprano desde €1,000+ antes de que el trabajo custom posterior empiece en €10,000+.",
         "truths": [
           "La prueba gratuita es para alcanzar el primer valor, no para pasear por funciones",
-          "€29 es la entrada para ejecución independiente",
-          "€79 añade guía sin convertir el producto en un servicio"
+          "€29 bloquea el precio founding antes del futuro tier público de €290/mes",
+          "€79 bloquea el soporte guiado antes del futuro tier supported de €790/mes"
         ],
         "tiers": {
           "starter": {
             "name": "Founding Tier €29",
             "price": "€29",
-            "anchorPrice": "$97",
+            "anchorPrice": "€290",
             "period": "/mes",
-            "description": "Ejecución self-serve con guía de IA para operadores que quieren avanzar de forma independiente.",
-            "priceNote": "Cohorte fundadora limitada mientras el acceso siga siendo selectivo.",
+            "description": "Ejecución self-serve para operadores que quieren entrar pronto al producto sin esperar al tier público más pulido.",
+            "priceNote": "Los founding members bloquean €29/mes en lugar de la futura tarifa pública de €290/mes.",
             "recommended": true,
             "features": [
               "Onboarding y diagnóstico guiados por IA",
@@ -439,8 +443,8 @@
             "name": "Founding Supported €79",
             "price": "€79",
             "period": "/mes",
-            "description": "El mismo producto con guía grupal estructurada y accountability.",
-            "priceNote": "Esto sustituye el antiguo nivel intermedio infravalorado por la oferta real de grupo guiado.",
+            "description": "El mismo producto con ayuda grupal más rápida para equipos que quieren guía práctica sin saltar directamente al trabajo a medida.",
+            "priceNote": "Los founding members bloquean €79/mes en lugar de la futura tarifa supported de €790/mes.",
             "features": [
               "Todo lo del Founding Tier",
               "Onboarding más acompañado",
@@ -448,14 +452,15 @@
               "Entorno compartido de soporte entre operadores",
               "Menos fricción cuando la implementación se complica"
             ],
-            "cta": "Solicitar acceso con soporte"
+            "cta": "Solicitar acceso con soporte",
+            "anchorPrice": "€790"
           },
           "enterprise": {
             "name": "Pico Pilot",
             "price": "€1,000+",
             "period": "/resultado",
-            "description": "Implementación orientada a resultado cuando el sistema está roto, es urgente o demasiado complejo para recuperarlo solo.",
-            "priceNote": "Los proyectos multiagente a medida y las integraciones más profundas empiezan en €10,000+.",
+            "description": "Implementación hands-on cuando el sistema está roto, es urgente o ya es demasiado caro seguir adivinando.",
+            "priceNote": "El founding price de Pico Pilot empieza desde €1,000+ antes de que el trabajo custom posterior pase a €10,000+.",
             "features": [
               "Objetivo y diagnóstico con alcance definido",
               "Fix o implementación hechos contigo",
@@ -463,7 +468,8 @@
               "Entrega pensada como prueba de valor",
               "Proyectos custom disponibles para escenarios más complejos"
             ],
-            "cta": "Hablar de implementación"
+            "cta": "Hablar de implementación",
+            "anchorPrice": "€10,000+"
           },
           "trial": {
             "name": "Prueba gratuita",
@@ -477,7 +483,8 @@
               "La extensión depende de la activación",
               "Mejor primer paso para demostrar seriedad"
             ],
-            "cta": "Solicitar acceso de prueba"
+            "cta": "Solicitar acceso de prueba",
+            "priceNote": "Gratis hasta definir o conectar un problema real de agente."
           }
         }
       },
