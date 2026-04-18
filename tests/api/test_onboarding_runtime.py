@@ -4,6 +4,12 @@ from httpx import AsyncClient
 
 class TestOnboardingState:
     @pytest.mark.asyncio
+    async def test_get_onboarding_requires_authentication(self, client_no_auth: AsyncClient):
+        response = await client_no_auth.get("/v1/onboarding")
+
+        assert response.status_code == 401
+
+    @pytest.mark.asyncio
     async def test_get_onboarding_returns_default_wizard_state(self, client: AsyncClient):
         response = await client.get("/v1/onboarding")
 
@@ -13,6 +19,20 @@ class TestOnboardingState:
         assert payload["current_step"] == "auth"
         assert payload["steps"][0]["id"] == "auth"
         assert payload["providers"][0]["id"] == "openclaw"
+
+    @pytest.mark.asyncio
+    async def test_post_onboarding_requires_authentication(self, client_no_auth: AsyncClient):
+        response = await client_no_auth.post(
+            "/v1/onboarding",
+            json={
+                "action": "complete_step",
+                "provider": "openclaw",
+                "step": "auth",
+                "payload": {"status": "in_progress"},
+            },
+        )
+
+        assert response.status_code == 401
 
     @pytest.mark.asyncio
     async def test_post_onboarding_complete_step_persists_state(self, client: AsyncClient):

@@ -1,9 +1,11 @@
 import { NextRequest } from 'next/server'
 
 const proxyJson = jest.fn()
+const hasAuthSession = jest.fn()
 
 jest.mock('../../app/api/_lib/controlPlane', () => ({
   getApiBaseUrl: () => 'http://localhost:8000',
+  hasAuthSession,
 }))
 
 jest.mock('../../app/api/_lib/proxy', () => ({
@@ -40,6 +42,8 @@ describe('pico onboarding route', () => {
   beforeEach(() => {
     jest.resetModules()
     proxyJson.mockReset()
+    hasAuthSession.mockReset()
+    hasAuthSession.mockReturnValue(true)
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined)
   })
 
