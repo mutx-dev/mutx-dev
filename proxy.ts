@@ -27,6 +27,13 @@ const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
+const PICO_AUTH_PATHS = new Set([
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+])
 const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
   JP: 'ja',
@@ -462,6 +469,30 @@ export function proxy(request: NextRequest) {
       )
     }
 
+    if (PICO_AUTH_PATHS.has(normalizedPath)) {
+      return finalizeResponse(
+        applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (normalizedPath === '/start' || normalizedPath === '/onboarding') {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, '/pico/onboarding', picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (normalizedPath === '/academy' || normalizedPath.startsWith('/academy/')) {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, `/pico${normalizedPath}`, picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/tutor') {
       return finalizeResponse(
         applyPicoLocale(rewriteWithinHost(request, '/pico/tutor', picoRequestHeaders), locale),
@@ -473,6 +504,22 @@ export function proxy(request: NextRequest) {
     if (normalizedPath === '/support') {
       return finalizeResponse(
         applyPicoLocale(rewriteWithinHost(request, '/pico/support', picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (normalizedPath === '/autopilot') {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, '/pico/autopilot', picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (normalizedPath === '/pricing') {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, '/pico/pricing', picoRequestHeaders), locale),
         host,
         normalizedPath,
       )
