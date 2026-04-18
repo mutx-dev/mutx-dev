@@ -24,9 +24,10 @@ type RateLimitState = {
 const SAFE_HTTP_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
 const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
 const APP_HOST = 'app.mutx.dev'
+const PICO_HOST = 'pico.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
-const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
+const PICO_HOSTS = new Set([PICO_HOST, 'pico.localhost'])
 const PICO_AUTH_PATHS = new Set([
   '/login',
   '/register',
@@ -216,6 +217,20 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
   }
 
   return normalized
+}
+
+function mapAppHostPicoPathToCanonicalPicoPath(pathname: string): string | null {
+  const normalized = normalizePathname(pathname)
+
+  if (normalized === '/pico') {
+    return '/'
+  }
+
+  if (normalized.startsWith('/pico/')) {
+    return normalized.slice('/pico'.length)
+  }
+
+  return null
 }
 
 function internalDashboardPathToPublicPath(pathname: string): string {
@@ -622,6 +637,16 @@ export function proxy(request: NextRequest) {
   }
 
   if (APP_HOSTS.has(host)) {
+    const canonicalPicoPath = mapAppHostPicoPathToCanonicalPicoPath(normalizedPath)
+    if (canonicalPicoPath) {
+      const picoHost = host === 'app.localhost' ? 'pico.localhost' : PICO_HOST
+      return finalizeResponse(
+        redirectToHost(request, picoHost, canonicalPicoPath),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }

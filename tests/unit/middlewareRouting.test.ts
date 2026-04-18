@@ -139,6 +139,33 @@ describe('host-aware UI routing proxy', () => {
     )
   })
 
+  it.each([
+    [
+      'https://app.mutx.dev/pico/onboarding?step=provider',
+      'https://pico.mutx.dev/onboarding?step=provider',
+    ],
+    [
+      'https://app.mutx.dev/pico/support?ref=help',
+      'https://pico.mutx.dev/support?ref=help',
+    ],
+    [
+      'https://app.mutx.dev/pico/autopilot?view=runs',
+      'https://pico.mutx.dev/autopilot?view=runs',
+    ],
+    [
+      'https://app.mutx.dev/pico/academy/install-hermes-locally?lesson=install-hermes-locally',
+      'https://pico.mutx.dev/academy/install-hermes-locally?lesson=install-hermes-locally',
+    ],
+  ])('redirects app-host pico route %s to the canonical pico host', (url, expectedLocation) => {
+    const response = proxy(mockRequest(url, { host: 'app.mutx.dev' }))
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe(expectedLocation)
+    expect(response.headers.get('cache-control')).toBe(
+      'private, no-cache, no-store, max-age=0, must-revalidate',
+    )
+  })
+
   it('passes through unrelated marketing routes without injecting auth-form rate-limit headers', () => {
     const response = proxy(
       mockRequest('https://mutx.dev/contact', { host: 'mutx.dev' }),
