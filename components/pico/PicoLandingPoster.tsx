@@ -11,6 +11,7 @@ import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
+import { usePicoEntryHref } from '@/lib/pico/navigation'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const STEP_ICONS = [Map, MessageSquare, ShieldCheck, Sparkles] as const
@@ -33,6 +34,7 @@ type LandingPricingTierContent = {
 export function PicoLandingPoster() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
+  const productEntryHref = usePicoEntryHref()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
   const heroRef = useRef<HTMLElement | null>(null)
@@ -159,14 +161,14 @@ export function PicoLandingPoster() {
 
               <SiteReveal delay={0.25}>
                 <div className={s.heroActions}>
-                  <button
-                    type="button"
+                  <Link
+                    href={productEntryHref}
                     className={s.heroPrimary}
-                    onClick={() => openForm('building-first')}
+                    data-testid="pico-landing-primary-cta"
                   >
                     {t('hero.cta')}
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </Link>
                   <a
                     href={FOUNDER_CALL_URL}
                     target="_blank"

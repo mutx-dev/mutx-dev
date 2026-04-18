@@ -1,5 +1,5 @@
 import { getPicoDefaultMessages } from '@/lib/pico/defaultMessages'
-import { picoHref } from '@/lib/pico/navigation'
+import { picoEntryHref, picoHref } from '@/lib/pico/navigation'
 import en from '@/messages/en.json'
 
 describe('pico landing truth', () => {
@@ -20,5 +20,7 @@ describe('pico landing truth', () => {
   it('keeps onboarding hrefs host-aware for landing CTAs', () => {
     expect(picoHref('/pico', '/onboarding')).toBe('/pico/onboarding')
     expect(picoHref('/', '/onboarding')).toBe('/onboarding')
+    expect(picoEntryHref('/pico')).toBe('/pico/onboarding')
+    expect(picoEntryHref('/')).toBe('/start')
   })
 })

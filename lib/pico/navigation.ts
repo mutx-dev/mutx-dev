@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 
 export function picoHref(pathname: string, target: string) {
@@ -12,6 +12,10 @@ export function picoHref(pathname: string, target: string) {
   return normalizedTarget ? `/pico${normalizedTarget}` : '/pico'
 }
 
+export function picoEntryHref(pathname: string) {
+  return pathname.startsWith('/pico') ? '/pico/onboarding' : '/start'
+}
+
 export function usePicoHref() {
   const pathname = usePathname()
 
@@ -19,4 +23,10 @@ export function usePicoHref() {
     (target: string) => picoHref(pathname, target),
     [pathname],
   )
+}
+
+export function usePicoEntryHref() {
+  const pathname = usePathname()
+
+  return useMemo(() => picoEntryHref(pathname), [pathname])
 }
