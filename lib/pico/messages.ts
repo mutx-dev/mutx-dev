@@ -25,16 +25,16 @@ type MessageObject = {
 }
 
 const LOCALE_MESSAGES: Record<PicoLocale, MessageObject> = {
-  en,
-  es,
-  fr,
-  de,
-  it,
-  pt,
-  ja,
-  ko,
-  zh,
-  ar,
+  en: en as MessageObject,
+  es: es as MessageObject,
+  fr: fr as MessageObject,
+  de: de as MessageObject,
+  it: it as MessageObject,
+  pt: pt as MessageObject,
+  ja: ja as MessageObject,
+  ko: ko as MessageObject,
+  zh: zh as MessageObject,
+  ar: ar as MessageObject,
 }
 
 const missingLocaleWarnings = new Set<string>()
