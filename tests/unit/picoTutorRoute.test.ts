@@ -2,11 +2,13 @@ import type { NextRequest } from 'next/server'
 
 const applyAuthCookies = jest.fn()
 const authenticatedFetch = jest.fn()
+const hasAuthSession = jest.fn()
 
 jest.mock('../../app/api/_lib/controlPlane', () => ({
   getApiBaseUrl: () => 'http://localhost:8000',
   applyAuthCookies,
   authenticatedFetch,
+  hasAuthSession,
 }))
 
 function mockJsonRequest(body: unknown) {
@@ -26,6 +28,24 @@ describe('pico tutor route', () => {
     jest.resetModules()
     applyAuthCookies.mockReset()
     authenticatedFetch.mockReset()
+    hasAuthSession.mockReset()
+    hasAuthSession.mockReturnValue(true)
+  })
+
+  it('returns 401 when no auth session exists', async () => {
+    hasAuthSession.mockReturnValue(false)
+
+    const { POST } = await import('../../app/api/pico/tutor/route')
+    const response = await POST(
+      mockJsonRequest({ question: 'How do I debug my run?' }) as never,
+    )
+
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({
+      status: 'error',
+      error: { code: 'UNAUTHORIZED', message: 'Unauthorized' },
+    })
+    expect(authenticatedFetch).not.toHaveBeenCalled()
   })
 
   it('returns a grounded tutor reply for a valid question', async () => {

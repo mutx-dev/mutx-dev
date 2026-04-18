@@ -4,13 +4,18 @@ import {
   applyAuthCookies,
   authenticatedFetch,
   getApiBaseUrl,
+  hasAuthSession,
 } from '@/app/api/_lib/controlPlane'
-import { badRequest, withErrorHandling } from '@/app/api/_lib/errors'
+import { badRequest, unauthorized, withErrorHandling } from '@/app/api/_lib/errors'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   return withErrorHandling(async () => {
+    if (!hasAuthSession(request)) {
+      return unauthorized()
+    }
+
     const body = await request.json().catch(() => ({}))
     const question = typeof body.question === 'string' ? body.question.trim() : ''
     const normalizedLessonSlug = typeof body.lessonSlug === 'string' ? body.lessonSlug.trim() : ''

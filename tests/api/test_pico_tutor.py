@@ -23,8 +23,20 @@ async def test_pico_tutor_returns_structured_install_guidance(client: AsyncClien
 
 
 @pytest.mark.asyncio
-async def test_pico_tutor_prefers_private_tailscale_guidance(client_no_auth: AsyncClient):
+async def test_pico_tutor_requires_authentication(client_no_auth: AsyncClient):
     response = await client_no_auth.post(
+        "/v1/pico/tutor",
+        json={
+            "question": "How do I reach my Hermes gateway over Tailscale without exposing it to the public internet?",
+        },
+    )
+
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_pico_tutor_prefers_private_tailscale_guidance(client: AsyncClient):
+    response = await client.post(
         "/v1/pico/tutor",
         json={
             "question": "How do I reach my Hermes gateway over Tailscale without exposing it to the public internet?",
