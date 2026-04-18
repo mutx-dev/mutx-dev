@@ -162,9 +162,43 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('rewrites pico /start into canonical onboarding instead of the wip guard', () => {
+  it.each([
+    [
+      'https://pico.mutx.dev/start?ref=hero',
+      'https://pico.mutx.dev/login?next=%2Fstart%3Fref%3Dhero',
+    ],
+    [
+      'https://pico.mutx.dev/academy/install-hermes-locally',
+      'https://pico.mutx.dev/login?next=%2Facademy%2Finstall-hermes-locally',
+    ],
+    [
+      'https://pico.mutx.dev/tutor?lesson=install-hermes-locally',
+      'https://pico.mutx.dev/login?next=%2Ftutor%3Flesson%3Dinstall-hermes-locally',
+    ],
+    [
+      'https://pico.mutx.dev/support?ref=help',
+      'https://pico.mutx.dev/login?next=%2Fsupport%3Fref%3Dhelp',
+    ],
+    [
+      'https://pico.mutx.dev/autopilot?view=runs',
+      'https://pico.mutx.dev/login?next=%2Fautopilot%3Fview%3Druns',
+    ],
+  ])('redirects anonymous protected pico route %s to pico-hosted login', (url, expectedLocation) => {
+    const response = proxy(mockRequest(url, { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }))
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get('location')).toBe(expectedLocation)
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
+  })
+
+  it('rewrites authenticated pico /start into canonical onboarding instead of the wip guard', () => {
     const response = proxy(
-      mockRequest('https://pico.mutx.dev/start?ref=hero', { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }),
+      mockRequest(
+        'https://pico.mutx.dev/start?ref=hero',
+        { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
+        'GET',
+        authCookies,
+      ),
     )
 
     expect(response.status).toBe(200)
@@ -174,12 +208,17 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('rewrites pico /onboarding into the canonical onboarding surface', () => {
+  it('rewrites authenticated pico /onboarding into the canonical onboarding surface', () => {
     const response = proxy(
-      mockRequest('https://pico.mutx.dev/onboarding?step=provider', {
-        host: 'pico.mutx.dev',
-        'CF-IPCountry': 'JP',
-      }),
+      mockRequest(
+        'https://pico.mutx.dev/onboarding?step=provider',
+        {
+          host: 'pico.mutx.dev',
+          'CF-IPCountry': 'JP',
+        },
+        'GET',
+        authCookies,
+      ),
     )
 
     expect(response.status).toBe(200)
@@ -189,11 +228,13 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('rewrites pico /tutor into the real tutor surface and preserves lesson context', () => {
+  it('rewrites authenticated pico /tutor into the real tutor surface and preserves lesson context', () => {
     const response = proxy(
       mockRequest(
         'https://pico.mutx.dev/tutor?lesson=install-hermes-locally',
         { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
+        'GET',
+        authCookies,
       ),
     )
 
@@ -204,12 +245,17 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('rewrites pico /support into the live support surface instead of the waitlist guard', () => {
+  it('rewrites authenticated pico /support into the live support surface instead of the waitlist guard', () => {
     const response = proxy(
-      mockRequest('https://pico.mutx.dev/support?ref=help', {
-        host: 'pico.mutx.dev',
-        'CF-IPCountry': 'JP',
-      }),
+      mockRequest(
+        'https://pico.mutx.dev/support?ref=help',
+        {
+          host: 'pico.mutx.dev',
+          'CF-IPCountry': 'JP',
+        },
+        'GET',
+        authCookies,
+      ),
     )
 
     expect(response.status).toBe(200)
@@ -282,11 +328,13 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=fr')
   })
 
-  it('rewrites direct pico academy routes into the live academy surface', () => {
+  it('rewrites authenticated direct pico academy routes into the live academy surface', () => {
     const response = proxy(
       mockRequest(
         'https://pico.mutx.dev/academy/install-hermes-locally',
         { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' },
+        'GET',
+        authCookies,
       ),
     )
 
@@ -297,12 +345,17 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
-  it('rewrites pico autopilot into the live control surface instead of the wip guard', () => {
+  it('rewrites authenticated pico autopilot into the live control surface instead of the wip guard', () => {
     const response = proxy(
-      mockRequest('https://pico.mutx.dev/autopilot?view=runs', {
-        host: 'pico.mutx.dev',
-        'CF-IPCountry': 'JP',
-      }),
+      mockRequest(
+        'https://pico.mutx.dev/autopilot?view=runs',
+        {
+          host: 'pico.mutx.dev',
+          'CF-IPCountry': 'JP',
+        },
+        'GET',
+        authCookies,
+      ),
     )
 
     expect(response.status).toBe(200)

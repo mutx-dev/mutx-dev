@@ -34,6 +34,7 @@ const PICO_AUTH_PATHS = new Set([
   '/reset-password',
   '/verify-email',
 ])
+const PICO_PROTECTED_PATHS = new Set(['/start', '/onboarding', '/tutor', '/support', '/autopilot'])
 const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
   JP: 'ja',
@@ -271,6 +272,13 @@ function redirectWithinHost(request: NextRequest, pathname: string) {
   return NextResponse.redirect(url)
 }
 
+function redirectToPicoLogin(request: NextRequest, nextPath: string) {
+  const url = new URL(request.url)
+  url.pathname = '/login'
+  url.search = new URLSearchParams({ next: nextPath }).toString()
+  return NextResponse.redirect(url)
+}
+
 function nextWithinHost(requestHeaders?: Headers) {
   if (!requestHeaders) {
     return NextResponse.next()
@@ -330,6 +338,18 @@ function buildPicoRequestHeaders(request: NextRequest, locale: PicoLocale) {
 
   requestHeaders.set('x-mutx-locale', locale)
   return requestHeaders
+}
+
+function hasAuthSession(request: NextRequest): boolean {
+  return Boolean(
+    request.cookies.get('access_token')?.value ||
+      request.cookies.get('refresh_token')?.value ||
+      request.headers.get('authorization')
+  )
+}
+
+function isProtectedPicoPath(pathname: string): boolean {
+  return PICO_PROTECTED_PATHS.has(pathname) || pathname === '/academy' || pathname.startsWith('/academy/')
 }
 
 function shouldDisableUiCaching(host: string, pathname: string): boolean {
@@ -472,6 +492,15 @@ export function proxy(request: NextRequest) {
     if (PICO_AUTH_PATHS.has(normalizedPath)) {
       return finalizeResponse(
         applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (isProtectedPicoPath(normalizedPath) && !hasAuthSession(request)) {
+      const nextPath = `${normalizedPath}${request.nextUrl.search}`
+      return finalizeResponse(
+        applyPicoLocale(redirectToPicoLogin(request, nextPath), locale),
         host,
         normalizedPath,
       )
