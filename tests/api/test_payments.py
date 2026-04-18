@@ -104,6 +104,20 @@ async def test_handle_checkout_complete_resolves_plan_from_subscription_items(
 
 
 @pytest.mark.asyncio
+async def test_checkout_route_requires_auth(client_no_auth):
+    response = await client_no_auth.post(
+        "/v1/payments/checkout",
+        json={
+            "plan_id": "starter",
+            "success_url": "https://pico.mutx.dev/onboarding?checkout=success",
+            "cancel_url": "https://pico.mutx.dev/pricing?checkout=canceled",
+        },
+    )
+
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_checkout_route_rejects_unsupported_price_id(client, monkeypatch):
     monkeypatch.setenv("STRIPE_STARTER_PRICE_ID", "price_starter")
     monkeypatch.setenv("STRIPE_PRO_PRICE_ID", "price_pro")

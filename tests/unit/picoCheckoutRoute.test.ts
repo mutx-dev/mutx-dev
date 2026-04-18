@@ -1,9 +1,11 @@
 import { NextRequest } from 'next/server'
 
 const proxyJson = jest.fn()
+const hasAuthSession = jest.fn()
 
 jest.mock('../../app/api/_lib/controlPlane', () => ({
   getApiBaseUrl: () => 'http://localhost:8000',
+  hasAuthSession,
 }))
 
 jest.mock('../../app/api/_lib/proxy', () => ({
@@ -12,6 +14,11 @@ jest.mock('../../app/api/_lib/proxy', () => ({
 
 const originalStarterPriceId = process.env.STRIPE_STARTER_PRICE_ID
 const originalProPriceId = process.env.STRIPE_PRO_PRICE_ID
+
+type MockCheckoutRequestOptions = {
+  body?: Record<string, unknown>
+  jsonError?: Error
+}
 
 function createCheckoutRequest(url: string, body: Record<string, unknown>) {
   return new NextRequest(url, {
@@ -23,10 +30,34 @@ function createCheckoutRequest(url: string, body: Record<string, unknown>) {
   })
 }
 
+function createJsonRequest(
+  url: string,
+  { body = {}, jsonError }: MockCheckoutRequestOptions = {},
+) {
+  return {
+    json: async () => {
+      if (jsonError) {
+        throw jsonError
+      }
+      return body
+    },
+    headers: {
+      get: () => null,
+    },
+    cookies: {
+      get: () => undefined,
+    },
+    nextUrl: new URL(url),
+    url,
+  } as unknown as NextRequest
+}
+
 describe('pico checkout route', () => {
   beforeEach(() => {
     jest.resetModules()
     proxyJson.mockReset()
+    hasAuthSession.mockReset()
+    hasAuthSession.mockReturnValue(true)
     process.env.STRIPE_STARTER_PRICE_ID = 'price_starter'
     process.env.STRIPE_PRO_PRICE_ID = 'price_pro'
   })
@@ -34,6 +65,27 @@ describe('pico checkout route', () => {
   afterAll(() => {
     process.env.STRIPE_STARTER_PRICE_ID = originalStarterPriceId
     process.env.STRIPE_PRO_PRICE_ID = originalProPriceId
+  })
+
+  it('returns 401 for anonymous checkout requests before parsing an invalid body', async () => {
+    hasAuthSession.mockReturnValue(false)
+
+    const { POST } = await import('../../app/api/pico/checkout/route')
+    const syntaxError = Object.assign(new SyntaxError('Unexpected end of JSON input'), {
+      status: 400,
+    })
+    const request = createJsonRequest('https://pico.mutx.dev/api/pico/checkout', {
+      jsonError: syntaxError,
+    })
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({
+      status: 'error',
+      error: { code: 'UNAUTHORIZED', message: 'Unauthorized' },
+    })
+    expect(proxyJson).not.toHaveBeenCalled()
   })
 
   it('uses /pico return paths on non-pico hosts when resolving a configured price id', async () => {
