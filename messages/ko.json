@@ -134,14 +134,14 @@
       }
     },
     "pricing": {
-      "eyebrow": "공개 액세스",
-      "title": "콘텐츠가 아니라 진전에 비용을 냅니다.",
+      "eyebrow": "파운딩 가격",
+      "title": "공개 가격 전에 파운딩 가격을 잠그세요.",
       "tiers": {
         "starter": {
           "name": "창립 Tier",
           "price": "29유로",
           "period": "/월",
-          "description": "독립적으로 움직이고 싶은 operator 를 위한 AI-guided self-serve execution.",
+          "description": "더 다듬어진 공개 tier 를 기다리지 않고 제품에 먼저 들어오고 싶은 운영자를 위한 셀프서브 실행형 플랜입니다.",
           "features": [
             "AI 진단 인테이크",
             "guided build, fix, control 경로",
@@ -149,14 +149,15 @@
           ],
           "cta": "Founding 액세스 요청",
           "ctaHref": "/pricing",
-          "priceNote": "액세스가 선별적인 동안만 열려 있는 제한 코호트입니다.",
-          "recommended": true
+          "priceNote": "파운딩 멤버는 이후 공개 가격 €290/월 대신 €29/월을 고정합니다.",
+          "recommended": true,
+          "anchorPrice": "정가 €290"
         },
         "pro": {
           "name": "창립 Supported",
           "price": "79유로",
           "period": "/월",
-          "description": "일이 더 messy 해질 때 group guidance 를 더한 같은 시스템입니다.",
+          "description": "바로 커스텀 작업으로 넘어가지 않고 실전 가이드를 원하는 팀을 위한, 더 빠른 그룹 도움을 포함한 같은 제품입니다.",
           "recommended": true,
           "features": [
             "Founding Tier 전체 포함",
@@ -164,13 +165,15 @@
             "shared operator accountability"
           ],
           "cta": "Supported 액세스 요청",
-          "ctaHref": "/pricing"
+          "ctaHref": "/pricing",
+          "anchorPrice": "정가 €790",
+          "priceNote": "파운딩 멤버는 이후 supported 가격 €790/월 대신 €79/월을 고정합니다."
         },
         "enterprise": {
           "name": "피코 파일럿",
           "price": "1,000유로+",
           "period": "/프로젝트",
-          "description": "깨졌거나 급하거나 더 복잡한 시스템을 위한 outcome-based implementation.",
+          "description": "시스템이 이미 망가졌거나 급하거나, 계속 추측하면서 버티기엔 비용이 너무 커졌을 때 들어가는 hands-on 구현입니다.",
           "features": [
             "scoped diagnosis 와 implementation",
             "측정 가능한 outcome 에 연결된 working system",
@@ -178,14 +181,15 @@
           ],
           "cta": "플래닝 콜 예약",
           "ctaHref": "https://calendly.com/mutxdev",
-          "priceNote": "맞춤형 multi-agent 프로젝트와 깊은 integration 은 €10,000+ 부터입니다."
+          "priceNote": "파운딩 Pico Pilot 은 €1,000+부터 시작하고, 이후 커스텀 프로젝트는 €10,000+부터 시작합니다.",
+          "anchorPrice": "향후 정가 €10,000+"
         },
         "trial": {
           "name": "무료 체험",
           "price": "무료",
           "period": "첫 가치",
           "description": "commit 하기 전에 real agent problem 에서 first value 에 도달하세요.",
-          "priceNote": "first value 는 real agent problem 을 정의하거나 연결하는 것입니다.",
+          "priceNote": "실제 에이전트 문제를 정의하거나 연결하기 전까지는 무료입니다.",
           "features": [
             "goal 을 설명하거나 agent 를 연결하기",
             "build, fix, control 로 라우팅되기",
@@ -195,8 +199,8 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "먼저 첫 가치를 얻고, 그다음 셀프서브로 갑니다. 지원이나 구현은 일이 정말 필요로 할 때만 붙습니다.",
-      "recommendedLabel": "가장 좋은 시작점"
+      "lead": "먼저 무료로 시작하세요. 지금 들어오면 코호트로 온보딩하는 동안 이후 공개 가격 대비 약 90% 할인된 금액을 유지합니다.",
+      "recommendedLabel": "파운딩 90% 할인"
     },
     "faq": {
       "eyebrow": "질문",
@@ -231,7 +235,7 @@
       "formHeadline": "진짜 blocker 부터 시작하세요.",
       "formSubline": "구축, 복구, 제어 중 무엇이 필요한지 알려 주세요. 맞는 경로로 안내하겠습니다.",
       "ctaButton": "액세스 요청",
-      "formCtaMeta": "무료 체험 · Founding €29 · Supported €79 · Pico Pilot €1,000+부터",
+      "formCtaMeta": "Free trial · 파운딩 가격 90% 할인 · €29 / €79 · Pico Pilot €1,000+부터",
       "secondaryButton": "플래닝 콜 예약"
     },
     "contactForm": {
@@ -2580,15 +2584,15 @@
       "accessPlans": {
         "label": "공개 액세스 ladder",
         "title": "첫 가치에서 시작하세요. support 는 일이 정말 요구할 때만 추가하세요.",
-        "body": "공개 offer 는 불확실함에서 결과까지 이동하도록 설계되었습니다. 실제 agent problem 을 정의하거나 연결하고, 가능하면 스스로 실행하고, 필요하면 group guidance 를 추가하고, 복잡성이나 긴급성이 높을 때만 implementation 으로 넘어갑니다.",
+        "body": "공개 오퍼는 단순합니다. 무료로 시작하고, 실제 에이전트 문제를 증명한 다음, 코호트 온보딩 기간 동안 이후 공개 가격보다 약 90% 낮은 파운딩 가격을 잠급니다.",
         "recommended": "가장 좋은 시작점",
         "meta": "이것이 공개 상업 ladder 입니다. 아래의 live billing layer 도 실제지만, 중요한 시점은 더 뒤입니다.",
         "noteLabel": "이 섹션이 존재하는 이유",
-        "note": "의도적으로 단순한 ladder 입니다. 무료 체험은 첫 가치로 데려갑니다. €29 는 독립 실행의 진입점입니다. €79 는 구조화된 guidance 를 더합니다. Pico Pilot 은 결과 기반 implementation 을 다루며, 맞춤형 multi-agent 프로젝트는 €10,000+ 부터 시작합니다.",
+        "note": "이 라더는 의도적으로 단순합니다. Free trial 은 첫 가치를 확인하게 해줍니다. 그 다음 파운딩 멤버는 이후 공개 가격 대비 약 90% 할인된 금액을 고정합니다. €29는 €290 대신, €79는 €790 대신이며, 초기 Pico Pilot 은 €1,000+부터이고 이후 커스텀 작업은 €10,000+부터 시작합니다.",
         "truths": [
           "무료 체험은 첫 가치를 얻기 위한 것이지 기능 구경을 위한 것이 아님",
-          "€29 는 독립 실행의 진입점",
-          "€79 는 product 를 서비스로 바꾸지 않고 guidance 를 더함"
+          "€29는 이후 공개 tier €290/월 전에 파운딩 가격을 잠급니다",
+          "€79는 이후 supported tier €790/월 전에 guided support 를 잠급니다"
         ],
         "tiers": {
           "trial": {
@@ -2603,14 +2607,15 @@
               "연장은 activation 에 따라 결정",
               "진지함을 증명하는 첫 단계로 적합"
             ],
-            "cta": "체험 액세스 요청"
+            "cta": "체험 액세스 요청",
+            "priceNote": "실제 에이전트 문제를 정의하거나 연결하기 전까지는 무료입니다."
           },
           "starter": {
             "name": "창립 Tier €29",
             "price": "29유로",
             "period": "/월",
-            "description": "스스로 전진하고 싶은 operator 를 위한 self-serve 실행 레이어입니다.",
-            "priceNote": "액세스가 선별적인 동안만 열려 있는 창립 코호트입니다.",
+            "description": "더 다듬어진 공개 tier 를 기다리지 않고 제품에 먼저 들어오고 싶은 운영자를 위한 셀프서브 실행형 플랜입니다.",
+            "priceNote": "파운딩 멤버는 이후 공개 가격 €290/월 대신 €29/월을 고정합니다.",
             "recommended": true,
             "features": [
               "AI 주도 onboarding 및 진단",
@@ -2619,13 +2624,14 @@
               "다음 행동을 위한 AI 지원",
               "독립 실행용 설계"
             ],
-            "cta": "창립 액세스 요청"
+            "cta": "창립 액세스 요청",
+            "anchorPrice": "정가 €290"
           },
           "pro": {
             "name": "창립 Supported €79",
             "price": "79유로",
             "period": "/월",
-            "description": "같은 product 에 구조화된 group guidance 와 accountability 를 더한 버전입니다.",
+            "description": "바로 커스텀 작업으로 넘어가지 않고 실전 가이드를 원하는 팀을 위한, 더 빠른 그룹 도움을 포함한 같은 제품입니다.",
             "features": [
               "창립 Tier 구성 전체 포함",
               "더 밀착된 onboarding",
@@ -2633,14 +2639,16 @@
               "운영자 간 공유 support 환경",
               "구현이 복잡해질 때 마찰 감소"
             ],
-            "cta": "지원형 액세스 요청"
+            "cta": "지원형 액세스 요청",
+            "anchorPrice": "정가 €790",
+            "priceNote": "파운딩 멤버는 이후 supported 가격 €790/월 대신 €79/월을 고정합니다."
           },
           "enterprise": {
             "name": "피코 파일럿",
             "price": "1,000유로+",
             "period": "/성과",
-            "description": "시스템이 깨져 있거나, 급하거나, 혼자 복구하기엔 너무 복잡할 때 쓰는 결과 기반 implementation 입니다.",
-            "priceNote": "맞춤형 multi-agent 프로젝트와 깊은 integration 은 €10,000+ 부터입니다.",
+            "description": "시스템이 이미 망가졌거나 급하거나, 계속 추측하면서 버티기엔 비용이 너무 커졌을 때 들어가는 hands-on 구현입니다.",
+            "priceNote": "파운딩 Pico Pilot 은 €1,000+부터 시작하고, 이후 커스텀 프로젝트는 €10,000+부터 시작합니다.",
             "features": [
               "명확한 scope 의 목표와 진단",
               "fix 또는 implementation 을 함께 진행",
@@ -2648,7 +2656,8 @@
               "납품물 자체가 가치 증거가 되도록 설계",
               "더 복잡한 작업을 위한 custom project 가능"
             ],
-            "cta": "implementation 상담하기"
+            "cta": "implementation 상담하기",
+            "anchorPrice": "향후 정가 €10,000+"
           }
         }
       }

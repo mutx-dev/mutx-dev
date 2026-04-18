@@ -19,8 +19,11 @@ describe('pico landing truth', () => {
     const truthMessages = en.pico
 
     expect(truthMessages.platform.title).toMatch(/build, fix, or control/i)
+    expect(JSON.stringify(truthMessages.pricing)).toMatch(/90%/i)
     expect(JSON.stringify(truthMessages.pricing)).toMatch(/€29/)
+    expect(JSON.stringify(truthMessages.pricing)).toMatch(/€290/)
     expect(JSON.stringify(truthMessages.pricing)).toMatch(/€79/)
+    expect(JSON.stringify(truthMessages.pricing)).toMatch(/€790/)
     expect(JSON.stringify(truthMessages.pricing)).toMatch(/€1,000\+/)
     expect(JSON.stringify(truthMessages.pricingPage.accessPlans.note)).toMatch(/€10,000\+/)
   })

@@ -905,6 +905,9 @@ test.describe('mutx.dev QA', () => {
     await expect(page.locator('#pricing')).toContainText(/request founding access/i);
     await expect(page.locator('#pricing')).toContainText(/request supported access/i);
     await expect(page.locator('#pricing')).toContainText(/book a planning call/i);
+    await expect(page.locator('#pricing')).toContainText(/90%/i);
+    await expect(page.locator('#pricing')).toContainText(/€290/i);
+    await expect(page.locator('#pricing')).toContainText(/€790/i);
     await expect(page.locator('main')).toContainText(/founding access|waitlist-first|request access/i);
     await expect(page.locator('main')).not.toContainText(/pre-register/i);
 
@@ -925,7 +928,9 @@ test.describe('mutx.dev QA', () => {
     ).toBeVisible();
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/free trial/i);
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€29/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€290/i);
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€79/i);
+    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€790/i);
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/pico pilot/i);
     await expect(page.getByTestId('pico-pricing-live-plans')).toContainText(
       /live product plans once pico is already in play/i,
