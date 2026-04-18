@@ -470,6 +470,14 @@ export function proxy(request: NextRequest) {
       )
     }
 
+    if (normalizedPath === '/support') {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, '/pico/support', picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/opengraph-image' || normalizedPath === '/twitter-image') {
       return finalizeResponse(
         applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),

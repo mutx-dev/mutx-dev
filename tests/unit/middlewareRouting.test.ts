@@ -189,6 +189,21 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
 
+  it('rewrites pico /support into the live support surface instead of the waitlist guard', () => {
+    const response = proxy(
+      mockRequest('https://pico.mutx.dev/support?ref=help', {
+        host: 'pico.mutx.dev',
+        'CF-IPCountry': 'JP',
+      }),
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://pico.mutx.dev/pico/support?ref=help',
+    )
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
+  })
+
   it('maps pico geolocation headers to supported locales on first authenticated visit', () => {
     const jpResponse = proxy(
       mockRequest(
