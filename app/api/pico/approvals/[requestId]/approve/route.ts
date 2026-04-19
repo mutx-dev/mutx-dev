@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 
-import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
-import { withErrorHandling } from '@/app/api/_lib/errors'
+import { getApiBaseUrl, hasAuthSession } from '@/app/api/_lib/controlPlane'
+import { unauthorized, withErrorHandling } from '@/app/api/_lib/errors'
 import { proxyJson } from '@/app/api/_lib/proxy'
 import { validateRequest } from '@/app/api/_lib/validation'
 
@@ -18,6 +18,10 @@ export async function POST(
     const requestIdValidation = validateApprovalRequestId(requestId)
     if (!requestIdValidation.success) {
       return requestIdValidation.response
+    }
+
+    if (!hasAuthSession(request)) {
+      return unauthorized()
     }
 
     const payloadValidation = await validateRequest(approvalResolveSchema, request)
