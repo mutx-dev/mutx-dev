@@ -4,9 +4,11 @@
   --nav-height: 4.8rem;
   position: relative;
   min-height: 100vh;
+  color-scheme: dark;
   color: var(--pico-text);
   font-family: var(--pico-font-body);
   overflow-x: clip;
+  -webkit-tap-highlight-color: rgba(var(--pico-accent-rgb), 0.12);
 }
 
 .page *,
@@ -240,7 +242,6 @@
 .hero {
   position: relative;
   padding: calc(var(--nav-height) + 1.05rem) 0 1.7rem;
-  min-height: 100svh;
   overflow: clip;
 }
 
@@ -272,17 +273,17 @@
   position: relative;
   z-index: 1;
   display: grid;
-  gap: clamp(2rem, 5vw, 4.75rem);
-  align-items: start;
-  min-height: calc(100svh - var(--nav-height) - 2.75rem);
+  gap: clamp(1.6rem, 4vw, 3.35rem);
+  align-items: center;
+  min-height: clamp(35rem, 76svh, 44rem);
   padding-top: clamp(0.75rem, 1.8vw, 1.5rem);
 }
 
 .heroCopy {
   display: grid;
-  gap: 0.9rem;
+  gap: 1rem;
   align-content: start;
-  max-width: 38rem;
+  max-width: 33rem;
 }
 
 .heroPrelude {
@@ -296,6 +297,7 @@
 .eyebrow,
 .heroVisualKicker,
 .heroVisualSignal,
+.heroOfferLabel,
 .shiftLabels,
 .pricingName,
 .pricingPeriod {
@@ -334,12 +336,12 @@
 .heroTitle {
   margin: 0;
   display: grid;
-  gap: 0.12em;
+  gap: 0.14em;
   font-family: var(--pico-font-display);
-  font-size: clamp(2.15rem, 4.4vw, 4.15rem);
+  font-size: clamp(2.45rem, 5vw, 5rem);
   line-height: 0.92;
   letter-spacing: -0.065em;
-  max-width: 12.8ch;
+  max-width: 8.8ch;
   text-wrap: balance;
 }
 
@@ -363,16 +365,16 @@
 }
 
 .heroSubtitle {
-  max-width: 24rem;
+  max-width: 30rem;
   margin: 0;
 }
 
 .heroActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
+  gap: 0.72rem;
   align-items: center;
-  padding-top: 0.45rem;
+  padding-top: 0.55rem;
 }
 
 .heroPrimary,
@@ -411,44 +413,47 @@
 
 .heroVisualWrap {
   display: grid;
+  align-content: center;
 }
 
 .heroVisual {
   position: relative;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-height: clamp(31rem, 50vw, 46rem);
-  padding: clamp(0.5rem, 1.4vw, 0.8rem) 0 0;
+  gap: 1rem;
+  min-height: auto;
+  padding: clamp(1rem, 2vw, 1.4rem);
   overflow: hidden;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.14);
+  border-radius: 2rem;
+  background:
+    linear-gradient(150deg, rgba(var(--pico-accent-rgb), 0.14), transparent 24%),
+    linear-gradient(180deg, rgba(8, 15, 10, 0.96), rgba(2, 4, 3, 1));
+  box-shadow:
+    0 34px 92px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .heroVisual::before {
   content: '';
   position: absolute;
-  inset: 1.4rem 0.35rem 1.2rem 4.2rem;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
-  border-radius: 2.65rem;
+  inset: 0.95rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  border-radius: 1.4rem;
   background:
-    radial-gradient(circle at 54% 20%, rgba(var(--pico-accent-rgb), 0.18), transparent 34%),
-    linear-gradient(180deg, rgba(9, 17, 11, 0.98), rgba(4, 8, 5, 0.99));
-  box-shadow:
-    0 32px 92px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 74px 74px;
+  opacity: 0.38;
 }
 
 .heroVisual::after {
   content: '';
   position: absolute;
-  inset: auto 18% 2.2rem;
-  height: 4rem;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.18), transparent 72%);
-  filter: blur(18px);
-  opacity: 0.9;
+  inset: 0 auto auto 0;
+  width: min(16rem, 48%);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(var(--pico-accent-rgb), 0.72), transparent 88%);
+  opacity: 0.95;
 }
 
 .heroVisualHeader {
@@ -456,19 +461,81 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  justify-self: end;
   justify-content: space-between;
   gap: 0.75rem;
-  width: min(100%, 20.5rem);
-  padding: 0.78rem 0.95rem;
+  width: 100%;
+  padding: 0 0 0.2rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.heroVisualIntro {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.heroVisualCopy {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.heroVisualTitle,
+.heroLaneTitle {
+  margin: 0;
+  font-family: var(--pico-font-display);
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.heroVisualTitle {
+  max-width: 11ch;
+  font-size: clamp(1.95rem, 3vw, 3.1rem);
+  line-height: 0.94;
+}
+
+.heroVisualBody,
+.heroOfferBody,
+.heroLaneBody {
+  margin: 0;
+  color: var(--pico-text-secondary);
+  line-height: 1.58;
+}
+
+.heroVisualBody {
+  max-width: 32rem;
+  font-size: 0.98rem;
+}
+
+.heroOfferCard {
+  position: relative;
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+  padding: 1rem 1rem 1.05rem;
   border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
-  border-radius: 999px;
-  background: rgba(5, 11, 7, 0.58);
-  backdrop-filter: blur(12px) saturate(1.2);
+  border-radius: 1.3rem;
+  background:
+    linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.12), rgba(255, 255, 255, 0.02)),
+    rgba(7, 13, 8, 0.88);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.heroOfferHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .heroVisualKicker,
-.heroVisualSignal {
+.heroVisualSignal,
+.heroOfferLabel {
   color: var(--pico-text-muted);
   font-size: 0.68rem;
   font-weight: 700;
@@ -479,61 +546,79 @@
   text-align: right;
 }
 
-.heroRobotStage {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 21rem;
-  padding: 1.1rem 0 0;
+.heroOfferLabel {
+  color: var(--pico-accent-bright);
 }
 
-.heroRobotGlow,
-.finalGlow {
-  position: absolute;
-  inset: auto 50% 50% auto;
-  transform: translate(50%, 50%);
-  width: 80%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.24), transparent 72%);
-  filter: blur(50px);
-  opacity: 0.95;
-  pointer-events: none;
+.heroOfferAnchor {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(var(--pico-accent-rgb), 0.72);
 }
 
-.heroRobotImage {
-  position: relative;
-  z-index: 1;
-  width: min(100%, 40rem);
-  height: auto;
-  display: block;
-  object-fit: contain;
-  filter: drop-shadow(0 30px 90px rgba(0, 0, 0, 0.48));
-  animation: picoFloat 7s ease-in-out infinite;
+.heroOfferPrice {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+  flex-wrap: wrap;
 }
 
-.heroSignalRail {
+.heroOfferAmount {
+  color: var(--pico-text);
+  font-family: var(--pico-font-display);
+  font-size: clamp(2.35rem, 4vw, 3.35rem);
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+}
+
+.heroOfferPeriod {
+  padding-bottom: 0.2rem;
+  color: var(--pico-text-muted);
+  font-family: var(--pico-font-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.heroOfferBody {
+  font-size: 0.9rem;
+}
+
+.heroLaneGrid {
   position: relative;
   z-index: 1;
   display: grid;
   gap: 0.75rem;
-  justify-self: end;
-  width: min(100%, 28rem);
-  padding: 1rem 1.05rem;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
-  border-radius: 1.55rem;
-  background: linear-gradient(180deg, rgba(7, 13, 8, 0.82), rgba(4, 8, 5, 0.74));
-  backdrop-filter: blur(14px) saturate(1.15);
 }
 
-.heroSignal {
+.heroLane {
+  position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.85rem;
-  align-items: start;
+  gap: 0.8rem;
+  min-height: 100%;
+  padding: 1rem 1rem 1.05rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  border-radius: 1.3rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0)),
+    rgba(5, 10, 7, 0.84);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.heroSignalIndex,
+.heroLaneTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.heroLaneIndex,
 .scenarioNumber,
 .pathNumber {
   color: var(--pico-text-muted);
@@ -543,17 +628,32 @@
   text-transform: uppercase;
 }
 
-.heroSignalIndex,
+.heroLaneIndex,
 .scenarioNumber {
   font-size: 0.7rem;
   padding-top: 0.25rem;
 }
 
-.heroSignalText {
-  margin: 0;
-  color: var(--pico-text);
-  font-size: 0.95rem;
-  line-height: 1.45;
+.heroLaneIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.18);
+  background: rgba(var(--pico-accent-rgb), 0.08);
+  color: var(--pico-accent-bright);
+}
+
+.heroLaneTitle {
+  font-size: clamp(1.45rem, 2vw, 1.95rem);
+  line-height: 0.96;
+}
+
+.heroLaneBody {
+  max-width: 18rem;
+  font-size: 0.92rem;
 }
 
 .qualifySection,
@@ -643,26 +743,40 @@
 }
 
 .scenarioBoard {
-  overflow: hidden;
-  border-radius: 1.7rem;
+  display: grid;
+  gap: 0.95rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .scenarioItem {
   display: grid;
   gap: 0.8rem;
   width: 100%;
+  min-height: 100%;
   padding: 1.2rem 1.25rem 1.3rem;
-  border: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), rgba(255, 255, 255, 0));
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  border-radius: 1.45rem;
+  background:
+    linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.08), rgba(255, 255, 255, 0.012)),
+    rgba(5, 10, 7, 0.72);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
   text-align: left;
 }
 
 .scenarioItem + .scenarioItem {
-  border-top: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+  border-top: 0;
 }
 
 .scenarioItem:hover {
-  background: linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.07), rgba(255, 255, 255, 0));
+  background:
+    linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.12), rgba(255, 255, 255, 0.012)),
+    rgba(5, 10, 7, 0.8);
 }
 
 .scenarioLine {
@@ -774,7 +888,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.8rem;
+  gap: 0.9rem;
 }
 
 .pathItem {
@@ -1264,13 +1378,18 @@
   }
 
   .heroShell {
-    grid-template-columns: minmax(0, 0.96fr) minmax(28rem, 1.04fr);
+    grid-template-columns: minmax(0, 0.78fr) minmax(34rem, 1.22fr);
     align-items: center;
-    min-height: clamp(40rem, 83svh, 50rem);
+    min-height: clamp(36rem, 76svh, 45rem);
   }
 
-  .heroVisual {
-    min-height: clamp(36rem, 49vw, 48rem);
+  .heroVisualIntro {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 17rem);
+    align-items: end;
+  }
+
+  .heroLaneGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .qualifyGrid {
@@ -1279,6 +1398,11 @@
 
   .pathGrid {
     grid-template-columns: minmax(18rem, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .scenarioBoard,
+  .pathList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .pathSticky {
@@ -1381,9 +1505,9 @@
   }
 
   .heroTitle {
-    font-size: clamp(1.72rem, 9.8vw, 3rem);
+    font-size: clamp(1.94rem, 10.5vw, 3.35rem);
     line-height: 0.92;
-    max-width: 9.2ch;
+    max-width: 8.2ch;
   }
 
   .heroSubtitle {
@@ -1396,38 +1520,32 @@
     padding-top: 0.2rem;
   }
 
-  .heroMeta {
-    display: none;
-  }
-
   .heroVisual {
-    min-height: 23rem;
-    padding: 0.2rem 0 0;
+    gap: 0.85rem;
+    padding: 1rem;
   }
 
   .heroVisual::before {
-    inset: 1rem 0 0.85rem;
+    inset: 0.8rem;
     border-radius: 1.9rem;
   }
 
   .heroVisualHeader,
-  .heroSignalRail {
+  .heroVisualIntro,
+  .heroLaneGrid {
     width: 100%;
   }
 
-  .heroRobotStage {
-    min-height: 13rem;
-    padding-top: 0;
+  .heroVisualTitle {
+    max-width: 12ch;
+    font-size: clamp(1.65rem, 7vw, 2.2rem);
   }
 
-  .heroSignalRail {
-    gap: 0.6rem;
-    padding-top: 0.9rem;
-  }
-
-  .heroSignalText {
+  .heroVisualBody,
+  .heroOfferBody,
+  .heroLaneBody {
     font-size: 0.9rem;
-    line-height: 1.4;
+    line-height: 1.5;
   }
 
   .scenarioItem,

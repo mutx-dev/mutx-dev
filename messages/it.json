@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " di MUTX",
       "cta": "Richiedi accesso",
-      "ctaMobile": "Accesso",
+      "ctaMobile": "Richiedi",
       "sectionsLabel": "Sezioni Della Pagina",
       "skipToMain": "Vai al contenuto principale"
     },
     "hero": {
       "badge": "Accesso fondativo · Su richiesta",
-      "title": "Fai funzionare un agente IA ",
-      "titleAccent": "e potertene fidare.",
-      "subtitle": "Parti da zero, recupera un disastro o controlla ciò che è già live.",
+      "title": "Metti 1 agente IA utile al lavoro.",
+      "titleAccent": "Poi rendilo affidabile.",
+      "subtitle": "Parti da zero, recupera un setup rotto o controlla un sistema live.",
       "cta": "Richiedi accesso",
-      "ctaSecondary": "Come Funziona",
-      "meta": "Fuori l’accesso è su richiesta. Dentro: build, fix o control."
+      "ctaSecondary": "Vedi il Pricing Fondativo",
+      "meta": "Fuori l’accesso è su richiesta. Dentro c’è il routing del prodotto.",
+      "panelEyebrow": "Rotta Operativa",
+      "panelTitle": "1 diagnosi. 3 corsie operative.",
+      "panelBody": "Descrivi l’obiettivo o collega il sistema. Pico ti instrada nella corsia che corrisponde al blocco.",
+      "offerBody": "Prima il trial gratuito. Poi i founding operator bloccano il prezzo iniziale prima del pricing pubblico.",
+      "lanes": {
+        "build": {
+          "title": "Costruisci",
+          "body": "Metti in funzione in fretta un primo agente utile."
+        },
+        "fix": {
+          "title": "Sistema",
+          "body": "Recupera un setup rotto senza ripartire da zero."
+        },
+        "control": {
+          "title": "Controlla",
+          "body": "Aggiungi approvazioni, limiti e visibilità."
+        }
+      }
     },
     "trustBar": {
       "items": {

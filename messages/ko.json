@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
       "cta": "액세스 요청",
-      "ctaMobile": "액세스",
+      "ctaMobile": "요청",
       "sectionsLabel": "페이지 섹션",
       "skipToMain": "본문으로 건너뛰기"
     },
     "hero": {
       "badge": "창립 액세스 · 신청 기반",
-      "title": "AI 에이전트를 실제로 돌아가게 만들고",
-      "titleAccent": "믿고 쓸 수 있게 하세요.",
-      "subtitle": "처음부터 시작하거나, 엉킨 것을 복구하거나, 이미 라이브인 것을 통제하세요.",
+      "title": "쓸모 있는 AI 에이전트 1개를 실제로 돌리세요.",
+      "titleAccent": "그다음 믿을 수 있게 만드세요.",
+      "subtitle": "처음부터 시작하거나, 망가진 설정을 복구하거나, 이미 라이브인 시스템을 통제하세요.",
       "cta": "액세스 요청",
-      "ctaSecondary": "작동 방식을 보기",
-      "meta": "바깥은 신청 기반. 안에서는 build, fix, control로 보냅니다."
+      "ctaSecondary": "창립 가격 보기",
+      "meta": "바깥은 신청 기반. 안에서는 제품이 경로를 정합니다.",
+      "panelEyebrow": "운영 경로",
+      "panelTitle": "진단 레이어는 1개. 운영 레인은 3개.",
+      "panelBody": "목표를 설명하거나 시스템을 연결하세요. Pico가 막힌 지점에 맞는 레인으로 보냅니다.",
+      "offerBody": "먼저 무료 체험으로 시작하세요. 이후 창립 멤버는 공개 가격 전에 초기 요금을 고정합니다.",
+      "lanes": {
+        "build": {
+          "title": "구축",
+          "body": "첫 번째 유용한 에이전트를 빠르게 돌립니다."
+        },
+        "fix": {
+          "title": "복구",
+          "body": "다시 시작하지 않고 망가진 설정을 살립니다."
+        },
+        "control": {
+          "title": "제어",
+          "body": "승인, 한도, 가시성을 더합니다."
+        }
+      }
     },
     "trustBar": {
       "items": {

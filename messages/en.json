@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
       "cta": "Request access",
-      "ctaMobile": "Access",
+      "ctaMobile": "Request",
       "sectionsLabel": "Page Sections",
       "skipToMain": "Skip to main content"
     },
     "hero": {
       "badge": "Founding Access · Request-Only",
-      "title": "Get an AI agent working ",
-      "titleAccent": "and trust it.",
-      "subtitle": "Start from zero, recover a mess, or control what is live.",
+      "title": "Get 1 useful AI agent working.",
+      "titleAccent": "Then make it trustworthy.",
+      "subtitle": "Start from scratch, recover a broken setup, or control a live system.",
       "cta": "Request access",
-      "ctaSecondary": "How It Works",
-      "meta": "Request-first outside. Build, fix, or control inside."
+      "ctaSecondary": "See Founding Pricing",
+      "meta": "Request-first outside. Product routing inside.",
+      "panelEyebrow": "Operator Route",
+      "panelTitle": "1 diagnosis layer. 3 operator lanes.",
+      "panelBody": "Describe the goal or connect the system. Pico routes you into the lane that matches the blocker.",
+      "offerBody": "Free trial first. Founding operators lock the early rate before public pricing.",
+      "lanes": {
+        "build": {
+          "title": "Build",
+          "body": "Get one useful agent working fast."
+        },
+        "fix": {
+          "title": "Fix",
+          "body": "Recover a broken setup without restarting."
+        },
+        "control": {
+          "title": "Control",
+          "body": "Add approvals, limits, and visibility."
+        }
+      }
     },
     "trustBar": {
       "items": {

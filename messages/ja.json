@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
       "cta": "アクセスを申請",
-      "ctaMobile": "アクセス",
+      "ctaMobile": "申請",
       "sectionsLabel": "ページセクション",
       "skipToMain": "メインコンテンツへスキップ"
     },
     "hero": {
       "badge": "創設アクセス · 申請制",
-      "title": "AIエージェントを動かし、",
-      "titleAccent": "信頼して使える状態へ。",
-      "subtitle": "ゼロから始める、壊れた状態を立て直す、稼働中を制御する。",
+      "title": "役立つAIエージェントを1つ動かす。",
+      "titleAccent": "そのあと信頼できる状態にする。",
+      "subtitle": "ゼロから始める、壊れたセットアップを立て直す、稼働中のシステムを制御する。",
       "cta": "アクセスを申請",
-      "ctaSecondary": "仕組みを見る",
-      "meta": "外は申請制。中では build・fix・control に振り分けます。"
+      "ctaSecondary": "創設価格を見る",
+      "meta": "外側は申請制。内側ではプロダクトが振り分けます。",
+      "panelEyebrow": "オペレーター経路",
+      "panelTitle": "診断レイヤーは1つ。運用レーンは3つ。",
+      "panelBody": "目標を説明するか、システムを接続してください。Pico が詰まりに合うレーンへ振り分けます。",
+      "offerBody": "まずは無料トライアル。そのあと創設メンバーは公開価格前に初期料金を固定できます。",
+      "lanes": {
+        "build": {
+          "title": "構築",
+          "body": "最初の役立つエージェントをすばやく動かします。"
+        },
+        "fix": {
+          "title": "修復",
+          "body": "壊れたセットアップをやり直さずに立て直します。"
+        },
+        "control": {
+          "title": "制御",
+          "body": "承認、制限、可視性を加えます。"
+        }
+      }
     },
     "trustBar": {
       "items": {

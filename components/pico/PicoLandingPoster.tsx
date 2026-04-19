@@ -4,16 +4,26 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { ArrowRight, Check, Map, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react'
+import {
+  ArrowRight,
+  Bot,
+  Check,
+  Map,
+  MessageSquare,
+  ShieldCheck,
+  Sparkles,
+  Wrench,
+} from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
-import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const STEP_ICONS = [Map, MessageSquare, ShieldCheck, Sparkles] as const
+const HERO_LANE_ICONS = [Bot, Wrench, ShieldCheck] as const
+const HERO_LANES = ['build', 'fix', 'control'] as const
 const PRICING_TIERS = ['trial', 'starter', 'pro', 'enterprise'] as const
 const FOUNDER_CALL_URL = 'https://calendly.com/mutxdev'
 
@@ -68,8 +78,7 @@ export function PicoLandingPoster() {
     [0, 1],
     [1, prefersReducedMotion ? 1 : 0.52],
   )
-
-  const heroRobot = picoRobotArtById.heroWave
+  const starterTier = t.raw('pricing.tiers.starter') as LandingPricingTierContent
 
   function openForm(interest?: string) {
     setFormInterest(interest)
@@ -115,8 +124,12 @@ export function PicoLandingPoster() {
               <Image src="/pico/logo.png" alt="PicoMUTX logo" width={20} height={20} priority />
             </span>
             <span className={s.navBrandCopy}>
-              <span className={s.navName}>{t('nav.brand')}</span>
-              <span className={s.navTag}>{t('nav.brandTag')}</span>
+              <span className={s.navName} translate="no">
+                {t('nav.brand')}
+              </span>
+              <span className={s.navTag} translate="no">
+                {t('nav.brandTag')}
+              </span>
             </span>
           </Link>
 
@@ -134,7 +147,12 @@ export function PicoLandingPoster() {
 
           <div className={s.navActions}>
             <PicoLangSwitcher />
-            <button type="button" className={s.navCta} onClick={() => openForm()}>
+            <button
+              type="button"
+              className={s.navCta}
+              onClick={() => openForm()}
+              aria-label={t('nav.cta')}
+            >
               <span className={s.navCtaLabel}>{t('nav.cta')}</span>
               <span className={s.navCtaLabelMobile}>{t('nav.ctaMobile')}</span>
               <ArrowRight className={s.navCtaIcon} aria-hidden="true" />
@@ -185,14 +203,10 @@ export function PicoLandingPoster() {
                     {t('hero.cta')}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
-                  <a href="#path" className={s.heroSecondary}>
+                  <a href="#pricing" className={s.heroSecondary}>
                     {t('hero.ctaSecondary')}
                   </a>
                 </div>
-              </SiteReveal>
-
-              <SiteReveal delay={0.31}>
-                <p className={s.heroMeta}>{t('hero.meta')}</p>
               </SiteReveal>
             </motion.div>
 
@@ -202,30 +216,50 @@ export function PicoLandingPoster() {
                 style={{ y: heroVisualY, scale: heroVisualScale }}
               >
                 <div className={s.heroVisualHeader}>
-                  <span className={s.heroVisualKicker}>{t('platform.eyebrow')}</span>
-                  <span className={s.heroVisualSignal}>{t('trustBar.items.1')}</span>
+                  <span className={s.heroVisualKicker}>{t('hero.panelEyebrow')}</span>
+                  <span className={s.heroVisualSignal}>{starterTier.name}</span>
                 </div>
 
-                <div className={s.heroRobotStage} aria-hidden="true">
-                  <div className={s.heroRobotGlow} />
-                  <Image
-                    src={heroRobot.src}
-                    alt=""
-                    width={1536}
-                    height={1024}
-                    priority
-                    className={s.heroRobotImage}
-                    sizes="(max-width: 900px) 78vw, 38rem"
-                  />
-                </div>
+                <div className={s.heroVisualIntro}>
+                  <div className={s.heroVisualCopy}>
+                    <h2 className={s.heroVisualTitle}>{t('hero.panelTitle')}</h2>
+                    <p className={s.heroVisualBody}>{t('hero.panelBody')}</p>
+                  </div>
 
-                <div className={s.heroSignalRail}>
-                  {Array.from({ length: 3 }, (_, index) => (
-                    <div key={index} className={s.heroSignal}>
-                      <span className={s.heroSignalIndex}>0{index + 1}</span>
-                      <p className={s.heroSignalText}>{t(`trustBar.items.${index}`)}</p>
+                  <div className={s.heroOfferCard}>
+                    <div className={s.heroOfferHead}>
+                      <span className={s.heroOfferLabel}>{t('pricing.recommendedLabel')}</span>
+                      {starterTier.anchorPrice ? (
+                        <span className={s.heroOfferAnchor}>{starterTier.anchorPrice}</span>
+                      ) : null}
                     </div>
-                  ))}
+
+                    <div className={s.heroOfferPrice}>
+                      <span className={s.heroOfferAmount}>{starterTier.price}</span>
+                      <span className={s.heroOfferPeriod}>{starterTier.period}</span>
+                    </div>
+
+                    <p className={s.heroOfferBody}>{t('hero.offerBody')}</p>
+                  </div>
+                </div>
+
+                <div className={s.heroLaneGrid}>
+                  {HERO_LANES.map((lane, index) => {
+                    const Icon = HERO_LANE_ICONS[index]
+
+                    return (
+                      <article key={lane} className={s.heroLane}>
+                        <div className={s.heroLaneTop}>
+                          <span className={s.heroLaneIndex}>0{index + 1}</span>
+                          <span className={s.heroLaneIcon}>
+                            <Icon className="h-4 w-4" aria-hidden="true" />
+                          </span>
+                        </div>
+                        <h3 className={s.heroLaneTitle}>{t(`hero.lanes.${lane}.title`)}</h3>
+                        <p className={s.heroLaneBody}>{t(`hero.lanes.${lane}.body`)}</p>
+                      </article>
+                    )
+                  })}
                 </div>
               </motion.div>
             </SiteReveal>
@@ -251,7 +285,7 @@ export function PicoLandingPoster() {
                   <SiteReveal key={index} delay={0.08 + index * 0.05}>
                     <motion.article
                       className={s.scenarioItem}
-                      whileHover={prefersReducedMotion ? undefined : { x: 4 }}
+                      whileHover={prefersReducedMotion ? undefined : { y: -4 }}
                       transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     >
                       <div className={s.scenarioLine}>

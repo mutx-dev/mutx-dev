@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " von MUTX",
       "cta": "Zugang anfragen",
-      "ctaMobile": "Zugang",
+      "ctaMobile": "Anfragen",
       "sectionsLabel": "Seitenabschnitte",
       "skipToMain": "Zum Hauptinhalt springen"
     },
     "hero": {
       "badge": "Gründerzugang · Auf Anfrage",
-      "title": "Bringen Sie einen KI-Agenten zum Laufen ",
-      "titleAccent": "und vertrauen Sie ihm.",
-      "subtitle": "Starten Sie bei null, retten Sie ein Chaos oder kontrollieren Sie ein Live-System.",
+      "title": "Bringen Sie 1 nützlichen KI-Agenten zum Laufen.",
+      "titleAccent": "Dann machen Sie ihn vertrauenswürdig.",
+      "subtitle": "Starten Sie bei null, retten Sie ein kaputtes Setup oder kontrollieren Sie ein Live-System.",
       "cta": "Zugang anfragen",
-      "ctaSecondary": "So Funktioniert Es",
-      "meta": "Außen auf Anfrage. Innen: Aufbau, Reparatur oder Kontrolle."
+      "ctaSecondary": "Gründerpreise ansehen",
+      "meta": "Außen auf Anfrage. Innen läuft das Produkt-Routing.",
+      "panelEyebrow": "Operator-Route",
+      "panelTitle": "1 Diagnoseschicht. 3 operative Spuren.",
+      "panelBody": "Beschreiben Sie das Ziel oder verbinden Sie das System. Pico leitet Sie in die Spur, die zum Blocker passt.",
+      "offerBody": "Zuerst der Free Trial. Danach sichern sich Founding-Operatoren den frühen Preis vor dem öffentlichen Tarif.",
+      "lanes": {
+        "build": {
+          "title": "Aufbauen",
+          "body": "Bringen Sie schnell einen ersten nützlichen Agenten zum Laufen."
+        },
+        "fix": {
+          "title": "Reparieren",
+          "body": "Retten Sie ein kaputtes Setup, ohne neu anzufangen."
+        },
+        "control": {
+          "title": "Kontrollieren",
+          "body": "Fügen Sie Freigaben, Limits und Sichtbarkeit hinzu."
+        }
+      }
     },
     "trustBar": {
       "items": {

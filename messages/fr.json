@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " par MUTX",
       "cta": "Demander l’accès",
-      "ctaMobile": "Accès",
+      "ctaMobile": "Demander",
       "sectionsLabel": "Sections De La Page",
       "skipToMain": "Aller au contenu principal"
     },
     "hero": {
       "badge": "Accès fondateur · Sur demande",
-      "title": "Mettez un agent IA en marche ",
-      "titleAccent": "et faites-lui confiance.",
-      "subtitle": "Partez de zéro, sauvez un chaos ou reprenez le contrôle d’un système live.",
+      "title": "Mettez 1 agent IA utile au travail.",
+      "titleAccent": "Puis rendez-le fiable.",
+      "subtitle": "Partez de zéro, sauvez un setup cassé ou reprenez le contrôle d’un système live.",
       "cta": "Demander l’accès",
-      "ctaSecondary": "Comment Ça Marche",
-      "meta": "À l’extérieur, accès sur demande. À l’intérieur : construire, réparer ou contrôler."
+      "ctaSecondary": "Voir le Pricing Fondateur",
+      "meta": "À l’extérieur, accès sur demande. À l’intérieur, le produit vous route.",
+      "panelEyebrow": "Route Opératoire",
+      "panelTitle": "1 couche de diagnostic. 3 voies opératoires.",
+      "panelBody": "Décrivez l’objectif ou connectez le système. Pico vous route vers la voie qui correspond au blocage.",
+      "offerBody": "Commencez par l’essai gratuit. Ensuite, les fondateurs bloquent le tarif initial avant le prix public.",
+      "lanes": {
+        "build": {
+          "title": "Construire",
+          "body": "Mettez vite en marche un premier agent utile."
+        },
+        "fix": {
+          "title": "Réparer",
+          "body": "Récupérez un setup cassé sans repartir de zéro."
+        },
+        "control": {
+          "title": "Contrôler",
+          "body": "Ajoutez validations, limites et visibilité."
+        }
+      }
     },
     "trustBar": {
       "items": {

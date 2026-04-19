@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
       "cta": "申请访问",
-      "ctaMobile": "访问",
+      "ctaMobile": "申请",
       "sectionsLabel": "页面分区",
       "skipToMain": "跳到主要内容"
     },
     "hero": {
       "badge": "创始访问 · 申请制",
-      "title": "让 AI 智能体真正跑起来，",
-      "titleAccent": "并敢于信任它。",
-      "subtitle": "从零开始、救回一团糟的设置，或接管已经在线的系统。",
+      "title": "先让 1 个有用的 AI 智能体真正跑起来。",
+      "titleAccent": "再让它值得信任。",
+      "subtitle": "可以从零开始、救回坏掉的设置，或接管已经在线的系统。",
       "cta": "申请访问",
-      "ctaSecondary": "看它如何运作",
-      "meta": "外面先申请。里面再分流到 build、fix、control。"
+      "ctaSecondary": "看创始定价",
+      "meta": "外面先申请。里面由产品负责分流。",
+      "panelEyebrow": "运营路径",
+      "panelTitle": "1 层诊断逻辑，3 条运营路径。",
+      "panelBody": "描述目标，或连接系统。Pico 会把你送到最匹配卡点的路径上。",
+      "offerBody": "先从免费试用开始。之后创始成员可以在公开价格前锁定早期费率。",
+      "lanes": {
+        "build": {
+          "title": "搭建",
+          "body": "快速跑通第一个真正有用的智能体。"
+        },
+        "fix": {
+          "title": "修复",
+          "body": "不用重来，也能救回坏掉的设置。"
+        },
+        "control": {
+          "title": "控制",
+          "body": "补上审批、限制与可见性。"
+        }
+      }
     },
     "trustBar": {
       "items": {

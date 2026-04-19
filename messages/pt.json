@@ -8,18 +8,36 @@
       "brand": "PicoMUTX",
       "brandTag": " da MUTX",
       "cta": "Solicitar acesso",
-      "ctaMobile": "Acesso",
+      "ctaMobile": "Solicitar",
       "sectionsLabel": "Seções Da Página",
       "skipToMain": "Pular para o conteúdo principal"
     },
     "hero": {
       "badge": "Acesso fundador · Sob solicitação",
-      "title": "Coloque um agente de IA para funcionar ",
-      "titleAccent": "e confie nele.",
-      "subtitle": "Comece do zero, recupere uma bagunça ou controle o que já está ao vivo.",
+      "title": "Coloque 1 agente de IA útil para trabalhar.",
+      "titleAccent": "Depois torne-o confiável.",
+      "subtitle": "Comece do zero, recupere um setup quebrado ou controle um sistema ao vivo.",
       "cta": "Solicitar acesso",
-      "ctaSecondary": "Como Funciona",
-      "meta": "Por fora, acesso sob solicitação. Por dentro: construir, corrigir ou controlar."
+      "ctaSecondary": "Ver o Pricing Fundador",
+      "meta": "Por fora, acesso sob solicitação. Por dentro, o produto encaminha você.",
+      "panelEyebrow": "Rota Operacional",
+      "panelTitle": "1 camada de diagnóstico. 3 trilhas operacionais.",
+      "panelBody": "Descreva o objetivo ou conecte o sistema. O Pico encaminha você para a trilha que combina com o bloqueio.",
+      "offerBody": "Primeiro o trial gratuito. Depois os fundadores travam o preço inicial antes do valor público.",
+      "lanes": {
+        "build": {
+          "title": "Construir",
+          "body": "Coloque rápido no ar um primeiro agente útil."
+        },
+        "fix": {
+          "title": "Corrigir",
+          "body": "Recupere um setup quebrado sem recomeçar."
+        },
+        "control": {
+          "title": "Controlar",
+          "body": "Adicione aprovações, limites e visibilidade."
+        }
+      }
     },
     "trustBar": {
       "items": {
