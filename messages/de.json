@@ -14,35 +14,17 @@
     },
     "hero": {
       "badge": "Gründerzugang · Auf Anfrage",
-      "title": "Bringen Sie 1 nützlichen KI-Agenten zum Laufen.",
-      "titleAccent": "Dann machen Sie ihn vertrauenswürdig.",
-      "subtitle": "Starten Sie bei null, retten Sie ein kaputtes Setup oder kontrollieren Sie ein Live-System.",
+      "title": "Bringen Sie einen nützlichen KI-Agenten zum Laufen.",
+      "titleAccent": "Dann vertrauen Sie ihm im echten Einsatz.",
+      "subtitle": "Starten Sie bei null, retten Sie ein kaputtes Setup oder übernehmen Sie ein Live-System.",
       "cta": "Zugang anfragen",
-      "ctaSecondary": "Gründerpreise ansehen",
-      "meta": "Außen auf Anfrage. Innen läuft das Produkt-Routing.",
-      "panelEyebrow": "Operator-Route",
-      "panelTitle": "1 Diagnoseschicht. 3 operative Spuren.",
-      "panelBody": "Beschreiben Sie das Ziel oder verbinden Sie das System. Pico leitet Sie in die Spur, die zum Blocker passt.",
-      "offerBody": "Zuerst der Free Trial. Danach sichern sich Founding-Operatoren den frühen Preis vor dem öffentlichen Tarif.",
-      "lanes": {
-        "build": {
-          "title": "Aufbauen",
-          "body": "Bringen Sie schnell einen ersten nützlichen Agenten zum Laufen."
-        },
-        "fix": {
-          "title": "Reparieren",
-          "body": "Retten Sie ein kaputtes Setup, ohne neu anzufangen."
-        },
-        "control": {
-          "title": "Kontrollieren",
-          "body": "Fügen Sie Freigaben, Limits und Sichtbarkeit hinzu."
-        }
-      }
+      "ctaSecondary": "So Funktioniert Es",
+      "meta": "Außen auf Anfrage. Innen läuft das Produkt-Routing."
     },
     "trustBar": {
       "items": {
-        "0": "Nullstart, Recovery oder Live-Kontrolle.",
-        "1": "Diagnose wählt Aufbau, Reparatur oder Kontrolle.",
+        "0": "Starten, retten oder kontrollieren.",
+        "1": "Pico diagnostiziert zuerst.",
         "2": "Leitplanken vor Vertrauen."
       }
     },
@@ -50,26 +32,26 @@
       "eyebrow": "Warum Pico",
       "title": "Die meisten Agentenprojekte scheitern nicht,",
       "titleLine2": "weil die Idee schwach war.",
-      "body": "Projekte geraten ins Stocken, wenn der Weg unübersichtlich wird: zu viele Stack-Entscheidungen, kein Recovery-Pfad und zu wenig operative Klarheit, sobald etwas bricht.",
+      "body": "Projekte stocken, wenn der Weg unübersichtlich wird: zu viele Stack-Entscheidungen, keine Recovery-Spur und zu wenig Kontrolle, sobald etwas bricht.",
       "scenarios": {
         "0": {
-          "label": "\"Ich weiß, was der Agent tun soll. Ich brauche nur den schnellsten vernünftigen Weg zu etwas, das läuft.\"",
-          "body": "Nicht der Start bei null ist das Problem, sondern die Wahl von Stack, Reihenfolge und Standards, ohne sich in endloser Recherche zu verlieren."
+          "label": "Bei null anfangen",
+          "body": "Sie brauchen den schnellsten vernünftigen Weg zu einem ersten funktionierenden Agenten."
         },
         "1": {
-          "label": "\"Ich habe schon einen Teil gebaut. Jetzt muss ich das Setup retten, statt komplett neu anzufangen.\"",
-          "body": "Wenn ein Build auf halber Strecke bricht, kostet das mehr als nur Zeit. Sie brauchen eine Recovery-Lane, nicht noch ein Theorielabyrinth."
+          "label": "Halbfertig & festgefahren",
+          "body": "Sie brauchen eine Recovery-Spur, keinen Neustart."
         },
         "2": {
-          "label": "\"Etwas läuft bereits live, aber ich vertraue Kosten, Logik oder Ausfallverhalten noch nicht.\"",
-          "body": "Dann reicht es nicht, dass der Agent existiert. Er muss lesbar, kontrollierbar und sicher genug für echte Arbeit sein."
+          "label": "Live, aber nicht vertrauenswürdig",
+          "body": "Sie brauchen Sicht auf Kosten, Logik und Fehlermodi."
         },
         "3": {
-          "label": "\"Ich brauche ein System, das ich erklären, prüfen und steuern kann, bevor ich mich darauf verlasse.\"",
-          "body": "Wenn Sie Runs, Schwellenwerte, Freigaben und Verhalten unter Druck nicht sehen, haben Sie noch kein operatives Asset."
+          "label": "Muss geprüft werden",
+          "body": "Sie brauchen etwas, das Sie erklären, prüfen und steuern können."
         }
       },
-      "close": "Pico macht aus dieser Unsicherheit den nächsten ehrlichen Schritt."
+      "close": "Pico macht aus dieser Unsicherheit den nächsten klaren Schritt."
     },
     "platform": {
       "eyebrow": "So Funktioniert Es",
@@ -77,16 +59,16 @@
       "body": "Pico findet den Blocker und routet den nächsten Schritt.",
       "howItWorks": {
         "0": {
-          "title": "Ziel beschreiben oder Agent verbinden",
-          "body": "Starten Sie mit der Aufgabe, dem Blocker oder dem Live-System, das Sie verstehen müssen. Pico nutzt diesen Kontext, um relevante Hilfe auszuwählen."
+          "title": "Ziel beschreiben oder System verbinden",
+          "body": "Starten Sie mit der Aufgabe, dem Blocker oder dem Live-Setup."
         },
         "1": {
           "title": "In Aufbau, Reparatur oder Kontrolle routen",
-          "body": "Neue Vorhaben bekommen einen praktischen Weg zum ersten nützlichen Agenten. Kaputte Setups bekommen Recovery-Schritte. Live-Systeme bekommen Sichtbarkeit, Schwellenwerte, Freigaben und operative Leitplanken."
+          "body": "Pico wählt die Spur, die zum Blocker passt."
         },
         "2": {
-          "title": "Änderungen in einem operativen Loop anwenden",
-          "body": "Verhalten beobachten, Probleme isolieren, die nächste Änderung umsetzen und weitergehen, ohne den Faden zu verlieren."
+          "title": "Den nächsten Schritt mit Sichtbarkeit & Leitplanken umsetzen",
+          "body": "Nehmen Sie die Änderung vor, prüfen Sie das Verhalten und gehen Sie weiter."
         },
         "3": {
           "title": "Eskalieren, wenn der Grenzfall real ist",
@@ -217,7 +199,7 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "Starte kostenlos. Wenn du früh reinkommst, sicherst du dir ungefähr 90 % unter dem späteren öffentlichen Preis, solange wir in Wellen onboarden.",
+      "lead": "Starten Sie kostenlos. Wenn Sie früh einsteigen, sichern Sie sich rund 90 % unter dem späteren öffentlichen Preis.",
       "recommendedLabel": "90 % günstiger"
     },
     "faq": {
@@ -250,6 +232,7 @@
       "eyebrow": "Gründerzugang",
       "title": "Fragen Sie Zugang zur richtigen Spur an.",
       "body": "Pico hilft Ihnen, etwas Nützliches zum Laufen zu bringen, es bei Bruch zu retten und es in realer Arbeit unter Kontrolle zu halten.",
+      "faqLabel": "Noch unsicher? Klären wir die letzten Hürden.",
       "formHeadline": "Beginnen Sie mit dem echten Blocker.",
       "formSubline": "Sagen Sie uns, ob Sie aufbauen, reparieren oder kontrollieren müssen. Wir leiten Sie in die richtige Spur.",
       "ctaButton": "Zugang anfragen",

@@ -14,35 +14,17 @@
     },
     "hero": {
       "badge": "Accès fondateur · Sur demande",
-      "title": "Mettez 1 agent IA utile au travail.",
-      "titleAccent": "Puis rendez-le fiable.",
+      "title": "Mettez un agent IA utile en marche.",
+      "titleAccent": "Puis faites-lui confiance en travail réel.",
       "subtitle": "Partez de zéro, sauvez un setup cassé ou reprenez le contrôle d’un système live.",
       "cta": "Demander l’accès",
-      "ctaSecondary": "Voir le Pricing Fondateur",
-      "meta": "À l’extérieur, accès sur demande. À l’intérieur, le produit vous route.",
-      "panelEyebrow": "Route Opératoire",
-      "panelTitle": "1 couche de diagnostic. 3 voies opératoires.",
-      "panelBody": "Décrivez l’objectif ou connectez le système. Pico vous route vers la voie qui correspond au blocage.",
-      "offerBody": "Commencez par l’essai gratuit. Ensuite, les fondateurs bloquent le tarif initial avant le prix public.",
-      "lanes": {
-        "build": {
-          "title": "Construire",
-          "body": "Mettez vite en marche un premier agent utile."
-        },
-        "fix": {
-          "title": "Réparer",
-          "body": "Récupérez un setup cassé sans repartir de zéro."
-        },
-        "control": {
-          "title": "Contrôler",
-          "body": "Ajoutez validations, limites et visibilité."
-        }
-      }
+      "ctaSecondary": "Comment Ça Marche",
+      "meta": "À l’extérieur, accès sur demande. À l’intérieur, le produit vous route."
     },
     "trustBar": {
       "items": {
-        "0": "Départ zéro, reprise ou contrôle live.",
-        "1": "Le diagnostic choisit construire, réparer ou contrôler.",
+        "0": "Démarrer, récupérer ou contrôler.",
+        "1": "Pico diagnostique d’abord.",
         "2": "Des garde-fous avant la confiance."
       }
     },
@@ -50,26 +32,26 @@
       "eyebrow": "Pourquoi Pico",
       "title": "La plupart des projets d’agents ne cassent pas",
       "titleLine2": "parce que l’idée était faible.",
-      "body": "Les projets bloquent quand le chemin se brouille : trop de choix de stack, aucune voie de récupération et pas assez de clarté opérationnelle quand quelque chose casse.",
+      "body": "Les projets bloquent quand le chemin se complique : trop de choix de stack, aucune voie de récupération et pas assez de contrôle quand quelque chose casse.",
       "scenarios": {
         "0": {
-          "label": "\"Je sais ce que je veux que l’agent fasse. Il me manque surtout le chemin le plus rapide et le plus sain pour en avoir un qui tourne.\"",
-          "body": "Partir de zéro n’est pas le vrai problème. Le vrai problème, c’est de choisir stack, séquence et standards sans transformer le travail en recherche infinie."
+          "label": "Partir de zéro",
+          "body": "Il vous faut le chemin le plus rapide et le plus sain vers un premier agent qui tourne."
         },
         "1": {
-          "label": "\"J’ai déjà construit une partie. Maintenant je dois récupérer le setup au lieu de repartir de zéro.\"",
-          "body": "Quand un build casse au milieu, la perte d’élan coûte plus que du temps. Il faut une voie de récupération, pas un nouveau labyrinthe théorique."
+          "label": "À moitié fait et bloqué",
+          "body": "Il vous faut une voie de récupération, pas un redémarrage complet."
         },
         "2": {
-          "label": "\"Quelque chose tourne déjà en live, mais je ne fais toujours pas confiance au coût, à la logique ou aux modes de panne.\"",
-          "body": "À ce stade, il ne suffit plus que l’agent existe. Il doit être lisible, contrôlable et assez sûr pour toucher du vrai travail."
+          "label": "Live mais peu fiable",
+          "body": "Il vous faut de la visibilité sur le coût, la logique et les modes de panne."
         },
         "3": {
-          "label": "\"J’ai besoin d’un système que je peux expliquer, relire et piloter avant d’en dépendre.\"",
-          "body": "Si vous ne voyez pas les runs, les seuils, les validations et le comportement sous pression, vous n’avez pas encore un actif opérationnel."
+          "label": "À revoir",
+          "body": "Il vous faut quelque chose que vous pouvez expliquer, inspecter et contrôler."
         }
       },
-      "close": "Pico transforme cette incertitude en prochaine action honnête."
+      "close": "Pico transforme cette incertitude en prochaine action claire."
     },
     "platform": {
       "eyebrow": "Comment Ça Marche",
@@ -77,16 +59,16 @@
       "body": "Pico trouve le blocage et route l’étape suivante.",
       "howItWorks": {
         "0": {
-          "title": "Décrivez l’objectif ou connectez l’agent",
-          "body": "Partez du travail à faire, du blocage ou du système live à comprendre. Pico utilise ce contexte pour déterminer l’aide réellement pertinente."
+          "title": "Décrivez l’objectif ou connectez le système",
+          "body": "Partez du travail, du blocage ou du setup live."
         },
         "1": {
           "title": "Soyez routé vers construire, réparer ou contrôler",
-          "body": "Les nouveaux cas obtiennent un chemin pratique vers un premier agent utile. Les setups cassés obtiennent une voie de récupération. Les systèmes live obtiennent visibilité, seuils, validations et garde-fous opérateur."
+          "body": "Pico choisit la voie qui correspond au blocage."
         },
         "2": {
-          "title": "Appliquez les changements dans une seule boucle opérationnelle",
-          "body": "Observez le comportement, isolez ce qui déraille, appliquez le changement suivant et continuez sans perdre le fil."
+          "title": "Appliquez le prochain mouvement avec visibilité & garde-fous",
+          "body": "Faites le changement, relisez le comportement et continuez."
         },
         "3": {
           "title": "Escaladez quand le cas limite est réel",
@@ -217,7 +199,7 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "Commencez gratuitement. Si vous entrez tôt, vous gardez environ 90 % de réduction sur le futur tarif public pendant que nous ouvrons par cohortes.",
+      "lead": "Commencez gratuitement. Si vous entrez tôt, vous gardez environ 90 % de réduction sur le futur tarif public.",
       "recommendedLabel": "Fondateur -90 %"
     },
     "faq": {
@@ -250,6 +232,7 @@
       "eyebrow": "Accès fondateur",
       "title": "Demandez l’accès à la bonne voie.",
       "body": "Pico vous aide à mettre quelque chose d’utile en marche, à le récupérer quand il casse et à le garder sous contrôle dans le vrai travail.",
+      "faqLabel": "Encore en train d’hésiter ? Levons les derniers blocages.",
       "formHeadline": "Commencez par le vrai blocage.",
       "formSubline": "Dites-nous si vous devez construire, réparer ou contrôler. Nous vous orienterons vers la bonne voie.",
       "ctaButton": "Demander l’accès",

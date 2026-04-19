@@ -6,13 +6,11 @@ import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import {
   ArrowRight,
-  Bot,
   Check,
   Map,
   MessageSquare,
   ShieldCheck,
   Sparkles,
-  Wrench,
 } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
@@ -20,10 +18,11 @@ import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
+import { picoRobotArtById } from '@/lib/picoRobotArt'
 
-const STEP_ICONS = [Map, MessageSquare, ShieldCheck, Sparkles] as const
-const HERO_LANE_ICONS = [Bot, Wrench, ShieldCheck] as const
-const HERO_LANES = ['build', 'fix', 'control'] as const
+const STEP_ICONS = [MessageSquare, Map, ShieldCheck] as const
+const PATH_STEP_INDICES = [0, 1, 2] as const
+const FAQ_INDICES = [0, 1, 3] as const
 const PRICING_TIERS = ['trial', 'starter', 'pro', 'enterprise'] as const
 const FOUNDER_CALL_URL = 'https://calendly.com/mutxdev'
 
@@ -78,6 +77,7 @@ export function PicoLandingPoster() {
     [0, 1],
     [1, prefersReducedMotion ? 1 : 0.52],
   )
+  const heroRobot = picoRobotArtById.heroWave
   const starterTier = t.raw('pricing.tiers.starter') as LandingPricingTierContent
 
   function openForm(interest?: string) {
@@ -176,93 +176,80 @@ export function PicoLandingPoster() {
 
           <div className={s.heroShell}>
             <motion.div className={s.heroCopy} style={{ y: heroCopyY, opacity: heroCopyOpacity }}>
-              <SiteReveal delay={0.04}>
-                <div className={s.heroPrelude}>
-                  <span className={s.heroBadge}>{t('hero.badge')}</span>
-                </div>
-              </SiteReveal>
+              <div className={s.heroPrelude}>
+                <span className={s.heroBadge}>{t('hero.badge')}</span>
+              </div>
 
-              <SiteReveal delay={0.11}>
-                <h1 className={s.heroTitle}>
-                  <span>{t('hero.title')}</span>
-                  <span className={s.heroTitleAccent}>{t('hero.titleAccent')}</span>
-                </h1>
-              </SiteReveal>
+              <h1 className={s.heroTitle}>
+                <span>{t('hero.title')}</span>
+                <span className={s.heroTitleAccent}>{t('hero.titleAccent')}</span>
+              </h1>
 
-              <SiteReveal delay={0.18}>
-                <p className={s.heroSubtitle}>{t('hero.subtitle')}</p>
-              </SiteReveal>
+              <p className={s.heroSubtitle}>{t('hero.subtitle')}</p>
 
-              <SiteReveal delay={0.25}>
-                <div className={s.heroActions}>
-                  <button
-                    type="button"
-                    className={s.heroPrimary}
-                    onClick={() => openForm('build')}
-                  >
-                    {t('hero.cta')}
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <a href="#pricing" className={s.heroSecondary}>
-                    {t('hero.ctaSecondary')}
-                  </a>
-                </div>
-              </SiteReveal>
+              <div className={s.heroActions}>
+                <button
+                  type="button"
+                  className={s.heroPrimary}
+                  onClick={() => openForm('build')}
+                >
+                  {t('hero.cta')}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+                <a href="#path" className={s.heroSecondary}>
+                  {t('hero.ctaSecondary')}
+                </a>
+              </div>
             </motion.div>
 
-            <SiteReveal delay={0.16} className={s.heroVisualWrap}>
+            <div className={s.heroVisualWrap}>
               <motion.div
                 className={s.heroVisual}
                 style={{ y: heroVisualY, scale: heroVisualScale }}
               >
                 <div className={s.heroVisualHeader}>
-                  <span className={s.heroVisualKicker}>{t('hero.panelEyebrow')}</span>
-                  <span className={s.heroVisualSignal}>{starterTier.name}</span>
+                  <span className={s.heroVisualKicker}>{t('hero.badge')}</span>
+                  <span className={s.heroVisualSignal} translate="no">
+                    {t('nav.brand')}
+                  </span>
                 </div>
 
-                <div className={s.heroVisualIntro}>
-                  <div className={s.heroVisualCopy}>
-                    <h2 className={s.heroVisualTitle}>{t('hero.panelTitle')}</h2>
-                    <p className={s.heroVisualBody}>{t('hero.panelBody')}</p>
-                  </div>
+                <div className={s.heroRobotStage} aria-hidden="true">
+                  <div className={s.heroRobotGlow} />
+                  <Image
+                    src={heroRobot.src}
+                    alt=""
+                    width={1536}
+                    height={1024}
+                    priority
+                    className={s.heroRobotImage}
+                    sizes="(max-width: 900px) 78vw, 36rem"
+                  />
+                </div>
 
-                  <div className={s.heroOfferCard}>
-                    <div className={s.heroOfferHead}>
-                      <span className={s.heroOfferLabel}>{t('pricing.recommendedLabel')}</span>
+                <div className={s.heroSignalRail}>
+                  <div className={s.heroProofCard}>
+                    <div className={s.heroProofTop}>
+                      <span className={s.heroProofLabel}>{t('pricing.recommendedLabel')}</span>
                       {starterTier.anchorPrice ? (
-                        <span className={s.heroOfferAnchor}>{starterTier.anchorPrice}</span>
+                        <span className={s.heroProofAnchor}>{starterTier.anchorPrice}</span>
                       ) : null}
                     </div>
-
-                    <div className={s.heroOfferPrice}>
-                      <span className={s.heroOfferAmount}>{starterTier.price}</span>
-                      <span className={s.heroOfferPeriod}>{starterTier.period}</span>
+                    <div className={s.heroProofBottom}>
+                      <span className={s.heroProofAmount}>{starterTier.price}</span>
+                      <span className={s.heroProofPeriod}>{starterTier.period}</span>
                     </div>
-
-                    <p className={s.heroOfferBody}>{t('hero.offerBody')}</p>
                   </div>
-                </div>
 
-                <div className={s.heroLaneGrid}>
-                  {HERO_LANES.map((lane, index) => {
-                    const Icon = HERO_LANE_ICONS[index]
-
-                    return (
-                      <article key={lane} className={s.heroLane}>
-                        <div className={s.heroLaneTop}>
-                          <span className={s.heroLaneIndex}>0{index + 1}</span>
-                          <span className={s.heroLaneIcon}>
-                            <Icon className="h-4 w-4" aria-hidden="true" />
-                          </span>
-                        </div>
-                        <h3 className={s.heroLaneTitle}>{t(`hero.lanes.${lane}.title`)}</h3>
-                        <p className={s.heroLaneBody}>{t(`hero.lanes.${lane}.body`)}</p>
-                      </article>
-                    )
-                  })}
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <div key={index} className={s.heroSignal}>
+                      <span className={s.heroSignalIndex}>0{index + 1}</span>
+                      <p className={s.heroSignalText}>{t(`trustBar.items.${index}`)}</p>
+                    </div>
+                  ))}
                 </div>
               </motion.div>
-            </SiteReveal>
+            </div>
           </div>
 
         </section>
@@ -277,7 +264,6 @@ export function PicoLandingPoster() {
                   <span className={s.titleLine}>{t('problem.titleLine2')}</span>
                 </h2>
                 <p className={s.sectionBody}>{t('problem.body')}</p>
-                <p className={s.sectionClose}>{t('problem.close')}</p>
               </SiteReveal>
 
               <div className={s.scenarioBoard}>
@@ -305,7 +291,7 @@ export function PicoLandingPoster() {
                   <p className={s.eyebrow}>{t('who.eyebrow')}</p>
                   <h3 className={s.whoTitle}>{t('who.forYouTitle')}</h3>
                   <ul className={s.whoList}>
-                    {Array.from({ length: 5 }, (_, index) => (
+                    {Array.from({ length: 3 }, (_, index) => (
                       <li key={index} className={s.whoItem}>
                         <Check className={s.whoCheck} aria-hidden="true" />
                         <span>{t(`who.forYou.${index}`)}</span>
@@ -320,7 +306,7 @@ export function PicoLandingPoster() {
                   <p className={s.eyebrow}>{t('who.title')}</p>
                   <h3 className={s.whoTitle}>{t('who.notForYouTitle')}</h3>
                   <ul className={s.notList}>
-                    {Array.from({ length: 5 }, (_, index) => (
+                    {Array.from({ length: 3 }, (_, index) => (
                       <li key={index} className={s.notItem}>
                         <span className={s.notDash} aria-hidden="true" />
                         <span>{t(`who.notForYou.${index}`)}</span>
@@ -329,6 +315,10 @@ export function PicoLandingPoster() {
                   </ul>
                 </div>
               </div>
+            </SiteReveal>
+
+            <SiteReveal delay={0.28}>
+              <p className={s.sectionClose}>{t('problem.close')}</p>
             </SiteReveal>
           </div>
         </section>
@@ -341,12 +331,11 @@ export function PicoLandingPoster() {
                   <p className={s.eyebrow}>{t('platform.eyebrow')}</p>
                   <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
                   <p className={s.sectionBody}>{t('platform.body')}</p>
-                  <p className={s.sectionClose}>{t('beforeAfter.close')}</p>
                 </div>
               </SiteReveal>
 
               <ol className={s.pathList}>
-                {Array.from({ length: 4 }, (_, index) => {
+                {PATH_STEP_INDICES.map((index) => {
                   const Icon = STEP_ICONS[index]
 
                   return (
@@ -377,33 +366,6 @@ export function PicoLandingPoster() {
           </div>
         </section>
 
-        <section className={s.shiftSection}>
-          <div className={s.sectionShell}>
-            <SiteReveal delay={0.05}>
-              <div className={s.shiftHeader}>
-                <p className={s.eyebrow}>{t('beforeAfter.eyebrow')}</p>
-                <h2 className={s.sectionTitle}>{t('beforeAfter.title')}</h2>
-              </div>
-            </SiteReveal>
-
-            <div className={s.shiftBoard}>
-              <div className={s.shiftLabels}>
-                <span>{t('beforeAfter.beforeLabel')}</span>
-                <span>{t('beforeAfter.afterLabel')}</span>
-              </div>
-
-              {Array.from({ length: 4 }, (_, index) => (
-                <SiteReveal key={index} delay={0.08 + index * 0.05}>
-                  <div className={s.shiftRow}>
-                    <p className={s.shiftBefore}>{t(`beforeAfter.items.${index}.before`)}</p>
-                    <p className={s.shiftAfter}>{t(`beforeAfter.items.${index}.after`)}</p>
-                  </div>
-                </SiteReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section id="pricing" className={s.accessSection}>
           <div className={s.sectionShell}>
             <div className={s.accessGrid}>
@@ -413,15 +375,6 @@ export function PicoLandingPoster() {
                     <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
                     <h2 className={s.sectionTitle}>{t('pricing.title')}</h2>
                     <p className={s.sectionBody}>{t('pricing.lead')}</p>
-                  </div>
-
-                  <div className={s.accessHighlights}>
-                    {Array.from({ length: 3 }, (_, index) => (
-                      <div key={index} className={s.accessHighlight}>
-                        <Check className={s.benefitCheck} aria-hidden="true" />
-                        <span>{t(`earlyAccess.benefits.${index}`)}</span>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </SiteReveal>
@@ -450,14 +403,11 @@ export function PicoLandingPoster() {
                             {pricingTier.anchorPrice ? (
                               <span className={s.pricingAnchor}>{pricingTier.anchorPrice}</span>
                             ) : null}
-                            <div className={s.pricingPrice}>
+                          <div className={s.pricingPrice}>
                               <span className={s.pricingAmount}>{pricingTier.price}</span>
                               <span className={s.pricingPeriod}>{pricingTier.period}</span>
                             </div>
                           </div>
-                          {pricingTier.priceNote ? (
-                            <p className={s.pricingPriceNote}>{pricingTier.priceNote}</p>
-                          ) : null}
                           <p className={s.pricingDescription}>{pricingTier.description}</p>
                         </div>
 
@@ -499,7 +449,7 @@ export function PicoLandingPoster() {
             </SiteReveal>
 
             <div className={s.faqStack}>
-              {Array.from({ length: 5 }, (_, index) => (
+              {FAQ_INDICES.map((index) => (
                 <SiteReveal key={index} delay={0.08 + index * 0.04}>
                   <details className={s.faqItem}>
                     <summary className={s.faqSummary}>
@@ -528,10 +478,6 @@ export function PicoLandingPoster() {
                 </span>
                 <h2 className={s.finalTitle}>{t('finalCta.title')}</h2>
                 <p className={s.finalBody}>{t('finalCta.body')}</p>
-                <div className={s.finalCallout}>
-                  <p className={s.finalFormHeadline}>{t('finalCta.formHeadline')}</p>
-                  <p className={s.finalFormSubline}>{t('finalCta.formSubline')}</p>
-                </div>
                 <div className={s.finalActions}>
                   <button type="button" className={s.finalButton} onClick={() => openForm()}>
                     {t('finalCta.ctaButton')}
@@ -545,7 +491,6 @@ export function PicoLandingPoster() {
                   >
                     {t('finalCta.secondaryButton')}
                   </a>
-                  <p className={s.finalMeta}>{t('finalCta.formCtaMeta')}</p>
                 </div>
               </SiteReveal>
             </div>

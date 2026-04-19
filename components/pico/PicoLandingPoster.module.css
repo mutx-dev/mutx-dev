@@ -419,41 +419,39 @@
 .heroVisual {
   position: relative;
   display: grid;
-  gap: 1rem;
-  min-height: auto;
-  padding: clamp(1rem, 2vw, 1.4rem);
+  grid-template-rows: auto 1fr auto;
+  min-height: clamp(30rem, 48vw, 42rem);
+  padding: clamp(0.45rem, 1.35vw, 0.8rem) 0 0;
   overflow: hidden;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.14);
-  border-radius: 2rem;
-  background:
-    linear-gradient(150deg, rgba(var(--pico-accent-rgb), 0.14), transparent 24%),
-    linear-gradient(180deg, rgba(8, 15, 10, 0.96), rgba(2, 4, 3, 1));
-  box-shadow:
-    0 34px 92px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .heroVisual::before {
   content: '';
   position: absolute;
-  inset: 0.95rem;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.1);
-  border-radius: 1.4rem;
+  inset: 1.25rem 0.3rem 1.05rem 3.8rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  border-radius: 2.55rem;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 74px 74px;
-  opacity: 0.38;
+    radial-gradient(circle at 54% 20%, rgba(var(--pico-accent-rgb), 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(9, 17, 11, 0.98), rgba(4, 8, 5, 0.99));
+  box-shadow:
+    0 32px 92px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .heroVisual::after {
   content: '';
   position: absolute;
-  inset: 0 auto auto 0;
-  width: min(16rem, 48%);
-  height: 1px;
-  background: linear-gradient(90deg, rgba(var(--pico-accent-rgb), 0.72), transparent 88%);
-  opacity: 0.95;
+  inset: auto 18% 2.2rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.18), transparent 72%);
+  filter: blur(18px);
+  opacity: 0.9;
 }
 
 .heroVisualHeader {
@@ -461,164 +459,132 @@
   z-index: 1;
   display: flex;
   align-items: center;
+  justify-self: end;
   justify-content: space-between;
   gap: 0.75rem;
-  width: 100%;
-  padding: 0 0 0.2rem;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  backdrop-filter: none;
-}
-
-.heroVisualIntro {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 0.9rem;
-}
-
-.heroVisualCopy {
-  display: grid;
-  gap: 0.6rem;
-}
-
-.heroVisualTitle,
-.heroLaneTitle {
-  margin: 0;
-  font-family: var(--pico-font-display);
-  letter-spacing: -0.06em;
-  text-wrap: balance;
-}
-
-.heroVisualTitle {
-  max-width: 11ch;
-  font-size: clamp(1.95rem, 3vw, 3.1rem);
-  line-height: 0.94;
-}
-
-.heroVisualBody,
-.heroOfferBody,
-.heroLaneBody {
-  margin: 0;
-  color: var(--pico-text-secondary);
-  line-height: 1.58;
-}
-
-.heroVisualBody {
-  max-width: 32rem;
-  font-size: 0.98rem;
-}
-
-.heroOfferCard {
-  position: relative;
-  display: grid;
-  gap: 0.55rem;
-  align-content: start;
-  padding: 1rem 1rem 1.05rem;
+  width: min(100%, 24rem);
+  padding: 0.72rem 0.95rem;
   border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
-  border-radius: 1.3rem;
-  background:
-    linear-gradient(180deg, rgba(var(--pico-accent-rgb), 0.12), rgba(255, 255, 255, 0.02)),
-    rgba(7, 13, 8, 0.88);
-  box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.heroOfferHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  border-radius: 999px;
+  background: rgba(5, 11, 7, 0.62);
+  backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .heroVisualKicker,
 .heroVisualSignal,
-.heroOfferLabel {
+.heroProofLabel,
+.heroProofPeriod {
   color: var(--pico-text-muted);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .heroVisualSignal {
   text-align: right;
 }
 
-.heroOfferLabel {
+.heroRobotStage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 18.5rem;
+  padding: 0.85rem 0 0;
+}
+
+.heroRobotGlow,
+.finalGlow {
+  position: absolute;
+  inset: auto 50% 50% auto;
+  transform: translate(50%, 50%);
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--pico-accent-rgb), 0.24), transparent 72%);
+  filter: blur(26px);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.heroRobotImage {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 35rem);
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 90px rgba(0, 0, 0, 0.48));
+  animation: picoFloat 7s ease-in-out infinite;
+}
+
+.heroSignalRail {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.78rem;
+  justify-self: end;
+  width: min(100%, 24rem);
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
+  border-radius: 1.65rem;
+  background: linear-gradient(180deg, rgba(7, 13, 8, 0.86), rgba(4, 8, 5, 0.76));
+  backdrop-filter: blur(14px) saturate(1.15);
+}
+
+.heroProofCard {
+  display: grid;
+  gap: 0.45rem;
+  padding-bottom: 0.22rem;
+  border-bottom: 1px solid rgba(var(--pico-accent-rgb), 0.1);
+}
+
+.heroProofTop,
+.heroSignal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.heroProofTop {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.heroProofLabel {
   color: var(--pico-accent-bright);
 }
 
-.heroOfferAnchor {
+.heroProofAnchor {
   color: rgba(255, 255, 255, 0.46);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-decoration: line-through;
   text-decoration-thickness: 1px;
   text-decoration-color: rgba(var(--pico-accent-rgb), 0.72);
 }
 
-.heroOfferPrice {
+.heroProofBottom {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 0.45rem;
   flex-wrap: wrap;
 }
 
-.heroOfferAmount {
+.heroProofAmount {
   color: var(--pico-text);
   font-family: var(--pico-font-display);
-  font-size: clamp(2.35rem, 4vw, 3.35rem);
+  font-size: clamp(2.2rem, 3.2vw, 2.9rem);
   line-height: 0.9;
   letter-spacing: -0.08em;
 }
 
-.heroOfferPeriod {
-  padding-bottom: 0.2rem;
-  color: var(--pico-text-muted);
-  font-family: var(--pico-font-accent);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.heroProofPeriod {
+  padding-top: 0.28rem;
 }
 
-.heroOfferBody {
-  font-size: 0.9rem;
-}
-
-.heroLaneGrid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 0.75rem;
-}
-
-.heroLane {
-  position: relative;
-  display: grid;
-  gap: 0.8rem;
-  min-height: 100%;
-  padding: 1rem 1rem 1.05rem;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.12);
-  border-radius: 1.3rem;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0)),
-    rgba(5, 10, 7, 0.84);
-  box-shadow:
-    0 16px 34px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.heroLaneTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.heroLaneIndex,
+.heroSignalIndex,
 .scenarioNumber,
 .pathNumber {
   color: var(--pico-text-muted);
@@ -628,37 +594,21 @@
   text-transform: uppercase;
 }
 
-.heroLaneIndex,
+.heroSignalIndex,
 .scenarioNumber {
   font-size: 0.7rem;
   padding-top: 0.25rem;
 }
 
-.heroLaneIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 999px;
-  border: 1px solid rgba(var(--pico-accent-rgb), 0.18);
-  background: rgba(var(--pico-accent-rgb), 0.08);
-  color: var(--pico-accent-bright);
-}
-
-.heroLaneTitle {
-  font-size: clamp(1.45rem, 2vw, 1.95rem);
-  line-height: 0.96;
-}
-
-.heroLaneBody {
-  max-width: 18rem;
-  font-size: 0.92rem;
+.heroSignalText {
+  margin: 0;
+  color: var(--pico-text);
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 
 .qualifySection,
 .pathSection,
-.shiftSection,
 .accessSection,
 .faqSection,
 .finalSection {
@@ -722,6 +672,10 @@
 .sectionBody,
 .sectionClose {
   max-width: 34rem;
+}
+
+.sectionClose {
+  justify-self: start;
 }
 
 .pricingBoard,
@@ -1021,6 +975,7 @@
 .accessHeader {
   display: grid;
   gap: 1rem;
+  max-width: 34rem;
 }
 
 .accessCopy {
@@ -1296,8 +1251,8 @@
 .finalPanel {
   position: relative;
   display: grid;
-  gap: 1.5rem;
-  width: min(100%, 58rem);
+  gap: 1.2rem;
+  width: min(100%, 48rem);
   margin: 0 auto;
   padding: clamp(1.35rem, 3vw, 1.9rem);
   border-radius: 2rem;
@@ -1383,13 +1338,8 @@
     min-height: clamp(36rem, 76svh, 45rem);
   }
 
-  .heroVisualIntro {
-    grid-template-columns: minmax(0, 1fr) minmax(15rem, 17rem);
-    align-items: end;
-  }
-
-  .heroLaneGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .heroVisual {
+    min-height: clamp(34rem, 46vw, 44rem);
   }
 
   .qualifyGrid {
@@ -1412,15 +1362,6 @@
 
   .accessGrid {
     gap: 1.35rem;
-  }
-
-  .accessHeader {
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    align-items: end;
-  }
-
-  .accessHighlights {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .pricingTiers {
@@ -1521,31 +1462,27 @@
   }
 
   .heroVisual {
-    gap: 0.85rem;
-    padding: 1rem;
+    min-height: 22rem;
+    padding: 0.2rem 0 0;
   }
 
   .heroVisual::before {
-    inset: 0.8rem;
+    inset: 1rem 0 0.85rem;
     border-radius: 1.9rem;
   }
 
   .heroVisualHeader,
-  .heroVisualIntro,
-  .heroLaneGrid {
+  .heroSignalRail {
     width: 100%;
   }
 
-  .heroVisualTitle {
-    max-width: 12ch;
-    font-size: clamp(1.65rem, 7vw, 2.2rem);
+  .heroRobotStage {
+    min-height: 12.75rem;
+    padding-top: 0;
   }
 
-  .heroVisualBody,
-  .heroOfferBody,
-  .heroLaneBody {
-    font-size: 0.9rem;
-    line-height: 1.5;
+  .heroSignalRail {
+    gap: 0.6rem;
   }
 
   .scenarioItem,
@@ -1559,10 +1496,6 @@
 
   .whoBoard {
     border-radius: 1.55rem;
-  }
-
-  .accessHighlights {
-    grid-template-columns: 1fr;
   }
 
   .pricingTier {
@@ -1599,6 +1532,15 @@
 
   .finalButton {
     width: 100%;
+  }
+
+  .heroProofAmount {
+    font-size: 2rem;
+  }
+
+  .heroSignalText {
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 }
 
