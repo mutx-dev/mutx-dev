@@ -899,7 +899,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.locator('a[href*="/pico/onboarding"], a[href*="/onboarding"]')).toHaveCount(0);
     await expect(page.getByRole('link', { name: /see pricing/i })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /request access/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /see how it works/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /how it works/i }).first()).toBeVisible();
     await expect(page.locator('#pricing button')).toHaveCount(4);
     await expect(page.locator('#pricing')).toContainText(/request trial access/i);
     await expect(page.locator('#pricing')).toContainText(/request founding access/i);

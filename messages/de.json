@@ -15,17 +15,17 @@
     "hero": {
       "badge": "Gründerzugang · Auf Anfrage",
       "title": "Bringen Sie einen KI-Agenten zum Laufen ",
-      "titleAccent": "und ihm in echter Arbeit vertrauen.",
-      "subtitle": "Starten Sie bei null, retten Sie ein kaputtes Setup oder übernehmen Sie die Kontrolle über einen Live-Agenten. Pico leitet Sie zu Aufbau, Reparatur oder Kontrolle.",
+      "titleAccent": "und vertrauen Sie ihm.",
+      "subtitle": "Starten Sie bei null, retten Sie ein Chaos oder kontrollieren Sie ein Live-System.",
       "cta": "Zugang anfragen",
       "ctaSecondary": "So Funktioniert Es",
-      "meta": "Außen bleibt der Zugang auf Anfrage. Innen diagnostiziert Pico den Blocker und leitet Sie zu Aufbau, Reparatur oder Kontrolle."
+      "meta": "Außen auf Anfrage. Innen: Aufbau, Reparatur oder Kontrolle."
     },
     "trustBar": {
       "items": {
-        "0": "Starten Sie bei null, mit einem chaotischen Setup oder mit einem Live-System",
-        "1": "Eine Diagnoseschicht führt Sie in Aufbau, Reparatur oder Kontrolle",
-        "2": "Sichtbarkeit, Freigaben und Leitplanken, bevor Vertrauen vorausgesetzt wird"
+        "0": "Nullstart, Recovery oder Live-Kontrolle.",
+        "1": "Diagnose wählt Aufbau, Reparatur oder Kontrolle.",
+        "2": "Leitplanken vor Vertrauen."
       }
     },
     "problem": {
@@ -54,9 +54,9 @@
       "close": "Pico macht aus dieser Unsicherheit den nächsten ehrlichen Schritt."
     },
     "platform": {
-      "eyebrow": "So funktioniert Pico",
-      "title": "Pico diagnostiziert den Blocker und leitet Sie dann zu Aufbau, Reparatur oder Kontrolle.",
-      "body": "Bringen Sie etwas Nützliches zum Laufen und halten Sie es vertrauenswürdig. Pico startet mit einer Diagnose, damit der nächste Schritt zum echten Blocker passt.",
+      "eyebrow": "So Funktioniert Es",
+      "title": "Erst Diagnose. Dann Aufbau, Reparatur oder Kontrolle.",
+      "body": "Pico findet den Blocker und routet den nächsten Schritt.",
       "howItWorks": {
         "0": {
           "title": "Ziel beschreiben oder Agent verbinden",
@@ -123,14 +123,14 @@
     },
     "earlyAccess": {
       "eyebrow": "Gründerzugang",
-      "title": "Außen Warteliste. Darunter ein echtes Produkt.",
-      "body": "Der Zugang öffnet sich in Wellen, damit ernsthafte Operatoren in der richtigen Spur landen, während die Workflows an realer Nutzung härten.",
+      "title": "Warteliste außen. Produkt innen.",
+      "body": "Der Zugang öffnet sich in Wellen, während das System an realer Nutzung härter wird.",
       "benefits": {
-        "0": "Starten Sie bei null, mit kaputtem Setup oder mit einem Live-System, dem Sie noch nicht trauen",
-        "1": "Sie werden in build, fix oder control geleitet",
-        "2": "Sichern Sie Founding-Preise, solange der Zugang selektiv bleibt",
-        "3": "Nutzen Sie Expertenhilfe nur, wenn der Edge Case real ist",
-        "4": "Prägen Sie die ersten Case Studies und Operating Patterns mit"
+        "0": "Bei null beginnen, kaputte Setups retten oder Live-Systeme steuern",
+        "1": "In build, fix oder control geroutet werden",
+        "2": "Founding-Preise früh sichern",
+        "3": "Expertenhilfe nur bei Bedarf nutzen",
+        "4": "Die ersten Operator-Playbooks mitprägen"
       }
     },
     "pricing": {

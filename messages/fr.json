@@ -15,17 +15,17 @@
     "hero": {
       "badge": "Accès fondateur · Sur demande",
       "title": "Mettez un agent IA en marche ",
-      "titleAccent": "et lui faire confiance dans le vrai travail.",
-      "subtitle": "Partez de zéro, récupérez un setup cassé ou reprenez le contrôle d’un agent live. Pico vous oriente vers la bonne voie : construire, réparer ou contrôler.",
+      "titleAccent": "et faites-lui confiance.",
+      "subtitle": "Partez de zéro, sauvez un chaos ou reprenez le contrôle d’un système live.",
       "cta": "Demander l’accès",
-      "ctaSecondary": "Voir Comment Ça Marche",
-      "meta": "À l’extérieur, l’accès reste sur demande. À l’intérieur, Pico diagnostique le blocage et vous oriente vers construire, réparer ou contrôler."
+      "ctaSecondary": "Comment Ça Marche",
+      "meta": "À l’extérieur, accès sur demande. À l’intérieur : construire, réparer ou contrôler."
     },
     "trustBar": {
       "items": {
-        "0": "Partez de zéro, d’un build désordonné ou d’un système déjà live",
-        "1": "Une seule couche de diagnostic vous oriente vers construire, réparer ou contrôler",
-        "2": "Visibilité, validations et garde-fous avant d’accorder votre confiance"
+        "0": "Départ zéro, reprise ou contrôle live.",
+        "1": "Le diagnostic choisit construire, réparer ou contrôler.",
+        "2": "Des garde-fous avant la confiance."
       }
     },
     "problem": {
@@ -54,9 +54,9 @@
       "close": "Pico transforme cette incertitude en prochaine action honnête."
     },
     "platform": {
-      "eyebrow": "Comment Pico fonctionne",
-      "title": "Pico diagnostique le blocage, puis vous oriente vers construire, réparer ou contrôler.",
-      "body": "Mettez quelque chose d’utile en marche et gardez-le fiable. Pico commence par le diagnostic pour que la prochaine action colle au vrai blocage.",
+      "eyebrow": "Comment Ça Marche",
+      "title": "D’abord le diagnostic. Puis construire, réparer ou contrôler.",
+      "body": "Pico trouve le blocage et route l’étape suivante.",
       "howItWorks": {
         "0": {
           "title": "Décrivez l’objectif ou connectez l’agent",
@@ -123,14 +123,14 @@
     },
     "earlyAccess": {
       "eyebrow": "Accès fondateur",
-      "title": "À l’extérieur, une waitlist. Dessous, un vrai produit.",
-      "body": "L’accès s’ouvre par vagues pour que les opérateurs sérieux arrivent dans la bonne voie pendant que les workflows se durcissent sur du vrai usage.",
+      "title": "Liste d’attente dehors. Produit dedans.",
+      "body": "L’accès s’ouvre par vagues pendant que le système se durcit sur un usage réel.",
       "benefits": {
-        "0": "Partez de zéro, d’un setup cassé ou d’un système live auquel vous ne faites pas encore confiance",
-        "1": "Vous êtes orienté vers build, fix ou control",
-        "2": "Bloquez le tarif founding pendant que l’accès reste sélectif",
-        "3": "Utilisez un input expert seulement quand le edge case est réel",
-        "4": "Aidez à façonner les premiers case studies et operating patterns"
+        "0": "Partez de zéro, sauvez des setups cassés ou contrôlez le live",
+        "1": "Passez vers build, fix ou control",
+        "2": "Bloquez tôt le tarif founding",
+        "3": "Utilisez l’aide experte seulement si nécessaire",
+        "4": "Façonnez les premiers playbooks opérateur"
       }
     },
     "pricing": {

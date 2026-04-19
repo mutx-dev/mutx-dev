@@ -9,7 +9,7 @@ describe('pico landing truth', () => {
 
     expect(truthMessages.nav.cta).toMatch(/request access/i)
     expect(truthMessages.hero.meta).toMatch(/request-first/i)
-    expect(truthMessages.earlyAccess.title).toMatch(/waitlist-first/i)
+    expect(truthMessages.earlyAccess.title).toMatch(/waitlist outside/i)
     expect(truthMessages.finalCta.ctaButton).toMatch(/request access/i)
     expect(truthMessages.contactForm.title).toMatch(/request/i)
     expect(JSON.stringify(truthMessages)).not.toMatch(preregPattern)

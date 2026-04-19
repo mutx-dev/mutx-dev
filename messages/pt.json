@@ -15,17 +15,17 @@
     "hero": {
       "badge": "Acesso fundador · Sob solicitação",
       "title": "Coloque um agente de IA para funcionar ",
-      "titleAccent": "e confiar nele no trabalho real.",
-      "subtitle": "Comece do zero, recupere um setup quebrado ou assuma o controle de um agente em operação. O Pico encaminha você para construir, corrigir ou controlar.",
+      "titleAccent": "e confie nele.",
+      "subtitle": "Comece do zero, recupere uma bagunça ou controle o que já está ao vivo.",
       "cta": "Solicitar acesso",
-      "ctaSecondary": "Ver Como Funciona",
-      "meta": "Por fora, o acesso continua por solicitação. Por dentro, o Pico diagnostica o bloqueio e encaminha você para construir, corrigir ou controlar."
+      "ctaSecondary": "Como Funciona",
+      "meta": "Por fora, acesso sob solicitação. Por dentro: construir, corrigir ou controlar."
     },
     "trustBar": {
       "items": {
-        "0": "Comece do zero, de uma build bagunçada ou de um sistema já ao vivo",
-        "1": "Uma camada de diagnóstico direciona você para build, fix ou control",
-        "2": "Visibilidade, aprovações e guardrails antes de assumir confiança"
+        "0": "Do zero, recuperação ou controle ao vivo.",
+        "1": "O diagnóstico escolhe construir, corrigir ou controlar.",
+        "2": "Guardrails antes da confiança."
       }
     },
     "problem": {
@@ -54,9 +54,9 @@
       "close": "O Pico transforma essa incerteza no próximo passo honesto."
     },
     "platform": {
-      "eyebrow": "Como o Pico funciona",
-      "title": "O Pico diagnostica o bloqueio e depois encaminha você para construir, corrigir ou controlar.",
-      "body": "Faça algo útil funcionar e continue confiando nele. O Pico começa pelo diagnóstico para que o próximo passo combine com o bloqueio real.",
+      "eyebrow": "Como Funciona",
+      "title": "Primeiro o diagnóstico. Depois construir, corrigir ou controlar.",
+      "body": "O Pico encontra o bloqueio e encaminha o próximo passo.",
       "howItWorks": {
         "0": {
           "title": "Descreva o objetivo ou conecte o agente",
@@ -123,14 +123,14 @@
     },
     "earlyAccess": {
       "eyebrow": "Acesso fundador",
-      "title": "Por fora, lista de espera. Por dentro, produto real.",
-      "body": "O acesso abre em ondas para que operadores sérios caiam na rota certa enquanto os workflows endurecem com uso real.",
+      "title": "Lista de espera por fora. Produto por dentro.",
+      "body": "O acesso abre em ondas enquanto o sistema endurece no uso real.",
       "benefits": {
-        "0": "Comece do zero, de um setup quebrado ou de um sistema ao vivo em que ainda não confia",
-        "1": "Seja encaminhado para build, fix ou control",
-        "2": "Garanta o founding pricing enquanto o acesso ainda é seletivo",
-        "3": "Use input especialista só quando o edge case for real",
-        "4": "Ajude a formar os primeiros case studies e operating patterns"
+        "0": "Comece do zero, recupere setups quebrados ou controle o live",
+        "1": "Entre em build, fix ou control",
+        "2": "Garanta cedo o founding pricing",
+        "3": "Use ajuda especialista só quando precisar",
+        "4": "Ajude a formar os primeiros playbooks operacionais"
       }
     },
     "pricing": {

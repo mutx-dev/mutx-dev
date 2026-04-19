@@ -15,17 +15,17 @@
     "hero": {
       "badge": "Founding Access · Request-Only",
       "title": "Get an AI agent working ",
-      "titleAccent": "and trust it in real work.",
-      "subtitle": "Start from zero, recover a broken setup, or take control of a live agent. Pico routes you into build, fix, or control.",
+      "titleAccent": "and trust it.",
+      "subtitle": "Start from zero, recover a mess, or control what is live.",
       "cta": "Request access",
-      "ctaSecondary": "See How It Works",
-      "meta": "Request-first outside. Inside, Pico diagnoses the blocker and routes you into build, fix, or control."
+      "ctaSecondary": "How It Works",
+      "meta": "Request-first outside. Build, fix, or control inside."
     },
     "trustBar": {
       "items": {
-        "0": "Start from zero, a messy build, or a live system",
-        "1": "One diagnosis layer routes you into build, fix, or control",
-        "2": "Visibility, approvals, and safeguards before trust is assumed"
+        "0": "Scratch, recovery, or live control.",
+        "1": "Diagnosis picks build, fix, or control.",
+        "2": "Add guardrails before trust."
       }
     },
     "problem": {
@@ -54,9 +54,9 @@
       "close": "Pico turns that uncertainty into one honest next move."
     },
     "platform": {
-      "eyebrow": "How Pico Works",
-      "title": "Pico diagnoses the blocker, then routes you to build, fix, or control.",
-      "body": "Get something useful working and keep it trustworthy. Pico starts with diagnosis so the next move matches the real blocker.",
+      "eyebrow": "How It Works",
+      "title": "Diagnosis first. Then build, fix, or control.",
+      "body": "Pico finds the blocker and routes the next step.",
       "howItWorks": {
         "0": {
           "title": "Describe the goal or connect the agent",
@@ -123,14 +123,14 @@
     },
     "earlyAccess": {
       "eyebrow": "Founding Access",
-      "title": "Waitlist-first outside. Real product underneath.",
-      "body": "Access opens in waves so serious operators land in the right lane while workflows harden on real use.",
+      "title": "Waitlist outside. Product inside.",
+      "body": "Access opens in waves while the product hardens on real use.",
       "benefits": {
-        "0": "Start from zero, a broken setup, or a live system you do not trust yet",
+        "0": "Start from scratch, recover broken setups, or control live systems",
         "1": "Get routed into build, fix, or control",
-        "2": "Lock founding pricing while access is still selective",
-        "3": "Use expert input only when the edge case is real",
-        "4": "Help shape the first case studies and operating patterns"
+        "2": "Lock founding pricing early",
+        "3": "Use expert input only when needed",
+        "4": "Shape the first operator playbooks"
       }
     },
     "pricing": {

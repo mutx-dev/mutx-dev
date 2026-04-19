@@ -15,17 +15,17 @@
     "hero": {
       "badge": "创始访问 · 申请制",
       "title": "让 AI 智能体真正跑起来，",
-      "titleAccent": "并在真实工作里敢用它。",
-      "subtitle": "你可以从零开始、救回一个坏掉的设置，或重新管住一个已经在跑的智能体。Pico 会先判断卡点，再把你送到搭建、修复或控制这条正确路径上。",
+      "titleAccent": "并敢于信任它。",
+      "subtitle": "从零开始、救回一团糟的设置，或接管已经在线的系统。",
       "cta": "申请访问",
       "ctaSecondary": "看它如何运作",
-      "meta": "外面仍然是申请制。进来之后，Pico 会先诊断卡点，再把你送到搭建、修复或控制。"
+      "meta": "外面先申请。里面再分流到 build、fix、control。"
     },
     "trustBar": {
       "items": {
-        "0": "可以从零开始、从一团糟的 build 开始，或从已经在线的系统开始",
-        "1": "一层诊断逻辑会把你分流到 build、fix、control 之一",
-        "2": "在谈信任之前，先把可见性、审批和护栏放上去"
+        "0": "从零开始、修复烂摊子、或接管在线系统。",
+        "1": "诊断先决定走 build、fix、control 哪条路。",
+        "2": "先上护栏，再谈信任。"
       }
     },
     "problem": {
@@ -54,9 +54,9 @@
       "close": "Pico 会把这种不确定，变成下一步诚实而清晰的动作。"
     },
     "platform": {
-      "eyebrow": "Pico 怎么工作",
-      "title": "Pico 先诊断卡点，再把你送到搭建、修复或控制。",
-      "body": "把有用的东西跑起来，并一直让它值得信任。Pico 先做诊断，让下一步真正对准眼前的问题。",
+      "eyebrow": "工作方式",
+      "title": "先诊断，再 build、fix、control。",
+      "body": "Pico 找到卡点，再路由下一步。",
       "howItWorks": {
         "0": {
           "title": "描述目标，或连接现有智能体",
@@ -123,14 +123,14 @@
     },
     "earlyAccess": {
       "eyebrow": "创始访问",
-      "title": "外面是候补名单，里面已经是真产品。",
-      "body": "访问会分批开放，让认真的操作者进入正确路径，同时把流程在真实使用里打磨扎实。",
+      "title": "外面是等候名单，里面是真产品。",
+      "body": "访问会分批开放，产品会在真实使用里变得更稳。",
       "benefits": {
-        "0": "可以从零开始，也可以从坏掉的 setup 或还不敢信任的 live system 开始",
-        "1": "会被路由到 build、fix、control 中正确的一条",
-        "2": "在访问仍然 selective 时锁定 founding pricing",
-        "3": "只有 edge case 真的出现时才使用 expert input",
-        "4": "一起塑造最早的 case studies 和 operating patterns"
+        "0": "从零、从坏掉的状态、或从在线系统开始",
+        "1": "被分流到 build、fix、control",
+        "2": "尽早锁定 founding pricing",
+        "3": "只在需要时用专家帮助",
+        "4": "一起定义第一批运营 playbook"
       }
     },
     "pricing": {
