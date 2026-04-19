@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { marketingHomepage } from '../lib/marketingContent';
 import { createDefaultPicoProgress } from '../lib/pico/academy';
 
@@ -84,6 +84,19 @@ async function expectRouteSurfaceSplit(page: Page) {
   expect(metrics.lightTop).toBeGreaterThanOrEqual(metrics.darkBottom - 1);
   expect(metrics.headingInsideDark).toBe(true);
   expect(metrics.crossingPanel).toBe(false);
+}
+
+async function getAverageRgb(locator: Locator) {
+  return locator.first().evaluate((node) => {
+    const color = getComputedStyle(node).color;
+    const channels = color.match(/\d+(\.\d+)?/g)?.slice(0, 3).map(Number) ?? [];
+
+    if (channels.length !== 3) {
+      throw new Error(`Could not parse computed color: ${color}`);
+    }
+
+    return channels.reduce((sum, channel) => sum + channel, 0) / channels.length;
+  });
 }
 
 async function stubPicoProductApis(
@@ -839,6 +852,12 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByText(/effective date: march 13, 2026/i)).toBeVisible();
     await expect(page.getByRole('heading', { name: /information we collect/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /^security$/i })).toBeVisible();
+    expect(
+      await getAverageRgb(
+        page.getByText(/we may collect information you provide directly to us/i)
+      )
+    ).toBeLessThan(140);
+    expect(await getAverageRgb(page.getByText(/^effective date$/i))).toBeLessThan(140);
 
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
     await expectRouteSurfaceSplit(page);

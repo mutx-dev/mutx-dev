@@ -713,10 +713,18 @@
 }
 
 .routeLightSection {
+  --marketing-surface-soft: rgba(255, 251, 244, 0.72);
+  --marketing-text: #2c1d15;
+  --marketing-text-soft: rgba(57, 36, 22, 0.82);
+  --marketing-text-muted: rgba(77, 58, 45, 0.62);
+  --marketing-border: rgba(73, 46, 26, 0.12);
+  --marketing-border-strong: rgba(139, 99, 59, 0.24);
+  --marketing-shadow: 0 24px 64px rgba(10, 8, 10, 0.12);
   padding: clamp(1.5rem, 3vw, 2.3rem) 0 clamp(4rem, 8vw, 5.5rem);
   background:
     linear-gradient(180deg, rgba(255, 247, 235, 0.62), rgba(245, 237, 225, 0.96) 6rem),
     var(--marketing-bg);
+  color: var(--marketing-text);
 }
 
 .routeSectionShell,
