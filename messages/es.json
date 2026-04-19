@@ -245,6 +245,7 @@
       "eyebrow": "Acceso fundador",
       "title": "Solicita acceso a la ruta correcta.",
       "body": "Pico te ayuda a poner algo útil en marcha, recuperarlo cuando se rompe y mantenerlo bajo control en trabajo real.",
+      "faqLabel": "¿Aún lo estás decidiendo? Aclara los últimos bloqueos.",
       "formHeadline": "Empieza por el bloqueo real.",
       "formSubline": "Cuéntanos si necesitas construir, arreglar o controlar. Te llevaremos a la ruta correcta.",
       "ctaButton": "Solicitar acceso",
@@ -1732,11 +1733,26 @@
         "signalCore": "Núcleo de señal",
         "firstWinPulse": "Pulso de la primera victoria",
         "trackInstallPrompt": "Instala Hermes ahora",
+        "sealFirstWin": "Sella la primera victoria",
+        "continueWithNextLesson": "Continuar con {lessonTitle}",
+        "openAutopilot": "Abrir Autopilot",
+        "proofStateHeadline": {
+          "install": "Haz que la primera prueba sea imposible de pasar por alto.",
+          "prompt": "Sella la prueba mientras la ruta siga siendo honesta.",
+          "cleared": "La primera prueba es real. Mantén el carril en movimiento."
+        },
+        "hostedSyncDetail": {
+          "offline": "sincronización alojada sin conexión",
+          "loading": "actualizando señal",
+          "gatewayLive": "gateway en vivo",
+          "gatewayUnbound": "gateway sin enlazar"
+        },
         "installDone": "la instalación está hecha",
         "proofCaptured": "prueba capturada",
         "runtimeNotAttached": "no conectado",
         "nextMove": "Siguiente movimiento",
-        "visibleSuccess": "Éxito visible"
+        "visibleSuccess": "Éxito visible",
+        "stepsClear": "{completed}/{total} pasos claros"
       },
       "labels": {
         "chapterPulse": "Pulso del capítulo",
@@ -1747,7 +1763,14 @@
         "guideMarker": "Marcador de guía",
         "trackChecklist": "Checklist del track",
         "chapterBrief": "Resumen del capítulo 01",
+        "chapterBriefTitle": "Haz que un comando funcione y conserva la prueba",
+        "chapterBriefBody": "Este primer capítulo debe estrechar el mundo rápido: instala Hermes, ejecuta un prompt mínimo y guarda la salida para que la primera victoria se convierta en algo real.",
         "fastestPath": "Ruta más rápida al valor",
+        "fastestPathBody": {
+          "done": "Ya superaste la primera victoria. No te quedes aquí. Abre la siguiente lección y mantén la secuencia en movimiento.",
+          "installDone": "Bien. La instalación está hecha. Ahora ejecuta un prompt mínimo y consigue la primera respuesta visible.",
+          "installFirst": "No compares todavía proveedores, frameworks ni stacks. Instala Hermes y haz que el comando funcione primero."
+        },
         "trackLocked": "Track bloqueado",
         "visibleSuccess": "Éxito visible",
         "studioLedger": "Libro del estudio",
@@ -1809,8 +1832,46 @@
         "installLesson": "Lección de instalación",
         "firstPromptLesson": "Lección del primer prompt",
         "askTutor": "Preguntar a Tutor",
+        "operatingRuleBody": "Tener más opciones tan pronto solo es procrastinación más bonita. Consigue la primera victoria y luego ensancha la superficie.",
         "currentPressureInstall": "hecho",
-        "currentPressureFirstPrompt": "prueba capturada"
+        "currentPressureFirstPrompt": "prueba capturada",
+        "liveStackRadarTitle": "El carril de onboarding ya sabe lo que de verdad están entregando los stacks rastreados",
+        "liveStackRadarBody": "Pico empieza con Hermes en el flujo de lecciones, pero el producto ahora mantiene visible el resto del mapa de stack en lugar de fingir que solo existe un runtime en la tierra.",
+        "openLiveLedger": "Abrir ledger en vivo",
+        "missionBoardTitle": "Mantén las dos primeras misiones visiblemente ancladas",
+        "missionBoardBody": "El onboarding debe saber dónde se quedó el operador. Estas tarjetas de misión reflejan el workspace de la lección para que la primera victoria sobreviva a los cambios de ruta en vez de disolverse en la memoria.",
+        "workspaceContinuity": "continuidad del workspace",
+        "operatorRecordTitle": "Mantén el arranque alojado y la verdad del runtime en un solo lugar",
+        "operatorRecordBody": "Mantén el estado de onboarding alojado, la verdad del runtime y el siguiente movimiento de activación en un solo registro del operador para el capítulo 01.",
+        "runtimeStatusOptions": {
+          "client_required": "cliente requerido",
+          "healthy": "operativo",
+          "degraded": "degradado",
+          "offline": "sin conexión",
+          "warning": "advertencia",
+          "unknown": "desconocido"
+        },
+        "installMethodOptions": {
+          "npm": "npm",
+          "brew": "brew",
+          "binary": "binario",
+          "manual": "manual"
+        },
+        "activationTrackBody": {
+          "done": "Ya conseguiste la primera victoria. Usa la acción principal de arriba y mantén la secuencia en movimiento.",
+          "installDone": "Hermes está instalado. Sáltate la vista general y abre ahora la primera lección de prompt.",
+          "installFirst": "Todo lo demás puede esperar. Abre la lección de instalación y haz que el comando funcione."
+        },
+        "operatorRuleBody": "Tener más opciones tan pronto sigue siendo procrastinación más bonita. Mantén el capítulo estrecho hasta que sean reales una ejecución local y un artefacto de prueba.",
+        "trackState": {
+          "active": "Track activo",
+          "set": "Establecer como track",
+          "locked": "Bloqueado"
+        },
+        "hostedRuntimeEditorTitle": "Actualiza el registro del operador sin salir de la ruta",
+        "hostedRuntimeEditorBody": "Esto no pretende instalar nada desde el navegador. Guarda la instantánea veraz más reciente del runtime para que el resto de Pico deje de adivinar.",
+        "savingSnapshot": "Guardando instantánea...",
+        "dismissChecklist": "Descartar checklist"
       },
       "compass": {
         "title": "Usa la ruta más corta que mantenga honesto al producto",
@@ -1825,6 +1886,10 @@
         "askTutorAboutStep": "Preguntar a Tutor sobre este paso",
         "inspectLiveControlRoom": "Inspeccionar sala de control en vivo",
         "escalateToHumanHelp": "Escalar a ayuda humana",
+        "primaryCaption": "Quédate en la secuencia principal hasta que una salida visible sea real.",
+        "tutorCaption": "Úsalo cuando te bloquee un comando concreto o una puerta de validación.",
+        "autopilotCaption": "Cambia aquí cuando el cuello de botella sea el estado del runtime, las aprobaciones o el gasto.",
+        "supportCaption": "Úsalo solo cuando la ruta del producto haya dejado de ser lo bastante veraz como para recuperarte por tu cuenta.",
         "nextMove": "Siguiente movimiento",
         "blocked": "Bloqueado",
         "runtime": "Runtime",
@@ -1840,7 +1905,12 @@
         "postTitle": "Postura del capítulo",
         "postBody": "Mantén el capítulo 01 estrecho a propósito. Sin navegar, sin turismo de stack y sin teatro extra de configuración antes de que exista un artefacto real.",
         "trackTitle": "Checklist del track",
-        "trackBody": "Una sola señal guía clara basta mientras la primera prueba todavía se está formando."
+        "trackBody": "Una sola señal guía clara basta mientras la primera prueba todavía se está formando.",
+        "labels": {
+          "brief": "01 • Resumen",
+          "reviewLine": "03 • Línea de revisión"
+        },
+        "guideMarkerBody": "Una sola señal guía clara basta mientras la primera prueba todavía se está formando."
       },
       "protocol": {
         "title": "Protocolo de prueba",
@@ -1891,6 +1961,9 @@
         "missing": "faltante",
         "resumeInstall": "Reanudar misión de instalación",
         "resumePrompt": "Reanudar misión de prompt"
+      },
+      "shared": {
+        "ok": "ok"
       }
     },
     "tutorPage": {
@@ -2040,6 +2113,17 @@
           "runtimeStatus": "Estado del runtime",
           "notSynced": "no sincronizado"
         },
+        "questionProtocol": [
+          "Nombra el paso exacto, el comando o la acción del dashboard en la que estabas.",
+          "Pega la evidencia: salida, error, transcripción o estado del runtime.",
+          "Pide el único siguiente movimiento que demuestre que la ruta vuelve a estar activa."
+        ],
+        "examplePrompts": [
+          "Hermes se abre en local, pero la ejecución en el VPS falla. ¿Qué debería verificar antes de cambiar nada?",
+          "El onboarding de OpenClaw terminó, pero la UI de Control sigue sin cargar. ¿Cuál es la ruta de verificación más limpia?",
+          "NanoClaw `/setup` se ejecutó en Claude Code, pero la ruta del contenedor sigue pareciendo rota. ¿Qué debería aislar primero?",
+          "El lanzador de PicoClaw funciona solo en localhost. ¿Debería cambiar la dirección de enlace o mantenerlo privado con Tailscale?"
+        ],
         "questionPlaceholder": "Describe el bloqueo, el paso exacto y lo que esperabas que ocurriera.",
         "blockedLessonLabel": "Lección bloqueada",
         "noLessonSelected": "Ninguna lección seleccionada",
@@ -2130,6 +2214,93 @@
       },
       "shared": {
         "openLesson": "Abrir {lessonTitle}"
+      }
+    },
+    "welcomeTour": {
+      "quickHelp": "Ayuda rápida",
+      "title": "Aprende el códice una vez y luego ciérralo.",
+      "close": "Cerrar",
+      "closeLabel": "Cerrar recorrido rápido",
+      "controls": {
+        "back": "Atrás",
+        "next": "Siguiente",
+        "finish": "Finalizar"
+      },
+      "steps": {
+        "mission": {
+          "eyebrow": "01 Misión",
+          "title": "Cada superficie de Pico debería tener una acción dominante.",
+          "body": "Si una página parece tratar por igual de navegación, métricas y explicación, está mintiendo. Encuentra el único movimiento que despeja la ruta.",
+          "bullets": {
+            "currentSurface": "Estás en el capítulo {chapter}: {label}.",
+            "backtrackPrevious": "Objetivo de retroceso: {label}.",
+            "backtrackOnboarding": "Objetivo de retroceso: onboarding.",
+            "forwardNext": "Ruta hacia delante: {label}.",
+            "forwardSupport": "Ruta hacia delante: soporte."
+          }
+        },
+        "route": {
+          "academy": {
+            "eyebrow": "02 La misión primero",
+            "title": "El códice solo quiere que importe una misión.",
+            "body": "Abre la lección dominante, despeja el paso visible y deja que el archivo permanezca en silencio hasta que la ruta principal esté hecha.",
+            "bullets": {
+              "map": "El mapa explica la secuencia. No debería competir con la misión.",
+              "proof": "El carril de prueba actual es lo único que debería sentirse urgente.",
+              "currentSurface": "Superficie actual: {pageTitle}."
+            }
+          },
+          "tutor": {
+            "eyebrow": "02 Un bloqueo",
+            "title": "Tutor es para el siguiente paso exacto.",
+            "body": "Pregunta por el único comando, ruta de archivo o paso de validación que está deteniendo la ruta.",
+            "bullets": {
+              "academy": "Si la secuencia es incorrecta, vuelve a Academy.",
+              "autopilot": "Si el bloqueo es el estado real del runtime, abre Autopilot.",
+              "currentSurface": "Superficie actual: {pageTitle}."
+            }
+          },
+          "autopilot": {
+            "eyebrow": "02 Verdad del runtime",
+            "title": "Autopilot supera el texto de la lección cuando el sistema está en vivo.",
+            "body": "Usa la superficie de runtime cuando la respuesta dependa de ejecuciones, alertas, aprobaciones o del estado actual.",
+            "bullets": {
+              "academy": "Vuelve a Academy cuando la secuencia de la misión sea el problema real.",
+              "support": "Escala solo cuando la verdad del runtime ya no baste.",
+              "currentSurface": "Superficie actual: {pageTitle}."
+            }
+          },
+          "support": {
+            "eyebrow": "02 Borde humano",
+            "title": "Soporte debería devolverte al movimiento con rapidez.",
+            "body": "Trae el paquete de lección o runtime más limpio posible y luego vuelve al producto en lugar de quedarte aquí.",
+            "bullets": {
+              "notDefault": "Soporte es el borde desordenado, no el espacio de trabajo por defecto.",
+              "packet": "Lleva el slug de la lección, la prueba y el bloqueo cuando escales.",
+              "currentSurface": "Superficie actual: {pageTitle}."
+            }
+          },
+          "onboarding": {
+            "eyebrow": "02 Primera victoria",
+            "title": "Onboarding existe para comprimir el primer éxito visible.",
+            "body": "Úsalo para llegar a un runtime funcional y a un artefacto de prueba, y luego pasa enseguida al códice.",
+            "bullets": {
+              "noise": "Trata las preferencias como ruido hasta que el primer éxito sea real.",
+              "academy": "Academy empieza a servir cuando necesites el carril exacto.",
+              "currentSurface": "Superficie actual: {pageTitle}."
+            }
+          }
+        },
+        "proof": {
+          "eyebrow": "03 Prueba",
+          "title": "Nunca abandones la ruta sin un artefacto de prueba.",
+          "body": "La plataforma solo se vuelve confiable cuando cada paso superado deja evidencia detrás, no solo optimismo.",
+          "bullets": {
+            "tutor": "Si el bloqueo es exacto, pregunta a Tutor.",
+            "autopilot": "Si el bloqueo es la verdad del sistema en vivo, abre Autopilot.",
+            "support": "Si ambos fallan, escala a Soporte con la prueba y las notas."
+          }
+        }
       }
     },
     "academyPage": {
@@ -2335,7 +2506,7 @@
         "openLiveApprovalSetup": "Abrir configuración de aprobación en vivo",
         "completeLabel": {
           "installHermesLocally": "Hermes está instalado",
-          "runYourFirstAgent": "Holy shit, it works",
+          "runYourFirstAgent": "La primera ejecución funcionó",
           "default": "Sellar este capítulo"
         },
         "askTutorAboutLesson": "Preguntar a Tutor sobre esta lección",
@@ -3132,6 +3303,10 @@
           "retention": "90 días de historial de ejecuciones y alertas"
         }
       }
+    },
+    "surfaceCompass": {
+      "label": "Brújula de superficie",
+      "operatingRule": "Regla operativa"
     }
   }
 }

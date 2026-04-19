@@ -1,11 +1,8 @@
-import type { Metadata } from 'next'
-
 import { PicoOnboardingPageClient } from '@/components/pico/PicoOnboardingPageClient'
+import { buildPicoPageMetadata } from '@/lib/pico/metadata'
 
-export const metadata: Metadata = {
-  title: 'Onboarding — PicoMUTX',
-  description:
-    'Install Hermes, run one bounded prompt, capture the first proof artifact, and attach hosted setup state when it is available.',
+export async function generateMetadata() {
+  return buildPicoPageMetadata('pico.pages.onboarding.meta', '/onboarding')
 }
 
 export default function PicoOnboardingPage() {

@@ -137,6 +137,20 @@
       "eyebrow": "파운딩 가격",
       "title": "공개 가격 전에 파운딩 가격을 잠그세요.",
       "tiers": {
+        "free": {
+          "name": "무료",
+          "price": "$0",
+          "period": "영구 무료",
+          "description": "과금하기 전에 stack map, lesson flow, product truth를 살펴보세요.",
+          "features": [
+            "월 100 credits",
+            "제한된 Tutor 액세스",
+            "Academy lesson(기본)",
+            "커뮤니티 지원"
+          ],
+          "cta": "현재 플랜",
+          "ctaHref": null
+        },
         "starter": {
           "name": "창립 Tier",
           "price": "29유로",
@@ -236,7 +250,12 @@
       "formSubline": "구축, 복구, 제어 중 무엇이 필요한지 알려 주세요. 맞는 경로로 안내하겠습니다.",
       "ctaButton": "액세스 요청",
       "formCtaMeta": "Free trial · 파운딩 가격 90% 할인 · €29 / €79 · Pico Pilot €1,000+부터",
+      "faqLabel": "아직 결정 중인가요? 남은 blocker 몇 가지만 정리해 봅시다.",
       "secondaryButton": "플래닝 콜 예약"
+    },
+    "localeSwitcher": {
+      "currentLanguage": "현재 언어",
+      "listLabel": "인터페이스 언어 선택"
     },
     "contactForm": {
       "dialogLabel": "문의 양식",
@@ -283,6 +302,9 @@
       "errorFallback": "문제가 발생했습니다. 다시 시도해 주세요."
     },
     "footer": {
+      "brand": "PicoMUTX",
+      "logoAlt": "PicoMUTX 로고",
+      "tagline": "PicoMUTX는 AI agent builder를 위한 학습 및 운영 플랫폼입니다.",
       "links": {
         "releases": "릴리스",
         "docs": "문서",
@@ -292,7 +314,203 @@
         "contact": "문의",
         "privacy": "개인정보 보호"
       },
+      "supportPrompt": "더 필요하신가요?",
+      "supportCta": "문의하기",
+      "supportBody": "Enterprise 요금제(100K+ credits, SSO, SLA)는 별도로 문의하세요.",
       "copyright": "© MUTX 2026. 배포된 에이전트를 위한 열린 제어."
+    },
+    "pages": {
+      "onboarding": {
+        "meta": {
+          "title": "시작하기 — PicoMUTX",
+          "description": "PicoMUTX workspace를 설정하고 학습을 시작하세요."
+        }
+      },
+      "pricing": {
+        "meta": {
+          "title": "요금제 — PicoMUTX",
+          "description": "요금제는 실제 제품 surface에 맞춰집니다. 12개 lesson, grounded tutoring, 모니터링된 runtime context, 그리고 Hermes, OpenClaw, NanoClaw, PicoClaw 전반의 live stack brief가 포함됩니다."
+        }
+      },
+      "academy": {
+        "meta": {
+          "title": "PicoMUTX Academy",
+          "description": "PicoMUTX Academy에서 lesson, track, 학습 경로를 살펴보세요."
+        }
+      },
+      "lesson": {
+        "meta": {
+          "title": "{title} · PicoMUTX Academy",
+          "description": "레슨 요약: {summary}"
+        }
+      },
+      "autopilot": {
+        "meta": {
+          "title": "PicoMUTX Autopilot",
+          "description": "PicoMUTX Autopilot으로 workflow를 자동화하세요."
+        }
+      },
+      "tutor": {
+        "meta": {
+          "title": "PicoMUTX Tutor",
+          "description": "PicoMUTX AI Tutor에게서 가이드된 도움을 받으세요."
+        }
+      },
+      "support": {
+        "meta": {
+          "title": "PicoMUTX Support",
+          "description": "PicoMUTX 지원을 받으세요."
+        }
+      },
+      "wip": {
+        "meta": {
+          "title": "라이브 빌드 레저 — PicoMUTX",
+          "description": "지금 PicoMUTX 경험을 구동하는 17개의 builder-pack docs, 추적 중인 repo snapshot, remote-access 기본값을 살펴보세요."
+        },
+        "title": "라이브 빌드 레저",
+        "subtitle": "이 경로는 더 이상 미완성을 사과하기 위한 곳이 아닙니다. 이제는 Pico를 실제로 구동하는 소스 자료, pack docs, Academy lesson, 추적 중인 repo, 그리고 그것들이 시사하는 remote-access posture를 보여줍니다.",
+        "backToPico": "Pico로 돌아가기",
+        "mutxPlatform": "MUTX 플랫폼",
+        "imageAlt": "라이브 stack brief를 살펴보는 PicoMUTX 로봇"
+      }
+    },
+    "auth": {
+      "eyebrow": "Pico 호스트 인증",
+      "orUseEmail": "또는 이메일 사용",
+      "forgotPassword": "비밀번호를 잊으셨나요?",
+      "fields": {
+        "name": {
+          "label": "이름",
+          "placeholder": "김하나"
+        },
+        "email": {
+          "label": "이메일",
+          "placeholder": "operator@company.com"
+        },
+        "password": {
+          "label": "비밀번호",
+          "placeholder": "비밀번호를 입력하세요"
+        },
+        "confirmPassword": {
+          "label": "비밀번호 확인",
+          "placeholder": "비밀번호를 다시 입력하세요"
+        }
+      },
+      "modes": {
+        "login": {
+          "title": "현재 Pico 빌드로 들어가기",
+          "subtitle": "provider 또는 이메일로 preview를 열고 지금 위치를 저장하세요.",
+          "submit": "Pico 들어가기",
+          "loading": "열는 중...",
+          "toggleQuestion": "액세스가 필요하신가요?",
+          "toggleAction": "계정 만들기"
+        },
+        "register": {
+          "title": "Pico preview 계정 만들기",
+          "subtitle": "한 번 가입하고 위치를 저장한 뒤, 제품이 개선되는 과정을 계속 따라가세요.",
+          "submit": "preview 계정 만들기",
+          "loading": "만드는 중...",
+          "toggleQuestion": "이미 계정이 있나요?",
+          "toggleAction": "로그인"
+        }
+      },
+      "errors": {
+        "passwordMismatch": "비밀번호가 일치하지 않습니다",
+        "passwordTooShort": "비밀번호는 8자 이상이어야 합니다",
+        "loginFailed": "로그인에 실패했습니다",
+        "registerFailed": "계정 생성에 실패했습니다",
+        "emailRequired": "먼저 이메일 주소를 입력하세요",
+        "resendFailed": "재전송에 실패했습니다"
+      },
+      "notice": {
+        "verificationSent": "인증 이메일을 보냈습니다",
+        "resending": "전송 중...",
+        "resendVerification": "인증 이메일 다시 보내기"
+      }
+    },
+    "authRecovery": {
+      "forgotPassword": {
+        "eyebrow": "비밀번호 복구",
+        "title": "control plane을 떠나지 않고 operator 액세스를 복구하세요.",
+        "description": "MUTX 계정에 연결된 이메일을 사용하면 재설정 링크를 보내드립니다. 오늘 필요한 경로가 hosted auth가 아니더라도 dashboard, docs, install flow는 계속 열려 있습니다.",
+        "asideEyebrow": "복구 메모",
+        "asideTitle": "인증 레인은 실용적으로 유지하세요.",
+        "asideBody": "재설정 흐름은 단순하고, 정직하며, 검증하기 쉬워야 합니다. 계정이 없거나 hosted 레인을 쓸 수 없어도 나머지 public surface는 계속 진실을 말해야 합니다.",
+        "highlights": [
+          "hosted operator 계정에 연결된 업무용 이메일을 사용하세요.",
+          "재설정 링크는 만료되므로 메일이 도착하면 빠르게 처리하세요.",
+          "지금 필요한 것이 product truth뿐이라면 docs와 dashboard는 계속 확인할 수 있습니다."
+        ],
+        "successTitle": "이메일을 확인하세요",
+        "successBody": "{email}로 비밀번호 재설정 안내를 보냈습니다.",
+        "successHint": "메일이 보이지 않으면 스팸함을 확인하거나 새 링크를 요청하세요.",
+        "backToSignIn": "로그인으로 돌아가기",
+        "tryAgain": "다시 시도",
+        "sendTitle": "재설정 안내 보내기",
+        "sendBody": "과장된 연출 없이, 이메일과 새 링크만 보내드립니다.",
+        "emailLabel": "이메일 주소",
+        "emailPlaceholder": "you@company.com",
+        "sending": "전송 중...",
+        "sendLink": "재설정 링크 보내기"
+      },
+      "resetPassword": {
+        "eyebrow": "비밀번호 재설정",
+        "title": "새 비밀번호를 설정하고 operator 레인으로 돌아오세요.",
+        "description": "강한 비밀번호를 설정하고 정확히 한 번 확인한 뒤, 흐름이 성공했는지 추측하지 않고 재설정을 끝내세요.",
+        "asideEyebrow": "재설정 규칙",
+        "asideTitle": "복구 경로는 지루할수록 좋습니다.",
+        "asideBody": "비밀번호 재설정은 단순하고 빠르며 확인 가능해야 합니다. 장식적인 auth 연출보다 확실한 폼 상태가 더 중요합니다.",
+        "highlights": [
+          "재설정 링크는 token 기반이므로, 만료되었거나 없는 token은 정직하게 실패해야 합니다.",
+          "최소 validator만 통과하는 비밀번호가 아니라, 스스로의 security 기준을 넘는 비밀번호를 사용하세요.",
+          "현재 경로가 hosted auth가 아니더라도 레인이 단단해지는 동안 docs와 dashboard는 계속 볼 수 있습니다."
+        ],
+        "invalidTitle": "유효하지 않은 재설정 링크",
+        "invalidBody": "이 비밀번호 재설정 링크는 없거나, 유효하지 않거나, 이미 만료되었습니다.",
+        "requestNewLink": "새 링크 요청",
+        "backToSignIn": "로그인으로 돌아가기",
+        "completeTitle": "비밀번호 재설정 완료",
+        "completeBody": "비밀번호가 업데이트되었습니다. 이제 로그인 레인에서 새 자격 증명을 사용할 수 있습니다.",
+        "signIn": "로그인",
+        "formTitle": "새 비밀번호 선택",
+        "formBody": "강하게 설정하고 한 번 확인하면 나머지는 폼이 처리합니다.",
+        "newPassword": "새 비밀번호",
+        "confirmPassword": "비밀번호 확인",
+        "resetting": "재설정 중...",
+        "resetPassword": "비밀번호 재설정",
+        "passwordsMismatch": "비밀번호가 일치하지 않습니다",
+        "passwordTooShort": "비밀번호는 8자 이상이어야 합니다"
+      },
+      "verifyEmail": {
+        "eyebrow": "이메일 확인",
+        "title": "platform가 준비됐다고 가장하기 전에 주소를 확인하세요.",
+        "description": "이제 인증은 계정 경계의 일부입니다. 이 흐름은 token을 정직하게 확인하고, 활성 host에서 재전송할 수 있으며, 가짜 성공 상태로 튕기지 않고 다음 경로를 안정적으로 유지합니다.",
+        "asideEyebrow": "확인 규칙",
+        "asideTitle": "확인은 명시적으로 유지하세요.",
+        "asideBody": "provider auth는 상위 identity가 이미 확인되어 있으므로 이 단계를 건너뛸 수 있습니다. 비밀번호 가입은 이메일 확인 레인을 통해 책임을 유지합니다.",
+        "highlights": [
+          "인증 링크는 하드코딩된 marketing route가 아니라 현재 활성 frontend host에서 종료됩니다.",
+          "만료되었거나 잘못된 token은 정직하게 실패하고, 재전송할 수 있는 명확한 경로를 남깁니다.",
+          "확인이 끝나면 로그인 레인이 곧바로 의도한 platform route로 보낼 수 있습니다."
+        ],
+        "verifying": "이메일을 확인하는 중...",
+        "missingContext": "이 인증 경로에는 token 또는 링크를 받아야 할 이메일이 필요합니다.",
+        "sentTo": "{email}로 인증 링크를 보냈습니다.",
+        "verificationComplete": "인증 완료",
+        "verificationCompleteBody": "이제 이 계정으로 로그인할 수 있습니다. 같은 이메일로 로그인하고 의도한 경로로 계속 진행하세요.",
+        "signIn": "로그인",
+        "checkInbox": "받은편지함 확인",
+        "checkInboxBody": "가능하면 같은 기기에서 인증 링크를 열어 주세요. 도착하지 않으면 여기서 다시 보낼 수 있습니다.",
+        "resend": "인증 이메일 다시 보내기",
+        "resendSending": "전송 중...",
+        "resendNeedsEmail": "인증 메일을 다시 보내려면 먼저 가입 폼에 입력한 주소를 넣어 주세요.",
+        "resendSent": "{email}로 인증 링크를 다시 보냈습니다.",
+        "verifySuccess": "이메일 인증이 완료되었습니다.",
+        "verifyFailure": "이메일 인증에 실패했습니다",
+        "resendFailure": "인증 이메일 재전송에 실패했습니다",
+        "verificationFailed": "인증 실패",
+        "verificationFailedBody": "token이 만료되었다면, 계정을 소유한 주소에서 새 메일을 요청하세요."
+      }
     },
     "waitlistForm": {
       "submit": "액세스 요청",
@@ -604,7 +822,7 @@
           "contextReady": "맥락 준비 완료",
           "needsProof": "증거 필요"
         },
-        "returnAcademy": "academy",
+      "returnAcademy": "Academy",
         "resumeLesson": "{lessonTitle} 재개",
         "openLesson": "{lessonTitle} 열기",
         "stepsClear": "{completed}/{total} 단계 완료"
@@ -690,13 +908,13 @@
           "changed": "이 승인은 상태가 바뀌었습니다. 라이브 동작에 영향을 준다면 검토해야 합니다."
         },
         "timeline": {
-          "runTitle": "{status} run {runId}",
-          "alertTitle": "{type} {state}",
+          "runTitle": "{status} 실행 {runId}",
+          "alertTitle": "{type} 경보 {state}",
           "alertResolved": "해결됨",
           "alertTriggered": "발생함",
           "alertNoMessage": "메시지 없이 기록된 경고입니다.",
           "approvalRequestedBy": "{requester} 가 요청함.",
-          "approvalTitle": "{action} {status}",
+          "approvalTitle": "{action} 승인 {status}",
           "approvalStatus": {
             "pending": "대기 중",
             "approved": "승인됨",
@@ -1100,11 +1318,11 @@
         "body": "다른 화면이 먼저 요청을 만들기를 기다리지 말고 여기서 라이브 승인 대기열을 직접 사용하세요.",
         "chip": "라이브 대기열 쓰기",
         "agentIdLabel": "에이전트 ID",
-        "agentIdPlaceholder": "agent-founder-lab",
+        "agentIdPlaceholder": "에이전트-123",
         "sessionOrRunIdLabel": "세션 또는 실행 ID",
-        "sessionOrRunIdPlaceholder": "ses-pico-approval",
+        "sessionOrRunIdPlaceholder": "세션-또는-실행-123",
         "actionTypeLabel": "작업 유형",
-        "actionTypePlaceholder": "OUTBOUND_SEND",
+        "actionTypePlaceholder": "고위험_작업",
         "summaryLabel": "이 작업에 게이트가 필요한 이유",
         "summaryPlaceholder": "위험한 작업을 명확히 설명하세요.",
         "summaryDefault": "런타임이 선을 넘기 전에 아웃바운드 전송에는 사람의 결정이 필요합니다.",
@@ -1137,9 +1355,9 @@
           "verificationPending": "확인 대기 중",
           "emailVerified": "이메일 확인됨",
           "emailStatusUnknown": "이메일 상태 알 수 없음",
-          "loadingWebhooks": "webhooks 로드 중",
-          "webhookCount": "{count} webhook{pluralSuffix}",
-          "webhooksUnavailable": "webhook을(를) 사용할 수 없습니다."
+          "loadingWebhooks": "웹훅 불러오는 중",
+          "webhookCount": "웹훅 {count}개",
+          "webhooksUnavailable": "웹훅을 사용할 수 없음"
         },
         "body": "{identity}(으)로 로그인되었습니다. 진행률 동기화, 온보딩 상태, 승인 및 실시간 런타임 데이터는 이제 이 호스트에서 호스팅된 MUTX 계정을 사용할 수 있습니다.",
         "rails": {
@@ -1161,12 +1379,12 @@
           "progressSync": "진행 상황 동기화",
           "runtimeTruth": "런타임 진실",
           "approvalConfidence": "승인 신뢰도",
-          "live": "살다",
+          "live": "실시간",
           "checking": "확인 중",
-          "grounded": "접지된",
-          "partial": "부분적인",
-          "limited": "제한된",
-          "usable": "쓸 수 있는"
+          "grounded": "근거 있음",
+          "partial": "부분적",
+          "limited": "제한적",
+          "usable": "사용 가능"
         },
         "finishEmailVerification": "이메일 확인 완료"
       },
@@ -1176,26 +1394,26 @@
       },
       "anonymous": {
         "chips": {
-          "sessionRequired": "호스팅된 세션이 필요합니다.",
+          "sessionRequired": "호스팅 세션 필요",
           "picoHostAuth": "피코 호스트 인증"
         },
         "body": "Pico 플랫폼 경로는 여기에 실시간으로 제공되지만 호스팅된 세션은 아직 이 도메인에 연결되지 않았습니다. 진행 상황을 유지하고 라이브 실행을 읽고 백엔드 온보딩/런타임 상태를 사용하려면 Pico에 로그인하세요. Google, GitHub, Discord, Apple, 비밀번호 등록 및 이메일 확인이 모두 이제 이 호스트에서 종료됩니다.",
         "rails": {
-          "progress": "진전",
+          "progress": "진행 상황",
           "runtimeTruth": "런타임 진실",
           "approvals": "승인",
-          "wontPersist": "지속되지 않을 것이다",
-          "limited": "제한된",
+          "wontPersist": "저장되지 않음",
+          "limited": "제한적",
           "readOnlyFeeling": "읽기 전용 느낌"
         },
         "withoutSession": {
           "label": "세션 없음",
           "progressSync": "진행 상황 동기화",
           "runtimeTruth": "런타임 진실",
-          "approvalsAndWebhooks": "승인 + webhooks",
-          "localOnly": "지역 전용",
-          "notTrustworthyYet": "아직은 믿을 수 없다",
-          "blocked": "막힌",
+          "approvalsAndWebhooks": "승인 + 웹훅",
+          "localOnly": "로컬 전용",
+          "notTrustworthyYet": "아직 신뢰 불가",
+          "blocked": "차단됨",
           "body": "진행 상황, 실시간 런타임 상태 또는 승인 동작을 신뢰하기 전에 이 호스트에 Pico 계정을 연결하세요.",
           "signIn": "로그인",
           "createAccount": "계정 만들기",
@@ -1205,51 +1423,51 @@
     },
     "platformSurface": {
       "syncState": {
-        "hydrating": "수분 공급",
-        "live": "살다",
-        "saving": "절약",
-        "localOnly": "지역 전용"
+        "hydrating": "불러오는 중",
+        "live": "실시간",
+        "saving": "저장 중",
+        "localOnly": "로컬 전용"
       },
       "shared": {
-        "notRecorded": "녹음되지 않음"
+        "notRecorded": "기록 없음"
       },
       "surfaceOptions": {
         "onboarding": {
           "label": "온보딩",
-          "note": "Launch bay memory"
+          "note": "시작 지점 기억"
         },
         "academy": {
-          "label": "Academy",
-          "note": "Primary learning spine"
+          "label": "아카데미",
+          "note": "핵심 학습 축"
         },
         "lesson": {
-          "label": "수업",
-          "note": "Active step memory"
+          "label": "레슨",
+          "note": "현재 단계 기억"
         },
         "tutor": {
-          "label": "Tutor",
-          "note": "Grounded next-step help"
+          "label": "튜터",
+          "note": "다음 움직임을 위한 근거 있는 도움"
         },
         "autopilot": {
-          "label": "Autopilot",
-          "note": "Runtime control room"
+          "label": "오토파일럿",
+          "note": "런타임 관제실"
         },
         "support": {
-          "label": "지원하다",
-          "note": "Human escalation lane"
+          "label": "지원",
+          "note": "사람 지원 에스컬레이션"
         },
-        "activeNow": "지금 활동 중",
-        "setRoute": "경로 설정"
+        "activeNow": "현재 활성",
+        "setRoute": "경로로 설정"
       },
       "header": {
         "label": "플랫폼 데스크",
-        "title": "한 곳에서 ID, 경로 메모리 및 제한 사항을 확인할 수 있습니다.",
-        "body": "이것은 Pico 계정에 대한 운영자 측 제어 데스크입니다. 계획 한도, 운영자가 마지막으로 작업한 위치, 제품 크롬이 초점 또는 복구에 맞게 조정되었는지 여부에 대한 진실을 알려야 합니다."
+        "title": "한 곳에서 신원, 경로 기억, 한계를 확인합니다",
+        "body": "이곳은 Pico 계정을 위한 운영자 제어 데스크입니다. 요금제 한도, 운영자가 마지막으로 작업한 위치, 그리고 제품 화면이 집중 모드인지 복구 모드인지까지 정확하게 보여줘야 합니다."
       },
       "summary": {
-        "plan": "계획",
-        "verification": "확인",
-        "workspaceSaves": "작업 공간이 절약됩니다",
+        "plan": "요금제",
+        "verification": "인증",
+        "workspaceSaves": "워크스페이스 저장 수",
         "verificationState": {
           "pending": "보류 중",
           "verified": "검증됨",
@@ -1259,39 +1477,39 @@
       },
       "routeMemory": {
         "label": "경로 메모리",
-        "body": "현재 표면은 작업자가 실제로 수행하는 작업과 일치해야 합니다. 제품이 차선을 변경할 때 이를 최신 상태로 유지하십시오.",
-        "activeSurfaceNotRecorded": "녹음되지 않음",
+        "body": "현재 화면은 운영자가 실제로 하고 있는 일과 맞아야 합니다. 제품 경로가 바뀌면 이 기억도 함께 갱신하세요.",
+        "activeSurfaceNotRecorded": "기록 없음",
         "currentSurface": {
-          "label": "현재 표면",
-          "body": "경로 메모리는 페이지가 변경될 때마다 재설정되는 대신 Pico을 통해 연산자를 따라야 합니다."
+          "label": "현재 화면",
+          "body": "경로 기억은 페이지가 바뀔 때마다 초기화되지 않고 Pico 전반에서 운영자를 따라가야 합니다."
         },
         "lastLessonContext": {
-          "label": "마지막 수업 내용",
-          "body": "이는 운영자가 레슨 스파인에 다시 들어가야 하는 복구 지점입니다."
+          "label": "마지막 레슨 맥락",
+          "body": "운영자가 레슨 흐름으로 돌아와야 할 때 복귀 기준점이 됩니다."
         }
       },
       "toggles": {
         "collapseRail": {
           "label": "레일 축소",
-          "body": "운전자가 이미 경로를 알고 있고 라이브 표면에 더 많은 공간이 필요한 경우 더 단단한 크롬을 사용하십시오."
+          "body": "운영자가 이미 경로를 알고 있고 라이브 화면에 더 많은 공간이 필요할 때 더 압축된 셸을 사용하세요."
         },
         "keepHelpLaneOpen": {
-          "label": "도움의 길을 열어두세요",
-          "body": "운영자가 제품 경로를 아직 학습하는 동안 복구 지침을 계속해서 확인하세요."
+          "label": "도움말 레인 열어두기",
+          "body": "운영자가 아직 제품 경로를 익히는 중이라면 복구 안내를 계속 보이게 두세요."
         }
       },
       "actions": {
         "resumeLastLesson": "지난 수업 다시 시작",
-        "openAcademy": "오픈아카데미",
+        "openAcademy": "아카데미 열기",
         "clearLessonMemory": "수업 기억 지우기",
         "resetPlatformMemory": "플랫폼 메모리 재설정",
         "openLiveControlRoom": "라이브 관제실 열기"
       },
       "entitlements": {
-        "label": "권리",
+        "label": "권한",
         "featureLabels": {
-          "academy": "Academy",
-          "tutor": "Tutor",
+          "academy": "아카데미",
+          "tutor": "튜터",
           "project_limit": "프로젝트 한도",
           "monitored_agents": "모니터링되는 에이전트",
           "alerts": "경고",
@@ -1303,11 +1521,11 @@
         "label": "경로 원장",
         "currentPath": "현재 경로",
         "platformStateUpdated": "플랫폼 상태가 업데이트되었습니다.",
-        "syncConfidence": "동기화 자신감"
+        "syncConfidence": "동기화 신뢰도"
       },
       "operatorTruth": {
-        "label": "운영자 진실",
-        "body": "제품은 자신보다 더 많이 아는 척하지 않고 경로와 수업 내용을 기억해야 합니다. `activeSurface`, `lastOpenedLessonSlug`, 레일 상태 및 도움말 레인은 Pico이 하나의 플랫폼처럼 느껴지도록 만드는 데 필요한 최소 지속 메모리입니다."
+        "label": "운영자 관점의 진실",
+        "body": "제품은 실제보다 더 많이 아는 척하지 않으면서 경로와 레슨 맥락을 기억해야 합니다. `activeSurface`, `lastOpenedLessonSlug`, 레일 상태, 도움말 레인은 Pico가 하나의 플랫폼처럼 느껴지게 하는 최소한의 지속 메모리입니다."
       }
     },
     "onboardingPage": {
@@ -1331,11 +1549,26 @@
         "signalCore": "신호 코어",
         "firstWinPulse": "첫 승리 펄스",
         "trackInstallPrompt": "지금 Hermes 설치",
+        "sealFirstWin": "첫 승리를 확정하세요",
+        "continueWithNextLesson": "{lessonTitle} 계속하기",
+        "openAutopilot": "Autopilot 열기",
+        "proofStateHeadline": {
+          "install": "첫 번째 증거를 절대 놓칠 수 없게 만드세요.",
+          "prompt": "route가 아직 정직할 때 증거를 봉인하세요.",
+          "cleared": "첫 번째 증거는 이제 실제입니다. 레인을 계속 움직이세요."
+        },
+        "hostedSyncDetail": {
+          "offline": "hosted sync 오프라인",
+          "loading": "신호 새로고침 중",
+          "gatewayLive": "gateway 연결됨",
+          "gatewayUnbound": "gateway 미연결"
+        },
         "installDone": "설치가 완료되었습니다",
         "proofCaptured": "증거 캡처",
         "runtimeNotAttached": "첨부되지 않음",
         "nextMove": "다음 움직임",
-        "visibleSuccess": "눈에 보이는 성공"
+        "visibleSuccess": "눈에 보이는 성공",
+        "stepsClear": "{completed}/{total} 단계 완료"
       },
       "labels": {
         "chapterPulse": "장 펄스",
@@ -1346,7 +1579,14 @@
         "guideMarker": "가이드 마커",
         "trackChecklist": "트랙 체크리스트",
         "chapterBrief": "01장 개요",
+        "chapterBriefTitle": "명령 하나를 실제로 돌리고, 증거를 남기세요",
+        "chapterBriefBody": "이 첫 장은 세상을 빠르게 좁혀야 합니다. Hermes를 설치하고, 아주 작은 prompt 하나를 실행하고, 그 출력물을 붙잡아 첫 승리를 실제 결과로 바꾸세요.",
         "fastestPath": "가치를 실현하는 가장 빠른 경로",
+        "fastestPathBody": {
+          "done": "첫 승리는 이미 넘겼습니다. 여기서 머물지 마세요. 다음 lesson을 열고 흐름을 계속 움직이세요.",
+          "installDone": "좋습니다. 설치는 끝났습니다. 이제 작은 prompt 하나를 실행해 첫 번째로 눈에 보이는 답을 얻으세요.",
+          "installFirst": "아직 provider, framework, stack을 비교하지 마세요. 먼저 Hermes를 설치하고 명령이 실제로 돌게 만드세요."
+        },
         "trackLocked": "트랙이 잠겼습니다.",
         "visibleSuccess": "눈에 보이는 성공",
         "studioLedger": "스튜디오 원장",
@@ -1356,6 +1596,7 @@
         "workspace": "작업공간",
         "jumpStraightTo": "바로 이동",
         "operatingRule": "운영규칙",
+        "operatingRuleBody": "이 단계에서 선택지를 늘리는 건 보기 좋은 미루기일 뿐입니다. 먼저 첫 승리를 만들고, 그다음에 surface를 넓히세요.",
         "currentPressure": "현재 압력",
         "install": "설치하다",
         "firstPrompt": "첫 번째 프롬프트",
@@ -1364,12 +1605,20 @@
         "doThisNow": "지금 하세요",
         "visibleMove": "보이는 움직임",
         "liveStackRadar": "라이브 스택 레이더",
+        "liveStackRadarTitle": "온보딩 레인은 이제 추적 중인 stack이 실제로 무엇을 shipping하는지 알고 있습니다",
+        "liveStackRadarBody": "Pico는 lesson flow에서는 Hermes로 시작하지만, 이제 product는 세상에 runtime이 하나뿐인 것처럼 굴지 않고 나머지 stack map도 계속 보이게 둡니다.",
+        "openLiveLedger": "라이브 레저 열기",
         "missionBoard": "미션보드",
+        "missionBoardTitle": "첫 두 개의 mission을 눈에 보이게 땅에 붙여 두세요",
+        "missionBoardBody": "온보딩은 operator가 어디서 멈췄는지 알아야 합니다. 이 mission 카드들은 lesson workspace를 그대로 비춰서, 첫 승리가 route 변경 때문에 기억 속으로 녹아 사라지지 않게 합니다.",
+        "workspaceContinuity": "workspace 연속성",
         "mission01": "미션 01",
         "mission02": "미션 02",
         "focusedStep": "집중 단계",
         "proofCaptured": "증거 캡처",
         "operatorRecord": "운영자 기록",
+        "operatorRecordTitle": "hosted kickoff와 runtime truth를 한곳에 유지하세요",
+        "operatorRecordBody": "Chapter 01에서는 hosted onboarding state, runtime truth, 다음 activation move를 하나의 operator record에 같이 보관해야 합니다.",
         "refreshSync": "동기화 새로 고침",
         "currentBinding": "현재 바인딩",
         "assistant": "어시스턴트",
@@ -1378,10 +1627,13 @@
         "updateStep": "단계 업데이트 중...",
         "completeStep": "현재 단계를 완료로 표시",
         "checklistDismissed": "체크리스트가 닫혔습니다.",
+        "dismissChecklist": "체크리스트 닫기",
         "checklistVisible": "체크리스트 표시",
         "completeWizard": "완전한 마법사",
         "resetWizard": "재설정 마법사",
         "hostedRuntimeEditor": "호스팅된 런타임 편집기",
+        "hostedRuntimeEditorTitle": "route를 떠나지 않고 operator record를 업데이트하세요",
+        "hostedRuntimeEditorBody": "이 기능은 브라우저에서 뭔가를 설치하는 척하지 않습니다. 대신 Pico의 나머지 화면이 추측을 멈출 수 있도록 가장 최신의 정직한 runtime snapshot을 저장합니다.",
         "runtimeLabel": "런타임 라벨",
         "runtimeStatusField": "런타임 상태",
         "installMethod": "설치 방법",
@@ -1389,6 +1641,7 @@
         "assistantName": "어시스턴트 이름",
         "workspaceField": "작업공간",
         "modelField": "모델",
+        "savingSnapshot": "스냅샷 저장 중...",
         "saveSnapshot": "런타임 스냅샷 저장",
         "openInstallLesson": "설치 강의 열기",
         "saveOnlyTruth": "현재 운영자 호스트에 있는 게이트웨이 URL, 런타임 상태 및 바운드 어시스턴트에 해당하는 정보만 저장하세요.",
@@ -1405,11 +1658,36 @@
         "doThisFirst": "이 작업을 먼저 수행하세요.",
         "outcomeDriven": "결과 중심",
         "outcome": "결과:",
+        "activationTrackBody": {
+          "done": "첫 승리는 이미 얻었습니다. 위의 주 액션을 사용해 흐름을 계속 앞으로 밀어 주세요.",
+          "installDone": "Hermes는 설치되었습니다. 개요는 건너뛰고 지금 첫 prompt lesson을 여세요.",
+          "installFirst": "다른 건 모두 기다릴 수 있습니다. install lesson을 열고 먼저 명령이 돌아가게 만드세요."
+        },
         "installLesson": "강의 설치",
         "firstPromptLesson": "첫 번째 프롬프트 레슨",
         "askTutor": "튜터에게 물어보세요",
         "currentPressureInstall": "완료",
-        "currentPressureFirstPrompt": "증거 캡처"
+        "currentPressureFirstPrompt": "증거 캡처",
+        "operatorRuleBody": "이 단계에서 선택지를 늘리는 건 여전히 보기 좋은 미루기입니다. local run 하나와 proof artifact 하나가 모두 실제가 될 때까지 이 chapter를 좁게 유지하세요.",
+        "trackState": {
+          "active": "활성 트랙",
+          "set": "트랙으로 설정",
+          "locked": "잠김"
+        },
+        "runtimeStatusOptions": {
+          "client_required": "클라이언트 필요",
+          "healthy": "정상",
+          "degraded": "성능 저하",
+          "offline": "오프라인",
+          "warning": "경고",
+          "unknown": "알 수 없음"
+        },
+        "installMethodOptions": {
+          "npm": "엔피엠",
+          "brew": "브루",
+          "binary": "바이너리",
+          "manual": "수동"
+        }
       },
       "compass": {
         "title": "제품을 정직하게 유지하는 최단 경로를 사용하십시오.",
@@ -1421,25 +1699,37 @@
         "openInstallLesson": "설치 강의 열기",
         "runFirstPrompt": "첫 번째 프롬프트 실행",
         "continueAcademyLane": "아카데미 레인 계속",
+        "primaryCaption": "눈에 보이는 출력 하나가 실제가 될 때까지 기본 시퀀스에 머무르세요.",
         "askTutorAboutStep": "이 단계에 대해 교사에게 물어보세요",
+        "tutorCaption": "구체적인 command나 validation gate 하나가 막혀 있을 때 사용하세요.",
         "inspectLiveControlRoom": "라이브 관제실 점검",
+        "autopilotCaption": "runtime state, approval, spend가 병목이 되는 순간 여기로 전환하세요.",
         "escalateToHumanHelp": "사람의 도움으로 에스컬레이션",
+        "supportCaption": "product path만으로는 더 이상 정직하게 복구할 수 없을 때만 사용하세요.",
         "nextMove": "다음 움직임",
         "blocked": "막힌",
         "runtime": "실행 시간",
         "messyEdge": "지저분한 가장자리"
       },
+      "shared": {
+        "ok": "확인"
+      },
       "doctrine": {
         "label": "킥오프 교리",
         "title": "취미 프로젝트가 아닌 샤프 스튜디오처럼 시작해보세요",
         "chip": "개요 • 제공 가능 • 검토",
+        "labels": {
+          "brief": "01 • 브리프",
+          "reviewLine": "03 • 리뷰 라인"
+        },
         "brief": "런타임을 깔끔하게 열어보세요.",
         "deliverable": "명백한 증거물 1개 생산",
         "reviewLine": "표면을 일찍 넓히지 마십시오.",
         "postTitle": "장 자세",
         "postBody": "의도적으로 01장을 좁게 유지하세요. 하나의 실제 유물이 존재하기 전에는 탐색도, 스택 관광도, 추가 설정 극장도 없습니다.",
         "trackTitle": "트랙 체크리스트",
-        "trackBody": "첫 번째 증명이 아직 형성되는 동안 하나의 명확한 안내 신호로 충분합니다."
+        "trackBody": "첫 번째 증명이 아직 형성되는 동안 하나의 명확한 안내 신호로 충분합니다.",
+        "guideMarkerBody": "첫 번째 증거가 아직 형태를 잡는 동안에는 분명한 가이드 신호 하나면 충분합니다."
       },
       "protocol": {
         "title": "증명 프로토콜",
@@ -1639,6 +1929,17 @@
           "runtimeStatus": "런타임 상태",
           "notSynced": "동기화되지 않음"
         },
+        "questionProtocol": [
+          "방금 멈춘 정확한 단계, 명령어, 또는 대시보드 동작을 적어 주세요.",
+          "증거를 붙여 넣으세요. 출력, 오류, 기록, 또는 런타임 상태입니다.",
+          "경로가 다시 살아났음을 증명할 다음 한 가지 행동만 요청하세요."
+        ],
+        "examplePrompts": [
+          "Hermes 는 로컬에서는 열리지만 VPS 실행은 실패합니다. 무엇을 바꾸기 전에 무엇부터 확인해야 하나요?",
+          "OpenClaw onboarding 은 끝났는데도 Control UI 가 아직 뜨지 않습니다. 가장 깔끔한 검증 경로는 무엇인가요?",
+          "NanoClaw `/setup` 은 Claude Code 에서 실행됐지만 container 경로가 여전히 깨진 것 같습니다. 무엇부터 분리해서 봐야 하나요?",
+          "PicoClaw launcher 는 localhost 에서만 동작합니다. bind address 를 바꿔야 하나요, 아니면 Tailscale 로 비공개 상태를 유지해야 하나요?"
+        ],
         "questionPlaceholder": "방해 요소, 정확한 단계, 예상되는 상황을 설명하세요.",
         "blockedLessonLabel": "차단된 수업",
         "noLessonSelected": "선택한 강의가 없습니다.",
@@ -1731,10 +2032,97 @@
         "openLesson": "{lessonTitle} 열기"
       }
     },
+    "welcomeTour": {
+      "quickHelp": "빠른 도움말",
+      "title": "코덱스는 한 번 익히고, 그다음 닫으세요.",
+      "close": "닫기",
+      "closeLabel": "빠른 투어 닫기",
+      "controls": {
+        "back": "뒤로",
+        "next": "다음",
+        "finish": "완료"
+      },
+      "steps": {
+        "mission": {
+          "eyebrow": "01 미션",
+          "title": "각 Pico 화면에는 하나의 주된 행동만 있어야 합니다.",
+          "body": "한 페이지가 탐색, 지표, 설명을 똑같이 다루는 것처럼 보인다면 그건 진실하지 않습니다. 경로를 여는 한 가지 움직임을 찾으세요.",
+          "bullets": {
+            "currentSurface": "지금은 Chapter {chapter}: {label}에 있습니다.",
+            "backtrackPrevious": "되돌아갈 대상: {label}.",
+            "backtrackOnboarding": "되돌아갈 대상: onboarding.",
+            "forwardNext": "앞으로 갈 경로: {label}.",
+            "forwardSupport": "앞으로 갈 경로: support."
+          }
+        },
+        "route": {
+          "academy": {
+            "eyebrow": "02 미션 우선",
+            "title": "코덱스는 지금 중요한 미션 하나만 원합니다.",
+            "body": "주된 레슨을 열고, 눈앞의 단계를 끝내고, 메인 경로가 끝날 때까지 아카이브는 조용히 두세요.",
+            "bullets": {
+              "map": "맵은 순서를 설명하는 역할입니다. 미션과 경쟁하면 안 됩니다.",
+              "proof": "지금 가장 급해야 하는 부분은 현재 증거 레인뿐입니다.",
+              "currentSurface": "현재 화면: {pageTitle}."
+            }
+          },
+          "tutor": {
+            "eyebrow": "02 하나의 막힘",
+            "title": "Tutor 는 정확한 다음 한 걸음을 위한 곳입니다.",
+            "body": "경로를 막고 있는 딱 하나의 명령어, file path, 또는 validation step 에 대해서만 물어보세요.",
+            "bullets": {
+              "academy": "순서가 잘못됐다면 Academy 로 돌아가세요.",
+              "autopilot": "live runtime state 가 막힘이라면 Autopilot 을 여세요.",
+              "currentSurface": "현재 화면: {pageTitle}."
+            }
+          },
+          "autopilot": {
+            "eyebrow": "02 런타임 진실",
+            "title": "system 이 live 상태라면 Autopilot 이 레슨 문구보다 우선합니다.",
+            "body": "답이 runs, alerts, approvals, 또는 current state 에 달려 있다면 runtime 화면을 사용하세요.",
+            "bullets": {
+              "academy": "진짜 문제가 미션 순서라면 Academy 로 돌아가세요.",
+              "support": "런타임 진실만으로는 더 이상 충분하지 않을 때만 Support 로 올리세요.",
+              "currentSurface": "현재 화면: {pageTitle}."
+            }
+          },
+          "support": {
+            "eyebrow": "02 사람의 경계",
+            "title": "Support 는 당신을 빠르게 다시 움직이게 해야 합니다.",
+            "body": "가장 깔끔한 lesson 또는 runtime packet 을 가져오고, 여기에 머물지 말고 다시 product 로 돌아가세요.",
+            "bullets": {
+              "notDefault": "Support 는 기본 workspace 가 아니라, 지저분한 가장자리입니다.",
+              "packet": "에스컬레이션할 때는 lesson slug, proof, blocker 를 함께 들고 가세요.",
+              "currentSurface": "현재 화면: {pageTitle}."
+            }
+          },
+          "onboarding": {
+            "eyebrow": "02 첫 승리",
+            "title": "Onboarding 은 첫 번째 눈에 보이는 성공까지의 거리를 줄이기 위해 존재합니다.",
+            "body": "작동하는 runtime 하나와 proof artifact 하나를 만든 뒤에는 곧바로 코덱스로 이동하세요.",
+            "bullets": {
+              "noise": "첫 성공이 진짜가 되기 전까지는 preferences 를 노이즈로 취급하세요.",
+              "academy": "정확한 레인이 필요해지는 순간 Academy 가 유용해집니다.",
+              "currentSurface": "현재 화면: {pageTitle}."
+            }
+          }
+        },
+        "proof": {
+          "eyebrow": "03 증거",
+          "title": "증거 산출물 없이 경로를 떠나지 마세요.",
+          "body": "플랫폼이 신뢰를 얻는 것은 각 단계가 낙관이 아니라 증거를 남길 때뿐입니다.",
+          "bullets": {
+            "tutor": "blocker 가 정확하다면 Tutor 에게 물어보세요.",
+            "autopilot": "blocker 가 live system 진실이라면 Autopilot 을 여세요.",
+            "support": "둘 다 실패하면 증거와 메모를 붙여 Support 로 올리세요."
+          }
+        }
+      }
+    },
     "academyPage": {
       "shell": {
         "eyebrow": "견습생 코덱스",
-        "title": "Academy",
+        "title": "아카데미",
         "description": "하나의 임무. 하나의 증거. 정직한 다음 행동."
       },
       "lessonState": {
@@ -2483,11 +2871,11 @@
           "note": "실제로 움직이는 경로"
         },
         "tutor": {
-          "label": "Tutor",
+        "label": "Tutor 도움",
           "note": "근거 있는 답 하나"
         },
         "autopilot": {
-          "label": "Autopilot",
+        "label": "Autopilot 관제",
           "note": "라이브 control room"
         },
         "support": {
@@ -2497,7 +2885,7 @@
       },
       "wordmark": {
         "logoAlt": "PicoMUTX 로고",
-        "atlas": "operator atlas"
+      "atlas": "operator 아틀라스"
       },
       "robotCard": {
         "signalLabel": "Pico 신호"
@@ -2553,8 +2941,8 @@
         "logoAlt": "PicoMUTX 로고",
         "links": {
           "releases": "릴리스",
-          "docs": "Docs",
-          "github": "GitHub",
+        "docs": "문서",
+        "github": "GitHub 저장소",
           "download": "다운로드",
           "privacy": "개인정보 보호"
         },
@@ -2660,7 +3048,91 @@
             "anchorPrice": "향후 정가 €10,000+"
           }
         }
-      }
+      },
+      "livePlans": {
+        "label": "라이브 product 플랜",
+        "title": "Pico가 이미 돌아가고 있을 때의 라이브 플랜",
+        "body": "이미 액세스가 있거나, product 뒤에 있는 billing layer를 이해해야 한다면, 여기 있는 플랜이 Pico 내부 깊은 곳에서 활성화됩니다.",
+        "badge": "Pico 내부",
+        "badgePopular": "operator 기본값",
+        "currentPlan": "현재",
+        "loading": "Checkout 시작 중...",
+        "checkoutError": "Checkout에 실패했습니다. 다시 시도해 주세요.",
+        "truths": [
+          "Checkout은 waitlist가 아니라 라이브 앱을 위한 것입니다",
+          "hosted session이 progress sync와 runtime state를 잠금 해제합니다",
+          "Enterprise는 막연한 카드 결제가 아니라 rollout planning으로 시작합니다"
+        ],
+        "tiers": {
+          "free": {
+            "name": "무료",
+            "price": "$0",
+            "period": "/월",
+            "description": "과금하기 전에 onboarding, Academy, live product의 형태를 살펴보세요.",
+            "features": [
+              "onboarding 및 Academy surface 열기",
+              "Tutor와 Autopilot의 product 형태 확인",
+              "로그인 시 hosted progress 사용",
+              "checkout 전 평가에 가장 적합"
+            ],
+            "cta": "Onboarding 열기"
+          },
+          "starter": {
+            "name": "스타터",
+            "price": "$9",
+            "period": "/월",
+            "description": "Academy 전체 액세스와 grounded tutoring을 갖춘 진지한 build lane 하나를 운영할 수 있습니다.",
+            "features": [
+              "월 1,000 credits",
+              "Academy 전체 액세스",
+              "grounded Tutor 지원",
+              "Autopilot 모드",
+              "첫 번째 유료 단계로 적합"
+            ],
+            "cta": "Starter 선택"
+          },
+          "pro": {
+            "name": "프로",
+            "price": "$29",
+            "period": "/월",
+            "description": "더 강한 runtime 가시성과 더 빠른 operator escalation을 갖춘 여러 개의 live lane입니다.",
+            "features": [
+              "월 10,000 credits",
+              "Tutor 전체 + BYOK",
+              "API 액세스",
+              "우선 지원",
+              "활성 workflow owner에게 적합"
+            ],
+            "cta": "Pro 선택"
+          },
+          "enterprise": {
+            "name": "엔터프라이즈",
+            "price": "맞춤형",
+            "period": "",
+            "description": "identity, control, direct operator support를 포함한 팀 rollout planning입니다.",
+            "features": [
+              "SSO 및 팀 관리",
+              "전담 rollout planning",
+              "SLA 기준 지원",
+              "custom workflow 설계",
+              "창업자에게 직접 연결"
+            ],
+            "cta": "플래닝 콜 예약"
+          }
+        }
+      },
+      "stackLabel": "stack truth",
+      "stackTitle": "액세스 약속을 뒷받침하는 것",
+      "stackBody": "이 오퍼는 추적된 pack docs, 순서화된 lesson, live stack brief를 기반으로 합니다. 이 route는 위에 붙은 로고가 아니라, 실제로 product 뒤에 무엇이 있는지를 보여줘야 합니다.",
+      "stackFooterPrefix": "마지막 builder-pack 갱신",
+      "stackFooterMiddle": "전반에 걸쳐",
+      "stackFooterDocs": "보이는 docs와",
+      "stackFooterStacks": "추적 중인 stack brief.",
+      "finalLabel": "다음 움직임",
+      "finalTitle": "정직한 레인을 고르는 데 도움이 필요하신가요?",
+      "finalBody": "질문이 긴급도, 플랜 적합성, rollout 형태라면 support가 직접 답하고 당신을 올바른 Pico route로 돌려보내야 합니다.",
+      "finalPrimary": "Support 레인 열기",
+      "finalSecondary": "landing으로 돌아가기"
     },
     "lessonPage": {
       "shell": {
@@ -2713,7 +3185,12 @@
         "inspectAutopilot": "Autopilot 살펴보기",
         "openSupportLane": "Support 레인 열기",
         "previousLesson": "이전 레슨",
-        "backToAcademyMap": "Academy 맵으로 돌아가기"
+        "backToAcademyMap": "Academy 맵으로 돌아가기",
+        "completeLabel": {
+          "runYourFirstAgent": "첫 실행이 성공했다",
+          "installHermesLocally": "Hermes가 설치되었습니다",
+          "default": "이 chapter를 봉인하기"
+        }
       },
       "hero": {
         "lessonLabel": "레슨",
@@ -2731,13 +3208,39 @@
           "progress": "진행",
           "stepsCleared": "완료된 단계",
           "telemetry": "텔레메트리",
-          "telemetryDetail": "{xp} xp • {difficulty}"
+          "telemetryDetail": "{xp} XP • 난이도 {difficulty}"
         }
       },
       "studio": {
         "label": "스튜디오 리뷰 보드",
         "title": "브리프, 결과물, 크리틱",
-        "stamp": "한 번에 하나의 실제 레슨"
+        "stamp": "한 번에 하나의 실제 레슨",
+        "cards": {
+          "brief": {
+            "label": "01 • 브리프",
+            "title": "스튜디오가 겨누는 결과"
+          },
+          "deliverable": {
+            "label": "02 • 결과물",
+            "title": "완성된 산출물이 증명해야 하는 것"
+          },
+          "critique": {
+            "label": "03 • 크리틱",
+            "title": "다음으로 넘어가기 전의 검토 라인"
+          }
+        },
+        "context": {
+          "trackArc": "트랙 흐름",
+          "trackArcFallback": "실제 operator 결과 하나를 만드세요.",
+          "lessonOutcome": "레슨 결과",
+          "timeAndWeight": "시간과 무게",
+          "timeAndWeightValue": "{minutes}분 • {xp} xp • {difficulty}",
+          "title": "챕터 맥락"
+        },
+        "posture": {
+          "title": "스튜디오 자세",
+          "body": "이 chapter를 좁게 유지하세요. 바빠 보이거나 고급스러워 보이는 것이 목적이 아닙니다. 내일이 되어도 예리한 operator가 신뢰할 산출물 하나를 만드는 것이 목적입니다."
+        }
       },
       "chapterSpine": {
         "title": "챕터 스파인"
@@ -2745,19 +3248,66 @@
       "workspace": {
         "label": "스튜디오 워크스페이스",
         "selectStep": "단계 선택",
-        "studioBrief": "스튜디오 브리프"
+        "studioBrief": "스튜디오 브리프",
+        "chooseStepBody": "레인을 시작하려면 chapter spine에서 단계를 선택하세요.",
+        "deliverableArtifact": "결과물 아티팩트",
+        "deliverablePlaceholder": "이 chapter가 실제로 작동했다는 것을 증명하는 출력, 기록 메모, 또는 산출물을 붙여 넣으세요.",
+        "benchNotes": "벤치 노트",
+        "benchNotesPlaceholder": "중요했던 blocker, file path, 또는 command 변형을 기록하세요.",
+        "reviewState": {
+          "label": "검토 상태",
+          "sealedBody": "이 chapter는 봉인되었습니다. 경로 감각이 살아 있을 때 다음으로 이동하세요.",
+          "readyBody": "증거는 이미 있습니다. chapter를 봉인하고 계속 움직이세요.",
+          "pendingBody": "증거가 실제를 말하기 전까지는 chapter를 봉인하지 마세요."
+        },
+        "chapterCompletion": "챕터 완료",
+        "creativeDirection": {
+          "title": "크리에이티브 디렉션",
+          "body": "현재 라이브 단계를 끝내고, 증거 아티팩트 하나를 기록한 뒤, chapter를 봉인하거나 다음 surface로 넘기세요."
+        }
       },
       "helpLane": {
-        "label": "현장 메모"
+        "label": "현장 메모",
+        "stayHereWhen": "여기에 머물러야 할 때",
+        "stayHereBody": "현재 단계 안에 아직 답이 있고, route를 아직 escalation할 필요가 없을 때입니다.",
+        "exactBlocker": "정확한 blocker",
+        "runtimeTruth": "런타임 진실",
+        "messyEdge": "지저분한 가장자리"
       },
       "surfaceCompass": {
         "title": "증거가 실제가 될 때까지 레슨을 좁게 유지하세요",
-        "body": "하나의 구체적인 막힘은 Tutor에서 해결하고, 런타임 진실이 중요해지면 Autopilot으로 옮기고, 둘 다 부족해질 때만 Support로 올리세요."
+        "body": "근거 있는 blocker 하나는 Tutor로 해결하고, live runtime truth가 중요해지면 Autopilot으로 전환하고, 둘 다 충분하지 않을 때만 Support로 올리세요.",
+        "status": {
+          "blockedByPrerequisite": "선행 조건으로 막힘",
+          "chapterSealed": "chapter 봉인됨",
+          "routeLaneActive": "route 레인 진행 중",
+          "readyToExecute": "실행 준비 완료"
+        },
+        "aside": "복구는 증거 레인 안이 아니라 그 아래에 있어야 합니다.",
+        "items": {
+          "askTutorLabel": "이 레슨에 대해 Tutor에게 묻기",
+          "askTutorCaption": "command, file path, validation check 중 하나가 실패할 때 사용하세요.",
+          "blocked": "막힘",
+          "returnToAcademyMap": "Academy 맵으로 돌아가기",
+          "returnCaption": "문제가 순서 자체에 있다면, 매핑된 route로 한 걸음 물러나세요.",
+          "backtrack": "되돌아가기",
+          "runtimeCaption": "blocker가 live runtime이나 approval에 의존할 때 여기로 전환하세요.",
+          "runtime": "런타임",
+          "supportCaption": "레슨, Tutor, 런타임 화면으로도 충분하지 않을 때만 escalation하세요.",
+          "messyEdge": "지저분한 가장자리"
+        }
       },
       "troubleshooting": {
         "label": "문제 해결 부록",
-        "title": "경로가 비틀릴 때만 읽는 작은 메모들"
+        "title": "route가 비뚤어질 때만 읽는 작은 메모들",
+        "stepsCount": "{count} 단계",
+        "nextCapability": "다음 capability",
+        "routeMemory": "route 메모리"
       }
+    },
+    "surfaceCompass": {
+      "label": "표면 나침반",
+      "operatingRule": "운영 규칙"
     }
   }
 }

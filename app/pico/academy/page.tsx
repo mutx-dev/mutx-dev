@@ -1,10 +1,8 @@
-import type { Metadata } from 'next'
-
 import { PicoAcademyDashboard } from '@/components/pico/PicoAcademyDashboard'
+import { buildPicoPageMetadata } from '@/lib/pico/metadata'
 
-export const metadata: Metadata = {
-  title: 'Academy — PicoMUTX',
-  description: 'Explore lessons, tracks, and learning paths on PicoMUTX Academy.',
+export async function generateMetadata() {
+  return buildPicoPageMetadata('pico.pages.academy.meta', '/academy')
 }
 
 export default function PicoAcademyPage() {

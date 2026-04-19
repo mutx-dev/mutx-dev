@@ -8,6 +8,7 @@ type PicoSessionUser = {
   role?: string | null
   plan?: string | null
   isEmailVerified?: boolean | null
+  preferredLocale?: string | null
 }
 
 export type PicoSessionState =
@@ -61,6 +62,7 @@ export function usePicoSession() {
           role?: string | null
           plan?: string | null
           is_email_verified?: boolean | null
+          preferred_locale?: string | null
         }
         setSession({
           status: 'authenticated',
@@ -73,6 +75,8 @@ export function usePicoSession() {
               typeof payload.is_email_verified === 'boolean'
                 ? payload.is_email_verified
                 : null,
+            preferredLocale:
+              typeof payload.preferred_locale === 'string' ? payload.preferred_locale : null,
           },
           error: null,
         })

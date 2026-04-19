@@ -1,11 +1,8 @@
-import type { Metadata } from 'next'
-
 import { PicoAutopilotPageClient } from '@/components/pico/PicoAutopilotPageClient'
+import { buildPicoPageMetadata } from '@/lib/pico/metadata'
 
-export const metadata: Metadata = {
-  title: 'Autopilot — PicoMUTX',
-  description:
-    'Inspect live runs, spend, alerts, and approvals in one PicoMUTX control room before you trust the automation.',
+export async function generateMetadata() {
+  return buildPicoPageMetadata('pico.pages.autopilot.meta', '/autopilot')
 }
 
 export default function PicoAutopilotPage() {

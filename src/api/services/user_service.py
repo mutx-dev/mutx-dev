@@ -19,6 +19,7 @@ from src.api.models.models import (
     Deployment,
     ExternalAuthIdentity,
     RefreshTokenSession,
+    UserSetting,
 )
 from src.api.security import hash_token_value
 from src.api.services.email.email_service import (
@@ -29,6 +30,8 @@ from src.api.services.social_auth import OAuthUserProfile
 
 settings = get_settings()
 MANAGED_API_KEY_PREFIX_LENGTH = 12
+PREFERRED_LOCALE_SETTING_KEY = "preferred_locale"
+SUPPORTED_UI_LOCALES = {"en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh", "ar"}
 
 
 def generate_api_key() -> tuple[str, str]:
@@ -96,6 +99,21 @@ def _as_utc_datetime(value: datetime | None) -> datetime | None:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+
+
+def normalize_preferred_locale(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    normalized = value.strip().lower()
+    if not normalized:
+        return None
+
+    if normalized in SUPPORTED_UI_LOCALES:
+        return normalized
+
+    base = normalized.split("-", 1)[0]
+    return base if base in SUPPORTED_UI_LOCALES else None
 
 
 class UserService:
@@ -184,6 +202,56 @@ class UserService:
     async def get_user_by_id(self, user_id: uuid.UUID) -> Optional[User]:
         result = await self.session.execute(select(User).where(User.id == user_id))
         return result.scalar_one_or_none()
+
+    async def get_user_locale(self, user_id: uuid.UUID) -> str | None:
+        result = await self.session.execute(
+            select(UserSetting.value).where(
+                UserSetting.user_id == user_id,
+                UserSetting.key == PREFERRED_LOCALE_SETTING_KEY,
+            )
+        )
+        value = result.scalar_one_or_none()
+        if isinstance(value, dict):
+            return normalize_preferred_locale(value.get("locale"))
+        if isinstance(value, str):
+            return normalize_preferred_locale(value)
+        return None
+
+    async def set_user_locale(self, user: User, locale: str | None) -> str | None:
+        normalized = normalize_preferred_locale(locale)
+        if normalized is None:
+            return await self.get_user_locale(user.id)
+
+        result = await self.session.execute(
+            select(UserSetting).where(
+                UserSetting.user_id == user.id,
+                UserSetting.key == PREFERRED_LOCALE_SETTING_KEY,
+            )
+        )
+        setting = result.scalar_one_or_none()
+        now = datetime.now(timezone.utc)
+
+        if setting is None:
+            setting = UserSetting(
+                user_id=user.id,
+                key=PREFERRED_LOCALE_SETTING_KEY,
+                value={"locale": normalized},
+            )
+            self.session.add(setting)
+        else:
+            setting.value = {"locale": normalized}
+            setting.updated_at = now
+
+        user.updated_at = now
+        await self.session.commit()
+        return normalized
+
+    async def initialize_user_locale(self, user: User, locale: str | None) -> str | None:
+        existing = await self.get_user_locale(user.id)
+        if existing is not None:
+            return existing
+
+        return await self.set_user_locale(user, locale)
 
     async def get_external_auth_identity(
         self, provider: str, provider_user_id: str

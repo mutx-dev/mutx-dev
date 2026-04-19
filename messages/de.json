@@ -197,6 +197,20 @@
           ],
           "cta": "Trial-Zugang Anfragen",
           "ctaHref": "/pricing"
+        },
+        "free": {
+          "name": "Kostenlos",
+          "price": "$0",
+          "period": "für immer",
+          "description": "Prüfen Sie Stack-Karte, Lektionsfluss und Produktwahrheit, bevor Sie Geld ausgeben.",
+          "features": [
+            "100 monatliche Credits",
+            "Begrenzter Zugang zu Tutor",
+            "Grundlegende Academy-Lektionen",
+            "Community-Support"
+          ],
+          "cta": "Aktueller Plan",
+          "ctaHref": null
         }
       },
       "lead": "Starte kostenlos. Wenn du früh reinkommst, sicherst du dir ungefähr 90 % unter dem späteren öffentlichen Preis, solange wir in Wellen onboarden.",
@@ -236,7 +250,8 @@
       "formSubline": "Sagen Sie uns, ob Sie aufbauen, reparieren oder kontrollieren müssen. Wir leiten Sie in die richtige Spur.",
       "ctaButton": "Zugang anfragen",
       "formCtaMeta": "Free Trial · Founding-Preise mit 90 % Rabatt · €29 / €79 · Pico Pilot ab €1,000+",
-      "secondaryButton": "Planungs-Call Buchen"
+      "secondaryButton": "Planungs-Call Buchen",
+      "faqLabel": "Noch unentschieden? Räumen Sie die letzten Blocker aus dem Weg."
     },
     "contactForm": {
       "dialogLabel": "Kontaktformular",
@@ -292,7 +307,13 @@
         "contact": "Kontakt",
         "privacy": "Datenschutz"
       },
-      "copyright": "© MUTX 2026. Offene Kontrolle für bereitgestellte Agenten."
+      "copyright": "© MUTX 2026. Offene Kontrolle für bereitgestellte Agenten.",
+      "brand": "PicoMUTX",
+      "logoAlt": "PicoMUTX-Logo",
+      "tagline": "PicoMUTX ist eine Lern- und Operations-Plattform für Teams, die KI-Agenten bauen.",
+      "supportPrompt": "Brauchen Sie mehr?",
+      "supportCta": "Kontaktieren Sie uns",
+      "supportBody": "für Enterprise-Preise (100K+ Credits, SSO, SLA)."
     },
     "waitlistForm": {
       "submit": "Zugang anfordern",
@@ -1335,7 +1356,22 @@
         "proofCaptured": "Beweis erfasst",
         "runtimeNotAttached": "nicht verbunden",
         "nextMove": "Nächster Schritt",
-        "visibleSuccess": "Sichtbarer Erfolg"
+        "visibleSuccess": "Sichtbarer Erfolg",
+        "sealFirstWin": "Den ersten Erfolg versiegeln",
+        "continueWithNextLesson": "Weiter mit {lessonTitle}",
+        "openAutopilot": "Autopilot öffnen",
+        "proofStateHeadline": {
+          "install": "Machen Sie den ersten Beleg unübersehbar.",
+          "prompt": "Versiegeln Sie den Beleg, solange die Route noch ehrlich ist.",
+          "cleared": "Der erste Beleg ist echt. Halten Sie die Spur in Bewegung."
+        },
+        "hostedSyncDetail": {
+          "offline": "gehostete Synchronisierung offline",
+          "loading": "Signal wird aktualisiert",
+          "gatewayLive": "Gateway live",
+          "gatewayUnbound": "Gateway ungebunden"
+        },
+        "stepsClear": "{completed}/{total} Schritte klar"
       },
       "labels": {
         "chapterPulse": "Kapitelpuls",
@@ -1409,7 +1445,52 @@
         "firstPromptLesson": "Erste-Prompt-Lektion",
         "askTutor": "Tutor fragen",
         "currentPressureInstall": "erledigt",
-        "currentPressureFirstPrompt": "Beweis erfasst"
+        "currentPressureFirstPrompt": "Beweis erfasst",
+        "runtimeStatusOptions": {
+          "client_required": "Client erforderlich",
+          "healthy": "betriebsbereit",
+          "degraded": "beeinträchtigt",
+          "offline": "offline",
+          "warning": "Warnung",
+          "unknown": "unbekannt"
+        },
+        "installMethodOptions": {
+          "npm": "npm",
+          "brew": "brew",
+          "binary": "Binärdatei",
+          "manual": "manuell"
+        },
+        "chapterBriefTitle": "Bringen Sie einen Befehl zum Laufen und behalten Sie den Beleg",
+        "chapterBriefBody": "Dieses erste Kapitel soll die Welt schnell verengen: Installieren Sie Hermes, führen Sie einen winzigen Prompt aus und bewahren Sie die Ausgabe auf, damit der erste Erfolg etwas Reales wird.",
+        "fastestPathBody": {
+          "done": "Sie haben den ersten Erfolg bereits geschafft. Bleiben Sie hier nicht hängen. Öffnen Sie die nächste Lektion und halten Sie die Sequenz in Bewegung.",
+          "installDone": "Gut. Die Installation ist erledigt. Führen Sie jetzt einen winzigen Prompt aus und holen Sie sich die erste sichtbare Antwort.",
+          "installFirst": "Vergleichen Sie jetzt noch keine Provider, Frameworks oder Stacks. Installieren Sie Hermes und bringen Sie zuerst den Befehl zum Laufen."
+        },
+        "operatingRuleBody": "Mehr Auswahl in diesem frühen Stadium ist nur hübscheres Aufschieben. Holen Sie zuerst den ersten Erfolg, dann verbreitern Sie die Oberfläche.",
+        "liveStackRadarTitle": "Die Onboarding-Spur weiß jetzt, was die verfolgten Stacks tatsächlich ausliefern",
+        "liveStackRadarBody": "Pico startet im Lektionsfluss mit Hermes, aber das Produkt hält jetzt die restliche Stack-Karte sichtbar, statt so zu tun, als gäbe es nur eine Runtime auf der Welt.",
+        "openLiveLedger": "Live-Ledger öffnen",
+        "missionBoardTitle": "Halten Sie die ersten beiden Missionen sichtbar verankert",
+        "missionBoardBody": "Onboarding sollte wissen, wo der Operator aufgehört hat. Diese Missionskarten spiegeln den Lektions-Workspace, damit der erste Erfolg Routenwechsel überlebt, statt in der Erinnerung zu verschwinden.",
+        "workspaceContinuity": "Workspace-Kontinuität",
+        "operatorRecordTitle": "Bewahren Sie gehosteten Kickoff und Runtime-Wahrheit an einem Ort",
+        "operatorRecordBody": "Halten Sie gehosteten Onboarding-Status, Runtime-Wahrheit und den nächsten Aktivierungsschritt für Kapitel 01 in einem einzigen Operator-Eintrag zusammen.",
+        "activationTrackBody": {
+          "done": "Sie haben den ersten Erfolg bereits erreicht. Nutzen Sie die Hauptaktion oben und halten Sie die Sequenz in Bewegung.",
+          "installDone": "Hermes ist installiert. Überspringen Sie den Überblick und öffnen Sie jetzt die erste Prompt-Lektion.",
+          "installFirst": "Alles andere kann warten. Öffnen Sie die Installationslektion und bringen Sie den Befehl zum Laufen."
+        },
+        "operatorRuleBody": "Mehr Auswahl in diesem frühen Stadium ist weiterhin nur hübscheres Aufschieben. Halten Sie das Kapitel eng, bis sowohl ein lokaler Lauf als auch ein Beweisartefakt real sind.",
+        "trackState": {
+          "active": "Aktiver Track",
+          "set": "Als Track setzen",
+          "locked": "Gesperrt"
+        },
+        "hostedRuntimeEditorTitle": "Aktualisieren Sie den Operator-Eintrag, ohne die Route zu verlassen",
+        "hostedRuntimeEditorBody": "Das tut nicht so, als würde es etwas im Browser installieren. Es speichert den neuesten wahrheitsgemäßen Runtime-Snapshot, damit der Rest von Pico aufhört zu raten.",
+        "savingSnapshot": "Snapshot wird gespeichert...",
+        "dismissChecklist": "Checkliste ausblenden"
       },
       "compass": {
         "title": "Nutzen Sie die kürzeste Route, die das Produkt ehrlich hält",
@@ -1427,7 +1508,11 @@
         "nextMove": "Nächster Schritt",
         "blocked": "Blockiert",
         "runtime": "Runtime",
-        "messyEdge": "Schwierige Kante"
+        "messyEdge": "Schwierige Kante",
+        "primaryCaption": "Bleiben Sie auf der Primärsequenz, bis eine sichtbare Ausgabe real ist.",
+        "tutorCaption": "Nutzen Sie das, wenn ein konkreter Befehl oder ein Validierungstor Sie blockiert.",
+        "autopilotCaption": "Wechseln Sie hierher, sobald Runtime-Status, Freigaben oder Spend zum Engpass werden.",
+        "supportCaption": "Nutzen Sie das nur, wenn der Produktpfad nicht mehr wahr genug ist, um sich allein zu erholen."
       },
       "doctrine": {
         "label": "Kickoff-Doktrin",
@@ -1439,7 +1524,12 @@
         "postTitle": "Kapitelhaltung",
         "postBody": "Halten Sie Kapitel 01 bewusst eng. Kein Browsing, kein Stack-Tourismus und kein zusätzliches Setup-Theater, bevor ein echtes Artefakt existiert.",
         "trackTitle": "Track-Checkliste",
-        "trackBody": "Ein klares Leit-Signal reicht, solange der erste Beweis noch entsteht."
+        "trackBody": "Ein klares Leit-Signal reicht, solange der erste Beweis noch entsteht.",
+        "labels": {
+          "brief": "01 • Briefing",
+          "reviewLine": "03 • Review-Linie"
+        },
+        "guideMarkerBody": "Ein einziges klares Leitsignal reicht, solange der erste Beleg noch Gestalt annimmt."
       },
       "protocol": {
         "title": "Beweisprotokoll",
@@ -1490,6 +1580,9 @@
         "missing": "fehlend",
         "resumeInstall": "Installationsmission fortsetzen",
         "resumePrompt": "Prompt-Mission fortsetzen"
+      },
+      "shared": {
+        "ok": "ok"
       }
     },
     "tutorPage": {
@@ -1639,6 +1732,17 @@
           "runtimeStatus": "Runtime-Status",
           "notSynced": "nicht synchronisiert"
         },
+        "questionProtocol": [
+          "Nennen Sie den genauen Schritt, Befehl oder die Dashboard-Aktion, bei der Sie waren.",
+          "Fügen Sie den Beleg ein: Ausgabe, Fehler, Transkript oder Runtime-Status.",
+          "Bitten Sie um den einen nächsten Schritt, der beweist, dass die Route wieder aktiv ist."
+        ],
+        "examplePrompts": [
+          "Hermes startet lokal, aber der Lauf auf dem VPS schlägt fehl. Was sollte ich prüfen, bevor ich irgendetwas ändere?",
+          "Das OpenClaw-Onboarding ist abgeschlossen, aber die Control-UI lädt immer noch nicht. Was ist der sauberste Verifikationspfad?",
+          "NanoClaw `/setup` lief in Claude Code, aber der Container-Pfad wirkt immer noch kaputt. Was sollte ich zuerst isolieren?",
+          "Der PicoClaw-Launcher funktioniert nur auf localhost. Sollte ich die Bind-Adresse ändern oder ihn mit Tailscale privat halten?"
+        ],
         "questionPlaceholder": "Beschreiben Sie den Blocker, den genauen Schritt und was Sie erwartet hatten.",
         "blockedLessonLabel": "Blockierte Lektion",
         "noLessonSelected": "Keine Lektion ausgewählt",
@@ -1729,6 +1833,93 @@
       },
       "shared": {
         "openLesson": "{lessonTitle} öffnen"
+      }
+    },
+    "welcomeTour": {
+      "quickHelp": "Schnellhilfe",
+      "title": "Lernen Sie den Kodex einmal, dann schließen Sie ihn.",
+      "close": "Schließen",
+      "closeLabel": "Schnelltour schließen",
+      "controls": {
+        "back": "Zurück",
+        "next": "Weiter",
+        "finish": "Fertig"
+      },
+      "steps": {
+        "mission": {
+          "eyebrow": "01 Mission",
+          "title": "Jede Pico-Oberfläche sollte eine dominante Aktion haben.",
+          "body": "Wenn eine Seite gleichermaßen nach Navigation, Metriken und Erklärung aussieht, lügt sie. Finden Sie den einen Schritt, der die Route freiräumt.",
+          "bullets": {
+            "currentSurface": "Sie befinden sich in Kapitel {chapter}: {label}.",
+            "backtrackPrevious": "Rückweg-Ziel: {label}.",
+            "backtrackOnboarding": "Rückweg-Ziel: Onboarding.",
+            "forwardNext": "Vorwärtsroute: {label}.",
+            "forwardSupport": "Vorwärtsroute: Support."
+          }
+        },
+        "route": {
+          "academy": {
+            "eyebrow": "02 Mission zuerst",
+            "title": "Dem Kodex soll nur eine Mission wichtig sein.",
+            "body": "Öffnen Sie die dominante Lektion, räumen Sie den sichtbaren Schritt frei und lassen Sie das Archiv still, bis die Hauptroute erledigt ist.",
+            "bullets": {
+              "map": "Die Karte erklärt die Sequenz. Sie sollte nicht mit der Mission konkurrieren.",
+              "proof": "Die aktuelle Beweisspur ist der einzige Teil, der dringend wirken sollte.",
+              "currentSurface": "Aktuelle Oberfläche: {pageTitle}."
+            }
+          },
+          "tutor": {
+            "eyebrow": "02 Ein Blocker",
+            "title": "Tutor ist für den exakten nächsten Schritt da.",
+            "body": "Fragen Sie nach dem einen Befehl, Dateipfad oder Verifikationsschritt, der die Route stoppt.",
+            "bullets": {
+              "academy": "Wenn die Sequenz falsch ist, gehen Sie zurück zu Academy.",
+              "autopilot": "Wenn echter Runtime-Status der Blocker ist, öffnen Sie Autopilot.",
+              "currentSurface": "Aktuelle Oberfläche: {pageTitle}."
+            }
+          },
+          "autopilot": {
+            "eyebrow": "02 Runtime-Wahrheit",
+            "title": "Autopilot schlägt den Lektions-Text, wenn das System live ist.",
+            "body": "Nutzen Sie die Runtime-Oberfläche, wenn die Antwort von Läufen, Warnungen, Freigaben oder dem aktuellen Status abhängt.",
+            "bullets": {
+              "academy": "Gehen Sie zurück zu Academy, wenn die Missions-Sequenz das eigentliche Problem ist.",
+              "support": "Eskalieren Sie erst, wenn Runtime-Wahrheit nicht mehr ausreicht.",
+              "currentSurface": "Aktuelle Oberfläche: {pageTitle}."
+            }
+          },
+          "support": {
+            "eyebrow": "02 Menschliche Kante",
+            "title": "Support sollte Sie schnell wieder in Bewegung bringen.",
+            "body": "Bringen Sie das sauberste Lektions- oder Runtime-Paket mit und kehren Sie dann zum Produkt zurück, statt hier hängen zu bleiben.",
+            "bullets": {
+              "notDefault": "Support ist die schwierige Kante, nicht der Standard-Workspace.",
+              "packet": "Nehmen Sie beim Eskalieren den Lesson-Slug, den Beleg und den Blocker mit.",
+              "currentSurface": "Aktuelle Oberfläche: {pageTitle}."
+            }
+          },
+          "onboarding": {
+            "eyebrow": "02 Erster Erfolg",
+            "title": "Onboarding existiert, um den ersten sichtbaren Erfolg zu verdichten.",
+            "body": "Nutzen Sie es, um zu einer funktionierenden Runtime und einem Beweisartefakt zu kommen, und wechseln Sie dann sofort in den Kodex.",
+            "bullets": {
+              "noise": "Behandeln Sie Präferenzen als Rauschen, bis der erste Erfolg real ist.",
+              "academy": "Academy wird nützlich, sobald Sie die exakte Spur brauchen.",
+              "currentSurface": "Aktuelle Oberfläche: {pageTitle}."
+            }
+          }
+        },
+        "proof": {
+          "eyebrow": "03 Beweis",
+          "title": "Verlassen Sie die Route nie ohne ein Beweisartefakt.",
+          "body": "Die Plattform wird erst vertrauenswürdig, wenn jeder freigeräumte Schritt Belege hinterlässt und nicht nur Optimismus.",
+          "bullets": {
+            "tutor": "Wenn der Blocker exakt ist, fragen Sie Tutor.",
+            "autopilot": "Wenn der Blocker Live-System-Wahrheit ist, öffnen Sie Autopilot.",
+            "support": "Wenn beides fehlschlägt, eskalieren Sie zu Support mit Beleg und Notizen."
+          }
+        }
       }
     },
     "academyPage": {
@@ -2791,7 +2982,7 @@
         "openLiveApprovalSetup": "Live-Freigabe einrichten",
         "completeLabel": {
           "installHermesLocally": "Hermes ist installiert",
-          "runYourFirstAgent": "Es funktioniert wirklich",
+          "runYourFirstAgent": "Der erste Lauf hat funktioniert",
           "default": "Dieses Kapitel versiegeln"
         },
         "askTutorAboutLesson": "Tutor zu dieser Lektion fragen",
@@ -2915,6 +3106,207 @@
         "stepsCount": "{count} Schritte",
         "nextCapability": "Nächste Fähigkeit",
         "routeMemory": "Routenspeicher"
+      }
+    },
+    "surfaceCompass": {
+      "label": "Oberflächenkompass",
+      "operatingRule": "Betriebsregel"
+    },
+    "localeSwitcher": {
+      "currentLanguage": "Aktuelle Sprache",
+      "listLabel": "Sprache der Oberfläche wählen"
+    },
+    "pages": {
+      "onboarding": {
+        "meta": {
+          "title": "Erste Schritte — PicoMUTX",
+          "description": "Richten Sie Ihren PicoMUTX-Workspace ein und beginnen Sie zu lernen."
+        }
+      },
+      "pricing": {
+        "meta": {
+          "title": "Preise — PicoMUTX",
+          "description": "Die Pläne entsprechen realen Produktoberflächen: 12 Lektionen, geführte Begleitung, überwachter Runtime-Kontext und Live-Stack-Briefings über Hermes, OpenClaw, NanoClaw und PicoClaw."
+        }
+      },
+      "academy": {
+        "meta": {
+          "title": "Academy — PicoMUTX",
+          "description": "Erkunden Sie Lektionen, Tracks und Lernpfade in der PicoMUTX Academy."
+        }
+      },
+      "lesson": {
+        "meta": {
+          "title": "{title} — PicoMUTX Academy",
+          "description": "{summary}"
+        }
+      },
+      "autopilot": {
+        "meta": {
+          "title": "Autopilot — PicoMUTX",
+          "description": "Automatisieren Sie Ihren Workflow mit PicoMUTX Autopilot."
+        }
+      },
+      "tutor": {
+        "meta": {
+          "title": "Tutor — PicoMUTX",
+          "description": "Holen Sie sich geführte Hilfe vom KI-Tutor von PicoMUTX."
+        }
+      },
+      "support": {
+        "meta": {
+          "title": "Support — PicoMUTX",
+          "description": "Holen Sie sich Hilfe und Support für PicoMUTX."
+        }
+      },
+      "wip": {
+        "meta": {
+          "title": "Live-Build-Ledger — PicoMUTX",
+          "description": "Prüfen Sie die 17 Builder-Pack-Dokumente, Snapshots verfolgter Repositories und die Remote-Access-Defaults, die jetzt das PicoMUTX-Erlebnis speisen."
+        },
+        "title": "Live-Build-Ledger",
+        "subtitle": "Diese Route existiert nicht mehr, um sich für Unfertigkeit zu entschuldigen. Sie zeigt jetzt das Quellmaterial, das Pico aktiv antreibt: Pack-Dokumente, Academy-Lektionen, verfolgte Repositories und die damit verbundene Remote-Access-Haltung.",
+        "backToPico": "Zurück zu Pico",
+        "mutxPlatform": "MUTX-Plattform",
+        "imageAlt": "PicoMUTX-Roboter inspiziert Live-Stack-Briefings"
+      }
+    },
+    "auth": {
+      "eyebrow": "Pico-Host-Authentifizierung",
+      "orUseEmail": "Oder E-Mail verwenden",
+      "forgotPassword": "Passwort vergessen?",
+      "fields": {
+        "name": {
+          "label": "Name",
+          "placeholder": "Anna Schmidt"
+        },
+        "email": {
+          "label": "E-Mail",
+          "placeholder": "you@company.com"
+        },
+        "password": {
+          "label": "Passwort",
+          "placeholder": "Passwort eingeben"
+        },
+        "confirmPassword": {
+          "label": "Passwort bestätigen",
+          "placeholder": "Passwort bestätigen"
+        }
+      },
+      "modes": {
+        "login": {
+          "title": "In den aktuellen Pico-Build wechseln",
+          "subtitle": "Nutzen Sie einen Provider oder E-Mail, um die Vorschau zu öffnen und Ihren Platz zu sichern.",
+          "submit": "Pico öffnen",
+          "loading": "Wird geöffnet...",
+          "toggleQuestion": "Brauchen Sie Zugang?",
+          "toggleAction": "Konto erstellen"
+        },
+        "register": {
+          "title": "Ihr Pico-Vorschaukonto erstellen",
+          "subtitle": "Einmal registrieren, Ihren Platz sichern und dem Produkt weiter folgen, während es besser wird.",
+          "submit": "Vorschaukonto erstellen",
+          "loading": "Wird erstellt...",
+          "toggleQuestion": "Sie haben bereits ein Konto?",
+          "toggleAction": "Anmelden"
+        }
+      },
+      "errors": {
+        "passwordMismatch": "Passwörter stimmen nicht überein",
+        "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+        "loginFailed": "Anmeldung fehlgeschlagen",
+        "registerFailed": "Konto konnte nicht erstellt werden",
+        "emailRequired": "Geben Sie zuerst Ihre E-Mail-Adresse ein",
+        "resendFailed": "Erneutes Senden fehlgeschlagen"
+      },
+      "notice": {
+        "verificationSent": "Bestätigungs-E-Mail gesendet",
+        "resending": "Wird gesendet...",
+        "resendVerification": "Bestätigungs-E-Mail erneut senden"
+      }
+    },
+    "authRecovery": {
+      "forgotPassword": {
+        "eyebrow": "Passwort-Wiederherstellung",
+        "title": "Stellen Sie Operator-Zugang wieder her, ohne die Control Plane zu verlassen.",
+        "description": "Verwenden Sie die E-Mail-Adresse Ihres MUTX-Kontos und wir senden Ihnen einen Reset-Link. Wenn gehostete Auth heute nicht die richtige Lane ist, bleiben Dashboard, Docs und Installationsfluss verfügbar.",
+        "asideEyebrow": "Wiederherstellungshinweise",
+        "asideTitle": "Halten Sie die Auth-Lane praktisch.",
+        "asideBody": "Reset-Flows sollten einfach, ehrlich und leicht zu verifizieren sein. Wenn das Konto nicht existiert oder die gehostete Lane nicht verfügbar ist, sagt die restliche öffentliche Oberfläche weiterhin die Wahrheit.",
+        "highlights": [
+          "Verwenden Sie die geschäftliche E-Mail, die mit dem gehosteten Operator-Konto verknüpft ist.",
+          "Reset-Links laufen ab, also handeln Sie schnell, sobald die E-Mail eintrifft.",
+          "Docs und Dashboard bleiben verfügbar, wenn Sie im Moment nur Produktwahrheit brauchen."
+        ],
+        "successTitle": "Prüfen Sie Ihre E-Mails",
+        "successBody": "Wir haben Anweisungen zum Zurücksetzen des Passworts an {email} gesendet.",
+        "successHint": "Wenn die E-Mail nicht auftaucht, prüfen Sie Spam oder fordern Sie einen weiteren Link an.",
+        "backToSignIn": "Zurück zur Anmeldung",
+        "tryAgain": "Erneut versuchen",
+        "sendTitle": "Reset-Anweisungen senden",
+        "sendBody": "Kein Drama. Nur die E-Mail und ein frischer Link.",
+        "emailLabel": "E-Mail-Adresse",
+        "emailPlaceholder": "you@company.com",
+        "sending": "Wird gesendet...",
+        "sendLink": "Reset-Link senden"
+      },
+      "resetPassword": {
+        "eyebrow": "Passwort zurücksetzen",
+        "title": "Legen Sie ein neues Passwort fest und kehren Sie zur Operator-Lane zurück.",
+        "description": "Verwenden Sie ein starkes Passwort, bestätigen Sie es sauber und schließen Sie den Reset ab, ohne raten zu müssen, ob der Flow funktioniert hat.",
+        "asideEyebrow": "Reset-Regeln",
+        "asideTitle": "Halten Sie den Recovery-Pfad langweilig.",
+        "asideBody": "Passwort-Resets sollten schlicht, schnell und leicht zu verifizieren sein. Saubere Formularzustände sind wichtiger als dekoratives Auth-Theater.",
+        "highlights": [
+          "Reset-Links sind tokenbasiert, daher sollte ein abgelaufenes oder fehlendes Token ehrlich fehlschlagen.",
+          "Verwenden Sie ein Passwort, das Ihre eigene Sicherheitslatte erfüllt, nicht nur den Minimalvalidator.",
+          "Wenn gehostete Auth nicht Ihr aktueller Weg ist, bleiben Docs und Dashboard sichtbar, während die Lane härter wird."
+        ],
+        "invalidTitle": "Ungültiger Reset-Link",
+        "invalidBody": "Dieser Passwort-Reset-Link fehlt, ist ungültig oder bereits abgelaufen.",
+        "requestNewLink": "Neuen Link anfordern",
+        "backToSignIn": "Zurück zur Anmeldung",
+        "completeTitle": "Passwort-Reset abgeschlossen",
+        "completeBody": "Ihr Passwort wurde aktualisiert. Die Anmelde-Lane kann jetzt die neuen Zugangsdaten verwenden.",
+        "signIn": "Anmelden",
+        "formTitle": "Neues Passwort wählen",
+        "formBody": "Halten Sie es stark, bestätigen Sie es einmal, und das Formular erledigt den Rest.",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Passwort bestätigen",
+        "resetting": "Wird zurückgesetzt...",
+        "resetPassword": "Passwort zurücksetzen",
+        "passwordsMismatch": "Passwörter stimmen nicht überein",
+        "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein"
+      },
+      "verifyEmail": {
+        "eyebrow": "E-Mail bestätigen",
+        "title": "Bestätigen Sie die Adresse, bevor die Plattform so tut, als wären Sie bereit.",
+        "description": "Bestätigung ist jetzt Teil der Kontogrenze. Der Flow bestätigt das Token ehrlich, kann vom aktiven Host erneut senden und hält die nächste Route stabil, statt Sie in einen falschen Erfolgszustand zu stoßen.",
+        "asideEyebrow": "Bestätigungsregeln",
+        "asideTitle": "Halten Sie Bestätigung explizit.",
+        "asideBody": "Provider-Auth kann diesen Schritt überspringen, weil die Upstream-Identität bereits bestätigt ist. Passwort-Registrierung bleibt über die E-Mail-Bestätigungs-Lane verantwortlich.",
+        "highlights": [
+          "Bestätigungslinks enden auf dem aktiven Frontend-Host statt auf einer hart codierten Marketing-Route.",
+          "Abgelaufene oder ungültige Tokens scheitern ehrlich und lassen einen klaren Resend-Pfad.",
+          "Nach der Bestätigung kann die Anmelde-Lane Sie direkt zur beabsichtigten Plattform-Route zurückschicken."
+        ],
+        "verifying": "Ihre E-Mail wird bestätigt...",
+        "missingContext": "Diese Bestätigungsroute braucht ein Token oder die E-Mail-Adresse, die eines erhalten soll.",
+        "sentTo": "Wir haben einen Bestätigungslink an {email} gesendet.",
+        "verificationComplete": "Bestätigung abgeschlossen",
+        "verificationCompleteBody": "Das Konto kann sich jetzt anmelden. Verwenden Sie dieselbe E-Mail und gehen Sie in die beabsichtigte Route weiter.",
+        "signIn": "Anmelden",
+        "checkInbox": "Prüfen Sie Ihren Posteingang",
+        "checkInboxBody": "Öffnen Sie den Bestätigungslink möglichst auf demselben Gerät. Wenn er nicht ankommt, senden Sie ihn von hier erneut.",
+        "resend": "Bestätigungs-E-Mail erneut senden",
+        "resendSending": "Wird gesendet...",
+        "resendNeedsEmail": "Geben Sie zuerst die Adresse aus dem Anmeldeformular ein, damit die Bestätigung erneut gesendet werden kann.",
+        "resendSent": "Wir haben einen weiteren Bestätigungslink an {email} gesendet.",
+        "verifySuccess": "Die E-Mail wurde erfolgreich bestätigt.",
+        "verifyFailure": "Bestätigung der E-Mail fehlgeschlagen",
+        "resendFailure": "Erneutes Senden der Bestätigungs-E-Mail fehlgeschlagen",
+        "verificationFailed": "Bestätigung fehlgeschlagen",
+        "verificationFailedBody": "Wenn das Token abgelaufen ist, fordern Sie eine weitere Nachricht von der Adresse an, der das Konto gehört."
       }
     }
   }

@@ -138,6 +138,20 @@
       "title": "Blocca il prezzo founding prima del prezzo pubblico.",
       "lead": "Parti gratis. Se entri presto, mantieni circa il 90% di sconto rispetto al futuro prezzo pubblico mentre apriamo in ondate.",
       "tiers": {
+        "free": {
+          "name": "Free",
+          "price": "$0",
+          "period": "per sempre",
+          "description": "Ispeziona la mappa dello stack, il flusso delle lezioni e la verità del prodotto prima di spendere.",
+          "features": [
+            "100 crediti mensili",
+            "Accesso limitato a Tutor",
+            "Lezioni Academy (base)",
+            "Supporto della community"
+          ],
+          "cta": "Piano attuale",
+          "ctaHref": null
+        },
         "trial": {
           "name": "Prova gratuita",
           "price": "Gratis",
@@ -231,6 +245,7 @@
       "eyebrow": "Accesso fondativo",
       "title": "Richiedi accesso al percorso giusto.",
       "body": "Pico ti aiuta a far funzionare qualcosa di utile, recuperarlo quando si rompe e tenerlo sotto controllo nel lavoro reale.",
+      "faqLabel": "Stai ancora decidendo? Chiarisci gli ultimi blocchi.",
       "formHeadline": "Parti dal blocco reale.",
       "formSubline": "Dicci se devi costruire, sistemare o controllare. Ti instraderemo verso il percorso giusto.",
       "ctaButton": "Richiedi accesso",
@@ -278,6 +293,9 @@
       "errorFallback": "Qualcosa è andato storto. Riprova."
     },
     "footer": {
+      "brand": "PicoMUTX",
+      "logoAlt": "Logo PicoMUTX",
+      "tagline": "PicoMUTX è una piattaforma di apprendimento e operazioni per chi costruisce agenti AI.",
       "links": {
         "releases": "Release",
         "docs": "Docs",
@@ -287,6 +305,9 @@
         "contact": "Contatti",
         "privacy": "Privacy"
       },
+      "supportPrompt": "Hai bisogno di altro?",
+      "supportCta": "Contattaci",
+      "supportBody": "per i prezzi Enterprise (100K+ credits, SSO, SLA).",
       "copyright": "© MUTX 2026. Controllo aperto per gli agenti distribuiti."
     },
     "waitlistForm": {
@@ -304,6 +325,203 @@
       "verificationFailedRefresh": "Verifica non riuscita. Aggiorna la verifica e riprova.",
       "verificationExpired": "La verifica è scaduta. Completa di nuovo la verifica.",
       "verificationTimedOut": "Timeout della verifica. Completa di nuovo la verifica."
+    },
+    "localeSwitcher": {
+      "currentLanguage": "Lingua corrente",
+      "listLabel": "Scegli la lingua dell'interfaccia"
+    },
+    "pages": {
+      "onboarding": {
+        "meta": {
+          "title": "Inizia — PicoMUTX",
+          "description": "Configura il tuo workspace PicoMUTX e inizia a imparare."
+        }
+      },
+      "pricing": {
+        "meta": {
+          "title": "Prezzi — PicoMUTX",
+          "description": "I piani corrispondono a superfici reali del prodotto: 12 lezioni, tutoring guidato, contesto runtime monitorato e briefing live degli stack su Hermes, OpenClaw, NanoClaw e PicoClaw."
+        }
+      },
+      "academy": {
+        "meta": {
+          "title": "Academy — PicoMUTX",
+          "description": "Esplora lezioni, track e percorsi di apprendimento nell'Academy PicoMUTX."
+        }
+      },
+      "lesson": {
+        "meta": {
+          "title": "{title} — Academy PicoMUTX",
+          "description": "{summary}"
+        }
+      },
+      "autopilot": {
+        "meta": {
+          "title": "Autopilot — PicoMUTX",
+          "description": "Automatizza il tuo workflow con PicoMUTX Autopilot."
+        }
+      },
+      "tutor": {
+        "meta": {
+          "title": "Tutor — PicoMUTX",
+          "description": "Ricevi aiuto guidato da Tutor, l'assistente AI di PicoMUTX."
+        }
+      },
+      "support": {
+        "meta": {
+          "title": "Supporto — PicoMUTX",
+          "description": "Ricevi aiuto e supporto per PicoMUTX."
+        }
+      },
+      "wip": {
+        "meta": {
+          "title": "Registro di build live — PicoMUTX",
+          "description": "Ispeziona i 17 documenti del builder pack, le istantanee dei repository tracciati e i default di accesso remoto che ora alimentano l'esperienza PicoMUTX."
+        },
+        "title": "Registro di build live",
+        "subtitle": "Questo percorso ha smesso di esistere per scusarsi di essere incompleto. Ora mostra il materiale sorgente che alimenta attivamente Pico: documenti del pack, lezioni dell'Academy, repository tracciati e la postura di accesso remoto che implicano.",
+        "backToPico": "Torna a Pico",
+        "mutxPlatform": "Piattaforma MUTX",
+        "imageAlt": "Robot PicoMUTX che ispeziona briefing live degli stack"
+      }
+    },
+    "auth": {
+      "eyebrow": "Autenticazione dell'host Pico",
+      "orUseEmail": "Oppure usa l'email",
+      "forgotPassword": "Hai dimenticato la password?",
+      "fields": {
+        "name": {
+          "label": "Nome",
+          "placeholder": "Jane Smith"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "you@company.com"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "Inserisci la tua password"
+        },
+        "confirmPassword": {
+          "label": "Conferma password",
+          "placeholder": "Conferma la tua password"
+        }
+      },
+      "modes": {
+        "login": {
+          "title": "Entra nell'attuale build di Pico",
+          "subtitle": "Usa un provider o l'email per aprire la preview e salvare il tuo posto.",
+          "submit": "Entra in Pico",
+          "loading": "Apertura...",
+          "toggleQuestion": "Hai bisogno di accesso?",
+          "toggleAction": "Crea un account"
+        },
+        "register": {
+          "title": "Crea il tuo account preview Pico",
+          "subtitle": "Registrati una volta, salva il tuo posto e continua a seguire il prodotto mentre migliora.",
+          "submit": "Crea account preview",
+          "loading": "Creazione...",
+          "toggleQuestion": "Hai già un account?",
+          "toggleAction": "Accedi"
+        }
+      },
+      "errors": {
+        "passwordMismatch": "Le password non coincidono",
+        "passwordTooShort": "La password deve contenere almeno 8 caratteri",
+        "loginFailed": "Impossibile accedere",
+        "registerFailed": "Impossibile creare l'account",
+        "emailRequired": "Inserisci prima il tuo indirizzo email",
+        "resendFailed": "Impossibile reinviare"
+      },
+      "notice": {
+        "verificationSent": "Email di verifica inviata",
+        "resending": "Invio in corso...",
+        "resendVerification": "Invia di nuovo l'email di verifica"
+      }
+    },
+    "authRecovery": {
+      "forgotPassword": {
+        "eyebrow": "Recupero password",
+        "title": "Recupera l'accesso operatore senza uscire dal control plane.",
+        "description": "Usa l'email collegata al tuo account MUTX e ti invieremo un link di reset. Se l'autenticazione hosted non è il percorso che ti serve oggi, dashboard, docs e flusso di installazione restano disponibili.",
+        "asideEyebrow": "Note di recupero",
+        "asideTitle": "Mantieni pratico il percorso di auth.",
+        "asideBody": "I flussi di reset dovrebbero essere semplici, onesti e facili da verificare. Se l'account non esiste o il percorso hosted non è disponibile, il resto della superficie pubblica continua a dire la verità.",
+        "highlights": [
+          "Usa l'email di lavoro collegata all'account operatore hosted.",
+          "I link di reset scadono, quindi gestisci l'email rapidamente appena arriva.",
+          "Docs e dashboard restano disponibili se in questo momento ti serve solo la verità del prodotto."
+        ],
+        "successTitle": "Controlla la tua email",
+        "successBody": "Abbiamo inviato le istruzioni per il reset della password a {email}.",
+        "successHint": "Se l'email non arriva, controlla lo spam o richiedi un altro link.",
+        "backToSignIn": "Torna all'accesso",
+        "tryAgain": "Riprova",
+        "sendTitle": "Invia istruzioni di reset",
+        "sendBody": "Nessun dramma. Solo l'email e un link nuovo.",
+        "emailLabel": "Indirizzo email",
+        "emailPlaceholder": "you@company.com",
+        "sending": "Invio in corso...",
+        "sendLink": "Invia link di reset"
+      },
+      "resetPassword": {
+        "eyebrow": "Reimposta password",
+        "title": "Imposta una nuova password e torna nel percorso operatore.",
+        "description": "Usa una password robusta, confermala con chiarezza e completa il reset senza dover indovinare se il flusso ha funzionato.",
+        "asideEyebrow": "Regole del reset",
+        "asideTitle": "Mantieni noioso il percorso di recupero.",
+        "asideBody": "I reset della password dovrebbero essere semplici, rapidi e facili da verificare. Stati del form solidi contano più del teatro decorativo dell'auth.",
+        "highlights": [
+          "I link di reset sono basati su token, quindi un token scaduto o mancante deve fallire con onestà.",
+          "Usa una password che soddisfi il tuo standard di sicurezza, non solo il validatore minimo.",
+          "Se l'autenticazione hosted non è il tuo percorso attuale, docs e dashboard restano visibili mentre la corsia si consolida."
+        ],
+        "invalidTitle": "Link di reset non valido",
+        "invalidBody": "Questo link di reset della password manca, non è valido oppure è già scaduto.",
+        "requestNewLink": "Richiedi un nuovo link",
+        "backToSignIn": "Torna all'accesso",
+        "completeTitle": "Reset completato",
+        "completeBody": "La tua password è stata aggiornata. Il percorso di accesso può ora usare le nuove credenziali.",
+        "signIn": "Accedi",
+        "formTitle": "Scegli una nuova password",
+        "formBody": "Tienila robusta, confermala una volta e al resto penserà il form.",
+        "newPassword": "Nuova password",
+        "confirmPassword": "Conferma password",
+        "resetting": "Reimpostazione...",
+        "resetPassword": "Reimposta password",
+        "passwordsMismatch": "Le password non coincidono",
+        "passwordTooShort": "La password deve contenere almeno 8 caratteri"
+      },
+      "verifyEmail": {
+        "eyebrow": "Verifica email",
+        "title": "Conferma l'indirizzo prima che la piattaforma finga che tu sia pronto.",
+        "description": "La verifica fa ora parte del confine dell'account. Il flusso conferma il token con onestà, può reinviare dall'host attivo e mantiene stabile il percorso successivo invece di spingerti in uno stato di falso successo.",
+        "asideEyebrow": "Regole di verifica",
+        "asideTitle": "Mantieni esplicita la conferma.",
+        "asideBody": "L'auth tramite provider può saltare questo passaggio perché l'identità upstream è già verificata. La registrazione con password resta responsabile tramite il percorso di conferma via email.",
+        "highlights": [
+          "I link di verifica terminano sull'host frontend attivo invece che su una route marketing hardcoded.",
+          "Token scaduti o non validi falliscono con onestà e lasciano un percorso chiaro per il reinvio.",
+          "Dopo la conferma, il percorso di accesso può riportarti direttamente alla route di piattaforma prevista."
+        ],
+        "verifying": "Verifica della tua email...",
+        "missingContext": "Questo percorso di verifica richiede un token o l'indirizzo email che deve riceverlo.",
+        "sentTo": "Abbiamo inviato un link di verifica a {email}.",
+        "verificationComplete": "Verifica completata",
+        "verificationCompleteBody": "L'account ora può accedere. Usa lo stesso indirizzo email e continua sul percorso previsto.",
+        "signIn": "Accedi",
+        "checkInbox": "Controlla la tua casella",
+        "checkInboxBody": "Apri il link di verifica dallo stesso dispositivo, se possibile. Se non arriva, invialo di nuovo da qui.",
+        "resend": "Invia di nuovo l'email di verifica",
+        "resendSending": "Invio in corso...",
+        "resendNeedsEmail": "Inserisci prima l'indirizzo nel modulo di registrazione così la verifica potrà essere reinviata.",
+        "resendSent": "Abbiamo inviato un altro link di verifica a {email}.",
+        "verifySuccess": "L'email è stata verificata con successo.",
+        "verifyFailure": "Impossibile verificare l'email",
+        "resendFailure": "Impossibile reinviare l'email di verifica",
+        "verificationFailed": "Verifica non riuscita",
+        "verificationFailedBody": "Se il token è scaduto, richiedi un altro messaggio dall'indirizzo che possiede l'account."
+      }
     },
     "supportPage": {
       "contact": {
@@ -1326,11 +1544,26 @@
         "signalCore": "Nucleo del segnale",
         "firstWinPulse": "Impulso della prima vittoria",
         "trackInstallPrompt": "Installa Hermes ora",
+        "sealFirstWin": "Sigilla il primo risultato",
+        "continueWithNextLesson": "Continua con {lessonTitle}",
+        "openAutopilot": "Apri Autopilot",
+        "proofStateHeadline": {
+          "install": "Rendi impossibile non notare la prima prova.",
+          "prompt": "Sigilla la prova finché il percorso è ancora onesto.",
+          "cleared": "La prima prova è reale. Continua a far scorrere il percorso."
+        },
+        "hostedSyncDetail": {
+          "offline": "sync hosted offline",
+          "loading": "aggiornamento del segnale",
+          "gatewayLive": "gateway live",
+          "gatewayUnbound": "gateway non associato"
+        },
         "installDone": "L'installazione è completata",
         "proofCaptured": "prova catturata",
         "runtimeNotAttached": "non allegato",
         "nextMove": "Prossima mossa",
-        "visibleSuccess": "Successo visibile"
+        "visibleSuccess": "Successo visibile",
+        "stepsClear": "{completed}/{total} passaggi chiari"
       },
       "labels": {
         "chapterPulse": "Impulso del capitolo",
@@ -1341,7 +1574,14 @@
         "guideMarker": "Indicatore guida",
         "trackChecklist": "Lista di controllo del monitoraggio",
         "chapterBrief": "Capitolo 01 breve",
+        "chapterBriefTitle": "Fai funzionare un comando e conserva la prova",
+        "chapterBriefBody": "Questo primo capitolo deve restringere il mondo in fretta: installa Hermes, esegui un prompt minimo e conserva l'output così il primo risultato diventa qualcosa di reale.",
         "fastestPath": "Il percorso più veloce verso il valore",
+        "fastestPathBody": {
+          "done": "Hai già superato il primo risultato. Non fermarti qui. Apri la lezione successiva e tieni in movimento la sequenza.",
+          "installDone": "Bene. L'installazione è completata. Ora esegui un prompt minimo e ottieni la prima risposta visibile.",
+          "installFirst": "Non confrontare ancora provider, framework o stack. Installa Hermes e fai prima funzionare il comando."
+        },
         "trackLocked": "Traccia bloccata",
         "visibleSuccess": "Successo visibile",
         "studioLedger": "Registro dello studio",
@@ -1351,6 +1591,7 @@
         "workspace": "Spazio di lavoro",
         "jumpStraightTo": "Vai direttamente a",
         "operatingRule": "Regola operativa",
+        "operatingRuleBody": "Più scelta così presto è solo procrastinazione più elegante. Ottieni il primo risultato, poi amplia la superficie.",
         "currentPressure": "Pressione attuale",
         "install": "Installa",
         "firstPrompt": "Primo suggerimento",
@@ -1359,12 +1600,20 @@
         "doThisNow": "Fallo adesso",
         "visibleMove": "Movimento visibile",
         "liveStackRadar": "Radar in tempo reale",
+        "liveStackRadarTitle": "La corsia di onboarding ora sa cosa stanno davvero rilasciando gli stack tracciati",
+        "liveStackRadarBody": "Pico parte con Hermes nel flusso delle lezioni, ma ora il prodotto mantiene visibile il resto della mappa degli stack invece di fingere che al mondo esista un solo runtime.",
+        "openLiveLedger": "Apri il registro live",
         "missionBoard": "Consiglio di missione",
+        "missionBoardTitle": "Mantieni ben ancorate le prime due missioni",
+        "missionBoardBody": "L'onboarding dovrebbe sapere dove si è fermato l'operatore. Queste card di missione rispecchiano il workspace della lezione così il primo risultato sopravvive ai cambi di route invece di dissolversi nella memoria.",
+        "workspaceContinuity": "continuità del workspace",
         "mission01": "Missione 01",
         "mission02": "Missione 02",
         "focusedStep": "Passo mirato",
         "proofCaptured": "Prova catturata",
         "operatorRecord": "Registro dell'operatore",
+        "operatorRecordTitle": "Mantieni kickoff hosted e verità del runtime nello stesso posto",
+        "operatorRecordBody": "Conserva stato di onboarding hosted, verità del runtime e prossima mossa di attivazione in un unico record operatore per il capitolo 01.",
         "refreshSync": "Aggiorna la sincronizzazione",
         "currentBinding": "Vincolo attuale",
         "assistant": "Assistente",
@@ -1400,11 +1649,40 @@
         "doThisFirst": "Fallo prima",
         "outcomeDriven": "Guidato dai risultati",
         "outcome": "Risultato:",
+        "activationTrackBody": {
+          "done": "Hai già ottenuto il primo risultato. Usa l'azione principale qui sopra e tieni la sequenza in movimento.",
+          "installDone": "Hermes è installato. Salta la panoramica e apri adesso la prima lezione di prompt.",
+          "installFirst": "Tutto il resto può aspettare. Apri la lezione di installazione e fai funzionare il comando."
+        },
         "installLesson": "Installa la lezione",
         "firstPromptLesson": "Prima lezione immediata",
         "askTutor": "Chiedi a tutor",
         "currentPressureInstall": "fatto",
-        "currentPressureFirstPrompt": "prova catturata"
+        "currentPressureFirstPrompt": "prova catturata",
+        "operatorRuleBody": "Più scelta così presto resta solo procrastinazione più elegante. Mantieni il capitolo stretto finché un'esecuzione locale e un artefatto di prova non sono entrambi reali.",
+        "trackState": {
+          "active": "Track attivo",
+          "set": "Imposta come track",
+          "locked": "Bloccato"
+        },
+        "runtimeStatusOptions": {
+          "client_required": "client richiesto",
+          "healthy": "operativo",
+          "degraded": "degradato",
+          "offline": "offline",
+          "warning": "avviso",
+          "unknown": "sconosciuto"
+        },
+        "installMethodOptions": {
+          "npm": "npm",
+          "brew": "brew",
+          "binary": "binario",
+          "manual": "manuale"
+        },
+        "hostedRuntimeEditorTitle": "Aggiorna il record dell'operatore senza lasciare il percorso",
+        "hostedRuntimeEditorBody": "Questo non finge di installare nulla dal browser. Salva l'ultima istantanea runtime veritiera così il resto di Pico smette di indovinare.",
+        "savingSnapshot": "Salvataggio istantanea...",
+        "dismissChecklist": "Nascondi checklist"
       },
       "compass": {
         "title": "Utilizza il percorso più breve che mantenga il prodotto onesto",
@@ -1419,6 +1697,10 @@
         "askTutorAboutStep": "Chiedi a tutor informazioni su questo passaggio",
         "inspectLiveControlRoom": "Ispeziona la sala di controllo dal vivo",
         "escalateToHumanHelp": "Passare all'aiuto umano",
+        "primaryCaption": "Resta sulla sequenza principale finché un'uscita visibile non è reale.",
+        "tutorCaption": "Usalo quando ti blocca un comando concreto o una barriera di validazione.",
+        "autopilotCaption": "Passa qui quando stato runtime, approvazioni o spesa diventano il collo di bottiglia.",
+        "supportCaption": "Usalo solo quando il percorso del prodotto non è più abbastanza onesto da permetterti di recuperare da solo.",
         "nextMove": "Prossima mossa",
         "blocked": "Bloccato",
         "runtime": "Runtime",
@@ -1434,7 +1716,12 @@
         "postTitle": "Postura del capitolo",
         "postBody": "Mantieni il capitolo 01 ristretto di proposito. Nessuna navigazione, nessun turismo di stack e nessun teatro di installazione aggiuntivo prima che esista un vero artefatto.",
         "trackTitle": "Lista di controllo del monitoraggio",
-        "trackBody": "È sufficiente una chiara indicazione guida mentre la prima prova è ancora in formazione."
+        "trackBody": "È sufficiente una chiara indicazione guida mentre la prima prova è ancora in formazione.",
+        "labels": {
+          "brief": "01 • Brief",
+          "reviewLine": "03 • Linea di review"
+        },
+        "guideMarkerBody": "Basta un unico segnale guida chiaro mentre la prima prova si sta ancora formando."
       },
       "protocol": {
         "title": "Protocollo di prova",
@@ -1485,6 +1772,9 @@
         "missing": "mancante",
         "resumeInstall": "Riprendi la missione di installazione",
         "resumePrompt": "Riprendi la missione immediata"
+      },
+      "shared": {
+        "ok": "ok"
       }
     },
     "tutorPage": {
@@ -1634,6 +1924,17 @@
           "runtimeStatus": "Stato Runtime",
           "notSynced": "non sincronizzato"
         },
+        "questionProtocol": [
+          "Indica il passaggio esatto, il comando o l'azione nel dashboard in cui ti trovavi.",
+          "Incolla la prova: output, errore, trascrizione o stato runtime.",
+          "Chiedi l'unica prossima mossa che dimostri che il percorso è di nuovo attivo."
+        ],
+        "examplePrompts": [
+          "Hermes si apre in locale, ma l'esecuzione sul VPS fallisce. Cosa dovrei verificare prima di cambiare qualsiasi cosa?",
+          "L'onboarding di OpenClaw è completato, ma la Control UI continua a non caricarsi. Qual è il percorso di verifica più pulito?",
+          "NanoClaw `/setup` è stato eseguito in Claude Code, ma il percorso del container sembra ancora rotto. Cosa dovrei isolare per prima cosa?",
+          "Il launcher di PicoClaw funziona solo su localhost. Dovrei cambiare l'indirizzo di bind o tenerlo privato con Tailscale?"
+        ],
         "questionPlaceholder": "Descrivi il blocco, il passaggio esatto e cosa ti aspettavi che accadesse.",
         "blockedLessonLabel": "Lezione bloccata",
         "noLessonSelected": "Nessuna lezione selezionata",
@@ -1724,6 +2025,93 @@
       },
       "shared": {
         "openLesson": "Apri {lessonTitle}"
+      }
+    },
+    "welcomeTour": {
+      "quickHelp": "Aiuto rapido",
+      "title": "Impara il codex una volta, poi chiudilo.",
+      "close": "Chiudi",
+      "closeLabel": "Chiudi il tour rapido",
+      "controls": {
+        "back": "Indietro",
+        "next": "Avanti",
+        "finish": "Termina"
+      },
+      "steps": {
+        "mission": {
+          "eyebrow": "01 Missione",
+          "title": "Ogni superficie Pico dovrebbe avere un'unica azione dominante.",
+          "body": "Se una pagina sembra parlare allo stesso modo di navigazione, metriche e spiegazione, sta mentendo. Trova l'unica mossa che libera il percorso.",
+          "bullets": {
+            "currentSurface": "Sei nel capitolo {chapter}: {label}.",
+            "backtrackPrevious": "Obiettivo di ritorno: {label}.",
+            "backtrackOnboarding": "Obiettivo di ritorno: onboarding.",
+            "forwardNext": "Percorso in avanti: {label}.",
+            "forwardSupport": "Percorso in avanti: supporto."
+          }
+        },
+        "route": {
+          "academy": {
+            "eyebrow": "02 Missione prima",
+            "title": "Il codex vuole che conti una sola missione.",
+            "body": "Apri la lezione dominante, completa il passaggio visibile e lascia che l'archivio resti silenzioso finché il percorso principale non è concluso.",
+            "bullets": {
+              "map": "La mappa spiega la sequenza. Non deve competere con la missione.",
+              "proof": "L'attuale corsia di prova è l'unica parte che deve sembrare urgente.",
+              "currentSurface": "Superficie attuale: {pageTitle}."
+            }
+          },
+          "tutor": {
+            "eyebrow": "02 Un bloccante",
+            "title": "Tutor serve per la prossima mossa esatta.",
+            "body": "Chiedi del singolo comando, percorso file o passaggio di verifica che sta bloccando il percorso.",
+            "bullets": {
+              "academy": "Se la sequenza è sbagliata, torna ad Academy.",
+              "autopilot": "Se il bloccante è lo stato runtime live, apri Autopilot.",
+              "currentSurface": "Superficie attuale: {pageTitle}."
+            }
+          },
+          "autopilot": {
+            "eyebrow": "02 Verità runtime",
+            "title": "Autopilot conta più del testo della lezione quando il sistema è live.",
+            "body": "Usa la superficie runtime quando la risposta dipende da run, alert, approvazioni o stato corrente.",
+            "bullets": {
+              "academy": "Torna ad Academy quando il vero problema è la sequenza della missione.",
+              "support": "Escala solo quando la verità runtime non basta più.",
+              "currentSurface": "Superficie attuale: {pageTitle}."
+            }
+          },
+          "support": {
+            "eyebrow": "02 Bordo umano",
+            "title": "Il supporto dovrebbe rimandarti rapidamente in movimento.",
+            "body": "Porta il pacchetto di lezione o runtime più pulito possibile, poi torna al prodotto invece di restare qui.",
+            "bullets": {
+              "notDefault": "Il supporto è il bordo disordinato, non lo spazio di lavoro predefinito.",
+              "packet": "Quando escali, porta con te lesson slug, prova e bloccante.",
+              "currentSurface": "Superficie attuale: {pageTitle}."
+            }
+          },
+          "onboarding": {
+            "eyebrow": "02 Primo risultato",
+            "title": "L'onboarding esiste per comprimere il primo successo visibile.",
+            "body": "Usalo per arrivare a un runtime funzionante e a un artefatto di prova, poi passa subito al codex.",
+            "bullets": {
+              "noise": "Tratta le preferenze come rumore finché il primo successo non è reale.",
+              "academy": "Academy diventa utile quando hai bisogno della corsia esatta.",
+              "currentSurface": "Superficie attuale: {pageTitle}."
+            }
+          }
+        },
+        "proof": {
+          "eyebrow": "03 Prova",
+          "title": "Non lasciare mai il percorso senza un artefatto di prova.",
+          "body": "La piattaforma diventa affidabile solo quando ogni passaggio completato lascia dietro di sé evidenza, non solo ottimismo.",
+          "bullets": {
+            "tutor": "Se il bloccante è preciso, chiedi a Tutor.",
+            "autopilot": "Se il bloccante è la verità del sistema live, apri Autopilot.",
+            "support": "Se entrambi falliscono, passa a Support con prove e note."
+          }
+        }
       }
     },
     "shell": {
@@ -2628,7 +3016,7 @@
         "openLiveApprovalSetup": "Apri la configurazione live delle approvazioni",
         "completeLabel": {
           "installHermesLocally": "Hermes è installato",
-          "runYourFirstAgent": "Cazzo, funziona",
+          "runYourFirstAgent": "La prima esecuzione ha funzionato",
           "default": "Sigilla questo capitolo"
         },
         "askTutorAboutLesson": "Chiedi al tutor di questa lezione",
@@ -2911,6 +3299,10 @@
         "proofCaptured": "catturato",
         "proofMissing": "mancante"
       }
+    },
+    "surfaceCompass": {
+      "label": "Bussola della superficie",
+      "operatingRule": "Regola operativa"
     }
   }
 }

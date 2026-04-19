@@ -490,6 +490,1208 @@
         "privacy": "Privacy"
       },
       "copyright": "© MUTX 2026. Open control for deployed agents."
+    },
+    "lessonPage": {
+      "actions": {
+        "completeLabel": {
+          "runYourFirstAgent": "The first run worked",
+          "installHermesLocally": "Hermes is installed",
+          "default": "Seal this chapter"
+        },
+        "openAutopilot": "Open Autopilot",
+        "runYourFirstAgentNow": "Run your first agent now",
+        "openLesson": "Open {lessonTitle}",
+        "completePrerequisiteFirst": "Complete {lessonTitle} first",
+        "openLiveApprovalSetup": "Open live approval setup",
+        "askTutorAboutLesson": "Ask the tutor about this lesson",
+        "resetWorkspace": "Reset workspace",
+        "reopenStep": "Reopen step",
+        "markStepDone": "Mark step done",
+        "askTutor": "Ask tutor",
+        "inspectAutopilot": "Inspect Autopilot",
+        "openSupportLane": "Open support lane",
+        "previousLesson": "Previous lesson",
+        "backToAcademyMap": "Back to academy map"
+      },
+      "shared": {
+        "difficulty": {
+          "setup": "setup",
+          "operator": "operator",
+          "builder": "builder"
+        },
+        "hostedStamp": {
+          "verifyHost": "verify host",
+          "hostedAttached": "hosted attached",
+          "localOnly": "local only",
+          "authError": "auth error",
+          "checking": "checking"
+        },
+        "chapterState": {
+          "blocked": "blocked",
+          "sealed": "sealed",
+          "active": "active",
+          "ready": "ready"
+        },
+        "proofState": {
+          "captured": "captured",
+          "pending": "pending"
+        },
+        "reviewState": {
+          "sealed": "sealed",
+          "ready": "ready",
+          "pending": "pending"
+        },
+        "stepState": {
+          "done": "done",
+          "active": "active"
+        }
+      },
+      "studio": {
+        "cards": {
+          "brief": {
+            "label": "01 • Brief",
+            "title": "The outcome the studio is chasing"
+          },
+          "deliverable": {
+            "label": "02 • Deliverable",
+            "title": "What the finished artifact should prove"
+          },
+          "critique": {
+            "label": "03 • Critique",
+            "title": "The review line before you move on"
+          }
+        },
+        "context": {
+          "trackArc": "Track arc",
+          "trackArcFallback": "Build one real operator outcome.",
+          "lessonOutcome": "Lesson outcome",
+          "timeAndWeight": "Time and weight",
+          "timeAndWeightValue": "{minutes}m • {xp} xp • {difficulty}",
+          "title": "Chapter context"
+        },
+        "label": "Studio review board",
+        "title": "Brief, deliverable, critique",
+        "stamp": "one real lesson at a time",
+        "posture": {
+          "title": "Studio posture",
+          "body": "Keep this chapter narrow. The goal is not to feel busy or advanced. The goal is to produce one artifact a sharp operator would still trust tomorrow."
+        }
+      },
+      "shell": {
+        "eyebrow": "Chapter {number} • lesson lane"
+      },
+      "hero": {
+        "lessonLabel": "Lesson",
+        "trackLabel": "Track",
+        "trackUnmapped": "Unmapped",
+        "trackNotMapped": "not mapped",
+        "missionBrief": "Mission brief",
+        "expectedResult": "Expected result: {value}",
+        "metrics": {
+          "state": "State",
+          "stateHintBlocked": "finish the prerequisite first",
+          "stateHintActive": "one route lane",
+          "proof": "Proof",
+          "proofStepFallback": "Choose a step",
+          "progress": "Progress",
+          "stepsCleared": "steps cleared",
+          "telemetry": "Telemetry",
+          "telemetryDetail": "{xp} xp • {difficulty}"
+        }
+      },
+      "chapterSpine": {
+        "title": "Chapter spine"
+      },
+      "workspace": {
+        "label": "Studio workspace",
+        "selectStep": "Select a step",
+        "studioBrief": "Studio brief",
+        "chooseStepBody": "Choose a step from the chapter spine to start the lane.",
+        "deliverableArtifact": "Deliverable artifact",
+        "deliverablePlaceholder": "Paste the output, transcript note, or artifact that proves this chapter worked.",
+        "benchNotes": "Bench notes",
+        "benchNotesPlaceholder": "Capture the blocker, file path, or command variation that mattered.",
+        "reviewState": {
+          "label": "Review state",
+          "sealedBody": "The chapter is sealed. Move on while the route is still fresh.",
+          "readyBody": "The proof exists. Seal the chapter and keep moving.",
+          "pendingBody": "Do not seal the chapter until the proof says something real."
+        },
+        "chapterCompletion": "Chapter completion",
+        "creativeDirection": {
+          "title": "Creative direction",
+          "body": "Finish the live step, log one proof artifact, then either seal the chapter or hand off to the next surface."
+        }
+      },
+      "helpLane": {
+        "label": "Field notes",
+        "stayHereWhen": "Stay here when",
+        "stayHereBody": "the current step still contains the answer and the route does not need escalation yet.",
+        "exactBlocker": "Exact blocker",
+        "runtimeTruth": "Runtime truth",
+        "messyEdge": "Messy edge"
+      },
+      "surfaceCompass": {
+        "title": "Keep the lesson narrow until the proof is real",
+        "body": "Use Tutor for one grounded blocker, switch to Autopilot when live runtime truth matters, and escalate to Support only after both stop being enough.",
+        "status": {
+          "blockedByPrerequisite": "blocked by prerequisite",
+          "chapterSealed": "chapter sealed",
+          "routeLaneActive": "route lane active",
+          "readyToExecute": "ready to execute"
+        },
+        "aside": "Recovery belongs below the proof lane, not inside it.",
+        "items": {
+          "askTutorLabel": "Ask tutor about this lesson",
+          "askTutorCaption": "Use this when one command, file path, or validation check is failing.",
+          "blocked": "Blocked",
+          "returnToAcademyMap": "Return to academy map",
+          "returnCaption": "Step back to the mapped route when the sequence itself is the problem.",
+          "backtrack": "Backtrack",
+          "runtimeCaption": "Switch here when the blocker depends on live runtime or approvals.",
+          "runtime": "Runtime",
+          "supportCaption": "Escalate only after the lesson, tutor, and runtime views stop being enough.",
+          "messyEdge": "Messy edge"
+        }
+      },
+      "troubleshooting": {
+        "label": "Troubleshooting appendix",
+        "title": "The smaller notes you only read when the route goes crooked",
+        "stepsCount": "{count} steps",
+        "nextCapability": "Next capability",
+        "routeMemory": "Route memory"
+      }
+    },
+    "onboardingPage": {
+      "labels": {
+        "runtimeStatusOptions": {
+          "client_required": "client required",
+          "healthy": "healthy",
+          "degraded": "degraded",
+          "offline": "offline",
+          "warning": "warning",
+          "unknown": "unknown"
+        },
+        "installMethodOptions": {
+          "npm": "npm",
+          "brew": "brew",
+          "binary": "binary",
+          "manual": "manual"
+        },
+        "chapterPosture": "Chapter posture",
+        "guideMarker": "Guide marker",
+        "trackChecklist": "Track checklist",
+        "chapterBrief": "Chapter 01 brief",
+        "chapterBriefTitle": "Make one command work and keep the proof",
+        "chapterBriefBody": "This first chapter should narrow the world fast: install Hermes, run one tiny prompt, and hold on to the output so the first win becomes something real.",
+        "fastestPath": "Fastest path to value",
+        "fastestPathBody": {
+          "done": "You already cleared the first win. Do not linger here. Open the next lesson and keep the sequence moving.",
+          "installDone": "Good. The install is done. Now run one tiny prompt and get the first visible answer.",
+          "installFirst": "Do not compare providers, frameworks, or stacks yet. Install Hermes and make the command work first."
+        },
+        "trackLocked": "Track locked",
+        "studioLedger": "Studio ledger",
+        "completedLessons": "Completed lessons",
+        "hostedSync": "Hosted sync",
+        "runtimeStatus": "Runtime status",
+        "workspace": "Workspace",
+        "jumpStraightTo": "Jump straight to",
+        "installLesson": "Install lesson",
+        "firstPromptLesson": "First prompt lesson",
+        "askTutor": "Ask tutor",
+        "operatingRule": "Operating rule",
+        "operatingRuleBody": "More choice this early is just prettier procrastination. Get the first win, then widen the surface.",
+        "currentPressure": "Current pressure",
+        "install": "Install",
+        "firstPrompt": "First prompt",
+        "currentPressureFirstPrompt": "proof captured",
+        "proofProtocol": "Proof protocol",
+        "visibleMoves": "Three visible moves to clear Chapter 01",
+        "liveStackRadar": "Live stack radar",
+        "liveStackRadarTitle": "The onboarding lane now knows what the tracked stacks are actually shipping",
+        "liveStackRadarBody": "Pico starts with Hermes in the lesson flow, but the product now keeps the rest of the stack map visible instead of pretending there is only one runtime on earth.",
+        "openLiveLedger": "Open live ledger",
+        "missionBoard": "Mission board",
+        "missionBoardTitle": "Keep the first two missions visibly grounded",
+        "missionBoardBody": "Onboarding should know where the operator left off. These mission cards mirror the lesson workspace so the first win survives route changes instead of dissolving into memory.",
+        "workspaceContinuity": "workspace continuity",
+        "mission01": "Mission 01",
+        "mission02": "Mission 02",
+        "operatorRecord": "Operator record",
+        "operatorRecordTitle": "Keep hosted kickoff and runtime truth in one place",
+        "operatorRecordBody": "Keep the hosted onboarding state, runtime truth, and next activation move in one operator record for Chapter 01.",
+        "refreshSync": "Refresh sync",
+        "currentBinding": "Current binding",
+        "activationTrack": "Activation track",
+        "doThisFirst": "Do this first",
+        "outcomeDriven": "Outcome-driven",
+        "outcome": "Outcome:",
+        "activationTrackBody": {
+          "done": "You already got the first win. Use the main action above and keep the sequence moving.",
+          "installDone": "Hermes is installed. Skip the overview and open the first prompt lesson now.",
+          "installFirst": "Everything else can wait. Open the install lesson and get the command working."
+        },
+        "operatorRuleBody": "More choice this early is still prettier procrastination. Keep the chapter narrow until one local run and one proof artifact are both real.",
+        "trackState": {
+          "active": "Active track",
+          "set": "Set as track",
+          "locked": "Locked"
+        },
+        "hostedRuntimeEditor": "Hosted runtime editor",
+        "hostedRuntimeEditorTitle": "Update the operator record without leaving the route",
+        "hostedRuntimeEditorBody": "This does not pretend to install anything from the browser. It stores the latest truthful runtime snapshot so the rest of Pico stops guessing.",
+        "runtimeLabel": "Runtime label",
+        "runtimeStatusField": "Runtime status",
+        "installMethod": "Install method",
+        "gatewayUrl": "Gateway URL",
+        "assistantName": "Assistant name",
+        "workspaceField": "Workspace",
+        "modelField": "Model",
+        "savingSnapshot": "Saving snapshot...",
+        "saveSnapshot": "Save runtime snapshot",
+        "openInstallLesson": "Open install lesson",
+        "saveOnlyTruth": "Save only what is true on the operator host right now: gateway URL, runtime health, and the bound assistant.",
+        "currentBindingTitle": "Current binding",
+        "assistant": "Assistant",
+        "model": "Model",
+        "hostedActions": "Hosted actions",
+        "updateStep": "Updating step...",
+        "completeStep": "Mark current step complete",
+        "checklistDismissed": "Checklist dismissed",
+        "dismissChecklist": "Dismiss checklist",
+        "completeWizard": "Complete wizard",
+        "resetWizard": "Reset wizard"
+      },
+      "runtime": {
+        "notRecorded": "not recorded",
+        "pending": "pending",
+        "done": "done",
+        "failed": "failed",
+        "active": "active",
+        "checklistDismissed": "checklist dismissed",
+        "checklistVisible": "checklist visible",
+        "notStarted": "not started",
+        "signInFirst": "Sign in first. The runtime snapshot is per operator account.",
+        "loading": "Loading backend onboarding and runtime state.",
+        "currentProvider": "current provider",
+        "availableSoon": "available soon",
+        "locked": "locked",
+        "ready": "ready",
+        "later": "later",
+        "wizardProgress": "Wizard progress",
+        "currentStep": "Current step",
+        "hostedKickoffReview": "Hosted kickoff review",
+        "noHostedState": "No hosted onboarding state has been recorded yet.",
+        "operatorHostSnapshot": "Operator host snapshot",
+        "gateway": "Gateway",
+        "installMethod": "Install method",
+        "lastSeen": "Last seen",
+        "bindings": "Bindings",
+        "noRuntimeSnapshot": "No runtime snapshot has been synced yet.",
+        "gatewayHealth": "Gateway health",
+        "unknown": "unknown",
+        "noDoctorSummary": "No doctor summary was synced yet."
+      },
+      "hero": {
+        "runtimeNotAttached": "not attached",
+        "trackInstallPrompt": "Install Hermes now",
+        "sealFirstWin": "Seal the first win",
+        "continueWithNextLesson": "Continue with {lessonTitle}",
+        "openAutopilot": "Open Autopilot",
+        "proofStateHeadline": {
+          "install": "Make the first proof impossible to miss.",
+          "prompt": "Seal the proof while the route is still honest.",
+          "cleared": "First proof is real. Keep the lane moving."
+        },
+        "hostedSyncDetail": {
+          "offline": "hosted sync offline",
+          "loading": "refreshing signal",
+          "gatewayLive": "gateway live",
+          "gatewayUnbound": "gateway unbound"
+        },
+        "shellEyebrow": "Onboarding",
+        "shellTitle": "Get to your first working agent fast",
+        "shellDescription": "Ignore everything except the first local win. Install Hermes, run one prompt, see a real answer, then keep moving.",
+        "firstWinPulse": "First-win pulse",
+        "subtitle": "Track the install, the first proof artifact, and the next move from one place.",
+        "chapterPulse": "Chapter pulse",
+        "stepsClear": "{completed}/{total} steps clear",
+        "proofState": "Proof state",
+        "proofArtifactLogged": "artifact logged",
+        "proofArtifactMissing": "artifact still missing",
+        "runtimeTruth": "Runtime truth",
+        "nextIrreversibleMove": "Next irreversible move",
+        "proof": "Proof",
+        "runtime": "Runtime",
+        "focus": "Focus",
+        "sync": "Sync",
+        "signalCore": "Signal core",
+        "nextMove": "Next move",
+        "visibleSuccess": "Visible success"
+      },
+      "mission": {
+        "captured": "captured",
+        "missing": "missing",
+        "completed": "completed",
+        "runBoundedPrompt": "Run one bounded prompt",
+        "firstWinProtocol": "first win protocol",
+        "doThisNow": "Do this now",
+        "visibleMove": "Visible move",
+        "focusedStep": "Focused step",
+        "resumeInstall": "Resume install mission",
+        "resumePrompt": "Resume prompt mission"
+      },
+      "doctrine": {
+        "labels": {
+          "brief": "01 • Brief",
+          "reviewLine": "03 • Review line"
+        },
+        "brief": "Make the runtime open cleanly",
+        "deliverable": "Produce one obvious proof artifact",
+        "reviewLine": "Do not widen the surface early",
+        "label": "Kickoff doctrine",
+        "title": "Start like a sharp studio, not a hobby project",
+        "chip": "brief • deliverable • review",
+        "postBody": "Keep Chapter 01 narrow on purpose. No browsing, no stack tourism, and no extra setup theater before one real artifact exists.",
+        "guideMarkerBody": "One clear guide cue is enough while the first proof is still forming."
+      },
+      "compass": {
+        "runFirstPrompt": "Run your first agent",
+        "inspectLiveControlRoom": "Open Autopilot",
+        "askTutorAboutStep": "Ask tutor about this step",
+        "escalateToHumanHelp": "Open support lane",
+        "title": "Use the shortest route that keeps the product honest",
+        "body": "Keep the first win narrow. Continue the lesson path when the sequence is clear, use tutor for one blocked command, open Autopilot only when live runtime state is the real question, and escalate last.",
+        "statusFirstWinCleared": "first win cleared",
+        "statusInstallCleared": "install cleared",
+        "statusColdStart": "cold start",
+        "aside": "This chapter exists to compress the world, not widen it. The first proof should happen before preferences, architecture debates, or tooling tours.",
+        "openInstallLesson": "Open install lesson",
+        "continueAcademyLane": "Continue academy lane",
+        "primaryCaption": "Stay on the primary sequence until one visible output is real.",
+        "nextMove": "Next move",
+        "tutorCaption": "Use this when one concrete command or validation gate is blocking you.",
+        "blocked": "Blocked",
+        "autopilotCaption": "Switch here once runtime state, approvals, or spend become the bottleneck.",
+        "runtime": "Runtime",
+        "supportCaption": "Only use this when the product path stopped being truthful enough to recover alone.",
+        "messyEdge": "Messy edge"
+      },
+      "shared": {
+        "ok": "ok"
+      },
+      "protocol": {
+        "body": "These are the only moves that count before the surface earns the right to get wider."
+      }
+    },
+    "academyPage": {
+      "lessonState": {
+        "cleared": "cleared",
+        "current": "current",
+        "ready": "ready",
+        "locked": "locked"
+      },
+      "syncState": {
+        "hydrating": "hydrating",
+        "live": "live",
+        "saving": "saving",
+        "localOnly": "local only"
+      },
+      "shared": {
+        "notRecorded": "not recorded",
+        "installHermesNow": "Install Hermes now",
+        "runFirstAgent": "Run your first agent",
+        "continueWithNextLesson": "Continue with {title}",
+        "openNextChapter": "Open the next chapter",
+        "openAutopilot": "Open Autopilot",
+        "askTutorNextStep": "Ask tutor for the exact next step",
+        "askTutorRouteCorrection": "Ask tutor for route correction",
+        "verifyHost": "verify host",
+        "hostedAttached": "hosted attached",
+        "authError": "auth error",
+        "checking": "checking",
+        "operator": "operator",
+        "signInToPersist": "sign in to persist",
+        "readingHostState": "reading host state",
+        "captured": "captured",
+        "inProgress": "in progress",
+        "ready": "ready",
+        "steps": "{completed}/{total} steps",
+        "controlRoom": "control room",
+        "lessons": "{completed}/{total} lessons",
+        "missing": "missing",
+        "previewStep": "Pick the next visible step",
+        "plan": "{plan} plan",
+        "resumeBody": "Open the lesson route and keep the proof lane short.",
+        "resumeMission": "Resume mission",
+        "askTutor": "Ask tutor",
+        "updated": "Updated {timestamp}",
+        "noProofLogged": "No proof has been logged yet. Save the single artifact that proves the mission actually worked.",
+        "ok": "ok",
+        "track": "Track {number}",
+        "clearedCount": "{completed}/{total} cleared",
+        "open": "open",
+        "locked": "locked"
+      },
+      "mission": {
+        "titleFallback": "Open Autopilot",
+        "summaryFallback": "Step into the live control room when the lesson lane is clear.",
+        "validationFallback": "Use the runtime when the question is no longer about reading the lesson."
+      },
+      "strip": {
+        "missionState": "Mission state",
+        "trackProgress": "Track progress",
+        "proof": "Proof",
+        "hosted": "Hosted"
+      },
+      "studio": {
+        "steps": {
+          "0": {
+            "label": "01 • Brief",
+            "title": "Read the mission like a client brief"
+          },
+          "1": {
+            "label": "02 • Deliverable",
+            "title": "Make one artifact worth keeping"
+          },
+          "2": {
+            "label": "03 • Critique",
+            "title": "Use the validation like studio review"
+          }
+        },
+        "label": "Studio method",
+        "title": "Learn like a boutique studio ships",
+        "stamp": "brief • deliverable • critique"
+      },
+      "standards": {
+        "trackOutcome": "Track outcome",
+        "levelReward": "Level reward",
+        "levelRewardFallback": "Ship one real operator outcome.",
+        "nextStandard": "Next standard",
+        "nextStandardFallback": "Keep the chapter narrow and honest.",
+        "label": "Track standards"
+      },
+      "shell": {
+        "eyebrow": "Apprentice codex",
+        "title": "Academy",
+        "description": "One mission. One proof. One honest next move."
+      },
+      "billboard": {
+        "chapterLabel": "Codex chapter",
+        "trackLabel": "Track",
+        "stopOf": "Stop {current} of {total}",
+        "currentMission": "Current mission",
+        "validationPrefix": "Validation:"
+      },
+      "workspace": {
+        "activeProofLane": "Active proof lane",
+        "resumeFromHere": "Resume from here",
+        "proofState": "Proof state",
+        "proofCaptured": "captured",
+        "proofMissing": "missing",
+        "capturedProof": "Captured proof",
+        "hostedNote": "Hosted note"
+      },
+      "chapterLedger": {
+        "chapterChecklist": "Chapter checklist",
+        "label": "Chapter ledger",
+        "title": "One dominant chapter, with the rest of the map kept quiet.",
+        "focusMode": "focused atlas",
+        "guidedAtlas": "guided atlas",
+        "body": "The current track gets the full editorial treatment. The rest of the atlas stays visible, but compressed, so the route still feels authored instead of equally loud everywhere.",
+        "mascotAlt": "PicoMUTX academy mascot",
+        "routeState": "Route state",
+        "nextDominantStop": "Next dominant stop",
+        "openAutopilot": "Open Autopilot",
+        "stopLevel": "Stop {number} • level {level}",
+        "dominantStop": "Dominant stop",
+        "missionCorrection": "Mission correction",
+        "missionCorrectionBody": "The atlas stays useful only if it keeps pushing you back into the current mission.",
+        "otherChapters": "Other chapters"
+      },
+      "referenceAnnex": {
+        "label": "Reference annex",
+        "title": "Capability, archive, and platform memory stay below the route on purpose",
+        "setup": "Setup",
+        "locked": "locked",
+        "body": "Platform memory stays available, but it sits under the codex on purpose. The Academy leads with route and proof, then exposes configuration only when you need it."
+      },
+      "capabilities": {
+        "label": "Unlocked capabilities",
+        "body": "The pieces that matter after the mission is already real.",
+        "liveSuffix": "live",
+        "live": "live",
+        "firstUnlockEmpty": "The first capability unlock lands only after the first lessons are cleared for real.",
+        "nextUnlock": "Next unlock",
+        "patternArchive": "Pattern archive",
+        "openPatternLesson": "Open pattern lesson",
+        "fieldNotes": "Field notes",
+        "controlAnnex": "Control annex"
+      }
+    },
+    "autopilotPage": {
+      "composer": {
+        "summaryDefault": "Outbound send requires a human decision before the runtime crosses the line.",
+        "sectionLabel": "Create a gated action",
+        "body": "Exercise the live approval queue here instead of waiting for another surface to create the request first.",
+        "chip": "live queue write",
+        "agentIdLabel": "Agent ID",
+        "agentIdPlaceholder": "agent-founder-lab",
+        "sessionOrRunIdLabel": "Session or run ID",
+        "sessionOrRunIdPlaceholder": "ses-pico-approval",
+        "actionTypeLabel": "Action type",
+        "actionTypePlaceholder": "OUTBOUND_SEND",
+        "summaryLabel": "Why this action needs a gate",
+        "summaryPlaceholder": "Describe the risky action clearly.",
+        "creating": "Creating request...",
+        "create": "Create approval request",
+        "reset": "Reset draft"
+      },
+      "shared": {
+        "label": {
+          "whyItMatters": "Why it matters: {impact}"
+        },
+        "action": {
+          "jumpToDetail": "Jump to detail section",
+          "openLesson": "Open {lessonTitle}",
+          "returnToAcademy": "Return to academy"
+        },
+        "time": {
+          "unknown": "Unknown time",
+          "unknownRelative": "unknown time"
+        },
+        "runDetail": {
+          "failedNoMessage": "The run stopped without a stored error message.",
+          "inFlight": "The run is still moving through the pipeline.",
+          "awaitingOwner": "The run is paused and waiting for owner input before continuing.",
+          "completedNoSummary": "The run completed without a short summary."
+        },
+        "runImpact": {
+          "failed": "This workflow did not finish cleanly. Check the error and traces before trusting the next attempt.",
+          "active": "Work is still in flight. Watch for hangs, retries, or silence that lasts too long.",
+          "awaitingOwner": "The run is paused waiting for owner action. Respond to unblock the pipeline.",
+          "completed": "This run completed. Verify the output is actually useful before you automate it harder."
+        },
+        "alertImpact": {
+          "resolved": "The alert is cleared, but you still want the root cause to make sense.",
+          "active": "This is active operator pain. If you ignore it, the runtime will keep surprising you."
+        },
+        "approvalImpact": {
+          "pending": "A risky action is waiting for a human decision. Nothing should proceed past this gate yet.",
+          "approved": "The gate opened. Make sure the approved action actually matches the request you intended to allow.",
+          "rejected": "The risky action was blocked. Good. Now decide whether the request was wrong or the guardrail is too strict.",
+          "changed": "This approval changed state and should be reviewed if it affects live behavior."
+        },
+        "timeline": {
+          "runTitle": "{status} run {runId}",
+          "alertTitle": "{type} {state}",
+          "alertResolved": "resolved",
+          "alertTriggered": "triggered",
+          "alertNoMessage": "Alert recorded without a message.",
+          "approvalStatus": {
+            "pending": "pending",
+            "approved": "approved",
+            "rejected": "rejected"
+          },
+          "approvalRequestedBy": "Requested by {requester}.",
+          "approvalTitle": "{action} {status}"
+        },
+        "timelineSources": {
+          "runs": "Runs",
+          "alerts": "Alerts",
+          "approvals": "Approvals"
+        },
+        "error": {
+          "partialSignals": "Some live MUTX signals failed to load. What is shown is partial, not fabricated.",
+          "loadLiveData": "Failed to load live autopilot data",
+          "resolveRequest": "Failed to {action} request",
+          "createApprovalRequiredFields": "agent, session, and action type are required before creating an approval request",
+          "createApproval": "Failed to create approval request"
+        },
+        "validation": {
+          "thresholdRange": "Enter a threshold between 1 and 100."
+        },
+        "loadState": {
+          "authRequired": "Auth required",
+          "loading": "Loading live data",
+          "partial": "Partial live data",
+          "offline": "Offline",
+          "ready": "Live data ready"
+        }
+      },
+      "emptyStates": {
+        "runs": {
+          "noAgent": {
+            "title": "No monitored agent exists yet",
+            "body": "Pico has no real MUTX agent to attach to. Create or deploy one actual agent first, then come back for run history."
+          },
+          "noHistory": {
+            "title": "An agent exists, but nothing has run yet",
+            "body": "MUTX knows about at least one agent, but there is no run history yet. Trigger one real task or wait for the first schedule tick, then come back here."
+          },
+          "openAcademy": "Open academy"
+        },
+        "alerts": {
+          "noRuns": {
+            "title": "No alerts because nothing is running yet",
+            "body": "An empty alert feed means nothing until the agent has executed real work. Get one run into MUTX first."
+          },
+          "none": {
+            "title": "No live alerts right now",
+            "body": "Good. The monitoring feed is quiet right now. Keep watching the next real run and failure path."
+          },
+          "inspectRecentRuns": "Inspect recent runs",
+          "getFirstRunLive": "Get the first run live"
+        },
+        "usage": {
+          "noBudget": {
+            "title": "No live budget snapshot yet",
+            "body": "There is no MUTX budget snapshot to compare against yet. Until that exists, cost awareness is incomplete."
+          },
+          "empty": {
+            "title": "Budget exists, but usage is empty",
+            "body": "The budget surface is live, but no usage events landed in the current window. Either the agent has not spent anything yet or usage emission is missing."
+          },
+          "triggerRealUsage": "Trigger real usage",
+          "setupBudgetVisibility": "Set up budget visibility"
+        },
+        "approvals": {
+          "noAgent": {
+            "title": "No agent exists to gate yet",
+            "body": "Approval queues only matter when a real agent is capable of doing something risky. Create or deploy the agent first."
+          },
+          "gateOff": {
+            "title": "Approval history exists, but the gate is off locally",
+            "body": "MUTX already has approval records, but Pico still says the gate is disabled. Turn the gate on here so local product state matches the control-plane reality."
+          },
+          "none": {
+            "title": "No approval records yet",
+            "body": "Nothing risky has been routed through the real approval queue yet. Exercise one real gated action before you call this governed."
+          },
+          "runGatedAction": "Run a gated action",
+          "configureApprovalGate": "Configure approval gate"
+        }
+      },
+      "hero": {
+        "primaryAction": {
+          "finishLesson": "Finish {lessonTitle} first",
+          "goBackToAcademy": "Go back to academy",
+          "inspectRun": "Inspect run {runId}"
+        },
+        "packet": {
+          "recoveryNotSet": "not set",
+          "run": "Run {value}",
+          "runNone": "none yet",
+          "budget": "Budget {value}",
+          "gate": "Gate {value}",
+          "recovery": "Recovery {value}",
+          "label": "Control packet"
+        },
+        "runState": {
+          "authRequired": "auth required",
+          "noLiveRun": "no live run",
+          "label": "Run state",
+          "triggerTaskFirst": "trigger a real task first"
+        },
+        "budgetLine": {
+          "offline": "offline",
+          "pending": "pending",
+          "label": "Budget line",
+          "threshold": "threshold {percent}",
+          "waitingForSpend": "waiting for live spend"
+        },
+        "gateState": {
+          "waiting": "{count} waiting",
+          "armed": "armed",
+          "off": "off",
+          "label": "Gate state",
+          "reviewVisible": "human review stays visible",
+          "enableBeforeRisk": "enable before risky action"
+        },
+        "runtimePulse": "Runtime pulse",
+        "headline": "Keep the run, spend, and gate in the same frame.",
+        "body": "Start with the latest execution, compare it to the current budget line, then decide whether a human gate belongs in the way. That order keeps the control room honest.",
+        "nextCheck": {
+          "label": "Next operator check",
+          "inspectRun": "Inspect run {runId}",
+          "createFirstRun": "Create the first live run",
+          "noRunBody": "No run is visible yet, so the honest move is still back on the lesson path."
+        },
+        "decisionLine": {
+          "label": "Decision line",
+          "thresholdBreached": "Spend is already across the line. Decide whether the next risky action needs a human gate.",
+          "pendingQueue": "The queue is holding risky actions in view. Review them before the surface gets noisier.",
+          "clear": "If the line is still clear, keep reading the run until the next decision becomes obvious."
+        }
+      },
+      "operatorDoctrine": {
+        "step": {
+          "read": {
+            "label": "01 • Read",
+            "title": "Start with the strongest live signal",
+            "authRequired": "Without a hosted session this room should refuse to improvise. Attach the live feed first.",
+            "withRun": "Run {runId} is the first thing to read. {detail}",
+            "noRun": "No live run exists yet. The honest move is to trigger one real task before tuning anything else."
+          },
+          "judge": {
+            "label": "02 • Judge",
+            "title": "Make the decision line explicit",
+            "authRequired": "Budget review is unavailable until the live account is attached.",
+            "withBudget": "{usage} usage against a {threshold} threshold. That line should tell you when a human steps in.",
+            "noBudget": "No live budget snapshot yet. Do not pretend a threshold matters until it meets real spend."
+          },
+          "intervene": {
+            "label": "03 • Intervene",
+            "title": "Keep risky actions reviewable",
+            "pending": "{count} approval item{pluralSuffix} is waiting. Good. The dangerous work is still visible.",
+            "configured": "The gate is configured, but nothing is waiting right now. Keep it reviewable and boring.",
+            "off": "The gate is still off. Turn it on before a risky action becomes an invisible side effect."
+          }
+        },
+        "sectionLabel": "Operator doctrine",
+        "title": "Read, judge, then intervene",
+        "chip": "signal • line • gate",
+        "postureLabel": "Control room posture",
+        "postureBody": "Use this room to review live state, not to celebrate movement for its own sake.",
+        "decisionLineLabel": "Decision line",
+        "decisionLineBody": "Start with the last run, compare it against the budget line, then decide whether the gate needs a human call. That order matters.",
+        "operatorCuesLabel": "Operator cues"
+      },
+      "shell": {
+        "eyebrow": "Autopilot bridge",
+        "title": "Trust the runtime because the surface tells the truth",
+        "description": "Inspect the latest run, compare it to live spend, then decide which risky actions deserve a gate. That is how trust gets earned here."
+      },
+      "surfaceCompass": {
+        "title": "Stay here only when the live runtime is the real source of truth",
+        "body": "Autopilot is for reading the current run, spend, alerts, and approvals. If the product still needs a lesson answer, go back to academy or tutor. If the runtime truth is visible but still not enough, escalate with the evidence attached.",
+        "status": {
+          "hostedSessionRequired": "hosted session required",
+          "runtimeVisible": "runtime visible",
+          "waitingForFirstRun": "waiting for first run"
+        },
+        "aside": "A control room should not ask for faith. If there is no live signal, leave and create one. If the signal exists, use it to decide the next move immediately.",
+        "items": {
+          "finishLesson": "Finish {lessonTitle}",
+          "goBackToAcademy": "Go back to academy",
+          "lessonCaption": "Return here when the real blocker is still on the lesson path rather than in the runtime.",
+          "backToLaneNote": "Back to lane",
+          "askTutor": "Ask tutor about the next move",
+          "askTutorCaption": "Use tutor when the product likely still knows the answer and the issue is not live runtime state.",
+          "askTutorNote": "Knowable",
+          "stayOnRecentRuns": "Stay on recent runs",
+          "stayOnRecentRunsCaption": "Remain here when the latest execution, trace, or alert feed is the actual decision surface.",
+          "stayHereNote": "Stay here",
+          "escalateWithEvidence": "Escalate with evidence",
+          "escalateCaption": "Escalate only after you have the packet, the run context, and the live signal that proves where the truth broke.",
+          "messyEdgeNote": "Messy edge"
+        }
+      },
+      "banner": {
+        "authRequired": "Live Autopilot needs an authenticated MUTX session. Until then, there is no honest run, alert, budget, or approval feed to show you."
+      },
+      "controlBrief": {
+        "sectionLabel": "Control brief",
+        "title": "Read the runtime before you trust the automation",
+        "body": "Autopilot earns trust when the last run, the live spend, and the risky actions stay visible in one control surface.",
+        "chip": {
+          "hostedSessionRequired": "Hosted session required",
+          "liveFeed": "Live control-plane feed",
+          "gateConfigured": "Gate configured in Pico",
+          "gateOff": "Gate still off in Pico"
+        },
+        "summary": {
+          "authRequired": "Until a MUTX session is attached, this surface refuses to invent truth. Use the academy to finish the setup path, then come back to read the real runtime.",
+          "withRun": "Latest run {runId} is {status}{asOfClause}. {detail}",
+          "withRunAsOf": " as of {timestamp}",
+          "noRun": "No live run is visible yet. The next honest move is to finish the academy path, trigger one real task, and return here only once the runtime has something to say."
+        }
+      },
+      "operatorRail": {
+        "sectionLabel": "Operator rail",
+        "sessionStatusLabel": "Session status",
+        "sessionStatus": {
+          "authRequired": "auth required",
+          "attached": "attached"
+        },
+        "progressSyncLabel": "Progress sync",
+        "budgetLineLabel": "Budget line",
+        "gateStateLabel": "Gate state",
+        "gateState": {
+          "enabled": "enabled",
+          "off": "off"
+        },
+        "activeSurfaceLabel": "Active surface",
+        "activeSurfaceNone": "none",
+        "helpLaneLabel": "Help lane",
+        "helpLane": {
+          "open": "open",
+          "closed": "closed"
+        },
+        "jumpToSubsystem": "Jump to subsystem",
+        "jump": {
+          "timeline": "Timeline",
+          "recentRuns": "Recent runs",
+          "alerts": "Alerts",
+          "approvalQueue": "Approval queue"
+        },
+        "emptyFeedLabel": "If the feed is empty",
+        "emptyFeedBody": "Do not dress up missing runtime data. Finish the academy path, trigger one real action, and come back only when MUTX has something to report."
+      },
+      "stats": {
+        "runs": {
+          "label": "Runs",
+          "noAgent": "No agent is connected to MUTX yet.",
+          "hasRuns": "Recent executions pulled from MUTX.",
+          "noRunsYet": "An agent exists, but no run has landed yet.",
+          "offline": "Sign in to read live run history."
+        },
+        "failures": {
+          "label": "Failures",
+          "hasFailures": "Failures are visible here. Good. Hidden failures are worse.",
+          "none": "No failed runs in the current window.",
+          "offline": "Sign in to see failed run count."
+        },
+        "alerts": {
+          "label": "Alerts",
+          "hasAlerts": "Unresolved operator pain from the monitoring feed.",
+          "noneWithRuns": "No unresolved alerts right now.",
+          "noneNoRuns": "No alerts yet because nothing has executed.",
+          "offline": "Sign in to read live alerts."
+        },
+        "budget": {
+          "label": "Budget",
+          "noSnapshot": "No live budget snapshot returned yet.",
+          "hasUsage": "{threshold} threshold against live spend.",
+          "noUsage": "Budget exists, but usage is empty in the current window.",
+          "offline": "Sign in to read budget usage."
+        },
+        "approvals": {
+          "label": "Approvals",
+          "pending": "Pending risky actions are waiting for a human call.",
+          "historyGateOff": "Approval history exists, but Pico gate is still off locally.",
+          "none": "No risky actions are blocked right now.",
+          "offline": "Sign in to see live approvals."
+        }
+      },
+      "sidebar": {
+        "latestRunLabel": "Latest run",
+        "latestRun": {
+          "unavailable": "unavailable",
+          "noneYet": "none yet"
+        },
+        "thresholdLineLabel": "Threshold line",
+        "thresholdLine": {
+          "breached": "breached",
+          "clear": "clear"
+        },
+        "recoveryLessonLabel": "Recovery lesson",
+        "stepsProgress": "{completed}/{total} steps",
+        "evidence": {
+          "captured": "captured",
+          "missing": "missing"
+        },
+        "workspaceProofLabel": "Workspace proof",
+        "stepsWithFocus": "{completed}/{total} steps • {stepTitle}",
+        "askTutor": "Ask tutor about the next move",
+        "escalateHumanHelp": "Escalate to human help",
+        "body": "Stay here when the runtime is the source of truth. If the lesson workspace is still incomplete, the academy remains the cleaner route back to a real answer."
+      },
+      "controlProtocol": {
+        "sectionLabel": "Control protocol",
+        "title": "Three operator checks before automation earns trust",
+        "body": "The control room should stage the first decisions in plain sight. Read the last run, read the spend line, and keep risky actions exposed before you touch anything more abstract.",
+        "chip": "live operator checklist",
+        "cardLabel": "Operator check"
+      },
+      "timeline": {
+        "sectionLabel": "Signal narrative",
+        "title": "Read the live story before you touch settings",
+        "body": "This is the operator narrative. If the timeline is empty, the correct answer is that nothing meaningful has happened yet.",
+        "authRequired": "No timeline without live control-plane access. That is the honest answer.",
+        "olderSignalsHidden": "{count} older signal{pluralSuffix} stayed out of view on purpose. Start with the strongest four."
+      },
+      "runs": {
+        "sectionLabel": "Run review",
+        "title": "Recent execution review",
+        "body": "Start here. Read the latest run before you touch thresholds or approvals.",
+        "refresh": "Refresh live data",
+        "authRequired": "Sign in, then come back here to inspect the first real run.",
+        "card": {
+          "title": "Run {runId}",
+          "operatorReadLabel": "Operator read",
+          "operatorRead": {
+            "failed": "This job failed. If the agent is still trusted, it should be because you understand this failure.",
+            "active": "This work is still active. Long silence means you may have a stuck runtime.",
+            "finished": "The job finished. Now verify the output is useful, not just technically complete."
+          },
+          "factsLabel": "Run facts",
+          "agent": "Agent: {agentId}",
+          "agentUnknown": "unknown",
+          "traceCount": "Trace count: {count}",
+          "started": "Started {timestamp}",
+          "startUnavailable": "Start time unavailable",
+          "traceSignalsLabel": "Trace signals",
+          "noTraces": "No run traces were returned for this run."
+        },
+        "olderRunsHidden": "{count} older run{pluralSuffix} are hidden so the review stays on the latest decisions first."
+      },
+      "spend": {
+        "sectionLabel": "Spend review",
+        "title": "Live spend and your line in the sand",
+        "usageLabel": "Usage",
+        "thresholdStatus": {
+          "above": "above threshold",
+          "within": "within threshold"
+        },
+        "summary": {
+          "authRequired": "Live budget requires authentication.",
+          "withBudget": "{used} used of {total}. Reset {reset}.",
+          "resetUnknown": "unknown",
+          "noSnapshot": "No live budget snapshot returned."
+        },
+        "thresholdLabel": "Threshold",
+        "thresholdBody": "Pico stores the local budget line here. Real alert delivery still follows the live MUTX monitoring setup, so this surface refuses to pretend email or webhook routing is active when it is not.",
+        "thresholdInputLabel": "Cost threshold percent",
+        "saveThreshold": "Save threshold",
+        "sync": "sync {state}",
+        "breachedWarning": "Threshold breached. Live usage is above the limit you configured.",
+        "topSpendersLabel": "Top spenders",
+        "breakdownAuthRequired": "Sign in to read the usage breakdown.",
+        "breakdownRow": "{credits} credits across {events} events",
+        "usageDriversLabel": "Usage drivers"
+      },
+      "alerts": {
+        "sectionLabel": "Alerts",
+        "title": "Meaningful monitoring events",
+        "body": "This is the live alert feed. No fake warning badges, no synthetic incidents.",
+        "authRequired": "Sign in to load live alerts.",
+        "card": {
+          "resolvedTitle": "Resolved alert",
+          "activeTitle": "Active alert",
+          "agent": "Agent: {agentId}",
+          "resolvedStatus": "Resolved",
+          "activeStatus": "Still active"
+        },
+        "hiddenCount": "{count} additional alert{pluralSuffix} are suppressed so the feed stays editorial instead of turning into a wall of badges."
+      },
+      "approvals": {
+        "sectionLabel": "Approvals",
+        "title": "Risky actions and their decisions",
+        "body": "This queue is now the approval source of truth for Pico. It should not disappear because a process restarted.",
+        "authRequired": "Sign in to load live approval requests.",
+        "gateMismatch": "Approval records already exist in MUTX, but Pico still shows the gate as off locally. Turn on the gate here so the product state matches the control-plane reality.",
+        "card": {
+          "pendingLabel": "Pending",
+          "fallbackSummary": "{requester} requested this action for agent {agentId}.",
+          "working": "Working...",
+          "approve": "Approve",
+          "reject": "Reject"
+        },
+        "hiddenPending": "{count} more pending approval{pluralSuffix} stayed out of view so the queue keeps the sharpest decisions on top."
+      },
+      "gateStatus": {
+        "sectionLabel": "Gate status",
+        "pendingActions": "Pending actions",
+        "decisionHistory": "Decision history",
+        "configuredLocally": "Configured locally",
+        "yes": "yes",
+        "no": "no"
+      },
+      "recentDecisions": {
+        "sectionLabel": "Recent decisions",
+        "hiddenOlder": "{count} older decision{pluralSuffix} are hidden so the recent record stays readable."
+      }
+    },
+    "sessionBanner": {
+      "errors": {
+        "loadWebhookRoutes": "Unable to load webhook routes"
+      },
+      "authenticated": {
+        "chips": {
+          "sessionAttached": "hosted session attached",
+          "plan": "plan {plan}",
+          "planUnknown": "plan unknown",
+          "verificationPending": "verification pending",
+          "emailVerified": "email verified",
+          "emailStatusUnknown": "email status unknown",
+          "loadingWebhooks": "loading webhooks",
+          "webhookCount": "{count} webhook{pluralSuffix}",
+          "webhooksUnavailable": "webhooks unavailable"
+        },
+        "body": "Signed in as {identity}. Progress sync, onboarding state, approvals, and live runtime data can now use the hosted MUTX account attached to this host.",
+        "rails": {
+          "identity": "Identity",
+          "operator": "operator",
+          "plan": "Plan",
+          "emailState": "Email state",
+          "webhookRoutes": "Webhook routes",
+          "unknown": "unknown",
+          "pending": "pending",
+          "verified": "verified",
+          "loading": "loading",
+          "na": "n/a"
+        },
+        "verificationNote": "Password accounts stay limited until the link sent by email has been confirmed. Finish that before treating the hosted session as production-ready.",
+        "productTruth": {
+          "label": "Product truth",
+          "body": "The product can now tell the truth about progress, runtime state, approvals, and hosted configuration. If this account is not production-ready yet, fix that here before trusting the rest of the surface.",
+          "progressSync": "Progress sync",
+          "runtimeTruth": "Runtime truth",
+          "approvalConfidence": "Approval confidence",
+          "live": "live",
+          "checking": "checking",
+          "grounded": "grounded",
+          "partial": "partial",
+          "limited": "limited",
+          "usable": "usable"
+        },
+        "finishEmailVerification": "Finish email verification"
+      },
+      "loading": {
+        "label": "Hosted session",
+        "body": "Checking whether an operator session is attached on this Pico host."
+      },
+      "anonymous": {
+        "chips": {
+          "sessionRequired": "hosted session required",
+          "picoHostAuth": "Pico host auth"
+        },
+        "body": "The Pico product routes are live here, but the hosted session is not attached on this domain yet. Sign in within Pico to persist progress, read live runs, and use onboarding/runtime state from the backend. Google, GitHub, Discord, Apple, password sign-up, and email confirmation now all complete on this host.",
+        "rails": {
+          "progress": "Progress",
+          "runtimeTruth": "Runtime truth",
+          "approvals": "Approvals",
+          "wontPersist": "won't persist",
+          "limited": "limited",
+          "readOnlyFeeling": "read-only feeling"
+        },
+        "withoutSession": {
+          "label": "Without session",
+          "progressSync": "Progress sync",
+          "runtimeTruth": "Runtime truth",
+          "approvalsAndWebhooks": "Approvals + webhooks",
+          "localOnly": "local only",
+          "notTrustworthyYet": "not trustworthy yet",
+          "blocked": "blocked",
+          "body": "Attach the Pico account on this host before trusting progress, live runtime state, or approvals behavior.",
+          "signIn": "Sign in",
+          "createAccount": "Create account",
+          "continueWithProvider": "Continue with {provider}"
+        }
+      }
+    },
+    "platformSurface": {
+      "syncState": {
+        "hydrating": "hydrating",
+        "live": "live",
+        "saving": "saving",
+        "localOnly": "local only"
+      },
+      "shared": {
+        "notRecorded": "not recorded"
+      },
+      "surfaceOptions": {
+        "onboarding": {
+          "label": "Onboarding",
+          "note": "Launch bay memory"
+        },
+        "academy": {
+          "label": "Academy",
+          "note": "Primary learning backbone"
+        },
+        "lesson": {
+          "label": "Lesson",
+          "note": "Active step memory"
+        },
+        "tutor": {
+          "label": "Tutor",
+          "note": "Grounded help for the next move"
+        },
+        "autopilot": {
+          "label": "Autopilot",
+          "note": "Runtime control room"
+        },
+        "support": {
+          "label": "Support",
+          "note": "Human escalation lane"
+        },
+        "activeNow": "active now",
+        "setRoute": "set route"
+      },
+      "header": {
+        "label": "Platform desk",
+        "title": "Identity, route memory, and limits in one place",
+        "body": "This is the operator-facing control desk for the Pico account. It should tell the truth about plan limits, where the operator last worked, and whether the product surface is tuned for focus or recovery."
+      },
+      "summary": {
+        "plan": "Plan",
+        "verification": "Verification",
+        "workspaceSaves": "Workspace saves",
+        "verificationState": {
+          "pending": "pending",
+          "verified": "verified",
+          "unknown": "unknown",
+          "signIn": "sign in"
+        }
+      },
+      "routeMemory": {
+        "label": "Route memory",
+        "body": "The current surface should match what the operator is actually doing. Keep this current when the product changes lanes.",
+        "activeSurfaceNotRecorded": "not recorded",
+        "currentSurface": {
+          "label": "Current surface",
+          "body": "Route memory should follow the operator across Pico instead of resetting at every page change."
+        },
+        "lastLessonContext": {
+          "label": "Last lesson context",
+          "body": "This is the recovery point when the operator needs to drop back into the lesson spine."
+        }
+      },
+      "toggles": {
+        "collapseRail": {
+          "label": "Collapse rail",
+          "body": "Use a tighter shell when the operator already knows the route and needs more room for the live surface."
+        },
+        "keepHelpLaneOpen": {
+          "label": "Keep help lane open",
+          "body": "Leave recovery guidance visible when the operator is still learning the product routes."
+        }
+      },
+      "actions": {
+        "resumeLastLesson": "Resume last lesson",
+        "openAcademy": "Open Academy",
+        "clearLessonMemory": "Clear lesson memory",
+        "resetPlatformMemory": "Reset platform memory",
+        "openLiveControlRoom": "Open live control room"
+      },
+      "entitlements": {
+        "label": "Entitlements",
+        "featureLabels": {
+          "academy": "Academy",
+          "tutor": "Tutor",
+          "project_limit": "Project limit",
+          "monitored_agents": "Monitored agents",
+          "alerts": "Alerts",
+          "approvals": "Approvals",
+          "retention": "Retention"
+        }
+      },
+      "routeLedger": {
+        "label": "Route ledger",
+        "currentPath": "Current path",
+        "platformStateUpdated": "Platform state updated",
+        "syncConfidence": "Sync confidence"
+      },
+      "operatorTruth": {
+        "label": "Operator truth",
+        "body": "The product should remember route and lesson context without pretending it knows more than it does. `activeSurface`, `lastOpenedLessonSlug`, the rail state, and the help lane are the minimum persisted memory Pico needs to feel like one platform."
+      }
+    },
+    "surfaceCompass": {
+      "label": "Surface compass",
+      "operatingRule": "Operating rule"
     }
   }
 }

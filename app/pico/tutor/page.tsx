@@ -1,11 +1,8 @@
-import type { Metadata } from 'next'
-
 import { PicoTutorPageClient } from '@/components/pico/PicoTutorPageClient'
+import { buildPicoPageMetadata } from '@/lib/pico/metadata'
 
-export const metadata: Metadata = {
-  title: 'Tutor — PicoMUTX',
-  description:
-    'Bring one blocked Pico step, get one grounded next move, and return to the lesson, runtime, or support route with better context.',
+export async function generateMetadata() {
+  return buildPicoPageMetadata('pico.pages.tutor.meta', '/tutor')
 }
 
 export default function PicoTutorPage() {

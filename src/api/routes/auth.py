@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.config import get_settings
 from src.api.database import get_db
 from src.api.models.models import User
-from src.api.services.user_service import UserService
+from src.api.services.user_service import UserService, normalize_preferred_locale
 from src.api.services.analytics import log_analytics_event, AnalyticsEventType
 from src.api.middleware.auth import get_current_user, get_current_user_optional
 from src.api.auth.jwt import (
@@ -45,11 +45,13 @@ class RegisterRequest(BaseModel):
     name: str
     password: str
     verification_origin: str | None = None
+    preferred_locale: str | None = None
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+    preferred_locale: str | None = None
 
 
 class RefreshRequest(BaseModel):
@@ -69,6 +71,7 @@ class TokenResponse(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int
+    preferred_locale: str | None = None
 
 
 class RegisterResponse(TokenResponse):
@@ -84,8 +87,17 @@ class UserResponse(BaseModel):
     created_at: datetime
     is_active: bool
     is_email_verified: bool = False
+    preferred_locale: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UpdatePreferredLocaleRequest(BaseModel):
+    preferred_locale: str
+
+
+class PreferredLocaleResponse(BaseModel):
+    preferred_locale: str | None = None
 
 
 def _is_loopback_host(host: str | None) -> bool:
@@ -189,7 +201,12 @@ def _validate_oauth_redirect_uri(provider: OAuthProvider, redirect_uri: str) -> 
     return redirect_uri
 
 
-@router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=RegisterResponse,
+    status_code=status.HTTP_201_CREATED,
+    response_model_exclude_none=True,
+)
 async def register(request: RegisterRequest, session: AsyncSession = Depends(get_db)):
     user_service = UserService(session)
 
@@ -212,6 +229,7 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
         name=request.name,
         password=request.password,
     )
+    preferred_locale = await user_service.set_user_locale(user, request.preferred_locale)
 
     # Send verification email
     token = await user_service.create_email_verification_token(user.id)
@@ -237,10 +255,11 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
         refresh_token=refresh_token,
         expires_in=_get_expires_in_seconds(access_token_expires_at),
         requires_email_verification=settings.require_email_verification,
+        preferred_locale=preferred_locale,
     )
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse, response_model_exclude_none=True)
 async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
     user_service = UserService(session)
 
@@ -263,6 +282,7 @@ async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
             detail="Email verification is required before login",
         )
 
+    preferred_locale = await user_service.initialize_user_locale(user, request.preferred_locale)
     access_token, access_token_expires_at, refresh_token = await issue_token_pair(session, user.id)
 
     # Track analytics event
@@ -277,10 +297,11 @@ async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
         access_token=access_token,
         refresh_token=refresh_token,
         expires_in=_get_expires_in_seconds(access_token_expires_at),
+        preferred_locale=preferred_locale,
     )
 
 
-@router.post("/local-bootstrap", response_model=TokenResponse)
+@router.post("/local-bootstrap", response_model=TokenResponse, response_model_exclude_none=True)
 async def local_bootstrap(
     request: LocalBootstrapRequest,
     http_request: Request,
@@ -308,10 +329,11 @@ async def local_bootstrap(
         access_token=access_token,
         refresh_token=refresh_token,
         expires_in=_get_expires_in_seconds(access_token_expires_at),
+        preferred_locale=await user_service.get_user_locale(user.id),
     )
 
 
-@router.post("/refresh", response_model=TokenResponse)
+@router.post("/refresh", response_model=TokenResponse, response_model_exclude_none=True)
 async def refresh(request: RefreshRequest, session: AsyncSession = Depends(get_db)):
     result = await refresh_access_token(request.refresh_token, session)
     if not result:
@@ -364,8 +386,12 @@ async def logout(
     return {"message": "Successfully logged out"}
 
 
-@router.get("/me", response_model=UserResponse)
-async def get_me(current_user: User = Depends(get_current_user)):
+@router.get("/me", response_model=UserResponse, response_model_exclude_none=True)
+async def get_me(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+):
+    user_service = UserService(session)
     if settings.require_email_verification and not current_user.is_email_verified:
         raise HTTPException(
             status_code=403,
@@ -379,7 +405,27 @@ async def get_me(current_user: User = Depends(get_current_user)):
         created_at=current_user.created_at,
         is_active=current_user.is_active,
         is_email_verified=current_user.is_email_verified,
+        preferred_locale=await user_service.get_user_locale(current_user.id),
     )
+
+
+@router.put("/locale", response_model=PreferredLocaleResponse, response_model_exclude_none=True)
+async def update_preferred_locale(
+    request: UpdatePreferredLocaleRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    user_service = UserService(session)
+    normalized_locale = normalize_preferred_locale(request.preferred_locale)
+
+    if normalized_locale is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported locale",
+        )
+
+    preferred_locale = await user_service.set_user_locale(current_user, normalized_locale)
+    return PreferredLocaleResponse(preferred_locale=preferred_locale)
 
 
 # New request models for password reset and email verification
@@ -413,6 +459,7 @@ class OAuthAuthorizeResponse(BaseModel):
 class OAuthExchangeRequest(BaseModel):
     code: str
     redirect_uri: str
+    preferred_locale: str | None = None
 
 
 VERIFICATION_EMAIL_RESPONSE_MESSAGE = (
@@ -533,7 +580,11 @@ async def authorize_oauth(provider: OAuthProvider, redirect_uri: str, state: str
     )
 
 
-@router.post("/oauth/{provider}/exchange", response_model=TokenResponse)
+@router.post(
+    "/oauth/{provider}/exchange",
+    response_model=TokenResponse,
+    response_model_exclude_none=True,
+)
 async def exchange_oauth_code(
     provider: OAuthProvider,
     request: OAuthExchangeRequest,
@@ -552,6 +603,7 @@ async def exchange_oauth_code(
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
 
     user = await user_service.get_or_create_user_for_oauth(profile)
+    preferred_locale = await user_service.initialize_user_locale(user, request.preferred_locale)
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -572,6 +624,7 @@ async def exchange_oauth_code(
         access_token=access_token,
         refresh_token=refresh_token,
         expires_in=_get_expires_in_seconds(access_token_expires_at),
+        preferred_locale=preferred_locale,
     )
 
 

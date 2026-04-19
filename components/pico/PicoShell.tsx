@@ -1,9 +1,10 @@
 'use client'
 
-import { type ReactNode, useEffect, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import {
   picoClasses,
@@ -14,20 +15,30 @@ import {
   picoPanel,
 } from '@/components/pico/picoTheme'
 import { PicoFooter } from '@/components/pico/PicoFooter'
+import { PicoLangSwitcher } from '@/components/pico/PicoLangSwitcher'
 import { PicoWelcomeTour } from '@/components/pico/PicoWelcomeTour'
 import { getPicoRouteRobot } from '@/lib/picoRobotArt'
 import { picoHref } from '@/lib/pico/navigation'
 import { cn } from '@/lib/utils'
 
-const navItems = [
-  { href: '/onboarding', label: 'Start', chapter: '01', note: 'first visible win' },
-  { href: '/academy', label: 'Lessons', chapter: '02', note: 'the working path' },
-  { href: '/tutor', label: 'Tutor', chapter: '03', note: 'one grounded answer' },
-  { href: '/autopilot', label: 'Autopilot', chapter: '04', note: 'live control room' },
-  { href: '/support', label: 'Human help', chapter: '05', note: 'the messy edge' },
+const NAV_ITEMS = [
+  { id: 'onboarding', href: '/onboarding', chapter: '01' },
+  { id: 'academy', href: '/academy', chapter: '02' },
+  { id: 'tutor', href: '/tutor', chapter: '03' },
+  { id: 'autopilot', href: '/autopilot', chapter: '04' },
+  { id: 'support', href: '/support', chapter: '05' },
 ] as const
 
 const PICO_WELCOME_TOUR_STORAGE_KEY = 'pico.welcome-tour.dismissed.v2'
+const PICO_WELCOME_TOUR_TOGGLE_ID = 'pico-welcome-tour-toggle'
+
+type PicoShellNavItem = {
+  id: (typeof NAV_ITEMS)[number]['id']
+  href: string
+  chapter: string
+  label: string
+  note: string
+}
 
 type PicoShellProps = {
   eyebrow?: string
@@ -73,17 +84,19 @@ function ShellBackground({ academyMode }: { academyMode: boolean }) {
 }
 
 function PicoWordmark({ pathname }: { pathname: string }) {
+  const t = useTranslations('pico.shell')
+
   return (
     <Link href={picoHref(pathname, '/onboarding')} className="inline-flex items-center gap-3">
       <span className="inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-[16px] border border-[color:var(--pico-border)] bg-[linear-gradient(145deg,rgba(var(--pico-accent-rgb),0.1),rgba(8,18,10,0.82))] shadow-[0_18px_36px_rgba(0,0,0,0.28),0_0_28px_rgba(var(--pico-accent-rgb),0.12)]">
-        <Image src="/pico/logo.png" alt="PicoMUTX logo" width={28} height={28} priority />
+        <Image src="/pico/logo.png" alt={t('wordmark.logoAlt')} width={28} height={28} priority />
       </span>
       <span className="grid gap-1">
         <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[color:var(--pico-text-muted)]">
           PicoMUTX
         </span>
         <span className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-          operator atlas
+          {t('wordmark.atlas')}
         </span>
       </span>
     </Link>
@@ -101,9 +114,11 @@ function ShellRobotCard({
   src: string
   alt: string
 }) {
+  const t = useTranslations('pico.shell')
+
   return (
     <div className={picoCodexInset('overflow-hidden p-4 lg:p-5')}>
-      <p className={picoClasses.label}>Pico signal</p>
+      <p className={picoClasses.label}>{t('robotCard.signalLabel')}</p>
       <div className="mt-4 overflow-hidden rounded-[22px] border border-[rgba(var(--pico-accent-rgb),0.2)] bg-[radial-gradient(circle_at_50%_14%,rgba(var(--pico-accent-rgb),0.18),transparent_52%),linear-gradient(180deg,rgba(6,12,6,0.98),rgba(2,4,2,1))]">
         <Image
           src={src}
@@ -130,16 +145,19 @@ function ShellHelpLane({
   nextItem,
 }: {
   pathname: string
-  currentItem: (typeof navItems)[number]
-  nextItem: (typeof navItems)[number] | null
+  currentItem: PicoShellNavItem
+  nextItem: PicoShellNavItem | null
 }) {
+  const t = useTranslations('pico.shell')
+
   return (
     <div className="grid gap-4 lg:grid-cols-3" data-testid="pico-help-lane-panel">
       <div className={picoCodexInset('p-4')}>
-        <p className={picoClasses.label}>Stay here when</p>
+        <p className={picoClasses.label}>{t('helpLane.stayHereWhen')}</p>
         <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-          the next move is still inside{' '}
-          <span className="text-[color:var(--pico-text)]">{currentItem.label}</span>.
+          {t('helpLane.stayHereBody', {
+            chapter: currentItem.label,
+          })}
         </p>
       </div>
       <Link
@@ -148,12 +166,12 @@ function ShellHelpLane({
           'p-4 transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(var(--pico-accent-rgb),0.16)]',
         )}
       >
-        <p className={picoClasses.label}>Recovery route</p>
+        <p className={picoClasses.label}>{t('helpLane.recoveryRoute')}</p>
         <p className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-          Open support lane
+          {t('helpLane.openSupportLane')}
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-          Use this when the product route is no longer honest about the blocker.
+          {t('helpLane.recoveryBody')}
         </p>
       </Link>
       <Link
@@ -162,12 +180,12 @@ function ShellHelpLane({
           'p-4 transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(255,255,255,0.03)]',
         )}
       >
-        <p className={picoClasses.label}>Continue sequence</p>
+        <p className={picoClasses.label}>{t('helpLane.continueSequence')}</p>
         <p className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-          {nextItem ? nextItem.label : 'Human help'}
+          {nextItem ? nextItem.label : t('helpLane.humanHelp')}
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-          Keep momentum if the next chapter is already the right tool.
+          {t('helpLane.continueBody')}
         </p>
       </Link>
     </div>
@@ -188,8 +206,17 @@ export function PicoShell({
   children,
 }: PicoShellProps) {
   const pathname = usePathname()
+  const t = useTranslations('pico.shell')
   const [tourOpen, setTourOpen] = useState(false)
+  const [controlsReady, setControlsReady] = useState(false)
+  const didHydrateTour = useRef(false)
+  const tourToggleRef = useRef<HTMLInputElement>(null)
   const academyMode = mode === 'academy'
+  const navItems: PicoShellNavItem[] = NAV_ITEMS.map((item) => ({
+    ...item,
+    label: t(`nav.${item.id}.label`),
+    note: t(`nav.${item.id}.note`),
+  }))
   const currentItem = navItems.find((item) => routeIsActive(pathname, item.href)) ?? navItems[0]
   const routeRobot = getPicoRouteRobot(pathname, academyMode)
   const currentIndex = navItems.findIndex((item) => item.href === currentItem.href)
@@ -198,20 +225,27 @@ export function PicoShell({
   const isAcademyLessonRoute = pathname.startsWith('/pico/academy/')
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
+    setControlsReady(true)
+    setTourOpen(Boolean(tourToggleRef.current?.checked))
+  }, [])
 
-    const dismissed = window.localStorage.getItem(PICO_WELCOME_TOUR_STORAGE_KEY) === 'dismissed'
-    setTourOpen(false)
-    if (dismissed) {
+  useEffect(() => {
+    if (!didHydrateTour.current) {
+      didHydrateTour.current = true
       return
     }
+    if (tourToggleRef.current) {
+      tourToggleRef.current.checked = false
+    }
+    setTourOpen(false)
   }, [pathname])
 
   function closeTour() {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(PICO_WELCOME_TOUR_STORAGE_KEY, 'dismissed')
+    }
+    if (tourToggleRef.current) {
+      tourToggleRef.current.checked = false
     }
     setTourOpen(false)
   }
@@ -220,6 +254,13 @@ export function PicoShell({
     return (
       <div className="relative min-h-screen overflow-hidden bg-[color:var(--pico-bg)] text-[color:var(--pico-text)]">
         <ShellBackground academyMode />
+        <input
+          ref={tourToggleRef}
+          id={PICO_WELCOME_TOUR_TOGGLE_ID}
+          type="checkbox"
+          className="peer sr-only"
+          onChange={(event) => setTourOpen(event.target.checked)}
+        />
 
         <div className="relative mx-auto max-w-[98rem] px-4 pb-32 pt-5 sm:px-6 lg:px-8 lg:pb-12">
           <header className={picoCodexFrame('overflow-hidden px-5 py-5 sm:px-6 lg:px-8')}>
@@ -227,28 +268,31 @@ export function PicoShell({
               <PicoWordmark pathname={pathname} />
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className={picoCodex.stamp}>Chapter {currentItem.chapter}</span>
+                <span className={picoCodex.stamp}>
+                  {t('academyMode.chapter', { chapter: currentItem.chapter })}
+                </span>
+                <PicoLangSwitcher />
                 <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setTourOpen(true)}
+                  <label
+                    htmlFor={PICO_WELCOME_TOUR_TOGGLE_ID}
                     className={picoClasses.tertiaryButton}
                     data-testid="pico-open-tour"
                   >
-                    How this works
-                  </button>
+                    {t('academyMode.howThisWorks')}
+                  </label>
                   {onToggleRail ? (
                     <button
                       type="button"
                       onClick={onToggleRail}
                       aria-pressed={!railCollapsed}
+                      disabled={!controlsReady}
                       className={cn(
                         picoClasses.tertiaryButton,
                         !railCollapsed &&
                           'border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] text-[color:var(--pico-text)]',
                       )}
                     >
-                      Map
+                      {t('academyMode.map')}
                     </button>
                   ) : null}
                   {onToggleHelpLane ? (
@@ -256,13 +300,14 @@ export function PicoShell({
                       type="button"
                       onClick={onToggleHelpLane}
                       aria-pressed={helpLaneOpen}
+                      disabled={!controlsReady}
                       className={cn(
                         picoClasses.tertiaryButton,
                         helpLaneOpen &&
                           'border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] text-[color:var(--pico-text)]',
                       )}
                     >
-                      Help
+                      {t('academyMode.help')}
                     </button>
                   ) : null}
                 </div>
@@ -272,16 +317,17 @@ export function PicoShell({
             <div className="mt-5 grid gap-5 border-t border-[color:var(--pico-border)] pt-5 lg:grid-cols-[minmax(0,1fr),22rem] lg:items-end">
               <div className="grid gap-2">
                 <div className="sm:hidden">
-                  <button
-                    type="button"
-                    onClick={() => setTourOpen(true)}
+                  <label
+                    htmlFor={PICO_WELCOME_TOUR_TOGGLE_ID}
                     className={picoClasses.tertiaryButton}
                     data-testid="pico-open-tour-mobile"
                   >
-                    How this works
-                  </button>
+                    {t('academyMode.howThisWorks')}
+                  </label>
                 </div>
-                <p className={picoClasses.label}>{eyebrow ?? `Chapter ${currentItem.chapter}`}</p>
+                <p className={picoClasses.label}>
+                  {eyebrow ?? t('academyMode.chapter', { chapter: currentItem.chapter })}
+                </p>
                 <p className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
                   {title}
                 </p>
@@ -294,15 +340,24 @@ export function PicoShell({
               <div className="grid gap-4">
                 <div className={picoCodexInset('grid gap-3 p-4 lg:p-5')}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className={picoClasses.label}>Route mode</p>
+                    <p className={picoClasses.label}>{t('academyMode.routeMode')}</p>
                     <span className={picoCodex.stamp}>{currentItem.label}</span>
                   </div>
                   <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    {currentItem.note}. {railCollapsed ? 'Focus mode is active.' : 'The map stays open.'}
+                    {currentItem.note}.{' '}
+                    {railCollapsed ? t('academyMode.focusModeActive') : t('academyMode.mapStaysOpen')}
                   </p>
                   <div className="grid gap-1 text-[11px] uppercase tracking-[0.22em] text-[color:var(--pico-text-muted)]">
-                    <span>{previousItem ? `Previous: ${previousItem.label}` : 'Start of sequence'}</span>
-                    <span>{nextItem ? `Next: ${nextItem.label}` : 'Final chapter'}</span>
+                    <span>
+                      {previousItem
+                        ? t('academyMode.previous', { label: previousItem.label })
+                        : t('academyMode.startOfSequence')}
+                    </span>
+                    <span>
+                      {nextItem
+                        ? t('academyMode.next', { label: nextItem.label })
+                        : t('academyMode.finalChapter')}
+                    </span>
                   </div>
                 </div>
                 <ShellRobotCard
@@ -335,19 +390,19 @@ export function PicoShell({
                     href={picoHref(pathname, '/academy')}
                     className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
-                    Back to map
+                    {t('academyMode.backToMap')}
                   </Link>
                   <a
                     href="#pico-proof-composer"
                     className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text)]"
                   >
-                    Proof
+                    {t('academyMode.proof')}
                   </a>
                   <a
                     href="#pico-lesson-recovery"
                     className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
-                    Help
+                    {t('academyMode.help')}
                   </a>
                 </>
               ) : (
@@ -356,21 +411,23 @@ export function PicoShell({
                     href="#pico-academy-workspace-summary"
                     className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text)]"
                   >
-                    Open mission
+                    {t('defaultMode.openMission')}
                   </a>
                   <button
                     type="button"
                     onClick={onToggleRail}
+                    disabled={!controlsReady}
                     className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
-                    Map
+                    {t('defaultMode.map')}
                   </button>
                   <button
                     type="button"
                     onClick={onToggleHelpLane}
+                    disabled={!controlsReady}
                     className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
-                    Help
+                    {t('defaultMode.help')}
                   </button>
                 </>
               )}
@@ -393,6 +450,13 @@ export function PicoShell({
   return (
     <div className="relative min-h-screen overflow-hidden bg-[color:var(--pico-bg)] text-[color:var(--pico-text)]">
       <ShellBackground academyMode={false} />
+      <input
+        ref={tourToggleRef}
+        id={PICO_WELCOME_TOUR_TOGGLE_ID}
+        type="checkbox"
+        className="peer sr-only"
+        onChange={(event) => setTourOpen(event.target.checked)}
+      />
 
       <div className="relative mx-auto max-w-[106rem] px-4 py-5 pb-28 sm:px-6 lg:px-8 lg:pb-4">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[18rem,minmax(0,1fr)]">
@@ -403,7 +467,7 @@ export function PicoShell({
               </div>
 
               <div className="border-b border-[color:var(--pico-border)] px-5 py-4">
-                <p className={picoClasses.label}>Current chapter</p>
+                <p className={picoClasses.label}>{t('defaultMode.currentChapter')}</p>
                 <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {currentItem.label}
                 </p>
@@ -442,45 +506,56 @@ export function PicoShell({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.02)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--pico-accent-bright)]">
-                      Chapter {currentItem.chapter}
+                      {t('defaultMode.chapter', { chapter: currentItem.chapter })}
                     </span>
                     <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
                       {currentItem.note}
                     </span>
                   </div>
 
-                  <div className="hidden sm:flex sm:flex-wrap sm:gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setTourOpen(true)}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <PicoLangSwitcher />
+                    <div className="hidden sm:flex sm:flex-wrap sm:gap-2">
+                    <label
+                      htmlFor={PICO_WELCOME_TOUR_TOGGLE_ID}
                       className={picoClasses.tertiaryButton}
                       data-testid="pico-open-tour"
                     >
-                      Quick help
-                    </button>
+                      {t('defaultMode.quickHelp')}
+                    </label>
                     {previousItem ? (
-                      <Link
+                      <a
                         href={picoHref(pathname, previousItem.href)}
-                        aria-label={`Go to previous chapter: ${previousItem.label}`}
+                        aria-label={t('defaultMode.previousChapterAria', {
+                          label: previousItem.label,
+                        })}
                         className={picoClasses.tertiaryButton}
                       >
-                        Previous chapter
-                      </Link>
+                        {t('defaultMode.previousChapter')}
+                      </a>
                     ) : null}
                     {nextItem ? (
-                      <Link
+                      <a
                         href={picoHref(pathname, nextItem.href)}
-                        aria-label={`Go to next chapter: ${nextItem.label}`}
+                        aria-label={t('defaultMode.nextChapterAria', {
+                          label: nextItem.label,
+                        })}
                         className={picoClasses.tertiaryButton}
                       >
-                        Next chapter
-                      </Link>
+                        {t('defaultMode.nextChapter')}
+                      </a>
                     ) : null}
                     {onToggleHelpLane ? (
-                      <button type="button" onClick={onToggleHelpLane} className={picoClasses.tertiaryButton}>
-                        {helpLaneOpen ? 'Hide recovery' : 'Show recovery'}
+                      <button
+                        type="button"
+                        onClick={onToggleHelpLane}
+                        className={picoClasses.tertiaryButton}
+                        disabled={!controlsReady}
+                      >
+                        {helpLaneOpen ? t('defaultMode.hideRecovery') : t('defaultMode.showRecovery')}
                       </button>
                     ) : null}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -488,15 +563,14 @@ export function PicoShell({
               <div className="grid grid-cols-[minmax(0,1fr)] gap-5 px-6 py-6 sm:px-7 lg:grid-cols-[minmax(0,1fr),20rem] lg:items-start">
                 <div className="grid min-w-0 gap-4">
                   <div className="sm:hidden">
-                    <button
-                      type="button"
-                      onClick={() => setTourOpen(true)}
-                      className={picoClasses.tertiaryButton}
-                      data-testid="pico-open-tour-mobile"
-                    >
-                      Quick help
-                    </button>
-                  </div>
+                  <label
+                    htmlFor={PICO_WELCOME_TOUR_TOGGLE_ID}
+                    className={picoClasses.tertiaryButton}
+                    data-testid="pico-open-tour-mobile"
+                  >
+                    {t('defaultMode.quickHelp')}
+                  </label>
+                </div>
                   {eyebrow ? (
                     <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
                       {eyebrow}
@@ -519,12 +593,12 @@ export function PicoShell({
                     alt={routeRobot.alt}
                   />
                   <div className={picoCodexInset('p-5')}>
-                    <p className={picoClasses.label}>Chapter note</p>
+                    <p className={picoClasses.label}>{t('defaultMode.chapterNote')}</p>
                     <p className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                       {currentItem.note}
                     </p>
                     <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Use this chapter to cut uncertainty quickly and identify the next irreversible action.
+                      {t('defaultMode.chapterNoteBody')}
                     </p>
                   </div>
                   {actions ? (
@@ -551,37 +625,49 @@ export function PicoShell({
 
       <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
         <div className="grid grid-cols-[auto,1fr,auto,auto] items-center gap-2 rounded-[24px] border border-[color:var(--pico-border)] bg-[rgba(6,12,8,0.94)] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.4)] backdrop-blur">
-          <Link
+          <a
             href={picoHref(pathname, previousItem?.href ?? '/onboarding')}
-            aria-label={previousItem ? `Go to previous chapter: ${previousItem.label}` : 'Go to onboarding'}
+            aria-label={
+              previousItem
+                ? t('defaultMode.previousChapterAria', { label: previousItem.label })
+                : t('defaultMode.goToOnboarding')
+            }
             className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--pico-text-secondary)]"
           >
-            Prev
-          </Link>
+            {t('defaultMode.prev')}
+          </a>
 
           <div className="min-w-0 px-2">
             <p className="truncate text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--pico-text-muted)]">
-              Chapter {currentItem.chapter}
+              {t('defaultMode.chapter', { chapter: currentItem.chapter })}
             </p>
             <p className="truncate font-[family:var(--font-site-display)] text-xl tracking-[-0.05em] text-[color:var(--pico-text)]">
               {currentItem.label}
             </p>
           </div>
 
-          <Link
+          <a
             href={picoHref(pathname, nextItem?.href ?? '/support')}
-            aria-label={nextItem ? `Go to next chapter: ${nextItem.label}` : 'Go to support'}
+            aria-label={
+              nextItem
+                ? t('defaultMode.nextChapterAria', { label: nextItem.label })
+                : t('defaultMode.goToSupport')
+            }
             className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--pico-text-secondary)]"
           >
-            Next
-          </Link>
+            {t('defaultMode.next')}
+          </a>
 
           <Link
             href={picoHref(pathname, currentItem.href === '/support' ? '/academy' : '/support')}
-            aria-label={currentItem.href === '/support' ? 'Open academy map' : 'Open help lane'}
+            aria-label={
+              currentItem.href === '/support'
+                ? t('defaultMode.openAcademyMap')
+                : t('defaultMode.openHelpLane')
+            }
             className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:rgba(var(--pico-accent-rgb),0.28)] bg-[linear-gradient(135deg,var(--pico-accent-bright)_0%,var(--pico-accent)_48%,var(--pico-accent-deep)_100%)] px-3 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-accent-contrast)]"
           >
-            {currentItem.href === '/support' ? 'Map' : 'Help'}
+            {currentItem.href === '/support' ? t('defaultMode.map') : t('defaultMode.help')}
           </Link>
         </div>
       </div>

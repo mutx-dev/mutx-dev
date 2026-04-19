@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { applyAuthCookies, getApiBaseUrl } from "@/app/api/_lib/controlPlane";
 import { validateRequest, schemas } from "@/app/api/_lib/validation";
 import { withErrorHandling } from "@/app/api/_lib/errors";
+import { normalizePicoLocale } from "@/lib/pico/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -13,12 +14,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return validation.response;
     }
 
-    const { email, password, name } = validation.data;
+    const { email, password, name, preferred_locale } = validation.data;
+    const preferredLocale =
+      normalizePicoLocale(preferred_locale) ??
+      normalizePicoLocale(request.cookies.get("NEXT_LOCALE")?.value);
     const body = {
       email,
       password,
       name,
       verification_origin: request.nextUrl.origin,
+      ...(preferredLocale ? { preferred_locale: preferredLocale } : {}),
     };
 
     const response = await fetch(`${getApiBaseUrl()}/v1/auth/register`, {

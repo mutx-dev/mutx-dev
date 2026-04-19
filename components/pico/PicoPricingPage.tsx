@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { ArrowRight, Check, ExternalLink } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { PicoContactForm } from '@/components/pico/PicoContactForm'
 import { PicoFooter } from '@/components/pico/PicoFooter'
+import { PicoLangSwitcher } from '@/components/pico/PicoLangSwitcher'
 import { PicoSessionBanner } from '@/components/pico/PicoSessionBanner'
 import {
   picoClasses,
@@ -81,32 +82,43 @@ const LIVE_PLAN_CONFIG: Array<{
   },
 ]
 
-function formatShortDate(value?: string | null) {
-  if (!value) return 'Unavailable'
+function formatShortDate(locale: string, value?: string | null) {
+  if (!value) return '—'
 
   const parsed = new Date(value)
   if (Number.isNaN(parsed.getTime())) {
-    return 'Unavailable'
+    return '—'
   }
 
-  return parsed.toLocaleDateString('en-US', {
+  return parsed.toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   })
 }
 
-function formatCompactNumber(value?: number | null) {
-  if (typeof value !== 'number') return 'n/a'
+function formatCompactNumber(locale: string, value?: number | null) {
+  if (typeof value !== 'number') return '—'
 
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(locale, {
     notation: 'compact',
     maximumFractionDigits: 1,
   }).format(value)
 }
 
+function formatHostLabel(value?: string | null) {
+  if (!value) return null
+
+  try {
+    return new URL(value).host.replace(/^www\./, '')
+  } catch {
+    return value
+  }
+}
+
 export function PicoPricingPage() {
   const pathname = usePathname()
+  const locale = useLocale()
   const pageT = useTranslations('pico.pricingPage')
   const session = usePicoSession()
   const toHref = usePicoHref()
@@ -233,12 +245,13 @@ export function PicoPricingPage() {
                 <span className="grid gap-0.5">
                   <span className={picoClasses.label}>PicoMUTX</span>
                   <span className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                    access atlas
+                    {pageT('eyebrow')}
                   </span>
                 </span>
               </Link>
 
               <div className="flex flex-wrap items-center gap-2">
+                <PicoLangSwitcher />
                 <span className={picoClasses.chip}>{pageT('eyebrow')}</span>
                 <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
                   {pageT('secondaryCta')}
@@ -326,15 +339,11 @@ export function PicoPricingPage() {
                     </div>
                     <div className="flex items-center justify-between gap-3 border-b border-[color:var(--pico-border)] pb-2">
                       <span>{pageT('routeState.docsLabel')}</span>
-                      <span className="text-[color:var(--pico-text)]">
-                        {packSnapshot.visibleDocCount} docs
-                      </span>
+                      <span className="text-[color:var(--pico-text)]">{packSnapshot.visibleDocCount}</span>
                     </div>
                     <div className="flex items-center justify-between gap-3">
                       <span>{pageT('routeState.stacksLabel')}</span>
-                      <span className="text-[color:var(--pico-text)]">
-                        {generated.stacks.length} tracked
-                      </span>
+                      <span className="text-[color:var(--pico-text)]">{generated.stacks.length}</span>
                     </div>
                   </div>
                 </div>
@@ -489,10 +498,7 @@ export function PicoPricingPage() {
 
                   {checkoutError ? (
                     <div className={picoEmber('p-4')}>
-                      <p className={picoClasses.label}>Checkout status</p>
-                      <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text)]">
-                        {checkoutError}
-                      </p>
+                      <p className="text-sm leading-6 text-[color:var(--pico-text)]">{checkoutError}</p>
                     </div>
                   ) : null}
                 </div>
@@ -614,9 +620,9 @@ export function PicoPricingPage() {
                 </div>
 
                 <p className="mt-4 text-sm leading-6 text-[color:var(--pico-text-muted)]">
-                  {pageT('stackFooterPrefix')}{' '}
+                    {pageT('stackFooterPrefix')}{' '}
                   <span className="text-[color:var(--pico-text)]">
-                    {formatShortDate(packSnapshot.refreshedAt)}
+                    {formatShortDate(locale, packSnapshot.refreshedAt)}
                   </span>{' '}
                   {pageT('stackFooterMiddle')}{' '}
                   <span className="text-[color:var(--pico-text)]">{packSnapshot.visibleDocCount}</span>{' '}
@@ -634,12 +640,12 @@ export function PicoPricingPage() {
                         <div>
                           <p className={picoClasses.label}>{stack.name}</p>
                           <h3 className="mt-2 font-[family:var(--font-site-display)] text-2xl leading-[1.02] tracking-[-0.05em] text-[color:var(--pico-text)]">
-                            {stack.live?.latestRef?.label ?? 'Tracked repo'}
+                            {stack.live?.latestRef?.label ?? stack.name}
                           </h3>
                         </div>
                         <div className="text-right text-xs leading-5 text-[color:var(--pico-text-muted)]">
-                          <div>{formatCompactNumber(stack.live?.stars)} stars</div>
-                          <div>{formatShortDate(stack.live?.latestRef?.publishedAt ?? stack.live?.pushedAt)}</div>
+                          <div>★ {formatCompactNumber(locale, stack.live?.stars)}</div>
+                          <div>{formatShortDate(locale, stack.live?.latestRef?.publishedAt ?? stack.live?.pushedAt)}</div>
                         </div>
                       </div>
 
@@ -660,7 +666,7 @@ export function PicoPricingPage() {
                             rel="noreferrer"
                             className="text-[color:var(--pico-accent-bright)] transition hover:text-[color:var(--pico-accent)]"
                           >
-                            Docs
+                            {formatHostLabel(stack.docsUrl)}
                           </a>
                         ) : null}
                         {stack.repoUrl ? (
@@ -670,7 +676,7 @@ export function PicoPricingPage() {
                             rel="noreferrer"
                             className="text-[color:var(--pico-text-secondary)] transition hover:text-[color:var(--pico-text)]"
                           >
-                            Repo
+                            {formatHostLabel(stack.repoUrl)}
                           </a>
                         ) : null}
                       </div>

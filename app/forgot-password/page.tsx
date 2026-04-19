@@ -1,37 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { AlertCircle, ArrowLeft, ArrowRight, Loader2, Mail } from 'lucide-react'
 
 import { AuthSurface } from '@/components/site/AuthSurface'
 import styles from '@/components/site/marketing/MarketingCore.module.css'
-
-const authSurfaceProps = {
-  eyebrow: 'Password recovery',
-  title: 'Recover operator access without leaving the control plane.',
-  description:
-    'Use the email attached to your MUTX account and we will send a reset link. If hosted auth is not the lane you need today, the dashboard, docs, and install flow are still available.',
-  asideEyebrow: 'Recovery notes',
-  asideTitle: 'Keep the auth lane practical.',
-  asideBody:
-    'Reset flows should be simple, honest, and easy to verify. If the account does not exist or the hosted lane is unavailable, the rest of the public surface still tells the truth.',
-  mediaSrc: '/landing/webp/reading-bench.webp',
-  mediaAlt: 'MUTX robot reading and reviewing system state on a bench',
-  mediaWidth: 1024,
-  mediaHeight: 1536,
-  highlights: [
-    'Use the work email tied to the hosted operator account.',
-    'Reset links expire, so handle the email quickly once it lands.',
-    'Docs and dashboard stay available if you only need product truth right now.',
-  ],
-} as const
+import { isPicoHost } from '@/lib/auth/redirects'
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations('pico.authRecovery.forgotPassword')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [hostVariant, setHostVariant] = useState<'default' | 'pico'>('default')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    setHostVariant(isPicoHost(window.location.hostname) ? 'pico' : 'default')
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,19 +39,35 @@ export default function ForgotPasswordPage() {
       const payload = await response.json()
 
       if (!response.ok) {
-        throw new Error(payload.detail || payload.error?.message || payload.error || 'Failed to send reset email')
+        throw new Error(
+          payload.detail || payload.error?.message || payload.error || t('sendLink'),
+        )
       }
 
       setSuccess(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setError(err instanceof Error ? err.message : t('sendLink'))
     } finally {
       setLoading(false)
     }
   }
 
+  const authSurfaceProps = {
+    eyebrow: t('eyebrow'),
+    title: t('title'),
+    description: t('description'),
+    asideEyebrow: t('asideEyebrow'),
+    asideTitle: t('asideTitle'),
+    asideBody: t('asideBody'),
+    mediaSrc: '/landing/webp/reading-bench.webp',
+    mediaAlt: 'MUTX robot reading and reviewing system state on a bench',
+    mediaWidth: 1024,
+    mediaHeight: 1536,
+    highlights: [t('highlights.0'), t('highlights.1'), t('highlights.2')],
+  } as const
+
   return (
-    <AuthSurface {...authSurfaceProps} variant="recovery">
+    <AuthSurface {...authSurfaceProps} variant="recovery" hostVariant={hostVariant}>
       {success ? (
         <div className={styles.formWrap}>
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
@@ -68,45 +75,45 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div>
-            <h2 className={styles.sectionTitle}>Check your email</h2>
+            <h2 className={styles.sectionTitle}>{t('successTitle')}</h2>
             <p className={styles.bodyText}>
-              We&apos;ve sent password reset instructions to <strong>{email}</strong>.
+              {t('successBody', { email })}
             </p>
             <p className={styles.bodyText}>
-              If the email does not show up, check spam or request another link.
+              {t('successHint')}
             </p>
           </div>
 
           <div className={styles.ctaRow}>
             <Link href="/login" className={styles.buttonPrimary}>
-              Back to sign in
+              {t('backToSignIn')}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <button type="button" onClick={() => setSuccess(false)} className={styles.buttonSecondary}>
-              Try again
+              {t('tryAgain')}
             </button>
           </div>
         </div>
       ) : (
         <div className={styles.formWrap}>
           <div>
-            <h2 className={styles.sectionTitle}>Send reset instructions</h2>
+            <h2 className={styles.sectionTitle}>{t('sendTitle')}</h2>
             <p className={styles.bodyText}>
-              No drama. Just the email and a fresh link.
+              {t('sendBody')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className={styles.formWrap}>
             <div className={styles.field}>
               <label htmlFor="email" className={styles.fieldLabel}>
-                Email address
+                {t('emailLabel')}
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
+                placeholder={t('emailPlaceholder')}
                 required
                 className={styles.input}
               />
@@ -123,11 +130,11 @@ export default function ForgotPasswordPage() {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Sending...
+                  {t('sending')}
                 </>
               ) : (
                 <>
-                  Send reset link
+                  {t('sendLink')}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -136,7 +143,7 @@ export default function ForgotPasswordPage() {
 
           <Link href="/login" className={styles.inlineLink}>
             <ArrowLeft className="h-4 w-4" />
-            Back to sign in
+            {t('backToSignIn')}
           </Link>
         </div>
       )}

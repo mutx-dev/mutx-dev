@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation'
 
 import { PicoLessonDetail } from '@/components/pico/PicoLessonDetail'
 import { PICO_LESSONS, getLessonBySlug } from '@/lib/pico/academy'
+import { buildPicoPageMetadata } from '@/lib/pico/metadata'
+import { loadPicoMessages } from '@/lib/pico/messages'
+import { getLocale } from 'next-intl/server'
 
 type PicoLessonPageProps = {
   params: Promise<{ slug: string }>
@@ -20,10 +23,21 @@ export async function generateMetadata({ params }: PicoLessonPageProps): Promise
     return {}
   }
 
-  return {
-    title: `${lesson.title} — PicoMUTX Academy`,
-    description: lesson.summary ?? `Learn ${lesson.title} on PicoMUTX Academy.`,
-  }
+  const locale = await getLocale()
+  const { messages } = await loadPicoMessages(locale)
+  const localizedLesson =
+    (messages as {
+      pico?: {
+        content?: {
+          lessons?: Record<string, { title?: string; summary?: string }>
+        }
+      }
+    }).pico?.content?.lessons?.[slug]
+
+  return buildPicoPageMetadata('pico.pages.lesson.meta', `/academy/${lesson.slug}`, {
+    title: localizedLesson?.title ?? lesson.title,
+    summary: localizedLesson?.summary ?? lesson.summary,
+  })
 }
 
 export default async function PicoLessonPage({ params }: PicoLessonPageProps) {

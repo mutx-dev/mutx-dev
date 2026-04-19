@@ -1122,7 +1122,7 @@ test.describe('mutx.dev QA', () => {
     await stubPicoProductApis(page);
 
     await page.goto('/pico/academy', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('pico-welcome-tour')).toHaveCount(0);
+    await expect(page.getByTestId('pico-welcome-tour')).toBeHidden();
     await page.getByTestId('pico-open-tour').click();
     await expect(page.getByTestId('pico-welcome-tour')).toBeVisible();
     await expect(page.getByTestId('pico-welcome-tour')).toContainText(/learn the codex once, then close it\./i);
@@ -1130,10 +1130,10 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByTestId('pico-welcome-tour')).toContainText(/the codex only wants one mission to matter\./i);
 
     await page.getByRole('button', { name: /close quick tour/i }).click();
-    await expect(page.getByTestId('pico-welcome-tour')).toHaveCount(0);
+    await expect(page.getByTestId('pico-welcome-tour')).toBeHidden();
 
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('pico-welcome-tour')).toHaveCount(0);
+    await expect(page.getByTestId('pico-welcome-tour')).toBeHidden();
 
     await page.getByTestId('pico-open-tour').click();
     await expect(page.getByTestId('pico-welcome-tour')).toBeVisible();

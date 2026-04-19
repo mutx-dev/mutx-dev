@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { extractApiErrorMessage } from '@/components/app/http'
-import { picoAuthCopy, picoAuthEyebrow, type PicoAuthMode } from '@/components/pico/picoAuthCopy'
+import { PicoLangSwitcher } from '@/components/pico/PicoLangSwitcher'
+import { type PicoAuthMode } from '@/components/pico/picoAuthCopy'
 import { buildOAuthStartHref, oauthProviders } from '@/lib/auth/oauth'
 import { resolveRedirectPath } from '@/lib/auth/redirects'
 
@@ -101,7 +103,7 @@ export function PicoAuthPage({
   initialEmail,
 }: PicoAuthPageProps) {
   const router = useRouter()
-  const text = picoAuthCopy[mode]
+  const t = useTranslations('pico.auth')
   const isRegister = mode === 'register'
   const redirectPath = resolveRedirectPath(nextPath, fallbackPath)
 
@@ -121,11 +123,11 @@ export function PicoAuthPage({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (isRegister && password !== confirmPassword) {
-      setError('Passwords do not match')
+      setError(t('errors.passwordMismatch'))
       return
     }
     if (isRegister && password.length < 8) {
-      setError('Password must be at least 8 characters')
+      setError(t('errors.passwordTooShort'))
       return
     }
 
@@ -142,11 +144,16 @@ export function PicoAuthPage({
       })
 
       const data = await res.json().catch(() => ({
-        detail: mode === 'login' ? 'Failed to sign in' : 'Failed to create account',
+        detail: mode === 'login' ? t('errors.loginFailed') : t('errors.registerFailed'),
       }))
 
       if (!res.ok) {
-        throw new Error(extractApiErrorMessage(data, mode === 'login' ? 'Failed to sign in' : 'Failed to create account'))
+        throw new Error(
+          extractApiErrorMessage(
+            data,
+            mode === 'login' ? t('errors.loginFailed') : t('errors.registerFailed'),
+          ),
+        )
       }
 
       if (isRegister && data.requires_email_verification) {
@@ -159,7 +166,13 @@ export function PicoAuthPage({
       router.replace(redirectPath)
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : mode === 'login' ? 'Failed to sign in' : 'Failed to create account')
+      setError(
+        err instanceof Error
+          ? err.message
+          : mode === 'login'
+            ? t('errors.loginFailed')
+            : t('errors.registerFailed'),
+      )
     } finally {
       setLoading(false)
     }
@@ -168,7 +181,10 @@ export function PicoAuthPage({
   /* ---- Resend ---- */
 
   async function handleResend() {
-    if (!email) { setError('Enter your email address first'); return }
+    if (!email) {
+      setError(t('errors.emailRequired'))
+      return
+    }
     setResending(true)
     setNotice('')
     try {
@@ -177,11 +193,11 @@ export function PicoAuthPage({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-      const data = await res.json().catch(() => ({ detail: 'Failed to resend' }))
-      if (!res.ok) throw new Error(extractApiErrorMessage(data, 'Failed to resend'))
-      setNotice(data.message || 'Verification email sent')
+      const data = await res.json().catch(() => ({ detail: t('errors.resendFailed') }))
+      if (!res.ok) throw new Error(extractApiErrorMessage(data, t('errors.resendFailed')))
+      setNotice(data.message || t('notice.verificationSent'))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to resend')
+      setError(err instanceof Error ? err.message : t('errors.resendFailed'))
     } finally {
       setResending(false)
     }
@@ -225,7 +241,16 @@ export function PicoAuthPage({
     }}>
       {/* Header */}
       <header style={{ width: '100%', padding: '1.25rem 1.5rem' }}>
-        <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
+        <div
+          style={{
+            maxWidth: '80rem',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+          }}
+        >
           <Link href="/" style={{
             fontFamily: c.fontDisplay,
             fontSize: '1.15rem',
@@ -237,6 +262,7 @@ export function PicoAuthPage({
           }}>
             PicoMUTX
           </Link>
+          <PicoLangSwitcher />
         </div>
       </header>
 
@@ -255,7 +281,7 @@ export function PicoAuthPage({
                 marginBottom: '0.75rem',
               }}
             >
-              {picoAuthEyebrow}
+              {t('eyebrow')}
             </p>
             <h1
               style={{
@@ -267,10 +293,10 @@ export function PicoAuthPage({
                 marginBottom: '0.5rem',
               }}
             >
-              {text.title}
+              {t(`modes.${mode}.title`)}
             </h1>
             <p style={{ color: c.text2, fontSize: '0.9rem', lineHeight: 1.6 }}>
-              {text.subtitle}
+              {t(`modes.${mode}.subtitle`)}
             </p>
           </div>
 
@@ -332,7 +358,7 @@ export function PicoAuthPage({
                 letterSpacing: '0.18em',
                 color: c.muted,
               }}>
-                Or use email
+                {t('orUseEmail')}
               </span>
               <span style={{ flex: 1, height: '1px', background: c.border }} />
             </div>
@@ -341,13 +367,13 @@ export function PicoAuthPage({
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               {isRegister && (
                 <div>
-                  <label htmlFor="pico-name" style={labelStyle}>Name</label>
+                  <label htmlFor="pico-name" style={labelStyle}>{t('fields.name.label')}</label>
                   <input
                     id="pico-name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Your name"
+                    placeholder={t('fields.name.placeholder')}
                     required
                     autoComplete="name"
                     style={inputStyle}
@@ -358,13 +384,13 @@ export function PicoAuthPage({
               )}
 
               <div>
-                <label htmlFor="pico-email" style={labelStyle}>Email address</label>
+                <label htmlFor="pico-email" style={labelStyle}>{t('fields.email.label')}</label>
                 <input
                   id="pico-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
+                  placeholder={t('fields.email.placeholder')}
                   required
                   autoComplete="email"
                   style={inputStyle}
@@ -374,13 +400,13 @@ export function PicoAuthPage({
               </div>
 
               <div>
-                <label htmlFor="pico-password" style={labelStyle}>Password</label>
+                <label htmlFor="pico-password" style={labelStyle}>{t('fields.password.label')}</label>
                 <input
                   id="pico-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter at least 8 characters"
+                  placeholder={t('fields.password.placeholder')}
                   required
                   autoComplete={isRegister ? 'new-password' : 'current-password'}
                   style={inputStyle}
@@ -391,13 +417,13 @@ export function PicoAuthPage({
 
               {isRegister && (
                 <div>
-                  <label htmlFor="pico-confirm" style={labelStyle}>Confirm password</label>
+                  <label htmlFor="pico-confirm" style={labelStyle}>{t('fields.confirmPassword.label')}</label>
                   <input
                     id="pico-confirm"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Enter at least 8 characters"
+                    placeholder={t('fields.confirmPassword.placeholder')}
                     required
                     autoComplete="new-password"
                     style={inputStyle}
@@ -467,7 +493,7 @@ export function PicoAuthPage({
                   boxShadow: `0 0 20px rgba(${c.accentRgb}, 0.2)`,
                 }}
               >
-                {loading ? text.loading : text.submit}
+                {loading ? t(`modes.${mode}.loading`) : t(`modes.${mode}.submit`)}
               </button>
             </form>
 
@@ -483,7 +509,7 @@ export function PicoAuthPage({
             }}>
               {mode === 'login' && (
                 <Link href="/forgot-password" style={{ color: c.muted, textDecoration: 'none', transition: 'color 0.2s' }}>
-                  Forgot password?
+                  {t('forgotPassword')}
                 </Link>
               )}
               {mode === 'login' && verificationError && (
@@ -493,16 +519,16 @@ export function PicoAuthPage({
                   disabled={resending}
                   style={{ background: 'none', border: 'none', color: c.muted, cursor: 'pointer', fontSize: '0.82rem', padding: 0, textDecoration: 'underline' }}
                 >
-                  {resending ? 'Sending\u2026' : 'Resend verification'}
+                  {resending ? t('notice.resending') : t('notice.resendVerification')}
                 </button>
               )}
               <p style={{ margin: 0 }}>
-                {text.toggleQ}{' '}
+                {t(`modes.${mode}.toggleQuestion`)}{' '}
                 <Link
-                  href={`/${text.toggleMode}?next=${encodeURIComponent(redirectPath)}`}
+                  href={`/${mode === 'login' ? 'register' : 'login'}?next=${encodeURIComponent(redirectPath)}`}
                   style={{ color: c.accent, textDecoration: 'none', fontWeight: 600 }}
                 >
-                  {text.toggleA}
+                  {t(`modes.${mode}.toggleAction`)}
                 </Link>
               </p>
             </div>
