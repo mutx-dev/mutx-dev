@@ -5451,6 +5451,80 @@
         }
       }
     },
+    "/v1/events": {
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Ingest Event",
+        "description": "Accept structured events from SDK adapters (LangChain, CrewAI, AutoGen).\n\nWhen ``agent_id`` is provided the event is persisted as an ``AgentLog``\nfor audit trail; otherwise it is accepted and logged without persistent\nstorage.",
+        "operationId": "ingest_event_v1_events_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/ingest/agent-status": {
       "post": {
         "tags": [
@@ -19125,6 +19199,52 @@
           "timestamp"
         ],
         "title": "HeartbeatResponse"
+      },
+      "IngestEvent": {
+        "properties": {
+          "event_type": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Event Type",
+            "description": "Adapter event type (e.g. agent_action, crew_task_start)"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp",
+            "description": "ISO 8601 timestamp from the adapter"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id",
+            "description": "Agent UUID if available"
+          },
+          "payload": {
+            "type": "object",
+            "title": "Payload",
+            "description": "Adapter-specific event data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_type"
+        ],
+        "title": "IngestEvent",
+        "description": "Generic event ingestion payload from SDK adapters.\n\nAccepts any structured event from LangChain, CrewAI, AutoGen, or future\nadapters.  ``event_type`` is the only required field; all other fields\nare carried as a free-form ``payload`` dict."
       },
       "IngestRequest": {
         "properties": {

@@ -1360,6 +1360,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ingest Event
+         * @description Accept structured events from SDK adapters (LangChain, CrewAI, AutoGen).
+         *
+         *     When ``agent_id`` is provided the event is persisted as an ``AgentLog``
+         *     for audit trail; otherwise it is accepted and logged without persistent
+         *     storage.
+         */
+        post: operations["ingest_event_v1_events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ingest/agent-status": {
         parameters: {
             query?: never;
@@ -5761,6 +5785,36 @@ export interface components {
             agent_id: string;
             /** Timestamp */
             timestamp: string;
+        };
+        /**
+         * IngestEvent
+         * @description Generic event ingestion payload from SDK adapters.
+         *
+         *     Accepts any structured event from LangChain, CrewAI, AutoGen, or future
+         *     adapters.  ``event_type`` is the only required field; all other fields
+         *     are carried as a free-form ``payload`` dict.
+         */
+        IngestEvent: {
+            /**
+             * Event Type
+             * @description Adapter event type (e.g. agent_action, crew_task_start)
+             */
+            event_type: string;
+            /**
+             * Timestamp
+             * @description ISO 8601 timestamp from the adapter
+             */
+            timestamp?: string | null;
+            /**
+             * Agent Id
+             * @description Agent UUID if available
+             */
+            agent_id?: string | null;
+            /**
+             * Payload
+             * @description Adapter-specific event data
+             */
+            payload?: Record<string, never>;
         };
         /**
          * IngestRequest
@@ -11845,6 +11899,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AgentResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ingest_event_v1_events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                "X-API-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IngestEvent"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
