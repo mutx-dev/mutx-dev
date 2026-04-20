@@ -8,67 +8,67 @@
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
       "cta": "Request access",
-      "ctaMobile": "Access",
+      "ctaMobile": "Request",
       "sectionsLabel": "Page Sections",
       "skipToMain": "Skip to main content"
     },
     "hero": {
       "badge": "Founding Access · Request-Only",
-      "title": "Get an AI agent working ",
-      "titleAccent": "and trust it in real work.",
-      "subtitle": "Start from zero, recover a broken setup, or take control of a live agent. Pico routes you into build, fix, or control.",
+      "title": "Get a useful AI agent working.",
+      "titleAccent": "Then trust it in real work.",
+      "subtitle": "Start from scratch, recover a broken setup, or take control of a live system.",
       "cta": "Request access",
-      "ctaSecondary": "See How It Works",
-      "meta": "Request-first outside. Inside, Pico diagnoses the blocker and routes you into build, fix, or control."
+      "ctaSecondary": "How It Works",
+      "meta": "Request-first outside. Product routing inside."
     },
     "trustBar": {
       "items": {
-        "0": "Start from zero, a messy build, or a live system",
-        "1": "One diagnosis layer routes you into build, fix, or control",
-        "2": "Visibility, approvals, and safeguards before trust is assumed"
+        "0": "Start, recover, or control.",
+        "1": "Pico diagnoses first.",
+        "2": "Guardrails before trust."
       }
     },
     "problem": {
       "eyebrow": "Why Pico",
       "title": "Most agent projects do not fail",
       "titleLine2": "because the idea was weak.",
-      "body": "Projects stall when the path gets messy: too many stack decisions, no recovery path, and no operational clarity once something breaks.",
+      "body": "Projects stall when the path gets messy: too many stack decisions, no recovery lane, and too little control once something breaks.",
       "scenarios": {
         "0": {
-          "label": "\"I know what I want the agent to do. I still need the fastest sane path to get one working.\"",
-          "body": "Starting from zero is not the real problem. The real problem is choosing the stack, sequence, and standards without turning the work into endless research."
+          "label": "Starting from zero",
+          "body": "You need the fastest sane path to one working agent."
         },
         "1": {
-          "label": "\"I already built part of this. Now I need to recover the setup instead of restarting from scratch.\"",
-          "body": "When a build breaks halfway through, losing momentum costs more than time. You need a recovery lane, not another theory rabbit hole."
+          "label": "Half-built & stuck",
+          "body": "You need a recovery lane, not a full restart."
         },
         "2": {
-          "label": "\"Something is already live, but I do not trust the cost, logic, or failure modes yet.\"",
-          "body": "At that point it is not enough for the agent to exist. It has to be legible, controllable, and safe enough to touch real work."
+          "label": "Live but untrusted",
+          "body": "You need visibility into cost, logic, and failure modes."
         },
         "3": {
-          "label": "\"I need a system I can explain, review, and control before I rely on it.\"",
-          "body": "If you cannot see runs, thresholds, approvals, and behavior under pressure, you do not have an operational asset yet."
+          "label": "Needs review",
+          "body": "You need something you can explain, inspect, and control."
         }
       },
-      "close": "Pico turns that uncertainty into one honest next move."
+      "close": "Pico turns that uncertainty into one clear next move."
     },
     "platform": {
-      "eyebrow": "How Pico Works",
-      "title": "Pico diagnoses the blocker, then routes you to build, fix, or control.",
-      "body": "Get something useful working and keep it trustworthy. Pico starts with diagnosis so the next move matches the real blocker.",
+      "eyebrow": "How It Works",
+      "title": "Diagnosis first. Then build, fix, or control.",
+      "body": "Pico finds the blocker and routes the next step.",
       "howItWorks": {
         "0": {
-          "title": "Describe the goal or connect the agent",
-          "body": "Start with the job, the blocker, or the live system you need to understand. Pico uses that context to decide what kind of help is actually relevant."
+          "title": "Describe the goal or connect the system",
+          "body": "Start with the job, the blocker, or the live setup."
         },
         "1": {
           "title": "Get routed into build, fix, or control",
-          "body": "New builds get a practical path to one useful agent. Broken setups get recovery steps. Live systems get visibility, thresholds, approvals, and operator guardrails."
+          "body": "Pico picks the lane that matches the blocker."
         },
         "2": {
-          "title": "Apply changes in one operational loop",
-          "body": "Observe behavior, isolate what is off, implement the next change, and keep moving without losing the thread."
+          "title": "Apply the next move with visibility & guardrails",
+          "body": "Make the change, review the behavior, and keep moving."
         },
         "3": {
           "title": "Escalate when the edge case is real",
@@ -123,20 +123,20 @@
     },
     "earlyAccess": {
       "eyebrow": "Founding Access",
-      "title": "Waitlist-first outside. Real product underneath.",
-      "body": "Access opens in waves so serious operators land in the right lane while workflows harden on real use.",
+      "title": "Waitlist outside. Product inside.",
+      "body": "Access opens in waves while the product hardens on real use.",
       "benefits": {
-        "0": "Start from zero, a broken setup, or a live system you do not trust yet",
+        "0": "Start from scratch, recover broken setups, or control live systems",
         "1": "Get routed into build, fix, or control",
-        "2": "Lock founding pricing while access is still selective",
-        "3": "Use expert input only when the edge case is real",
-        "4": "Help shape the first case studies and operating patterns"
+        "2": "Lock founding pricing early",
+        "3": "Use expert input only when needed",
+        "4": "Shape the first operator playbooks"
       }
     },
     "pricing": {
       "eyebrow": "Founding Pricing",
       "title": "Lock the founding rate before public pricing.",
-      "lead": "Start free. If you get in early, you keep roughly 90% off the later public rate while we onboard in waves.",
+      "lead": "Start free. If you get in early, you keep roughly 90% off the later public rate.",
       "recommendedLabel": "90% Off Founding",
       "tiers": {
         "trial": {
@@ -415,7 +415,7 @@
     "finalCta": {
       "eyebrow": "Founding Access",
       "title": "Request access to the right lane.",
-      "body": "Pico helps you get something useful working, recover it when it breaks, and keep it under control in real work.",
+      "body": "Pico helps you ship, recover, and control agents without the usual chaos.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
       "formHeadline": "Start with the real blocker.",
       "formSubline": "Tell us whether you need to build, fix, or control. We will route you to the right lane.",

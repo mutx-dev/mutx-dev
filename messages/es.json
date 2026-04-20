@@ -8,67 +8,67 @@
       "brand": "PicoMUTX",
       "brandTag": " por MUTX",
       "cta": "Solicitar acceso",
-      "ctaMobile": "Acceso",
+      "ctaMobile": "Solicitar",
       "sectionsLabel": "Secciones De La Página",
       "skipToMain": "Saltar al contenido principal"
     },
     "hero": {
       "badge": "Acceso fundador · Bajo solicitud",
-      "title": "Haz que un agente de IA funcione ",
-      "titleAccent": "y confiar en él en trabajo real.",
-      "subtitle": "Empieza desde cero, recupera un setup roto o toma el control de un agente en vivo. Pico te enruta hacia construir, arreglar o controlar.",
+      "title": "Pon a funcionar un agente de IA útil.",
+      "titleAccent": "Luego confía en él en trabajo real.",
+      "subtitle": "Empieza desde cero, rescata un setup roto o toma el control de un sistema en vivo.",
       "cta": "Solicitar acceso",
-      "ctaSecondary": "Ver Cómo Funciona",
-      "meta": "Por fuera, el acceso sigue siendo por solicitud. Por dentro, Pico diagnostica el bloqueo y te enruta hacia construir, arreglar o controlar."
+      "ctaSecondary": "Cómo Funciona",
+      "meta": "Por fuera, acceso bajo solicitud. Por dentro, el producto te enruta."
     },
     "trustBar": {
       "items": {
-        "0": "Empieza desde cero, desde una build desordenada o desde un sistema en vivo",
-        "1": "Una sola capa de diagnóstico te enruta a construir, arreglar o controlar",
-        "2": "Visibilidad, aprobaciones y guardarraíles antes de asumir confianza"
+        "0": "Empieza, recupera o controla.",
+        "1": "Pico diagnostica primero.",
+        "2": "Guardarraíles antes de confiar."
       }
     },
     "problem": {
       "eyebrow": "Por qué Pico",
       "title": "La mayoría de los proyectos con agentes no fallan",
       "titleLine2": "porque la idea fuera débil.",
-      "body": "Los proyectos se frenan cuando el camino se ensucia: demasiadas decisiones de stack, ninguna ruta de recuperación y poca claridad operativa cuando algo se rompe.",
+      "body": "Los proyectos se frenan cuando el camino se complica: demasiadas decisiones de stack, ninguna vía de recuperación y poco control cuando algo se rompe.",
       "scenarios": {
         "0": {
-          "label": "\"Sé lo que quiero que haga el agente. Lo que me falta es la ruta más rápida y sensata para tener uno funcionando.\"",
-          "body": "Empezar desde cero no es el problema. El problema es elegir stack, secuencia y estándares sin convertir el trabajo en investigación infinita."
+          "label": "Empezar desde cero",
+          "body": "Necesitas la ruta más rápida y sensata hacia un primer agente funcionando."
         },
         "1": {
-          "label": "\"Ya construí una parte. Ahora necesito recuperar el setup, no empezar otra vez desde cero.\"",
-          "body": "Cuando una build se rompe a mitad de camino, perder impulso cuesta más que tiempo. Necesitas una vía de recuperación, no otro agujero de teoría."
+          "label": "A medio hacer y atascado",
+          "body": "Necesitas una vía de recuperación, no empezar de nuevo."
         },
         "2": {
-          "label": "\"Ya hay algo en vivo, pero todavía no confío en el coste, la lógica o los modos de fallo.\"",
-          "body": "En ese punto no basta con que el agente exista. Tiene que ser legible, controlable y lo bastante seguro para tocar trabajo real."
+          "label": "En vivo pero sin confianza",
+          "body": "Necesitas visibilidad sobre coste, lógica y modos de fallo."
         },
         "3": {
-          "label": "\"Necesito un sistema que pueda explicar, revisar y controlar antes de depender de él.\"",
-          "body": "Si no puedes ver ejecuciones, umbrales, aprobaciones y comportamiento bajo presión, todavía no tienes un activo operativo."
+          "label": "Necesita revisión",
+          "body": "Necesitas algo que puedas explicar, inspeccionar y controlar."
         }
       },
-      "close": "Pico convierte esa incertidumbre en el siguiente paso honesto."
+      "close": "Pico convierte esa incertidumbre en el siguiente paso claro."
     },
     "platform": {
-      "eyebrow": "Cómo funciona Pico",
-      "title": "Pico diagnostica el bloqueo y luego te enruta hacia construir, arreglar o controlar.",
-      "body": "Haz que algo útil funcione y siga siendo confiable. Pico empieza por el diagnóstico para que el siguiente paso coincida con el bloqueo real.",
+      "eyebrow": "Cómo Funciona",
+      "title": "Primero diagnóstico. Luego construir, arreglar o controlar.",
+      "body": "Pico detecta el bloqueo y enruta el siguiente paso.",
       "howItWorks": {
         "0": {
-          "title": "Describe el objetivo o conecta el agente",
-          "body": "Empieza con el trabajo, el bloqueo o el sistema en vivo que necesitas entender. Pico usa ese contexto para decidir qué ayuda es realmente relevante."
+          "title": "Describe el objetivo o conecta el sistema",
+          "body": "Empieza por el trabajo, el bloqueo o el setup en vivo."
         },
         "1": {
           "title": "Recibe una ruta de construir, arreglar o controlar",
-          "body": "Los casos nuevos obtienen una ruta práctica hacia un agente útil. Los setups rotos obtienen pasos de recuperación. Los sistemas en vivo obtienen visibilidad, umbrales, aprobaciones y guardarraíles operativos."
+          "body": "Pico elige la vía que coincide con el bloqueo."
         },
         "2": {
-          "title": "Aplica cambios en un solo loop operativo",
-          "body": "Observa el comportamiento, aísla lo que va mal, aplica el siguiente cambio y sigue avanzando sin perder el hilo."
+          "title": "Aplica el siguiente paso con visibilidad y guardarraíles",
+          "body": "Haz el cambio, revisa el comportamiento y sigue avanzando."
         },
         "3": {
           "title": "Escala cuando el borde complicado es real",
@@ -123,14 +123,14 @@
     },
     "earlyAccess": {
       "eyebrow": "Acceso fundador",
-      "title": "Por fuera hay waitlist. Por dentro ya hay producto real.",
-      "body": "El acceso se abre por olas para que los operadores serios caigan en la ruta correcta mientras los workflows se endurecen con uso real.",
+      "title": "Lista de espera fuera. Producto dentro.",
+      "body": "El acceso se abre por olas mientras el sistema se endurece con uso real.",
       "benefits": {
-        "0": "Empieza desde cero, desde un setup roto o desde un sistema en vivo en el que aún no confías",
-        "1": "Te enruta a build, fix o control",
-        "2": "Asegura el founding pricing mientras el acceso sigue siendo selectivo",
-        "3": "Usa input experto solo cuando el edge case sea real",
-        "4": "Ayuda a dar forma a los primeros case studies y operating patterns"
+        "0": "Empieza desde cero, rescata setups rotos o controla sistemas en vivo",
+        "1": "Entra en build, fix o control",
+        "2": "Asegura el founding pricing temprano",
+        "3": "Usa ayuda experta solo cuando haga falta",
+        "4": "Da forma a los primeros playbooks operativos"
       }
     },
     "pricing": {
@@ -212,7 +212,7 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "Empieza gratis. Si entras ahora, conservas alrededor del 90 % de descuento frente al precio público futuro mientras abrimos por cohortes.",
+      "lead": "Empieza gratis. Si entras pronto, mantienes alrededor de un 90 % por debajo del precio público futuro.",
       "recommendedLabel": "Founding -90%"
     },
     "faq": {
@@ -245,6 +245,7 @@
       "eyebrow": "Acceso fundador",
       "title": "Solicita acceso a la ruta correcta.",
       "body": "Pico te ayuda a poner algo útil en marcha, recuperarlo cuando se rompe y mantenerlo bajo control en trabajo real.",
+      "faqLabel": "¿Aún lo estás pensando? Aclaremos los últimos bloqueos.",
       "formHeadline": "Empieza por el bloqueo real.",
       "formSubline": "Cuéntanos si necesitas construir, arreglar o controlar. Te llevaremos a la ruta correcta.",
       "ctaButton": "Solicitar acceso",
