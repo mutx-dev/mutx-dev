@@ -506,4 +506,146 @@ describe('host-aware UI routing proxy', () => {
     expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('no-store')
   })
+
+  describe('pico protected route auth gating', () => {
+    it('redirects anonymous /start to pico-hosted login with next preserved', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/start', { host: 'pico.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2Fstart')
+      expect(response.headers.get('cache-control')).toMatch(/no-cache|no-store/)
+    })
+
+    it('redirects anonymous /onboarding to pico-hosted login with next preserved', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/onboarding', { host: 'pico.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2Fonboarding')
+    })
+
+    it('redirects anonymous /academy to pico-hosted login with next preserved', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/academy', { host: 'pico.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2Facademy')
+    })
+
+    it('redirects anonymous /academy/lesson to pico-hosted login with next preserved', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/academy/install-hermes-locally', { host: 'pico.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2Facademy%2Finstall-hermes-locally')
+    })
+
+    it('redirects anonymous /tutor to pico-hosted login with next preserved', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/tutor', { host: 'pico.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2Ftutor')
+    })
+
+    it('redirects anonymous /support to pico-hosted login with next preserved', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/support', { host: 'pico.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2Fsupport')
+    })
+
+    it('redirects anonymous /autopilot to pico-hosted login with next preserved', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/autopilot', { host: 'pico.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/login?next=%2Fautopilot')
+    })
+
+    it('allows authenticated /start to proceed to onboarding page', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/start', { host: 'pico.mutx.dev' }, 'GET', authCookies),
+      )
+
+      expect(response.status).toBe(200)
+      expect(response.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico/onboarding')
+      expect(response.headers.get('location')).toBeNull()
+    })
+
+    it('allows authenticated /academy to proceed to academy page', () => {
+      const response = proxy(
+        mockRequest('https://pico.mutx.dev/academy', { host: 'pico.mutx.dev' }, 'GET', authCookies),
+      )
+
+      expect(response.status).toBe(200)
+      expect(response.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico/academy')
+      expect(response.headers.get('location')).toBeNull()
+    })
+  })
+
+  describe('app-host pico route boundary enforcement', () => {
+    it('blocks app-host access to /pico/onboarding by redirecting to canonical pico host', () => {
+      const response = proxy(
+        mockRequest('https://app.mutx.dev/pico/onboarding', { host: 'app.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/onboarding')
+    })
+
+    it('blocks app-host access to /pico/academy by redirecting to canonical pico host', () => {
+      const response = proxy(
+        mockRequest('https://app.mutx.dev/pico/academy', { host: 'app.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/academy')
+    })
+
+    it('blocks app-host access to /pico/tutor by redirecting to canonical pico host', () => {
+      const response = proxy(
+        mockRequest('https://app.mutx.dev/pico/tutor', { host: 'app.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/tutor')
+    })
+
+    it('blocks app-host access to /pico/support by redirecting to canonical pico host', () => {
+      const response = proxy(
+        mockRequest('https://app.mutx.dev/pico/support', { host: 'app.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/support')
+    })
+
+    it('blocks app-host access to /pico/autopilot by redirecting to canonical pico host', () => {
+      const response = proxy(
+        mockRequest('https://app.mutx.dev/pico/autopilot', { host: 'app.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/autopilot')
+    })
+
+    it('preserves query parameters when redirecting app-host pico routes', () => {
+      const response = proxy(
+        mockRequest('https://app.mutx.dev/pico/academy/install-hermes-locally?lesson=true', { host: 'app.mutx.dev' }),
+      )
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe('https://pico.mutx.dev/academy/install-hermes-locally?lesson=true')
+    })
+  })
 })
