@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 import uuid
@@ -733,6 +733,20 @@ class MetricsReportRequest(BaseModel):
     memory_usage: float = Field(
         ..., ge=0.0, le=100.0, description="Memory usage percentage (0-100)"
     )
+
+
+class IngestEvent(BaseModel):
+    """Generic event ingestion payload from SDK adapters.
+
+    Accepts any structured event from LangChain, CrewAI, AutoGen, or future
+    adapters.  ``event_type`` is the only required field; all other fields
+    are carried as a free-form ``payload`` dict.
+    """
+
+    event_type: str = Field(..., min_length=1, description="Adapter event type (e.g. agent_action, crew_task_start)")
+    timestamp: Optional[str] = Field(None, description="ISO 8601 timestamp from the adapter")
+    agent_id: Optional[uuid.UUID] = Field(None, description="Agent UUID if available")
+    payload: Dict[str, Any] = Field(default_factory=dict, description="Adapter-specific event data")
 
 
 class HealthResponse(BaseModel):
