@@ -134,78 +134,80 @@
       }
     },
     "pricing": {
-      "eyebrow": "Founding Pricing",
-      "title": "Lock the founding rate before public pricing.",
-      "lead": "Start free. If you get in early, you keep roughly 90% off the later public rate while we onboard in waves.",
-      "recommendedLabel": "90% Off Founding",
+      "eyebrow": "Simple Pricing",
+      "title": "Start building and controlling AI agents today.",
+      "lead": "Start free. Upgrade when you need more power and control.",
+      "recommendedLabel": "Popular",
       "tiers": {
         "trial": {
-          "name": "Free trial",
+          "name": "Free",
           "price": "Free",
-          "period": "first value",
-          "description": "Reach first value on a real agent problem before you commit.",
-          "priceNote": "Free until a real agent problem is defined or connected.",
+          "period": "forever",
+          "description": "Build and control your first AI agent with full guidance.",
+          "priceNote": "No credit card required.",
           "features": [
             "Describe a goal or connect an agent",
             "Get routed into build, fix, or control",
-            "Reach first value before paying"
+            "Full academy access",
+            "Start immediately"
           ],
-          "cta": "Request Trial Access",
-          "ctaHref": "/pricing"
+          "cta": "Get Started",
+          "ctaHref": "/start"
         },
         "starter": {
-          "name": "Founding Tier",
-          "price": "€29",
+          "name": "Starter",
+          "price": "$9",
           "period": "/mo",
-          "description": "Self-serve execution for operators who want the product early without waiting for the polished public tier.",
-          "priceNote": "Founding members lock €29/mo instead of the later €290/mo public rate.",
+          "description": "For operators building and controlling AI agents.",
+          "priceNote": "Cancel anytime.",
           "recommended": true,
           "features": [
             "AI diagnostic intake",
             "Guided build, fix, and control paths",
+            "Full academy access",
+            "Priority support",
             "Built for independent execution"
           ],
-          "cta": "Request Founding Access",
-          "ctaHref": "/pricing",
-          "anchorPrice": "€290"
+          "cta": "Choose Starter",
+          "ctaHref": "/start"
         },
         "pro": {
-          "name": "Founding Supported",
-          "price": "€79",
+          "name": "Pro",
+          "price": "$29",
           "period": "/mo",
-          "description": "The same product with faster group help for teams that want hands-on guidance without jumping straight to custom work.",
+          "description": "For teams needing more control and support.",
           "features": [
-            "Everything in the Founding Tier",
+            "Everything in Starter",
+            "Enhanced onboarding support",
             "Weekly group troubleshooting",
-            "Shared operator accountability"
+            "Shared operator support environment",
+            "Lower friction when implementation gets messy"
           ],
-          "cta": "Request Supported Access",
-          "ctaHref": "/pricing",
-          "anchorPrice": "€790",
-          "priceNote": "Founding members lock €79/mo instead of the later €790/mo supported rate."
+          "cta": "Choose Pro",
+          "ctaHref": "/start"
         },
         "enterprise": {
-          "name": "Pico Pilot",
-          "price": "€1,000+",
-          "period": "/engagement",
-          "description": "Hands-on implementation when the system is broken, urgent, or too expensive to keep guessing on.",
-          "priceNote": "Founding pilot pricing starts at €1,000+ before later custom engagements move to €10,000+.",
+          "name": "Enterprise",
+          "price": "Custom",
+          "period": "/month",
+          "description": "For organizations needing custom implementation and support.",
           "features": [
-            "Scoped diagnosis and implementation",
-            "A working system tied to measurable outcome",
-            "Custom projects when complexity is real"
+            "Custom implementation",
+            "Dedicated support",
+            "Advanced security features",
+            "Custom integrations",
+            "SLA guarantees"
           ],
-          "cta": "Book a Planning Call",
-          "ctaHref": "https://calendly.com/mutxdev",
-          "anchorPrice": "€10,000+"
+          "cta": "Contact Sales",
+          "ctaHref": "https://calendly.com/mutxdev"
         }
       }
     },
     "pricingPage": {
-      "eyebrow": "Pricing route",
-      "title": "Choose the lane you need now. See product billing only when it matters.",
-      "subtitle": "Public Pico is still access-first. This page shows the public lane first, then the in-product billing layer for teams already operating inside the system.",
-      "primaryCta": "Request access",
+      "eyebrow": "Pricing",
+      "title": "Choose the plan that fits your needs.",
+      "subtitle": "Start free and upgrade as you grow. All plans include full access to our academy and support resources.",
+      "primaryCta": "Get Started",
       "secondaryCta": "Talk to support",
       "returnToLanding": "Return to landing",
       "routeState": {
@@ -222,82 +224,76 @@
         "stacksLabel": "Tracked stacks"
       },
       "accessPlans": {
-        "label": "Public access ladder",
-        "title": "Start with first value. Add support only when the work actually needs it.",
-        "body": "The public offer is simple: start free, prove a real agent problem, then lock founding pricing that sits roughly 90% below the later public rate while we onboard in cohorts.",
-        "recommended": "Best starting point",
-        "meta": "This is the public commercial ladder. The live product billing below is real too, but it matters later.",
-        "noteLabel": "Why this section exists",
-        "note": "The ladder is simple on purpose. Free trial gets you to first value. Founding members then lock roughly 90% off the later public rates: €29 instead of €290, €79 instead of €790, and early Pico Pilot pricing from €1,000+ before later custom work starts at €10,000+.",
+        "label": "Our Plans",
+        "title": "Start with free. Upgrade when you need more power.",
+        "body": "All plans include full academy access. Choose what's right for your journey.",
+        "recommended": "Popular",
+        "meta": "Simple, transparent pricing for every stage of your AI journey.",
+        "noteLabel": "Why choose Pico?",
+        "note": "Start building and controlling AI agents today with our straightforward pricing. No hidden fees, cancel anytime.",
         "truths": [
-          "Free trial is for first value, not feature sightseeing",
-          "€29 locks the founding rate before the later €290/mo public tier",
-          "€79 locks guided support before the later €790/mo supported tier"
+          "Free plan is perfect for getting started",
+          "Starter plan gives you more power and support",
+          "Pro plan includes priority support and advanced features"
         ],
         "tiers": {
           "trial": {
-            "name": "Free Trial",
+            "name": "Free",
             "price": "Free",
-            "period": "first value",
-            "description": "Define or connect a real agent problem and reach the first useful moment before you commit.",
+            "period": "forever",
+            "description": "Build and control your first AI agent with full guidance.",
             "features": [
-              "Describe a goal or connect an existing agent",
-              "Get routed into build, fix, or control",
-              "Reach first value before paying",
-              "Extended access depends on activation",
-              "Best first step for proving seriousness"
+              "Full academy access",
+              "1 AI agent",
+              "Basic support",
+              "Start immediately"
             ],
-            "cta": "Request trial access",
-            "priceNote": "Free until a real agent problem is defined or connected."
+            "cta": "Get Started",
+            "priceNote": "No credit card required."
           },
           "starter": {
-            "name": "€29 Founding Tier",
-            "price": "€29",
+            "name": "Starter",
+            "price": "$9",
             "period": "/mo",
-            "description": "Self-serve execution for operators who want the product early without waiting for the polished public tier.",
-            "priceNote": "Founding members lock €29/mo instead of the later €290/mo public rate.",
+            "description": "For individuals needing more power and support.",
+            "priceNote": "Cancel anytime.",
             "recommended": true,
             "features": [
-              "AI-driven onboarding and diagnostic flow",
-              "Guided build, fix, and control paths",
-              "Templates and reusable skills",
-              "AI-assisted support for the next move",
-              "Built for independent execution"
+              "Everything in Free",
+              "Priority support",
+              "Advanced analytics",
+              "More AI agents",
+              "Full product access"
             ],
-            "cta": "Request founding access",
-            "anchorPrice": "€290"
+            "cta": "Choose Starter"
           },
           "pro": {
-            "name": "€79 Founding Supported",
-            "price": "€79",
+            "name": "Pro",
+            "price": "$29",
             "period": "/mo",
-            "description": "The same product with faster group help for teams that want hands-on guidance without jumping straight to custom work.",
+            "description": "For teams needing more control and support.",
             "features": [
-              "Everything in the Founding Tier",
+              "Everything in Starter",
               "Enhanced onboarding support",
               "Weekly group troubleshooting",
               "Shared operator support environment",
               "Lower friction when implementation gets messy"
             ],
-            "cta": "Request supported access",
-            "anchorPrice": "€790",
-            "priceNote": "Founding members lock €79/mo instead of the later €790/mo supported rate."
+            "cta": "Choose Pro"
           },
           "enterprise": {
-            "name": "Pico Pilot",
-            "price": "€1,000+",
-            "period": "/outcome",
-            "description": "Hands-on implementation when the system is broken, urgent, or too expensive to keep guessing on.",
-            "priceNote": "Founding pilot pricing starts at €1,000+ before later custom engagements move to €10,000+.",
+            "name": "Enterprise",
+            "price": "Custom",
+            "period": "/month",
+            "description": "For organizations needing custom implementation and support.",
             "features": [
-              "Scoped objective and diagnosis",
-              "Fix or implementation handled with you",
-              "Working system tied to a measurable result",
-              "Delivery designed to become a proof point",
-              "Custom projects available for higher-complexity work"
+              "Custom implementation",
+              "Dedicated support",
+              "Advanced security features",
+              "Custom integrations",
+              "SLA guarantees"
             ],
-            "cta": "Talk through implementation",
-            "anchorPrice": "€10,000+"
+            "cta": "Contact Sales"
           }
         }
       },
@@ -341,7 +337,7 @@
               "Autopilot mode",
               "Best first paid step"
             ],
-            "cta": "Choose starter"
+            "cta": "Choose Starter"
           },
           "pro": {
             "name": "Pro",
@@ -355,7 +351,7 @@
               "Priority support",
               "Best for active workflow owners"
             ],
-            "cta": "Choose pro"
+            "cta": "Choose Pro"
           },
           "enterprise": {
             "name": "Enterprise",
