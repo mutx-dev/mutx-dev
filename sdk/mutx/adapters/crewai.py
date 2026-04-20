@@ -188,23 +188,35 @@ class MutxCrewAICallbackHandler:
             pass
 
 
-def run_crew(crew: Any, inputs: dict[str, Any]) -> Any:
+def run_crew(crew: Any, inputs: dict[str, Any], *, api_key: str = "", api_url: str = "https://api.mutx.dev") -> Any:
     """Execute a CrewAI crew with MUTX callback attached.
 
     Args:
         crew: A CrewAI Crew instance.
         inputs: Dictionary of inputs to pass to the crew kickoff.
+        api_key: MUTX API key for authentication. Reads from MUTX_API_KEY env var if empty.
+        api_url: MUTX API base URL.
 
     Returns:
         The result of the crew execution.
 
     Raises:
         ImportError: If crewai is not installed.
+        ValueError: If no API key is provided or found in environment.
 
     Example:
         >>> crew = Crew(agents=[researcher, writer], tasks=[...])
-        >>> result = run_crew(crew, {"topic": "AI ethics"})
+        >>> result = run_crew(crew, {"topic": "AI ethics"}, api_key="mutx_...")
     """
+    import os
+
+    # Resolve API key: explicit param > env var > error
+    resolved_key = api_key or os.environ.get("MUTX_API_KEY", "")
+    if not resolved_key:
+        raise ValueError(
+            "MUTX API key required. Pass api_key parameter or set MUTX_API_KEY environment variable."
+        )
+
     # Verify crewai is available
     try:
         from crewai import Crew  # noqa: F401
@@ -217,8 +229,8 @@ def run_crew(crew: Any, inputs: dict[str, Any]) -> Any:
     crew_name = getattr(crew, "name", "crewai-crew") or "crewai-crew"
 
     handler = MutxCrewAICallbackHandler(
-        api_url="https://api.mutx.dev",
-        api_key="",  # Will be replaced when actually used
+        api_url=api_url,
+        api_key=resolved_key,
         crew_name=crew_name,
     )
 
