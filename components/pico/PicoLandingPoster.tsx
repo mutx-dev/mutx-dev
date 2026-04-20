@@ -375,22 +375,13 @@ export function PicoLandingPoster() {
           <div className={s.sectionShell}>
             <div className={s.accessGrid}>
               <SiteReveal className={s.accessIntro} delay={0.05}>
-                <div className={s.accessHeader}>
-                  <div className={s.accessCopy}>
-                    <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
-                    <h2 className={s.sectionTitle}>{t('pricing.title')}</h2>
-                    <p className={s.sectionBody}>{t('pricing.lead')}</p>
-                  </div>
-
-                  <div className={s.accessHighlights}>
-                    {Array.from({ length: 3 }, (_, index) => (
-                      <div key={index} className={s.accessHighlight}>
-                        <Check className={s.benefitCheck} aria-hidden="true" />
-                        <span>{t(`earlyAccess.benefits.${index}`)}</span>
-                      </div>
-                    ))}
-                  </div>
+              <SiteReveal className={s.accessIntro} delay={0.05}>
+                <div className={s.accessCopy}>
+                  <p className={s.eyebrow}>{t('pricing.eyebrow')}</p>
+                  <h2 className={s.sectionTitle}>{t('pricing.title')}</h2>
+                  <p className={s.sectionBody}>{t('pricing.lead')}</p>
                 </div>
+              </SiteReveal>
               </SiteReveal>
 
               <SiteReveal className={s.pricingBoard} delay={0.12}>
