@@ -441,10 +441,10 @@
       "messageOptional": "(optional)",
       "messagePlaceholder": "Describe the goal, blocker, or live system…",
       "submitting": "Sending...",
-      "submit": "Request access",
+      "submit": "Get started",
       "disclaimer": "No generic nurture funnel. A human will reply with the honest next route.",
-      "successTitle": "Access request received.",
-      "successBody": "We have the context. Expect a human reply that points you to the right lane.",
+      "successTitle": "Let's get started!",
+      "successBody": "We have your context. Check your email for next steps to begin your AI agent journey.",
       "successBack": "Back to the page",
       "errorFallback": "Something went wrong. Please try again.",
       "networkError": "Network error. Please try again."

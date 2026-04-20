@@ -107,7 +107,7 @@ export function PicoLandingPoster() {
         open={formOpen}
         onClose={() => setFormOpen(false)}
         defaultInterest={formInterest}
-        source="pico-waitlist"
+        source="pico-support"
       />
 
       <header className={s.nav}>
