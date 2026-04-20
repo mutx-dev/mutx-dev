@@ -82,17 +82,19 @@ export function PicoLandingPoster() {
       return
     }
 
+    // For trial and starter tiers, go to onboarding
     if (tier === 'trial' || tier === 'starter') {
-      openForm('build')
+      window.location.href = '/start'
       return
     }
 
+    // For pro and enterprise, show the pricing page
     if (tier === 'pro') {
-      openForm('fix')
+      window.location.href = '/pico/pricing'
       return
     }
 
-    openForm()
+    window.location.href = '/start'
   }
 
   return (
@@ -134,11 +136,11 @@ export function PicoLandingPoster() {
 
           <div className={s.navActions}>
             <PicoLangSwitcher />
-            <button type="button" className={s.navCta} onClick={() => openForm()}>
+            <a href="/start" className={s.navCta}>
               <span className={s.navCtaLabel}>{t('nav.cta')}</span>
               <span className={s.navCtaLabelMobile}>{t('nav.ctaMobile')}</span>
               <ArrowRight className={s.navCtaIcon} aria-hidden="true" />
-            </button>
+            </a>
           </div>
         </div>
       </header>
@@ -177,14 +179,13 @@ export function PicoLandingPoster() {
 
               <SiteReveal delay={0.25}>
                 <div className={s.heroActions}>
-                  <button
-                    type="button"
+                  <a
+                    href="/start"
                     className={s.heroPrimary}
-                    onClick={() => openForm('build')}
                   >
                     {t('hero.cta')}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </button>
+                  </a>
                   <a href="#path" className={s.heroSecondary}>
                     {t('hero.ctaSecondary')}
                   </a>
@@ -499,10 +500,10 @@ export function PicoLandingPoster() {
                   <p className={s.finalFormSubline}>{t('finalCta.formSubline')}</p>
                 </div>
                 <div className={s.finalActions}>
-                  <button type="button" className={s.finalButton} onClick={() => openForm()}>
+                  <a href="/start" className={s.finalButton}>
                     {t('finalCta.ctaButton')}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </button>
+                  </a>
                   <a
                     href={FOUNDER_CALL_URL}
                     target="_blank"

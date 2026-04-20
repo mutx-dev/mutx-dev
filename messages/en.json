@@ -7,19 +7,19 @@
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Request access",
-      "ctaMobile": "Access",
+      "cta": "Get started",
+      "ctaMobile": "Start",
       "sectionsLabel": "Page Sections",
       "skipToMain": "Skip to main content"
     },
     "hero": {
-      "badge": "Founding Access · Request-Only",
+      "badge": "Now Available · Start Free",
       "title": "Get an AI agent working ",
       "titleAccent": "and trust it in real work.",
       "subtitle": "Start from zero, recover a broken setup, or take control of a live agent. Pico routes you into build, fix, or control.",
-      "cta": "Request access",
+      "cta": "Get started",
       "ctaSecondary": "See How It Works",
-      "meta": "Request-first outside. Inside, Pico diagnoses the blocker and routes you into build, fix, or control."
+      "meta": "Start immediately. Pico diagnoses the blocker and routes you into build, fix, or control."
     },
     "trustBar": {
       "items": {
@@ -311,7 +311,7 @@
         "loading": "Starting checkout...",
         "checkoutError": "Checkout failed. Please try again.",
         "truths": [
-          "Checkout is for the live app, not the waitlist",
+          "Checkout is for the live app, start free anytime",
           "Hosted session unlocks progress sync and runtime state",
           "Enterprise starts with rollout planning, not a blind card swipe"
         ],
@@ -404,7 +404,7 @@
         },
         "3": {
           "q": "Is there a free way to start?",
-          "a": "Yes. The public ladder starts with a free trial focused on first value. Public access is still waitlist-first, but the trial and founding tiers are already defined."
+          "a": "Yes. Pico starts with a free trial focused on first value. You can get started immediately - no waitlist or access request needed."
         },
         "4": {
           "q": "Is this for enterprises?",
@@ -413,20 +413,20 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Founding Access",
-      "title": "Request access to the right lane.",
+      "eyebrow": "Start Building Today",
+      "title": "Get started with Pico.",
       "body": "Pico helps you get something useful working, recover it when it breaks, and keep it under control in real work.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
-      "formHeadline": "Start with the real blocker.",
-      "formSubline": "Tell us whether you need to build, fix, or control. We will route you to the right lane.",
-      "ctaButton": "Request access",
+      "formHeadline": "Start your AI agent journey.",
+      "formSubline": "Choose your lane: build, fix, or control. We'll guide you from there.",
+      "ctaButton": "Get started",
       "secondaryButton": "Book a Planning Call",
-      "formCtaMeta": "Free trial · Founding rates at 90% off · €29 / €79 · Pico Pilot from €1,000+"
+      "formCtaMeta": "Free trial · Start immediately · Pro features from €29/mo"
     },
     "contactForm": {
       "dialogLabel": "Contact form",
       "closeLabel": "Close",
-      "title": "Request Pico access",
+      "title": "Contact Pico Team",
       "subtitle": "Tell us what you are trying to ship, recover, or control. We will route you to the right next step.",
       "emailLabel": "Work email",
       "emailPlaceholder": "you@company.com",

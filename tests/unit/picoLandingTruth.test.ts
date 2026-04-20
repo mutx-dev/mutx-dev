@@ -7,11 +7,10 @@ describe('pico landing truth', () => {
   it('keeps root landing copy access-first without slipping back into prereg theater', () => {
     const truthMessages = en.pico
 
-    expect(truthMessages.nav.cta).toMatch(/request access/i)
-    expect(truthMessages.hero.meta).toMatch(/request-first/i)
-    expect(truthMessages.earlyAccess.title).toMatch(/waitlist-first/i)
-    expect(truthMessages.finalCta.ctaButton).toMatch(/request access/i)
-    expect(truthMessages.contactForm.title).toMatch(/request/i)
+    expect(truthMessages.nav.cta).toMatch(/get started|start/i)
+    expect(truthMessages.hero.meta).toMatch(/start immediately/i)
+    expect(truthMessages.finalCta.ctaButton).toMatch(/get started|start/i)
+    expect(truthMessages.contactForm.title).toMatch(/contact/i)
     expect(JSON.stringify(truthMessages)).not.toMatch(preregPattern)
   })
 
