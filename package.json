@@ -172,7 +172,7 @@
     "zod": "^4.3.6"
   },
   "overrides": {
-    "@xmldom/xmldom": "^0.8.12",
+    "@xmldom/xmldom": "^0.8.13",
     "app-builder-bin": "5.0.0-alpha.13"
   }
 }
