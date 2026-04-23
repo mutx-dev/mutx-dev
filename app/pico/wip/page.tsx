@@ -1,13 +1,19 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 
 import s from './page.module.css'
-import { buildPicoPageMetadata } from '@/lib/pico/metadata'
 
-const FOUNDER_CALL_URL = 'https://calendly.com/mutxdev'
-
-export async function generateMetadata() {
-  return buildPicoPageMetadata('pico.pages.wip.meta', '/wip')
+export const metadata: Metadata = {
+  title: 'PicoMUTX beta opens soon',
+  description: 'The PicoMUTX waitlist is closed while the beta is prepared.',
+  alternates: {
+    canonical: 'https://pico.mutx.dev',
+  },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
 }
 
 export default function PicoWipPage() {
@@ -16,32 +22,21 @@ export default function PicoWipPage() {
       <div className={s.shell}>
         <section className={s.hero}>
           <div>
-            <p className={s.kicker}>Public route guard</p>
-            <h1 className={s.title}>Oops. You should not be here.</h1>
+            <p className={s.kicker}>PicoMUTX beta</p>
+            <h1 className={s.title}>Waitlist is closed.</h1>
             <p className={s.subtitle}>
-              `pico.mutx.dev` is just the Pico waitlist landing right now. This route is not public.
-              Head back to the landing, join the waitlist, or book a founder call if you want help
-              choosing the right lane.
+              Waitlist is closed, beta opens soon. We are keeping pico.mutx.dev private while the
+              product gets ready for real users.
             </p>
-            <div className={s.links}>
-              <Link href="/" className={s.primaryLink}>
-                Back to Pico landing
-              </Link>
-              <a
-                href={FOUNDER_CALL_URL}
-                target="_blank"
-                rel="noreferrer"
-                className={s.secondaryLink}
-              >
-                Book founder call
-              </a>
-            </div>
+            <p className={s.notice}>
+              Signups, login, and OAuth routes are unavailable on this host for now.
+            </p>
           </div>
 
           <div className={s.visual}>
             <Image
               src="/pico/robot/guide.png"
-              alt="PicoMUTX robot blocking access to a private route"
+              alt="PicoMUTX robot holding the beta gate"
               width={320}
               height={320}
               className={s.robot}

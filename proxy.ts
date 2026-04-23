@@ -23,19 +23,13 @@ type RateLimitState = {
 
 const SAFE_HTTP_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
 const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
+const PICO_AUTH_CLOSED_DETAIL = 'Pico waitlist is closed; beta opens soon'
 const APP_HOST = 'app.mutx.dev'
 const PICO_HOST = 'pico.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set([PICO_HOST, 'pico.localhost'])
-const PICO_AUTH_PATHS = new Set([
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/reset-password',
-  '/verify-email',
-])
-const PICO_PROTECTED_PATHS = new Set(['/start', '/onboarding', '/tutor', '/support', '/autopilot'])
+const PICO_WIP_PATH = '/pico/wip'
 const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
   JP: 'ja',
@@ -287,25 +281,6 @@ function redirectWithinHost(request: NextRequest, pathname: string) {
   return NextResponse.redirect(url)
 }
 
-function redirectToPicoLogin(request: NextRequest, nextPath: string) {
-  const url = new URL(request.url)
-  url.pathname = '/login'
-  url.search = new URLSearchParams({ next: nextPath }).toString()
-  return NextResponse.redirect(url)
-}
-
-function nextWithinHost(requestHeaders?: Headers) {
-  if (!requestHeaders) {
-    return NextResponse.next()
-  }
-
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  })
-}
-
 function rewriteWithinHost(request: NextRequest, pathname: string, requestHeaders?: Headers) {
   const url = new URL(request.url)
   url.pathname = pathname
@@ -353,18 +328,6 @@ function buildPicoRequestHeaders(request: NextRequest, locale: PicoLocale) {
 
   requestHeaders.set('x-mutx-locale', locale)
   return requestHeaders
-}
-
-function hasAuthSession(request: NextRequest): boolean {
-  return Boolean(
-    request.cookies.get('access_token')?.value ||
-      request.cookies.get('refresh_token')?.value ||
-      request.headers.get('authorization')
-  )
-}
-
-function isProtectedPicoPath(pathname: string): boolean {
-  return PICO_PROTECTED_PATHS.has(pathname) || pathname === '/academy' || pathname.startsWith('/academy/')
 }
 
 function shouldDisableUiCaching(host: string, pathname: string): boolean {
@@ -489,6 +452,18 @@ export function proxy(request: NextRequest) {
   }
 
   if (PICO_HOSTS.has(host)) {
+    if (normalizedPath.startsWith('/api/auth/oauth/')) {
+      return finalizeResponse(redirectWithinHost(request, '/wip'), host, normalizedPath)
+    }
+
+    if (normalizedPath.startsWith('/api/auth/')) {
+      return finalizeResponse(
+        NextResponse.json({ detail: PICO_AUTH_CLOSED_DETAIL }, { status: 403 }),
+        host,
+        normalizedPath,
+      )
+    }
+
     // API routes must hit the real /api/* handlers, not /pico/api/*
     if (normalizedPath.startsWith('/api')) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
@@ -496,89 +471,8 @@ export function proxy(request: NextRequest) {
     const locale = getLocaleFromRequest(request)
     const picoRequestHeaders = buildPicoRequestHeaders(request, locale)
 
-    if (normalizedPath === '/') {
-      return finalizeResponse(
-        applyPicoLocale(rewriteWithinHost(request, '/pico', picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (PICO_AUTH_PATHS.has(normalizedPath)) {
-      return finalizeResponse(
-        applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (isProtectedPicoPath(normalizedPath) && !hasAuthSession(request)) {
-      const nextPath = `${normalizedPath}${request.nextUrl.search}`
-      return finalizeResponse(
-        applyPicoLocale(redirectToPicoLogin(request, nextPath), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (normalizedPath === '/start' || normalizedPath === '/onboarding') {
-      return finalizeResponse(
-        applyPicoLocale(rewriteWithinHost(request, '/pico/onboarding', picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (normalizedPath === '/academy' || normalizedPath.startsWith('/academy/')) {
-      return finalizeResponse(
-        applyPicoLocale(rewriteWithinHost(request, `/pico${normalizedPath}`, picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (normalizedPath === '/tutor') {
-      return finalizeResponse(
-        applyPicoLocale(rewriteWithinHost(request, '/pico/tutor', picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (normalizedPath === '/support') {
-      return finalizeResponse(
-        applyPicoLocale(rewriteWithinHost(request, '/pico/support', picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (normalizedPath === '/autopilot') {
-      return finalizeResponse(
-        applyPicoLocale(rewriteWithinHost(request, '/pico/autopilot', picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (normalizedPath === '/pricing') {
-      return finalizeResponse(
-        applyPicoLocale(rewriteWithinHost(request, '/pico/pricing', picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
-    if (normalizedPath === '/opengraph-image' || normalizedPath === '/twitter-image') {
-      return finalizeResponse(
-        applyPicoLocale(nextWithinHost(picoRequestHeaders), locale),
-        host,
-        normalizedPath,
-      )
-    }
-
     return finalizeResponse(
-      applyPicoLocale(rewriteWithinHost(request, '/pico/wip', picoRequestHeaders), locale),
+      applyPicoLocale(rewriteWithinHost(request, PICO_WIP_PATH, picoRequestHeaders), locale),
       host,
       normalizedPath,
     )
