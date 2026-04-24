@@ -23,12 +23,18 @@ type RateLimitState = {
 
 const SAFE_HTTP_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
 const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
-const PICO_AUTH_CLOSED_DETAIL = 'Pico waitlist is closed; beta opens soon'
 const APP_HOST = 'app.mutx.dev'
 const PICO_HOST = 'pico.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set([PICO_HOST, 'pico.localhost'])
+const PICO_AUTH_UI_PATHS = new Set([
+  '/forgot-password',
+  '/login',
+  '/register',
+  '/reset-password',
+  '/verify-email',
+])
 const PICO_WIP_PATH = '/pico/wip'
 const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
@@ -175,6 +181,10 @@ function normalizePathname(pathname: string): string {
   }
 
   return pathname
+}
+
+function isOAuthCallbackPath(pathname: string): boolean {
+  return /^\/api\/auth\/oauth\/[^/]+\/callback$/.test(pathname)
 }
 
 function mapLegacyAppPathToDashboard(pathname: string): string {
@@ -440,6 +450,7 @@ export function proxy(request: NextRequest) {
 
   if (
     normalizedPath.startsWith('/api') &&
+    !isOAuthCallbackPath(normalizedPath) &&
     !SAFE_HTTP_METHODS.has(request.method.toUpperCase()) &&
     request.headers.get('origin') &&
     !isAllowedApiOrigin(request, host)
@@ -451,25 +462,41 @@ export function proxy(request: NextRequest) {
     )
   }
 
-  if (PICO_HOSTS.has(host)) {
-    if (normalizedPath.startsWith('/api/auth/oauth/')) {
-      return finalizeResponse(redirectWithinHost(request, '/wip'), host, normalizedPath)
-    }
+  if (PICO_HOSTS.has(host) && !normalizedPath.startsWith('/api')) {
+    const locale = getLocaleFromRequest(request)
+    const picoRequestHeaders = buildPicoRequestHeaders(request, locale)
 
-    if (normalizedPath.startsWith('/api/auth/')) {
+    if (PICO_AUTH_UI_PATHS.has(normalizedPath)) {
       return finalizeResponse(
-        NextResponse.json({ detail: PICO_AUTH_CLOSED_DETAIL }, { status: 403 }),
+        applyPicoLocale(NextResponse.next(), locale),
         host,
         normalizedPath,
       )
     }
 
-    // API routes must hit the real /api/* handlers, not /pico/api/*
-    if (normalizedPath.startsWith('/api')) {
-      return finalizeResponse(NextResponse.next(), host, normalizedPath)
+    if (normalizedPath === '/pico') {
+      return finalizeResponse(
+        applyPicoLocale(redirectWithinHost(request, '/'), locale),
+        host,
+        normalizedPath,
+      )
     }
-    const locale = getLocaleFromRequest(request)
-    const picoRequestHeaders = buildPicoRequestHeaders(request, locale)
+
+    if (normalizedPath === '/') {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, '/pico', picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
+
+    if (normalizedPath === '/wip' || normalizedPath === PICO_WIP_PATH) {
+      return finalizeResponse(
+        applyPicoLocale(rewriteWithinHost(request, PICO_WIP_PATH, picoRequestHeaders), locale),
+        host,
+        normalizedPath,
+      )
+    }
 
     return finalizeResponse(
       applyPicoLocale(rewriteWithinHost(request, PICO_WIP_PATH, picoRequestHeaders), locale),

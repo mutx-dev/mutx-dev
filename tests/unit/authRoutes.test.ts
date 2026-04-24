@@ -901,7 +901,40 @@ describe("auth route handlers", () => {
       expect(setCookieHeader).toContain("mutx_oauth_state=");
       expect(setCookieHeader).toContain("mutx_oauth_next=");
       expect(setCookieHeader).toContain("mutx_oauth_intent=");
+      expect(setCookieHeader).toContain("SameSite=none");
     });
+
+    it.each(["google", "github", "discord", "apple"])(
+      "starts %s OAuth with the pico callback origin",
+      async (provider) => {
+        (global.fetch as jest.Mock).mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: async () => ({
+            authorization_url: `https://provider.example/${provider}`,
+          }),
+        });
+        const { GET } =
+          await import("../../app/api/auth/oauth/[provider]/start/route");
+
+        const response = await GET(
+          mockRequest(
+            {},
+            `https://pico.mutx.dev/api/auth/oauth/${provider}/start?next=%2Fonboarding&intent=login`,
+          ),
+          { params: Promise.resolve({ provider }) },
+        );
+
+        const authorizeUrl = (global.fetch as jest.Mock).mock.calls[0][0] as URL;
+        expect(authorizeUrl.searchParams.get("redirect_uri")).toBe(
+          `https://pico.mutx.dev/api/auth/oauth/${provider}/callback`,
+        );
+        expect(response.status).toBe(307);
+        expect(response.headers.get("location")).toBe(
+          `https://provider.example/${provider}`,
+        );
+      },
+    );
   });
 
   describe("GET /api/auth/oauth/[provider]/callback", () => {
@@ -999,6 +1032,53 @@ describe("auth route handlers", () => {
         { params: Promise.resolve({ provider: "google" }) },
       );
 
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe("https://pico.mutx.dev/");
+    });
+
+    it("exchanges Apple form_post callbacks with the pico redirect URI", async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          access_token: "oauth_access_token",
+          refresh_token: "oauth_refresh_token",
+          expires_in: 1800,
+        }),
+      });
+      const { POST } =
+        await import("../../app/api/auth/oauth/[provider]/callback/route");
+      const formData = new Map<string, string>([
+        ["code", "apple-code"],
+        ["state", "state-123"],
+      ]);
+
+      const response = await POST(
+        {
+          ...mockRequest(
+            {
+              mutx_oauth_state: "state-123",
+              mutx_oauth_intent: "login",
+            },
+            "https://pico.mutx.dev/api/auth/oauth/apple/callback",
+          ),
+          formData: async () => formData,
+        } as unknown as NextRequest,
+        { params: Promise.resolve({ provider: "apple" }) },
+      );
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:8000/v1/auth/oauth/apple/exchange",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code: "apple-code",
+            redirect_uri: "https://pico.mutx.dev/api/auth/oauth/apple/callback",
+          }),
+          cache: "no-store",
+        },
+      );
       expect(response.status).toBe(307);
       expect(response.headers.get("location")).toBe("https://pico.mutx.dev/");
     });

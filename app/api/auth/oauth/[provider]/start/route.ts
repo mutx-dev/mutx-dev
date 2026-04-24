@@ -32,7 +32,9 @@ function setOAuthCookie(
 ) {
   response.cookies.set(name, value, {
     httpOnly: true,
-    sameSite: "lax",
+    // Apple Sign In returns with response_mode=form_post, so the
+    // transient OAuth state cookies must be sent on a cross-site POST.
+    sameSite: "none",
     secure: shouldUseSecureCookies(request),
     domain: getCookieDomain(request),
     path: "/",

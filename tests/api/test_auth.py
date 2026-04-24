@@ -658,6 +658,57 @@ class TestAuthEndpoints:
         identity = identity_result.scalar_one()
         assert identity.user_id == user.id
 
+    @pytest.mark.asyncio
+    async def test_apple_oauth_exchange_generates_client_secret(self, monkeypatch):
+        from src.api.services import social_auth
+
+        captured: dict[str, str] = {}
+
+        async def fake_exchange_apple_code(
+            client,
+            *,
+            code: str,
+            redirect_uri: str,
+            client_id: str,
+            client_secret: str,
+        ) -> OAuthUserProfile:
+            captured["code"] = code
+            captured["redirect_uri"] = redirect_uri
+            captured["client_id"] = client_id
+            captured["client_secret"] = client_secret
+            return OAuthUserProfile(
+                provider=OAuthProvider.APPLE,
+                provider_user_id="apple-user-123",
+                email="apple@example.com",
+                email_verified=True,
+                display_name="Apple User",
+                username=None,
+                avatar_url=None,
+                profile={"sub": "apple-user-123"},
+            )
+
+        monkeypatch.setattr(social_auth.settings, "apple_client_id", "dev.mutx.web")
+        monkeypatch.setattr(
+            social_auth,
+            "_generate_apple_client_secret",
+            lambda: "generated-apple-secret",
+        )
+        monkeypatch.setattr(social_auth, "_exchange_apple_code", fake_exchange_apple_code)
+
+        profile = await social_auth.exchange_code_for_user_profile(
+            OAuthProvider.APPLE,
+            code="provider-code",
+            redirect_uri="https://pico.mutx.dev/api/auth/oauth/apple/callback",
+        )
+
+        assert profile.email == "apple@example.com"
+        assert captured == {
+            "code": "provider-code",
+            "redirect_uri": "https://pico.mutx.dev/api/auth/oauth/apple/callback",
+            "client_id": "dev.mutx.web",
+            "client_secret": "generated-apple-secret",
+        }
+
 
 class TestPasswordCompatibility:
     """Compatibility tests for legacy password hashes."""
