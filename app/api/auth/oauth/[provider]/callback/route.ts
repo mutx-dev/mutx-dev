@@ -29,7 +29,7 @@ function clearOAuthCookies(response: NextResponse, request: NextRequest) {
   for (const suffix of ["state", "next", "intent"]) {
     response.cookies.set(`${OAUTH_COOKIE_PREFIX}_${suffix}`, "", {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       secure,
       domain,
       path: "/",

@@ -112,15 +112,19 @@ async def exchange_code_for_user_profile(
     client_id = get_provider_client_id(provider)
     client_secret = get_provider_client_secret(provider)
 
-    if not client_id or not client_secret:
+    if not client_id:
         raise SocialAuthError(
             f"{provider.value.title()} OAuth is not configured on the backend.",
             status_code=500,
         )
 
-    # For Apple, client_secret must be a dynamically-generated JWT
     if provider == OAuthProvider.APPLE:
         client_secret = _generate_apple_client_secret()
+    elif not client_secret:
+        raise SocialAuthError(
+            f"{provider.value.title()} OAuth is not configured on the backend.",
+            status_code=500,
+        )
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
