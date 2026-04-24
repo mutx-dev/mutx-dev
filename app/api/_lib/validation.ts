@@ -91,12 +91,14 @@ export const schemas = {
   login: z.object({
     email: z.string().email("Invalid email format"),
     password: z.string().min(1, "Password is required"),
+    preferred_locale: localeSchema,
   }),
 
   register: z.object({
     email: z.string().email("Invalid email format"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     name: z.string().min(1, "Name is required").max(100, "Name too long"),
+    preferred_locale: localeSchema,
   }),
 
   localBootstrap: z.object({
@@ -121,6 +123,10 @@ export const schemas = {
 
   resendVerification: z.object({
     email: z.string().email("Invalid email format"),
+  }),
+
+  preferredLocale: z.object({
+    preferred_locale: localeSchema.unwrap(),
   }),
 
   resetPassword: z.object({

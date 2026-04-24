@@ -12,6 +12,19 @@ const applyAuthCookies = jest.fn((response, _request, payload) => {
       maxAge: 60 * 60 * 24 * 7,
     });
   }
+
+  if (payload.preferred_locale) {
+    response.cookies.set("mutx_user_locale", payload.preferred_locale, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+});
+const applyPicoLocalePreference = jest.fn((response, _request, locale) => {
+  response.cookies.set("mutx_user_locale", locale, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+  });
 });
 const authenticatedFetch = jest.fn();
 const clearAuthCookies = jest.fn((response) => {
@@ -26,6 +39,7 @@ const shouldUseSecureCookies = jest.fn();
 
 jest.mock("../../app/api/_lib/controlPlane", () => ({
   applyAuthCookies,
+  applyPicoLocalePreference,
   authenticatedFetch,
   clearAuthCookies,
   getApiBaseUrl: () => "http://localhost:8000",
@@ -53,12 +67,14 @@ function mockRequest(
 function mockJsonRequest(
   body: unknown,
   url = "https://app.mutx.dev/api/auth/login",
+  cookies: Record<string, string> = {},
 ) {
   return {
     url,
     nextUrl: new URL(url),
     cookies: {
-      get: () => undefined,
+      get: (name: string) =>
+        cookies[name] ? { value: cookies[name] } : undefined,
     },
     json: async () => body,
   } as NextRequest;
@@ -69,6 +85,7 @@ describe("auth route handlers", () => {
 
   beforeEach(() => {
     applyAuthCookies.mockClear();
+    applyPicoLocalePreference.mockClear();
     authenticatedFetch.mockReset();
     clearAuthCookies.mockClear();
     getAuthToken.mockReset();
@@ -201,6 +218,42 @@ describe("auth route handlers", () => {
       expect(setCookieHeader).toContain("refresh_token=");
     });
 
+    it("forwards the guest locale cookie when logging in", async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          access_token: "test_access_token",
+          refresh_token: "test_refresh_token",
+          expires_in: 1800,
+          preferred_locale: "fr",
+        }),
+      });
+      const { POST } = await import("../../app/api/auth/login/route");
+
+      await POST(
+        mockJsonRequest(
+          {
+            email: "operator@mutx.dev",
+            password: "correctpassword",
+          },
+          "https://app.mutx.dev/api/auth/login",
+          { NEXT_LOCALE: "fr" },
+        ),
+      );
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:8000/v1/auth/login",
+        expect.objectContaining({
+          body: JSON.stringify({
+            email: "operator@mutx.dev",
+            password: "correctpassword",
+            preferred_locale: "fr",
+          }),
+        }),
+      );
+    });
+
     it("uses default maxAge when expires_in is absent from login response", async () => {
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
@@ -236,6 +289,45 @@ describe("auth route handlers", () => {
       expect(body.status).toBe("error");
       expect(body.error.code).toBe("VALIDATION_ERROR");
       expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it("forwards the guest locale cookie when registering", async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 201,
+        json: async () => ({
+          access_token: "test_access_token",
+          refresh_token: "test_refresh_token",
+          expires_in: 1800,
+          preferred_locale: "ja",
+        }),
+      });
+      const { POST } = await import("../../app/api/auth/register/route");
+
+      await POST(
+        mockJsonRequest(
+          {
+            email: "operator@mutx.dev",
+            password: "verystrongpassword",
+            name: "Operator",
+          },
+          "https://app.mutx.dev/api/auth/register",
+          { NEXT_LOCALE: "ja" },
+        ),
+      );
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:8000/v1/auth/register",
+        expect.objectContaining({
+          body: JSON.stringify({
+            email: "operator@mutx.dev",
+            password: "verystrongpassword",
+            name: "Operator",
+            verification_origin: "https://app.mutx.dev",
+            preferred_locale: "ja",
+          }),
+        }),
+      );
     });
 
     it("returns 400 when password is too short", async () => {

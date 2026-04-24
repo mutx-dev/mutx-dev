@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 
-from src.api.models.models import ExternalAuthIdentity, User
+from src.api.models.models import ExternalAuthIdentity, User, UserSetting
 from src.api.database import get_db
 from src.api.main import create_app
 from src.api.services.social_auth import OAuthProvider, OAuthUserProfile
@@ -71,6 +71,30 @@ class TestAuthEndpoints:
         assert captured["frontend_url"] == "https://pico.mutx.dev"
 
     @pytest.mark.asyncio
+    async def test_register_persists_preferred_locale(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
+        response = await client_no_auth.post(
+            "/v1/auth/register",
+            json={
+                "email": "locale-register@example.com",
+                "password": "StrongPassword123!",
+                "name": "Locale Register",
+                "preferred_locale": "fr-CA",
+            },
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["preferred_locale"] == "fr"
+
+        result = await db_session.execute(
+            select(UserSetting).where(UserSetting.key == "preferred_locale")
+        )
+        setting = result.scalar_one()
+        assert setting.value == {"locale": "fr"}
+
+    @pytest.mark.asyncio
     async def test_login_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
         """Test user login."""
         from src.api.auth.password import hash_password
@@ -97,6 +121,75 @@ class TestAuthEndpoints:
         data = response.json()
         assert "access_token" in data
         assert data["token_type"] == "bearer"
+
+    @pytest.mark.asyncio
+    async def test_login_initializes_preferred_locale_when_missing(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
+        from src.api.auth.password import hash_password
+
+        user = User(
+            id=uuid.uuid4(),
+            email="locale-login@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Locale Login",
+            is_active=True,
+        )
+        db_session.add(user)
+        await db_session.commit()
+
+        response = await client_no_auth.post(
+            "/v1/auth/login",
+            json={
+                "email": "locale-login@example.com",
+                "password": "StrongPassword123!",
+                "preferred_locale": "ja-JP",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["preferred_locale"] == "ja"
+
+        result = await db_session.execute(
+            select(UserSetting).where(
+                UserSetting.user_id == user.id,
+                UserSetting.key == "preferred_locale",
+            )
+        )
+        setting = result.scalar_one()
+        assert setting.value == {"locale": "ja"}
+
+    @pytest.mark.asyncio
+    async def test_login_preserves_saved_preferred_locale(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
+        from src.api.auth.password import hash_password
+
+        user = User(
+            id=uuid.uuid4(),
+            email="saved-locale@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Saved Locale",
+            is_active=True,
+        )
+        db_session.add(user)
+        await db_session.flush()
+        db_session.add(UserSetting(user_id=user.id, key="preferred_locale", value={"locale": "de"}))
+        await db_session.commit()
+
+        response = await client_no_auth.post(
+            "/v1/auth/login",
+            json={
+                "email": "saved-locale@example.com",
+                "password": "StrongPassword123!",
+                "preferred_locale": "ja",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["preferred_locale"] == "de"
 
     @pytest.mark.asyncio
     async def test_local_bootstrap_creates_verified_operator(
@@ -194,6 +287,19 @@ class TestAuthEndpoints:
         data = response.json()
         assert data["email"] == test_user.email
         assert data["id"] == str(test_user.id)
+
+    @pytest.mark.asyncio
+    async def test_me_endpoint_returns_preferred_locale(
+        self, client: AsyncClient, test_user, db_session: AsyncSession
+    ):
+        db_session.add(UserSetting(user_id=test_user.id, key="preferred_locale", value={"locale": "pt"}))
+        await db_session.commit()
+
+        response = await client.get("/v1/auth/me")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["preferred_locale"] == "pt"
 
     @pytest.mark.asyncio
     async def test_register_duplicate_email(

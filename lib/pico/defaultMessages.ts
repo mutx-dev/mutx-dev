@@ -82,6 +82,667 @@ function indexValues<T>(values: readonly T[]) {
   return Object.fromEntries(values.map((value, index) => [String(index), value]))
 }
 
+function buildPicoSupportPageMessages() {
+  const support = PICO_GENERATED_CONTENT.support
+
+  return {
+    contact: {
+      interest: {
+        lessonBlocker: 'Lesson or command blocker',
+        runtimeMismatch: 'Live runtime or Autopilot mismatch',
+        sessionMismatch: 'Hosted session or account mismatch',
+        billingPlan: 'Billing, approvals, or plan question',
+        officeHours: 'Office hours or deeper walkthrough',
+      },
+      title: 'Tell us where the product path broke',
+      subtitle: 'Share the route, blocker, and proof. We will answer like humans, not a waitlist.',
+      interestLabel: 'What broke?',
+      messageLabel: 'What happened?',
+      messageOptional: '(include the packet)',
+      messagePlaceholder: 'Paste the exact blocker, route, command, or runtime mismatch.',
+      submit: 'Send support request',
+      submitting: 'Sending support request...',
+      disclaimer: 'No waitlist. No launch theater. Just a human reply.',
+      successTitle: 'Support request sent.',
+      successBody:
+        'We got the packet. Expect a human reply that points you back into the product.',
+      successBack: 'Back to support',
+    },
+    shell: {
+      eyebrow: 'Human help',
+      title: 'Get a human when the product path stops being enough',
+      description:
+        'Triage the messy edge fast, attach the real signal, and get back to the next honest move without turning support into a maze.',
+    },
+    hero: {
+      badge: 'Escalation pulse',
+      mode: {
+        open: 'desk open',
+        triage: 'triage mode',
+      },
+      title: 'Send the blocker with enough proof to fix it fast.',
+      body:
+        'Name the route, attach the signal, and point to the return lane. That gives support enough context to answer without slowing the next move down.',
+      packetState: {
+        label: 'Packet state',
+        readyToPaste: 'ready to paste',
+        routeAndEvidenceFirst: 'route and evidence first',
+      },
+      runtimeTruth: {
+        label: 'Runtime truth',
+        gatewayAttached: 'gateway attached',
+        attachSignal: 'attach the signal if it matters',
+      },
+      returnLane: {
+        label: 'Return lane',
+      },
+      handoff: {
+        label: 'Shortest clean handoff',
+        returnAcademy: 'Route back into academy',
+        sequenceFallback:
+          'If the blocker is still, fundamentally, a sequence problem, return there first.',
+      },
+      packetPreview: {
+        label: 'Packet preview',
+      },
+    },
+    actions: {
+      getHumanHelp: 'Get human help',
+      copyPacket: 'Copy packet',
+      copiedPacket: 'Copied packet',
+      requestOfficeHours: 'Request office hours',
+    },
+    compass: {
+      title: 'Support only exists to return the operator to the product',
+      body:
+        'Escalate cleanly, attach the packet, then go back to the surface that can move the work again. Academy is for sequence problems, tutor is for one knowable next step, and Autopilot is for live runtime truth.',
+      status: {
+        open: 'escalation open',
+        standby: 'human help standby',
+      },
+      aside:
+        'Human help should resolve the messy edge, not replace the product. The best support interaction ends with a clearer route back into Pico.',
+      academy: {
+        return: 'Return to academy',
+        caption:
+          'Go back here when the blocker was still fundamentally a lesson sequence problem.',
+        note: 'Sequence',
+      },
+      tutor: {
+        label: 'Ask tutor first',
+        caption:
+          'Use this when the product probably still knows the answer but you need the exact next move.',
+        note: 'Knowable',
+      },
+      autopilot: {
+        label: 'Re-enter Autopilot',
+        caption:
+          'Open the control room when the blocker depends on live runs, budget, alerts, or approvals.',
+        note: 'Runtime',
+      },
+    },
+    standards: {
+      label: 'Escalation standards',
+      title: 'Hand off the problem like a sharp operator',
+      chip: 'route • evidence • return',
+      cards: support.escalationStandards,
+      packetPosture: {
+        label: 'Packet posture',
+        body:
+          'Strong support starts with a clean packet. The best escalation reads like an operator handoff, not a panic dump.',
+      },
+      deskTone: {
+        label: 'Desk tone',
+        body:
+          'Support should lower the temperature without slowing the route back into action.',
+      },
+      bestFirstMove: {
+        label: 'Best first move',
+        body:
+          'Copy the packet, choose the right lane, and ask for the shortest route back into Academy, Tutor, or Autopilot.',
+      },
+    },
+    desk: {
+      label: 'Support desk',
+      title: 'Send context, not noise',
+      body:
+        'Human help is for the part the product cannot truthfully close on its own. The faster you frame the blocker, the faster support can send you back to the product path.',
+      callout: {
+        title: 'If the next move is still obvious, go back and do it.',
+        body:
+          'Support exists for the messy edge, not for skipping the lesson, the tutor, or the live control surface.',
+      },
+      lanes: support.lanes.map((lane) => ({
+        ...lane,
+        cta: lane.id === 'fixing-existing' ? 'Start escalation' : 'Book office hours',
+      })),
+    },
+    rail: {
+      label: 'Operator rail',
+      supportRequests: 'Support requests',
+      tutorQuestions: 'Tutor questions',
+      plan: {
+        label: 'Plan',
+        unknown: 'unknown',
+        signIn: 'sign in',
+      },
+      activeSurface: {
+        label: 'Active surface',
+        none: 'none',
+      },
+      tryTheseFirst: 'Try these first',
+      tryTutorFirst: 'Try tutor first',
+      returnAcademy: 'Return to academy',
+      openAutopilot: 'Open Autopilot',
+      directLine: 'Direct line',
+    },
+    packet: {
+      label: 'Diagnostic packet',
+      title: 'Operator packet',
+      chip: 'live context',
+      preview: {
+        route: 'Route',
+        runtime: 'Runtime',
+        return: 'Return',
+        packet: 'Packet',
+      },
+      diagnostic: {
+        title: 'Pico diagnostic packet',
+        route: 'Route:',
+        hostedSession: 'Hosted session:',
+        hostedPlan: 'Hosted plan:',
+        selectedTrack: 'Selected track:',
+        completedLessons: 'Completed lessons:',
+        nextLesson: 'Next lesson:',
+        recoveryWorkspace: 'Recovery lesson workspace:',
+        recoveryFocusedStep: 'Recovery lesson focused step:',
+        recoveryProof: 'Recovery lesson proof:',
+        activeSurface: 'Active surface:',
+        lastOpenedLesson: 'Last opened lesson:',
+        railCollapsed: 'Rail collapsed:',
+        helpLaneOpen: 'Help lane open:',
+        supportRequestsSent: 'Support requests sent:',
+        tutorQuestionsAsked: 'Tutor questions asked:',
+        approvalGateEnabled: 'Approval gate enabled:',
+        hostedOnboardingStatus: 'Hosted onboarding status:',
+        hostedOnboardingStep: 'Hosted onboarding step:',
+        hostedWorkspace: 'Hosted workspace:',
+        runtimeStatus: 'Runtime status:',
+        gatewayUrl: 'Gateway URL:',
+        runtimeBindings: 'Runtime bindings:',
+        values: {
+          unknown: 'unknown',
+          na: 'n/a',
+          none: 'none',
+          notAvailable: 'not available',
+          captured: 'captured',
+          missing: 'missing',
+          yes: 'yes',
+          no: 'no',
+        },
+      },
+      problemLabel: 'Problem:',
+      openFormWithPacket: 'Open form with packet',
+    },
+    state: {
+      label: 'Live operator state',
+      hostedOnboarding: 'Hosted onboarding',
+      runtimeStatus: 'Runtime status',
+      currentTrack: 'Current track',
+      currentTrackNotChosenYet: 'not chosen yet',
+      nextLesson: 'Next lesson',
+      nextLessonNone: 'none',
+      lessonWorkspace: 'Lesson workspace',
+      focusedStep: 'Focused step',
+    },
+    returnMap: {
+      label: 'Return map',
+      title: 'Human help should end in one cleaner route back into Pico',
+      chip: 'operator return map',
+      model: {
+        label: 'Support return model',
+        cards: [
+          {
+            title: '1. Route the blocker fast',
+            body: 'Do not send a life story. Lead with the exact surface that broke.',
+          },
+          {
+            title: '2. Attach the evidence',
+            body: 'Send the command, runtime fact, or approval state that proves what failed.',
+          },
+          {
+            title: '3. Return to the product',
+            body: 'The response should restore momentum, not create a support maze.',
+          },
+        ],
+      },
+      anatomy: {
+        label: 'Packet anatomy',
+        body: 'A premium escalation packet always reads in the same order: route, evidence, return lane.',
+        cards: [
+          {
+            title: 'Route first',
+            body: 'Name the exact surface that broke.',
+          },
+          {
+            title: 'Evidence second',
+            body: 'Attach the signal that proves the failure.',
+          },
+          {
+            title: 'Return third',
+            body: 'Ask for the cleanest way back into motion.',
+          },
+        ],
+      },
+      paths: {
+        lesson: {
+          label: 'Lesson path',
+          title: 'Resume the academy lane',
+          body:
+            'Use this when the blocker was still fundamentally a lesson or setup sequence problem.',
+        },
+        tutor: {
+          label: 'Grounded answer',
+          title: 'Ask tutor if the next move is still knowable',
+          body:
+            'Go back here when the product likely still knows the answer but you need the exact next step.',
+          cta: 'Open tutor',
+        },
+        autopilot: {
+          label: 'Runtime truth',
+          title: 'Re-enter the control room',
+          body:
+            'Use Autopilot when the blocker depends on live runs, budget, approvals, or alert state.',
+          cta: 'Open Autopilot',
+        },
+      },
+    },
+    shared: {
+      stepNotSet: 'not set',
+      runtime: {
+        localOnly: 'local only',
+        checking: 'checking',
+        notAttached: 'not attached',
+      },
+      packetState: {
+        copied: 'copied',
+        proofAttached: 'proof attached',
+        contextReady: 'context ready',
+        needsProof: 'needs proof',
+      },
+      returnAcademy: 'academy',
+      resumeLesson: 'Resume {lessonTitle}',
+      openLesson: 'Open {lessonTitle}',
+      stepsClear: '{completed}/{total} steps clear',
+    },
+  }
+}
+
+function buildPicoTutorPageMessages() {
+  const tutor = PICO_GENERATED_CONTENT.tutor
+
+  return {
+    shell: {
+      eyebrow: 'Grounded tutor',
+      title: 'Ask for the exact next step',
+      description:
+        'Bring one concrete blocker, get one grounded move back, and return to the lesson or runtime route that can move the work.',
+    },
+    hero: {
+      badge: 'Crit pulse',
+      title: 'Attach the blocked lesson and narrow the answer to one move.',
+      body:
+        'Route the question through the actual lesson, command, or runtime edge that failed. That keeps the reply grounded enough to send you back into action.',
+      lessonLane: {
+        label: 'Lesson lane',
+        connectBlockedLesson: 'Connect the blocked lesson',
+      },
+      replyState: {
+        label: 'Reply state',
+        readyToActOn: 'ready to act on',
+        waitingForPreciseBlocker: 'waiting for a precise blocker',
+      },
+      connection: {
+        label: 'Connection',
+        hostedContextAvailable: 'hosted context available',
+        hostedContextMissing: 'hosted context missing',
+      },
+      focusedStep: {
+        label: 'Focused step',
+        body: 'If the answer does not make this step clearer, leave tutor and use the cleaner route.',
+      },
+      packetPreview: {
+        label: 'Crit packet preview',
+        lane: 'Lane {value}',
+        state: 'State {value}',
+        focus: 'Focus {value}',
+        output: 'Output {value}',
+        noneAttached: 'none attached',
+        groundedMove: 'one grounded move',
+      },
+      recentPressure: {
+        label: 'Recent pressure',
+        empty:
+          'No recent question saved yet. Bring the first blocked step instead of a broad description of the whole project.',
+      },
+      signal: {
+        answerReady: 'answer ready',
+        reviewingBlocker: 'reviewing blocker',
+        lessonAttached: 'lesson attached',
+        awaitingBlocker: 'awaiting blocker',
+        localOnly: 'local only',
+        checking: 'checking',
+        openaiConnected: 'openai connected',
+        platformAccess: 'platform access',
+        groundedMode: 'grounded mode',
+        attachLesson: 'attach lesson',
+        notSet: 'not set',
+        lessonSteps: '{completed}/{total} steps',
+      },
+    },
+    actions: {
+      backToLesson: 'Back to lesson',
+      openAcademy: 'Open academy',
+      escalateToHumanHelp: 'Escalate to human help',
+    },
+    compass: {
+      title: 'The tutor should end in motion, not another loop',
+      body:
+        'Use tutor only to recover one grounded next move. Return to the lesson when the answer is sufficient, inspect Autopilot when the runtime is the real blocker, and escalate only when neither route can tell the truth.',
+      status: {
+        answerReady: 'answer ready',
+        lessonContextAttached: 'lesson context attached',
+        awaitingBlocker: 'awaiting blocker',
+      },
+      aside:
+        'A good tutor answer ends in one move. If it does not, leave the loop and return to the lesson, the runtime, or support.',
+      items: {
+        returnToBlockedLesson: 'Return to blocked lesson',
+        returnToAcademy: 'Return to academy',
+        returnCaption:
+          'Go back here when the tutor answer still keeps the lesson path truthful.',
+        resumeLane: 'Resume lane',
+        inspectLiveControlRoom: 'Inspect live control room',
+        inspectCaption:
+          'Open this when the problem has shifted from knowable lesson logic to runtime state.',
+        runtime: 'Runtime',
+        openSupportLane: 'Open support lane',
+        escalateCaption:
+          'Escalate only when the tutor answer still does not give one concrete move.',
+        escalate: 'Escalate',
+      },
+    },
+    method: {
+      label: 'Crit desk method',
+      title: 'Treat each question like a studio critique',
+      chip: 'frame • evidence • exit',
+      cards: {
+        frame: {
+          label: '01 • Frame',
+          title: 'Bring one blocked step',
+          bodyWithLesson:
+            'Tie the question to {lessonTitle}. The desk works best when the lesson route is already attached.',
+          bodyWithoutLesson:
+            'Name the exact step, command, or approval state that broke. Broad anxiety is not enough.',
+        },
+        evidence: {
+          label: '02 • Evidence',
+          title: 'Bring what actually happened',
+          body: 'Paste the command, transcript, error, or runtime signal. This desk reviews evidence, not vibes.',
+        },
+        exit: {
+          label: '03 • Exit',
+          title: 'Leave with one move',
+          body:
+            'A good tutor answer gives one next action, one verification line, and a clean handoff if the evidence stays thin.',
+        },
+      },
+      deskPosture: {
+        label: 'Desk posture',
+        body:
+          'This is not a general chat surface. Use it as a review desk that narrows ambiguity into one next move.',
+      },
+      attachedLane: {
+        label: 'Attached lane',
+        bodyWithLesson:
+          '{lessonTitle} is attached, so the tutor can answer against the real lesson brief instead of guessing.',
+        bodyWithoutLesson:
+          'No lesson is attached yet. Connect the blocked lesson if you want the tutor to stay grounded in the actual route.',
+      },
+      lessonReviewBoard: {
+        lessonBrief: 'Lesson brief',
+        deliverable: 'Deliverable',
+        critiqueLine: 'Critique line',
+      },
+    },
+    form: {
+      label: 'Crit desk',
+      mascotAlt: 'PicoMUTX tutor mascot',
+      title: 'Bring one blocker to the desk',
+      body:
+        'Ask only when the lesson path is blocked. The answer should send you back into action, not into another loop of reading.',
+      authAttached: 'Hosted identity and runtime context attached',
+      readOnlyMode: 'Read-only tutor mode. Hosted session context is missing until you sign in.',
+      whereYouAre: {
+        label: 'Where you are',
+        body: 'You are asking about {lessonTitle}. Keep the question tied to the step that is actually blocked.',
+        lessonSteps: 'Lesson steps',
+        focusedStep: 'Focused step',
+        backToLesson: 'Back to lesson',
+      },
+      packet: {
+        label: 'Crit packet',
+        body: 'Bring just enough context for a sharp answer: route, failure, and exact expectation.',
+        chip: 'route • failure • expectation',
+        currentTrack: 'Current track',
+        currentTrackNotChosenYet: 'not chosen yet',
+        nextLesson: 'Next lesson',
+        nextLessonNone: 'none',
+        hostedOnboardingStep: 'Hosted onboarding step',
+        sessionRequired: 'session required',
+        runtimeStatus: 'Runtime status',
+        notSynced: 'not synced',
+      },
+      questionProtocol: tutor.questionProtocol,
+      examplePrompts: tutor.examplePrompts,
+      questionPlaceholder: 'Describe the blocker, the exact step, and what you expected to happen.',
+      blockedLessonLabel: 'Blocked lesson',
+      noLessonSelected: 'No lesson selected',
+      submitLoading: 'Finding the next step...',
+      submitIdle: 'Get next step',
+    },
+    rail: {
+      label: 'Operator rail',
+      questionsAsked: 'Questions asked',
+      liveAnswerState: 'Live answer state',
+      thinking: 'thinking',
+      waiting: 'waiting',
+      recentQuestions: 'Recent questions',
+      connection: {
+        label: 'OpenAI connection',
+        authPrompt:
+          'Sign in to attach your own OpenAI key. Tutor still works in read-only mode without a personal connection.',
+        checking: 'Checking whether your OpenAI key is already connected.',
+        connectPrompt:
+          'Connect an OpenAI key if you want your own live Tutor quota and model access.',
+        connectedAs: 'Connected as {maskedKey}',
+        connectedKey: 'Connected key',
+        connectedBody:
+          'Live Tutor answers now prefer your own OpenAI access before any platform fallback.',
+        source: 'source: {value}',
+        disconnecting: 'Disconnecting...',
+        disconnect: 'Disconnect OpenAI',
+        bringYourOwnKey: 'Bring your own OpenAI key',
+        apiKeyPlaceholder: 'sk-proj-...',
+        connecting: 'Connecting OpenAI...',
+        connect: 'Connect OpenAI',
+        platformHint:
+          'Platform access is already available. Connecting your own key simply overrides the Tutor model budget and ownership path for this account.',
+      },
+      escalationRule: {
+        label: 'Escalation rule',
+        body:
+          'If the answer still does not give you one concrete move, stop looping and open support with the lesson context attached.',
+        cta: 'Open support lane',
+      },
+    },
+    critique: {
+      label: 'Studio critique',
+      chips: {
+        confidence: '{value} confidence',
+        officialFallback: 'official fallback',
+        humanEscalationLikely: 'human escalation likely',
+      },
+      singleNextMove: 'Single next move',
+      situation: 'Situation',
+      diagnosis: 'Diagnosis',
+      steps: 'Steps',
+      commands: 'Commands',
+      reviewLine: 'Review line',
+      fallbackRoute: 'Fallback route',
+      empty:
+        'Ask one blocker, not a whole story. Pico Tutor will ground the answer in lessons, the curated operator pack, and official docs when the question is version-sensitive.',
+      emptyHowItWorks:
+        'How this works: state the failing step, the expected result, and the exact failure. The answer should give you a concrete move, one verification step, and a clean escalation path if the evidence is still thin.',
+    },
+    matches: {
+      label: 'Grounded lesson matches',
+      bestMatch: 'best match',
+      alternative: 'alt',
+    },
+    evidence: {
+      label: 'Critique evidence',
+      openSource: 'Open source',
+    },
+    officialLinks: {
+      label: 'Official links',
+    },
+    exitRoute: {
+      label: 'Exit route',
+      returnToBlockedLesson: 'Return to blocked lesson',
+      returnToAcademy: 'Return to academy',
+      openAutopilot: 'Open Autopilot',
+      openSupportLane: 'Open support lane',
+      body:
+        'The tutor should end in motion. Return to the lesson if the path is still clear, open Autopilot if the runtime is now the bottleneck, and escalate only when the product path stopped being truthful.',
+    },
+    escalationNote: {
+      label: 'Escalation note',
+      getHumanHelp: 'Get human help',
+    },
+    nextQuestion: {
+      label: 'If the answer is still fuzzy',
+    },
+    errors: {
+      loadOpenAIConnection: 'Failed to load OpenAI connection',
+      tutorRequestFailed: 'Tutor request failed',
+      malformedResponse: 'Tutor response came back malformed',
+      pasteOpenAIKeyFirst: 'Paste an OpenAI API key first',
+      connectOpenAIKey: 'Failed to connect the OpenAI key',
+      disconnectOpenAIKey: 'Failed to disconnect the OpenAI key',
+    },
+    shared: {
+      openLesson: 'Open {lessonTitle}',
+    },
+  }
+}
+
+function buildPicoWelcomeTourMessages() {
+  return {
+    quickHelp: 'Quick help',
+    title: 'Learn the codex once, then close it.',
+    close: 'Close',
+    closeLabel: 'Close quick tour',
+    controls: {
+      back: 'Back',
+      next: 'Next',
+      finish: 'Finish',
+    },
+    steps: {
+      mission: {
+        eyebrow: '01 Mission',
+        title: 'Each Pico surface should have one dominant action.',
+        body:
+          'If a page looks equally about navigation, metrics, and explanation, it is lying. Find the one move that clears the route.',
+        bullets: {
+          currentSurface: 'You are in Chapter {chapter}: {label}.',
+          backtrackPrevious: 'Backtrack target: {label}.',
+          backtrackOnboarding: 'Backtrack target: onboarding.',
+          forwardNext: 'Forward route: {label}.',
+          forwardSupport: 'Forward route: support.',
+        },
+      },
+      route: {
+        academy: {
+          eyebrow: '02 Mission first',
+          title: 'The codex only wants one mission to matter.',
+          body:
+            'Open the dominant lesson, clear the visible step, and let the archive stay quiet until the main route is done.',
+          bullets: {
+            map: 'The map explains sequence. It should not compete with the mission.',
+            proof: 'The current proof lane is the only part that should feel urgent.',
+            currentSurface: 'Current surface: {pageTitle}.',
+          },
+        },
+        tutor: {
+          eyebrow: '02 One blocker',
+          title: 'Tutor is for the exact next move.',
+          body: 'Ask about the one command, file path, or validation step that is stopping the route.',
+          bullets: {
+            academy: 'If the sequence is wrong, return to Academy.',
+            autopilot: 'If live runtime state is the blocker, open Autopilot.',
+            currentSurface: 'Current surface: {pageTitle}.',
+          },
+        },
+        autopilot: {
+          eyebrow: '02 Runtime truth',
+          title: 'Autopilot beats lesson copy when the system is live.',
+          body:
+            'Use the runtime surface when the answer depends on runs, alerts, approvals, or current state.',
+          bullets: {
+            academy: 'Return to Academy when the mission sequence is the real problem.',
+            support: 'Escalate only after runtime truth is no longer enough.',
+            currentSurface: 'Current surface: {pageTitle}.',
+          },
+        },
+        support: {
+          eyebrow: '02 Human edge',
+          title: 'Support should send you back into motion fast.',
+          body:
+            'Bring the cleanest lesson or runtime packet possible, then return to the product instead of lingering here.',
+          bullets: {
+            notDefault: 'Support is the messy edge, not the default workspace.',
+            packet: 'Carry lesson slug, proof, and blocker when you escalate.',
+            currentSurface: 'Current surface: {pageTitle}.',
+          },
+        },
+        onboarding: {
+          eyebrow: '02 First win',
+          title: 'Onboarding exists to compress the first visible success.',
+          body:
+            'Use it to get to one working runtime and one proof artifact, then move immediately into the codex.',
+          bullets: {
+            noise: 'Treat preferences as noise until the first success is real.',
+            academy: 'Academy becomes useful once you need the exact lane.',
+            currentSurface: 'Current surface: {pageTitle}.',
+          },
+        },
+      },
+      proof: {
+        eyebrow: '03 Proof',
+        title: 'Never leave the route without a proof artifact.',
+        body:
+          'The platform becomes trustworthy only when each cleared step leaves behind evidence, not just optimism.',
+        bullets: {
+          tutor: 'If the blocker is exact, ask Tutor.',
+          autopilot: 'If the blocker is live system truth, open Autopilot.',
+          support: 'If both fail, escalate to Support with the proof and notes.',
+        },
+      },
+    },
+  }
+}
+
 export function getPicoDefaultMessages() {
   const landing = PICO_GENERATED_CONTENT.landing
   const pricing = PICO_GENERATED_CONTENT.pricing
@@ -124,6 +785,101 @@ export function getPicoDefaultMessages() {
       localeSwitcher: {
         currentLanguage: 'Current language',
         listLabel: 'Choose interface language',
+      },
+      surfaceCompass: {
+        label: 'Surface compass',
+        operatingRule: 'Operating rule',
+      },
+      shell: {
+        nav: {
+          onboarding: {
+            label: 'Start',
+            note: 'first visible win',
+          },
+          academy: {
+            label: 'Lessons',
+            note: 'the working path',
+          },
+          tutor: {
+            label: 'Tutor',
+            note: 'one grounded answer',
+          },
+          autopilot: {
+            label: 'Autopilot',
+            note: 'live control room',
+          },
+          support: {
+            label: 'Human help',
+            note: 'the messy edge',
+          },
+        },
+        wordmark: {
+          logoAlt: 'PicoMUTX logo',
+          atlas: 'operator atlas',
+        },
+        robotCard: {
+          signalLabel: 'Pico signal',
+        },
+        helpLane: {
+          stayHereWhen: 'Stay here when',
+          stayHereBody: 'the next move is still inside {chapter}.',
+          recoveryRoute: 'Recovery route',
+          openSupportLane: 'Open support lane',
+          recoveryBody: 'Use this when the product route is no longer honest about the blocker.',
+          continueSequence: 'Continue sequence',
+          humanHelp: 'Human help',
+          continueBody: 'Keep momentum if the next chapter is already the right tool.',
+        },
+        academyMode: {
+          chapter: 'Chapter {chapter}',
+          howThisWorks: 'How this works',
+          map: 'Map',
+          help: 'Help',
+          routeMode: 'Route mode',
+          focusModeActive: 'Focus mode is active.',
+          mapStaysOpen: 'The map stays open.',
+          previous: 'Previous: {label}',
+          startOfSequence: 'Start of sequence',
+          next: 'Next: {label}',
+          finalChapter: 'Final chapter',
+          backToMap: 'Back to map',
+          proof: 'Proof',
+        },
+        defaultMode: {
+          currentChapter: 'Current chapter',
+          chapter: 'Chapter {chapter}',
+          quickHelp: 'Quick help',
+          previousChapter: 'Previous chapter',
+          previousChapterAria: 'Go to previous chapter: {label}',
+          nextChapter: 'Next chapter',
+          nextChapterAria: 'Go to next chapter: {label}',
+          goToOnboarding: 'Go to onboarding',
+          goToSupport: 'Go to support',
+          hideRecovery: 'Hide recovery',
+          showRecovery: 'Show recovery',
+          chapterNote: 'Chapter note',
+          chapterNoteBody:
+            'Use this chapter to cut uncertainty quickly and identify the next irreversible action.',
+          prev: 'Prev',
+          next: 'Next',
+          openAcademyMap: 'Open academy map',
+          openHelpLane: 'Open help lane',
+          map: 'Map',
+          help: 'Help',
+          openMission: 'Open mission',
+        },
+        footer: {
+          logoAlt: 'PicoMUTX logo',
+          links: {
+            releases: 'Releases',
+            docs: 'Docs',
+            github: 'GitHub',
+            download: 'Download',
+            privacy: 'Privacy',
+          },
+          copyright:
+            '© {year} MUTX. PicoMUTX is a learning and operations platform for AI agent builders.',
+        },
       },
       footer: {
         brand: 'PicoMUTX',
@@ -403,6 +1159,9 @@ export function getPicoDefaultMessages() {
         finalPrimary: 'Open support lane',
         finalSecondary: 'Return to landing',
       },
+      supportPage: buildPicoSupportPageMessages(),
+      tutorPage: buildPicoTutorPageMessages(),
+      welcomeTour: buildPicoWelcomeTourMessages(),
       auth: {
         eyebrow: 'Pico host auth',
         orUseEmail: 'Or use email',

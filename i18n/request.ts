@@ -1,26 +1,35 @@
+import { cookies, headers } from 'next/headers'
 import { getRequestConfig } from 'next-intl/server'
-import { routing } from './routing'
-import { cookies } from 'next/headers'
+
+import { PICO_AUTH_LOCALE_COOKIE, PICO_LOCALES } from '@/lib/pico/locale'
+import { loadPicoMessages } from '@/lib/pico/messages'
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale
 
-  // Fall back to NEXT_LOCALE cookie when requestLocale is empty
-  // This handles cookie-driven locale switching on paths without locale segments (e.g. /)
+  if (!locale) {
+    const headerStore = await headers()
+    const headerLocale = headerStore.get('x-mutx-locale')
+
+    if (headerLocale && PICO_LOCALES.includes(headerLocale as (typeof PICO_LOCALES)[number])) {
+      locale = headerLocale
+    }
+  }
+
   if (!locale) {
     const cookieStore = await cookies()
-    const cookieLocale = cookieStore.get('NEXT_LOCALE')?.value
-    if (cookieLocale && routing.locales.includes(cookieLocale as (typeof routing.locales)[number])) {
+    const cookieLocale =
+      cookieStore.get(PICO_AUTH_LOCALE_COOKIE)?.value ?? cookieStore.get('NEXT_LOCALE')?.value
+
+    if (cookieLocale && PICO_LOCALES.includes(cookieLocale as (typeof PICO_LOCALES)[number])) {
       locale = cookieLocale
     }
   }
 
-  if (!locale || !routing.locales.includes(locale as (typeof routing.locales)[number])) {
-    locale = routing.defaultLocale
-  }
+  const resolved = await loadPicoMessages(locale)
 
   return {
-    locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    locale: resolved.locale,
+    messages: resolved.messages,
   }
 })

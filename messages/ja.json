@@ -137,6 +137,20 @@
       "eyebrow": "創業価格",
       "title": "一般公開前に創業価格を確保。",
       "tiers": {
+        "free": {
+          "name": "Free",
+          "price": "$0",
+          "period": "ずっと無料",
+          "description": "課金する前に、stack map、lesson flow、product truth を確認できます。",
+          "features": [
+            "毎月 100 credits",
+            "限定的な Tutor アクセス",
+            "Academy lesson（基本）",
+            "コミュニティサポート"
+          ],
+          "cta": "現在のプラン",
+          "ctaHref": null
+        },
         "starter": {
           "name": "創設 Tier",
           "price": "€29",
@@ -236,7 +250,12 @@
       "formSubline": "構築・修復・制御のどれが必要か教えてください。適切なルートに案内します。",
       "ctaButton": "アクセスを申請",
       "formCtaMeta": "Free trial · 創業価格は 90%オフ · €29 / €79 · Pico Pilot は €1,000+ から",
+      "faqLabel": "まだ迷っていますか？ 残っているブロッカーを整理しましょう。",
       "secondaryButton": "Planning Call を予約"
+    },
+    "localeSwitcher": {
+      "currentLanguage": "現在の言語",
+      "listLabel": "インターフェース言語を選択"
     },
     "contactForm": {
       "dialogLabel": "お問い合わせフォーム",
@@ -283,6 +302,9 @@
       "errorFallback": "問題が発生しました。もう一度お試しください。"
     },
     "footer": {
+      "brand": "PicoMUTX",
+      "logoAlt": "PicoMUTX ロゴ",
+      "tagline": "PicoMUTX は AI agent builder のための学習・運用プラットフォームです。",
       "links": {
         "releases": "リリース",
         "docs": "ドキュメント",
@@ -292,7 +314,203 @@
         "contact": "お問い合わせ",
         "privacy": "プライバシー"
       },
+      "supportPrompt": "さらに必要ですか？",
+      "supportCta": "お問い合わせ",
+      "supportBody": "Enterprise 料金（100K+ credits、SSO、SLA）について。",
       "copyright": "© MUTX 2026. 導入済みエージェントのオープンコントロール。"
+    },
+    "pages": {
+      "onboarding": {
+        "meta": {
+          "title": "はじめに — PicoMUTX",
+          "description": "PicoMUTX の workspace をセットアップして学習を始めましょう。"
+        }
+      },
+      "pricing": {
+        "meta": {
+          "title": "Pricing — PicoMUTX",
+          "description": "プランは実際のプロダクト面に対応しています。12 の lesson、grounded tutoring、監視された runtime context、そして Hermes、OpenClaw、NanoClaw、PicoClaw をまたぐ live stack brief が含まれます。"
+        }
+      },
+      "academy": {
+        "meta": {
+          "title": "Academy — PicoMUTX",
+          "description": "PicoMUTX Academy で lesson、track、学習パスを確認しましょう。"
+        }
+      },
+      "lesson": {
+        "meta": {
+          "title": "{title} — PicoMUTX Academy",
+          "description": "{summary}"
+        }
+      },
+      "autopilot": {
+        "meta": {
+          "title": "Autopilot — PicoMUTX",
+          "description": "PicoMUTX Autopilot で workflow を自動化します。"
+        }
+      },
+      "tutor": {
+        "meta": {
+          "title": "Tutor — PicoMUTX",
+          "description": "PicoMUTX の AI Tutor からガイド付きの支援を受けましょう。"
+        }
+      },
+      "support": {
+        "meta": {
+          "title": "Support — PicoMUTX",
+          "description": "PicoMUTX のヘルプとサポートを受ける。"
+        }
+      },
+      "wip": {
+        "meta": {
+          "title": "ライブビルド台帳 — PicoMUTX",
+          "description": "PicoMUTX 体験を支えている 17 の builder-pack docs、追跡された repo snapshot、そして remote-access の既定値を確認できます。"
+        },
+        "title": "ライブビルド台帳",
+        "subtitle": "このルートは、未完成であることを弁明するためのものではなくなりました。いまは Pico を実際に支えているソース資料、pack docs、Academy lesson、追跡中の repo、そしてそれらが示す remote-access posture を表示します。",
+        "backToPico": "Pico に戻る",
+        "mutxPlatform": "MUTX Platform",
+        "imageAlt": "ライブ stack brief を確認する PicoMUTX ロボット"
+      }
+    },
+    "auth": {
+      "eyebrow": "Pico ホスト認証",
+      "orUseEmail": "またはメールを使用",
+      "forgotPassword": "パスワードをお忘れですか？",
+      "fields": {
+        "name": {
+          "label": "名前",
+          "placeholder": "山田 花子"
+        },
+        "email": {
+          "label": "メールアドレス",
+          "placeholder": "you@company.com"
+        },
+        "password": {
+          "label": "パスワード",
+          "placeholder": "パスワードを入力"
+        },
+        "confirmPassword": {
+          "label": "パスワードを確認",
+          "placeholder": "パスワードを再入力"
+        }
+      },
+      "modes": {
+        "login": {
+          "title": "現在の Pico ビルドに入る",
+          "subtitle": "プロバイダーまたはメールでプレビューを開き、現在地を保存します。",
+          "submit": "Pico に入る",
+          "loading": "開いています...",
+          "toggleQuestion": "アクセスが必要ですか？",
+          "toggleAction": "作成する"
+        },
+        "register": {
+          "title": "Pico プレビューアカウントを作成",
+          "subtitle": "一度登録すれば現在地を保存でき、製品の改善を追い続けられます。",
+          "submit": "プレビューアカウントを作成",
+          "loading": "作成中...",
+          "toggleQuestion": "すでにアカウントをお持ちですか？",
+          "toggleAction": "サインイン"
+        }
+      },
+      "errors": {
+        "passwordMismatch": "パスワードが一致しません",
+        "passwordTooShort": "パスワードは 8 文字以上で入力してください",
+        "loginFailed": "サインインに失敗しました",
+        "registerFailed": "アカウントの作成に失敗しました",
+        "emailRequired": "先にメールアドレスを入力してください",
+        "resendFailed": "再送信に失敗しました"
+      },
+      "notice": {
+        "verificationSent": "確認メールを送信しました",
+        "resending": "送信中...",
+        "resendVerification": "確認メールを再送信"
+      }
+    },
+    "authRecovery": {
+      "forgotPassword": {
+        "eyebrow": "パスワード復旧",
+        "title": "control plane を離れずに operator アクセスを復旧する。",
+        "description": "MUTX アカウントに紐づいたメールアドレスを使うと、リセットリンクを送信します。今日必要なのが hosted auth ではなくても、dashboard、docs、install flow は引き続き利用できます。",
+        "asideEyebrow": "復旧メモ",
+        "asideTitle": "認証レーンは実用的に保つ。",
+        "asideBody": "リセットフローはシンプルで、正直で、検証しやすいべきです。アカウントが存在しない場合や hosted レーンが利用できない場合でも、公開面のほかの部分は引き続き真実を示します。",
+        "highlights": [
+          "hosted operator アカウントに紐づいた業務メールを使用してください。",
+          "リセットリンクには有効期限があるため、届いたらすぐに対応してください。",
+          "いま必要なのが product truth だけなら、docs と dashboard は引き続き利用できます。"
+        ],
+        "successTitle": "メールを確認してください",
+        "successBody": "{email} にパスワード再設定手順を送信しました。",
+        "successHint": "メールが見当たらない場合は迷惑メールを確認するか、別のリンクをリクエストしてください。",
+        "backToSignIn": "サインインに戻る",
+        "tryAgain": "もう一度試す",
+        "sendTitle": "再設定手順を送信",
+        "sendBody": "大げさな演出は不要です。メールアドレスと新しいリンクだけで十分です。",
+        "emailLabel": "メールアドレス",
+        "emailPlaceholder": "you@company.com",
+        "sending": "送信中...",
+        "sendLink": "再設定リンクを送信"
+      },
+      "resetPassword": {
+        "eyebrow": "パスワードを再設定",
+        "title": "新しいパスワードを設定し、operator レーンに戻る。",
+        "description": "強いパスワードを設定し、正しく確認して、フローが成功したかを推測せずに再設定を完了します。",
+        "asideEyebrow": "再設定ルール",
+        "asideTitle": "復旧経路は地味なままに。",
+        "asideBody": "パスワード再設定は簡潔で速く、検証しやすいべきです。装飾的な auth 演出よりも、強いフォーム状態の方が重要です。",
+        "highlights": [
+          "再設定リンクは token ベースなので、期限切れや欠落した token は正直に失敗させる必要があります。",
+          "最低要件を満たすだけでなく、自分の security 基準を満たすパスワードを使ってください。",
+          "いまの経路が hosted auth でなくても、レーンが強化される間は docs と dashboard を閲覧できます。"
+        ],
+        "invalidTitle": "無効な再設定リンク",
+        "invalidBody": "このパスワード再設定リンクは存在しない、無効、またはすでに期限切れです。",
+        "requestNewLink": "新しいリンクをリクエスト",
+        "backToSignIn": "サインインに戻る",
+        "completeTitle": "パスワードの再設定が完了しました",
+        "completeBody": "パスワードが更新されました。サインインレーンでは新しい認証情報を使用できます。",
+        "signIn": "サインイン",
+        "formTitle": "新しいパスワードを選択",
+        "formBody": "強いパスワードを設定して一度確認すれば、あとはフォームが処理します。",
+        "newPassword": "新しいパスワード",
+        "confirmPassword": "パスワードを確認",
+        "resetting": "再設定中...",
+        "resetPassword": "パスワードを再設定",
+        "passwordsMismatch": "パスワードが一致しません",
+        "passwordTooShort": "パスワードは 8 文字以上で入力してください"
+      },
+      "verifyEmail": {
+        "eyebrow": "メールを確認",
+        "title": "platform が準備完了だと装う前に、アドレスを確認する。",
+        "description": "確認はアカウント境界の一部です。このフローは token を正直に検証し、アクティブな host から再送でき、偽の成功状態に飛ばすのではなく次のルートを安定させます。",
+        "asideEyebrow": "確認ルール",
+        "asideTitle": "確認は明示的に保つ。",
+        "asideBody": "provider auth では上流の identity がすでに確認されているため、この手順を省略できます。パスワード登録はメール確認レーンによって責任を保ちます。",
+        "highlights": [
+          "確認リンクは固定された marketing route ではなく、現在の frontend host で終端します。",
+          "期限切れまたは無効な token は正直に失敗し、再送のための明確な経路を残します。",
+          "確認後は、サインインレーンが意図した platform route へ直接戻せます。"
+        ],
+        "verifying": "メールを確認しています...",
+        "missingContext": "この確認ルートには token、または受信先となるメールアドレスが必要です。",
+        "sentTo": "{email} に確認リンクを送信しました。",
+        "verificationComplete": "確認が完了しました",
+        "verificationCompleteBody": "このアカウントはサインインできます。同じメールアドレスでサインインし、目的のルートへ進んでください。",
+        "signIn": "サインイン",
+        "checkInbox": "受信箱を確認",
+        "checkInboxBody": "可能であれば同じデバイスで確認リンクを開いてください。届かない場合はここから再送できます。",
+        "resend": "確認メールを再送信",
+        "resendSending": "送信中...",
+        "resendNeedsEmail": "確認メールを再送するには、先にサインアップフォームのメールアドレスを入力してください。",
+        "resendSent": "{email} に確認リンクを再送しました。",
+        "verifySuccess": "メールアドレスの確認が完了しました。",
+        "verifyFailure": "メールアドレスの確認に失敗しました",
+        "resendFailure": "確認メールの再送信に失敗しました",
+        "verificationFailed": "確認に失敗しました",
+        "verificationFailedBody": "token の有効期限が切れている場合は、このアカウントのメールアドレスから新しいメッセージをリクエストしてください。"
+      }
     },
     "waitlistForm": {
       "submit": "アクセスをリクエスト",
@@ -1331,11 +1549,26 @@
         "signalCore": "シグナルコア",
         "firstWinPulse": "先勝パルス",
         "trackInstallPrompt": "今すぐHermesをインストールしてください",
+        "sealFirstWin": "最初の勝利を確定する",
+        "continueWithNextLesson": "{lessonTitle} を続ける",
+        "openAutopilot": "Autopilot を開く",
+        "proofStateHeadline": {
+          "install": "最初の証拠を見逃しようがないものにする。",
+          "prompt": "route がまだ正直なうちに証拠を確定する。",
+          "cleared": "最初の証拠は本物です。このレーンを前に進めましょう。"
+        },
+        "hostedSyncDetail": {
+          "offline": "hosted sync はオフライン",
+          "loading": "シグナルを更新中",
+          "gatewayLive": "gateway は live",
+          "gatewayUnbound": "gateway は未接続"
+        },
         "installDone": "インストールが完了しました",
         "proofCaptured": "捕らえられた証拠",
         "runtimeNotAttached": "付いていない",
         "nextMove": "次の動き",
-        "visibleSuccess": "目に見える成功"
+        "visibleSuccess": "目に見える成功",
+        "stepsClear": "{completed}/{total} ステップ完了"
       },
       "labels": {
         "chapterPulse": "チャプターパルス",
@@ -1346,7 +1579,14 @@
         "guideMarker": "ガイドマーカー",
         "trackChecklist": "トラックチェックリスト",
         "chapterBrief": "第01章の概要",
+        "chapterBriefTitle": "1 つのコマンドを動かし、証拠を残す",
+        "chapterBriefBody": "この最初の章では、世界をすばやく絞り込みます。Hermes をインストールし、小さな prompt を 1 つ実行し、その出力を保持して、最初の勝利を本物にしてください。",
         "fastestPath": "価値への最速パス",
+        "fastestPathBody": {
+          "done": "最初の勝利はすでにクリアしています。ここで足を止めないでください。次の lesson を開き、流れを止めずに進めましょう。",
+          "installDone": "良い状態です。インストールは完了しています。次は小さな prompt を 1 つ実行し、最初の目に見える答えを手に入れてください。",
+          "installFirst": "まだ provider、framework、stack を比較しないでください。まず Hermes をインストールし、コマンドを動かしましょう。"
+        },
         "trackLocked": "トラックがロックされました",
         "visibleSuccess": "目に見える成功",
         "studioLedger": "スタジオ台帳",
@@ -1356,6 +1596,7 @@
         "workspace": "ワークスペース",
         "jumpStraightTo": "に直接ジャンプします",
         "operatingRule": "運用ルール",
+        "operatingRuleBody": "この段階で選択肢を増やしても、見栄えの良い先延ばしになるだけです。まず最初の勝利を取り、そのあとで surface を広げましょう。",
         "currentPressure": "現在の圧力",
         "install": "インストール",
         "firstPrompt": "最初のプロンプト",
@@ -1364,12 +1605,20 @@
         "doThisNow": "今すぐこれを実行してください",
         "visibleMove": "目に見える動き",
         "liveStackRadar": "ライブスタックレーダー",
+        "liveStackRadarTitle": "オンボーディングレーンは、追跡中の stack が実際に何を出荷しているかを把握しています",
+        "liveStackRadarBody": "Pico は lesson flow では Hermes から始まりますが、いまの product は地上に runtime が 1 つしかないふりをせず、stack map の残りも見える状態に保ちます。",
+        "openLiveLedger": "ライブ台帳を開く",
         "missionBoard": "ミッションボード",
+        "missionBoardTitle": "最初の 2 つの mission を目に見える形で接地させる",
+        "missionBoardBody": "オンボーディングは、operator がどこで止まったかを知っているべきです。これらの mission card は lesson workspace を反映し、最初の勝利が route 変更で記憶の中に溶けないようにします。",
+        "workspaceContinuity": "workspace の継続性",
         "mission01": "ミッション01",
         "mission02": "ミッション02",
         "focusedStep": "集中したステップ",
         "proofCaptured": "捕らえられた証拠",
         "operatorRecord": "オペレーターの記録",
+        "operatorRecordTitle": "hosted kickoff と runtime truth を 1 か所に保つ",
+        "operatorRecordBody": "Chapter 01 のために、hosted onboarding state、runtime truth、次の activation move を 1 つの operator record にまとめて保持します。",
         "refreshSync": "リフレッシュ同期",
         "currentBinding": "現在のバインディング",
         "assistant": "アシスタント",
@@ -1378,10 +1627,13 @@
         "updateStep": "ステップを更新しています...",
         "completeStep": "現在のステップを完了としてマークする",
         "checklistDismissed": "チェックリストが却下されました",
+        "dismissChecklist": "チェックリストを閉じる",
         "checklistVisible": "チェックリストが表示されます",
         "completeWizard": "ウィザードを完了する",
         "resetWizard": "リセットウィザード",
         "hostedRuntimeEditor": "ホスト型ランタイムエディター",
+        "hostedRuntimeEditorTitle": "route を離れずに operator record を更新する",
+        "hostedRuntimeEditorBody": "これはブラウザから何かをインストールするふりはしません。Pico のほかの部分が推測をやめられるよう、最新で正直な runtime snapshot を保存します。",
         "runtimeLabel": "ランタイムラベル",
         "runtimeStatusField": "実行時のステータス",
         "installMethod": "インストール方法",
@@ -1389,6 +1641,7 @@
         "assistantName": "アシスタント名",
         "workspaceField": "ワークスペース",
         "modelField": "モデル",
+        "savingSnapshot": "スナップショットを保存中...",
         "saveSnapshot": "実行時のスナップショットを保存する",
         "openInstallLesson": "オープンインストールレッスン",
         "saveOnlyTruth": "現時点でオペレーター ホスト上で正しいもの (ゲートウェイ URL、ランタイム ヘルス、バインドされたアシスタント) のみを保存します。",
@@ -1405,11 +1658,36 @@
         "doThisFirst": "最初にこれを実行してください",
         "outcomeDriven": "結果重視",
         "outcome": "結果：",
+        "activationTrackBody": {
+          "done": "最初の勝利はすでに取れています。上の主アクションを使って、そのまま流れを前に進めてください。",
+          "installDone": "Hermes はインストール済みです。概要は飛ばして、いま最初の prompt lesson を開きましょう。",
+          "installFirst": "ほかはすべて後回しで構いません。install lesson を開き、まずコマンドを動かしてください。"
+        },
         "installLesson": "レッスンをインストールする",
         "firstPromptLesson": "初めての即席レッスン",
         "askTutor": "家庭教師に質問する",
         "currentPressureInstall": "終わり",
-        "currentPressureFirstPrompt": "捕らえられた証拠"
+        "currentPressureFirstPrompt": "捕らえられた証拠",
+        "operatorRuleBody": "この段階で選択肢を増やしても、やはり見栄えの良い先延ばしです。1 回の local run と 1 つの proof artifact の両方が本物になるまで、この chapter は狭く保ってください。",
+        "trackState": {
+          "active": "アクティブなトラック",
+          "set": "トラックに設定",
+          "locked": "ロック済み"
+        },
+        "runtimeStatusOptions": {
+          "client_required": "クライアント必須",
+          "healthy": "正常",
+          "degraded": "劣化",
+          "offline": "オフライン",
+          "warning": "警告",
+          "unknown": "不明"
+        },
+        "installMethodOptions": {
+          "npm": "npm",
+          "brew": "brew",
+          "binary": "バイナリ",
+          "manual": "手動"
+        }
       },
       "compass": {
         "title": "製品の誠実さを保つ最短ルートを使用する",
@@ -1421,25 +1699,37 @@
         "openInstallLesson": "オープンインストールレッスン",
         "runFirstPrompt": "最初のプロンプトを実行する",
         "continueAcademyLane": "アカデミーレーンを続ける",
+        "primaryCaption": "目に見える出力が 1 つ本物になるまでは、主シーケンスにとどまってください。",
         "askTutorAboutStep": "このステップについて講師に質問する",
+        "tutorCaption": "具体的な command や validation gate が 1 つだけ詰まっているときに使ってください。",
         "inspectLiveControlRoom": "ライブコントロールルームを視察する",
+        "autopilotCaption": "runtime state、approval、spend が bottleneck になったら、ここに切り替えます。",
         "escalateToHumanHelp": "人間のサポートにエスカレーションする",
+        "supportCaption": "product path だけでは正直に回復できなくなったときにだけ使ってください。",
         "nextMove": "次の動き",
         "blocked": "ブロックされました",
         "runtime": "ランタイム",
         "messyEdge": "乱雑なエッジ"
       },
+      "shared": {
+        "ok": "OK"
+      },
       "doctrine": {
         "label": "キックオフドクトリン",
         "title": "趣味のプロジェクトではなく、シャープなスタジオのように始めましょう",
         "chip": "概要、成果物、レビュー",
+        "labels": {
+          "brief": "01 • ブリーフ",
+          "reviewLine": "03 • レビューライン"
+        },
         "brief": "ランタイムをきれいに開くようにする",
         "deliverable": "明らかな証拠となる成果物を 1 つ生成する",
         "reviewLine": "早めに面を広げないでください",
         "postTitle": "章の姿勢",
         "postBody": "Chapter 01 は意図的に狭くしてください。実際のアーティファクトが存在する前に、ブラウジング、スタック ツーリズム、追加のセットアップ シアターは必要ありません。",
         "trackTitle": "トラックチェックリスト",
-        "trackBody": "最初の校正がまだ形成されている間は、明確なガイド キューが 1 つあれば十分です。"
+        "trackBody": "最初の校正がまだ形成されている間は、明確なガイド キューが 1 つあれば十分です。",
+        "guideMarkerBody": "最初の証拠がまだ形になっている途中なら、明確なガイドの合図は 1 つで十分です。"
       },
       "protocol": {
         "title": "証明プロトコル",
@@ -1639,6 +1929,17 @@
           "runtimeStatus": "実行時のステータス",
           "notSynced": "同期されていません"
         },
+        "questionProtocol": [
+          "いま止まっている正確なステップ、command、または dashboard action を明示してください。",
+          "証拠を貼り付けてください。output、error、transcript、または runtime state です。",
+          "そのルートが再び live であると証明できる、次の一手だけを求めてください。"
+        ],
+        "examplePrompts": [
+          "Hermes はローカルでは開きますが、VPS での run が失敗します。何かを変える前に、まず何を検証すべきですか？",
+          "OpenClaw の onboarding は完了したのに、Control UI がまだ読み込まれません。どの検証ルートが最も確実ですか？",
+          "NanoClaw の `/setup` は Claude Code で実行できましたが、container path がまだ壊れているようです。まず何を切り分けるべきですか？",
+          "PicoClaw launcher は localhost でしか動きません。bind address を変えるべきですか、それとも Tailscale で非公開のままにすべきですか？"
+        ],
         "questionPlaceholder": "障害となるもの、正確な手順、何が起こると予想したかについて説明してください。",
         "blockedLessonLabel": "ブロックされたレッスン",
         "noLessonSelected": "レッスンが選択されていません",
@@ -1729,6 +2030,93 @@
       },
       "shared": {
         "openLesson": "{lessonTitle} を開く"
+      }
+    },
+    "welcomeTour": {
+      "quickHelp": "クイックヘルプ",
+      "title": "コーデックスは一度つかんだら、閉じて進んでください。",
+      "close": "閉じる",
+      "closeLabel": "クイックツアーを閉じる",
+      "controls": {
+        "back": "戻る",
+        "next": "次へ",
+        "finish": "完了"
+      },
+      "steps": {
+        "mission": {
+          "eyebrow": "01 ミッション",
+          "title": "どの Pico 画面にも、主となる行動は一つだけあるべきです。",
+          "body": "あるページがナビゲーション、メトリクス、説明のすべてを同じ比重で扱っているように見えるなら、その画面は真実を語っていません。ルートを前に進める一手を見つけてください。",
+          "bullets": {
+            "currentSurface": "いまはチャプター {chapter}: {label} にいます。",
+            "backtrackPrevious": "戻る先: {label}。",
+            "backtrackOnboarding": "戻る先: onboarding。",
+            "forwardNext": "進む先: {label}。",
+            "forwardSupport": "進む先: support。"
+          }
+        },
+        "route": {
+          "academy": {
+            "eyebrow": "02 ミッション優先",
+            "title": "コーデックスが重視するのは、いま意味を持つ一つのミッションだけです。",
+            "body": "主となるレッスンを開き、見えているステップを進め、メインルートが終わるまではアーカイブを静かにしておいてください。",
+            "bullets": {
+              "map": "マップは順序を示すためのものです。ミッションと競合してはいけません。",
+              "proof": "いま緊急であるべきなのは、現在の証跡レーンだけです。",
+              "currentSurface": "現在の画面: {pageTitle}。"
+            }
+          },
+          "tutor": {
+            "eyebrow": "02 ひとつの blocker",
+            "title": "Tutor は、正確な次の一手のためにあります。",
+            "body": "いまルートを止めている、ひとつの command、file path、または validation step について聞いてください。",
+            "bullets": {
+              "academy": "順序が違うなら、Academy に戻ってください。",
+              "autopilot": "live runtime state が blocker なら、Autopilot を開いてください。",
+              "currentSurface": "現在の画面: {pageTitle}。"
+            }
+          },
+          "autopilot": {
+            "eyebrow": "02 ランタイムの真実",
+            "title": "system が live なら、Autopilot がレッスン文面より優先されます。",
+            "body": "答えが runs、alerts、approvals、または current state に依存するなら、runtime 画面を使ってください。",
+            "bullets": {
+              "academy": "本当の問題がミッションの順序なら、Academy に戻ってください。",
+              "support": "ランタイムの真実だけでは足りなくなってから、Support にエスカレーションしてください。",
+              "currentSurface": "現在の画面: {pageTitle}。"
+            }
+          },
+          "support": {
+            "eyebrow": "02 人が入る境界",
+            "title": "Support は、すばやく動作に戻すためのものです。",
+            "body": "できるだけ整理された lesson または runtime packet を持ち込み、ここに留まらず product に戻ってください。",
+            "bullets": {
+              "notDefault": "Support は default workspace ではなく、厄介な端境です。",
+              "packet": "エスカレーション時には lesson slug、proof、blocker を持っていってください。",
+              "currentSurface": "現在の画面: {pageTitle}。"
+            }
+          },
+          "onboarding": {
+            "eyebrow": "02 最初の勝ち",
+            "title": "Onboarding は、最初に見える成功までを最短化するためにあります。",
+            "body": "ひとつの working runtime とひとつの proof artifact に到達したら、すぐコーデックスへ移ってください。",
+            "bullets": {
+              "noise": "最初の成功が本物になるまでは、preferences はノイズとして扱ってください。",
+              "academy": "正確なレーンが必要になった時点で、Academy が役立ちます。",
+              "currentSurface": "現在の画面: {pageTitle}。"
+            }
+          }
+        },
+        "proof": {
+          "eyebrow": "03 証跡",
+          "title": "証跡アーティファクトを残さずにルートを離れないでください。",
+          "body": "platform が信頼できるものになるのは、クリアした各ステップに楽観ではなく証拠が残るときだけです。",
+          "bullets": {
+            "tutor": "blocker が正確なら、Tutor に聞いてください。",
+            "autopilot": "blocker が live system の真実なら、Autopilot を開いてください。",
+            "support": "両方で足りなければ、証跡とメモを付けて Support にエスカレーションしてください。"
+          }
+        }
       }
     },
     "academyPage": {
@@ -2791,7 +3179,7 @@
         "openLiveApprovalSetup": "ライブ承認設定を開く",
         "completeLabel": {
           "installHermesLocally": "Hermes はインストール済み",
-          "runYourFirstAgent": "本当に動いた",
+          "runYourFirstAgent": "最初の実行が成功した",
           "default": "このチャプターを封印する"
         },
         "askTutorAboutLesson": "このレッスンについて Tutor に聞く",
@@ -2916,6 +3304,10 @@
         "nextCapability": "次の capability",
         "routeMemory": "ルートメモリ"
       }
+    },
+    "surfaceCompass": {
+      "label": "サーフェスコンパス",
+      "operatingRule": "運用ルール"
     }
   }
 }

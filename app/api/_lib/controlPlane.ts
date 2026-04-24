@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFileSync } from 'node:fs'
 
+import {
+  PICO_AUTH_LOCALE_COOKIE,
+  PICO_LOCALE_COOKIE,
+  normalizePicoLocale,
+} from '@/lib/pico/locale'
+
 export type AuthTokens = {
   access_token: string
   refresh_token?: string
   expires_in: number
+  preferred_locale?: string | null
 }
+
+const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
 function normalizeBaseUrl(value?: string | null) {
   if (!value) return null
@@ -98,6 +107,8 @@ export function applyAuthCookies(
       maxAge: 60 * 60 * 24 * 7,
     })
   }
+
+  applyPicoLocalePreference(response, request, tokens.preferred_locale)
 }
 
 export function clearAuthCookies(response: NextResponse, request: NextRequest) {
@@ -119,6 +130,43 @@ export function clearAuthCookies(response: NextResponse, request: NextRequest) {
     domain: cookieDomain,
     path: '/',
     maxAge: 0,
+  })
+  response.cookies.set(PICO_AUTH_LOCALE_COOKIE, '', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false,
+    domain: cookieDomain,
+    path: '/',
+    maxAge: 0,
+  })
+}
+
+export function applyPicoLocalePreference(
+  response: NextResponse,
+  request: NextRequest,
+  localeCandidate?: string | null,
+) {
+  const locale = normalizePicoLocale(localeCandidate)
+  if (!locale) {
+    return
+  }
+
+  const cookieDomain = getCookieDomain(request)
+
+  response.cookies.set(PICO_AUTH_LOCALE_COOKIE, locale, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false,
+    domain: cookieDomain,
+    path: '/',
+    maxAge: PICO_LOCALE_COOKIE_MAX_AGE,
+  })
+  response.cookies.set(PICO_LOCALE_COOKIE, locale, {
+    sameSite: 'lax',
+    secure: false,
+    domain: cookieDomain,
+    path: '/',
+    maxAge: PICO_LOCALE_COOKIE_MAX_AGE,
   })
 }
 

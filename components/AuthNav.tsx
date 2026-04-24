@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { PicoLangSwitcher } from "@/components/pico/PicoLangSwitcher";
+
 type AuthNavProps = {
   hostVariant?: "default" | "pico";
 };
@@ -35,9 +37,12 @@ export function AuthNav({ hostVariant = "default" }: AuthNavProps) {
             </span>
           </Link>
 
-        <span className="hidden rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(255,248,236,0.03)] px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-[rgba(232,221,203,0.6)] lg:inline-flex">
-          {isPicoPreview ? "preview account boundary" : "hosted operator identity"}
-        </span>
+        <div className="flex items-center gap-3">
+          {isPicoPreview ? <PicoLangSwitcher /> : null}
+          <span className="hidden rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(255,248,236,0.03)] px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-[rgba(232,221,203,0.6)] lg:inline-flex">
+            {isPicoPreview ? "preview account boundary" : "hosted operator identity"}
+          </span>
+        </div>
       </div>
     </nav>
   );

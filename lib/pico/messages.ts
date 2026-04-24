@@ -96,7 +96,10 @@ function collectMissingPaths(
 }
 
 function getBaseEnglishMessages() {
-  return deepMergeMessages(en as MessageObject, getPicoDefaultMessages() as MessageObject)
+  return deepMergeMessages(
+    getPicoDefaultMessages() as unknown as MessageObject,
+    en as MessageObject,
+  )
 }
 
 function warnMissingMessages(locale: PicoLocale, messages: MessageObject | undefined, base: MessageObject) {

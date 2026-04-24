@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLocale, useMessages } from 'next-intl'
 
 import { PicoSessionBanner } from '@/components/pico/PicoSessionBanner'
 import { PicoShell } from '@/components/pico/PicoShell'
@@ -49,12 +50,47 @@ type RuntimeDraft = {
   model: string
 }
 
-function formatTimestamp(value?: string | null) {
-  if (!value) return 'not recorded'
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) return 'not recorded'
+type MessageRecord = Record<string, unknown>
 
-  return parsed.toLocaleString('en-US', {
+type TranslationValues = Record<string, string | number>
+
+type PicoTrack = (typeof PICO_TRACKS)[number]
+
+function getNestedMessage(messages: unknown, path: string): unknown {
+  let current = messages
+
+  for (const segment of path.split('.')) {
+    if (!current || typeof current !== 'object' || Array.isArray(current)) {
+      return undefined
+    }
+
+    current = (current as MessageRecord)[segment]
+  }
+
+  return current
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+}
+
+function formatFallback(template: string, values?: TranslationValues) {
+  if (!values) {
+    return template
+  }
+
+  return template.replace(/\{(\w+)\}/g, (_match, key: string) => {
+    const value = values[key]
+    return value === undefined ? `{${key}}` : String(value)
+  })
+}
+
+function formatTimestamp(locale: string, value?: string | null, fallback = 'not recorded') {
+  if (!value) return fallback
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return fallback
+
+  return parsed.toLocaleString(locale, {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
@@ -67,12 +103,84 @@ function joinClasses(...classes: Array<string | false | null | undefined>) {
 }
 
 export function PicoOnboardingPageClient() {
+  const locale = useLocale()
   const pathname = usePathname()
+  const messages = useMessages()
   const prefersReducedMotion = useReducedMotion()
   const session = usePicoSession()
   const { progress, derived, actions } = usePicoProgress(session.status === 'authenticated')
   const setup = usePicoSetupState(session.status === 'authenticated')
   const toHref = usePicoHref()
+  const readMessage = (path: string) => getNestedMessage(messages, path)
+  const readMessageString = (path: string, fallback: string) => {
+    const value = readMessage(path)
+    return typeof value === 'string' ? value : fallback
+  }
+  const readMessageStrings = (path: string, fallback: readonly string[]) => {
+    const value = readMessage(path)
+    return isStringArray(value) ? value : [...fallback]
+  }
+  const tt = (path: string, fallback: string, values?: TranslationValues) => {
+    const value = readMessage(`pico.onboardingPage.${path}`)
+    return formatFallback(typeof value === 'string' ? value : fallback, values)
+  }
+  const localizeTrack = (track: PicoTrack) => ({
+    ...track,
+    title: readMessageString(`pico.content.tracks.${track.slug}.title`, track.title),
+    outcome: readMessageString(`pico.content.tracks.${track.slug}.outcome`, track.outcome),
+    intro: readMessageString(`pico.content.tracks.${track.slug}.intro`, track.intro),
+    checklist: readMessageStrings(`pico.content.tracks.${track.slug}.checklist`, track.checklist),
+  })
+  const localizeLesson = (lesson: ReturnType<typeof getLessonBySlug> | null | undefined) => {
+    if (!lesson) {
+      return lesson
+    }
+
+    return {
+      ...lesson,
+      title: readMessageString(`pico.content.lessons.${lesson.slug}.title`, lesson.title),
+      summary: readMessageString(`pico.content.lessons.${lesson.slug}.summary`, lesson.summary),
+      objective: readMessageString(`pico.content.lessons.${lesson.slug}.objective`, lesson.objective),
+      outcome: readMessageString(`pico.content.lessons.${lesson.slug}.outcome`, lesson.outcome),
+      expectedResult: readMessageString(
+        `pico.content.lessons.${lesson.slug}.expectedResult`,
+        lesson.expectedResult,
+      ),
+      validation: readMessageString(
+        `pico.content.lessons.${lesson.slug}.validation`,
+        lesson.validation,
+      ),
+      steps: lesson.steps.map((step, index) => ({
+        ...step,
+        title: readMessageString(
+          `pico.content.lessons.${lesson.slug}.steps.${index}.title`,
+          step.title,
+        ),
+      })),
+    }
+  }
+  const notSetLabel = readMessageString('pico.onboardingPage.shared.notSet', 'not set')
+  const notRecordedLabel = tt('runtime.notRecorded', 'not recorded')
+  const localOnlyLabel = readMessageString('pico.onboardingPage.shared.runtime.localOnly', 'local only')
+  const checkingLabel = readMessageString('pico.onboardingPage.shared.runtime.checking', 'checking')
+  const notAttachedLabel = tt('hero.runtimeNotAttached', 'not attached')
+  const localLabel = readMessageString('pico.onboardingPage.shared.local', 'local')
+  const sealedLabel = readMessageString('pico.onboardingPage.shared.sealed', 'sealed')
+  const capturedLabel = tt('mission.captured', 'captured')
+  const missingLabel = tt('mission.missing', 'missing')
+  const recordedLabel = readMessageString('pico.onboardingPage.shared.recorded', 'recorded')
+  const onePromptAwayLabel = readMessageString('pico.onboardingPage.shared.onePromptAway', 'one prompt away')
+  const installFirstLabel = readMessageString('pico.onboardingPage.shared.installFirst', 'install first')
+  const noneLabel = readMessageString('pico.onboardingPage.shared.none', 'none')
+  const signInLabel = readMessageString('pico.onboardingPage.shared.signIn', 'sign in')
+  const pendingLabel = tt('runtime.pending', 'pending')
+  const doneLabel = tt('runtime.done', 'done')
+  const completedLabel = tt('mission.completed', 'completed')
+  const failedLabel = tt('runtime.failed', 'failed')
+  const activeLabel = tt('runtime.active', 'active')
+  const checklistDismissedLabel = tt('runtime.checklistDismissed', 'checklist dismissed')
+  const checklistVisibleLabel = tt('runtime.checklistVisible', 'checklist visible')
+  const notStartedLabel = tt('runtime.notStarted', 'not started')
   const [runtimeDraft, setRuntimeDraft] = useState<RuntimeDraft>({
     label: 'OpenClaw',
     status: 'healthy',
@@ -83,14 +191,32 @@ export function PicoOnboardingPageClient() {
     model: '',
   })
 
-  const firstTrack = PICO_TRACKS[0]
+  function formatRuntimeStatusOption(status: (typeof runtimeStatusOptions)[number]) {
+    return readMessageString(
+      `pico.onboardingPage.labels.runtimeStatusOptions.${status}`,
+      status.replace(/_/g, ' '),
+    )
+  }
+
+  function formatInstallMethodOption(method: (typeof installMethodOptions)[number]) {
+    return readMessageString(
+      `pico.onboardingPage.labels.installMethodOptions.${method}`,
+      method,
+    )
+  }
+
+  const firstTrackSource = PICO_TRACKS[0]
+  const firstTrack = localizeTrack(firstTrackSource)
   const installLessonSlug = 'install-hermes-locally'
   const firstRunLessonSlug = 'run-your-first-agent'
-  const installLesson = getLessonBySlug(installLessonSlug)
-  const firstRunLesson = getLessonBySlug(firstRunLessonSlug)
+  const installLesson = localizeLesson(getLessonBySlug(installLessonSlug))
+  const firstRunLesson = localizeLesson(getLessonBySlug(firstRunLessonSlug))
   const installDone = progress.completedLessons.includes(installLessonSlug)
   const firstRunDone = progress.completedLessons.includes(firstRunLessonSlug)
-  const activeTrack = PICO_TRACKS.find((track) => track.slug === progress.selectedTrack) ?? firstTrack
+  const activeTrack = localizeTrack(
+    PICO_TRACKS.find((track) => track.slug === progress.selectedTrack) ?? firstTrackSource,
+  )
+  const nextLesson = derived.nextLesson ? localizeLesson(derived.nextLesson) : null
   const activationLessonSlug = firstRunDone
     ? (derived.nextLesson?.slug ?? activeTrack.lessons[0])
     : installDone
@@ -106,12 +232,12 @@ export function PicoOnboardingPageClient() {
   })
   const installFocusedStep =
     installWorkspace.workspace.activeStepIndex >= 0
-      ? installLesson?.steps[installWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
-      : 'not set'
+      ? installLesson?.steps[installWorkspace.workspace.activeStepIndex]?.title ?? notSetLabel
+      : notSetLabel
   const firstRunFocusedStep =
     firstRunWorkspace.workspace.activeStepIndex >= 0
-      ? firstRunLesson?.steps[firstRunWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
-      : 'not set'
+      ? firstRunLesson?.steps[firstRunWorkspace.workspace.activeStepIndex]?.title ?? notSetLabel
+      : notSetLabel
   const storyRailClass =
     'mt-6 grid grid-flow-col auto-cols-[minmax(16rem,82vw)] gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid-flow-row md:auto-cols-auto md:overflow-visible xl:grid-cols-3'
   const missionRailClass =
@@ -122,22 +248,22 @@ export function PicoOnboardingPageClient() {
     'grid grid-flow-col auto-cols-[minmax(15rem,82vw)] gap-3 overflow-x-auto pb-2 snap-x snap-mandatory md:grid-flow-row md:auto-cols-auto md:overflow-visible'
   const kickoffDoctrine = [
     {
-      label: '01 • Brief',
-      title: 'Make the runtime open cleanly',
+      label: tt('doctrine.labels.brief', '01 • Brief'),
+      title: tt('doctrine.brief', 'Make the runtime open cleanly'),
       body:
         installLesson?.objective ??
         'Install Hermes and get the command working from a fresh shell.',
     },
     {
       label: '02 • Deliverable',
-      title: 'Produce one obvious proof artifact',
+      title: tt('doctrine.deliverable', 'Produce one obvious proof artifact'),
       body:
         firstRunLesson?.expectedResult ??
         'Save one prompt and one answer in a file you can reopen later.',
     },
     {
-      label: '03 • Review line',
-      title: 'Do not widen the surface early',
+      label: tt('doctrine.labels.reviewLine', '03 • Review line'),
+      title: tt('doctrine.reviewLine', 'Do not widen the surface early'),
       body:
         firstRunLesson?.validation ??
         'Verify one bounded run before you touch more advanced surfaces.',
@@ -170,37 +296,39 @@ export function PicoOnboardingPageClient() {
   }, [completedLessonStepCount, totalLessonStepCount])
   const runtimeSignal =
     session.status !== 'authenticated'
-      ? 'local only'
+      ? localOnlyLabel
       : setup.loading
-        ? 'checking'
-        : setup.runtime?.status ?? 'not attached'
+        ? checkingLabel
+        : setup.runtime?.status ?? notAttachedLabel
   const nextMoveTitle = !installDone
-    ? 'Install Hermes now'
+    ? tt('hero.trackInstallPrompt', 'Install Hermes now')
     : !proofCaptured
-      ? 'Run one bounded prompt'
+      ? (firstRunLesson?.title ?? tt('mission.runBoundedPrompt', 'Run one bounded prompt'))
       : !firstRunDone
-        ? 'Seal the first win'
-        : derived.nextLesson
-          ? `Continue with ${derived.nextLesson.title}`
-          : 'Open Autopilot'
+        ? tt('hero.sealFirstWin', 'Seal the first win')
+        : nextLesson
+          ? tt('hero.continueWithNextLesson', 'Continue with {lessonTitle}', {
+              lessonTitle: nextLesson.title,
+            })
+          : tt('hero.openAutopilot', 'Open Autopilot')
   const activeFocusStep = !installDone ? installFocusedStep : firstRunFocusedStep
   const activeWorkspaceLabel =
-    setup.onboarding?.workspace ?? currentBinding?.workspace ?? runtimeDraft.workspace ?? 'not recorded'
+    setup.onboarding?.workspace ?? currentBinding?.workspace ?? runtimeDraft.workspace ?? notRecordedLabel
   const heroEyebrow = !proofCaptured
-    ? 'Make the first proof impossible to miss.'
+    ? tt('hero.proofStateHeadline.install', 'Make the first proof impossible to miss.')
     : !firstRunDone
-      ? 'Seal the proof while the route is still honest.'
-      : 'First proof is real. Keep the lane moving.'
-  const hostedSyncLabel = session.status === 'authenticated' ? `${hostedCompletionRatio}%` : 'local'
-  const proofSignalLabel = proofCaptured ? (firstRunDone ? 'sealed' : 'captured') : 'missing'
+      ? tt('hero.proofStateHeadline.prompt', 'Seal the proof while the route is still honest.')
+      : tt('hero.proofStateHeadline.cleared', 'First proof is real. Keep the lane moving.')
+  const hostedSyncLabel = session.status === 'authenticated' ? `${hostedCompletionRatio}%` : localLabel
+  const proofSignalLabel = proofCaptured ? (firstRunDone ? sealedLabel : capturedLabel) : missingLabel
   const runtimeSignalDetail =
     session.status !== 'authenticated'
-      ? 'hosted sync offline'
+      ? tt('hero.hostedSyncDetail.offline', 'hosted sync offline')
       : setup.loading
-        ? 'refreshing signal'
+        ? tt('hero.hostedSyncDetail.loading', 'refreshing signal')
         : setup.runtime?.gateway_url
-          ? 'gateway live'
-          : 'gateway unbound'
+          ? tt('hero.hostedSyncDetail.gatewayLive', 'gateway live')
+          : tt('hero.hostedSyncDetail.gatewayUnbound', 'gateway unbound')
   const orbitTransition = prefersReducedMotion
     ? undefined
     : { duration: 20, repeat: Infinity, ease: 'linear' as const }
@@ -280,9 +408,12 @@ export function PicoOnboardingPageClient() {
 
   return (
     <PicoShell
-      eyebrow="Onboarding"
-      title="Get to your first working agent fast"
-      description="Ignore everything except the first local win. Install Hermes, run one prompt, see a real answer, then keep moving."
+      eyebrow={tt('hero.shellEyebrow', 'Onboarding')}
+      title={tt('hero.shellTitle', 'Get to your first working agent fast')}
+      description={tt(
+        'hero.shellDescription',
+        'Ignore everything except the first local win. Install Hermes, run one prompt, see a real answer, then keep moving.',
+      )}
       heroContent={
         <div
           className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.16),rgba(9,16,11,0.88)_38%,rgba(255,255,255,0.03)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
@@ -311,7 +442,7 @@ export function PicoOnboardingPageClient() {
           <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
             <div className="grid gap-5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={picoClasses.chip}>First-win pulse</span>
+                <span className={picoClasses.chip}>{tt('hero.firstWinPulse', 'First-win pulse')}</span>
                 <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                   {activeTrack.title}
                 </span>
@@ -320,32 +451,40 @@ export function PicoOnboardingPageClient() {
                 {heroEyebrow}
               </p>
               <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Track the install, the first proof artifact, and the next move from one place.
+                {tt(
+                  'hero.subtitle',
+                  'Track the install, the first proof artifact, and the next move from one place.',
+                )}
               </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className={picoSoft('p-4')}>
-                  <p className={picoClasses.label}>Chapter pulse</p>
+                  <p className={picoClasses.label}>{tt('hero.chapterPulse', 'Chapter pulse')}</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {chapterPulsePercent}%
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    {completedLessonStepCount}/{totalLessonStepCount} steps clear
+                    {tt('hero.stepsClear', '{completed}/{total} steps clear', {
+                      completed: completedLessonStepCount,
+                      total: totalLessonStepCount,
+                    })}
                   </p>
                 </div>
 
                 <div className={picoSoft('p-4')}>
-                  <p className={picoClasses.label}>Proof state</p>
+                  <p className={picoClasses.label}>{tt('hero.proofState', 'Proof state')}</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {proofSignalLabel}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    {proofCaptured ? 'artifact logged' : 'artifact still missing'}
+                    {proofCaptured
+                      ? tt('hero.proofArtifactLogged', 'artifact logged')
+                      : tt('hero.proofArtifactMissing', 'artifact still missing')}
                   </p>
                 </div>
 
                 <div className={picoSoft('p-4')}>
-                  <p className={picoClasses.label}>Runtime truth</p>
+                  <p className={picoClasses.label}>{tt('hero.runtimeTruth', 'Runtime truth')}</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {runtimeSignal}
                   </p>
@@ -360,7 +499,9 @@ export function PicoOnboardingPageClient() {
                   <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
                 </div>
                 <div className="min-w-0">
-                  <p className={picoClasses.label}>Next irreversible move</p>
+                  <p className={picoClasses.label}>
+                    {tt('hero.nextIrreversibleMove', 'Next irreversible move')}
+                  </p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {nextMoveTitle}
                   </p>
@@ -400,7 +541,7 @@ export function PicoOnboardingPageClient() {
                 animate={prefersReducedMotion ? undefined : { y: [-2, 10, -2], x: [0, 6, 0] }}
                 transition={ambientDriftTransition}
               >
-                <p className={picoClasses.label}>Proof</p>
+                <p className={picoClasses.label}>{tt('hero.proof', 'Proof')}</p>
                 <p className="mt-1 font-medium text-[color:var(--pico-text)]">{proofSignalLabel}</p>
               </motion.div>
 
@@ -409,7 +550,7 @@ export function PicoOnboardingPageClient() {
                 animate={prefersReducedMotion ? undefined : { y: [8, -6, 8], x: [0, -4, 0] }}
                 transition={slowFloatTransition}
               >
-                <p className={picoClasses.label}>Runtime</p>
+                <p className={picoClasses.label}>{tt('hero.runtime', 'Runtime')}</p>
                 <p className="mt-1 font-medium text-[color:var(--pico-text)]">{runtimeSignal}</p>
               </motion.div>
 
@@ -418,7 +559,7 @@ export function PicoOnboardingPageClient() {
                 animate={prefersReducedMotion ? undefined : { y: [0, -10, 0], x: [-2, 6, -2] }}
                 transition={ambientDriftTransition}
               >
-                <p className={picoClasses.label}>Focus</p>
+                <p className={picoClasses.label}>{tt('hero.focus', 'Focus')}</p>
                 <p className="mt-1 text-sm font-medium text-[color:var(--pico-text)]">{activeFocusStep}</p>
               </motion.div>
 
@@ -427,13 +568,13 @@ export function PicoOnboardingPageClient() {
                 animate={prefersReducedMotion ? undefined : { y: [6, -4, 6], x: [0, -6, 0] }}
                 transition={slowFloatTransition}
               >
-                <p className={picoClasses.label}>Sync</p>
+                <p className={picoClasses.label}>{tt('hero.sync', 'Sync')}</p>
                 <p className="mt-1 font-medium text-[color:var(--pico-text)]">{hostedSyncLabel}</p>
               </motion.div>
 
               <div className="relative flex h-full items-center justify-center">
                 <div className="w-full max-w-[11rem] rounded-[30px] border border-[rgba(var(--pico-accent-rgb),0.22)] bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-4 text-center shadow-[0_22px_60px_rgba(0,0,0,0.32)] backdrop-blur-xl">
-                  <p className={picoClasses.label}>Signal core</p>
+                  <p className={picoClasses.label}>{tt('hero.signalCore', 'Signal core')}</p>
                   <p className="mt-3 font-[family:var(--font-site-display)] text-5xl tracking-[-0.08em] text-[color:var(--pico-text)]">
                     {chapterPulsePercent}%
                   </p>
@@ -444,7 +585,10 @@ export function PicoOnboardingPageClient() {
                     />
                   </div>
                   <p className="mt-3 text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
-                    {completedLessonStepCount}/{totalLessonStepCount} steps clear
+                    {tt('hero.stepsClear', '{completed}/{total} steps clear', {
+                      completed: completedLessonStepCount,
+                      total: totalLessonStepCount,
+                    })}
                   </p>
                 </div>
               </div>
@@ -464,67 +608,89 @@ export function PicoOnboardingPageClient() {
           <div className="grid gap-3 sm:flex sm:flex-wrap">
             <Link
             href={
-              firstRunDone && !derived.nextLesson
+              firstRunDone && !nextLesson
                 ? toHref('/autopilot')
                 : toHref(`/academy/${activationLessonSlug}`)
             }
             className={picoClasses.primaryButton}
             >
               {!installDone
-                ? 'Install Hermes now'
+                ? tt('hero.trackInstallPrompt', 'Install Hermes now')
                 : !firstRunDone
-                  ? 'Run your first agent'
-                  : derived.nextLesson
-                    ? `Continue with ${derived.nextLesson.title}`
-                    : 'Open Autopilot'}
+                  ? tt('compass.runFirstPrompt', 'Run your first agent')
+                  : nextLesson
+                    ? `Continue with ${nextLesson.title}`
+                    : tt('compass.inspectLiveControlRoom', 'Open Autopilot')}
             </Link>
             <Link href={toHref(`/tutor?lesson=${activationLessonSlug}`)} className={picoClasses.secondaryButton}>
-              Ask tutor about this step
+              {tt('compass.askTutorAboutStep', 'Ask tutor about this step')}
             </Link>
             <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
-              Open support lane
+              {tt('compass.escalateToHumanHelp', 'Open support lane')}
             </Link>
           </div>
         }
     >
       <PicoSessionBanner session={session} nextPath={pathname} />
       <PicoSurfaceCompass
-        title="Use the shortest route that keeps the product honest"
-        body="Keep the first win narrow. Continue the lesson path when the sequence is clear, use tutor for one blocked command, open Autopilot only when live runtime state is the real question, and escalate last."
+        title={tt('compass.title', 'Use the shortest route that keeps the product honest')}
+        body={tt(
+          'compass.body',
+          'Keep the first win narrow. Continue the lesson path when the sequence is clear, use tutor for one blocked command, open Autopilot only when live runtime state is the real question, and escalate last.',
+        )}
         status={
           firstRunDone
-            ? 'first win cleared'
+            ? tt('compass.statusFirstWinCleared', 'first win cleared')
             : installDone
-              ? 'install cleared'
-              : 'cold start'
+              ? tt('compass.statusInstallCleared', 'install cleared')
+              : tt('compass.statusColdStart', 'cold start')
         }
-        aside="This chapter exists to compress the world, not widen it. The first proof should happen before preferences, architecture debates, or tooling tours."
+        aside={tt(
+          'compass.aside',
+          'This chapter exists to compress the world, not widen it. The first proof should happen before preferences, architecture debates, or tooling tours.',
+        )}
         items={[
           {
             href: toHref(`/academy/${activationLessonSlug}`),
-            label: !installDone ? 'Open install lesson' : !firstRunDone ? 'Run first prompt' : 'Continue academy lane',
-            caption: 'Stay on the primary sequence until one visible output is real.',
-            note: 'Next move',
+            label: !installDone
+              ? tt('compass.openInstallLesson', 'Open install lesson')
+              : !firstRunDone
+                ? tt('compass.runFirstPrompt', 'Run first prompt')
+                : tt('compass.continueAcademyLane', 'Continue academy lane'),
+            caption: tt(
+              'compass.primaryCaption',
+              'Stay on the primary sequence until one visible output is real.',
+            ),
+            note: tt('compass.nextMove', 'Next move'),
             tone: 'primary',
           },
           {
             href: toHref(`/tutor?lesson=${activationLessonSlug}`),
-            label: 'Ask tutor about this step',
-            caption: 'Use this when one concrete command or validation gate is blocking you.',
-            note: 'Blocked',
+            label: tt('compass.askTutorAboutStep', 'Ask tutor about this step'),
+            caption: tt(
+              'compass.tutorCaption',
+              'Use this when one concrete command or validation gate is blocking you.',
+            ),
+            note: tt('compass.blocked', 'Blocked'),
           },
           {
             href: toHref('/autopilot'),
-            label: 'Inspect live control room',
-            caption: 'Switch here once runtime state, approvals, or spend become the bottleneck.',
-            note: 'Runtime',
+            label: tt('compass.inspectLiveControlRoom', 'Inspect live control room'),
+            caption: tt(
+              'compass.autopilotCaption',
+              'Switch here once runtime state, approvals, or spend become the bottleneck.',
+            ),
+            note: tt('compass.runtime', 'Runtime'),
             tone: 'soft',
           },
           {
             href: toHref('/support'),
-            label: 'Escalate to human help',
-            caption: 'Only use this when the product path stopped being truthful enough to recover alone.',
-            note: 'Messy edge',
+            label: tt('compass.escalateToHumanHelp', 'Escalate to human help'),
+            caption: tt(
+              'compass.supportCaption',
+              'Only use this when the product path stopped being truthful enough to recover alone.',
+            ),
+            note: tt('compass.messyEdge', 'Messy edge'),
           },
         ]}
       />
@@ -534,12 +700,12 @@ export function PicoOnboardingPageClient() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Kickoff doctrine</p>
+                <p className={picoClasses.label}>{tt('doctrine.label', 'Kickoff doctrine')}</p>
                 <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
-                  Start like a sharp studio, not a hobby project
+                  {tt('doctrine.title', 'Start like a sharp studio, not a hobby project')}
                 </h2>
               </div>
-              <span className={picoClasses.chip}>brief • deliverable • review</span>
+              <span className={picoClasses.chip}>{tt('doctrine.chip', 'brief • deliverable • review')}</span>
             </div>
 
             <div className={storyRailClass}>
@@ -559,17 +725,23 @@ export function PicoOnboardingPageClient() {
 
           <div className="grid gap-4">
             <div className={picoEmber('p-5')}>
-              <p className={picoClasses.label}>Chapter posture</p>
+              <p className={picoClasses.label}>{tt('labels.chapterPosture', 'Chapter posture')}</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Keep Chapter 01 narrow on purpose. No browsing, no stack tourism, and no extra setup theater before one real artifact exists.
+                {tt(
+                  'doctrine.postBody',
+                  'Keep Chapter 01 narrow on purpose. No browsing, no stack tourism, and no extra setup theater before one real artifact exists.',
+                )}
               </p>
             </div>
 
             <div className={picoInset('overflow-hidden p-0')}>
               <div className="border-b border-[color:var(--pico-border)] p-5">
-                <p className={picoClasses.label}>Guide marker</p>
+                <p className={picoClasses.label}>{tt('labels.guideMarker', 'Guide marker')}</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  One clear guide cue is enough while the first proof is still forming.
+                  {tt(
+                    'doctrine.guideMarkerBody',
+                    'One clear guide cue is enough while the first proof is still forming.',
+                  )}
                 </p>
               </div>
               <div className="flex items-center justify-center p-6">
@@ -585,12 +757,12 @@ export function PicoOnboardingPageClient() {
             </div>
 
             <div className={picoInset('p-5')}>
-              <p className={picoClasses.label}>Track checklist</p>
+              <p className={picoClasses.label}>{tt('labels.trackChecklist', 'Track checklist')}</p>
               <div className="mt-4 grid gap-3">
                 {activeTrack.checklist.map((item) => (
                   <div key={item} className="flex items-start gap-3">
                     <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-accent)]">
-                      ok
+                      {tt('shared.ok', 'ok')}
                     </span>
                     <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item}</p>
                   </div>
@@ -605,99 +777,124 @@ export function PicoOnboardingPageClient() {
         <div className={picoPanel('overflow-hidden p-0')}>
           <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
             <div className="p-6 sm:p-7">
-              <p className={picoClasses.label}>Chapter 01 brief</p>
+              <p className={picoClasses.label}>{tt('labels.chapterBrief', 'Chapter 01 brief')}</p>
               <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
-                Make one command work and keep the proof
+                {tt('labels.chapterBriefTitle', 'Make one command work and keep the proof')}
               </h2>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
-                This first chapter should narrow the world fast: install Hermes, run one tiny prompt, and hold on to the output so the first win becomes something real.
+                {tt(
+                  'labels.chapterBriefBody',
+                  'This first chapter should narrow the world fast: install Hermes, run one tiny prompt, and hold on to the output so the first win becomes something real.',
+                )}
               </p>
 
               <div className={joinClasses(picoEmber('mt-6 p-5 text-sm leading-7'), 'sm:p-6')}>
-                <p className="font-medium text-[color:var(--pico-text)]">Fastest path to value</p>
+                <p className="font-medium text-[color:var(--pico-text)]">
+                  {tt('labels.fastestPath', 'Fastest path to value')}
+                </p>
                 <p className="mt-2">
                   {firstRunDone
-                    ? 'You already cleared the first win. Do not linger here. Open the next lesson and keep the sequence moving.'
+                    ? tt(
+                        'labels.fastestPathBody.done',
+                        'You already cleared the first win. Do not linger here. Open the next lesson and keep the sequence moving.',
+                      )
                     : installDone
-                      ? 'Good. The install is done. Now run one tiny prompt and get the first visible answer.'
-                      : 'Do not compare providers, frameworks, or stacks yet. Install Hermes and make the command work first.'}
+                      ? tt(
+                          'labels.fastestPathBody.installDone',
+                          'Good. The install is done. Now run one tiny prompt and get the first visible answer.',
+                        )
+                      : tt(
+                          'labels.fastestPathBody.installFirst',
+                          'Do not compare providers, frameworks, or stacks yet. Install Hermes and make the command work first.',
+                        )}
                 </p>
               </div>
 
               <div className={picoInset('mt-6 grid gap-4 p-5 lg:grid-cols-3')}>
                 <div>
-                  <p className={picoClasses.label}>Track locked</p>
+                  <p className={picoClasses.label}>{tt('labels.trackLocked', 'Track locked')}</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {activeTrack.title}
                   </p>
                 </div>
                 <div>
-                  <p className={picoClasses.label}>Next move</p>
+                  <p className={picoClasses.label}>{tt('hero.nextMove', 'Next move')}</p>
                   <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
-                    {derived.nextLesson?.title ?? 'none'}
+                    {nextLesson?.title ?? noneLabel}
                   </p>
                 </div>
                 <div>
-                  <p className={picoClasses.label}>Visible success</p>
+                  <p className={picoClasses.label}>{tt('hero.visibleSuccess', 'Visible success')}</p>
                   <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
                     {firstRunWorkspace.workspace.evidence.trim() || firstRunDone
-                      ? 'recorded'
+                      ? recordedLabel
                       : installDone
-                        ? 'one prompt away'
-                        : 'install first'}
+                        ? onePromptAwayLabel
+                        : installFirstLabel}
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">
-              <p className={picoClasses.label}>Studio ledger</p>
+              <p className={picoClasses.label}>{tt('labels.studioLedger', 'Studio ledger')}</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">Completed lessons</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">
+                    {tt('labels.completedLessons', 'Completed lessons')}
+                  </p>
                   <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">
                     {derived.completedLessonCount}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">Hosted sync</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">
+                    {tt('labels.hostedSync', 'Hosted sync')}
+                  </p>
                   <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">
-                    {session.status === 'authenticated' ? `${hostedCompletionRatio}%` : 'sign in'}
+                    {session.status === 'authenticated' ? `${hostedCompletionRatio}%` : signInLabel}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">Runtime status</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">
+                    {tt('labels.runtimeStatus', 'Runtime status')}
+                  </p>
                   <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                    {setup.runtime?.status ?? 'not attached'}
+                    {setup.runtime?.status ?? notAttachedLabel}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">Workspace</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">
+                    {tt('labels.workspace', 'Workspace')}
+                  </p>
                   <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                    {setup.onboarding?.workspace ?? currentBinding?.workspace ?? 'not recorded'}
+                    {setup.onboarding?.workspace ?? currentBinding?.workspace ?? notRecordedLabel}
                   </p>
                 </div>
               </div>
 
               <div className={picoInset('mt-4 p-4')}>
-                <p className={picoClasses.label}>Jump straight to</p>
+                <p className={picoClasses.label}>{tt('labels.jumpStraightTo', 'Jump straight to')}</p>
                 <div className="mt-3 grid gap-2">
                   <Link href={toHref(`/academy/${installLessonSlug}`)} className={picoClasses.secondaryButton}>
-                    Install lesson
+                    {tt('labels.installLesson', 'Install lesson')}
                   </Link>
                   <Link href={toHref(`/academy/${firstRunLessonSlug}`)} className={picoClasses.tertiaryButton}>
-                    First prompt lesson
+                    {tt('labels.firstPromptLesson', 'First prompt lesson')}
                   </Link>
                   <Link href={toHref('/tutor')} className={picoClasses.tertiaryButton}>
-                    Ask tutor
+                    {tt('labels.askTutor', 'Ask tutor')}
                   </Link>
                 </div>
               </div>
 
               <div className={picoInset('mt-4 p-4')}>
-                <p className={picoClasses.label}>Operating rule</p>
+                <p className={picoClasses.label}>{tt('labels.operatingRule', 'Operating rule')}</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  More choice this early is just prettier procrastination. Get the first win, then widen the surface.
+                  {tt(
+                    'labels.operatingRuleBody',
+                    'More choice this early is just prettier procrastination. Get the first win, then widen the surface.',
+                  )}
                 </p>
               </div>
             </div>
@@ -706,16 +903,22 @@ export function PicoOnboardingPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Current pressure</p>
+            <p className={picoClasses.label}>{tt('labels.currentPressure', 'Current pressure')}</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Install</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{installDone ? 'done' : 'pending'}</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">{tt('labels.install', 'Install')}</p>
+                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                  {installDone ? doneLabel : pendingLabel}
+                </p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">First prompt</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">
+                  {tt('labels.firstPrompt', 'First prompt')}
+                </p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {firstRunWorkspace.workspace.evidence.trim() || firstRunDone ? 'proof captured' : 'pending'}
+                  {firstRunWorkspace.workspace.evidence.trim() || firstRunDone
+                    ? tt('labels.currentPressureFirstPrompt', 'proof captured')
+                    : pendingLabel}
                 </p>
               </div>
             </div>
@@ -726,15 +929,18 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('mt-6 p-6 sm:p-7')} data-testid="pico-onboarding-proof-protocol">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Proof protocol</p>
+            <p className={picoClasses.label}>{tt('labels.proofProtocol', 'Proof protocol')}</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              Three visible moves to clear Chapter 01
+              {tt('labels.visibleMoves', 'Three visible moves to clear Chapter 01')}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              These are the only moves that count before the surface earns the right to get wider.
+              {tt(
+                'protocol.body',
+                'These are the only moves that count before the surface earns the right to get wider.',
+              )}
             </p>
           </div>
-          <span className={picoClasses.chip}>first win protocol</span>
+          <span className={picoClasses.chip}>{tt('mission.firstWinProtocol', 'first win protocol')}</span>
         </div>
 
         <div className={storyRailClass}>
@@ -742,14 +948,20 @@ export function PicoOnboardingPageClient() {
             <article key={item.title} className={picoInset('snap-start flex h-full flex-col p-5 sm:p-6')}>
               <div className="flex items-center justify-between gap-3">
                 <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-accent)]">
-                  {item.chapter}
+                  {tt(`protocol.items.${index}.chapter`, item.chapter)}
                 </span>
-                <span className={picoClasses.label}>{index === 0 ? 'Do this now' : 'Visible move'}</span>
+                <span className={picoClasses.label}>
+                  {index === 0
+                    ? tt('mission.doThisNow', 'Do this now')
+                    : tt('mission.visibleMove', 'Visible move')}
+                </span>
               </div>
               <h3 className="mt-6 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                {item.title}
+                {tt(`protocol.items.${index}.title`, item.title)}
               </h3>
-              <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">{item.body}</p>
+              <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+                {tt(`protocol.items.${index}.body`, item.body)}
+              </p>
             </article>
           ))}
         </div>
@@ -758,33 +970,44 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-stack-radar">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Live stack radar</p>
+            <p className={picoClasses.label}>{tt('labels.liveStackRadar', 'Live stack radar')}</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              The onboarding lane now knows what the tracked stacks are actually shipping
+              {tt(
+                'labels.liveStackRadarTitle',
+                'The onboarding lane now knows what the tracked stacks are actually shipping',
+              )}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              Pico starts with Hermes in the lesson flow, but the product now keeps the rest of the
-              stack map visible instead of pretending there is only one runtime on earth.
+              {tt(
+                'labels.liveStackRadarBody',
+                'Pico starts with Hermes in the lesson flow, but the product now keeps the rest of the stack map visible instead of pretending there is only one runtime on earth.',
+              )}
             </p>
           </div>
           <Link href={toHref('/wip')} className={picoClasses.secondaryButton}>
-            Open live ledger
+            {tt('labels.openLiveLedger', 'Open live ledger')}
           </Link>
         </div>
 
         <div className={storyRailClass}>
-          {stackSpotlights.map((stack) => (
+          {stackSpotlights.map((stack, index) => (
             <article key={stack.id} className={picoInset('snap-start flex h-full flex-col p-5 sm:p-6')}>
               <div className="flex items-center justify-between gap-3">
-                <span className={picoClasses.label}>{stack.name}</span>
-                <span className={picoClasses.chip}>{stack.latestSignal}</span>
+                <span className={picoClasses.label}>
+                  {tt(`runtime.stackSpotlights.${index}.name`, stack.name)}
+                </span>
+                <span className={picoClasses.chip}>
+                  {tt(`runtime.stackSpotlights.${index}.latestSignal`, stack.latestSignal)}
+                </span>
               </div>
               <p className="mt-6 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                {stack.whyNow}
+                {tt(`runtime.stackSpotlights.${index}.whyNow`, stack.whyNow)}
               </p>
               <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
-                Keep this map in view while you execute the first lessons. Stack choice, launch
-                posture, and remote-access decisions should stay explicit from day one.
+                {tt(
+                  `runtime.stackSpotlights.${index}.body`,
+                  'Keep this map in view while you execute the first lessons. Stack choice, launch posture, and remote-access decisions should stay explicit from day one.',
+                )}
               </p>
             </article>
           ))}
@@ -794,24 +1017,27 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-mission-board">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Mission board</p>
+            <p className={picoClasses.label}>{tt('labels.missionBoard', 'Mission board')}</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              Keep the first two missions visibly grounded
+              {tt('labels.missionBoardTitle', 'Keep the first two missions visibly grounded')}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              Onboarding should know where the operator left off. These mission cards mirror the lesson workspace so the first win survives route changes instead of dissolving into memory.
+              {tt(
+                'labels.missionBoardBody',
+                'Onboarding should know where the operator left off. These mission cards mirror the lesson workspace so the first win survives route changes instead of dissolving into memory.',
+              )}
             </p>
           </div>
-          <span className={picoClasses.chip}>workspace continuity</span>
+          <span className={picoClasses.chip}>{tt('labels.workspaceContinuity', 'workspace continuity')}</span>
         </div>
 
         <div className={missionRailClass}>
           <article className={picoInset('grid gap-4 p-5')} data-testid="pico-onboarding-install-mission">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className={picoClasses.label}>Mission 01</p>
+                <p className={picoClasses.label}>{tt('labels.mission01', 'Mission 01')}</p>
                 <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                  Install Hermes
+                  {tt('mission.installHermes', installLesson?.title ?? 'Install Hermes')}
                 </h3>
               </div>
               <span className={picoClasses.chip}>
@@ -826,22 +1052,30 @@ export function PicoOnboardingPageClient() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Focused step</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">
+                  {tt('mission.focusedStep', 'Focused step')}
+                </p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{installFocusedStep}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Proof state</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">
+                  {tt('hero.proofState', 'Proof state')}
+                </p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {installWorkspace.workspace.evidence.trim() ? 'captured' : installDone ? 'completed' : 'missing'}
+                  {installWorkspace.workspace.evidence.trim()
+                    ? capturedLabel
+                    : installDone
+                      ? completedLabel
+                      : missingLabel}
                 </p>
               </div>
             </div>
             <div className="grid gap-3 sm:flex sm:flex-wrap">
               <Link href={toHref(`/academy/${installLessonSlug}`)} className={picoClasses.secondaryButton}>
-                Resume install mission
+                {tt('mission.resumeInstall', 'Resume install mission')}
               </Link>
               <Link href={toHref(`/tutor?lesson=${installLessonSlug}`)} className={picoClasses.tertiaryButton}>
-                Ask tutor
+                {tt('labels.askTutor', 'Ask tutor')}
               </Link>
             </div>
           </article>
@@ -849,9 +1083,12 @@ export function PicoOnboardingPageClient() {
           <article className={picoInset('grid gap-4 p-5')} data-testid="pico-onboarding-first-run-mission">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className={picoClasses.label}>Mission 02</p>
+                <p className={picoClasses.label}>{tt('labels.mission02', 'Mission 02')}</p>
                 <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                  Run one bounded prompt
+                  {tt(
+                    'mission.runBoundedPrompt',
+                    firstRunLesson?.title ?? 'Run one bounded prompt',
+                  )}
                 </h3>
               </div>
               <span className={picoClasses.chip}>
@@ -866,22 +1103,30 @@ export function PicoOnboardingPageClient() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Focused step</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">
+                  {tt('mission.focusedStep', 'Focused step')}
+                </p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{firstRunFocusedStep}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Proof state</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">
+                  {tt('hero.proofState', 'Proof state')}
+                </p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {firstRunWorkspace.workspace.evidence.trim() ? 'captured' : firstRunDone ? 'completed' : 'missing'}
+                  {firstRunWorkspace.workspace.evidence.trim()
+                    ? capturedLabel
+                    : firstRunDone
+                      ? completedLabel
+                      : missingLabel}
                 </p>
               </div>
             </div>
             <div className="grid gap-3 sm:flex sm:flex-wrap">
               <Link href={toHref(`/academy/${firstRunLessonSlug}`)} className={picoClasses.secondaryButton}>
-                Resume prompt mission
+                {tt('mission.resumePrompt', 'Resume prompt mission')}
               </Link>
               <Link href={toHref(`/tutor?lesson=${firstRunLessonSlug}`)} className={picoClasses.tertiaryButton}>
-                Ask tutor
+                {tt('labels.askTutor', 'Ask tutor')}
               </Link>
             </div>
           </article>
@@ -891,12 +1136,18 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-operator-record">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Operator record</p>
+            <p className={picoClasses.label}>{tt('labels.operatorRecord', 'Operator record')}</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              Keep hosted kickoff and runtime truth in one place
+              {tt(
+                'labels.operatorRecordTitle',
+                'Keep hosted kickoff and runtime truth in one place',
+              )}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              Keep the hosted onboarding state, runtime truth, and next activation move in one operator record for Chapter 01.
+              {tt(
+                'labels.operatorRecordBody',
+                'Keep the hosted onboarding state, runtime truth, and next activation move in one operator record for Chapter 01.',
+              )}
             </p>
           </div>
           {session.status === 'authenticated' ? (
@@ -905,7 +1156,7 @@ export function PicoOnboardingPageClient() {
               onClick={() => void setup.refresh()}
               className={picoClasses.tertiaryButton}
             >
-              Refresh sync
+              {tt('labels.refreshSync', 'Refresh sync')}
             </button>
           ) : null}
         </div>
@@ -914,13 +1165,11 @@ export function PicoOnboardingPageClient() {
           <div className="grid gap-4">
             {session.status !== 'authenticated' ? (
               <div className={picoSoft('p-5')}>
-                <p className={picoClasses.body}>
-                  Sign in on the Pico host to attach the hosted onboarding wizard and the latest runtime snapshot to this page.
-                </p>
+                <p className={picoClasses.body}>{tt('runtime.signInFirst', 'Sign in first. The runtime snapshot is per operator account.')}</p>
               </div>
             ) : setup.loading ? (
               <div className={picoSoft('p-5')}>
-                <p className={picoClasses.body}>Loading backend onboarding and runtime state.</p>
+                <p className={picoClasses.body}>{tt('runtime.loading', 'Loading backend onboarding and runtime state.')}</p>
               </div>
             ) : setup.error ? (
               <div className={picoEmber('p-5')}>
@@ -947,11 +1196,17 @@ export function PicoOnboardingPageClient() {
                               <div>
                                 <p className="font-medium text-[color:var(--pico-text)]">{provider.label}</p>
                                 <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
-                                  {active ? 'current provider' : provider.enabled ? 'available soon' : 'locked'}
+                                  {active
+                                    ? tt('runtime.currentProvider', 'current provider')
+                                    : provider.enabled
+                                      ? tt('runtime.availableSoon', 'available soon')
+                                      : tt('runtime.locked', 'locked')}
                                 </p>
                               </div>
                             </div>
-                            <span className={picoClasses.chip}>{provider.enabled ? 'ready' : 'later'}</span>
+                            <span className={picoClasses.chip}>
+                              {provider.enabled ? tt('runtime.ready', 'ready') : tt('runtime.later', 'later')}
+                            </span>
                           </div>
                           <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{provider.summary}</p>
                         </article>
@@ -962,27 +1217,35 @@ export function PicoOnboardingPageClient() {
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">Wizard progress</p>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">
+                      {tt('runtime.wizardProgress', 'Wizard progress')}
+                    </p>
                     <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">
-                      {setup.onboarding ? `${hostedCompletionRatio}%` : 'not started'}
+                      {setup.onboarding ? `${hostedCompletionRatio}%` : notStartedLabel}
                     </p>
                   </div>
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">Current step</p>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">
+                      {tt('runtime.currentStep', 'Current step')}
+                    </p>
                     <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                      {setup.onboarding?.current_step ?? 'not recorded'}
+                      {setup.onboarding?.current_step ?? notRecordedLabel}
                     </p>
                   </div>
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">Runtime status</p>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">
+                      {tt('labels.runtimeStatus', 'Runtime status')}
+                    </p>
                     <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                      {setup.runtime?.status ?? 'not attached'}
+                      {setup.runtime?.status ?? notAttachedLabel}
                     </p>
                   </div>
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">Current binding</p>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">
+                      {tt('labels.currentBinding', 'Current binding')}
+                    </p>
                     <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                      {currentBinding?.assistant_name ?? currentBinding?.assistant_id ?? 'none'}
+                      {currentBinding?.assistant_name ?? currentBinding?.assistant_id ?? noneLabel}
                     </p>
                   </div>
                 </div>
@@ -991,13 +1254,13 @@ export function PicoOnboardingPageClient() {
                   <div className={picoInset('grid gap-4 p-5')}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className={picoClasses.label}>Hosted kickoff review</p>
+                        <p className={picoClasses.label}>{tt('runtime.hostedKickoffReview', 'Hosted kickoff review')}</p>
                         <h3 className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                           {setup.onboarding.status}
                         </h3>
                       </div>
                       <span className={picoClasses.chip}>
-                        {setup.onboarding.checklist_dismissed ? 'checklist dismissed' : 'checklist visible'}
+                        {setup.onboarding.checklist_dismissed ? checklistDismissedLabel : checklistVisibleLabel}
                       </span>
                     </div>
 
@@ -1024,7 +1287,7 @@ export function PicoOnboardingPageClient() {
                               </p>
                             </div>
                             <span className={picoClasses.chip}>
-                              {failed ? 'failed' : step.completed ? 'done' : active ? 'active' : 'pending'}
+                              {failed ? failedLabel : step.completed ? doneLabel : active ? activeLabel : pendingLabel}
                             </span>
                           </div>
                         )
@@ -1033,35 +1296,37 @@ export function PicoOnboardingPageClient() {
                   </div>
                 ) : (
                   <div className={picoSoft('p-5')}>
-                    <p className={picoClasses.body}>No hosted onboarding state has been recorded yet.</p>
+                    <p className={picoClasses.body}>{tt('runtime.noHostedState', 'No hosted onboarding state has been recorded yet.')}</p>
                   </div>
                 )}
 
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr),18rem]">
                   <div className={picoInset('p-5')}>
-                    <p className={picoClasses.label}>Operator host snapshot</p>
+                    <p className={picoClasses.label}>{tt('runtime.operatorHostSnapshot', 'Operator host snapshot')}</p>
                     {setup.runtime ? (
                       <div className="mt-4 grid gap-3 sm:grid-cols-2">
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">Gateway</p>
+                          <p className="text-sm text-[color:var(--pico-text-muted)]">{tt('runtime.gateway', 'Gateway')}</p>
                           <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                            {setup.runtime.gateway_url ?? 'not recorded'}
+                            {setup.runtime.gateway_url ?? notRecordedLabel}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">Install method</p>
+                          <p className="text-sm text-[color:var(--pico-text-muted)]">
+                            {tt('runtime.installMethod', 'Install method')}
+                          </p>
                           <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                            {setup.runtime.install_method ?? 'not recorded'}
+                            {setup.runtime.install_method ?? notRecordedLabel}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">Last seen</p>
+                          <p className="text-sm text-[color:var(--pico-text-muted)]">{tt('runtime.lastSeen', 'Last seen')}</p>
                           <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                            {formatTimestamp(setup.runtime.last_seen_at)}
+                            {formatTimestamp(locale, setup.runtime.last_seen_at, notRecordedLabel)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">Bindings</p>
+                          <p className="text-sm text-[color:var(--pico-text-muted)]">{tt('runtime.bindings', 'Bindings')}</p>
                           <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                             {setup.runtime.binding_count}
                           </p>
@@ -1069,20 +1334,20 @@ export function PicoOnboardingPageClient() {
                       </div>
                     ) : (
                       <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                        No runtime snapshot has been synced yet.
+                        {tt('runtime.noRuntimeSnapshot', 'No runtime snapshot has been synced yet.')}
                       </p>
                     )}
                   </div>
 
                   <div className={picoEmber('p-5')}>
-                    <p className={picoClasses.label}>Gateway health</p>
+                    <p className={picoClasses.label}>{tt('runtime.gatewayHealth', 'Gateway health')}</p>
                     <p className="mt-2 text-lg text-[color:var(--pico-text)]">
-                      {setup.runtime?.gateway?.status ?? 'unknown'}
+                      {setup.runtime?.gateway?.status ?? tt('runtime.unknown', 'unknown')}
                     </p>
                     <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                       {typeof setup.runtime?.gateway?.doctor_summary === 'string'
                         ? setup.runtime.gateway.doctor_summary
-                        : 'No doctor summary was synced yet.'}
+                        : tt('runtime.noDoctorSummary', 'No doctor summary was synced yet.')}
                     </p>
                   </div>
                 </div>
@@ -1092,18 +1357,20 @@ export function PicoOnboardingPageClient() {
 
           <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Activation track</p>
+              <p className={picoClasses.label}>{tt('labels.activationTrack', 'Activation track')}</p>
               <article className={picoInset('mt-4 grid gap-4 p-5')}>
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className={picoClasses.chip}>Do this first</span>
-                    <span className={picoClasses.chip}>Outcome-driven</span>
+                    <span className={picoClasses.chip}>{tt('labels.doThisFirst', 'Do this first')}</span>
+                    <span className={picoClasses.chip}>{tt('labels.outcomeDriven', 'Outcome-driven')}</span>
                   </div>
                   <h2 className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {firstTrack.title}
                   </h2>
                   <p className={picoClasses.body}>{firstTrack.intro}</p>
-                  <p className="text-sm text-[color:var(--pico-accent)]">Outcome: {firstTrack.outcome}</p>
+                  <p className="text-sm text-[color:var(--pico-accent)]">
+                    {tt('labels.outcome', 'Outcome:')} {firstTrack.outcome}
+                  </p>
                 </div>
                 <div className="grid gap-3">
                   {firstTrack.checklist.map((item) => (
@@ -1115,23 +1382,36 @@ export function PicoOnboardingPageClient() {
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.body}>
                     {firstRunDone
-                      ? 'You already got the first win. Use the main action above and keep the sequence moving.'
+                      ? tt(
+                          'labels.activationTrackBody.done',
+                          'You already got the first win. Use the main action above and keep the sequence moving.',
+                        )
                       : installDone
-                        ? 'Hermes is installed. Skip the overview and open the first prompt lesson now.'
-                        : 'Everything else can wait. Open the install lesson and get the command working.'}
+                        ? tt(
+                            'labels.activationTrackBody.installDone',
+                            'Hermes is installed. Skip the overview and open the first prompt lesson now.',
+                          )
+                        : tt(
+                            'labels.activationTrackBody.installFirst',
+                            'Everything else can wait. Open the install lesson and get the command working.',
+                          )}
                   </p>
                 </div>
               </article>
             </section>
 
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Operator rule</p>
+              <p className={picoClasses.label}>{tt('labels.operatingRule', 'Operator rule')}</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                More choice this early is still prettier procrastination. Keep the chapter narrow until one local run and one proof artifact are both real.
+                {tt(
+                  'labels.operatorRuleBody',
+                  'More choice this early is still prettier procrastination. Keep the chapter narrow until one local run and one proof artifact are both real.',
+                )}
               </p>
               {firstRunDone ? (
                 <div className="mt-4 grid gap-3">
                   {PICO_TRACKS.slice(1).map((track) => {
+                    const localizedTrack = localizeTrack(track)
                     const selected = progress.selectedTrack === track.slug
                     const unlocked = derived.unlockedTrackSlugs.includes(track.slug)
                     return (
@@ -1139,9 +1419,11 @@ export function PicoOnboardingPageClient() {
                         <div className="flex items-start justify-between gap-3">
                           <div>
                             <h3 className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                              {track.title}
+                              {localizedTrack.title}
                             </h3>
-                            <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{track.intro}</p>
+                            <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                              {localizedTrack.intro}
+                            </p>
                           </div>
                           <button
                             type="button"
@@ -1149,7 +1431,11 @@ export function PicoOnboardingPageClient() {
                             disabled={!unlocked}
                             className={picoClasses.tertiaryButton}
                           >
-                            {selected ? 'Active track' : unlocked ? 'Set as track' : 'Locked'}
+                            {selected
+                              ? tt('labels.trackState.active', 'Active track')
+                              : unlocked
+                                ? tt('labels.trackState.set', 'Set as track')
+                                : tt('labels.trackState.locked', 'Locked')}
                           </button>
                         </div>
                       </article>
@@ -1164,23 +1450,29 @@ export function PicoOnboardingPageClient() {
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.04fr),22rem]">
         <section className={picoPanel('p-6 sm:p-7')}>
-          <p className={picoClasses.label}>Hosted runtime editor</p>
+          <p className={picoClasses.label}>{tt('labels.hostedRuntimeEditor', 'Hosted runtime editor')}</p>
           <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-            Update the operator record without leaving the route
+            {tt(
+              'labels.hostedRuntimeEditorTitle',
+              'Update the operator record without leaving the route',
+            )}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            This does not pretend to install anything from the browser. It stores the latest truthful runtime snapshot so the rest of Pico stops guessing.
+            {tt(
+              'labels.hostedRuntimeEditorBody',
+              'This does not pretend to install anything from the browser. It stores the latest truthful runtime snapshot so the rest of Pico stops guessing.',
+            )}
           </p>
 
           {session.status !== 'authenticated' ? (
             <div className={picoSoft('mt-5 p-5')}>
-              <p className={picoClasses.body}>Sign in first. The runtime snapshot is per operator account.</p>
+              <p className={picoClasses.body}>{tt('runtime.signInFirst', 'Sign in first. The runtime snapshot is per operator account.')}</p>
             </div>
           ) : (
             <div className="mt-5 grid gap-4">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                  <span className={picoClasses.label}>Runtime label</span>
+                  <span className={picoClasses.label}>{tt('labels.runtimeLabel', 'Runtime label')}</span>
                   <input
                     value={runtimeDraft.label}
                     onChange={(event) =>
@@ -1192,7 +1484,7 @@ export function PicoOnboardingPageClient() {
                 </label>
 
                 <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                  <span className={picoClasses.label}>Runtime status</span>
+                  <span className={picoClasses.label}>{tt('labels.runtimeStatusField', 'Runtime status')}</span>
                   <select
                     value={runtimeDraft.status}
                     onChange={(event) =>
@@ -1202,14 +1494,14 @@ export function PicoOnboardingPageClient() {
                   >
                     {runtimeStatusOptions.map((status) => (
                       <option key={status} value={status}>
-                        {status}
+                        {formatRuntimeStatusOption(status)}
                       </option>
                     ))}
                   </select>
                 </label>
 
                 <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                  <span className={picoClasses.label}>Install method</span>
+                  <span className={picoClasses.label}>{tt('labels.installMethod', 'Install method')}</span>
                   <select
                     value={runtimeDraft.installMethod}
                     onChange={(event) =>
@@ -1219,14 +1511,14 @@ export function PicoOnboardingPageClient() {
                   >
                     {installMethodOptions.map((method) => (
                       <option key={method} value={method}>
-                        {method}
+                        {formatInstallMethodOption(method)}
                       </option>
                     ))}
                   </select>
                 </label>
 
                 <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                  <span className={picoClasses.label}>Gateway URL</span>
+                  <span className={picoClasses.label}>{tt('labels.gatewayUrl', 'Gateway URL')}</span>
                   <input
                     value={runtimeDraft.gatewayUrl}
                     onChange={(event) =>
@@ -1238,7 +1530,7 @@ export function PicoOnboardingPageClient() {
                 </label>
 
                 <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                  <span className={picoClasses.label}>Assistant name</span>
+                  <span className={picoClasses.label}>{tt('labels.assistantName', 'Assistant name')}</span>
                   <input
                     value={runtimeDraft.assistantName}
                     onChange={(event) =>
@@ -1250,7 +1542,7 @@ export function PicoOnboardingPageClient() {
                 </label>
 
                 <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                  <span className={picoClasses.label}>Workspace</span>
+                  <span className={picoClasses.label}>{tt('labels.workspaceField', 'Workspace')}</span>
                   <input
                     value={runtimeDraft.workspace}
                     onChange={(event) =>
@@ -1263,7 +1555,7 @@ export function PicoOnboardingPageClient() {
               </div>
 
               <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-                <span className={picoClasses.label}>Model</span>
+                <span className={picoClasses.label}>{tt('labels.modelField', 'Model')}</span>
                 <input
                   value={runtimeDraft.model}
                   onChange={(event) =>
@@ -1282,14 +1574,19 @@ export function PicoOnboardingPageClient() {
                     className={picoClasses.primaryButton}
                     disabled={setup.pendingAction !== null || !runtimeDraftDirty}
                   >
-                    {setup.pendingAction === 'runtime' ? 'Saving snapshot...' : 'Save runtime snapshot'}
+                    {setup.pendingAction === 'runtime'
+                      ? tt('labels.savingSnapshot', 'Saving snapshot...')
+                      : tt('labels.saveSnapshot', 'Save runtime snapshot')}
                   </button>
                   <Link href={toHref('/academy/install-hermes-locally')} className={picoClasses.secondaryButton}>
-                    Open install lesson
+                    {tt('labels.openInstallLesson', 'Open install lesson')}
                   </Link>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Save only what is true on the operator host right now: gateway URL, runtime health, and the bound assistant.
+                  {tt(
+                    'labels.saveOnlyTruth',
+                    'Save only what is true on the operator host right now: gateway URL, runtime health, and the bound assistant.',
+                  )}
                 </p>
               </div>
             </div>
@@ -1298,24 +1595,24 @@ export function PicoOnboardingPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Current binding</p>
+            <p className={picoClasses.label}>{tt('labels.currentBindingTitle', 'Current binding')}</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Assistant</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">{tt('labels.assistant', 'Assistant')}</p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {currentBinding?.assistant_name ?? currentBinding?.assistant_id ?? 'not recorded'}
+                  {currentBinding?.assistant_name ?? currentBinding?.assistant_id ?? notRecordedLabel}
                 </p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Workspace</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">{tt('labels.workspace', 'Workspace')}</p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {currentBinding?.workspace ?? setup.onboarding?.workspace ?? 'not recorded'}
+                  {currentBinding?.workspace ?? setup.onboarding?.workspace ?? notRecordedLabel}
                 </p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Model</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">{tt('labels.model', 'Model')}</p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {currentBinding?.model ?? 'not recorded'}
+                  {currentBinding?.model ?? notRecordedLabel}
                 </p>
               </div>
             </div>
@@ -1323,7 +1620,7 @@ export function PicoOnboardingPageClient() {
 
           {session.status === 'authenticated' && setup.onboarding ? (
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Hosted actions</p>
+              <p className={picoClasses.label}>{tt('labels.hostedActions', 'Hosted actions')}</p>
               <div className="mt-4 grid gap-3">
                 <button
                   type="button"
@@ -1331,7 +1628,9 @@ export function PicoOnboardingPageClient() {
                   className={picoClasses.primaryButton}
                   disabled={setup.pendingAction !== null}
                 >
-                  {setup.pendingAction === 'complete_step' ? 'Updating step...' : 'Mark current step complete'}
+                  {setup.pendingAction === 'complete_step'
+                    ? tt('labels.updateStep', 'Updating step...')
+                    : tt('labels.completeStep', 'Mark current step complete')}
                 </button>
                 <button
                   type="button"
@@ -1339,7 +1638,9 @@ export function PicoOnboardingPageClient() {
                   className={picoClasses.secondaryButton}
                   disabled={setup.pendingAction !== null || setup.onboarding.checklist_dismissed}
                 >
-                  {setup.onboarding.checklist_dismissed ? 'Checklist dismissed' : 'Dismiss checklist'}
+                  {setup.onboarding.checklist_dismissed
+                    ? tt('labels.checklistDismissed', 'Checklist dismissed')
+                    : tt('labels.dismissChecklist', 'Dismiss checklist')}
                 </button>
                 <button
                   type="button"
@@ -1347,7 +1648,7 @@ export function PicoOnboardingPageClient() {
                   className={picoClasses.tertiaryButton}
                   disabled={setup.pendingAction !== null}
                 >
-                  Complete wizard
+                  {tt('labels.completeWizard', 'Complete wizard')}
                 </button>
                 <button
                   type="button"
@@ -1355,7 +1656,7 @@ export function PicoOnboardingPageClient() {
                   className={picoClasses.tertiaryButton}
                   disabled={setup.pendingAction !== null}
                 >
-                  Reset wizard
+                  {tt('labels.resetWizard', 'Reset wizard')}
                 </button>
               </div>
             </section>

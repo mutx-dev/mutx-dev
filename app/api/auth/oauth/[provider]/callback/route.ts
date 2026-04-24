@@ -6,6 +6,7 @@ import {
   getCookieDomain,
   shouldUseSecureCookies,
 } from "@/app/api/_lib/controlPlane";
+import { normalizePicoLocale } from "@/lib/pico/locale";
 import {
   getDefaultRedirectPathForHost,
   resolveRedirectPath,
@@ -114,6 +115,9 @@ export async function GET(
   }
 
   const redirectUri = `${getPublicOrigin(request)}/api/auth/oauth/${provider}/callback`;
+  const preferredLocale = normalizePicoLocale(
+    request.cookies.get("NEXT_LOCALE")?.value ?? null,
+  );
   const response = await fetch(
     `${getApiBaseUrl()}/v1/auth/oauth/${provider}/exchange`,
     {
@@ -122,6 +126,7 @@ export async function GET(
       body: JSON.stringify({
         code,
         redirect_uri: redirectUri,
+        ...(preferredLocale ? { preferred_locale: preferredLocale } : {}),
       }),
       cache: "no-store",
     },
@@ -199,6 +204,9 @@ export async function POST(
   }
 
   const redirectUri = `${getPublicOrigin(request)}/api/auth/oauth/${provider}/callback`;
+  const preferredLocale = normalizePicoLocale(
+    request.cookies.get("NEXT_LOCALE")?.value ?? null,
+  );
   const response = await fetch(
     `${getApiBaseUrl()}/v1/auth/oauth/${provider}/exchange`,
     {
@@ -207,6 +215,7 @@ export async function POST(
       body: JSON.stringify({
         code,
         redirect_uri: redirectUri,
+        ...(preferredLocale ? { preferred_locale: preferredLocale } : {}),
       }),
       cache: "no-store",
     },

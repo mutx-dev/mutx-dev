@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 import {
@@ -34,67 +35,93 @@ type TourStep = {
   bullets: string[]
 }
 
-function buildRouteStep(currentItem: PicoWelcomeTourNavItem, pageTitle: string): TourStep {
+function buildRouteKey(currentItem: PicoWelcomeTourNavItem) {
   if (currentItem.href === '/academy') {
-    return {
-      eyebrow: '02 Mission first',
-      title: 'The codex only wants one mission to matter.',
-      body: 'Open the dominant lesson, clear the visible step, and let the archive stay quiet until the main route is done.',
-      bullets: [
-        'The map explains sequence. It should not compete with the mission.',
-        'The current proof lane is the only part that should feel urgent.',
-        `Current surface: ${pageTitle}.`,
-      ],
-    }
+    return 'academy'
   }
 
   if (currentItem.href === '/tutor') {
-    return {
-      eyebrow: '02 One blocker',
-      title: 'Tutor is for the exact next move.',
-      body: 'Ask about the one command, file path, or validation step that is stopping the route.',
-      bullets: [
-        'If the sequence is wrong, return to Academy.',
-        'If live runtime state is the blocker, open Autopilot.',
-        `Current surface: ${pageTitle}.`,
-      ],
-    }
+    return 'tutor'
   }
 
   if (currentItem.href === '/autopilot') {
+    return 'autopilot'
+  }
+
+  if (currentItem.href === '/support') {
+    return 'support'
+  }
+
+  return 'onboarding'
+}
+
+function buildRouteStep(
+  t: ReturnType<typeof useTranslations<'pico.welcomeTour'>>,
+  currentItem: PicoWelcomeTourNavItem,
+  pageTitle: string,
+): TourStep {
+  const routeKey = buildRouteKey(currentItem)
+
+  if (routeKey === 'academy') {
     return {
-      eyebrow: '02 Runtime truth',
-      title: 'Autopilot beats lesson copy when the system is live.',
-      body: 'Use the runtime surface when the answer depends on runs, alerts, approvals, or current state.',
+      eyebrow: t('steps.route.academy.eyebrow'),
+      title: t('steps.route.academy.title'),
+      body: t('steps.route.academy.body'),
       bullets: [
-        'Return to Academy when the mission sequence is the real problem.',
-        'Escalate only after runtime truth is no longer enough.',
-        `Current surface: ${pageTitle}.`,
+        t('steps.route.academy.bullets.map'),
+        t('steps.route.academy.bullets.proof'),
+        t('steps.route.academy.bullets.currentSurface', { pageTitle }),
       ],
     }
   }
 
-  if (currentItem.href === '/support') {
+  if (routeKey === 'tutor') {
     return {
-      eyebrow: '02 Human edge',
-      title: 'Support should send you back into motion fast.',
-      body: 'Bring the cleanest lesson or runtime packet possible, then return to the product instead of lingering here.',
+      eyebrow: t('steps.route.tutor.eyebrow'),
+      title: t('steps.route.tutor.title'),
+      body: t('steps.route.tutor.body'),
       bullets: [
-        'Support is the messy edge, not the default workspace.',
-        'Carry lesson slug, proof, and blocker when you escalate.',
-        `Current surface: ${pageTitle}.`,
+        t('steps.route.tutor.bullets.academy'),
+        t('steps.route.tutor.bullets.autopilot'),
+        t('steps.route.tutor.bullets.currentSurface', { pageTitle }),
+      ],
+    }
+  }
+
+  if (routeKey === 'autopilot') {
+    return {
+      eyebrow: t('steps.route.autopilot.eyebrow'),
+      title: t('steps.route.autopilot.title'),
+      body: t('steps.route.autopilot.body'),
+      bullets: [
+        t('steps.route.autopilot.bullets.academy'),
+        t('steps.route.autopilot.bullets.support'),
+        t('steps.route.autopilot.bullets.currentSurface', { pageTitle }),
+      ],
+    }
+  }
+
+  if (routeKey === 'support') {
+    return {
+      eyebrow: t('steps.route.support.eyebrow'),
+      title: t('steps.route.support.title'),
+      body: t('steps.route.support.body'),
+      bullets: [
+        t('steps.route.support.bullets.notDefault'),
+        t('steps.route.support.bullets.packet'),
+        t('steps.route.support.bullets.currentSurface', { pageTitle }),
       ],
     }
   }
 
   return {
-    eyebrow: '02 First win',
-    title: 'Onboarding exists to compress the first visible success.',
-    body: 'Use it to get to one working runtime and one proof artifact, then move immediately into the codex.',
+    eyebrow: t('steps.route.onboarding.eyebrow'),
+    title: t('steps.route.onboarding.title'),
+    body: t('steps.route.onboarding.body'),
     bullets: [
-      'Treat preferences as noise until the first success is real.',
-      'Academy becomes useful once you need the exact lane.',
-      `Current surface: ${pageTitle}.`,
+      t('steps.route.onboarding.bullets.noise'),
+      t('steps.route.onboarding.bullets.academy'),
+      t('steps.route.onboarding.bullets.currentSurface', { pageTitle }),
     ],
   }
 }
@@ -107,6 +134,7 @@ export function PicoWelcomeTour({
   nextItem,
   pageTitle,
 }: PicoWelcomeTourProps) {
+  const t = useTranslations('pico.welcomeTour')
   const [stepIndex, setStepIndex] = useState(0)
 
   useEffect(() => {
@@ -118,57 +146,65 @@ export function PicoWelcomeTour({
   const steps = useMemo<TourStep[]>(
     () => [
       {
-        eyebrow: '01 Mission',
-        title: 'Each Pico surface should have one dominant action.',
-        body: 'If a page looks equally about navigation, metrics, and explanation, it is lying. Find the one move that clears the route.',
+        eyebrow: t('steps.mission.eyebrow'),
+        title: t('steps.mission.title'),
+        body: t('steps.mission.body'),
         bullets: [
-          `You are in Chapter ${currentItem.chapter}: ${currentItem.label}.`,
-          previousItem ? `Backtrack target: ${previousItem.label}.` : 'Backtrack target: onboarding.',
-          nextItem ? `Forward route: ${nextItem.label}.` : 'Forward route: support.',
+          t('steps.mission.bullets.currentSurface', {
+            chapter: currentItem.chapter,
+            label: currentItem.label,
+          }),
+          previousItem
+            ? t('steps.mission.bullets.backtrackPrevious', { label: previousItem.label })
+            : t('steps.mission.bullets.backtrackOnboarding'),
+          nextItem
+            ? t('steps.mission.bullets.forwardNext', { label: nextItem.label })
+            : t('steps.mission.bullets.forwardSupport'),
         ],
       },
-      buildRouteStep(currentItem, pageTitle),
+      buildRouteStep(t, currentItem, pageTitle),
       {
-        eyebrow: '03 Proof',
-        title: 'Never leave the route without a proof artifact.',
-        body: 'The platform becomes trustworthy only when each cleared step leaves behind evidence, not just optimism.',
+        eyebrow: t('steps.proof.eyebrow'),
+        title: t('steps.proof.title'),
+        body: t('steps.proof.body'),
         bullets: [
-          'If the blocker is exact, ask Tutor.',
-          'If the blocker is live system truth, open Autopilot.',
-          'If both fail, escalate to Support with the proof and notes.',
+          t('steps.proof.bullets.tutor'),
+          t('steps.proof.bullets.autopilot'),
+          t('steps.proof.bullets.support'),
         ],
       },
     ],
-    [currentItem, nextItem, pageTitle, previousItem],
+    [currentItem, nextItem, pageTitle, previousItem, t],
   )
 
   const step = steps[stepIndex]
 
-  if (!open) {
-    return null
-  }
-
   return (
     <div
-      className="pointer-events-none fixed inset-x-4 bottom-24 top-4 z-50 flex items-end justify-end sm:inset-x-6 sm:bottom-6 sm:top-6"
+      id="pico-welcome-tour"
+      className={cn(
+        'pointer-events-none fixed inset-x-4 bottom-24 top-4 z-50 items-end justify-end sm:inset-x-6 sm:bottom-6 sm:top-6',
+        open ? 'flex' : 'hidden peer-checked:flex',
+      )}
       data-testid="pico-welcome-tour"
+      aria-hidden={!open}
     >
       <section className={picoCodexFrame('pointer-events-auto flex max-h-full w-full max-w-[26rem] flex-col overflow-hidden p-0')}>
         <div className="border-b border-[color:var(--pico-border)] px-5 py-4 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className={picoClasses.label}>Quick help</p>
+              <p className={picoClasses.label}>{t('quickHelp')}</p>
               <h2 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[color:var(--pico-text)]">
-                Learn the codex once, then close it.
+                {t('title')}
               </h2>
             </div>
             <button
               type="button"
               onClick={onClose}
               className={picoClasses.tertiaryButton}
-              aria-label="Close quick tour"
+              aria-label={t('closeLabel')}
             >
-              Close
+              {t('close')}
             </button>
           </div>
         </div>
@@ -213,11 +249,11 @@ export function PicoWelcomeTour({
                 className={picoClasses.tertiaryButton}
                 disabled={stepIndex === 0}
               >
-                Back
+                {t('controls.back')}
               </button>
               {stepIndex === steps.length - 1 ? (
                 <button type="button" onClick={onClose} className={picoClasses.primaryButton}>
-                  Finish
+                  {t('controls.finish')}
                 </button>
               ) : (
                 <button
@@ -225,7 +261,7 @@ export function PicoWelcomeTour({
                   onClick={() => setStepIndex((current) => Math.min(current + 1, steps.length - 1))}
                   className={picoClasses.primaryButton}
                 >
-                  Next
+                  {t('controls.next')}
                 </button>
               )}
             </div>

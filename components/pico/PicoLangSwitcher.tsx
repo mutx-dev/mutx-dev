@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 const LOCALES = [
   { code: 'en', flag: '🇺🇸', label: 'English' },
@@ -20,9 +20,15 @@ const LOCALES = [
 export function PicoLangSwitcher() {
   const router = useRouter()
   const locale = useLocale()
+  const t = useTranslations('pico.localeSwitcher')
   const [open, setOpen] = useState(false)
+  const [ready, setReady] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0]
+
+  useEffect(() => {
+    setReady(true)
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -46,6 +52,12 @@ export function PicoLangSwitcher() {
 
   const handleSelect = useCallback((code: string) => {
     document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+    void fetch('/api/auth/locale', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ preferred_locale: code }),
+    }).catch(() => undefined)
     setOpen(false)
     router.refresh()
   }, [router])
@@ -57,7 +69,10 @@ export function PicoLangSwitcher() {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="inline-flex min-h-[2.45rem] items-center justify-center gap-2 rounded-full border border-[color:var(--pico-border)] bg-[rgba(7,14,9,0.82)] px-3 py-2 text-sm font-semibold text-[color:var(--pico-text)] shadow-[0_12px_30px_rgba(0,0,0,0.24)] backdrop-blur transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(var(--pico-accent-rgb),0.08)]"
+        aria-label={`${t('currentLanguage')}: ${current.label}`}
+        disabled={!ready}
+        data-testid="pico-lang-switcher"
+        className="inline-flex min-h-[2.45rem] items-center justify-center gap-2 rounded-full border border-[color:var(--pico-border)] bg-[rgba(7,14,9,0.82)] px-3 py-2 text-sm font-semibold text-[color:var(--pico-text)] shadow-[0_12px_30px_rgba(0,0,0,0.24)] backdrop-blur transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(var(--pico-accent-rgb),0.08)] disabled:cursor-wait disabled:opacity-60"
       >
         <span aria-hidden="true">{current.flag}</span>
         <span className="hidden text-[11px] uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)] sm:inline">
@@ -70,6 +85,7 @@ export function PicoLangSwitcher() {
       {open && (
         <div
           role="listbox"
+          aria-label={t('listLabel')}
           className="absolute right-0 top-[calc(100%+0.45rem)] z-[100] flex max-h-80 min-w-[14rem] flex-col gap-1 overflow-y-auto rounded-[20px] border border-[color:var(--pico-border)] bg-[linear-gradient(180deg,rgba(8,15,10,0.96),rgba(4,9,6,0.98))] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.34)] backdrop-blur-xl"
         >
           {LOCALES.map((l) => (
