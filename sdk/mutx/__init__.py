@@ -26,6 +26,7 @@ from mutx.assistant import Assistant
 from mutx.budgets import Budgets
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
+from mutx.governance import Governance
 from mutx.governance_credentials import GovernanceCredentials
 from mutx.governance_supervision import GovernanceSupervision
 from mutx.ingest import Ingest
@@ -94,6 +95,10 @@ class MutxClient:
     @property
     def governance_credentials(self) -> GovernanceCredentials:
         return GovernanceCredentials(self.http)
+
+    @property
+    def governance(self) -> Governance:
+        return Governance(self.http)
 
     @property
     def governance_supervision(self) -> GovernanceSupervision:

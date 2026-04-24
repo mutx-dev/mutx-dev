@@ -2,7 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Activity, AlertTriangle, Bot, Layers3, Wallet, Webhook } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  Bot,
+  KeyRound,
+  Layers3,
+  ShieldCheck,
+  Wallet,
+  Webhook,
+} from "lucide-react";
 
 import { ApiRequestError, normalizeCollection, readJson } from "@/components/app/http";
 import {
@@ -17,7 +26,6 @@ import {
   LiveStatCard,
   asDashboardStatus,
   formatCurrency,
-  formatDateTime,
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
@@ -77,6 +85,33 @@ type OverviewResource<T = unknown> = {
   error: string | null;
 };
 
+type GovernanceIdentity = {
+  agent_id: string;
+  trust_tier?: string;
+  lifecycle_status?: string;
+  credential_status?: string;
+};
+
+type GovernanceAttestation = {
+  summary?: {
+    identities?: number;
+    pending_approvals?: number;
+    credential_backends?: number;
+    supervised_agents?: number;
+    discovery_items?: number;
+  };
+  coverage?: Record<string, boolean>;
+  compliance?: {
+    overall_satisfied?: boolean;
+  };
+};
+
+type GovernanceRuntimeStatus = {
+  status?: string;
+  policy_name?: string | null;
+  pending_approvals?: number;
+};
+
 type DashboardOverviewPayload = {
   generatedAt: string;
   session: {
@@ -92,9 +127,33 @@ type DashboardOverviewPayload = {
     webhooks: OverviewResource<unknown>;
     budget: OverviewResource<unknown>;
     health: OverviewResource<Record<string, unknown>>;
+    securityMetrics: OverviewResource<Record<string, unknown>>;
+    securityCompliance: OverviewResource<Record<string, unknown>>;
+    securityApprovals: OverviewResource<unknown>;
+    governanceCredentialBackends: OverviewResource<unknown>;
+    governanceTrust: OverviewResource<{ items?: GovernanceIdentity[] } | unknown>;
+    governanceLifecycle: OverviewResource<{ items?: GovernanceIdentity[] } | unknown>;
+    governanceDiscovery: OverviewResource<{ items?: unknown[] } | unknown>;
+    governanceAttestation: OverviewResource<GovernanceAttestation>;
+    governanceRuntimeStatus: OverviewResource<GovernanceRuntimeStatus>;
+    governedSupervision: OverviewResource<unknown>;
+    governedProfiles: OverviewResource<unknown>;
     runtime: OverviewResource<OpenClawRuntimeSnapshot>;
     onboarding: OverviewResource<OpenClawOnboardingState>;
   };
+};
+
+type GovernanceOverviewState = {
+  approvals: number;
+  backendCount: number;
+  healthyBackendCount: number;
+  trustItems: GovernanceIdentity[];
+  lifecycleItems: GovernanceIdentity[];
+  discoveryCount: number;
+  attestation: GovernanceAttestation | null;
+  runtimeStatus: GovernanceRuntimeStatus | null;
+  supervisedAgents: number;
+  profileCount: number;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -131,15 +190,24 @@ function pickBudget(payload: unknown): Budget | null {
 function summarizeRunHealth(runs: Run[]) {
   const completed = runs.filter((run) => run.status === "completed").length;
   const failed = runs.filter((run) => run.status === "failed").length;
+  const inFlight = runs.filter((run) => run.status === "running" && !run.completed_at).length;
   return {
     total: runs.length,
     completed,
     failed,
+    inFlight,
   };
 }
 
 function isAuthError(error: unknown): error is ApiRequestError {
   return error instanceof ApiRequestError && (error.status === 401 || error.status === 403);
+}
+
+function pickGovernanceCollection<T>(payload: unknown): T[] {
+  if (isRecord(payload) && Array.isArray(payload.items)) {
+    return payload.items as T[];
+  }
+  return normalizeCollection<T>(payload, ["items", "data"]);
 }
 
 export function DashboardOverviewPageClient() {
@@ -155,7 +223,21 @@ export function DashboardOverviewPageClient() {
   const [budget, setBudget] = useState<Budget | null>(null);
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
   const [openclawRuntime, setOpenclawRuntime] = useState<OpenClawRuntimeSnapshot | null>(null);
-  const [openclawOnboarding, setOpenclawOnboarding] = useState<OpenClawOnboardingState | null>(null);
+  const [openclawOnboarding, setOpenclawOnboarding] = useState<OpenClawOnboardingState | null>(
+    null,
+  );
+  const [governance, setGovernance] = useState<GovernanceOverviewState>({
+    approvals: 0,
+    backendCount: 0,
+    healthyBackendCount: 0,
+    trustItems: [],
+    lifecycleItems: [],
+    discoveryCount: 0,
+    attestation: null,
+    runtimeStatus: null,
+    supervisedAgents: 0,
+    profileCount: 0,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -184,17 +266,20 @@ export function DashboardOverviewPageClient() {
           webhooks: webhooksResult,
           budget: budgetResult,
           health: healthResult,
+          governanceTrust: governanceTrustResult,
+          governanceLifecycle: governanceLifecycleResult,
+          governanceDiscovery: governanceDiscoveryResult,
+          governanceAttestation: governanceAttestationResult,
+          governanceCredentialBackends: governanceCredentialBackendsResult,
+          governanceRuntimeStatus: governanceRuntimeStatusResult,
+          securityApprovals: securityApprovalsResult,
+          governedSupervision: governedSupervisionResult,
+          governedProfiles: governedProfilesResult,
           runtime: runtimeResult,
           onboarding: onboardingResult,
         } = payload.resources;
 
-        const coreResults = [
-          agentsResult,
-          deploymentsResult,
-          runsResult,
-          alertsResult,
-          budgetResult,
-        ];
+        const coreResults = [agentsResult, deploymentsResult, runsResult, alertsResult, budgetResult];
         const coreHasData = coreResults.some((result) => result.status === "ok");
         const coreHardFailure = coreResults.find((result) => result.status === "error");
 
@@ -227,9 +312,54 @@ export function DashboardOverviewPageClient() {
         setBudget(budgetResult.status === "ok" ? pickBudget(budgetResult.data) : null);
         setHealth(healthResult.status === "ok" ? (healthResult.data ?? null) : null);
         setOpenclawRuntime(runtimeResult.status === "ok" ? runtimeResult.data : null);
-        setOpenclawOnboarding(
-          onboardingResult.status === "ok" ? onboardingResult.data : null,
+        setOpenclawOnboarding(onboardingResult.status === "ok" ? onboardingResult.data : null);
+
+        const backends = pickGovernanceCollection<Record<string, unknown>>(
+          governanceCredentialBackendsResult.status === "ok"
+            ? governanceCredentialBackendsResult.data
+            : null,
         );
+        const trustItems = pickGovernanceCollection<GovernanceIdentity>(
+          governanceTrustResult.status === "ok" ? governanceTrustResult.data : null,
+        );
+        const lifecycleItems = pickGovernanceCollection<GovernanceIdentity>(
+          governanceLifecycleResult.status === "ok" ? governanceLifecycleResult.data : null,
+        );
+        const discoveryItems = pickGovernanceCollection<Record<string, unknown>>(
+          governanceDiscoveryResult.status === "ok" ? governanceDiscoveryResult.data : null,
+        );
+        const approvals = normalizeCollection<Record<string, unknown>>(
+          securityApprovalsResult.status === "ok" ? securityApprovalsResult.data : null,
+          ["items", "data"],
+        );
+        const supervisedAgents = normalizeCollection<Record<string, unknown>>(
+          governedSupervisionResult.status === "ok" ? governedSupervisionResult.data : null,
+          ["items", "data"],
+        );
+        const profiles = normalizeCollection<Record<string, unknown>>(
+          governedProfilesResult.status === "ok" ? governedProfilesResult.data : null,
+          ["items", "data"],
+        );
+
+        setGovernance({
+          approvals:
+            approvals.length ||
+            Number(governanceAttestationResult.data?.summary?.pending_approvals ?? 0),
+          backendCount: backends.length,
+          healthyBackendCount: backends.filter((backend) => backend.is_healthy).length,
+          trustItems,
+          lifecycleItems,
+          discoveryCount:
+            discoveryItems.length ||
+            Number(governanceAttestationResult.data?.summary?.discovery_items ?? 0),
+          attestation: governanceAttestationResult.status === "ok" ? governanceAttestationResult.data : null,
+          runtimeStatus:
+            governanceRuntimeStatusResult.status === "ok" ? governanceRuntimeStatusResult.data : null,
+          supervisedAgents:
+            supervisedAgents.length ||
+            Number(governanceAttestationResult.data?.summary?.supervised_agents ?? 0),
+          profileCount: profiles.length,
+        });
         setLoading(false);
       } catch (loadError) {
         if (!cancelled) {
@@ -283,6 +413,10 @@ export function DashboardOverviewPageClient() {
       openclawOnboarding?.gateway_url,
   );
   const openclawStatus = openclawRuntime?.status ?? openclawOnboarding?.status ?? "unknown";
+  const governanceCoverage = governance.attestation?.coverage ?? {};
+  const governedIdentityCount =
+    governance.attestation?.summary?.identities ?? governance.trustItems.length;
+  const complianceSatisfied = governance.attestation?.compliance?.overall_satisfied;
 
   const briefingBarEntries = [
     {
@@ -301,23 +435,19 @@ export function DashboardOverviewPageClient() {
     },
     {
       label: "Queue",
-      value: runHealth.total > 0
-        ? `${runs.filter((r) => !r.completed_at).length} in flight`
-        : "empty",
+      value: runHealth.total > 0 ? `${runHealth.inFlight} in flight` : "empty",
       status: (runHealth.failed > 0
         ? "degraded"
-        : runs.filter((r) => !r.completed_at).length > 0
+        : runHealth.inFlight > 0
           ? "healthy"
           : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
     },
     {
-      label: "Runs",
-      value: runHealth.total > 0
-        ? `${runHealth.completed} ok · ${runHealth.failed} failed`
-        : "No runs",
-      status: (runHealth.failed > 0
+      label: "Governance",
+      value: `${governedIdentityCount} tracked`,
+      status: (complianceSatisfied === false
         ? "degraded"
-        : runHealth.total > 0
+        : governedIdentityCount > 0
           ? "healthy"
           : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
     },
@@ -345,7 +475,7 @@ export function DashboardOverviewPageClient() {
     return (
       <LiveAuthRequired
         title="Operator session required"
-        message="Sign in to load fleet posture, run activity, alerts, and budget telemetry."
+        message="Sign in to load fleet posture, governance state, and runtime telemetry."
       />
     );
   }
@@ -359,9 +489,7 @@ export function DashboardOverviewPageClient() {
       {partialFailures.length > 0 ? (
         <div className="rounded-xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
           <p className="font-medium">Overview is running with partial data.</p>
-          <p className="mt-1 text-xs text-amber-100/80">
-            {partialFailures.slice(0, 3).join(" · ")}
-          </p>
+          <p className="mt-1 text-xs text-amber-100/80">{partialFailures.slice(0, 4).join(" · ")}</p>
         </div>
       ) : null}
 
@@ -381,31 +509,51 @@ export function DashboardOverviewPageClient() {
           status={asDashboardStatus(activeDeployments.length > 0 ? "healthy" : "idle")}
         />
         <LiveStatCard
-          label="Runs"
-          value={String(runHealth.total)}
-          detail={`${runHealth.completed} completed, ${runHealth.failed} failed in the current window.`}
-          status={asDashboardStatus(runHealth.failed > 0 ? "warning" : "healthy")}
+          label="Governance"
+          value={String(governedIdentityCount)}
+          detail={`${governance.approvals} approvals pending · ${governance.discoveryCount} discovery items tracked.`}
+          status={asDashboardStatus(complianceSatisfied === false ? "warning" : "healthy")}
         />
         <LiveStatCard
           label="Credits"
           value={budget ? formatCurrency(budget.credits_remaining) : "$0"}
-          detail={budget ? `${budget.plan} plan, ${budget.usage_percentage}% of the envelope used.` : "Budget API returned no data."}
+          detail={
+            budget
+              ? `${budget.plan} plan, ${budget.usage_percentage}% of the envelope used.`
+              : "Budget API returned no data."
+          }
           status={asDashboardStatus(budget && budget.usage_percentage >= 80 ? "warning" : "healthy")}
         />
       </LiveKpiGrid>
 
-      {runs.length > 0 && (
+      {runs.length > 0 ? (
         <LivePanel title="Run flow" meta="queue orchestration">
           <FlowStatusBar
             stages={[
-              { status: "pending", count: runs.filter((r) => r.status === "created" || r.status === "queued").length, maxCount: runs.length },
-              { status: "running", count: runs.filter((r) => r.status === "running" && !r.completed_at).length, maxCount: runs.length },
-              { status: "completed", count: runs.filter((r) => r.status === "completed").length, maxCount: runs.length },
-              { status: "failed", count: runs.filter((r) => r.status === "failed").length, maxCount: runs.length },
+              {
+                status: "pending",
+                count: runs.filter((run) => run.status === "created" || run.status === "queued").length,
+                maxCount: runs.length,
+              },
+              {
+                status: "running",
+                count: runHealth.inFlight,
+                maxCount: runs.length,
+              },
+              {
+                status: "completed",
+                count: runHealth.completed,
+                maxCount: runs.length,
+              },
+              {
+                status: "failed",
+                count: runHealth.failed,
+                maxCount: runs.length,
+              },
             ]}
           />
         </LivePanel>
-      )}
+      ) : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.85fr)]">
         <div className="grid gap-4">
@@ -419,23 +567,24 @@ export function DashboardOverviewPageClient() {
                 <div className="mt-3 flex items-center gap-2">
                   <StatusBadge status={asDashboardStatus(healthStatus)} label={healthStatus} />
                   <span className="text-xs text-slate-500">
-                    {(typeof health?.timestamp === "string" && formatRelativeTime(health.timestamp)) || "fresh check"}
+                    {(typeof health?.timestamp === "string" && formatRelativeTime(health.timestamp)) ||
+                      "fresh check"}
                   </span>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-slate-400">
-                  One surface for deployments, execution, alerts, keys, and delivery posture. No route shells pretending to be live data.
+                  One surface for deployments, execution, governance, credentials, and recovery.
                 </p>
               </div>
               <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                 <div className="flex items-center gap-2 text-slate-300">
-                  <AlertTriangle className="h-4 w-4 text-amber-300" />
-                  <span className="text-sm font-medium">Alert pressure</span>
+                  <ShieldCheck className="h-4 w-4 text-cyan-300" />
+                  <span className="text-sm font-medium">Governance boundary</span>
                 </div>
                 <p className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-                  {unresolvedAlerts.length}
+                  {governedIdentityCount}
                 </p>
                 <p className="mt-2 text-sm text-slate-400">
-                  unresolved alerts across the current operator scope
+                  governed identities with live trust, lifecycle, discovery, and attestation signals
                 </p>
               </div>
             </div>
@@ -451,10 +600,14 @@ export function DashboardOverviewPageClient() {
               <div className="grid gap-4">
                 <FlowStatusBar
                   stages={[
-                    { status: "pending", count: runs.filter((r) => r.status === "created" || r.status === "queued").length, maxCount: runs.length },
-                    { status: "running", count: runs.filter((r) => r.status === "running" && !r.completed_at).length, maxCount: runs.length },
-                    { status: "completed", count: runs.filter((r) => r.status === "completed").length, maxCount: runs.length },
-                    { status: "failed", count: runs.filter((r) => r.status === "failed").length, maxCount: runs.length },
+                    {
+                      status: "pending",
+                      count: runs.filter((run) => run.status === "created" || run.status === "queued").length,
+                      maxCount: runs.length,
+                    },
+                    { status: "running", count: runHealth.inFlight, maxCount: runs.length },
+                    { status: "completed", count: runHealth.completed, maxCount: runs.length },
+                    { status: "failed", count: runHealth.failed, maxCount: runs.length },
                   ]}
                 />
                 <div className="grid gap-3">
@@ -467,7 +620,8 @@ export function DashboardOverviewPageClient() {
                       <div className="min-w-0">
                         <p className="truncate font-mono text-sm text-white">{run.id}</p>
                         <p className="mt-1 text-sm text-slate-400">
-                          Agent {typeof run.agent_id === 'string' ? run.agent_id.slice(0, 8) : 'unknown'} · {run.trace_count} traces · {formatRelativeTime(run.started_at)}
+                          Agent {typeof run.agent_id === "string" ? run.agent_id.slice(0, 8) : "unknown"} ·{" "}
+                          {run.trace_count} traces · {formatRelativeTime(run.started_at)}
                         </p>
                       </div>
                       <div className="flex items-start justify-between gap-3 md:flex-col md:items-end">
@@ -482,9 +636,7 @@ export function DashboardOverviewPageClient() {
               </div>
             )}
           </LivePanel>
-        </div>
 
-        <div className="grid gap-4">
           <LivePanel title="OpenClaw runtime" meta="tracked provider">
             {hasOpenClawRuntime ? (
               <div className="grid gap-3">
@@ -518,7 +670,8 @@ export function DashboardOverviewPageClient() {
                       {openclawBinding?.assistant_id ?? openclawBinding?.assistant_name ?? "Not bound"}
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
-                      {openclawRuntime?.binding_count ?? 0} tracked binding{openclawRuntime?.binding_count === 1 ? "" : "s"}
+                      {openclawRuntime?.binding_count ?? 0} tracked binding
+                      {openclawRuntime?.binding_count === 1 ? "" : "s"}
                     </p>
                   </div>
 
@@ -533,41 +686,7 @@ export function DashboardOverviewPageClient() {
                       {openclawBinding?.model ?? "Model metadata syncs when the binding is available."}
                     </p>
                   </div>
-
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                      Gateway
-                    </p>
-                    <p className="mt-2 break-all text-sm text-white">
-                      {openclawRuntime?.gateway_url ?? openclawOnboarding?.gateway_url ?? "Not recorded"}
-                    </p>
-                    <p className="mt-2 text-xs text-slate-500">
-                      {openclawRuntime?.keys_remain_local
-                        ? "Keys remain local to the operator host."
-                        : "Gateway metadata is synced from the last known runtime snapshot."}
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                      Sync state
-                    </p>
-                    <p className="mt-2 text-sm text-white">
-                      {formatDateTime(openclawRuntime?.last_synced_at ?? openclawRuntime?.last_seen_at)}
-                    </p>
-                    <p className="mt-2 text-xs text-slate-500">
-                      {openclawRuntime?.stale
-                        ? `Snapshot is stale. Setup is waiting on ${openclawOnboarding?.current_step ?? "resync"}.`
-                        : "Snapshot is fresh enough for the current dashboard session."}
-                    </p>
-                  </div>
                 </div>
-
-                {openclawOnboarding?.last_error ? (
-                  <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-amber-100">
-                    {openclawOnboarding.last_error}
-                  </div>
-                ) : null}
               </div>
             ) : (
               <LiveEmptyState
@@ -575,6 +694,76 @@ export function DashboardOverviewPageClient() {
                 message="Once the operator host imports or resyncs OpenClaw, the bound instance will surface here immediately after sign-in."
               />
             )}
+          </LivePanel>
+        </div>
+
+        <div className="grid gap-4">
+          <LivePanel title="Governance boundary" meta="mission control">
+            <div className="grid gap-3">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="flex items-center gap-2 text-slate-300">
+                  <ShieldCheck className="h-4 w-4 text-cyan-300" />
+                  <span className="text-sm font-medium">Attestation posture</span>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <StatusBadge
+                    status={asDashboardStatus(complianceSatisfied === false ? "warning" : "healthy")}
+                    label={complianceSatisfied === false ? "attention" : "covered"}
+                  />
+                  <span className="text-xs text-slate-500">
+                    policy {governance.runtimeStatus?.policy_name ?? "not loaded"}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  Trust, lifecycle, discovery, receipts, and runtime guardrails are exposed in the same shell instead of a disconnected security console.
+                </p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <KeyRound className="h-4 w-4 text-cyan-300" />
+                    <span className="text-sm font-medium">Credential backends</span>
+                  </div>
+                  <p className="mt-3 text-2xl font-semibold text-white">{governance.backendCount}</p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    {governance.healthyBackendCount} healthy · approvals {governance.approvals}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <Layers3 className="h-4 w-4 text-cyan-300" />
+                    <span className="text-sm font-medium">Governed runtime</span>
+                  </div>
+                  <p className="mt-3 text-2xl font-semibold text-white">{governance.supervisedAgents}</p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    {governance.profileCount} launch profiles · {governance.runtimeStatus?.status ?? "unknown"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="flex items-center gap-2 text-slate-300">
+                  <AlertTriangle className="h-4 w-4 text-amber-300" />
+                  <span className="text-sm font-medium">Coverage summary</span>
+                </div>
+                <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-2">
+                  <div>
+                    policy coverage: {governanceCoverage.policy_coverage ? "present" : "missing"}
+                  </div>
+                  <div>
+                    receipt integrity: {governanceCoverage.receipt_integrity ? "passing" : "attention"}
+                  </div>
+                  <div>
+                    discovery: {governanceCoverage.discovery_coverage ? "tracked" : "missing"}
+                  </div>
+                  <div>
+                    runtime guardrails:{" "}
+                    {governanceCoverage.runtime_guardrail_presence ? "present" : "missing"}
+                  </div>
+                </div>
+              </div>
+            </div>
           </LivePanel>
 
           <LivePanel title="Live alerts" meta={`${alerts.length} items`}>
@@ -629,18 +818,11 @@ export function DashboardOverviewPageClient() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2 text-slate-300">
-                      <Layers3 className="h-4 w-4 text-cyan-300" />
-                      <span className="text-sm font-medium">Hot deployments</span>
-                    </div>
-                    <p className="mt-2 text-xl font-semibold text-white">{activeDeployments.length}</p>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <div className="flex items-center gap-2 text-slate-300">
                       <Wallet className="h-4 w-4 text-cyan-300" />
                       <span className="text-sm font-medium">Spend posture</span>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">
-                      Infra and model spend stay in separate surfaces so operators can tell whether the cost problem is deployment shape or token burn.
+                    <p className="mt-2 text-xl font-semibold text-white">
+                      {budget ? `${budget.usage_percentage}%` : "N/A"}
                     </p>
                   </div>
                 </div>

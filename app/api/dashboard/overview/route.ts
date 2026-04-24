@@ -122,6 +122,49 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         ["webhooks", `${apiBaseUrl}/v1/webhooks`, "Failed to fetch webhooks"],
         ["budget", `${apiBaseUrl}/v1/budgets`, "Failed to fetch budget"],
         ["health", `${apiBaseUrl}/health`, "Failed to fetch health"],
+        ["securityMetrics", `${apiBaseUrl}/v1/security/metrics`, "Failed to fetch governance metrics"],
+        ["securityCompliance", `${apiBaseUrl}/v1/security/compliance`, "Failed to fetch governance compliance"],
+        ["securityApprovals", `${apiBaseUrl}/v1/security/approvals`, "Failed to fetch pending approvals"],
+        [
+          "governanceCredentialBackends",
+          `${apiBaseUrl}/v1/governance/credentials/backends`,
+          "Failed to fetch governance credential backends",
+        ],
+        [
+          "governanceTrust",
+          `${apiBaseUrl}/v1/governance/trust`,
+          "Failed to fetch governance trust state",
+        ],
+        [
+          "governanceLifecycle",
+          `${apiBaseUrl}/v1/governance/lifecycle`,
+          "Failed to fetch governance lifecycle state",
+        ],
+        [
+          "governanceDiscovery",
+          `${apiBaseUrl}/v1/governance/discovery`,
+          "Failed to fetch governance discovery inventory",
+        ],
+        [
+          "governanceAttestation",
+          `${apiBaseUrl}/v1/governance/attestations`,
+          "Failed to fetch governance attestations",
+        ],
+        [
+          "governanceRuntimeStatus",
+          `${apiBaseUrl}/v1/runtime/governance/status`,
+          "Failed to fetch governed runtime status",
+        ],
+        [
+          "governedSupervision",
+          `${apiBaseUrl}/v1/runtime/governance/supervised/`,
+          "Failed to fetch governed runtime supervision",
+        ],
+        [
+          "governedProfiles",
+          `${apiBaseUrl}/v1/runtime/governance/supervised/profiles`,
+          "Failed to fetch governed runtime profiles",
+        ],
         [
           "runtime",
           `${apiBaseUrl}/v1/runtime/providers/openclaw`,
