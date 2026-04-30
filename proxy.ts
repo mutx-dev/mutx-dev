@@ -23,18 +23,12 @@ type RateLimitState = {
 
 const SAFE_HTTP_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
 const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
+const PICO_AUTH_PRIVATE_DETAIL = 'Pico account access is not open yet'
 const APP_HOST = 'app.mutx.dev'
 const PICO_HOST = 'pico.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set([PICO_HOST, 'pico.localhost'])
-const PICO_AUTH_UI_PATHS = new Set([
-  '/forgot-password',
-  '/login',
-  '/register',
-  '/reset-password',
-  '/verify-email',
-])
 const PICO_WIP_PATH = '/pico/wip'
 const PICO_LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, PicoLocale>> = {
@@ -462,17 +456,21 @@ export function proxy(request: NextRequest) {
     )
   }
 
+  if (PICO_HOSTS.has(host) && normalizedPath.startsWith('/api/auth/oauth/')) {
+    return finalizeResponse(redirectWithinHost(request, '/wip'), host, normalizedPath)
+  }
+
+  if (PICO_HOSTS.has(host) && normalizedPath.startsWith('/api/auth/')) {
+    return finalizeResponse(
+      NextResponse.json({ detail: PICO_AUTH_PRIVATE_DETAIL }, { status: 403 }),
+      host,
+      normalizedPath,
+    )
+  }
+
   if (PICO_HOSTS.has(host) && !normalizedPath.startsWith('/api')) {
     const locale = getLocaleFromRequest(request)
     const picoRequestHeaders = buildPicoRequestHeaders(request, locale)
-
-    if (PICO_AUTH_UI_PATHS.has(normalizedPath)) {
-      return finalizeResponse(
-        applyPicoLocale(NextResponse.next(), locale),
-        host,
-        normalizedPath,
-      )
-    }
 
     if (normalizedPath === '/pico') {
       return finalizeResponse(

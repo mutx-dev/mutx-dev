@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import s from './page.module.css'
+import { PicoWipReturn } from '@/components/pico/PicoWipReturn'
 
 export const metadata: Metadata = {
-  title: 'PicoMUTX beta opens soon',
-  description: 'The PicoMUTX waitlist is closed while the beta is prepared.',
+  title: 'PicoMUTX route is preparing',
+  description: 'The PicoMUTX academy and product pages are still being prepared.',
   alternates: {
     canonical: 'https://pico.mutx.dev',
   },
@@ -19,24 +21,31 @@ export const metadata: Metadata = {
 export default function PicoWipPage() {
   return (
     <div className={s.root} data-testid="pico-host-guard">
+      <PicoWipReturn />
       <div className={s.shell}>
         <section className={s.hero}>
-          <div>
-            <p className={s.kicker}>PicoMUTX beta</p>
-            <h1 className={s.title}>Waitlist is closed.</h1>
+          <div className={s.copy}>
+            <p className={s.kicker}>PicoMUTX route guard</p>
+            <h1 className={s.title}>This lane is still being prepared.</h1>
             <p className={s.subtitle}>
-              Waitlist is closed, beta opens soon. We are keeping pico.mutx.dev private while the
-              product gets ready for real users.
+              The academy, tutor, support, autopilot, pricing, login, and account paths are still
+              private while the public waitlist opens back up.
             </p>
-            <p className={s.notice}>
-              Signups, login, and OAuth routes are unavailable on this host for now.
-            </p>
+            <div className={s.actions}>
+              <Link href="/" className={s.primaryLink}>
+                Back to waitlist
+              </Link>
+              <p className={s.notice}>Returning you in a moment.</p>
+            </div>
           </div>
 
           <div className={s.visual}>
+            <div className={s.bubble} data-testid="pico-wip-speech">
+              You&apos;re not supposed to be here!
+            </div>
             <Image
-              src="/pico/robot/guide.png"
-              alt="PicoMUTX robot holding the beta gate"
+              src="/pico/robot/point.png"
+              alt="PicoMUTX robot pointing visitors back to the waitlist"
               width={320}
               height={320}
               className={s.robot}

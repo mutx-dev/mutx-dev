@@ -1,29 +1,62 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Mettre un agent IA en marche et le garder sous contrôle",
-      "description": "PicoMUTX aide les fondateurs, les opérateurs et les petites équipes à construire, récupérer et contrôler des agents IA auxquels on peut réellement faire confiance dans le travail réel."
+      "title": "PicoMUTX — Lancez un agent IA et gardez-le sous contrôle",
+      "description": "PicoMUTX aide les fondateurs et les opérateurs à construire, récupérer et contrôler des agents IA fiables en usage réel."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " par MUTX",
       "cta": "Demander l’accès",
-      "ctaMobile": "Accès",
-      "sectionsLabel": "Sections De La Page",
+      "ctaMobile": "Demander",
+      "sectionsLabel": "Sections de la page",
       "skipToMain": "Aller au contenu principal"
     },
     "hero": {
-      "badge": "Accès fondateur · Sur demande",
-      "title": "Mettez un agent IA en marche ",
-      "titleAccent": "et lui faire confiance dans le vrai travail.",
-      "subtitle": "Partez de zéro, récupérez un setup cassé ou reprenez le contrôle d’un agent live. Pico vous oriente vers la bonne voie : construire, réparer ou contrôler.",
+      "badge": "Waitlist ouverte · Accès fondateur",
+      "title": "Arrêtez de surveiller ",
+      "titleAccent": "votre IA.",
+      "subtitle": "Partez de zéro, récupérez un setup cassé ou reprenez le contrôle d’un agent live. Pico transforme un vrai blocage en voie claire : construire, réparer ou contrôler.",
       "cta": "Demander l’accès",
-      "ctaSecondary": "Voir Comment Ça Marche",
-      "meta": "À l’extérieur, l’accès reste sur demande. À l’intérieur, Pico diagnostique le blocage et vous oriente vers construire, réparer ou contrôler."
+      "ctaSecondary": "Voir comment ça marche",
+      "meta": "Waitlist ouverte. Les parcours produit rouvriront après la passe de finition de l’académie."
+    },
+    "agentSlider": {
+      "ariaLabel": "Types d’agents autonomes",
+      "items": {
+        "0": {
+          "name": "Agent Dev",
+          "description": "Écrit, teste et livre du code en autonomie."
+        },
+        "1": {
+          "name": "Agent Marché",
+          "description": "Surveille les signaux et fait remonter les changements clés."
+        },
+        "2": {
+          "name": "Agent Deal",
+          "description": "Évalue les opportunités et signale les paris à forte conviction."
+        },
+        "3": {
+          "name": "Agent Ops",
+          "description": "Détecte les problèmes et exécute les correctifs en temps réel."
+        },
+        "4": {
+          "name": "Agent Growth",
+          "description": "Itère sur le contenu et la distribution selon la performance."
+        },
+        "5": {
+          "name": "Agent Sécurité",
+          "description": "Scanne et réduit les risques en continu."
+        },
+        "6": {
+          "name": "Agent Data",
+          "description": "Maintient et fait évoluer les pipelines automatiquement."
+        }
+      }
     },
     "trustBar": {
       "items": {
-        "0": "Partez de zéro, d’un build désordonné ou d’un système déjà live",
+        "0": "Partez de zéro, d’un build désordonné ou d’un système live",
         "1": "Une seule couche de diagnostic vous oriente vers construire, réparer ou contrôler",
         "2": "Visibilité, validations et garde-fous avant d’accorder votre confiance"
       }
@@ -55,15 +88,15 @@
     },
     "platform": {
       "eyebrow": "Comment Pico fonctionne",
-      "title": "Pico diagnostique le blocage, puis vous oriente vers construire, réparer ou contrôler.",
-      "body": "Mettez quelque chose d’utile en marche et gardez-le fiable. Pico commence par le diagnostic pour que la prochaine action colle au vrai blocage.",
+      "title": "Diagnostic d’abord. Puis construire, réparer ou contrôler.",
+      "body": "Pico trouve le blocage et oriente la prochaine étape pour que l’élan ne disparaisse pas dès qu’un problème survient.",
       "howItWorks": {
         "0": {
           "title": "Décrivez l’objectif ou connectez l’agent",
           "body": "Partez du travail à faire, du blocage ou du système live à comprendre. Pico utilise ce contexte pour déterminer l’aide réellement pertinente."
         },
         "1": {
-          "title": "Soyez routé vers construire, réparer ou contrôler",
+          "title": "Soyez orienté vers construire, réparer ou contrôler",
           "body": "Les nouveaux cas obtiennent un chemin pratique vers un premier agent utile. Les setups cassés obtiennent une voie de récupération. Les systèmes live obtiennent visibilité, seuils, validations et garde-fous opérateur."
         },
         "2": {
@@ -98,7 +131,7 @@
     },
     "beforeAfter": {
       "eyebrow": "Le basculement",
-      "title": "Ce qui change quand build, recovery & control vivent au même endroit",
+      "title": "Avant PicoMUTX vs. après",
       "beforeLabel": "Avant",
       "afterLabel": "Après",
       "items": {
@@ -123,7 +156,7 @@
     },
     "earlyAccess": {
       "eyebrow": "Accès fondateur",
-      "title": "À l’extérieur, une waitlist. Dessous, un vrai produit.",
+      "title": "Waitlist en façade. Vrai produit dessous.",
       "body": "L’accès s’ouvre par vagues pour que les opérateurs sérieux arrivent dans la bonne voie pendant que les workflows se durcissent sur du vrai usage.",
       "benefits": {
         "0": "Partez de zéro, d’un setup cassé ou d’un système live auquel vous ne faites pas encore confiance",
@@ -135,7 +168,7 @@
     },
     "pricing": {
       "eyebrow": "Tarifs Fondateurs",
-      "title": "Bloquez le tarif fondateur avant le tarif public.",
+      "title": "Verrouillez la voie fondatrice avant la réouverture des parcours produit.",
       "tiers": {
         "starter": {
           "name": "Founding Tier",
@@ -199,8 +232,8 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "Commencez gratuitement. Si vous entrez tôt, vous gardez environ 90 % de réduction sur le futur tarif public pendant que nous ouvrons par cohortes.",
-      "recommendedLabel": "Fondateur -90 %"
+      "lead": "La waitlist est de nouveau ouverte. Dites-nous si vous devez construire, réparer ou contrôler, et nous orienterons les opérateurs sérieux vers la bonne vague.",
+      "recommendedLabel": "90 % de réduction fondateur"
     },
     "faq": {
       "eyebrow": "Questions",
@@ -219,8 +252,8 @@
           "a": "Pour des systèmes d’agents utiles : support, copilotes internes, capture de leads, suivi commercial et workflows opérationnels qui doivent être construits, récupérés ou contrôlés dans le monde réel."
         },
         "3": {
-          "q": "Existe-t-il une manière gratuite de commencer ?",
-          "a": "Oui. L’échelle publique commence par un essai gratuit centré sur la première valeur. L’accès public reste waitlist-first, mais l’essai et les tiers fondateurs sont déjà définis."
+          "q": "La waitlist est-elle ouverte ?",
+          "a": "Oui. La waitlist publique est de nouveau ouverte. L’académie et les parcours produit restent privés jusqu’à ce que cette refonte dépasse la landing page."
         },
         "4": {
           "q": "Est-ce conçu pour les entreprises ?",
@@ -232,6 +265,7 @@
       "eyebrow": "Accès fondateur",
       "title": "Demandez l’accès à la bonne voie.",
       "body": "Pico vous aide à mettre quelque chose d’utile en marche, à le récupérer quand il casse et à le garder sous contrôle dans le vrai travail.",
+      "faqLabel": "Encore hésitant ? Clarifiez les derniers points de blocage.",
       "formHeadline": "Commencez par le vrai blocage.",
       "formSubline": "Dites-nous si vous devez construire, réparer ou contrôler. Nous vous orienterons vers la bonne voie.",
       "ctaButton": "Demander l’accès",
@@ -242,7 +276,7 @@
       "dialogLabel": "Formulaire de contact",
       "closeLabel": "Fermer",
       "title": "Demander l’accès à Pico",
-      "subtitle": "Expliquez-nous ce que vous essayez de construire, récupérer ou contrôler. Nous vous orienterons vers la bonne prochaine étape.",
+      "subtitle": "Dites-nous ce que vous essayez de livrer, récupérer ou contrôler. Nous vous orienterons vers la bonne prochaine étape.",
       "emailLabel": "Email professionnel",
       "emailPlaceholder": "vous@entreprise.com",
       "nameLabel": "Nom",
@@ -295,7 +329,7 @@
       "copyright": "© MUTX 2026. Contrôle ouvert pour les agents déployés."
     },
     "waitlistForm": {
-      "submit": "Demander l'accès",
+      "submit": "Demander l’accès",
       "submitting": "Envoi en cours...",
       "success": "Vous êtes sur la liste.",
       "successCheckInbox": "Vous êtes sur la liste. Vérifiez votre boîte de réception.",
@@ -1890,10 +1924,10 @@
       }
     },
     "pricingPage": {
-      "eyebrow": "Parcours prix",
-      "title": "Choisissez maintenant la voie dont vous avez besoin. Regardez la facturation produit seulement quand elle compte.",
-      "subtitle": "Pico public reste access-first. Cette page montre d’abord l’échelle publique, puis la couche de facturation dans le produit pour les équipes déjà en train d’opérer dans le système.",
-      "primaryCta": "Demander l’accès",
+      "eyebrow": "Tarifs",
+      "title": "Choisissez l’offre adaptée à vos besoins.",
+      "subtitle": "Commencez gratuitement et passez à l’offre supérieure quand vous grandissez. Tous les plans incluent l’accès complet à l’académie et aux ressources de support.",
+      "primaryCta": "Commencer",
       "secondaryCta": "Parler au support",
       "returnToLanding": "Retour à la landing",
       "routeState": {

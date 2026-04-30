@@ -7,21 +7,54 @@
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Get started",
-      "ctaMobile": "Start",
+      "cta": "Request access",
+      "ctaMobile": "Request",
       "sectionsLabel": "Page Sections",
       "skipToMain": "Skip to main content"
     },
-    "hero": {
-      "badge": "Now Available · Start Free",
-      "title": "Get an AI agent working ",
-      "titleAccent": "and trust it in real work.",
-      "subtitle": "Start from zero, recover a broken setup, or take control of a live agent. Pico routes you into build, fix, or control.",
-      "cta": "Get started",
-      "ctaSecondary": "See How It Works",
-      "meta": "Start immediately. Pico diagnoses the blocker and routes you into build, fix, or control."
-    },
-    "trustBar": {
+  "hero": {
+    "badge": "Waitlist Open · Founding Access",
+    "title": "Stop babysitting ",
+    "titleAccent": "your AI.",
+    "subtitle": "Start from zero, recover a broken setup, or take control of a live agent. Pico routes one real blocker into build, fix, or control.",
+    "cta": "Request access",
+    "ctaSecondary": "See How It Works",
+    "meta": "Waitlist open. Product routes reopen after the academy polish pass."
+  },
+  "agentSlider": {
+    "ariaLabel": "Autonomous agent types",
+    "items": {
+      "0": {
+        "name": "Dev Agent",
+        "description": "Writes, tests, and ships code autonomously."
+      },
+      "1": {
+        "name": "Market Agent",
+        "description": "Monitors signals and surfaces meaningful changes."
+      },
+      "2": {
+        "name": "Deal Agent",
+        "description": "Evaluates opportunities and flags high-conviction plays."
+      },
+      "3": {
+        "name": "Ops Agent",
+        "description": "Detects issues and executes fixes in real time."
+      },
+      "4": {
+        "name": "Growth Agent",
+        "description": "Iterates content and distribution based on performance."
+      },
+      "5": {
+        "name": "Security Agent",
+        "description": "Scans and mitigates risk continuously."
+      },
+      "6": {
+        "name": "Data Agent",
+        "description": "Maintains and evolves pipelines automatically."
+      }
+    }
+  },
+  "trustBar": {
       "items": {
         "0": "Start from zero, a messy build, or a live system",
         "1": "One diagnosis layer routes you into build, fix, or control",
@@ -40,7 +73,7 @@
         },
         "1": {
           "label": "\"I already built part of this. Now I need to recover the setup instead of restarting from scratch.\"",
-          "body": "When a build breaks halfway through, losing momentum costs more than time. You need a recovery lane, not another theory rabbit hole."
+          "body": "When a build breaks halfway through, losing momentum costs more than time. You need a recovery lane, not another theory loop."
         },
         "2": {
           "label": "\"Something is already live, but I do not trust the cost, logic, or failure modes yet.\"",
@@ -55,8 +88,8 @@
     },
     "platform": {
       "eyebrow": "How Pico Works",
-      "title": "Pico diagnoses the blocker, then routes you to build, fix, or control.",
-      "body": "Get something useful working and keep it trustworthy. Pico starts with diagnosis so the next move matches the real blocker.",
+      "title": "Diagnosis first. Then build, fix, or control.",
+      "body": "Pico finds the blocker and routes the next step so progress does not disappear the moment something breaks.",
       "howItWorks": {
         "0": {
           "title": "Describe the goal or connect the agent",
@@ -98,7 +131,7 @@
     },
     "beforeAfter": {
       "eyebrow": "The Shift",
-      "title": "What changes when build, recovery, and control live in one place",
+      "title": "Before PicoMUTX vs. after",
       "beforeLabel": "Before",
       "afterLabel": "After",
       "items": {
@@ -134,72 +167,70 @@
       }
     },
     "pricing": {
-      "eyebrow": "Simple Pricing",
-      "title": "Start building and controlling AI agents today.",
-      "lead": "Start free. Upgrade when you need more power and control.",
-      "recommendedLabel": "Popular",
+      "eyebrow": "Founding Pricing",
+      "title": "Lock the founding lane before the product routes reopen.",
+      "lead": "The waitlist is open again. Tell us whether you need to build, fix, or control, and we will route serious operators into the right wave.",
+      "recommendedLabel": "90% Off Founding",
       "tiers": {
         "trial": {
-          "name": "Free",
+          "name": "Free trial",
           "price": "Free",
-          "period": "forever",
-          "description": "Build and control your first AI agent with full guidance.",
-          "priceNote": "No credit card required.",
+          "period": "first value",
+          "description": "Reach first value on a real agent problem before you commit.",
+          "priceNote": "Free until a real agent problem is defined or connected.",
           "features": [
             "Describe a goal or connect an agent",
             "Get routed into build, fix, or control",
-            "Full academy access",
-            "Start immediately"
+            "Reach first value before paying"
           ],
-          "cta": "Get Started",
-          "ctaHref": "/start"
+          "cta": "Request Trial Access",
+          "ctaHref": "/pricing"
         },
         "starter": {
-          "name": "Starter",
-          "price": "$9",
+          "name": "Founding Tier",
+          "price": "€29",
           "period": "/mo",
-          "description": "For operators building and controlling AI agents.",
-          "priceNote": "Cancel anytime.",
+          "description": "Self-serve execution for operators who want the product early without waiting for the polished public tier.",
+          "priceNote": "Founding members lock €29/mo instead of the later €290/mo public rate.",
           "recommended": true,
           "features": [
             "AI diagnostic intake",
             "Guided build, fix, and control paths",
-            "Full academy access",
-            "Priority support",
             "Built for independent execution"
           ],
-          "cta": "Choose Starter",
-          "ctaHref": "/start"
+          "cta": "Request Founding Access",
+          "ctaHref": "/pricing",
+          "anchorPrice": "€290"
         },
         "pro": {
-          "name": "Pro",
-          "price": "$29",
+          "name": "Founding Supported",
+          "price": "€79",
           "period": "/mo",
-          "description": "For teams needing more control and support.",
+          "description": "The same product with faster group help for teams that want hands-on guidance without jumping straight to custom work.",
           "features": [
-            "Everything in Starter",
-            "Enhanced onboarding support",
+            "Everything in the Founding Tier",
             "Weekly group troubleshooting",
-            "Shared operator support environment",
-            "Lower friction when implementation gets messy"
+            "Shared operator accountability"
           ],
-          "cta": "Choose Pro",
-          "ctaHref": "/start"
+          "cta": "Request Supported Access",
+          "ctaHref": "/pricing",
+          "anchorPrice": "€790",
+          "priceNote": "Founding members lock €79/mo instead of the later €790/mo supported rate."
         },
         "enterprise": {
-          "name": "Enterprise",
-          "price": "Custom",
-          "period": "/month",
-          "description": "For organizations needing custom implementation and support.",
+          "name": "Pico Pilot",
+          "price": "€1,000+",
+          "period": "/engagement",
+          "description": "Hands-on implementation when the system is broken, urgent, or too expensive to keep guessing on.",
           "features": [
-            "Custom implementation",
-            "Dedicated support",
-            "Advanced security features",
-            "Custom integrations",
-            "SLA guarantees"
+            "Scoped diagnosis and implementation",
+            "A working system tied to measurable outcome",
+            "Custom projects when complexity is real"
           ],
-          "cta": "Contact Sales",
-          "ctaHref": "https://calendly.com/mutxdev"
+          "cta": "Book a Planning Call",
+          "ctaHref": "https://calendly.com/mutxdev",
+          "priceNote": "Founding pilot pricing starts at €1,000+ before later custom engagements move to €10,000+.",
+          "anchorPrice": "€10,000+"
         }
       }
     },
@@ -399,8 +430,8 @@
           "a": "Practical agent systems: support flows, internal copilots, lead capture, sales follow-up, and operational workflows that need to get built, fixed, or controlled in the real world."
         },
         "3": {
-          "q": "Is there a free way to start?",
-          "a": "Yes. Pico starts with a free trial focused on first value. You can get started immediately - no waitlist or access request needed."
+          "q": "Is the waitlist open?",
+          "a": "Yes. The public waitlist is open again. The academy and product routes are still private until this redesign pass moves beyond the landing page."
         },
         "4": {
           "q": "Is this for enterprises?",
@@ -409,20 +440,20 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Start Building Today",
-      "title": "Get started with Pico.",
+      "eyebrow": "Founding Access",
+      "title": "Request access to the right lane.",
       "body": "Pico helps you get something useful working, recover it when it breaks, and keep it under control in real work.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
-      "formHeadline": "Start your AI agent journey.",
-      "formSubline": "Choose your lane: build, fix, or control. We'll guide you from there.",
-      "ctaButton": "Get started",
+      "formHeadline": "Start with the real blocker.",
+      "formSubline": "Tell us whether you need to build, fix, or control. We will route you to the right lane.",
+      "ctaButton": "Request access",
       "secondaryButton": "Book a Planning Call",
-      "formCtaMeta": "Free trial · Start immediately · Pro features from €29/mo"
+      "formCtaMeta": "Free trial · Founding rates at 90% off · €29 / €79 · Pico Pilot from €1,000+"
     },
     "contactForm": {
       "dialogLabel": "Contact form",
       "closeLabel": "Close",
-      "title": "Contact Pico Team",
+      "title": "Request Pico access",
       "subtitle": "Tell us what you are trying to ship, recover, or control. We will route you to the right next step.",
       "emailLabel": "Work email",
       "emailPlaceholder": "you@company.com",
@@ -441,10 +472,10 @@
       "messageOptional": "(optional)",
       "messagePlaceholder": "Describe the goal, blocker, or live system…",
       "submitting": "Sending...",
-      "submit": "Get started",
+      "submit": "Request access",
       "disclaimer": "No generic nurture funnel. A human will reply with the honest next route.",
-      "successTitle": "Let's get started!",
-      "successBody": "We have your context. Check your email for next steps to begin your AI agent journey.",
+      "successTitle": "Request received.",
+      "successBody": "We have your context. Check your email for the next route into Pico.",
       "successBack": "Back to the page",
       "errorFallback": "Something went wrong. Please try again.",
       "networkError": "Network error. Please try again."
