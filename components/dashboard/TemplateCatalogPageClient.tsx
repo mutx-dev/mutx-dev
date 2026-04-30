@@ -347,7 +347,7 @@ export function TemplateCatalogPageClient() {
       name: "New Custom Template",
       summary: "Editable custom starter template.",
       description: "User-owned custom template.",
-      starter_prompt: "Deploy the custom template and continue from the MUTX operator surface.",
+      starter_prompt: "Deploy the custom template and continue from the MUTX dashboard.",
       system_prompt: "You are a custom MUTX assistant template. Operate safely and concisely.",
       category: "custom",
       tags: ["custom"],
@@ -695,7 +695,7 @@ export function TemplateCatalogPageClient() {
       {!error && !loading && filteredTemplates.length === 0 ? (
         <EmptyState
           title="No starter templates matched"
-          message="Adjust the search or source filter. MUTX only shows templates backed by the live control plane."
+          message="Adjust the search or source filter. MUTX only shows templates backed by live product data."
         />
       ) : null}
 

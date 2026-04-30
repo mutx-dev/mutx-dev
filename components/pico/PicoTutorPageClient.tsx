@@ -164,18 +164,18 @@ export function PicoTutorPageClient() {
       label: '01 • Frame',
       title: 'Bring one blocked step',
       body: selectedLesson
-        ? `Tie the question to ${selectedLesson.title}. The desk works best when the lesson route is already attached.`
-        : 'Name the exact step, command, or approval state that broke. Broad anxiety is not enough.',
+        ? `Tie the question to ${selectedLesson.title}. Tutor works best when the lesson is attached.`
+        : 'Name the exact step, command, or approval state that stopped you.',
     },
     {
       label: '02 • Evidence',
       title: 'Bring what actually happened',
-      body: 'Paste the command, transcript, error, or runtime signal. This desk reviews evidence, not vibes.',
+      body: 'Paste the command, transcript, error, or runtime status so the answer can stay specific.',
     },
     {
       label: '03 • Exit',
       title: 'Leave with one move',
-      body: 'A good tutor answer gives one next action, one verification line, and a clean handoff if the evidence stays thin.',
+      body: 'A good tutor answer gives one next action, one verification line, and a clear handoff when setup needs help.',
     },
   ]
   const lessonReviewBoard = selectedLesson
@@ -214,7 +214,7 @@ export function PicoTutorPageClient() {
           ? 'openai connected'
           : openAIConnection?.status === 'platform'
             ? 'platform access'
-            : 'grounded mode'
+            : 'setup mode'
   const lessonSignal = selectedLesson
     ? `${lessonWorkspace.completedStepCount}/${selectedLesson.steps.length} steps`
     : 'attach lesson'
@@ -223,10 +223,10 @@ export function PicoTutorPageClient() {
       ? selectedLesson.steps[lessonWorkspace.workspace.activeStepIndex]?.title ?? 'not set'
       : 'not set'
   const tutorPacketPreview = [
-    `Lane ${selectedLesson?.title ?? 'none attached'}`,
+    `Lesson ${selectedLesson?.title ?? 'none attached'}`,
     `State ${tutorSignal}`,
     `Focus ${focusedStepLabel}`,
-    `Output one grounded move`,
+    `Output one next step`,
   ].join('\n')
 
   useEffect(() => {
@@ -443,7 +443,7 @@ export function PicoTutorPageClient() {
     <PicoShell
       eyebrow="Grounded tutor"
       title="Ask for the exact next step"
-      description="Bring one concrete blocker, get one grounded move back, and return to the lesson or runtime route that can move the work."
+      description="Bring one concrete blocker, get one next step back, and return to the lesson, runtime, or support path."
       heroContent={
         <div
           className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(8,14,9,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
@@ -464,7 +464,7 @@ export function PicoTutorPageClient() {
           <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
             <div className="grid gap-5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={picoClasses.chip}>Crit pulse</span>
+                <span className={picoClasses.chip}>Tutor status</span>
                 <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                   {tutorSignal}
                 </span>
@@ -473,12 +473,12 @@ export function PicoTutorPageClient() {
                 Attach the blocked lesson and narrow the answer to one move.
               </h2>
               <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Route the question through the actual lesson, command, or runtime edge that failed. That keeps the reply grounded enough to send you back into action.
+                Route the question through the lesson, command, or runtime step that failed. Tutor should send you back into action.
               </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className={picoSoft('p-4')}>
-                  <p className={picoClasses.label}>Lesson lane</p>
+                  <p className={picoClasses.label}>Lesson</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {lessonSignal}
                   </p>
@@ -518,7 +518,7 @@ export function PicoTutorPageClient() {
                     {focusedStepLabel}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    If the answer does not make this step clearer, leave tutor and use the cleaner route.
+                    If the answer does not make this step clearer, leave Tutor and use the better path.
                   </p>
                 </div>
               </div>
@@ -526,7 +526,7 @@ export function PicoTutorPageClient() {
 
             <div className={picoInset('grid gap-4 overflow-hidden border-[color:rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_20%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
               <div className={picoSoft('p-4')}>
-                <p className={picoClasses.label}>Crit packet preview</p>
+                <p className={picoClasses.label}>Question packet</p>
                 <pre className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   <code>{tutorPacketPreview}</code>
                 </pre>
@@ -567,8 +567,8 @@ export function PicoTutorPageClient() {
     >
       <PicoSessionBanner session={session} nextPath={pathname} />
       <PicoSurfaceCompass
-        title="The tutor should end in motion, not another loop"
-        body="Use tutor only to recover one grounded next move. Return to the lesson when the answer is sufficient, inspect Autopilot when the runtime is the real blocker, and escalate only when neither route can tell the truth."
+        title="Tutor should return you to setup"
+        body="Use Tutor for one blocked command, file path, provider setting, or validation step. Return to the lesson when the answer is enough, inspect Autopilot for runtime state, and get human help when keys, hosting, or implementation decisions are involved."
         status={
           reply
             ? 'answer ready'
@@ -576,7 +576,7 @@ export function PicoTutorPageClient() {
               ? 'lesson context attached'
               : 'awaiting blocker'
         }
-        aside="A good tutor answer ends in one move. If it does not, leave the loop and return to the lesson, the runtime, or support."
+        aside="A good tutor answer ends in one move. If it does not, return to the lesson, runtime, or support."
         items={[
           {
             href: selectedLesson
@@ -589,22 +589,22 @@ export function PicoTutorPageClient() {
               : derived.nextLesson
                 ? `Open ${derived.nextLesson.title}`
                 : 'Return to academy',
-            caption: 'Go back here when the tutor answer still keeps the lesson path truthful.',
-            note: 'Resume lane',
+            caption: 'Go back here when the tutor answer unblocks the lesson step.',
+            note: 'Resume lesson',
             tone: 'primary',
           },
           {
             href: toHref('/autopilot'),
-            label: 'Inspect live control room',
+            label: 'Inspect runtime state',
             caption: 'Open this when the problem has shifted from knowable lesson logic to runtime state.',
             note: 'Runtime',
             tone: 'soft',
           },
           {
             href: toHref('/support'),
-            label: 'Open support lane',
-            caption: 'Escalate only when the tutor answer still does not give one concrete move.',
-            note: 'Escalate',
+            label: 'Get human help',
+            caption: 'Use this for API keys, hosting, integrations, or custom implementation.',
+            note: 'Support',
           },
         ]}
       />
@@ -614,9 +614,9 @@ export function PicoTutorPageClient() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Crit desk method</p>
+                <p className={picoClasses.label}>Tutor method</p>
                 <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
-                  Treat each question like a studio critique
+                  Keep each question narrow
                 </h2>
               </div>
               <span className={picoClasses.chip}>frame • evidence • exit</span>
@@ -639,17 +639,17 @@ export function PicoTutorPageClient() {
 
           <div className="grid gap-4">
             <div className={picoEmber('p-5')}>
-              <p className={picoClasses.label}>Desk posture</p>
+              <p className={picoClasses.label}>Tutor rule</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                This is not a general chat surface. Use it as a review desk that narrows ambiguity into one next move.
+                This is not general chat. Use it to turn one setup blocker into one next move.
               </p>
             </div>
             <div className={picoInset('p-5')}>
-              <p className={picoClasses.label}>Attached lane</p>
+              <p className={picoClasses.label}>Attached lesson</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 {selectedLesson
                   ? `${selectedLesson.title} is attached, so the tutor can answer against the real lesson brief instead of guessing.`
-                  : 'No lesson is attached yet. Connect the blocked lesson if you want the tutor to stay grounded in the actual route.'}
+                  : 'No lesson is attached yet. Connect the blocked lesson if you want the answer tied to the setup path.'}
               </p>
             </div>
           </div>
@@ -660,7 +660,7 @@ export function PicoTutorPageClient() {
         <div className={picoPanel('overflow-hidden p-0')}>
           <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
             <form onSubmit={submit} className="p-6 sm:p-7">
-              <p className={picoClasses.label}>Crit desk</p>
+              <p className={picoClasses.label}>Tutor desk</p>
               <div className="mt-3 flex items-center gap-4">
                 <Image
                   src="/pico/mascot/pico-atom.svg"
@@ -726,12 +726,12 @@ export function PicoTutorPageClient() {
               <div className={picoInset('mt-6 grid gap-4 p-5')}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className={picoClasses.label}>Crit packet</p>
+                    <p className={picoClasses.label}>Question packet</p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Bring just enough context for a sharp answer: route, failure, and exact expectation.
+                      Bring just enough context for a useful answer: page, failure, and expected result.
                     </p>
                   </div>
-                  <span className={picoClasses.chip}>route • failure • expectation</span>
+                  <span className={picoClasses.chip}>page • failure • expected result</span>
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -820,7 +820,7 @@ export function PicoTutorPageClient() {
             </form>
 
             <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">
-              <p className={picoClasses.label}>Operator rail</p>
+              <p className={picoClasses.label}>Tutor rail</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoSoft('p-4')}>
                   <p className="text-sm text-[color:var(--pico-text-muted)]">Questions asked</p>
@@ -930,12 +930,12 @@ export function PicoTutorPageClient() {
               </div>
 
               <div className={picoInset('mt-4 p-4')}>
-                <p className={picoClasses.label}>Escalation rule</p>
+                <p className={picoClasses.label}>Support rule</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   If the answer still does not give you one concrete move, stop looping and open support with the lesson context attached.
                 </p>
                 <Link href={toHref('/support')} className={cn(picoClasses.secondaryButton, 'mt-4')}>
-                  Open support lane
+                  Get human help
                 </Link>
               </div>
             </div>
@@ -944,7 +944,7 @@ export function PicoTutorPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Studio critique</p>
+            <p className={picoClasses.label}>Tutor answer</p>
             {error ? (
               <div className="mt-4 rounded-[24px] border border-rose-400/20 bg-rose-400/10 p-5 text-sm leading-6 text-rose-50">
                 {error}
@@ -1015,7 +1015,7 @@ export function PicoTutorPageClient() {
 
                 {reply.structured.verify.length ? (
                   <div className={picoSoft('p-5')}>
-                    <p className="font-medium text-[color:var(--pico-text)]">Review line</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Review check</p>
                     <div className="mt-3 grid gap-3">
                       {reply.structured.verify.map((item) => (
                         <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]')}>
@@ -1028,7 +1028,7 @@ export function PicoTutorPageClient() {
 
                 {reply.structured.ifThisFails.length ? (
                   <div className={picoSoft('p-5')}>
-                    <p className="font-medium text-[color:var(--pico-text)]">Fallback route</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Fallback path</p>
                     <div className="mt-3 grid gap-3">
                       {reply.structured.ifThisFails.map((item) => (
                         <div key={item} className={picoInset('px-4 py-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]')}>
@@ -1042,7 +1042,7 @@ export function PicoTutorPageClient() {
             ) : (
               <div className={picoSoft('mt-4 p-5')}>
                 <p className={picoClasses.body}>
-                  Ask one blocker, not a whole story. Pico Tutor will ground the answer in lessons, the curated operator pack, and official docs when the question is version-sensitive.
+                  Ask one blocker, not the whole project. Pico Tutor uses lessons, the builder pack, and official docs when the question depends on current setup details.
                 </p>
                 <p className="mt-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   How this works: state the failing step, the expected result, and the exact failure. The answer should give you a concrete move, one verification step, and a clean escalation path if the evidence is still thin.
@@ -1053,7 +1053,7 @@ export function PicoTutorPageClient() {
 
           {reply?.lessons.length ? (
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Grounded lesson matches</p>
+              <p className={picoClasses.label}>Lesson matches</p>
               <div className="mt-4 grid gap-3">
                 {reply.lessons.map((lesson, index) => (
                   <Link
@@ -1074,7 +1074,7 @@ export function PicoTutorPageClient() {
 
           {reply?.structured.sources.length ? (
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Critique evidence</p>
+              <p className={picoClasses.label}>Answer sources</p>
               <div className="mt-4 grid gap-3">
                 {reply.structured.sources.map((source) => (
                   <div
@@ -1129,7 +1129,7 @@ export function PicoTutorPageClient() {
           ) : null}
 
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Exit route</p>
+            <p className={picoClasses.label}>Exit path</p>
             <div className="mt-4 grid gap-3">
               <Link
                 href={
@@ -1151,12 +1151,12 @@ export function PicoTutorPageClient() {
                 Open Autopilot
               </Link>
               <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
-                Open support lane
+                Get human help
               </Link>
             </div>
             <div className={picoSoft('mt-4 p-4')}>
               <p className={picoClasses.body}>
-                The tutor should end in motion. Return to the lesson if the path is still clear, open Autopilot if the runtime is now the bottleneck, and escalate only when the product path stopped being truthful.
+                Tutor should end with a next step. Return to the lesson if the path is clear, open Autopilot if runtime state is the blocker, and get human help when setup needs a person.
               </p>
             </div>
           </section>

@@ -80,7 +80,7 @@ export function Sidebar() {
         <div className="border-t border-[rgba(255,255,255,0.06)] p-4">
           <div className="rounded-lg bg-[rgba(255,255,255,0.03)] p-3">
             <p className="text-xs text-[rgba(255,255,255,0.4)]">
-              MUTX operator surface
+              MUTX dashboard
             </p>
           </div>
         </div>

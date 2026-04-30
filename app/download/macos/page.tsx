@@ -94,7 +94,7 @@ export default async function MacDownloadPage() {
                     Download MUTX for macOS.
                   </h1>
                   <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>
-                    MUTX {releaseLabel} is the signed macOS operator app for Apple Silicon
+                    MUTX {releaseLabel} is the signed macOS app for Apple Silicon
                     and Intel. Install it, then move straight into the dashboard.
                   </p>
                 </div>
@@ -153,10 +153,10 @@ export default async function MacDownloadPage() {
             <div className={`${styles.routeReleaseBand} ${styles.routeHeroPanel}`}>
               <div className={styles.routeReleaseBandCopy}>
                 <div className={styles.intro}>
-                  <p className={styles.eyebrow}>Stable operator lane</p>
+                  <p className={styles.eyebrow}>Stable macOS release</p>
                   <h2 className={styles.sectionTitle}>Mac app first.</h2>
                   <p className={styles.bodyText}>
-                    Downloads, notes, and checksums stay in one public lane.
+                    Downloads, notes, and checksums stay in one place.
                   </p>
                 </div>
               </div>

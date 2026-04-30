@@ -5759,6 +5759,84 @@
         }
       }
     },
+    "/v1/ingest/events": {
+      "post": {
+        "tags": [
+          "ingest"
+        ],
+        "summary": "Ingest Event",
+        "description": "Canonical event ingestion endpoint for SDK adapters.\n\nAccepts structured events from LangChain, CrewAI, AutoGen, and future\nadapter integrations.  When ``agent_id`` is provided the event is\npersisted as an ``AgentLog`` for audit trail; otherwise it is accepted\nand logged without persistent storage (a dedicated events table is\nplanned for Wave 2).",
+        "operationId": "ingest_event_v1_ingest_events_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer token for JWT auth",
+              "title": "Authorization"
+            },
+            "description": "Bearer token for JWT auth"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "API key for ingestion authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for ingestion authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/runs": {
       "post": {
         "tags": [
@@ -12611,6 +12689,444 @@
         }
       }
     },
+    "/v1/governance/trust": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "List Governance Trust",
+        "description": "List governance trust records.",
+        "operationId": "list_governance_trust_v1_governance_trust_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovernanceIdentityList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/governance/trust/{agent_id}": {
+      "post": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "Update Governance Trust",
+        "description": "Update governance trust metadata for an agent.",
+        "operationId": "update_governance_trust_v1_governance_trust__agent_id__post",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GovernanceTrustUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovernedIdentity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/governance/lifecycle": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "List Governance Lifecycle",
+        "description": "List governance lifecycle records.",
+        "operationId": "list_governance_lifecycle_v1_governance_lifecycle_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovernanceIdentityList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/governance/lifecycle/{agent_id}": {
+      "post": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "Update Governance Lifecycle",
+        "description": "Update an agent governance lifecycle state.",
+        "operationId": "update_governance_lifecycle_v1_governance_lifecycle__agent_id__post",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GovernanceLifecycleUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GovernedIdentity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/governance/discovery": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "List Governance Discovery",
+        "description": "List governance discovery findings.",
+        "operationId": "list_governance_discovery_v1_governance_discovery_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/governance/discovery/scan": {
+      "post": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "Scan Governance Discovery",
+        "description": "Run a lightweight governance discovery scan of known local runtime state.",
+        "operationId": "scan_governance_discovery_v1_governance_discovery_scan_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryScanResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/governance/attestations": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "Get Governance Attestations",
+        "description": "Return a governance attestation bundle for the current operator.",
+        "operationId": "get_governance_attestations_v1_governance_attestations_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttestationBundle"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/governance/attestations/verify": {
+      "post": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "Verify Governance Attestations",
+        "description": "Verify and return the current governance attestation bundle.",
+        "operationId": "verify_governance_attestations_v1_governance_attestations_verify_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttestationBundle"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/governance/credentials/backends": {
       "get": {
         "tags": [
@@ -16881,6 +17397,105 @@
         ],
         "title": "AssistantWakeupResponse"
       },
+      "AttestationBundle": {
+        "properties": {
+          "summary": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Summary"
+          },
+          "coverage": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object",
+            "title": "Coverage"
+          },
+          "compliance": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Compliance"
+          },
+          "discovery": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Discovery"
+          },
+          "runtime": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Runtime"
+          },
+          "owasp_agentic_risk_mapping": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Owasp Agentic Risk Mapping"
+          },
+          "generated_at": {
+            "type": "string",
+            "title": "Generated At"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "summary",
+          "coverage",
+          "compliance",
+          "discovery",
+          "runtime",
+          "owasp_agentic_risk_mapping",
+          "generated_at"
+        ],
+        "title": "AttestationBundle"
+      },
       "AuditEventResponse": {
         "properties": {
           "event_id": {
@@ -18326,6 +18941,116 @@
         "title": "DeploymentVersionResponse",
         "description": "Response model for deployment version"
       },
+      "DiscoveryFinding": {
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "title": "Finding Id"
+          },
+          "entity_id": {
+            "type": "string",
+            "title": "Entity Id"
+          },
+          "entity_type": {
+            "type": "string",
+            "title": "Entity Type"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ],
+            "title": "Risk Level",
+            "default": "unknown"
+          },
+          "registration_status": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "registered",
+              "unregistered",
+              "ignored"
+            ],
+            "title": "Registration Status",
+            "default": "unknown"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "default": 0.0
+          },
+          "discovered_at": {
+            "type": "string",
+            "title": "Discovered At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "finding_id",
+          "entity_id",
+          "entity_type",
+          "title",
+          "source",
+          "discovered_at"
+        ],
+        "title": "DiscoveryFinding"
+      },
+      "DiscoveryList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DiscoveryFinding"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "DiscoveryList"
+      },
+      "DiscoveryScanResponse": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "scanned_at": {
+            "type": "string",
+            "title": "Scanned At"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DiscoveryFinding"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "scanned_at",
+          "items"
+        ],
+        "title": "DiscoveryScanResponse"
+      },
       "DocumentArtifactResponse": {
         "properties": {
           "id": {
@@ -19003,6 +19728,249 @@
         ],
         "title": "GeneratePackageRequest",
         "description": "Trigger generation of a ready-to-deploy package for the session."
+      },
+      "GovernanceIdentityList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GovernedIdentity"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "GovernanceIdentityList"
+      },
+      "GovernanceLifecycleUpdate": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "active",
+              "suspended",
+              "retired"
+            ],
+            "title": "State"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "default": ""
+          },
+          "apply_runtime_action": {
+            "type": "boolean",
+            "title": "Apply Runtime Action",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "title": "GovernanceLifecycleUpdate"
+      },
+      "GovernanceTrustUpdate": {
+        "properties": {
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "delta": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "default": ""
+          },
+          "capability_scope": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capability Scope"
+          },
+          "resource_scope": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Scope"
+          },
+          "credential_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "unknown",
+                  "missing",
+                  "brokered",
+                  "expired"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Status"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          }
+        },
+        "type": "object",
+        "title": "GovernanceTrustUpdate"
+      },
+      "GovernedIdentity": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "trust_score": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Trust Score",
+            "default": 500
+          },
+          "trust_tier": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "low",
+              "trusted",
+              "elevated",
+              "critical"
+            ],
+            "title": "Trust Tier",
+            "default": "trusted"
+          },
+          "credential_status": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "missing",
+              "brokered",
+              "expired"
+            ],
+            "title": "Credential Status",
+            "default": "unknown"
+          },
+          "lifecycle_status": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "active",
+              "suspended",
+              "retired"
+            ],
+            "title": "Lifecycle Status",
+            "default": "active"
+          },
+          "launch_profile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Launch Profile"
+          },
+          "faramesh_policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faramesh Policy"
+          },
+          "capability_scope": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Capability Scope"
+          },
+          "resource_scope": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Resource Scope"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "agent_id",
+          "updated_at"
+        ],
+        "title": "GovernedIdentity"
       },
       "HTTPValidationError": {
         "properties": {
@@ -22532,7 +23500,8 @@
           },
           "session_id": {
             "type": "string",
-            "title": "Session Id"
+            "title": "Session Id",
+            "default": ""
           },
           "onboarding_state": {
             "anyOf": [
@@ -22552,8 +23521,7 @@
         },
         "type": "object",
         "required": [
-          "reply",
-          "session_id"
+          "reply"
         ],
         "title": "PicoChatResponse",
         "description": "Coach reply with optional onboarding state snapshot."
@@ -22648,7 +23616,7 @@
           "apiKey": {
             "type": "string",
             "maxLength": 512,
-            "minLength": 20,
+            "minLength": 10,
             "title": "Apikey"
           }
         },
@@ -22728,6 +23696,17 @@
           "message": {
             "type": "string",
             "title": "Message"
+          },
+          "apiKeySet": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apikeyset"
           }
         },
         "type": "object",
@@ -22885,6 +23864,28 @@
             "type": "boolean",
             "title": "Usedofficialfallback",
             "default": false
+          },
+          "reply": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply"
+          },
+          "nextLesson": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextlesson"
           }
         },
         "type": "object",

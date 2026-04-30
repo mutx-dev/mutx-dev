@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 PicoTutorConfidence = Literal["high", "medium", "low"]
 PicoTutorIntent = Literal[
@@ -30,14 +30,29 @@ class PicoTutorSetupContext(BaseModel):
 
 
 class PicoTutorRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     question: str = Field(..., min_length=1, max_length=6000)
     lessonSlug: str | None = Field(default=None, max_length=255)
     progress: dict[str, Any] | None = None
     setupContext: PicoTutorSetupContext | None = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_legacy_payload(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+
+        normalized = dict(value)
+        if "question" not in normalized and "message" in normalized:
+            normalized["question"] = normalized["message"]
+        if "lessonSlug" not in normalized and "lesson" in normalized:
+            normalized["lessonSlug"] = normalized["lesson"]
+        return normalized
+
 
 class PicoTutorOpenAIConnectionRequest(BaseModel):
-    apiKey: str = Field(..., min_length=20, max_length=512)
+    apiKey: str = Field(..., min_length=10, max_length=512)
 
 
 class PicoTutorLessonLink(BaseModel):
@@ -94,6 +109,16 @@ class PicoTutorResponse(BaseModel):
     intent: PicoTutorIntent
     skillLevel: PicoTutorSkillLevel
     usedOfficialFallback: bool = False
+    reply: str | None = None
+    nextLesson: str | None = None
+
+    @model_validator(mode="after")
+    def _sync_legacy_response_fields(self) -> "PicoTutorResponse":
+        if self.reply is None:
+            self.reply = self.answer
+        if self.nextLesson is None and self.recommendedLessonIds:
+            self.nextLesson = self.recommendedLessonIds[0]
+        return self
 
 
 class PicoTutorOpenAIConnectionStatus(BaseModel):
@@ -106,3 +131,10 @@ class PicoTutorOpenAIConnectionStatus(BaseModel):
     connectedAt: str | None = None
     validatedAt: str | None = None
     message: str
+    apiKeySet: bool | None = None
+
+    @model_validator(mode="after")
+    def _sync_legacy_status_fields(self) -> "PicoTutorOpenAIConnectionStatus":
+        if self.apiKeySet is None:
+            self.apiKeySet = self.source == "user" and self.connected
+        return self

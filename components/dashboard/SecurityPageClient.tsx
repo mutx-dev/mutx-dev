@@ -95,7 +95,7 @@ export function SecurityPageClient() {
         <LiveStatCard
           label="Boundary"
           value="Operator owned"
-          detail="Auth and key state are held inside the product surface, not in a disconnected admin wall."
+          detail="Auth and key state are held inside the product, not in a disconnected admin wall."
           status="success"
         />
       </LiveKpiGrid>
@@ -155,7 +155,7 @@ export function SecurityPageClient() {
                 <span className="text-sm font-medium">Rotation posture</span>
               </div>
               <p className="mt-3 text-sm leading-6 text-slate-400">
-                Keys should rotate from the same product surface operators use to deploy, replay, and recover.
+                Keys should rotate from the same product area teams use to deploy, replay, and recover.
               </p>
             </div>
           </div>

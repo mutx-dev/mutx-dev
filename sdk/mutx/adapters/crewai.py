@@ -188,7 +188,9 @@ class MutxCrewAICallbackHandler:
             pass
 
 
-def run_crew(crew: Any, inputs: dict[str, Any], *, api_key: str = "", api_url: str = "https://api.mutx.dev") -> Any:
+def run_crew(
+    crew: Any, inputs: dict[str, Any], *, api_key: str = "", api_url: str = "https://api.mutx.dev"
+) -> Any:
     """Execute a CrewAI crew with MUTX callback attached.
 
     Args:

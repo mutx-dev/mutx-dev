@@ -125,16 +125,16 @@ const homepageActions: MarketingActionLink[] = [
 export const marketingHomepage: MarketingHomepage = {
   hero: {
     tagline: 'AI Agent Infrastructure',
-    title: 'See it. Control it. Prove it.',
-    support: 'Live visibility, hard boundaries, and reviewable history for every agent run.',
+    title: 'Run agents with review built in.',
+    support: 'Live runs, clear permissions, approvals, and readable history in one place.',
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
   },
   socialProof: {
     tagline: 'Built for teams running AI agents in production',
-    title: 'Deep control-plane depth, not a thin wrapper.',
-    body: 'Audit history, RBAC, approvals, observability, and hard execution boundaries stay in one operating surface.',
+    title: 'Everything you need to review agent work.',
+    body: 'Audit history, permissions, approvals, observability, and execution limits stay in one product.',
     items: [
       {
         value: '100%',
@@ -144,7 +144,7 @@ export const marketingHomepage: MarketingHomepage = {
       {
         value: 'RBAC',
         label: 'Governance built in',
-        detail: 'Roles, route-level enforcement, and boundaries stay explicit from the start.',
+        detail: 'Roles, access rules, and boundaries stay explicit from the start.',
       },
       {
         value: 'Approvals',
@@ -164,29 +164,29 @@ export const marketingHomepage: MarketingHomepage = {
       {
         value: 'macOS',
         label: 'Native desktop',
-        detail: 'Start locally with a real operator surface instead of raw config work.',
+        detail: 'Start locally with a usable app instead of raw config work.',
       },
     ],
   },
   salesSections: {
     demo: {
       eyebrow: 'See MUTX in action',
-      title: 'Watch the run, not the aftermath.',
-      body: 'One surface for steps, permissions, and the record that survives review.',
+      title: 'Watch the run while it happens.',
+      body: 'Steps, permissions, and run history stay together for review.',
       story: {
         mediaSrc: '/marketing/dashboard/story-demo.mp4',
         mediaPosterSrc: '/marketing/dashboard/story-poster.jpg',
-        mediaAlt: 'MUTX product walkthrough showing an operator moving through overview, traces, and webhooks',
+        mediaAlt: 'MUTX product walkthrough showing overview, traces, and webhooks',
       },
       tabs: [
         {
           id: 'overview',
           label: 'Overview',
           title: 'Watch fleet state refresh live.',
-          body: 'Runtime posture, recent execution, and operator context stay in one control surface.',
+          body: 'Runtime status, recent execution, and user context stay in one view.',
           mediaType: 'image',
           mediaSrc: '/marketing/dashboard/overview-poster.jpg',
-          mediaAlt: 'MUTX dashboard overview showing live fleet state and operator context',
+          mediaAlt: 'MUTX dashboard overview showing live fleet state and account context',
         },
         {
           id: 'traces',
@@ -200,7 +200,7 @@ export const marketingHomepage: MarketingHomepage = {
         {
           id: 'webhooks',
           label: 'Delivery Receipts',
-          title: 'Keep downstream proof inside the product.',
+          title: 'Keep webhook history inside the product.',
           body: 'Webhook history, failures, and payload receipts stay readable without leaving the dashboard.',
           mediaType: 'image',
           mediaSrc: '/marketing/dashboard/webhooks-poster.jpg',
@@ -253,8 +253,8 @@ export const marketingHomepage: MarketingHomepage = {
     },
     proof: {
       eyebrow: 'Why teams switch',
-      title: 'From hoping to knowing.',
-      body: 'Runs stay legible, boundaries stay explicit, and the record still makes sense later.',
+      title: 'From guesswork to reviewable runs.',
+      body: 'Runs stay readable, boundaries stay explicit, and the record still makes sense later.',
       items: [
         {
           title: 'Visibility',
@@ -269,7 +269,7 @@ export const marketingHomepage: MarketingHomepage = {
         {
           title: 'Trust',
           before: 'Another AI demo that looks impressive for five minutes but falls apart the first time something goes wrong.',
-          after: 'A real product with audit trails, run history, and clear boundaries — so you can trust AI in production.',
+          after: 'A real product with audit trails, run history, and clear boundaries for production use.',
         },
       ],
     },

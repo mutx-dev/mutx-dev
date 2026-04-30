@@ -199,7 +199,7 @@ export function PicoAcademyDashboard() {
   const currentMissionTitle = activationLesson?.title ?? 'Open Autopilot'
   const currentMissionSummary = activationLesson
     ? activationLesson.objective
-    : 'Step into the live control room when the lesson lane is clear.'
+    : 'Open Autopilot after the first setup steps are complete.'
   const currentMissionValidation = activationLesson
     ? activationLesson.validation
     : 'Use the runtime when the question is no longer about reading the lesson.'
@@ -213,14 +213,14 @@ export function PicoAcademyDashboard() {
         ? 'Run your first agent'
         : nextLesson
           ? `Continue with ${nextLesson.title}`
-          : 'Open the next chapter'
+          : 'Open the next lesson'
     : 'Open Autopilot'
   const currentMissionSecondaryHref = toHref(
     `/tutor${activationLessonSlug ? `?lesson=${activationLessonSlug}` : ''}`,
   )
   const currentMissionSecondaryLabel = activationLessonSlug
     ? 'Ask tutor for the exact next step'
-    : 'Ask tutor for route correction'
+    : 'Ask tutor for setup help'
   const missionIndex =
     activationLesson && activeTrackLessons.length > 0
       ? Math.max(
@@ -241,7 +241,7 @@ export function PicoAcademyDashboard() {
           : 'checking'
   const hostedDetail =
     session.status === 'authenticated'
-      ? session.user.email ?? session.user.name ?? 'operator'
+      ? session.user.email ?? session.user.name ?? 'user'
       : session.status === 'unauthenticated'
         ? 'sign in to persist'
         : session.status === 'error'
@@ -250,15 +250,15 @@ export function PicoAcademyDashboard() {
 
   const missionStrip = [
     {
-      label: 'Mission state',
+      label: 'Lesson state',
       value: workspaceCaptured
-        ? 'captured'
+        ? 'saved'
         : activationLessonWorkspace.completedStepCount > 0
           ? 'in progress'
           : 'ready',
       detail: activationLesson
         ? `${activationLessonWorkspace.completedStepCount}/${activationLesson.steps.length} steps`
-        : 'control room',
+        : 'autopilot',
     },
     {
       label: 'Track progress',
@@ -266,8 +266,8 @@ export function PicoAcademyDashboard() {
       detail: `${activeTrackCompletedCount}/${activeTrackLessons.length} lessons`,
     },
     {
-      label: 'Proof',
-      value: workspaceCaptured ? 'captured' : 'missing',
+      label: 'Output',
+      value: workspaceCaptured ? 'saved' : 'missing',
       detail: focusedActivationStep?.title ?? 'Pick the next visible step',
     },
     {
@@ -280,17 +280,17 @@ export function PicoAcademyDashboard() {
   const studioMethod = [
     {
       label: '01 • Brief',
-      title: 'Read the mission like a client brief',
+      title: 'Read the setup step',
       body: currentMissionSummary,
     },
     {
       label: '02 • Deliverable',
-      title: 'Make one artifact worth keeping',
+      title: 'Save one useful output',
       body: activationLesson?.expectedResult ?? currentMissionValidation,
     },
     {
       label: '03 • Critique',
-      title: 'Use the validation like studio review',
+      title: 'Use the validation as the check',
       body: currentMissionValidation,
     },
   ]
@@ -302,11 +302,11 @@ export function PicoAcademyDashboard() {
     },
     {
       label: 'Level reward',
-      value: currentLevel?.projectOutcome ?? 'Ship one real operator outcome.',
+      value: currentLevel?.projectOutcome ?? 'Ship one working setup outcome.',
     },
     {
       label: 'Next standard',
-      value: currentLevel?.recommendedNextStep ?? 'Keep the chapter narrow and honest.',
+      value: currentLevel?.recommendedNextStep ?? 'Keep the chapter narrow and practical.',
     },
   ]
 
@@ -323,9 +323,9 @@ export function PicoAcademyDashboard() {
   return (
     <PicoShell
       mode="academy"
-      eyebrow="Apprentice codex"
+      eyebrow="Academy"
       title="Academy"
-      description="One mission. One proof. One honest next move."
+      description="One setup step, one saved output, one next move."
       railCollapsed={progress.platform.railCollapsed}
       helpLaneOpen={progress.platform.helpLaneOpen}
       onToggleRail={() =>
@@ -343,7 +343,7 @@ export function PicoAcademyDashboard() {
           <div className="grid gap-8 lg:grid-cols-[8rem,minmax(0,1fr)]">
             <div className="grid content-between gap-6 border-b border-[color:var(--pico-border)] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
               <div className="grid gap-2">
-                <p className={picoClasses.label}>Codex chapter</p>
+                <p className={picoClasses.label}>Chapter</p>
                 <p className="font-[family:var(--font-site-display)] text-7xl leading-none tracking-[-0.08em] text-[color:var(--pico-accent)] sm:text-8xl">
                   {activeTrackChapter}
                 </p>
@@ -362,7 +362,7 @@ export function PicoAcademyDashboard() {
 
             <div className="grid gap-6">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={picoCodex.stamp}>Current mission</span>
+                <span className={picoCodex.stamp}>Current lesson</span>
                 <span className={picoCodex.stamp}>{hostedStatus}</span>
                 {session.status === 'authenticated' && session.user.plan ? (
                   <span className={picoCodex.stamp}>
@@ -423,7 +423,7 @@ export function PicoAcademyDashboard() {
               <div className="grid gap-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <p className={picoClasses.label}>Active proof lane</p>
+                    <p className={picoClasses.label}>Active setup step</p>
                     <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                       {focusedActivationStep?.title ?? activationLesson.title}
                     </h2>
@@ -437,7 +437,7 @@ export function PicoAcademyDashboard() {
                   <p className={picoClasses.label}>Resume from here</p>
                   <p className="mt-4 text-base leading-8 text-[color:var(--pico-text-secondary)]">
                     {focusedActivationStep?.body ??
-                      'Open the lesson route and keep the proof lane short.'}
+                      'Open the lesson and finish the next setup step.'}
                   </p>
                   {focusedActivationStep?.command ? (
                     <pre className="mt-5 overflow-x-auto rounded-[22px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] p-4 text-sm text-[color:var(--pico-accent-bright)]">
@@ -452,7 +452,7 @@ export function PicoAcademyDashboard() {
                   </div>
                   <div className="mt-5 flex flex-wrap gap-3">
                     <Link href={currentMissionPrimaryHref} className={picoClasses.primaryButton}>
-                      Resume mission
+                      Resume lesson
                     </Link>
                     <Link href={currentMissionSecondaryHref} className={picoClasses.tertiaryButton}>
                       Ask tutor
@@ -463,9 +463,9 @@ export function PicoAcademyDashboard() {
 
               <div className="grid gap-4">
                 <div className={picoCodexInset('p-5')}>
-                  <p className={picoClasses.label}>Proof state</p>
+                  <p className={picoClasses.label}>Output state</p>
                   <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                    {workspaceCaptured ? 'captured' : 'missing'}
+                    {workspaceCaptured ? 'saved' : 'missing'}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     Updated {workspaceUpdatedAt}
@@ -473,11 +473,11 @@ export function PicoAcademyDashboard() {
                 </div>
 
                 <div className={picoCodexNote('p-5')}>
-                  <p className={picoClasses.label}>Captured proof</p>
+                  <p className={picoClasses.label}>Saved output</p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     {workspaceCaptured
                       ? activationLessonWorkspace.workspace.evidence
-                      : 'No proof has been logged yet. Save the single artifact that proves the mission actually worked.'}
+                      : 'No output has been saved yet. Save the command result, transcript, or file path before moving on.'}
                   </p>
                 </div>
 
@@ -502,12 +502,12 @@ export function PicoAcademyDashboard() {
             <div>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className={picoClasses.label}>Studio method</p>
+                  <p className={picoClasses.label}>Academy method</p>
                   <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
-                    Learn like a boutique studio ships
+                    Finish the setup in small steps
                   </h2>
                 </div>
-                <span className={picoCodex.stamp}>brief • deliverable • critique</span>
+                <span className={picoCodex.stamp}>brief • output • check</span>
               </div>
 
               <div className="mt-6 grid gap-4 xl:grid-cols-3">
@@ -569,17 +569,17 @@ export function PicoAcademyDashboard() {
           <div className="border-b border-[color:var(--pico-border)] px-6 py-6 sm:px-8 lg:px-10">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Chapter ledger</p>
+                <p className={picoClasses.label}>Chapter map</p>
                 <h2 className="mt-3 max-w-4xl font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
-                  One dominant chapter, with the rest of the map kept quiet.
+                  Work on the current chapter first.
                 </h2>
               </div>
               <span className={picoCodex.stamp}>
-                {progress.platform.railCollapsed ? 'focus mode' : 'guided atlas'}
+                {progress.platform.railCollapsed ? 'focus mode' : 'guided map'}
               </span>
             </div>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              The current track gets the full editorial treatment. The rest of the atlas stays visible, but compressed, so the route still feels authored instead of equally loud everywhere.
+              The current track stays prominent. Other chapters stay visible without competing with the next setup step.
             </p>
           </div>
 
@@ -612,13 +612,13 @@ export function PicoAcademyDashboard() {
                     <p className="text-sm leading-6 text-[color:var(--pico-text-muted)]">{activeTrack.intro}</p>
                     <div className="grid gap-3 pt-2">
                       <div className={picoCodexInset('p-4')}>
-                        <p className={picoClasses.label}>Route state</p>
+                        <p className={picoClasses.label}>Track state</p>
                         <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
                           {activeTrackCompletedCount}/{activeTrackLessons.length} cleared
                         </p>
                       </div>
                       <div className={picoCodexInset('p-4')}>
-                        <p className={picoClasses.label}>Next dominant stop</p>
+                        <p className={picoClasses.label}>Next stop</p>
                         <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
                           {activationLesson?.title ?? 'Open Autopilot'}
                         </p>
@@ -682,7 +682,7 @@ export function PicoAcademyDashboard() {
 
                             {dominant ? (
                               <div className={picoCodexNote('mt-3 p-4')}>
-                                <p className={picoClasses.label}>Dominant stop</p>
+                                <p className={picoClasses.label}>Current stop</p>
                                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                                   {lesson.expectedResult}
                                 </p>
@@ -704,9 +704,9 @@ export function PicoAcademyDashboard() {
             <aside className="border-t border-[color:var(--pico-border)] bg-[rgba(5,14,8,0.62)] px-6 py-6 sm:px-8 xl:border-l xl:border-t-0">
               <div className="grid gap-4">
                 <div className={picoCodexInset('p-5')}>
-                  <p className={picoClasses.label}>Mission correction</p>
+                  <p className={picoClasses.label}>Setup correction</p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    The atlas stays useful only if it keeps pushing you back into the current mission.
+                    The map is useful only when it brings you back to the current setup step.
                   </p>
                   <div className="mt-4 grid gap-3">
                     <Link href={currentMissionPrimaryHref} className={picoClasses.primaryButton}>
@@ -766,9 +766,9 @@ export function PicoAcademyDashboard() {
         <section className={picoCodexFrame('px-6 py-6 sm:px-8')}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className={picoClasses.label}>Reference annex</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                Capability, archive, and platform memory stay below the route on purpose
+                <p className={picoClasses.label}>Reference</p>
+                <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                Extra tools stay below the active setup work
               </h2>
             </div>
             <span className={picoCodex.stamp}>
@@ -783,7 +783,7 @@ export function PicoAcademyDashboard() {
                   <div>
                     <p className={picoClasses.label}>Unlocked capabilities</p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      The pieces that matter after the mission is already real.
+                      The pieces that matter after the first setup work is complete.
                     </p>
                   </div>
                   <span className={picoCodex.stamp}>
@@ -881,9 +881,9 @@ export function PicoAcademyDashboard() {
               </div>
 
               <div className={picoCodexSheet('p-5')}>
-                <p className={picoClasses.label}>Control annex</p>
+                <p className={picoClasses.label}>Account panel</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Platform memory stays available, but it sits under the codex on purpose. The Academy leads with route and proof, then exposes configuration only when you need it.
+                  Platform memory stays available below the lesson flow. Academy leads with the setup step, saved output, and the next action.
                 </p>
                 <div className="mt-5">
                   <PicoPlatformSurface

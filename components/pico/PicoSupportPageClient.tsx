@@ -20,35 +20,61 @@ import { usePicoLessonWorkspace } from '@/components/pico/usePicoLessonWorkspace
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
-import { PICO_GENERATED_CONTENT } from '@/lib/pico/generatedContent'
 import { usePicoHref } from '@/lib/pico/navigation'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 import { cn } from '@/lib/utils'
 
-const supportLanes = PICO_GENERATED_CONTENT.support.lanes
+const supportOptions = [
+  {
+    id: 'fixing-existing',
+    title: 'A setup step is blocked',
+    body: 'Use this for a command, provider setting, install step, or runtime status that is stopping the first working agent.',
+  },
+  {
+    id: 'other',
+    title: 'You need guided implementation',
+    body: 'Use this for API keys, local or cloud hosting, integrations, team rollout, or a custom agent setup.',
+  },
+] as const
 
-const escalationStandards = PICO_GENERATED_CONTENT.support.escalationStandards
+const supportStandards = [
+  {
+    label: '01 • Page',
+    title: 'Name where you are',
+    body: 'Include the Pico page, lesson, command, or hosting step where setup stopped.',
+  },
+  {
+    label: '02 • Blocker',
+    title: 'Show what happened',
+    body: 'Paste the command output, error text, provider setting, or runtime status.',
+  },
+  {
+    label: '03 • Next step',
+    title: 'Ask for one action',
+    body: 'The reply should get you back to install, first run, agent packet, or implementation help.',
+  },
+] as const
 
 const supportInterestOptions = [
   { value: 'fixing-existing', label: 'Lesson or command blocker' },
-  { value: 'runtime-truth', label: 'Live runtime or Autopilot mismatch' },
+  { value: 'runtime-hosting', label: 'Runtime, hosting, or Autopilot issue' },
   { value: 'hosted-session', label: 'Hosted session or account mismatch' },
   { value: 'billing-or-plan', label: 'Billing, approvals, or plan question' },
-  { value: 'other', label: 'Office hours or deeper walkthrough' },
+  { value: 'other', label: '1-on-1 guidance or custom implementation' },
 ] as const
 
 const supportContactCopy = {
-  title: 'Tell us where the product path broke',
-  subtitle: 'Share the route, blocker, and proof. We will answer like humans, not a waitlist.',
+  title: 'Tell us where setup is blocked',
+  subtitle: 'Share the page, blocker, and current notes. We will help you get back to a working agent.',
   interestLabel: 'What broke?',
   messageLabel: 'What happened?',
   messageOptional: '(include the packet)',
-  messagePlaceholder: 'Paste the exact blocker, route, command, or runtime mismatch.',
+  messagePlaceholder: 'Paste the exact blocker, command, provider setting, or hosting question.',
   submit: 'Send support request',
   submitting: 'Sending support request...',
-  disclaimer: 'No waitlist. No launch theater. Just a human reply.',
+  disclaimer: 'Human help for setup, hosting, keys, integrations, or custom implementation.',
   successTitle: 'Support request sent.',
-  successBody: 'We got the packet. Expect a human reply that points you back into the product.',
+  successBody: 'We got the packet. Expect a human reply focused on getting your agent running.',
   successBack: 'Back to support',
 } as const
 
@@ -82,10 +108,10 @@ export function PicoSupportPageClient() {
   const packetState = copied
     ? 'copied'
     : recoveryWorkspace.workspace.evidence.trim()
-      ? 'proof attached'
+      ? 'notes attached'
       : session.status === 'authenticated'
         ? 'context ready'
-        : 'needs proof'
+        : 'needs notes'
   const returnRouteLabel = recoveryLesson?.title ?? 'academy'
   const packetPreview = [
     `Route ${pathname}`,
@@ -104,7 +130,7 @@ export function PicoSupportPageClient() {
     () =>
       [
         'Pico diagnostic packet',
-        `Route: ${pathname}`,
+        `Page: ${pathname}`,
         `Hosted session: ${session.status}`,
         `Hosted plan: ${session.status === 'authenticated' ? session.user.plan ?? 'unknown' : 'n/a'}`,
         `Selected track: ${progress.selectedTrack ?? 'none'}`,
@@ -112,11 +138,11 @@ export function PicoSupportPageClient() {
         `Next lesson: ${derived.nextLesson?.title ?? 'none'}`,
         `Recovery lesson workspace: ${recoveryWorkspace.completedStepCount}/${recoveryLesson?.steps.length ?? 0}`,
         `Recovery lesson focused step: ${recoveryFocusedStep}`,
-        `Recovery lesson proof: ${recoveryWorkspace.workspace.evidence.trim() ? 'captured' : 'missing'}`,
-        `Active surface: ${progress.platform.activeSurface ?? 'none'}`,
+        `Recovery lesson notes: ${recoveryWorkspace.workspace.evidence.trim() ? 'saved' : 'missing'}`,
+        `Active page: ${progress.platform.activeSurface ?? 'none'}`,
         `Last opened lesson: ${progress.platform.lastOpenedLessonSlug ?? 'none'}`,
         `Rail collapsed: ${progress.platform.railCollapsed ? 'yes' : 'no'}`,
-        `Help lane open: ${progress.platform.helpLaneOpen ? 'yes' : 'no'}`,
+        `Help panel open: ${progress.platform.helpLaneOpen ? 'yes' : 'no'}`,
         `Support requests sent: ${progress.supportRequests}`,
         `Tutor questions asked: ${progress.tutorQuestions}`,
         `Approval gate enabled: ${progress.autopilot.approvalGateEnabled ? 'yes' : 'no'}`,
@@ -184,8 +210,8 @@ export function PicoSupportPageClient() {
       />
       <PicoShell
         eyebrow="Human help"
-        title="Get a human when the product path stops being enough"
-        description="Triage the messy edge fast, attach the real signal, and get back to the next honest move without turning support into a maze."
+        title="Get a human when setup needs guidance"
+        description="Use this for API keys, local or cloud hosting, integrations, team rollout, or custom implementation."
         heroContent={
           <div
             className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(9,15,10,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
@@ -206,16 +232,16 @@ export function PicoSupportPageClient() {
             <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
               <div className="grid gap-5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={picoClasses.chip}>Escalation pulse</span>
+                  <span className={picoClasses.chip}>Support packet</span>
                   <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                     {formOpen ? 'desk open' : 'triage mode'}
                   </span>
                 </div>
                 <h2 className="font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
-                  Send the blocker with enough proof to fix it fast.
+                  Send the setup context we need to help.
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Name the route, attach the signal, and point to the return lane. That gives support enough context to answer without slowing the next move down.
+                  Include the page, the blocker, and what you already tried. For keys, hosting, or custom builds, 1-on-1 guidance is usually the fastest path.
                 </p>
 
                 <div className="grid gap-3 sm:grid-cols-3">
@@ -225,22 +251,22 @@ export function PicoSupportPageClient() {
                       {packetState}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      {copied ? 'ready to paste' : 'route and evidence first'}
+                      {copied ? 'ready to paste' : 'setup notes first'}
                     </p>
                   </div>
 
                   <div className={picoSoft('p-4')}>
-                    <p className={picoClasses.label}>Runtime truth</p>
+                    <p className={picoClasses.label}>Runtime state</p>
                     <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                       {runtimeSignal}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      {setup.runtime?.gateway_url ? 'gateway attached' : 'attach the signal if it matters'}
+                      {setup.runtime?.gateway_url ? 'gateway attached' : 'attach runtime status if it matters'}
                     </p>
                   </div>
 
                   <div className={picoSoft('p-4')}>
-                    <p className={picoClasses.label}>Return lane</p>
+                    <p className={picoClasses.label}>Return step</p>
                     <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                       {returnRouteLabel}
                     </p>
@@ -255,9 +281,9 @@ export function PicoSupportPageClient() {
                     <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
                   </div>
                   <div className="min-w-0">
-                    <p className={picoClasses.label}>Shortest clean handoff</p>
+                    <p className={picoClasses.label}>Suggested next step</p>
                     <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                      {recoveryLesson ? `Resume ${recoveryLesson.title}` : 'Route back into academy'}
+                      {recoveryLesson ? `Resume ${recoveryLesson.title}` : 'Return to academy'}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                       {recoveryLesson
@@ -305,7 +331,7 @@ export function PicoSupportPageClient() {
               onClick={() => openEscalation('fixing-existing')}
               className={picoClasses.primaryButton}
             >
-              Get human help
+              Get 1-on-1 help
             </button>
             <button
               type="button"
@@ -319,17 +345,17 @@ export function PicoSupportPageClient() {
               onClick={() => openEscalation('other')}
               className={picoClasses.tertiaryButton}
             >
-              Request office hours
+              Book guidance
             </button>
           </div>
         }
       >
         <PicoSessionBanner session={session} nextPath={pathname} />
         <PicoSurfaceCompass
-          title="Support only exists to return the operator to the product"
-          body="Escalate cleanly, attach the packet, then go back to the surface that can move the work again. Academy is for sequence problems, tutor is for one knowable next step, and Autopilot is for live runtime truth."
-          status={formOpen ? 'escalation open' : 'human help standby'}
-          aside="Human help should resolve the messy edge, not replace the product. The best support interaction ends with a clearer route back into Pico."
+          title="Support is for setup that needs a person"
+          body="Use support for API keys, local or cloud hosting, team rollout, integrations, and custom implementation. Use Tutor for one command. Use Academy when you just need the next setup step."
+          status={formOpen ? 'support request open' : 'human help standby'}
+          aside="Most users should not have to manage keys, deployments, and hosting alone. Pico should make the product usable without pretending every setup is self-serve."
           items={[
             {
               href: derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy'),
@@ -341,13 +367,13 @@ export function PicoSupportPageClient() {
             {
               href: toHref('/tutor'),
               label: 'Ask tutor first',
-              caption: 'Use this when the product probably still knows the answer but you need the exact next move.',
+              caption: 'Use this when one command or setting is blocking you.',
               note: 'Knowable',
             },
             {
               href: toHref('/autopilot'),
-              label: 'Re-enter Autopilot',
-              caption: 'Open the control room when the blocker depends on live runs, budget, alerts, or approvals.',
+              label: 'Open Autopilot',
+              caption: 'Use this when the blocker depends on live runs, spend, alerts, or approvals.',
               note: 'Runtime',
               tone: 'soft',
             },
@@ -359,16 +385,16 @@ export function PicoSupportPageClient() {
             <div>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className={picoClasses.label}>Escalation standards</p>
+                  <p className={picoClasses.label}>Support standards</p>
                   <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
-                    Hand off the problem like a sharp operator
+                    Send the smallest useful packet
                   </h2>
                 </div>
-                <span className={picoClasses.chip}>route • evidence • return</span>
+                <span className={picoClasses.chip}>page • blocker • notes</span>
               </div>
 
               <div className="mt-6 grid gap-4 xl:grid-cols-3">
-                {escalationStandards.map((item) => (
+                {supportStandards.map((item) => (
                   <article key={item.label} className={picoInset('flex h-full flex-col p-5')}>
                     <p className={picoClasses.label}>{item.label}</p>
                     <h3 className="mt-5 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
@@ -384,16 +410,16 @@ export function PicoSupportPageClient() {
 
             <div className="grid gap-4">
               <div className={picoEmber('p-5')}>
-                <p className={picoClasses.label}>Packet posture</p>
+                <p className={picoClasses.label}>Packet basics</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Strong support starts with a clean packet. The best escalation reads like an operator handoff, not a panic dump.
+                  Good support starts with a short packet: page, setup step, error, and what you already tried.
                 </p>
               </div>
               <div className={picoInset('overflow-hidden p-0')}>
                 <div className="border-b border-[color:var(--pico-border)] p-5">
                   <p className={picoClasses.label}>Desk tone</p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    Support should lower the temperature without slowing the route back into action.
+                    Support should make setup easier without adding another process to manage.
                   </p>
                 </div>
                 <div className="flex items-center justify-center p-6">
@@ -410,7 +436,7 @@ export function PicoSupportPageClient() {
               <div className={picoInset('p-5')}>
                 <p className={picoClasses.label}>Best first move</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Copy the packet, choose the right lane, and ask for the shortest route back into Academy, Tutor, or Autopilot.
+                  Copy the packet and ask for the shortest path back to a working agent.
                 </p>
               </div>
             </div>
@@ -426,33 +452,33 @@ export function PicoSupportPageClient() {
                   Send context, not noise
                 </h2>
                 <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
-                  Human help is for the part the product cannot truthfully close on its own. The faster you frame the blocker, the faster support can send you back to the product path.
+                  Human help is for the parts most users do not want to handle alone: API keys, hosting, runtime access, integrations, and custom implementation.
                 </p>
 
                 <div className={picoEmber('mt-6 p-5')}>
                   <p className="font-medium text-[color:var(--pico-text)]">
-                    If the next move is still obvious, go back and do it.
+                    If the next setup step is obvious, do that first.
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    Support exists for the messy edge, not for skipping the lesson, the tutor, or the live control surface.
+                    Support is for blocked setup, implementation choices, and rollout details.
                   </p>
                 </div>
 
                 <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                  {supportLanes.map((lane) => (
-                    <article key={lane.id} className={picoInset('grid gap-4 p-5')}>
+                  {supportOptions.map((option) => (
+                    <article key={option.id} className={picoInset('grid gap-4 p-5')}>
                       <div>
                         <h3 className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                          {lane.title}
+                          {option.title}
                         </h3>
-                        <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{lane.body}</p>
+                        <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{option.body}</p>
                       </div>
                       <button
                         type="button"
-                        onClick={() => openEscalation(lane.id)}
-                        className={lane.id === 'fixing-existing' ? picoClasses.primaryButton : picoClasses.secondaryButton}
+                        onClick={() => openEscalation(option.id)}
+                        className={option.id === 'fixing-existing' ? picoClasses.primaryButton : picoClasses.secondaryButton}
                       >
-                        {lane.id === 'fixing-existing' ? 'Start escalation' : 'Book office hours'}
+                        {option.id === 'fixing-existing' ? 'Start support request' : 'Book guidance'}
                       </button>
                     </article>
                   ))}
@@ -460,7 +486,7 @@ export function PicoSupportPageClient() {
               </div>
 
               <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">
-                <p className={picoClasses.label}>Operator rail</p>
+                <p className={picoClasses.label}>Support rail</p>
                 <div className="mt-4 grid gap-3">
                   <div className={picoSoft('p-4')}>
                     <p className="text-sm text-[color:var(--pico-text-muted)]">Support requests</p>
@@ -477,7 +503,7 @@ export function PicoSupportPageClient() {
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">Active surface</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Active page</p>
                   <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {progress.platform.activeSurface ?? 'none'}
                   </p>
@@ -518,7 +544,7 @@ export function PicoSupportPageClient() {
                 <div>
                   <p className={picoClasses.label}>Diagnostic packet</p>
                   <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                    Operator packet
+                    Setup packet
                   </h2>
                 </div>
                 <span className={picoClasses.chip}>live context</span>
@@ -549,7 +575,7 @@ export function PicoSupportPageClient() {
             </section>
 
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Live operator state</p>
+              <p className={picoClasses.label}>Live setup state</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoInset('p-4')}>
                   <p className="text-sm text-[color:var(--pico-text-muted)]">Hosted onboarding</p>
@@ -599,10 +625,10 @@ export function PicoSupportPageClient() {
             <div>
               <p className={picoClasses.label}>Return map</p>
               <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-                Human help should end in one cleaner route back into Pico
+                Human help should end with one clear next setup step
               </h2>
             </div>
-            <span className={picoClasses.chip}>operator return map</span>
+            <span className={picoClasses.chip}>return map</span>
           </div>
 
           <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.92fr),minmax(0,1.08fr)]">
@@ -612,18 +638,18 @@ export function PicoSupportPageClient() {
                 <div className="grid gap-3">
                   <div className={picoSoft('p-4')}>
                     <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                      1. Route the blocker fast
+                      1. Name the blocker fast
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Do not send a life story. Lead with the exact surface that broke.
+                      Lead with the page or setup step that is blocked.
                     </p>
                   </div>
                   <div className={picoSoft('p-4')}>
                     <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                      2. Attach the evidence
+                      2. Add the current notes
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Send the command, runtime fact, or approval state that proves what failed.
+                      Send the command, runtime fact, error text, or provider setting.
                     </p>
                   </div>
                   <div className={picoSoft('p-4')}>
@@ -631,7 +657,7 @@ export function PicoSupportPageClient() {
                       3. Return to the product
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      The response should restore momentum, not create a support maze.
+                      The response should give one next step, not a new process to manage.
                     </p>
                   </div>
                 </div>
@@ -641,26 +667,26 @@ export function PicoSupportPageClient() {
                 <div>
                   <p className={picoClasses.label}>Packet anatomy</p>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    A premium escalation packet always reads in the same order: route, evidence, return lane.
+                    A useful support packet reads in the same order: page, blocker, current notes.
                   </p>
                 </div>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div className={picoSoft('p-4')}>
-                    <p className="font-medium text-[color:var(--pico-text)]">Route first</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Page first</p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Name the exact surface that broke.
+                      Name the exact page or setup step.
                     </p>
                   </div>
                   <div className={picoSoft('p-4')}>
-                    <p className="font-medium text-[color:var(--pico-text)]">Evidence second</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Blocker second</p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Attach the signal that proves the failure.
+                      Add the command, error, or setting that is blocking progress.
                     </p>
                   </div>
                   <div className={picoSoft('p-4')}>
-                    <p className="font-medium text-[color:var(--pico-text)]">Return third</p>
+                    <p className="font-medium text-[color:var(--pico-text)]">Next step third</p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Ask for the cleanest way back into motion.
+                      Ask for the next concrete setup step.
                     </p>
                   </div>
                 </div>
@@ -672,7 +698,7 @@ export function PicoSupportPageClient() {
                 <div>
                   <p className={picoClasses.label}>Lesson path</p>
                   <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                    Resume the academy lane
+                    Resume academy
                   </h3>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     Use this when the blocker was still fundamentally a lesson or setup sequence problem.
@@ -688,7 +714,7 @@ export function PicoSupportPageClient() {
 
               <article className={picoInset('grid gap-4 p-5')}>
                 <div>
-                  <p className={picoClasses.label}>Grounded answer</p>
+                  <p className={picoClasses.label}>Tutor answer</p>
                   <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     Ask tutor if the next move is still knowable
                   </h3>
@@ -703,9 +729,9 @@ export function PicoSupportPageClient() {
 
               <article className={picoInset('grid gap-4 p-5')}>
                 <div>
-                  <p className={picoClasses.label}>Runtime truth</p>
+                  <p className={picoClasses.label}>Runtime state</p>
                   <h3 className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                    Re-enter the control room
+                    Open runtime review
                   </h3>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     Use Autopilot when the blocker depends on live runs, budget, approvals, or alert state.

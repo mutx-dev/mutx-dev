@@ -1,28 +1,28 @@
 .pico-root {
-  --pico-bg: #030804;
-  --pico-bg-raised: #071108;
-  --pico-bg-surface: rgba(164, 255, 92, 0.05);
-  --pico-bg-surface-hover: rgba(164, 255, 92, 0.1);
-  --pico-bg-panel: rgba(6, 13, 8, 0.86);
-  --pico-bg-panel-strong: rgba(8, 15, 10, 0.94);
-  --pico-bg-input: rgba(8, 14, 9, 0.96);
-  --pico-text: #f5ffe9;
-  --pico-text-secondary: rgba(221, 239, 211, 0.8);
-  --pico-text-muted: rgba(157, 188, 145, 0.62);
-  --pico-border: rgba(164, 255, 92, 0.14);
-  --pico-border-hover: rgba(164, 255, 92, 0.32);
-  --pico-border-strong: rgba(206, 255, 170, 0.22);
-  --pico-accent-rgb: 164, 255, 92;
-  --pico-accent: #a4ff5c;
-  --pico-accent-bright: #ebffbf;
-  --pico-accent-deep: #60ca32;
-  --pico-accent-contrast: #051103;
-  --pico-accent-soft: rgba(164, 255, 92, 0.12);
-  --pico-accent-glow: rgba(164, 255, 92, 0.14);
-  --pico-accent-fog: rgba(164, 255, 92, 0.07);
-  --pico-blue: #73efbe;
-  --pico-blue-soft: rgba(115, 239, 190, 0.12);
-  --pico-blue-glow: rgba(115, 239, 190, 0.08);
+  --pico-bg: #050706;
+  --pico-bg-raised: #0a0f0d;
+  --pico-bg-surface: rgba(58, 255, 136, 0.05);
+  --pico-bg-surface-hover: rgba(58, 255, 136, 0.1);
+  --pico-bg-panel: rgba(9, 14, 12, 0.88);
+  --pico-bg-panel-strong: rgba(11, 17, 14, 0.95);
+  --pico-bg-input: rgba(10, 15, 13, 0.96);
+  --pico-text: #f1fbf3;
+  --pico-text-secondary: rgba(222, 236, 226, 0.78);
+  --pico-text-muted: rgba(155, 176, 162, 0.62);
+  --pico-border: rgba(218, 255, 228, 0.1);
+  --pico-border-hover: rgba(58, 255, 136, 0.3);
+  --pico-border-strong: rgba(170, 255, 195, 0.2);
+  --pico-accent-rgb: 58, 255, 136;
+  --pico-accent: #3aff88;
+  --pico-accent-bright: #bfffd6;
+  --pico-accent-deep: #17b85e;
+  --pico-accent-contrast: #031008;
+  --pico-accent-soft: rgba(58, 255, 136, 0.12);
+  --pico-accent-glow: rgba(58, 255, 136, 0.12);
+  --pico-accent-fog: rgba(58, 255, 136, 0.06);
+  --pico-blue: #68d6ff;
+  --pico-blue-soft: rgba(104, 214, 255, 0.11);
+  --pico-blue-glow: rgba(104, 214, 255, 0.08);
   --pico-red: #ff8c72;
   --pico-red-soft: rgba(255, 140, 114, 0.1);
   --pico-yellow-rgb: 195, 255, 91;
@@ -36,29 +36,29 @@
   --pico-radius-full: 999px;
   --pico-shell: min(100% - 2.5rem, 80rem);
   --pico-shadow-panel:
-    0 28px 90px rgba(0, 0, 0, 0.34),
+    0 18px 56px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  --pico-shadow-frame:
+    0 24px 88px rgba(0, 0, 0, 0.36),
     0 0 0 1px rgba(255, 255, 255, 0.02),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  --pico-shadow-frame:
-    0 36px 120px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(255, 255, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   min-height: 100vh;
   position: relative;
   isolation: isolate;
   color: var(--pico-text);
   background:
-    radial-gradient(circle at 16% -6%, rgba(var(--pico-accent-rgb), 0.16), transparent 26%),
-    radial-gradient(circle at 84% 2%, rgba(115, 239, 190, 0.1), transparent 22%),
-    linear-gradient(180deg, #071008 0%, #040905 38%, #020603 100%);
+    radial-gradient(circle at 18% -10%, rgba(var(--pico-accent-rgb), 0.11), transparent 26%),
+    radial-gradient(circle at 86% 4%, rgba(104, 214, 255, 0.07), transparent 22%),
+    linear-gradient(180deg, #080c0a 0%, #050706 48%, #030504 100%);
   color-scheme: dark;
 }
 
 body:has(.pico-root) {
   background:
-    radial-gradient(circle at 16% -10%, rgba(var(--pico-accent-rgb), 0.14), transparent 24%),
-    radial-gradient(circle at 86% 6%, rgba(115, 239, 190, 0.08), transparent 20%),
-    linear-gradient(180deg, #071008 0%, #030804 100%);
+    radial-gradient(circle at 16% -10%, rgba(var(--pico-accent-rgb), 0.09), transparent 24%),
+    radial-gradient(circle at 86% 6%, rgba(104, 214, 255, 0.06), transparent 20%),
+    linear-gradient(180deg, #080c0a 0%, #050706 100%);
   color: var(--pico-text);
 }
 
@@ -72,7 +72,7 @@ body:has(.pico-root) {
     linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 88%);
-  opacity: 0.28;
+  opacity: 0.18;
   z-index: -2;
 }
 
@@ -82,10 +82,10 @@ body:has(.pico-root) {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 0%, rgba(var(--pico-accent-rgb), 0.12), transparent 38%),
-    radial-gradient(circle at 50% 100%, rgba(var(--pico-accent-rgb), 0.06), transparent 28%);
+    radial-gradient(circle at 50% 0%, rgba(var(--pico-accent-rgb), 0.08), transparent 38%),
+    radial-gradient(circle at 50% 100%, rgba(var(--pico-accent-rgb), 0.035), transparent 28%);
   mix-blend-mode: screen;
-  opacity: 0.8;
+  opacity: 0.62;
   z-index: -1;
 }
 

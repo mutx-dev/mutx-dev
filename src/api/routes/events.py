@@ -6,19 +6,18 @@ delegating to the same ingestion logic that lives on the ingest router
 at ``/v1/ingest/events``.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Header, Request
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from datetime import datetime, timezone
-from typing import Optional
 import json
 import logging
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
+from src.api.middleware.auth import get_current_user_or_api_key
 from src.api.models import Agent, AgentLog, User
 from src.api.models.schemas import IngestEvent
-from src.api.middleware.auth import get_current_user_or_api_key
-from src.api.time_utils import utc_now
 
 router = APIRouter(tags=["events"])
 logger = logging.getLogger(__name__)

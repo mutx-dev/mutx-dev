@@ -132,6 +132,57 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           `${apiBaseUrl}/v1/onboarding?provider=openclaw`,
           "Failed to fetch OpenClaw onboarding state",
         ],
+        ["securityMetrics", `${apiBaseUrl}/v1/security/metrics`, "Failed to fetch security metrics"],
+        [
+          "securityCompliance",
+          `${apiBaseUrl}/v1/security/compliance`,
+          "Failed to fetch security compliance",
+        ],
+        [
+          "securityApprovals",
+          `${apiBaseUrl}/v1/approvals?status=PENDING&limit=12`,
+          "Failed to fetch security approvals",
+        ],
+        [
+          "governanceCredentialBackends",
+          `${apiBaseUrl}/v1/governance/credentials/backends`,
+          "Failed to fetch governance credential backends",
+        ],
+        [
+          "governanceTrust",
+          `${apiBaseUrl}/v1/governance/trust`,
+          "Failed to fetch governance trust",
+        ],
+        [
+          "governanceLifecycle",
+          `${apiBaseUrl}/v1/governance/lifecycle`,
+          "Failed to fetch governance lifecycle",
+        ],
+        [
+          "governanceDiscovery",
+          `${apiBaseUrl}/v1/governance/discovery`,
+          "Failed to fetch governance discovery",
+        ],
+        [
+          "governanceAttestation",
+          `${apiBaseUrl}/v1/governance/attestations`,
+          "Failed to fetch governance attestation",
+        ],
+        [
+          "governanceRuntimeStatus",
+          `${apiBaseUrl}/v1/runtime/governance/status`,
+          "Failed to fetch governance runtime status",
+        ],
+        [
+          "governedSupervision",
+          `${apiBaseUrl}/v1/runtime/governance/supervised/`,
+          "Failed to fetch governed supervision",
+        ],
+        [
+          "governedProfiles",
+          `${apiBaseUrl}/v1/runtime/governance/supervised/profiles`,
+          "Failed to fetch governed profiles",
+        ],
       ].map(async ([key, url, fallbackMessage]) => {
         const resource = await fetchOverviewResource(request, url, fallbackMessage);
         return { key, resource };

@@ -27,50 +27,50 @@ type AuthPageProps = {
 const authContent = {
   default: {
     login: {
-      eyebrow: "Operator sign-in",
-      title: "Sign in to the governed runtime.",
+      eyebrow: "Sign in",
+      title: "Sign in to MUTX.",
       description:
-        "Use the hosted operator account, establish the session cleanly, and continue into the dashboard that reflects real deployment state instead of a demo shell.",
+        "Use your MUTX account to open the dashboard, review agents, and continue your setup.",
       asideEyebrow: "What unlocks next",
-      asideTitle: "The dashboard should tell the truth the moment auth succeeds.",
+      asideTitle: "Your dashboard opens after sign-in.",
       asideBody:
-        "Once the session is live, MUTX can load fleet posture, deployment state, traces, and security surfaces from the same operator boundary.",
+        "Once your session is active, MUTX loads your agents, deployments, traces, and settings from the same workspace.",
       mediaSrc: "/landing/webp/wiring-bay.webp",
       mediaAlt: "MUTX robot operating inside a wiring bay",
       mediaWidth: 1024,
       mediaHeight: 1536,
       highlights: [
-        "Social auth now lands on the same hosted session model as password auth.",
-        "Session cookies stay scoped to the current host instead of leaking across subdomains.",
-        "If the API rejects the session, the form surfaces the upstream error instead of inventing one.",
+        "Use a provider or password to reach the same MUTX workspace.",
+        "Sessions stay scoped to the current host.",
+        "If sign-in fails, the form shows the returned error.",
       ],
       heading: "Welcome back",
       subheading:
-        "Use a provider or password and continue into the operator dashboard.",
+        "Use a provider or password and continue into the dashboard.",
       submitLabel: "Sign in",
       loadingLabel: "Signing in",
     },
     register: {
-      eyebrow: "Operator access",
-      title: "Create an operator account and enter the real dashboard.",
+      eyebrow: "Create account",
+      title: "Create your MUTX account.",
       description:
-        "Register with password or provider auth, confirm the identity cleanly, and land in the same control surface used for live operator work.",
+        "Sign up with a password or provider, confirm your identity, and open the dashboard.",
       asideEyebrow: "Account rules",
-      asideTitle: "Registration should be explicit, boring, and easy to verify.",
+      asideTitle: "Account setup should be clear and easy to verify.",
       asideBody:
-        "The registration lane now sends real verification mail, blocks the fake success path when email confirmation is required, and links provider identities onto the same MUTX account model.",
+        "MUTX sends verification email when needed and links provider identities to the same account.",
       mediaSrc: "/landing/webp/victory-core.webp",
       mediaAlt: "MUTX robot holding the MUTX mark after access is granted",
       mediaWidth: 1536,
       mediaHeight: 1024,
       highlights: [
-        "Google, GitHub, Discord, and Apple all terminate on real MUTX sessions.",
-        "Password registration sends a verification email to the active host, not a hardcoded marketing domain.",
-        "If email confirmation is required, the UI moves into a verification state instead of pretending the dashboard is ready.",
+        "Google, GitHub, Discord, and Apple can all create MUTX sessions.",
+        "Password registration sends verification email to the current host.",
+        "If email confirmation is required, the UI moves into a verification state.",
       ],
       heading: "Create your account",
       subheading:
-        "Choose the fastest safe lane into the hosted operator surface.",
+        "Choose the fastest path into your hosted dashboard.",
       submitLabel: "Sign up",
       loadingLabel: "Creating account",
     },
@@ -108,14 +108,14 @@ const authContent = {
       asideEyebrow: "Why sign in now",
       asideTitle: "Because this preview already remembers your work.",
       asideBody:
-        "Registration is not pretending the product is done. It simply gives the current build a stable way to remember you while onboarding, lessons, and operator tools keep evolving.",
+        "Registration gives the current build a stable way to remember you while onboarding, lessons, and agent tools keep evolving.",
       mediaSrc: "/landing/webp/victory-core.webp",
       mediaAlt: "MUTX robot holding the MUTX mark after access is granted",
       mediaWidth: 1536,
       mediaHeight: 1024,
       highlights: [
         "Accounts created here stay scoped to the Pico preview host.",
-        "Verification email and provider auth return you to the Pico flow, not the operator dashboard.",
+        "Verification email and provider auth return you to the Pico flow, not the main dashboard.",
         "You get a real preview account, not a throwaway demo identity.",
       ],
       heading: "Create your Pico preview account",
@@ -458,7 +458,7 @@ export function AuthPage({
             </>
           ) : (
             <p className={styles.bodyText}>
-              Already have an operator account?{" "}
+              Already have an account?{" "}
               <Link
                 href={buildAuthHref("login", redirectPath)}
                 className={styles.inlineLink}

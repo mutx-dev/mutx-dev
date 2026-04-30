@@ -88,22 +88,22 @@ export function answerPicoTutorQuestion(
   if (!best) {
     return {
       answer:
-        'I cannot ground that in the shipped Pico lesson corpus yet. Use the support lane and include the exact command, error, and what you expected to happen.',
+        'I cannot match that to the shipped Pico lesson corpus yet. Use support and include the exact command, error, and what you expected to happen.',
       lessonSlug: null,
       lessonTitle: null,
       matches: [],
       nextActions: [
-        'Open the support lane and paste the exact command or stack trace.',
+        'Open support and paste the exact command or stack trace.',
         'State which lesson you were following.',
         'Include the last step that actually worked.',
       ],
-      escalationReason: 'No grounded lesson match found.',
+      escalationReason: 'No lesson match found.',
     }
   }
 
   if (riskyTopic) {
     return {
-      answer: `This question touches ${riskyTopic}, which is where the tutor should stop bluffing. Follow the grounded steps below, then escalate before doing anything irreversible.`,
+      answer: `This question touches ${riskyTopic}, which is where Tutor should be careful. Follow the steps below, then escalate before doing anything irreversible.`,
       lessonSlug: best.slug,
       lessonTitle: best.title,
       matches: matches.map((match) => ({

@@ -138,8 +138,8 @@ export const PICO_MILESTONE_XP: Record<string, number> = {
 export const PICO_PLAN_MATRIX: Record<PicoPlan, Record<PicoPlanFeature, string>> = {
   free: {
     academy: 'Full academy access',
-    tutor: 'Grounded tutor with light daily usage',
-    project_limit: '1 active project lane',
+    tutor: 'Tutor with light daily usage',
+    project_limit: '1 active project',
     monitored_agents: 'Preview only',
     alerts: 'In-app threshold alerts',
     approvals: 'Preview the approval workflow',
@@ -148,7 +148,7 @@ export const PICO_PLAN_MATRIX: Record<PicoPlan, Record<PicoPlanFeature, string>>
   starter: {
     academy: 'Full academy access',
     tutor: 'Priority tutor routing',
-    project_limit: '3 active project lanes',
+    project_limit: '3 active projects',
     monitored_agents: '1 monitored agent',
     alerts: 'In-app plus email-ready config',
     approvals: 'One approval gate',
@@ -157,7 +157,7 @@ export const PICO_PLAN_MATRIX: Record<PicoPlan, Record<PicoPlanFeature, string>>
   pro: {
     academy: 'Full academy access',
     tutor: 'Priority tutor routing',
-    project_limit: 'Unlimited project lanes',
+    project_limit: 'Unlimited projects',
     monitored_agents: 'Multiple monitored agents',
     alerts: 'Stronger alert routing',
     approvals: 'Multiple approval gates',
@@ -211,7 +211,7 @@ export const PICO_LEVELS: PicoLevel[] = [
     title: 'Production',
     objective: 'See the run history and catch failure modes early.',
     projectOutcome: 'A user can inspect runs, failures, and runtime state.',
-    completionState: 'Run activity appears in the control layer.',
+    completionState: 'Run activity appears in Autopilot.',
     xpReward: 170,
     badge: 'Signal Hunter',
     recommendedNextStep: 'Add cost and approval controls.',
@@ -231,9 +231,9 @@ export const PICO_LEVELS: PicoLevel[] = [
     title: 'Systems',
     objective: 'Ship a reusable production pattern, not a toy demo.',
     projectOutcome: 'One serious workflow a founder could run in production.',
-    completionState: 'A stronger pattern ships with a real artifact and control surface.',
+    completionState: 'A stronger pattern ships with a real saved output and review page.',
     xpReward: 240,
-    badge: 'Pattern Operator',
+    badge: 'Pattern Builder',
     recommendedNextStep: 'Move from one agent to a governed fleet.',
   },
 ]
@@ -248,7 +248,7 @@ export const PICO_TRACKS: PicoTrack[] = [
     checklist: [
       'Hermes installed',
       'Model/provider configured',
-      'One successful response captured',
+      'One successful response saved',
     ],
     nextTrack: 'deployed-agent',
   },
@@ -285,8 +285,8 @@ export const PICO_TRACKS: PicoTrack[] = [
   {
     slug: 'controlled-agent',
     title: 'Track D — Controlled Agent',
-    outcome: 'The runtime is visible and governed.',
-    intro: 'This is where the babysitter problem gets replaced by operator tools.',
+    outcome: 'The runtime is visible and reviewable.',
+    intro: 'This is where live runs, costs, and approvals become easy to review.',
     lessons: [
       'see-your-agent-activity',
       'set-a-cost-threshold',
@@ -309,7 +309,7 @@ export const PICO_TRACKS: PicoTrack[] = [
       'One business workflow accepts real structured input',
       'Structured input accepted',
       'Output validated',
-      'Runs visible from the control layer',
+      'Runs visible in Autopilot',
     ],
   },
 ]
@@ -318,7 +318,7 @@ export const PICO_RELEASE_NOTES = [
   {
     title: 'Pico shell lands inside MUTX',
     date: '2026-04-11',
-    body: 'Academy, tutor, support, and autopilot now live in one surface instead of a marketing-only landing page.',
+    body: 'Academy, tutor, support, and Autopilot now live in one product area instead of a marketing-only landing page.',
   },
   {
     title: 'Progress persistence switched to user settings',
@@ -326,27 +326,27 @@ export const PICO_RELEASE_NOTES = [
     body: 'Authenticated users sync progress to the backend while anonymous users keep a local fallback.',
   },
   {
-    title: 'Autopilot now reads real MUTX signals',
+    title: 'Autopilot now reads real MUTX data',
     date: '2026-04-11',
-    body: 'Runs, alerts, budgets, and approvals are pulled from live MUTX routes. No fake telemetry theater.',
+    body: 'Runs, alerts, budgets, and approvals are pulled from live MUTX routes.',
   },
 ] as const
 
 export const PICO_SHOWCASE_PATTERNS = [
   {
-    title: 'Lead-response operator',
+    title: 'Lead-response workflow',
     lessonSlug: 'build-a-lead-response-agent',
     summary: 'Takes an inbound lead, drafts the first reply, and waits for approval before the risky send.',
   },
   {
-    title: 'Document triage lane',
+    title: 'Document triage workflow',
     lessonSlug: 'build-a-document-processing-agent',
-    summary: 'Ingests files, extracts the useful parts, tags the result, and surfaces runs for review.',
+    summary: 'Ingests files, extracts the useful parts, tags the result, and shows runs for review.',
   },
   {
     title: 'Daily workflow loop',
     lessonSlug: 'create-a-scheduled-workflow',
-    summary: 'Turns one useful prompt into a repeatable operator habit with logs and timing.',
+    summary: 'Turns one useful prompt into a repeatable habit with logs and timing.',
   },
 ] as const
 
@@ -508,7 +508,7 @@ export const PICO_LESSONS: PicoLesson[] = [
   {
     slug: 'run-your-first-agent',
     title: 'Run your first agent',
-    summary: 'Run one real prompt, get one visible answer, and save the transcript as proof.',
+    summary: 'Run one real prompt, get one visible answer, and save the transcript.',
     level: 0,
     track: 'first-agent',
     estimatedMinutes: 6,
@@ -640,7 +640,7 @@ export const PICO_LESSONS: PicoLesson[] = [
       {
         title: 'Pick the one channel you already have credentials for',
         body: 'Use one ingress only. The goal is a working input path, not channel coverage.',
-        command: 'Example surfaces: Telegram bot token, Discord bot token, Slack app token, or one webhook endpoint.',
+        command: 'Example channels: Telegram bot token, Discord bot token, Slack app token, or one webhook endpoint.',
       },
       {
         title: 'Store the minimum credentials on the runtime host',
@@ -741,39 +741,39 @@ export const PICO_LESSONS: PicoLesson[] = [
   {
     slug: 'see-your-agent-activity',
     title: 'See your agent activity',
-    summary: 'Open the control surface, inspect one real run or empty-state truth, and record the first operator signal.',
+    summary: 'Open Autopilot, inspect one real run or empty state, and record the first runtime note.',
     level: 4,
     track: 'controlled-agent',
     estimatedMinutes: 20,
     difficulty: 'operator',
-    objective: 'Leave the control layer with one concrete signal you can name later.',
+    objective: 'Leave Autopilot with one concrete runtime note you can name later.',
     prerequisites: ['create-a-scheduled-workflow'],
-    outcome: 'One recorded operator signal: a run id, an alert type, or an honest empty-state fact.',
-    expectedResult: 'You can point to a concrete runtime signal instead of saying "it seems fine".',
-    validation: 'Open Autopilot and write down one signal in a file such as `~/pico-operator-checkpoint.txt`.',
+    outcome: 'One recorded runtime note: a run id, an alert type, or an empty-state fact.',
+    expectedResult: 'You can point to a concrete runtime note instead of saying "it seems fine".',
+    validation: 'Open Autopilot and write down one runtime note in a file such as `~/pico-runtime-checkpoint.txt`.',
     xp: 70,
     milestoneEvents: ['first_monitoring_event_seen'],
     steps: [
       {
         title: 'Open Autopilot',
-        body: 'Go to the control surface and start with runs. Do not browse the whole page yet.',
+        body: 'Go to Autopilot and start with runs. Do not browse the whole page yet.',
         command: 'Open /pico/autopilot',
       },
       {
-        title: 'Inspect one signal',
+        title: 'Inspect one runtime note',
         body: 'Capture one run id, alert type, or empty-state fact. One is enough for this lesson.',
         command: 'Example artifact line: run_id=<paste>, alert_type=<paste>, or empty_state=no_live_agent',
       },
       {
         title: 'Save the checkpoint',
-        body: 'Store that signal in a file so you can compare later states against something concrete.',
-        command: 'printf "checkpoint=<paste your first operator signal here>\n" > ~/pico-operator-checkpoint.txt',
+        body: 'Store that note in a file so you can compare later states against something concrete.',
+        command: 'printf "checkpoint=<paste your first runtime note here>\n" > ~/pico-runtime-checkpoint.txt',
       },
     ],
     troubleshooting: [
-      'If no runs appear, verify the scheduled workflow really executed before blaming the control surface.',
-      'If auth blocks the view, sign in first. This lesson depends on the actual control plane.',
-      'If the page is empty, record the empty-state truth honestly. Empty is still signal.',
+      'If no runs appear, verify the scheduled workflow really executed before blaming Autopilot.',
+      'If auth blocks the view, sign in first. This lesson depends on live runtime data.',
+      'If the page is empty, record the empty-state fact. Empty is still useful.',
     ],
     nextLesson: 'set-a-cost-threshold',
   },
@@ -787,7 +787,7 @@ export const PICO_LESSONS: PicoLesson[] = [
     difficulty: 'operator',
     objective: 'Define one cost threshold you are willing to tolerate before the runtime gets noisy.',
     prerequisites: ['see-your-agent-activity'],
-    outcome: 'One saved threshold tied to the control surface.',
+    outcome: 'One saved threshold tied to Autopilot.',
     expectedResult: 'The saved threshold persists after reload and appears in the product state.',
     validation: 'Save a threshold, reload the page, and confirm the same value is still there.',
     xp: 65,
@@ -849,9 +849,9 @@ export const PICO_LESSONS: PicoLesson[] = [
       },
     ],
     troubleshooting: [
-      'If approvals are unavailable, say so plainly. The runtime is not governed yet.',
+      'If approvals are unavailable, say so plainly. The runtime is not ready for unattended risky actions yet.',
       'If everybody can approve everything, the gate exists but the policy is weak. Record that gap and keep going.',
-      'If you gate trivial noise, the queue becomes spam and operators stop trusting it.',
+      'If you gate trivial noise, the queue becomes spam and people stop trusting it.',
     ],
     nextLesson: 'build-a-lead-response-agent',
   },
@@ -866,7 +866,7 @@ export const PICO_LESSONS: PicoLesson[] = [
     objective: 'Ship one workflow a founder would actually use this week.',
     prerequisites: ['add-an-approval-gate'],
     outcome: 'A lead-response workflow with a gated outbound step.',
-    expectedResult: 'Lead data becomes a draft reply or structured operator summary, and the risky send stays gated.',
+    expectedResult: 'Lead data becomes a draft reply or structured summary, and the risky send stays gated.',
     validation: 'Run one lead through the workflow end to end and save the drafted result.',
     xp: 90,
     steps: [
@@ -896,7 +896,7 @@ export const PICO_LESSONS: PicoLesson[] = [
   {
     slug: 'build-a-document-processing-agent',
     title: 'Build a document-processing agent',
-    summary: 'Ingest one document, extract the few fields that matter, and surface one reviewed output artifact.',
+    summary: 'Ingest one document, extract the few fields that matter, and show one reviewed output.',
     level: 6,
     track: 'production-pattern',
     estimatedMinutes: 40,

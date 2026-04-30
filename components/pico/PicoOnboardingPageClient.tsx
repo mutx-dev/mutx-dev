@@ -122,25 +122,25 @@ export function PicoOnboardingPageClient() {
     'grid grid-flow-col auto-cols-[minmax(15rem,82vw)] gap-3 overflow-x-auto pb-2 snap-x snap-mandatory md:grid-flow-row md:auto-cols-auto md:overflow-visible'
   const kickoffDoctrine = [
     {
-      label: '01 • Brief',
-      title: 'Make the runtime open cleanly',
+      label: '01 • Install',
+      title: 'Make the runtime open',
       body:
         installLesson?.objective ??
         'Install Hermes and get the command working from a fresh shell.',
     },
     {
-      label: '02 • Deliverable',
-      title: 'Produce one obvious proof artifact',
+      label: '02 • First run',
+      title: 'Get one useful answer',
       body:
         firstRunLesson?.expectedResult ??
         'Save one prompt and one answer in a file you can reopen later.',
     },
     {
-      label: '03 • Review line',
-      title: 'Do not widen the surface early',
+      label: '03 • Agent packet',
+      title: 'Download the Markdown packet',
       body:
         firstRunLesson?.validation ??
-        'Verify one bounded run before you touch more advanced surfaces.',
+        'Use the generated .md files to give your agent setup notes, update rules, and the next operating steps.',
     },
   ]
 
@@ -179,7 +179,7 @@ export function PicoOnboardingPageClient() {
     : !proofCaptured
       ? 'Run one bounded prompt'
       : !firstRunDone
-        ? 'Seal the first win'
+      ? 'Save the first run'
         : derived.nextLesson
           ? `Continue with ${derived.nextLesson.title}`
           : 'Open Autopilot'
@@ -187,17 +187,17 @@ export function PicoOnboardingPageClient() {
   const activeWorkspaceLabel =
     setup.onboarding?.workspace ?? currentBinding?.workspace ?? runtimeDraft.workspace ?? 'not recorded'
   const heroEyebrow = !proofCaptured
-    ? 'Make the first proof impossible to miss.'
+    ? 'Install first. Then prepare the agent packet.'
     : !firstRunDone
-      ? 'Seal the proof while the route is still honest.'
-      : 'First proof is real. Keep the lane moving.'
+      ? 'Save the first run and generate the packet.'
+      : 'First run is ready. Keep setup moving.'
   const hostedSyncLabel = session.status === 'authenticated' ? `${hostedCompletionRatio}%` : 'local'
-  const proofSignalLabel = proofCaptured ? (firstRunDone ? 'sealed' : 'captured') : 'missing'
+  const proofSignalLabel = proofCaptured ? (firstRunDone ? 'ready' : 'saved') : 'missing'
   const runtimeSignalDetail =
     session.status !== 'authenticated'
       ? 'hosted sync offline'
       : setup.loading
-        ? 'refreshing signal'
+        ? 'refreshing status'
         : setup.runtime?.gateway_url
           ? 'gateway live'
           : 'gateway unbound'
@@ -282,7 +282,7 @@ export function PicoOnboardingPageClient() {
     <PicoShell
       eyebrow="Onboarding"
       title="Get to your first working agent fast"
-      description="Ignore everything except the first local win. Install Hermes, run one prompt, see a real answer, then keep moving."
+      description="Install the runtime, run one prompt, then prepare the Markdown packet your agent can read to self-update and start operating."
       heroContent={
         <div
           className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.16),rgba(9,16,11,0.88)_38%,rgba(255,255,255,0.03)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
@@ -311,7 +311,7 @@ export function PicoOnboardingPageClient() {
           <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
             <div className="grid gap-5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={picoClasses.chip}>First-win pulse</span>
+                <span className={picoClasses.chip}>Setup status</span>
                 <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                   {activeTrack.title}
                 </span>
@@ -320,12 +320,12 @@ export function PicoOnboardingPageClient() {
                 {heroEyebrow}
               </p>
               <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Track the install, the first proof artifact, and the next move from one place.
+                Track the install, the first run, and the agent packet from one place.
               </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className={picoSoft('p-4')}>
-                  <p className={picoClasses.label}>Chapter pulse</p>
+                  <p className={picoClasses.label}>Setup progress</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {chapterPulsePercent}%
                   </p>
@@ -335,17 +335,17 @@ export function PicoOnboardingPageClient() {
                 </div>
 
                 <div className={picoSoft('p-4')}>
-                  <p className={picoClasses.label}>Proof state</p>
+                  <p className={picoClasses.label}>First run</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {proofSignalLabel}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    {proofCaptured ? 'artifact logged' : 'artifact still missing'}
+                    {proofCaptured ? 'output saved' : 'output not saved yet'}
                   </p>
                 </div>
 
                 <div className={picoSoft('p-4')}>
-                  <p className={picoClasses.label}>Runtime truth</p>
+                  <p className={picoClasses.label}>Runtime state</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {runtimeSignal}
                   </p>
@@ -360,7 +360,7 @@ export function PicoOnboardingPageClient() {
                   <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
                 </div>
                 <div className="min-w-0">
-                  <p className={picoClasses.label}>Next irreversible move</p>
+                  <p className={picoClasses.label}>Next setup step</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {nextMoveTitle}
                   </p>
@@ -400,7 +400,7 @@ export function PicoOnboardingPageClient() {
                 animate={prefersReducedMotion ? undefined : { y: [-2, 10, -2], x: [0, 6, 0] }}
                 transition={ambientDriftTransition}
               >
-                <p className={picoClasses.label}>Proof</p>
+                <p className={picoClasses.label}>Run</p>
                 <p className="mt-1 font-medium text-[color:var(--pico-text)]">{proofSignalLabel}</p>
               </motion.div>
 
@@ -482,27 +482,27 @@ export function PicoOnboardingPageClient() {
               Ask tutor about this step
             </Link>
             <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
-              Open support lane
+              Get setup help
             </Link>
           </div>
         }
     >
       <PicoSessionBanner session={session} nextPath={pathname} />
       <PicoSurfaceCompass
-        title="Use the shortest route that keeps the product honest"
-        body="Keep the first win narrow. Continue the lesson path when the sequence is clear, use tutor for one blocked command, open Autopilot only when live runtime state is the real question, and escalate last."
+        title="Use the shortest setup path"
+        body="Stay on the install path until one local run works. Use Tutor for one blocked command, Autopilot when runtime state matters, and human help when setup requires keys, hosting, or custom implementation."
         status={
           firstRunDone
-            ? 'first win cleared'
+            ? 'first run saved'
             : installDone
               ? 'install cleared'
               : 'cold start'
         }
-        aside="This chapter exists to compress the world, not widen it. The first proof should happen before preferences, architecture debates, or tooling tours."
+        aside="Most users should not have to reason through API keys, hosting, or deployment alone. Pico keeps the first setup small and points to support when the work needs hands-on help."
         items={[
           {
             href: toHref(`/academy/${activationLessonSlug}`),
-            label: !installDone ? 'Open install lesson' : !firstRunDone ? 'Run first prompt' : 'Continue academy lane',
+            label: !installDone ? 'Open install lesson' : !firstRunDone ? 'Run first prompt' : 'Continue academy',
             caption: 'Stay on the primary sequence until one visible output is real.',
             note: 'Next move',
             tone: 'primary',
@@ -515,16 +515,16 @@ export function PicoOnboardingPageClient() {
           },
           {
             href: toHref('/autopilot'),
-            label: 'Inspect live control room',
+            label: 'Inspect runtime state',
             caption: 'Switch here once runtime state, approvals, or spend become the bottleneck.',
             note: 'Runtime',
             tone: 'soft',
           },
           {
             href: toHref('/support'),
-            label: 'Escalate to human help',
-            caption: 'Only use this when the product path stopped being truthful enough to recover alone.',
-            note: 'Messy edge',
+            label: 'Get 1-on-1 help',
+            caption: 'Use this for API keys, hosting, cloud setup, or custom implementation.',
+            note: 'Guidance',
           },
         ]}
       />
@@ -534,12 +534,12 @@ export function PicoOnboardingPageClient() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Kickoff doctrine</p>
+                <p className={picoClasses.label}>Setup path</p>
                 <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
-                  Start like a sharp studio, not a hobby project
+                  Finish the first run before adding complexity
                 </h2>
               </div>
-              <span className={picoClasses.chip}>brief • deliverable • review</span>
+              <span className={picoClasses.chip}>install • run • packet</span>
             </div>
 
             <div className={storyRailClass}>
@@ -559,9 +559,9 @@ export function PicoOnboardingPageClient() {
 
           <div className="grid gap-4">
             <div className={picoEmber('p-5')}>
-              <p className={picoClasses.label}>Chapter posture</p>
+              <p className={picoClasses.label}>Setup rule</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Keep Chapter 01 narrow on purpose. No browsing, no stack tourism, and no extra setup theater before one real artifact exists.
+                Keep Chapter 01 narrow. Install the runtime, run one prompt, then use the packet to give your agent the right working context.
               </p>
             </div>
 
@@ -569,7 +569,7 @@ export function PicoOnboardingPageClient() {
               <div className="border-b border-[color:var(--pico-border)] p-5">
                 <p className={picoClasses.label}>Guide marker</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  One clear guide cue is enough while the first proof is still forming.
+                  One clear guide cue is enough while the first run is still forming.
                 </p>
               </div>
               <div className="flex items-center justify-center p-6">
@@ -605,12 +605,12 @@ export function PicoOnboardingPageClient() {
         <div className={picoPanel('overflow-hidden p-0')}>
           <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
             <div className="p-6 sm:p-7">
-              <p className={picoClasses.label}>Chapter 01 brief</p>
+              <p className={picoClasses.label}>First setup step</p>
               <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
-                Make one command work and keep the proof
+                Make one command work and keep the output
               </h2>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
-                This first chapter should narrow the world fast: install Hermes, run one tiny prompt, and hold on to the output so the first win becomes something real.
+                This first step should stay small: install Hermes, run one prompt, and keep the output so the agent packet has real context.
               </p>
 
               <div className={joinClasses(picoEmber('mt-6 p-5 text-sm leading-7'), 'sm:p-6')}>
@@ -626,7 +626,7 @@ export function PicoOnboardingPageClient() {
 
               <div className={picoInset('mt-6 grid gap-4 p-5 lg:grid-cols-3')}>
                 <div>
-                  <p className={picoClasses.label}>Track locked</p>
+                  <p className={picoClasses.label}>Current track</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {activeTrack.title}
                   </p>
@@ -651,7 +651,7 @@ export function PicoOnboardingPageClient() {
             </div>
 
             <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">
-              <p className={picoClasses.label}>Studio ledger</p>
+              <p className={picoClasses.label}>Setup ledger</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoSoft('p-4')}>
                   <p className="text-sm text-[color:var(--pico-text-muted)]">Completed lessons</p>
@@ -697,7 +697,7 @@ export function PicoOnboardingPageClient() {
               <div className={picoInset('mt-4 p-4')}>
                 <p className={picoClasses.label}>Operating rule</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  More choice this early is just prettier procrastination. Get the first win, then widen the surface.
+                  More options this early usually slow setup down. Get the first run, then add channels, hosting, and automation.
                 </p>
               </div>
             </div>
@@ -715,7 +715,7 @@ export function PicoOnboardingPageClient() {
               <div className={picoSoft('p-4')}>
                 <p className="text-sm text-[color:var(--pico-text-muted)]">First prompt</p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {firstRunWorkspace.workspace.evidence.trim() || firstRunDone ? 'proof captured' : 'pending'}
+                  {firstRunWorkspace.workspace.evidence.trim() || firstRunDone ? 'output saved' : 'pending'}
                 </p>
               </div>
             </div>
@@ -726,15 +726,15 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('mt-6 p-6 sm:p-7')} data-testid="pico-onboarding-proof-protocol">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Proof protocol</p>
+              <p className={picoClasses.label}>Agent packet</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              Three visible moves to clear Chapter 01
+              Three steps before the agent packet
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              These are the only moves that count before the surface earns the right to get wider.
+              Complete these before downloading the .md files your agent will use for setup notes and operating instructions.
             </p>
           </div>
-          <span className={picoClasses.chip}>first win protocol</span>
+          <span className={picoClasses.chip}>packet checklist</span>
         </div>
 
         <div className={storyRailClass}>
@@ -758,17 +758,17 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-stack-radar">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Live stack radar</p>
+            <p className={picoClasses.label}>Stack notes</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              The onboarding lane now knows what the tracked stacks are actually shipping
+              The setup path stays tied to current stack notes
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              Pico starts with Hermes in the lesson flow, but the product now keeps the rest of the
-              stack map visible instead of pretending there is only one runtime on earth.
+              Pico starts with Hermes in the lesson flow and keeps other stack notes nearby for
+              teams that need a different setup path.
             </p>
           </div>
           <Link href={toHref('/wip')} className={picoClasses.secondaryButton}>
-            Open live ledger
+            Open notes
           </Link>
         </div>
 
@@ -783,8 +783,8 @@ export function PicoOnboardingPageClient() {
                 {stack.whyNow}
               </p>
               <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
-                Keep this map in view while you execute the first lessons. Stack choice, launch
-                posture, and remote-access decisions should stay explicit from day one.
+                Keep this list in view while you execute the first lessons. Stack choice, launch
+                hosting, and remote-access decisions should stay explicit from day one.
               </p>
             </article>
           ))}
@@ -794,12 +794,12 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-mission-board">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Mission board</p>
-            <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              Keep the first two missions visibly grounded
+              <p className={picoClasses.label}>Setup board</p>
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+              Keep the first two steps easy to resume
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              Onboarding should know where the operator left off. These mission cards mirror the lesson workspace so the first win survives route changes instead of dissolving into memory.
+              Onboarding should know where setup stopped. These cards mirror the lesson workspace so the first run and packet context are easy to resume.
             </p>
           </div>
           <span className={picoClasses.chip}>workspace continuity</span>
@@ -809,7 +809,7 @@ export function PicoOnboardingPageClient() {
           <article className={picoInset('grid gap-4 p-5')} data-testid="pico-onboarding-install-mission">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className={picoClasses.label}>Mission 01</p>
+                <p className={picoClasses.label}>Step 01</p>
                 <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   Install Hermes
                 </h3>
@@ -830,15 +830,15 @@ export function PicoOnboardingPageClient() {
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{installFocusedStep}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Proof state</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Output state</p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {installWorkspace.workspace.evidence.trim() ? 'captured' : installDone ? 'completed' : 'missing'}
+                  {installWorkspace.workspace.evidence.trim() ? 'saved' : installDone ? 'completed' : 'missing'}
                 </p>
               </div>
             </div>
             <div className="grid gap-3 sm:flex sm:flex-wrap">
               <Link href={toHref(`/academy/${installLessonSlug}`)} className={picoClasses.secondaryButton}>
-                Resume install mission
+                Resume install step
               </Link>
               <Link href={toHref(`/tutor?lesson=${installLessonSlug}`)} className={picoClasses.tertiaryButton}>
                 Ask tutor
@@ -849,7 +849,7 @@ export function PicoOnboardingPageClient() {
           <article className={picoInset('grid gap-4 p-5')} data-testid="pico-onboarding-first-run-mission">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className={picoClasses.label}>Mission 02</p>
+                <p className={picoClasses.label}>Step 02</p>
                 <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   Run one bounded prompt
                 </h3>
@@ -870,15 +870,15 @@ export function PicoOnboardingPageClient() {
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{firstRunFocusedStep}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Proof state</p>
+                <p className="text-sm text-[color:var(--pico-text-muted)]">Output state</p>
                 <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {firstRunWorkspace.workspace.evidence.trim() ? 'captured' : firstRunDone ? 'completed' : 'missing'}
+                  {firstRunWorkspace.workspace.evidence.trim() ? 'saved' : firstRunDone ? 'completed' : 'missing'}
                 </p>
               </div>
             </div>
             <div className="grid gap-3 sm:flex sm:flex-wrap">
               <Link href={toHref(`/academy/${firstRunLessonSlug}`)} className={picoClasses.secondaryButton}>
-                Resume prompt mission
+                Resume prompt step
               </Link>
               <Link href={toHref(`/tutor?lesson=${firstRunLessonSlug}`)} className={picoClasses.tertiaryButton}>
                 Ask tutor
@@ -891,12 +891,12 @@ export function PicoOnboardingPageClient() {
       <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-operator-record">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Operator record</p>
+            <p className={picoClasses.label}>Setup record</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              Keep hosted kickoff and runtime truth in one place
+              Keep setup state and runtime notes in one place
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              Keep the hosted onboarding state, runtime truth, and next activation move in one operator record for Chapter 01.
+              Keep the hosted onboarding state, runtime notes, and next setup step in one record for the first setup phase.
             </p>
           </div>
           {session.status === 'authenticated' ? (
@@ -1039,7 +1039,7 @@ export function PicoOnboardingPageClient() {
 
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr),18rem]">
                   <div className={picoInset('p-5')}>
-                    <p className={picoClasses.label}>Operator host snapshot</p>
+                    <p className={picoClasses.label}>Runtime snapshot</p>
                     {setup.runtime ? (
                       <div className="mt-4 grid gap-3 sm:grid-cols-2">
                         <div>
@@ -1092,7 +1092,7 @@ export function PicoOnboardingPageClient() {
 
           <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Activation track</p>
+              <p className={picoClasses.label}>Setup track</p>
               <article className={picoInset('mt-4 grid gap-4 p-5')}>
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-3">
@@ -1115,7 +1115,7 @@ export function PicoOnboardingPageClient() {
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.body}>
                     {firstRunDone
-                      ? 'You already got the first win. Use the main action above and keep the sequence moving.'
+                      ? 'The first run is saved. Use the main action above and keep the sequence moving.'
                       : installDone
                         ? 'Hermes is installed. Skip the overview and open the first prompt lesson now.'
                         : 'Everything else can wait. Open the install lesson and get the command working.'}
@@ -1125,9 +1125,9 @@ export function PicoOnboardingPageClient() {
             </section>
 
             <section className={picoPanel('p-5')}>
-              <p className={picoClasses.label}>Operator rule</p>
+              <p className={picoClasses.label}>Setup rule</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                More choice this early is still prettier procrastination. Keep the chapter narrow until one local run and one proof artifact are both real.
+                Keep the chapter narrow until one local run works and the agent packet has enough context to be useful.
               </p>
               {firstRunDone ? (
                 <div className="mt-4 grid gap-3">
@@ -1166,15 +1166,15 @@ export function PicoOnboardingPageClient() {
         <section className={picoPanel('p-6 sm:p-7')}>
           <p className={picoClasses.label}>Hosted runtime editor</p>
           <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-            Update the operator record without leaving the route
+            Update the setup record without leaving the page
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            This does not pretend to install anything from the browser. It stores the latest truthful runtime snapshot so the rest of Pico stops guessing.
+            This does not install anything from the browser. It stores the runtime snapshot Pico needs before preparing the agent packet.
           </p>
 
           {session.status !== 'authenticated' ? (
             <div className={picoSoft('mt-5 p-5')}>
-              <p className={picoClasses.body}>Sign in first. The runtime snapshot is per operator account.</p>
+              <p className={picoClasses.body}>Sign in first. The runtime snapshot is saved to your account.</p>
             </div>
           ) : (
             <div className="mt-5 grid gap-4">
@@ -1289,7 +1289,7 @@ export function PicoOnboardingPageClient() {
                   </Link>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Save only what is true on the operator host right now: gateway URL, runtime health, and the bound assistant.
+                  Save what is available on this machine right now: gateway URL, runtime health, and the bound assistant.
                 </p>
               </div>
             </div>

@@ -156,7 +156,7 @@ export function explainAlertImpact(alert: AutopilotAlertSummary) {
     return 'A live workflow is hurting. Hidden runtime failures are how trust dies.'
   }
 
-  return 'Something triggered monitoring. Treat it as a signal to verify the runtime before trusting it.'
+  return 'Something triggered monitoring. Verify the runtime before letting it continue unattended.'
 }
 
 export function explainApprovalImpact(approval: AutopilotApprovalSummary) {

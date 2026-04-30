@@ -173,7 +173,7 @@ function UpgradeNudge({
   return (
     <DashboardSectionPage
       title='Full Mode Required'
-      description={`The ${panel} panel is gated in essential mode so the shell stays focused on the core operator path.`}
+      description={`The ${panel} panel is gated in essential mode so the shell stays focused on the core workflow.`}
       badge='essential mode'
       checks={[
         'Switch the interface mode to full once you need the broader Mission Control surface.',
@@ -589,7 +589,7 @@ function renderPanel(panel: DashboardPanelId) {
           description='Browse, clone, and deploy MUTX agent starter templates. Custom templates are editable and persisted to your catalog.'
           icon={LayoutGrid}
           iconTone='text-violet-300 bg-violet-400/10'
-          badge='operator surface'
+          badge='workspace'
           stats={[
             { label: 'Scope', value: 'Templates + custom' },
             { label: 'Source', value: 'API + local catalog' },

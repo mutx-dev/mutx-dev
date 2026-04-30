@@ -14,7 +14,7 @@ type Step =
 
 const steps: Step[] = [
   { type: 'command', content: 'mutx setup hosted' },
-  { type: 'output', content: 'operator authenticated', tone: 'success' },
+  { type: 'output', content: 'user authenticated', tone: 'success' },
   { type: 'output', content: 'Personal Assistant deployed', tone: 'success' },
   { type: 'wait', delay: 350 },
   { type: 'divider' },
@@ -121,8 +121,8 @@ export function AnimatedTerminal() {
   return (
     <TerminalWindow
       title="mutx"
-      path="~/control"
-      label="live operator view"
+      path="~/mutx"
+      label="live app view"
       className="h-[320px] sm:h-[360px] lg:h-[420px] xl:h-[460px]"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.06),transparent_30%)]" />
@@ -133,7 +133,7 @@ export function AnimatedTerminal() {
           <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">skills</span>
           <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">deployments</span>
           <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">health</span>
-          <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-cyan-200/90">control plane</span>
+          <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-cyan-200/90">agent controls</span>
         </div>
 
         <div className="flex-1 overflow-hidden rounded-2xl border border-white/10 bg-black/65 p-3 sm:p-4 lg:p-5">

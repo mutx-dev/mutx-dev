@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 import { buildOAuthStartHref, oauthProviders } from '@/lib/auth/oauth'
-import { picoClasses, picoEmber, picoInset, picoPanel, picoSoft } from '@/components/pico/picoTheme'
+import { picoClasses, picoEmber, picoPanel, picoSoft } from '@/components/pico/picoTheme'
 import { type PicoSessionState } from '@/components/pico/usePicoSession'
 import { mergeRedirectPathWithSearch, resolveRedirectPath } from '@/lib/auth/redirects'
 
@@ -31,11 +31,6 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
     loading: false,
     error: null,
   })
-  const authenticatedRailClass =
-    'mt-4 grid grid-flow-col auto-cols-[minmax(12rem,72vw)] gap-3 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid-flow-row sm:auto-cols-auto sm:overflow-visible sm:grid-cols-2 xl:grid-cols-4'
-  const anonymousRailClass =
-    'mt-4 grid grid-flow-col auto-cols-[minmax(12rem,72vw)] gap-3 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid-flow-row sm:auto-cols-auto sm:overflow-visible sm:grid-cols-3'
-
   useEffect(() => {
     if (session.status !== 'authenticated') {
       setReadiness({
@@ -108,11 +103,11 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
 
   if (session.status === 'authenticated') {
     return (
-      <div className={picoPanel('p-4 sm:p-5')}>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr),20rem]">
-          <div>
+      <div className={picoPanel('p-3 sm:p-4')}>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={picoClasses.chip}>hosted session attached</span>
+              <span className={picoClasses.chip}>hosted session live</span>
               <span className={picoClasses.chip}>
                 {session.user.plan ? `${session.user.plan.toLowerCase()} plan` : 'plan unknown'}
               </span>
@@ -125,87 +120,41 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
               </span>
               <span className={picoClasses.chip}>
                 {readiness.loading
-                  ? 'loading webhooks'
+                  ? 'checking webhooks'
                   : readiness.webhookCount != null
                     ? `${readiness.webhookCount} webhook${readiness.webhookCount === 1 ? '' : 's'}`
-                    : 'webhooks unavailable'}
+                    : 'webhooks partial'}
               </span>
             </div>
-
-            <p className="mt-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              Signed in as <span className="text-[color:var(--pico-text)]">{session.user.email ?? session.user.name ?? 'operator'}</span>. Progress sync, onboarding state, approvals, and live runtime data can now use the hosted MUTX account on this host.
+            <p className="mt-2 truncate text-sm text-[color:var(--pico-text-secondary)]">
+              Signed in as {session.user.email ?? session.user.name ?? 'user'} - progress sync and runtime reads are attached.
             </p>
-
-            <div className={authenticatedRailClass}>
-              <div className={picoInset('snap-start p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Identity</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {session.user.name ?? 'operator'}
-                </p>
-              </div>
-              <div className={picoInset('snap-start p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Plan</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {session.user.plan ? session.user.plan.toLowerCase() : 'unknown'}
-                </p>
-              </div>
-              <div className={picoInset('snap-start p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Email state</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {session.user.isEmailVerified === false
-                    ? 'pending'
-                    : session.user.isEmailVerified === true
-                      ? 'verified'
-                      : 'unknown'}
-                </p>
-              </div>
-              <div className={picoInset('snap-start p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">Webhook routes</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                  {readiness.loading
-                    ? 'loading'
-                    : readiness.webhookCount != null
-                      ? String(readiness.webhookCount)
-                      : 'n/a'}
-                </p>
-              </div>
-            </div>
-
-            {session.user.isEmailVerified === false && session.user.email ? (
-              <p className="mt-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Password accounts stay limited until the inbox link is confirmed. Finish that before treating the hosted session as production-ready.
-              </p>
-            ) : null}
             {readiness.error ? (
-              <p className="mt-4 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{readiness.error}</p>
+              <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{readiness.error}</p>
             ) : null}
           </div>
 
-          <div className={picoSoft('grid gap-3 p-4')}>
-            <p className={picoClasses.label}>Product truth</p>
-            <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              The product can now tell the truth about progress, runtime state, approvals, and hosted setup. If this account is not production-ready yet, fix that here before trusting the rest of the surface.
-            </p>
-            <div className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-              <div className="flex items-center justify-between gap-3 border-b border-[color:var(--pico-border)] pb-2">
-                <span>Progress sync</span>
-                <span className="text-[color:var(--pico-text)]">live</span>
+          <div className={picoSoft('grid gap-2 p-3 sm:min-w-[22rem]')}>
+            <div className="grid grid-cols-3 gap-2 text-xs text-[color:var(--pico-text-secondary)]">
+              <div>
+                <p className="text-[color:var(--pico-text-muted)]">Sync</p>
+                <p className="mt-1 font-medium text-[color:var(--pico-text)]">live</p>
               </div>
-              <div className="flex items-center justify-between gap-3 border-b border-[color:var(--pico-border)] pb-2">
-                <span>Runtime truth</span>
-                <span className="text-right text-[color:var(--pico-text)]">
+              <div>
+                <p className="text-[color:var(--pico-text-muted)]">Email</p>
+                <p className="mt-1 font-medium text-[color:var(--pico-text)]">
+                  {session.user.isEmailVerified === false ? 'pending' : 'verified'}
+                </p>
+              </div>
+              <div>
+                <p className="text-[color:var(--pico-text-muted)]">Runtime</p>
+                <p className="mt-1 font-medium text-[color:var(--pico-text)]">
                   {readiness.loading
                     ? 'checking'
                     : readiness.webhookCount != null && readiness.webhookCount > 0
-                      ? 'grounded'
+                      ? 'available'
                       : 'partial'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span>Approval confidence</span>
-                <span className="text-right text-[color:var(--pico-text)]">
-                  {session.user.isEmailVerified === false ? 'limited' : 'usable'}
-                </span>
+                </p>
               </div>
             </div>
             {session.user.isEmailVerified === false && session.user.email ? (
@@ -213,7 +162,7 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
                 href={`/verify-email?email=${encodeURIComponent(session.user.email)}&next=${encodeURIComponent(redirectPath)}`}
                 className={picoClasses.secondaryButton}
               >
-                Finish email verification
+                Finish verification
               </Link>
             ) : null}
           </div>
@@ -227,7 +176,7 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
       <div className={picoPanel('p-4 sm:p-5')}>
         <p className={picoClasses.label}>Hosted session</p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-          Checking whether this Pico host has an operator session attached.
+          Checking whether this Pico host has a session attached.
         </p>
       </div>
     )
@@ -243,52 +192,34 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
   }
 
   return (
-    <div className={picoEmber('p-4 sm:p-5')}>
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr),24rem]">
-        <div>
+    <div className={picoEmber('p-3 sm:p-4')}>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <span className={picoClasses.chip}>hosted session required</span>
-            <span className={picoClasses.chip}>pico host auth</span>
+            <span className={picoClasses.chip}>local preview</span>
           </div>
-          <p className="mt-4 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            The Pico platform routes are live here, but the hosted session is not attached yet on this domain. Sign in on Pico to persist progress, read live runs, and use the backend onboarding/runtime state. Google, GitHub, Discord, Apple, password signup, and email confirmation all terminate on this host now.
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+            Sign in to persist progress, read live runtime state, and use hosted approvals on this Pico domain.
           </p>
-          <div className={anonymousRailClass}>
-            <div className={picoInset('snap-start p-4')}>
-              <p className="text-sm text-[color:var(--pico-text-muted)]">Progress</p>
-              <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">won’t persist</p>
-            </div>
-            <div className={picoInset('snap-start p-4')}>
-              <p className="text-sm text-[color:var(--pico-text-muted)]">Runtime truth</p>
-              <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">limited</p>
-            </div>
-            <div className={picoInset('snap-start p-4')}>
-              <p className="text-sm text-[color:var(--pico-text-muted)]">Approvals</p>
-              <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">read-only feeling</p>
-            </div>
-          </div>
         </div>
 
-        <div className={picoSoft('grid gap-3 p-4')}>
-          <p className={picoClasses.label}>Without session</p>
-          <div className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
-            <div className="flex items-center justify-between gap-3 border-b border-[color:var(--pico-border)] pb-2">
-              <span>Progress sync</span>
-              <span className="text-[color:var(--pico-text)]">local only</span>
+        <div className={picoSoft('grid gap-3 p-3 sm:min-w-[24rem]')}>
+          <div className="grid grid-cols-3 gap-2 text-xs text-[color:var(--pico-text-secondary)]">
+            <div>
+              <p className="text-[color:var(--pico-text-muted)]">Progress</p>
+              <p className="mt-1 font-medium text-[color:var(--pico-text)]">local</p>
             </div>
-            <div className="flex items-center justify-between gap-3 border-b border-[color:var(--pico-border)] pb-2">
-              <span>Runtime truth</span>
-              <span className="text-right text-[color:var(--pico-text)]">not trustworthy yet</span>
+            <div>
+              <p className="text-[color:var(--pico-text-muted)]">Runtime</p>
+              <p className="mt-1 font-medium text-[color:var(--pico-text)]">limited</p>
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <span>Approvals + webhooks</span>
-              <span className="text-right text-[color:var(--pico-text)]">blocked</span>
+            <div>
+              <p className="text-[color:var(--pico-text-muted)]">Approvals</p>
+              <p className="mt-1 font-medium text-[color:var(--pico-text)]">blocked</p>
             </div>
           </div>
-          <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            Attach the Pico account on this host before you trust progress, live runtime state, or approval behavior.
-          </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             <Link href={`/login?next=${encodeURIComponent(redirectPath)}`} className={picoClasses.primaryButton}>
               Sign in
             </Link>
@@ -296,8 +227,8 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
               Create account
             </Link>
           </div>
-          <div className="grid gap-2">
-            {oauthProviders.map((provider) => (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {oauthProviders.slice(0, 4).map((provider) => (
               <Link
                 key={provider.id}
                 href={buildOAuthStartHref(provider.id, 'login', redirectPath)}

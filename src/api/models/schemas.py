@@ -743,7 +743,9 @@ class IngestEvent(BaseModel):
     are carried as a free-form ``payload`` dict.
     """
 
-    event_type: str = Field(..., min_length=1, description="Adapter event type (e.g. agent_action, crew_task_start)")
+    event_type: str = Field(
+        ..., min_length=1, description="Adapter event type (e.g. agent_action, crew_task_start)"
+    )
     timestamp: Optional[str] = Field(None, description="ISO 8601 timestamp from the adapter")
     agent_id: Optional[uuid.UUID] = Field(None, description="Agent UUID if available")
     payload: Dict[str, Any] = Field(default_factory=dict, description="Adapter-specific event data")

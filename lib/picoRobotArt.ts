@@ -13,7 +13,7 @@ const picoRobotArt = {
   heroWave: {
     id: 'hero-wave',
     src: '/pico/robot/hero-wave.png',
-    alt: 'PicoMUTX mascot floating above the product surface',
+    alt: 'PicoMUTX mascot floating above the product',
   },
   wave: {
     id: 'wave',
@@ -48,12 +48,12 @@ const picoRobotArt = {
   guide: {
     id: 'guide',
     src: '/pico/robot/guide.png',
-    alt: 'PicoMUTX mascot guiding an operator through the next step',
+    alt: 'PicoMUTX mascot guiding a user through the next step',
   },
   point: {
     id: 'point',
     src: '/pico/robot/point.png',
-    alt: 'PicoMUTX mascot pointing at a control signal',
+    alt: 'PicoMUTX mascot pointing at run status',
   },
   celebrate: {
     id: 'celebrate',
@@ -93,75 +93,75 @@ export const picoRobotMarketingHighlights: PicoRobotMarketingHighlight[] = [
   },
   {
     ...picoRobotArt.builder,
-    title: 'Guidance that keeps operators moving',
+    title: 'Guidance that keeps setup moving',
     caption:
-      'The coach stays oriented around the next concrete action, whether the operator is learning, testing, or pushing toward autopilot.',
+      'The coach stays focused on the next concrete action, whether you are learning, testing, or preparing Autopilot.',
   },
   {
     ...picoRobotArt.thumbsUp,
-    title: 'Confidence signals inside the flow',
+    title: 'Clear status inside the flow',
     caption:
-      'Status, approvals, and proof points are framed as part of the same visual system, which makes the runtime feel trustworthy and legible.',
+      'Status, approvals, and saved outputs use one visual system so runtime state stays readable.',
   },
 ]
 
 export const picoRobotAutopilotHighlights: PicoRobotMarketingHighlight[] = [
   {
     ...picoRobotArt.point,
-    title: 'Runtime posture at a glance',
+    title: 'Runtime state at a glance',
     caption:
-      'The operator should be able to read the state of the control room before touching any setting or approving any action.',
+      'You should be able to read the current run state before changing a setting or approving an action.',
   },
   {
     ...picoRobotArt.coins,
     title: 'Escalation stays connected to the run',
     caption:
-      'When risk rises, the surface should keep the last execution, budget pressure, and pending decisions tied together.',
+      'When risk rises, the page keeps the last execution, budget pressure, and pending decisions together.',
   },
   {
     ...picoRobotArt.atom,
-    title: 'Trust comes from visible decisions',
+    title: 'Review risky decisions',
     caption:
-      'Approvals are only credible when they read like durable operator calls instead of temporary UI toasts.',
+      'Approvals should stay visible long enough for a person to review them.',
   },
 ]
 
 const picoRouteRobotSignals = {
   landing: {
     ...picoRobotArt.heroWave,
-    title: 'Launch signal',
+    title: 'Launch marker',
     caption:
-      'Keep the landing read clean: one strong mascot cue, then let the routed product pages carry the rest of the character.',
+      'Keep the landing simple, then let the product pages handle setup.',
   },
   onboarding: {
     ...picoRobotArt.guide,
     title: 'Guide marker',
     caption:
-      'Onboarding should feel like the first honest handoff into the product, with one clear next move and no mascot pile-up.',
+      'Onboarding should give one clear setup step and keep the agent packet in view.',
   },
   academy: {
     ...picoRobotArt.sprout,
-    title: 'Lesson posture',
+    title: 'Lesson marker',
     caption:
-      'Academy is where the system grows operator confidence a step at a time, so the visual cue stays calm and directional.',
+      'Academy keeps setup moving one lesson at a time.',
   },
   tutor: {
     ...picoRobotArt.builder,
-    title: 'Crit desk',
+    title: 'Tutor marker',
     caption:
-      'Tutor should feel like a focused working session: grounded feedback, one revision path, and no decorative noise.',
+      'Tutor should answer one blocker and send you back to setup.',
   },
   autopilot: {
     ...picoRobotArt.point,
-    title: 'Control-room cue',
+    title: 'Runtime marker',
     caption:
-      'Autopilot earns trust when the operator can read state, spend, and risk quickly enough to act without guessing.',
+      'Autopilot keeps run state, spend, and approvals close together.',
   },
   support: {
     ...picoRobotArt.coffee,
-    title: 'Desk tone',
+    title: 'Support marker',
     caption:
-      'Support can lower the temperature without losing momentum, which is exactly where a calmer signal belongs.',
+      'Support is for setup that needs a person: keys, hosting, integrations, or custom implementation.',
   },
 } satisfies Record<string, PicoRobotMarketingHighlight>
 

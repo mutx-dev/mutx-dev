@@ -500,7 +500,7 @@ export function DashboardOverviewPageClient() {
                       </p>
                       <p className="mt-2 text-sm leading-6 text-slate-400">
                         {openclawBinding?.workspace
-                          ? `Workspace ${openclawBinding.workspace} is bound into the operator surface.`
+                          ? `Workspace ${openclawBinding.workspace} is bound into the dashboard.`
                           : openclawRuntime?.privacy_summary ??
                             "The dashboard is showing the last synced OpenClaw runtime snapshot from the operator host."}
                       </p>

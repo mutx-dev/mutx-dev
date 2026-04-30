@@ -339,7 +339,7 @@ export function AppDomainDemoIntro() {
                     variants={itemVariants}
                     className="mt-5 max-w-[34rem] text-[15px] leading-7 text-[rgba(247,238,225,0.72)] sm:text-[16px]"
                   >
-                    The route map is real. Some fleet posture, activity, and control surfaces are staged
+                    The route map is real. Some fleet status, activity, and controls are staged
                     so the product can be shown cleanly before full operator auth.
                   </motion.p>
 

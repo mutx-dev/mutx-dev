@@ -4143,7 +4143,7 @@ export function DesktopNativeRoutePage({
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
               <p className="text-sm font-semibold text-white">What setup will do</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
-                It drives the real desktop bridge setup flow, binds a workspace, and refreshes the native route context without bouncing you into a separate product surface.
+                It drives the real desktop bridge setup flow, binds a workspace, and refreshes the native context without bouncing you into a separate product area.
               </p>
             </div>
           </div>

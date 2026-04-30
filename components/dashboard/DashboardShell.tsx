@@ -181,7 +181,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
     if (!isDesktop) {
       return {
         eyebrow: "web shell",
-        title: "Canonical MUTX operator surface",
+        title: "Canonical MUTX dashboard",
         detail: "Desktop-only actions stay gated until this session is running inside MUTX.app.",
       };
     }

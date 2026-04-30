@@ -1444,6 +1444,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ingest/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ingest Event
+         * @description Canonical event ingestion endpoint for SDK adapters.
+         *
+         *     Accepts structured events from LangChain, CrewAI, AutoGen, and future
+         *     adapter integrations.  When ``agent_id`` is provided the event is
+         *     persisted as an ``AgentLog`` for audit trail; otherwise it is accepted
+         *     and logged without persistent storage (a dedicated events table is
+         *     planned for Wave 2).
+         */
+        post: operations["ingest_event_v1_ingest_events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runs": {
         parameters: {
             query?: never;
@@ -3156,6 +3182,166 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/governance/trust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Governance Trust
+         * @description List governance trust records.
+         */
+        get: operations["list_governance_trust_v1_governance_trust_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/trust/{agent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Update Governance Trust
+         * @description Update governance trust metadata for an agent.
+         */
+        post: operations["update_governance_trust_v1_governance_trust__agent_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/lifecycle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Governance Lifecycle
+         * @description List governance lifecycle records.
+         */
+        get: operations["list_governance_lifecycle_v1_governance_lifecycle_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/lifecycle/{agent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Update Governance Lifecycle
+         * @description Update an agent governance lifecycle state.
+         */
+        post: operations["update_governance_lifecycle_v1_governance_lifecycle__agent_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/discovery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Governance Discovery
+         * @description List governance discovery findings.
+         */
+        get: operations["list_governance_discovery_v1_governance_discovery_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/discovery/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scan Governance Discovery
+         * @description Run a lightweight governance discovery scan of known local runtime state.
+         */
+        post: operations["scan_governance_discovery_v1_governance_discovery_scan_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/attestations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Governance Attestations
+         * @description Return a governance attestation bundle for the current operator.
+         */
+        get: operations["get_governance_attestations_v1_governance_attestations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/attestations/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify Governance Attestations
+         * @description Verify and return the current governance attestation bundle.
+         */
+        post: operations["verify_governance_attestations_v1_governance_attestations_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/governance/credentials/backends": {
         parameters: {
             query?: never;
@@ -4808,6 +4994,40 @@ export interface components {
             /** Label */
             label?: string | null;
         };
+        /** AttestationBundle */
+        AttestationBundle: {
+            /** Summary */
+            summary: {
+                [key: string]: number | string;
+            };
+            /** Coverage */
+            coverage: {
+                [key: string]: boolean;
+            };
+            /** Compliance */
+            compliance: {
+                [key: string]: boolean | string | number;
+            };
+            /** Discovery */
+            discovery: {
+                [key: string]: number;
+            };
+            /** Runtime */
+            runtime: {
+                [key: string]: number | string | boolean | null;
+            };
+            /** Owasp Agentic Risk Mapping */
+            owasp_agentic_risk_mapping: {
+                [key: string]: string;
+            }[];
+            /** Generated At */
+            generated_at: string;
+            /**
+             * Verified
+             * @default false
+             */
+            verified: boolean;
+        };
         /**
          * AuditEventResponse
          * @description Response model for an audit event.
@@ -5443,6 +5663,52 @@ export interface components {
             /** Rolled Back At */
             rolled_back_at?: string | null;
         };
+        /** DiscoveryFinding */
+        DiscoveryFinding: {
+            /** Finding Id */
+            finding_id: string;
+            /** Entity Id */
+            entity_id: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Title */
+            title: string;
+            /** Source */
+            source: string;
+            /**
+             * Risk Level
+             * @default unknown
+             * @enum {string}
+             */
+            risk_level: "unknown" | "low" | "medium" | "high" | "critical";
+            /**
+             * Registration Status
+             * @default unknown
+             * @enum {string}
+             */
+            registration_status: "unknown" | "registered" | "unregistered" | "ignored";
+            /**
+             * Confidence
+             * @default 0
+             */
+            confidence: number;
+            /** Discovered At */
+            discovered_at: string;
+        };
+        /** DiscoveryList */
+        DiscoveryList: {
+            /** Items */
+            items: components["schemas"]["DiscoveryFinding"][];
+        };
+        /** DiscoveryScanResponse */
+        DiscoveryScanResponse: {
+            /** Count */
+            count: number;
+            /** Scanned At */
+            scanned_at: string;
+            /** Items */
+            items: components["schemas"]["DiscoveryFinding"][];
+        };
         /** DocumentArtifactResponse */
         DocumentArtifactResponse: {
             /**
@@ -5710,6 +5976,89 @@ export interface components {
         GeneratePackageRequest: {
             /** Session Id */
             session_id: string;
+        };
+        /** GovernanceIdentityList */
+        GovernanceIdentityList: {
+            /** Items */
+            items: components["schemas"]["GovernedIdentity"][];
+        };
+        /** GovernanceLifecycleUpdate */
+        GovernanceLifecycleUpdate: {
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "unknown" | "active" | "suspended" | "retired";
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+            /**
+             * Apply Runtime Action
+             * @default true
+             */
+            apply_runtime_action: boolean;
+        };
+        /** GovernanceTrustUpdate */
+        GovernanceTrustUpdate: {
+            /** Score */
+            score?: number | null;
+            /** Delta */
+            delta?: number | null;
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+            /** Capability Scope */
+            capability_scope?: string[] | null;
+            /** Resource Scope */
+            resource_scope?: string[] | null;
+            /** Credential Status */
+            credential_status?: ("unknown" | "missing" | "brokered" | "expired") | null;
+            /** Display Name */
+            display_name?: string | null;
+        };
+        /** GovernedIdentity */
+        GovernedIdentity: {
+            /** Agent Id */
+            agent_id: string;
+            /** Display Name */
+            display_name?: string | null;
+            /**
+             * Trust Score
+             * @default 500
+             */
+            trust_score: number;
+            /**
+             * Trust Tier
+             * @default trusted
+             * @enum {string}
+             */
+            trust_tier: "unknown" | "low" | "trusted" | "elevated" | "critical";
+            /**
+             * Credential Status
+             * @default unknown
+             * @enum {string}
+             */
+            credential_status: "unknown" | "missing" | "brokered" | "expired";
+            /**
+             * Lifecycle Status
+             * @default active
+             * @enum {string}
+             */
+            lifecycle_status: "unknown" | "active" | "suspended" | "retired";
+            /** Launch Profile */
+            launch_profile?: string | null;
+            /** Faramesh Policy */
+            faramesh_policy?: string | null;
+            /** Capability Scope */
+            capability_scope?: string[];
+            /** Resource Scope */
+            resource_scope?: string[];
+            /** Updated At */
+            updated_at: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -7048,7 +7397,10 @@ export interface components {
         PicoChatResponse: {
             /** Reply */
             reply: string;
-            /** Session Id */
+            /**
+             * Session Id
+             * @default
+             */
             session_id: string;
             onboarding_state?: components["schemas"]["OnboardingState"] | null;
             /**
@@ -7125,6 +7477,8 @@ export interface components {
             validatedAt?: string | null;
             /** Message */
             message: string;
+            /** Apikeyset */
+            apiKeySet?: boolean | null;
         };
         /** PicoTutorRequest */
         PicoTutorRequest: {
@@ -7180,6 +7534,10 @@ export interface components {
              * @default false
              */
             usedOfficialFallback: boolean;
+            /** Reply */
+            reply?: string | null;
+            /** Nextlesson */
+            nextLesson?: string | null;
         };
         /** PicoTutorSetupContext */
         PicoTutorSetupContext: {
@@ -12062,6 +12420,44 @@ export interface operations {
             };
         };
     };
+    ingest_event_v1_ingest_events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Bearer token for JWT auth */
+                authorization?: string | null;
+                /** @description API key for ingestion authentication */
+                "X-API-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IngestEvent"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_runs_v1_runs_get: {
         parameters: {
             query?: {
@@ -15667,6 +16063,266 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsageBreakdownResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_governance_trust_v1_governance_trust_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernanceIdentityList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_governance_trust_v1_governance_trust__agent_id__post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GovernanceTrustUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernedIdentity"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_governance_lifecycle_v1_governance_lifecycle_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernanceIdentityList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_governance_lifecycle_v1_governance_lifecycle__agent_id__post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GovernanceLifecycleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GovernedIdentity"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_governance_discovery_v1_governance_discovery_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscoveryList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scan_governance_discovery_v1_governance_discovery_scan_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscoveryScanResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_governance_attestations_v1_governance_attestations_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttestationBundle"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_governance_attestations_v1_governance_attestations_verify_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttestationBundle"];
                 };
             };
             /** @description Validation Error */

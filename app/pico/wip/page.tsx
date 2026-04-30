@@ -6,7 +6,7 @@ import s from './page.module.css'
 import { PicoWipReturn } from '@/components/pico/PicoWipReturn'
 
 export const metadata: Metadata = {
-  title: 'PicoMUTX route is preparing',
+  title: 'PicoMUTX page is preparing',
   description: 'The PicoMUTX academy and product pages are still being prepared.',
   alternates: {
     canonical: 'https://pico.mutx.dev',
@@ -25,8 +25,8 @@ export default function PicoWipPage() {
       <div className={s.shell}>
         <section className={s.hero}>
           <div className={s.copy}>
-            <p className={s.kicker}>PicoMUTX route guard</p>
-            <h1 className={s.title}>This lane is still being prepared.</h1>
+            <p className={s.kicker}>PicoMUTX page guard</p>
+            <h1 className={s.title}>This page is still being prepared.</h1>
             <p className={s.subtitle}>
               The academy, tutor, support, autopilot, pricing, login, and account paths are still
               private while the public waitlist opens back up.

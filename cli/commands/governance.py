@@ -62,6 +62,129 @@ def governance_group():
     pass
 
 
+def _governance_client():
+    from cli.config import current_config, get_client
+
+    config = current_config()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        sys.exit(1)
+
+    return get_client(config)
+
+
+@governance_group.command(name="doctor")
+def doctor_command() -> None:
+    """Summarize governance attestation posture."""
+    client = _governance_client()
+    response = client.get("/v1/governance/attestations")
+    response.raise_for_status()
+    payload = response.json()
+    summary = payload.get("summary", {}) if isinstance(payload, dict) else {}
+
+    click.echo("Governance Doctor")
+    click.echo("=" * 50)
+    click.echo(f"  Identities:          {summary.get('identities', 0)}")
+    click.echo(f"  Discovery items:     {summary.get('discovery_items', 0)}")
+    click.echo(f"  Credential backends: {summary.get('credential_backends', 0)}")
+    click.echo(f"  Supervised agents:   {summary.get('supervised_agents', 0)}")
+    click.echo(f"  Pending approvals:   {summary.get('pending_approvals', 0)}")
+
+
+@governance_group.command(name="verify")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def verify_command(output_json: bool) -> None:
+    """Verify governance attestations."""
+    client = _governance_client()
+    response = client.post("/v1/governance/attestations/verify")
+    response.raise_for_status()
+    payload = response.json()
+
+    if output_json:
+        click.echo(json.dumps(payload, indent=2))
+        return
+
+    summary = payload.get("summary", {}) if isinstance(payload, dict) else {}
+    click.echo("Governance attestation verification")
+    click.echo(f"  Identities:          {summary.get('identities', 0)}")
+    click.echo(f"  Discovery items:     {summary.get('discovery_items', 0)}")
+    click.echo(f"  Credential backends: {summary.get('credential_backends', 0)}")
+
+
+@governance_group.group(name="trust")
+def trust_group() -> None:
+    """Inspect and adjust governance trust records."""
+    pass
+
+
+@trust_group.command(name="list")
+def trust_list_command() -> None:
+    """List governance trust records."""
+    client = _governance_client()
+    response = client.get("/v1/governance/trust")
+    response.raise_for_status()
+    payload = response.json()
+    items = payload.get("items", []) if isinstance(payload, dict) else []
+
+    if not items:
+        click.echo("No governance trust records found.")
+        return
+
+    click.echo(f"{'AGENT':<24} {'SCORE':<8} {'TIER':<14} {'LIFECYCLE'}")
+    click.echo("-" * 70)
+    for item in items:
+        click.echo(
+            f"{item.get('agent_id', '-'):<24} {item.get('trust_score', '-')!s:<8} "
+            f"{item.get('trust_tier', '-'):<14} {item.get('lifecycle_status', '-')}"
+        )
+
+
+@governance_group.group(name="lifecycle")
+def lifecycle_group() -> None:
+    """Manage governance lifecycle state."""
+    pass
+
+
+@lifecycle_group.command(name="set")
+@click.argument("agent_id")
+@click.argument("state")
+@click.option("--reason", default=None, help="Reason for the lifecycle change")
+@click.option("--apply-runtime-action/--no-apply-runtime-action", default=True)
+def lifecycle_set_command(
+    agent_id: str, state: str, reason: str | None, apply_runtime_action: bool
+) -> None:
+    """Set lifecycle state for an agent."""
+    client = _governance_client()
+    payload = {
+        "state": state,
+        "reason": reason,
+        "apply_runtime_action": apply_runtime_action,
+    }
+    response = client.post(f"/v1/governance/lifecycle/{agent_id}", json=payload)
+    response.raise_for_status()
+    result = response.json()
+    click.echo(
+        f"{result.get('agent_id', agent_id)} lifecycle state: "
+        f"{result.get('lifecycle_status', state)}"
+    )
+
+
+@governance_group.group(name="discovery")
+def discovery_group() -> None:
+    """Inspect governance discovery inventory."""
+    pass
+
+
+@discovery_group.command(name="scan")
+def discovery_scan_command() -> None:
+    """Run a governance discovery scan."""
+    client = _governance_client()
+    response = client.post("/v1/governance/discovery/scan")
+    response.raise_for_status()
+    payload = response.json()
+    click.echo(f"Scanned {payload.get('count', 0)} entities")
+
+
 @governance_group.command(name="status")
 @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
 def status_command(output_json: bool) -> None:

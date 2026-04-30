@@ -14,19 +14,19 @@ import core from "@/components/site/marketing/MarketingCore.module.css";
 import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: "AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX",
+  title: "AI Agent Control Plane - Runtime Traces, Lifecycle, Agent Setup | MUTX",
   description:
-    "The control plane isn&rsquo;t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
+    "MUTX gives you runtime traces, agent lifecycle records, and a clear review dashboard for every agent in your workspace.",
   ...buildPageMetadata({
-    title: "AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX",
+    title: "AI Agent Control Plane - Runtime Traces, Lifecycle, Agent Setup | MUTX",
     description:
-      "The control plane isn&rsquo;t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
+      "MUTX gives you runtime traces, agent lifecycle records, and a clear review dashboard for every agent in your workspace.",
     path: "/ai-agent-control-plane",
     socialDescription:
-      "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.",
+      "Runtime traces, lifecycle records, and a clear review dashboard for every agent in your workspace.",
     twitterTitle: "AI Agent Control Plane | MUTX",
     twitterDescription:
-      "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and operator surfaces — built in from day one.",
+      "Runtime traces, lifecycle records, and review dashboards for agents from setup to daily use.",
   }),
 };
 
@@ -54,7 +54,7 @@ const structuredData = {
       name: "AI Agent Control Plane | MUTX",
       url: getCanonicalUrl("/ai-agent-control-plane"),
       description:
-        "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.",
+        "Runtime traces, lifecycle records, and a clear review dashboard for every agent in your workspace.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
@@ -63,19 +63,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Runtime visibility",
-    body: "See what your agents actually did — not what the model promised. Traces, tool calls, context windows, and outcomes in a surface your on-call can read at 2 AM.",
+    body: "See what your agents did. Traces, tool calls, context windows, and outcomes are collected in one place.",
   },
   {
     title: "Agent lifecycle",
-    body: "Every agent has a record. Who created it, what runtime it uses, what toolchain version was active. Lifecycle state is durable — not trapped in a Slack thread or someone&rsquo;s memory.",
+    body: "Every agent has a record: who created it, what runtime it uses, and which toolchain version was active.",
   },
   {
-    title: "Operator surface",
-    body: "Operators shouldn&rsquo;t need to SSH into a box or grep a log to figure out what happened. MUTX gives you a readable surface for every agent action, every time.",
+    title: "Agent setup",
+    body: "Set up agents, review their actions, and keep the important details visible without digging through logs.",
   },
   {
-    title: "Consistency guarantees",
-    body: "Staging and production should behave the same way because the control plane enforces it — not because the team agreed it should and forgot to follow through.",
+    title: "Consistent settings",
+    body: "Keep staging and production aligned with settings that travel with each agent configuration.",
   },
 ];
 
@@ -101,10 +101,8 @@ export default function AIAgentControlPlanePage() {
                   </h1>
                   <p className={feat.heroSupport}>
                     Most agent tooling treats the control plane as an
-                    afterthought — something bolted on after the demo impresses
-                    the room. MUTX makes it the foundation. Runtime visibility,
-                    operator workflows, and consistency guarantees ship built in,
-                    not retrofitted after the first production fire.
+                    afterthought. MUTX makes it the place where setup,
+                    runtime visibility, and daily review all come together.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -129,13 +127,12 @@ export default function AIAgentControlPlanePage() {
                 <h2 className={feat.sectionTitle}>
                   Read the runtime.
                   <br />
-                  Don&rsquo;t guess.
+                  Keep context clear.
                 </h2>
                 <p className={feat.sectionBody}>
-                  When something breaks in production, you need to trace
-                  backward from what actually happened — not forward from what
-                  you hoped would happen. MUTX keeps the runtime legible enough
-                  for real operators working real incidents under real pressure.
+                  When something changes in production, you need to see what
+                  happened, which tools ran, and which settings were active.
+                  MUTX keeps that context easy to read.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -159,10 +156,9 @@ export default function AIAgentControlPlanePage() {
                   Every concern.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Governance, cost, deployment, and observability aren&rsquo;t
-                  four tools that happen to share a billing account. They&rsquo;re
-                  first-class properties of the same control plane — so policies
-                  and traces stay coherent as your agent fleet scales.
+                  Governance, cost, deployment, and observability belong in the
+                  same workspace. Policies, traces, and setup details stay
+                  connected as your agent fleet grows.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -173,7 +169,7 @@ export default function AIAgentControlPlanePage() {
                   <p className={feat.featureCardBody}>
                     Auth boundaries and access controls enforced by the control
                     plane, not by convention. They travel with the agent
-                    everywhere it runs — no exceptions.
+                    everywhere it runs.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -182,8 +178,8 @@ export default function AIAgentControlPlanePage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Spend limits and rate limits are control plane properties.
-                    Enforced at the control layer, not duct-taped into
-                    individual API calls after the first bill shock.
+                    They are enforced in the runtime instead of scattered
+                    across individual API calls.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -191,9 +187,8 @@ export default function AIAgentControlPlanePage() {
                     <Link href="/ai-agent-monitoring">Monitoring</Link>
                   </h3>
                   <p className={feat.featureCardBody}>
-                    Traces and metrics surface through the control plane — not
-                    through a separate observability stack that silently drifts
-                    from the agent definition.
+                    Traces and metrics surface through the control plane, tied
+                    to the agent definitions they describe.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -202,7 +197,7 @@ export default function AIAgentControlPlanePage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Deployments are control plane records. What ran, when, with
-                    what config — versioned and legible in the same surface
+                    what config - versioned and readable in the same dashboard
                     you use to operate the agent.
                   </p>
                 </div>
@@ -220,10 +215,8 @@ export default function AIAgentControlPlanePage() {
                   are actually doing.
                 </h2>
                 <p className={feat.finalBody}>
-                  Download the Mac app and open the runtime surface. See real
-                  agent traces, what the control plane enforces, and what an
-                  operator surface looks like when it&rsquo;s built for
-                  legibility — not for screenshots.
+                  Download the Mac app and open the runtime workspace. Review
+                  agent traces, settings, and setup details in one place.
                 </p>
                 <div className={feat.finalActions}>
                   <Link href="/download" className={core.buttonPrimary}>

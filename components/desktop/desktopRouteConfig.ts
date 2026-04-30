@@ -181,7 +181,7 @@ export const DESKTOP_ROUTE_META: Record<DesktopRouteKey, DesktopRouteMeta> = {
     title: "Sessions",
     path: "/dashboard/sessions",
     publicHref: "/sessions",
-    description: "Local and cloud session activity in one native operator surface.",
+    description: "Local and cloud session activity in one native workspace.",
     badge: "execution",
     section: "execution",
     icon: Users,

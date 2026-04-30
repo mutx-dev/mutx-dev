@@ -37,13 +37,13 @@ type TourStep = {
 function buildRouteStep(currentItem: PicoWelcomeTourNavItem, pageTitle: string): TourStep {
   if (currentItem.href === '/academy') {
     return {
-      eyebrow: '02 Mission first',
-      title: 'The codex only wants one mission to matter.',
-      body: 'Open the dominant lesson, clear the visible step, and let the archive stay quiet until the main route is done.',
+      eyebrow: '02 Lesson first',
+      title: 'Work on one setup step at a time.',
+      body: 'Open the current lesson, finish the visible step, and leave the rest of the archive alone until setup is stable.',
       bullets: [
-        'The map explains sequence. It should not compete with the mission.',
-        'The current proof lane is the only part that should feel urgent.',
-        `Current surface: ${pageTitle}.`,
+        'The map explains the order.',
+        'The current lesson should stay easy to find.',
+        `Current page: ${pageTitle}.`,
       ],
     }
   }
@@ -52,49 +52,49 @@ function buildRouteStep(currentItem: PicoWelcomeTourNavItem, pageTitle: string):
     return {
       eyebrow: '02 One blocker',
       title: 'Tutor is for the exact next move.',
-      body: 'Ask about the one command, file path, or validation step that is stopping the route.',
+      body: 'Ask about the command, file path, provider setting, or validation step that is blocking setup.',
       bullets: [
         'If the sequence is wrong, return to Academy.',
-        'If live runtime state is the blocker, open Autopilot.',
-        `Current surface: ${pageTitle}.`,
+        'If the runtime is already running, open Autopilot.',
+        `Current page: ${pageTitle}.`,
       ],
     }
   }
 
   if (currentItem.href === '/autopilot') {
     return {
-      eyebrow: '02 Runtime truth',
-      title: 'Autopilot beats lesson copy when the system is live.',
-      body: 'Use the runtime surface when the answer depends on runs, alerts, approvals, or current state.',
+      eyebrow: '02 Runtime',
+      title: 'Use Autopilot after a real run exists.',
+      body: 'Use this page when the answer depends on runs, alerts, approvals, spend, or current runtime state.',
       bullets: [
-        'Return to Academy when the mission sequence is the real problem.',
-        'Escalate only after runtime truth is no longer enough.',
-        `Current surface: ${pageTitle}.`,
+        'Return to Academy when setup is still incomplete.',
+        'Get human help when hosting, keys, or rollout details are unclear.',
+        `Current page: ${pageTitle}.`,
       ],
     }
   }
 
   if (currentItem.href === '/support') {
     return {
-      eyebrow: '02 Human edge',
-      title: 'Support should send you back into motion fast.',
-      body: 'Bring the cleanest lesson or runtime packet possible, then return to the product instead of lingering here.',
+      eyebrow: '02 Human help',
+      title: 'Use support when setup needs guidance.',
+      body: 'Bring the lesson, error, or runtime notes you have. A human can help with API keys, hosting, integrations, and custom implementation.',
       bullets: [
-        'Support is the messy edge, not the default workspace.',
-        'Carry lesson slug, proof, and blocker when you escalate.',
-        `Current surface: ${pageTitle}.`,
+        'Most users should not have to solve hosting alone.',
+        'Carry the lesson slug, error, and current runtime notes.',
+        `Current page: ${pageTitle}.`,
       ],
     }
   }
 
   return {
-    eyebrow: '02 First win',
-    title: 'Onboarding exists to compress the first visible success.',
-    body: 'Use it to get to one working runtime and one proof artifact, then move immediately into the codex.',
+    eyebrow: '02 First run',
+    title: 'Onboarding gets you to one working runtime.',
+    body: 'Install the runtime, run one prompt, then prepare the Markdown packet your agent can read next.',
     bullets: [
-      'Treat preferences as noise until the first success is real.',
-      'Academy becomes useful once you need the exact lane.',
-      `Current surface: ${pageTitle}.`,
+      'Leave preferences alone until the first run works.',
+      'Academy gives the exact setup steps.',
+      `Current page: ${pageTitle}.`,
     ],
   }
 }
@@ -118,24 +118,24 @@ export function PicoWelcomeTour({
   const steps = useMemo<TourStep[]>(
     () => [
       {
-        eyebrow: '01 Mission',
-        title: 'Each Pico surface should have one dominant action.',
-        body: 'If a page looks equally about navigation, metrics, and explanation, it is lying. Find the one move that clears the route.',
+        eyebrow: '01 Page',
+        title: 'Each Pico page has one main job.',
+        body: 'Use the page for the setup step in front of you. Do not turn every screen into a research project.',
         bullets: [
           `You are in Chapter ${currentItem.chapter}: ${currentItem.label}.`,
-          previousItem ? `Backtrack target: ${previousItem.label}.` : 'Backtrack target: onboarding.',
-          nextItem ? `Forward route: ${nextItem.label}.` : 'Forward route: support.',
+          previousItem ? `Back: ${previousItem.label}.` : 'Back: onboarding.',
+          nextItem ? `Next: ${nextItem.label}.` : 'Next: support.',
         ],
       },
       buildRouteStep(currentItem, pageTitle),
       {
-        eyebrow: '03 Proof',
-        title: 'Never leave the route without a proof artifact.',
-        body: 'The platform becomes trustworthy only when each cleared step leaves behind evidence, not just optimism.',
+        eyebrow: '03 Output',
+        title: 'Save the output before moving on.',
+        body: 'The agent packet works better when setup leaves behind a command, a result, and a short note about what changed.',
         bullets: [
           'If the blocker is exact, ask Tutor.',
-          'If the blocker is live system truth, open Autopilot.',
-          'If both fail, escalate to Support with the proof and notes.',
+          'If the runtime is already live, open Autopilot.',
+          'If setup needs judgment, ask Support with the notes you have.',
         ],
       },
     ],
@@ -159,7 +159,7 @@ export function PicoWelcomeTour({
             <div>
               <p className={picoClasses.label}>Quick help</p>
               <h2 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[color:var(--pico-text)]">
-                Learn the codex once, then close it.
+                Learn the flow once, then close it.
               </h2>
             </div>
             <button

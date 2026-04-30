@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 
 import { PicoLandingSurface } from '@/components/pico/PicoLandingSurface'
 
-const TITLE = 'PicoMUTX — Get an AI Agent Working and Under Control'
+const TITLE = 'PicoMUTX — Get an AI Agent Running'
 const DESCRIPTION =
-  'PicoMUTX helps founders and operators build, recover, and control AI agents they can trust in real-world use.'
+  'PicoMUTX helps teams install, configure, and run useful AI agents with guided setup and review built in.'
 
 export const metadata: Metadata = {
   title: TITLE,

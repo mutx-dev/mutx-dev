@@ -2280,7 +2280,7 @@ export function DesktopOperatorCockpit({
               advancedView ? "Advanced Operator Control" : "Mission Control"
             }
             meta={
-              advancedView ? "Native control surface" : "Desktop operator seat"
+              advancedView ? "Native controls" : "Desktop workspace"
             }
             className="min-h-[320px]"
           >
