@@ -157,9 +157,10 @@ def lifecycle_set_command(
     client = _governance_client()
     payload = {
         "state": state,
-        "reason": reason,
         "apply_runtime_action": apply_runtime_action,
     }
+    if reason is not None:
+        payload["reason"] = reason
     response = client.post(f"/v1/governance/lifecycle/{agent_id}", json=payload)
     response.raise_for_status()
     result = response.json()

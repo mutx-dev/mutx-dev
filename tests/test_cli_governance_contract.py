@@ -109,7 +109,7 @@ class _DummyClient:
 
 def test_governance_doctor_command(monkeypatch) -> None:
     client = _DummyClient()
-    monkeypatch.setattr("cli.config.current_config", lambda: _DummyConfig())
+    monkeypatch.setattr("cli.config.current_config", _DummyConfig)
     monkeypatch.setattr("cli.config.get_client", lambda _config: client)
 
     result = CliRunner().invoke(cli, ["governance", "doctor"])
@@ -121,7 +121,7 @@ def test_governance_doctor_command(monkeypatch) -> None:
 
 def test_governance_verify_json_command(monkeypatch) -> None:
     client = _DummyClient()
-    monkeypatch.setattr("cli.config.current_config", lambda: _DummyConfig())
+    monkeypatch.setattr("cli.config.current_config", _DummyConfig)
     monkeypatch.setattr("cli.config.get_client", lambda _config: client)
 
     result = CliRunner().invoke(cli, ["governance", "verify", "--json"])
@@ -134,7 +134,7 @@ def test_governance_verify_json_command(monkeypatch) -> None:
 
 def test_governance_trust_list_command(monkeypatch) -> None:
     client = _DummyClient()
-    monkeypatch.setattr("cli.config.current_config", lambda: _DummyConfig())
+    monkeypatch.setattr("cli.config.current_config", _DummyConfig)
     monkeypatch.setattr("cli.config.get_client", lambda _config: client)
 
     result = CliRunner().invoke(cli, ["governance", "trust", "list"])
@@ -146,7 +146,7 @@ def test_governance_trust_list_command(monkeypatch) -> None:
 
 def test_governance_lifecycle_set_command(monkeypatch) -> None:
     client = _DummyClient()
-    monkeypatch.setattr("cli.config.current_config", lambda: _DummyConfig())
+    monkeypatch.setattr("cli.config.current_config", _DummyConfig)
     monkeypatch.setattr("cli.config.get_client", lambda _config: client)
 
     result = CliRunner().invoke(
@@ -163,9 +163,24 @@ def test_governance_lifecycle_set_command(monkeypatch) -> None:
     ) in client.calls
 
 
+def test_governance_lifecycle_set_omits_empty_reason(monkeypatch) -> None:
+    client = _DummyClient()
+    monkeypatch.setattr("cli.config.current_config", _DummyConfig)
+    monkeypatch.setattr("cli.config.get_client", lambda _config: client)
+
+    result = CliRunner().invoke(cli, ["governance", "lifecycle", "set", "agent-1", "active"])
+
+    assert result.exit_code == 0
+    assert (
+        "POST",
+        "/v1/governance/lifecycle/agent-1",
+        {"state": "active", "apply_runtime_action": True},
+    ) in client.calls
+
+
 def test_governance_discovery_scan_command(monkeypatch) -> None:
     client = _DummyClient()
-    monkeypatch.setattr("cli.config.current_config", lambda: _DummyConfig())
+    monkeypatch.setattr("cli.config.current_config", _DummyConfig)
     monkeypatch.setattr("cli.config.get_client", lambda _config: client)
 
     result = CliRunner().invoke(cli, ["governance", "discovery", "scan"])
