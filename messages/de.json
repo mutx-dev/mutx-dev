@@ -2,7 +2,7 @@
   "pico": {
     "meta": {
       "title": "PicoMUTX — Einen KI-Agenten zum Laufen bringen und unter Kontrolle halten",
-      "description": "PicoMUTX hilft Gründern, Operatoren und kleinen Teams dabei, KI-Agenten aufzubauen, zu stabilisieren und so kontrollierbar zu machen, dass man ihnen im echten Einsatz vertrauen kann."
+      "description": "PicoMUTX hilft Gründern und Operatoren, KI-Agenten aufzubauen, zu retten und zu kontrollieren, denen sie im echten Einsatz vertrauen können."
     },
     "nav": {
       "brand": "PicoMUTX",
@@ -13,13 +13,46 @@
       "skipToMain": "Zum Hauptinhalt springen"
     },
     "hero": {
-      "badge": "Gründerzugang · Auf Anfrage",
-      "title": "Bringen Sie einen KI-Agenten zum Laufen ",
-      "titleAccent": "und ihm in echter Arbeit vertrauen.",
+      "badge": "Warteliste offen · Founding Access",
+      "title": "Hören Sie auf, Ihre KI ",
+      "titleAccent": "ständig zu beaufsichtigen.",
       "subtitle": "Starten Sie bei null, retten Sie ein kaputtes Setup oder übernehmen Sie die Kontrolle über einen Live-Agenten. Pico leitet Sie zu Aufbau, Reparatur oder Kontrolle.",
       "cta": "Zugang anfragen",
-      "ctaSecondary": "So Funktioniert Es",
-      "meta": "Außen bleibt der Zugang auf Anfrage. Innen diagnostiziert Pico den Blocker und leitet Sie zu Aufbau, Reparatur oder Kontrolle."
+      "ctaSecondary": "So funktioniert es",
+      "meta": "Warteliste offen. Produktpfade öffnen wieder nach dem Academy-Polish."
+    },
+    "agentSlider": {
+      "ariaLabel": "Autonome Agententypen",
+      "items": {
+        "0": {
+          "name": "Dev-Agent",
+          "description": "Schreibt, testet und shipped Code autonom."
+        },
+        "1": {
+          "name": "Market-Agent",
+          "description": "Überwacht Signale und zeigt relevante Veränderungen."
+        },
+        "2": {
+          "name": "Deal-Agent",
+          "description": "Bewertet Chancen und markiert starke Plays."
+        },
+        "3": {
+          "name": "Ops-Agent",
+          "description": "Erkennt Probleme und behebt sie in Echtzeit."
+        },
+        "4": {
+          "name": "Growth-Agent",
+          "description": "Optimiert Content und Distribution nach Performance."
+        },
+        "5": {
+          "name": "Security-Agent",
+          "description": "Scannt und reduziert Risiken kontinuierlich."
+        },
+        "6": {
+          "name": "Data-Agent",
+          "description": "Pflegt und entwickelt Pipelines automatisch weiter."
+        }
+      }
     },
     "trustBar": {
       "items": {
@@ -55,8 +88,8 @@
     },
     "platform": {
       "eyebrow": "So funktioniert Pico",
-      "title": "Pico diagnostiziert den Blocker und leitet Sie dann zu Aufbau, Reparatur oder Kontrolle.",
-      "body": "Bringen Sie etwas Nützliches zum Laufen und halten Sie es vertrauenswürdig. Pico startet mit einer Diagnose, damit der nächste Schritt zum echten Blocker passt.",
+      "title": "Erst Diagnose. Dann Aufbau, Reparatur oder Kontrolle.",
+      "body": "Pico findet den Blocker und routet den nächsten Schritt, damit der Fortschritt nicht verschwindet, sobald etwas bricht.",
       "howItWorks": {
         "0": {
           "title": "Ziel beschreiben oder Agent verbinden",
@@ -98,7 +131,7 @@
     },
     "beforeAfter": {
       "eyebrow": "Der Wechsel",
-      "title": "Was sich ändert, wenn Build, Recovery & Control an einem Ort leben",
+      "title": "Vor PicoMUTX vs. danach",
       "beforeLabel": "Vorher",
       "afterLabel": "Nachher",
       "items": {
@@ -135,7 +168,9 @@
     },
     "pricing": {
       "eyebrow": "Founding-Preise",
-      "title": "Sichere dir den Founding-Preis vor dem öffentlichen Preis.",
+      "title": "Sichern Sie sich die Founding-Lane, bevor die Produktpfade wieder öffnen.",
+      "lead": "Die Warteliste ist wieder offen. Sagen Sie uns, ob Sie aufbauen, reparieren oder kontrollieren müssen, und wir routen ernsthafte Operatoren in die passende Welle.",
+      "recommendedLabel": "90 % Founding-Rabatt",
       "tiers": {
         "starter": {
           "name": "Founding Tier",
@@ -147,7 +182,7 @@
             "Geführte build-, fix- und control-Pfade",
             "Für unabhängige Execution gebaut"
           ],
-          "cta": "Founding-Zugang Anfragen",
+          "cta": "Founding-Zugang anfragen",
           "ctaHref": "/pricing",
           "priceNote": "Founding-Mitglieder sichern sich €29/Monat statt der späteren öffentlichen Stufe von €290/Monat.",
           "recommended": true,
@@ -164,7 +199,7 @@
             "Wöchentliches Gruppen-Troubleshooting",
             "Geteilte Operator-Accountability"
           ],
-          "cta": "Supported-Zugang Anfragen",
+          "cta": "Supported-Zugang anfragen",
           "ctaHref": "/pricing",
           "anchorPrice": "€790",
           "priceNote": "Founding-Mitglieder sichern sich €79/Monat statt der späteren Supported-Stufe von €790/Monat."
@@ -179,7 +214,7 @@
             "Ein funktionierendes System mit messbarem Ergebnis",
             "Custom Projects, wenn die Komplexität real ist"
           ],
-          "cta": "Planungs-Call Buchen",
+          "cta": "Planungs-Call buchen",
           "ctaHref": "https://calendly.com/mutxdev",
           "priceNote": "Founding-Pilotpreise starten bei €1,000+, bevor spätere Custom-Projekte bei €10,000+ anfangen.",
           "anchorPrice": "€10,000+"
@@ -195,12 +230,10 @@
             "Sie werden in build, fix oder control geleitet",
             "Erreichen Sie ersten Wert vor der Zahlung"
           ],
-          "cta": "Trial-Zugang Anfragen",
+          "cta": "Testzugang anfragen",
           "ctaHref": "/pricing"
         }
-      },
-      "lead": "Starte kostenlos. Wenn du früh reinkommst, sicherst du dir ungefähr 90 % unter dem späteren öffentlichen Preis, solange wir in Wellen onboarden.",
-      "recommendedLabel": "90 % günstiger"
+      }
     },
     "faq": {
       "eyebrow": "Fragen",
@@ -219,8 +252,8 @@
           "a": "Für praktische Agentensysteme: Support-Flows, interne Copiloten, Lead-Erfassung, Sales-Follow-up und operative Workflows, die in der realen Welt gebaut, repariert oder kontrolliert werden müssen."
         },
         "3": {
-          "q": "Gibt es einen kostenlosen Einstieg?",
-          "a": "Ja. Die öffentliche Leiter startet mit einer kostenlosen Testphase, die auf den ersten Wert ausgerichtet ist. Öffentlich bleibt Pico vorerst waitlist-first, aber Testphase und Gründer-Tiers sind klar definiert."
+          "q": "Ist die Warteliste offen?",
+          "a": "Ja. Die öffentliche Warteliste ist wieder offen. Academy und Produktpfade bleiben privat, bis dieser Redesign-Durchlauf über die Landingpage hinaus ist."
         },
         "4": {
           "q": "Ist das für Unternehmen gedacht?",
@@ -232,11 +265,12 @@
       "eyebrow": "Gründerzugang",
       "title": "Fragen Sie Zugang zur richtigen Spur an.",
       "body": "Pico hilft Ihnen, etwas Nützliches zum Laufen zu bringen, es bei Bruch zu retten und es in realer Arbeit unter Kontrolle zu halten.",
+      "faqLabel": "Noch unsicher? Klären Sie die letzten Blocker.",
       "formHeadline": "Beginnen Sie mit dem echten Blocker.",
       "formSubline": "Sagen Sie uns, ob Sie aufbauen, reparieren oder kontrollieren müssen. Wir leiten Sie in die richtige Spur.",
       "ctaButton": "Zugang anfragen",
-      "formCtaMeta": "Free Trial · Founding-Preise mit 90 % Rabatt · €29 / €79 · Pico Pilot ab €1,000+",
-      "secondaryButton": "Planungs-Call Buchen"
+      "formCtaMeta": "Kostenlose Testphase · Founding-Preise mit 90 % Rabatt · €29 / €79 · Pico Pilot ab €1,000+",
+      "secondaryButton": "Planungs-Call buchen"
     },
     "contactForm": {
       "dialogLabel": "Kontaktformular",
@@ -2562,10 +2596,10 @@
       }
     },
     "pricingPage": {
-      "eyebrow": "Preisroute",
-      "title": "Wählen Sie jetzt die Lane, die Sie brauchen. Produktabrechnung erst, wenn sie wirklich zählt.",
-      "subtitle": "Pico ist öffentlich weiter access-first. Diese Seite zeigt zuerst die öffentliche Leiter und dann die In-Product-Abrechnung für Teams, die bereits im System arbeiten.",
-      "primaryCta": "Zugang anfragen",
+      "eyebrow": "Preise",
+      "title": "Wählen Sie den Plan, der zu Ihren Bedürfnissen passt.",
+      "subtitle": "Starten Sie kostenlos und upgraden Sie, wenn Sie wachsen. Alle Pläne enthalten vollen Zugang zu Academy und Support-Ressourcen.",
+      "primaryCta": "Loslegen",
       "secondaryCta": "Mit dem Support sprechen",
       "returnToLanding": "Zur Landing zurück",
       "routeState": {
@@ -2582,82 +2616,80 @@
         "stacksLabel": "Verfolgte Stacks"
       },
       "accessPlans": {
-        "label": "Öffentliche Zugangsleiter",
-        "title": "Mit erstem Wert starten. Unterstützung nur hinzufügen, wenn die Arbeit sie wirklich braucht.",
-        "body": "Das öffentliche Angebot ist einfach: kostenlos starten, ein reales Agentenproblem beweisen und dann Founding-Preise sichern, die ungefähr 90 % unter dem späteren öffentlichen Preis liegen, solange wir in Cohorts onboarden.",
-        "recommended": "Bester Einstieg",
-        "meta": "Das ist die öffentliche kommerzielle Leiter. Die Live-Abrechnung darunter ist ebenfalls real, wird aber später wichtig.",
-        "noteLabel": "Warum dieser Bereich existiert",
-        "note": "Die Ladder ist absichtlich einfach. Der Free Trial bringt dich zum ersten Wert. Danach sichern Founding-Mitglieder ungefähr 90 % unter den späteren öffentlichen Preisen: €29 statt €290, €79 statt €790 und frühe Pico-Pilot-Preise ab €1,000+, bevor spätere Custom-Arbeit bei €10,000+ beginnt.",
+        "label": "Unsere Pläne",
+        "title": "Starten Sie kostenlos. Upgraden Sie, wenn Sie mehr Leistung brauchen.",
+        "body": "Alle Pläne enthalten vollen Academy-Zugang. Wählen Sie, was zu Ihrer Reise passt.",
+        "recommended": "Beliebt",
+        "meta": "Einfache, transparente Preise für jede Phase Ihrer KI-Reise.",
+        "noteLabel": "Warum Pico wählen?",
+        "note": "Starten Sie noch heute mit dem Aufbau und der Kontrolle von KI-Agenten. Klare Preise, keine versteckten Gebühren, jederzeit kündbar.",
         "truths": [
-          "Die kostenlose Testphase ist für ersten Wert da, nicht für Feature-Sightseeing",
-          "€29 sichert den Founding-Preis vor der späteren öffentlichen Stufe von €290/Monat",
-          "€79 sichert Guided Support vor der späteren Supported-Stufe von €790/Monat"
+          "Der kostenlose Plan ist perfekt für den Einstieg",
+          "Der Starter-Plan gibt Ihnen mehr Leistung und Support",
+          "Der Pro-Plan enthält priorisierten Support und erweiterte Funktionen"
         ],
         "tiers": {
           "starter": {
-            "name": "Founding Tier €29",
-            "price": "€29",
-            "anchorPrice": "€290",
+            "name": "Starter",
+            "price": "$9",
+            "anchorPrice": "$9",
             "period": "/Monat",
-            "description": "Self-serve-Ausführung für Operatoren, die früh ins Produkt wollen, ohne auf die auspolierte öffentliche Stufe zu warten.",
-            "priceNote": "Founding-Mitglieder sichern sich €29/Monat statt der späteren öffentlichen Stufe von €290/Monat.",
+            "description": "Für Einzelpersonen, die mehr Leistung und Support brauchen.",
+            "priceNote": "Jederzeit kündbar.",
             "recommended": true,
             "features": [
-              "KI-gestütztes Onboarding und Diagnose",
-              "Geführte Pfade für Aufbau, Reparatur und Kontrolle",
-              "Vorlagen und wiederverwendbare Skills",
-              "KI-Assistenz für den nächsten Schritt",
-              "Gebaut für unabhängige Ausführung"
+              "Alles aus Free",
+              "Priorisierter Support",
+              "Erweiterte Analytics",
+              "Mehr KI-Agenten",
+              "Voller Produktzugang"
             ],
-            "cta": "Gründerzugang anfragen"
+            "cta": "Starter wählen"
           },
           "pro": {
-            "name": "Founding Supported €79",
-            "price": "€79",
+            "name": "Pro",
+            "price": "$29",
             "period": "/Monat",
-            "description": "Dasselbe Produkt mit schnellerer Gruppenhilfe für Teams, die praktische Führung wollen, ohne sofort in Custom-Projekte zu springen.",
-            "priceNote": "Founding-Mitglieder sichern sich €79/Monat statt der späteren Supported-Stufe von €790/Monat.",
+            "description": "Für Teams, die mehr Kontrolle und Support brauchen.",
             "features": [
-              "Alles aus dem Founding Tier",
-              "Engeres Onboarding",
-              "Wöchentliche Gruppen-Fehlerbehebung",
-              "Geteiltes Operator-Support-Umfeld",
+              "Alles aus Starter",
+              "Erweiterter Onboarding-Support",
+              "Wöchentliches Gruppen-Troubleshooting",
+              "Geteilte Operator-Support-Umgebung",
               "Weniger Reibung, wenn die Umsetzung chaotisch wird"
             ],
-            "cta": "Supported-Zugang anfragen",
-            "anchorPrice": "€790"
+            "cta": "Pro wählen",
+            "anchorPrice": "$29"
           },
           "enterprise": {
-            "name": "Pico Pilot",
-            "price": "€1,000+",
-            "period": "/Ergebnis",
-            "description": "Hands-on-Implementierung, wenn das System kaputt, dringend oder zu teuer zum Weiter-Raten ist.",
-            "priceNote": "Founding-Pilotpreise starten bei €1,000+, bevor spätere Custom-Projekte bei €10,000+ anfangen.",
+            "name": "Enterprise",
+            "price": "Individuell",
+            "period": "/Monat",
+            "description": "Für Organisationen, die individuelle Implementierung und Support brauchen.",
+            "priceNote": "Individuelle Preise nach Bedarf.",
             "features": [
-              "Ziel und Diagnose mit klarem Scope",
-              "Fix oder Implementierung gemeinsam umgesetzt",
-              "Funktionierendes System an ein messbares Ergebnis gekoppelt",
-              "Lieferung als Beweisstück angelegt",
-              "Custom-Projekte für komplexere Arbeit verfügbar"
+              "Individuelle Implementierung",
+              "Dedizierter Support",
+              "Erweiterte Sicherheitsfunktionen",
+              "Individuelle Integrationen",
+              "SLA-Garantien"
             ],
-            "cta": "Implementierung besprechen",
-            "anchorPrice": "€10,000+"
+            "cta": "Sales kontaktieren",
+            "anchorPrice": "Individuell"
           },
           "trial": {
-            "name": "Kostenlose Testphase",
+            "name": "Free",
             "price": "Kostenlos",
-            "period": "erster Wert",
-            "description": "Definieren oder verbinden Sie ein echtes Agentenproblem und erreichen Sie den ersten nützlichen Moment, bevor Sie sich festlegen.",
+            "period": "für immer",
+            "description": "Bauen und kontrollieren Sie Ihren ersten KI-Agenten mit voller Anleitung.",
             "features": [
-              "Ziel beschreiben oder bestehenden Agenten verbinden",
-              "In Aufbau, Reparatur oder Kontrolle geroutet werden",
-              "Ersten Wert erreichen, bevor Sie zahlen",
-              "Verlängerung hängt von Aktivierung ab",
-              "Bester erster Schritt, um Ernsthaftigkeit zu beweisen"
+              "Voller Academy-Zugang",
+              "1 KI-Agent",
+              "Basis-Support",
+              "Sofort starten"
             ],
-            "cta": "Testzugang anfragen",
-            "priceNote": "Kostenlos, bis ein reales Agentenproblem definiert oder verbunden ist."
+            "cta": "Loslegen",
+            "priceNote": "Keine Kreditkarte erforderlich."
           }
         }
       },
@@ -2671,7 +2703,7 @@
         "loading": "Bezahlvorgang wird gestartet...",
         "checkoutError": "Bezahlvorgang fehlgeschlagen. Bitte versuchen Sie es erneut.",
         "truths": [
-          "Der Bezahlvorgang ist für die Live-App, nicht für die Warteliste",
+          "Checkout ist für die Live-App, kostenlos starten können Sie jederzeit",
           "Eine gehostete Sitzung schaltet Fortschrittssynchronisierung und Runtime-Zustand frei",
           "Enterprise beginnt mit Rollout-Planung, nicht mit blindem Kartendurchzug"
         ],
@@ -2693,7 +2725,7 @@
             "name": "Starter",
             "price": "$9",
             "period": "/Monat",
-            "description": "Eine ernsthafte Build-Spur mit vollem Academy-Zugang und fundierter Tutor-Begleitung.",
+            "description": "Eine ernsthafte Build-Lane mit vollem Academy-Zugang und fundiertem Tutor.",
             "features": [
               "1.000 monatliche Credits",
               "Voller Academy-Zugang",
@@ -2707,7 +2739,7 @@
             "name": "Pro",
             "price": "$29",
             "period": "/Monat",
-            "description": "Mehrere Live-Spuren mit stärkerer Runtime-Sichtbarkeit und schnellerer Operator-Eskalation.",
+            "description": "Mehrere Live-Lanes mit stärkerer Runtime-Sichtbarkeit und schnellerer Operator-Eskalation.",
             "features": [
               "10.000 monatliche Credits",
               "Voller Tutor + BYOK",

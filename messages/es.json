@@ -1,25 +1,58 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Pon un agente de IA a funcionar y mantenlo bajo control",
-      "description": "PicoMUTX ayuda a fundadores, operadores y equipos pequeños a construir, recuperar y controlar agentes de IA en los que se pueda confiar en el trabajo real."
+      "title": "PicoMUTX — Pon un agente de IA a funcionar y bajo control",
+      "description": "PicoMUTX ayuda a fundadores y operadores a construir, recuperar y controlar agentes de IA en los que sí se puede confiar en uso real."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " por MUTX",
       "cta": "Solicitar acceso",
-      "ctaMobile": "Acceso",
-      "sectionsLabel": "Secciones De La Página",
+      "ctaMobile": "Solicitar",
+      "sectionsLabel": "Secciones de la página",
       "skipToMain": "Saltar al contenido principal"
     },
     "hero": {
-      "badge": "Acceso fundador · Bajo solicitud",
-      "title": "Haz que un agente de IA funcione ",
-      "titleAccent": "y confiar en él en trabajo real.",
-      "subtitle": "Empieza desde cero, recupera un setup roto o toma el control de un agente en vivo. Pico te enruta hacia construir, arreglar o controlar.",
+      "badge": "Lista de espera abierta · Acceso fundador",
+      "title": "Deja de vigilar ",
+      "titleAccent": "tu IA.",
+      "subtitle": "Empieza desde cero, recupera un setup roto o toma el control de un agente en vivo. Pico convierte un bloqueo real en la ruta correcta: construir, arreglar o controlar.",
       "cta": "Solicitar acceso",
-      "ctaSecondary": "Ver Cómo Funciona",
-      "meta": "Por fuera, el acceso sigue siendo por solicitud. Por dentro, Pico diagnostica el bloqueo y te enruta hacia construir, arreglar o controlar."
+      "ctaSecondary": "Ver cómo funciona",
+      "meta": "Lista de espera abierta. Las rutas de producto reabrirán tras el pulido de la academia."
+    },
+    "agentSlider": {
+      "ariaLabel": "Tipos de agentes autónomos",
+      "items": {
+        "0": {
+          "name": "Agente Dev",
+          "description": "Escribe, prueba y lanza código de forma autónoma."
+        },
+        "1": {
+          "name": "Agente Mercado",
+          "description": "Monitorea señales y destaca cambios relevantes."
+        },
+        "2": {
+          "name": "Agente Deal",
+          "description": "Evalúa oportunidades y marca jugadas de alta convicción."
+        },
+        "3": {
+          "name": "Agente Ops",
+          "description": "Detecta problemas y ejecuta fixes en tiempo real."
+        },
+        "4": {
+          "name": "Agente Growth",
+          "description": "Itera contenido y distribución según el rendimiento."
+        },
+        "5": {
+          "name": "Agente Seguridad",
+          "description": "Escanea y mitiga riesgos continuamente."
+        },
+        "6": {
+          "name": "Agente Data",
+          "description": "Mantiene y evoluciona pipelines automáticamente."
+        }
+      }
     },
     "trustBar": {
       "items": {
@@ -55,8 +88,8 @@
     },
     "platform": {
       "eyebrow": "Cómo funciona Pico",
-      "title": "Pico diagnostica el bloqueo y luego te enruta hacia construir, arreglar o controlar.",
-      "body": "Haz que algo útil funcione y siga siendo confiable. Pico empieza por el diagnóstico para que el siguiente paso coincida con el bloqueo real.",
+      "title": "Diagnóstico primero. Luego construir, arreglar o controlar.",
+      "body": "Pico encuentra el bloqueo y enruta el siguiente paso para que el avance no desaparezca cuando algo se rompe.",
       "howItWorks": {
         "0": {
           "title": "Describe el objetivo o conecta el agente",
@@ -98,7 +131,7 @@
     },
     "beforeAfter": {
       "eyebrow": "El cambio",
-      "title": "Qué cambia cuando build, recovery y control viven en un mismo lugar",
+      "title": "Antes de PicoMUTX vs. después",
       "beforeLabel": "Antes",
       "afterLabel": "Después",
       "items": {
@@ -123,7 +156,7 @@
     },
     "earlyAccess": {
       "eyebrow": "Acceso fundador",
-      "title": "Por fuera hay waitlist. Por dentro ya hay producto real.",
+      "title": "Lista de espera por fuera. Producto real por debajo.",
       "body": "El acceso se abre por olas para que los operadores serios caigan en la ruta correcta mientras los workflows se endurecen con uso real.",
       "benefits": {
         "0": "Empieza desde cero, desde un setup roto o desde un sistema en vivo en el que aún no confías",
@@ -135,7 +168,7 @@
     },
     "pricing": {
       "eyebrow": "Precios Founding",
-      "title": "Bloquea el precio founding antes del precio público.",
+      "title": "Bloquea la ruta fundadora antes de que reabran las rutas de producto.",
       "tiers": {
         "free": {
           "name": "Free",
@@ -212,8 +245,8 @@
           "ctaHref": "/pricing"
         }
       },
-      "lead": "Empieza gratis. Si entras ahora, conservas alrededor del 90 % de descuento frente al precio público futuro mientras abrimos por cohortes.",
-      "recommendedLabel": "Founding -90%"
+      "lead": "La lista de espera vuelve a estar abierta. Cuéntanos si necesitas construir, arreglar o controlar, y llevaremos a los operadores serios a la ola correcta.",
+      "recommendedLabel": "90% de descuento fundador"
     },
     "faq": {
       "eyebrow": "Preguntas",
@@ -232,8 +265,8 @@
           "a": "Para sistemas de agentes prácticos: soporte, copilotos internos, captación de leads, seguimiento comercial y workflows operativos que necesitan construirse, recuperarse o controlarse en el mundo real."
         },
         "3": {
-          "q": "¿Hay una forma gratuita de empezar?",
-          "a": "Sí. La escalera pública arranca con una prueba gratuita enfocada en el primer valor. El acceso público sigue siendo waitlist-first, pero la prueba y los tiers fundadores ya están definidos."
+          "q": "¿La lista de espera está abierta?",
+          "a": "Sí. La lista pública de espera vuelve a estar abierta. La academia y las rutas de producto siguen privadas hasta que este rediseño avance más allá de la landing page."
         },
         "4": {
           "q": "¿Esto es para empresas?",
@@ -245,6 +278,7 @@
       "eyebrow": "Acceso fundador",
       "title": "Solicita acceso a la ruta correcta.",
       "body": "Pico te ayuda a poner algo útil en marcha, recuperarlo cuando se rompe y mantenerlo bajo control en trabajo real.",
+      "faqLabel": "¿Aún lo estás decidiendo? Aclara los últimos bloqueos.",
       "formHeadline": "Empieza por el bloqueo real.",
       "formSubline": "Cuéntanos si necesitas construir, arreglar o controlar. Te llevaremos a la ruta correcta.",
       "ctaButton": "Solicitar acceso",
@@ -255,7 +289,7 @@
       "dialogLabel": "Formulario de contacto",
       "closeLabel": "Cerrar",
       "title": "Solicita acceso a Pico",
-      "subtitle": "Cuéntanos qué intentas construir, recuperar o controlar. Te guiaremos hacia el siguiente paso correcto.",
+      "subtitle": "Cuéntanos qué intentas lanzar, recuperar o controlar. Te llevaremos al siguiente paso correcto.",
       "emailLabel": "Correo de trabajo",
       "emailPlaceholder": "tu@empresa.com",
       "nameLabel": "Nombre",
@@ -389,10 +423,10 @@
       }
     },
     "pricingPage": {
-      "eyebrow": "Ruta de precios",
-      "title": "Elige ahora el carril que necesitas. Mira la facturación del producto solo cuando importe.",
-      "subtitle": "Pico público sigue siendo access-first. Esta página muestra primero la escalera pública y luego la capa de facturación dentro del producto para equipos que ya operan dentro del sistema.",
-      "primaryCta": "Solicitar acceso",
+      "eyebrow": "Precios",
+      "title": "Elige el plan que encaja con tus necesidades.",
+      "subtitle": "Empieza gratis y mejora cuando crezcas. Todos los planes incluyen acceso completo a la academia y recursos de soporte.",
+      "primaryCta": "Empezar",
       "secondaryCta": "Hablar con soporte",
       "returnToLanding": "Volver a la landing",
       "routeState": {

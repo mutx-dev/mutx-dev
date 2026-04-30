@@ -1,78 +1,111 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — 让 AI 智能体真正跑起来，并保持在可控范围内",
-      "description": "PicoMUTX 帮助创始人、运营者和小团队构建、修复并控制 AI 智能体，让它们在真实工作中也值得信任。"
+      "title": "PicoMUTX — 别再盯着 AI 智能体，先让它可用可控",
+      "description": "PicoMUTX 帮助创始人和运营者构建、修复并控制能在真实业务中被信任的 AI 智能体。"
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
       "cta": "申请访问",
-      "ctaMobile": "访问",
+      "ctaMobile": "申请",
       "sectionsLabel": "页面分区",
       "skipToMain": "跳到主要内容"
     },
     "hero": {
-      "badge": "创始访问 · 申请制",
-      "title": "让 AI 智能体真正跑起来，",
-      "titleAccent": "并在真实工作里敢用它。",
-      "subtitle": "你可以从零开始、救回一个坏掉的设置，或重新管住一个已经在跑的智能体。Pico 会先判断卡点，再把你送到搭建、修复或控制这条正确路径上。",
+      "badge": "候补名单已开放 · 创始访问",
+      "title": "别再守着",
+      "titleAccent": "你的 AI。",
+      "subtitle": "从零开始、救回坏掉的设置，或管住已经上线的智能体。Pico 会把一个真实卡点路由到构建、修复或控制。",
       "cta": "申请访问",
-      "ctaSecondary": "看它如何运作",
-      "meta": "外面仍然是申请制。进来之后，Pico 会先诊断卡点，再把你送到搭建、修复或控制。"
+      "ctaSecondary": "查看运作方式",
+      "meta": "候补名单已开放。学院打磨完成后，产品路径将重新开放。"
+    },
+    "agentSlider": {
+      "ariaLabel": "自主智能体类型",
+      "items": {
+        "0": {
+          "name": "开发智能体",
+          "description": "自主编写、测试并交付代码。"
+        },
+        "1": {
+          "name": "市场智能体",
+          "description": "监控信号，并呈现有意义的变化。"
+        },
+        "2": {
+          "name": "交易智能体",
+          "description": "评估机会，并标记高把握行动。"
+        },
+        "3": {
+          "name": "运维智能体",
+          "description": "发现问题，并实时执行修复。"
+        },
+        "4": {
+          "name": "增长智能体",
+          "description": "根据表现迭代内容和分发。"
+        },
+        "5": {
+          "name": "安全智能体",
+          "description": "持续扫描并降低风险。"
+        },
+        "6": {
+          "name": "数据智能体",
+          "description": "自动维护并演进数据管道。"
+        }
+      }
     },
     "trustBar": {
       "items": {
-        "0": "可以从零开始、从一团糟的 build 开始，或从已经在线的系统开始",
-        "1": "一层诊断逻辑会把你分流到 build、fix、control 之一",
-        "2": "在谈信任之前，先把可见性、审批和护栏放上去"
+        "0": "可从零、混乱的构建中、或线上系统开始",
+        "1": "一层诊断逻辑，把你路由到构建、修复或控制",
+        "2": "先建立可见性、审批和安全护栏，再谈信任"
       }
     },
     "problem": {
       "eyebrow": "为什么是 Pico",
-      "title": "大多数智能体项目失败，",
+      "title": "大多数智能体项目停住，",
       "titleLine2": "并不是因为想法太弱。",
-      "body": "项目卡住，通常不是因为点子不行，而是因为技术选择太多、没有恢复路径、出了问题也看不清系统到底在怎么跑。",
+      "body": "项目卡住，是因为路径变复杂：技术选择太多，没有恢复路径，出问题后也看不清运营状态。",
       "scenarios": {
         "0": {
-          "label": "“我知道我想让这个智能体做什么。我缺的是一条最快、最稳妥、能把它跑起来的路。”",
-          "body": "从零开始本身不是问题。真正的问题是，你得在不把自己拖进无穷研究的前提下决定 stack、顺序和标准。"
+          "label": "“我知道想让智能体做什么。我需要最快、靠谱、能跑起来的路径。”",
+          "body": "从零开始本身不是问题。真正的问题是，如何在不掉进无尽研究的情况下决定技术栈、顺序和标准。"
         },
         "1": {
-          "label": "“我已经做了一部分。现在我需要的是把 setup 救回来，而不是全部重来。”",
-          "body": "当一条 build 在中途断掉时，损失的不只是时间。你需要的是 recovery lane，不是再掉进一个理论黑洞。"
+          "label": "“我已经做了一部分。现在要救回设置，而不是全部重来。”",
+          "body": "构建中途坏掉时，损失的不只是时间。你需要的是恢复通道，不是又一轮理论循环。"
         },
         "2": {
           "label": "“已经有东西在线上跑，但我还不信任它的成本、逻辑和失败模式。”",
-          "body": "到这一步，仅仅存在已经不够了。它必须可读、可控，而且足够安全，才能碰真正的工作。"
+          "body": "到这一步，仅仅存在已经不够。它必须可读、可控，并且安全到可以接触真实工作。"
         },
         "3": {
-          "label": "“如果一个系统我无法解释、复查和控制，我就不想依赖它。”",
-          "body": "如果你看不到运行、阈值、审批和高压下的行为，那它还不是一个运营资产。"
+          "label": "“在依赖它之前，我需要一个能解释、能复查、能控制的系统。”",
+          "body": "如果看不到运行、阈值、审批和高压下的行为，它还不是运营资产。"
         }
       },
       "close": "Pico 会把这种不确定，变成下一步诚实而清晰的动作。"
     },
     "platform": {
-      "eyebrow": "Pico 怎么工作",
-      "title": "Pico 先诊断卡点，再把你送到搭建、修复或控制。",
-      "body": "把有用的东西跑起来，并一直让它值得信任。Pico 先做诊断，让下一步真正对准眼前的问题。",
+      "eyebrow": "Pico 如何工作",
+      "title": "先诊断。再构建、修复或控制。",
+      "body": "Pico 找到卡点并路由下一步，避免一出问题进度就消失。",
       "howItWorks": {
         "0": {
-          "title": "描述目标，或连接现有智能体",
-          "body": "从你想完成的工作、卡住的地方，或你需要理解的线上系统开始。Pico 用这些上下文来判断哪种帮助才真正相关。"
+          "title": "描述目标，或连接智能体",
+          "body": "从要完成的工作、当前卡点，或需要理解的线上系统开始。Pico 用这些上下文判断真正相关的帮助。"
         },
         "1": {
-          "title": "被路由到 build、fix 或 control",
-          "body": "新项目会得到一条通往第一个有用智能体的实战路径。坏掉的 setup 会得到恢复步骤。线上系统会得到可见性、阈值、审批和运营护栏。"
+          "title": "进入构建、修复或控制路径",
+          "body": "新构建会得到通向第一个有用智能体的实战路径。坏掉的设置会得到恢复步骤。线上系统会得到可见性、阈值、审批和运营护栏。"
         },
         "2": {
-          "title": "在同一个运营循环里应用变化",
-          "body": "观察行为、隔离问题、应用下一次修改，然后不丢线地继续推进。"
+          "title": "在一个运营循环里应用变化",
+          "body": "观察行为、隔离异常、执行下一次修改，然后不断线地继续推进。"
         },
         "3": {
-          "title": "只有边界情况真的出现时才升级给人",
-          "body": "当系统自己无法闭环时，人类支持进来是为了提供证据和校准，而不是代替整个产品。"
+          "title": "只有真实边界情况才升级给人",
+          "body": "当系统无法独自闭环时，人工指导用于证明和校准，而不是替代整个产品。"
         }
       }
     },
@@ -82,192 +115,193 @@
       "forYouTitle": "如果你符合这些情况，它适合你……",
       "notForYouTitle": "如果你符合这些情况，它不适合你……",
       "forYou": {
-        "0": "你想把一个有用的智能体真正落地，而不是靠拍脑袋拼完整套 stack",
-        "1": "你已经有一个半成品或坏掉的 setup，需要把节奏找回来",
-        "2": "你已经有东西在线上或接近上线，但在信任之前还需要更强的控制",
-        "3": "你想要的是结果导向的帮助，而不是一门课或更多理论",
-        "4": "你想要一个会随着时间减少临时专家依赖的系统"
+        "0": "你想交付一个有用的智能体，而不是靠猜拼完整套技术栈",
+        "1": "你已有半成品或坏掉的设置，需要找回推进节奏",
+        "2": "你已有上线或接近上线的东西，但信任之前还需要更多控制",
+        "3": "你想要结果优先的帮助，而不是课程或理论深坑",
+        "4": "你想让系统随着时间减少对临时专家介入的依赖"
       },
       "notForYou": {
-        "0": "你想找一个不需要判断力的通用 no-code 玩具",
-        "1": "你已经需要面向成熟 agent fleet 的 enterprise 级治理基础设施",
-        "2": "你追求的是教育内容、热点或 hype，而不是运营推进",
-        "3": "你期待 AI 替代责任、review 或 ownership",
-        "4": "你真正想买的是创始人 access，而不是一个产品"
+        "0": "你想要一个把判断力拿掉的通用无代码玩具",
+        "1": "你已经需要覆盖成熟智能体资产的企业级治理基础设施",
+        "2": "相比运营推进，你更想要教育内容、炒作或追热点",
+        "3": "你期待 AI 替代负责、复查或问责",
+        "4": "你只是想买创始人 access，而不是使用产品"
       }
     },
     "beforeAfter": {
-      "eyebrow": "变化",
-      "title": "当 build、recovery、control 放在一个地方时，会发生什么变化",
+      "eyebrow": "转变",
+      "title": "使用 PicoMUTX 前后",
       "beforeLabel": "之前",
       "afterLabel": "之后",
       "items": {
         "0": {
-          "before": "你不知道自己现在该先 build、debug，还是先加 control",
-          "after": "你会被送进真正匹配阻塞点的 lane"
+          "before": "你不确定该先构建、调试，还是先加控制",
+          "after": "你会被路由到真正匹配卡点的路径"
         },
         "1": {
-          "before": "每个问题都把你丢进不同的 tool、文档或意见回路",
-          "after": "构建、恢复和控制都放进了同一个 operating system"
+          "before": "每个问题都把你丢进不同工具、文档或观点循环",
+          "after": "构建、恢复和控制都在同一个运营系统里"
         },
         "2": {
-          "before": "坏掉的 setup 或不透明的 runtime 会杀死节奏",
-          "after": "下一步动作变得可见、可复查、而且站得住"
+          "before": "坏掉的设置或模糊的运行行为会杀死节奏",
+          "after": "下一步动作清楚、可复查、有依据"
         },
         "3": {
-          "before": "你手里有一个自己都解释不清、也不敢信的 agent",
-          "after": "你得到一个可以运行、检查并有信心持续改进的东西"
+          "before": "你有一个自己也解释不清、无法完全信任的智能体",
+          "after": "你得到一个能运行、能检查、能自信改进的东西"
         }
       },
       "close": "目标不是抽象地学习 AI。目标是把有用的东西跑起来，并让它持续可信。"
     },
     "earlyAccess": {
       "eyebrow": "创始访问",
-      "title": "外面是候补名单，里面已经是真产品。",
-      "body": "访问会分批开放，让认真的操作者进入正确路径，同时把流程在真实使用里打磨扎实。",
+      "title": "外面是候补名单。里面是真产品。",
+      "body": "访问会分批开放，让认真的运营者进入正确路径，同时用真实使用把流程打磨扎实。",
       "benefits": {
-        "0": "可以从零开始，也可以从坏掉的 setup 或还不敢信任的 live system 开始",
-        "1": "会被路由到 build、fix、control 中正确的一条",
-        "2": "在访问仍然 selective 时锁定 founding pricing",
-        "3": "只有 edge case 真的出现时才使用 expert input",
-        "4": "一起塑造最早的 case studies 和 operating patterns"
+        "0": "可以从零、坏掉的设置，或暂时不敢信任的线上系统开始",
+        "1": "会被路由到构建、修复或控制",
+        "2": "在访问仍然筛选时锁定创始价格",
+        "3": "只有边界情况真实出现时才使用专家输入",
+        "4": "一起塑造第一批案例和运营模式"
       }
     },
     "pricing": {
       "eyebrow": "创始价格",
-      "title": "在公开定价前锁定创始价格。",
+      "title": "产品路径重新开放前，先锁定创始通道。",
       "tiers": {
         "starter": {
           "name": "创始 Tier",
-          "price": "29欧元",
+          "price": "29€",
           "period": "/月",
-          "description": "给想尽早进入产品、又不想等公开版更成熟之后再进来的运营者的自助执行层。",
+          "description": "面向想提前使用产品、无需等待公开版打磨完成的运营者，自助执行。",
           "features": [
             "AI 诊断入口",
-            "guided build、fix、control 路径",
-            "为 independent execution 而设计"
+            "构建、修复和控制引导路径",
+            "为独立执行而设计"
           ],
-          "cta": "申请 Founding 访问",
+          "cta": "申请创始访问",
           "ctaHref": "/pricing",
           "priceNote": "创始成员锁定 €29/月，而不是之后公开价 €290/月。",
           "recommended": true,
-          "anchorPrice": "原价 €290"
+          "anchorPrice": "290€"
         },
         "pro": {
           "name": "创始 Supported",
-          "price": "79欧元",
+          "price": "79€",
           "period": "/月",
-          "description": "同一套产品，但提供更快的群组支持，适合想要实操指导、又不想直接跳到定制项目的团队。",
+          "description": "同一套产品，附带更快的群组帮助，适合需要实操指导但不想直接进入定制项目的团队。",
           "recommended": true,
           "features": [
-            "包含 Founding Tier 的全部内容",
-            "每周 group troubleshooting",
-            "shared operator accountability"
+            "创始 Tier 的全部内容",
+            "每周群组排障",
+            "共享运营者责任"
           ],
-          "cta": "申请 Supported 访问",
+          "cta": "申请支持型访问",
           "ctaHref": "/pricing",
-          "anchorPrice": "原价 €790",
+          "anchorPrice": "790€",
           "priceNote": "创始成员锁定 €79/月，而不是之后支持价 €790/月。"
         },
         "enterprise": {
-          "name": "Pico 领航",
-          "price": "1,000欧元+",
+          "name": "Pico 试点",
+          "price": "1,000€+",
           "period": "/项目",
-          "description": "当系统已经坏掉、事情很急，或者继续靠猜已经太贵时，直接进入 hands-on 实施。",
+          "description": "当系统已坏、事情紧急，或继续靠猜太贵时，进入手把手实施。",
           "features": [
-            "scoped diagnosis 与 implementation",
-            "绑定到可衡量 outcome 的 working system",
-            "当 complexity 真的上来时的 custom project"
+            "限定范围的诊断与实施",
+            "绑定可衡量结果的可运行系统",
+            "复杂性真实存在时的定制项目"
           ],
           "cta": "预约规划通话",
           "ctaHref": "https://calendly.com/mutxdev",
           "priceNote": "创始期 Pico Pilot 从 €1,000+ 起，后续定制项目将从 €10,000+ 起。",
-          "anchorPrice": "后续原价 €10,000+"
+          "anchorPrice": "10,000€+"
         },
         "trial": {
           "name": "免费试用",
           "price": "免费",
           "period": "第一价值",
-          "description": "在真正承诺之前，先在一个 real agent problem 上拿到 first value。",
-          "priceNote": "在定义或接入真实代理问题之前免费。",
+          "description": "在承诺之前，先在真实智能体问题上拿到第一价值。",
+          "priceNote": "在定义或接入真实智能体问题前免费。",
           "features": [
-            "描述一个 goal，或连接一个 agent",
-            "被路由到 build、fix、control",
-            "在付费前拿到 first value"
+            "描述目标或连接智能体",
+            "路由到构建、修复或控制",
+            "付费前先拿到第一价值"
           ],
           "cta": "申请试用访问",
           "ctaHref": "/pricing"
         }
       },
-      "lead": "先免费开始。如果你现在加入，在我们分批开放期间，你可以一直保留比未来公开价格低约90%的创始价格。",
-      "recommendedLabel": "创始直降90%"
+      "lead": "候补名单重新开放。告诉我们你需要构建、修复还是控制，我们会把认真的运营者路由到正确批次。",
+      "recommendedLabel": "创始 90% 折扣"
     },
     "faq": {
       "eyebrow": "问题",
-      "title": "在承诺之前值得先搞清楚的问题",
+      "title": "在决定之前值得弄清楚的问题",
       "items": {
         "0": {
           "q": "我需要会写代码吗？",
-          "a": "不需要。PicoMUTX 面向的是想拿到结果、但不想变成全职 agent engineer 的 operator。"
+          "a": "不需要。PicoMUTX 面向需要结果、但不想把自己变成全职智能体工程师的运营者。"
         },
         "1": {
           "q": "如果我已经试过并失败了怎么办？",
-          "a": "那正是主要入口之一。PicoMUTX 就是为在第一次高成本、混乱、失去信心的阻塞之后重新找回节奏而设计的。"
+          "a": "这正是主要入口之一。PicoMUTX 用来在第一次混乱、昂贵或伤害信任的卡点之后，帮你找回推进节奏。"
         },
         "2": {
-          "q": "它适合什么类型的智能体工作？",
-          "a": "适合实用型 agent system：support、内部 copilot、lead capture、销售跟进，以及那些需要在现实世界里被构建、修复和控制的运营 workflow。"
+          "q": "它适合哪类智能体工作？",
+          "a": "适合实用型智能体系统：支持流程、内部副驾、线索捕获、销售跟进，以及需要在真实世界中构建、修复或控制的运营流程。"
         },
         "3": {
-          "q": "有免费开始的方式吗？",
-          "a": "有。公开阶梯从一个聚焦第一价值的免费试用开始。公开入口目前仍然是候补名单优先，但试用和创始 tiers 已经定义好了。"
+          "q": "候补名单开放了吗？",
+          "a": "是的。公开候补名单已重新开放。学院和产品路径仍保持私有，直到这次落地页 redesign 继续推进。"
         },
         "4": {
-          "q": "这是给企业准备的吗？",
-          "a": "PicoMUTX 是通往 MUTX 的商业 wedge，不是完整的 enterprise governance 层。更重的多团队治理属于更大的 MUTX stack。"
+          "q": "这是给企业用的吗？",
+          "a": "PicoMUTX 是进入 MUTX 的商业切入口，不是完整的企业治理层。更重的多团队治理属于更大的 MUTX 技术栈。"
         }
       }
     },
     "finalCta": {
       "eyebrow": "创始访问",
-      "title": "申请进入最适合你的路径。",
-      "body": "Pico 帮你把有用的东西跑起来，坏了能救回来，进入真实工作后也能一直管得住。",
-      "formHeadline": "从真正的 blocker 开始。",
-      "formSubline": "告诉我们你需要搭建、修复还是控制，我们会把你送到正确路径。",
+      "title": "申请进入正确路径。",
+      "body": "Pico 帮你把有用的东西跑起来，坏了能救回来，并在真实工作中持续可控。",
+      "faqLabel": "还在犹豫？先厘清最后几个卡点。",
+      "formHeadline": "从真实卡点开始。",
+      "formSubline": "告诉我们你需要构建、修复还是控制。我们会把你路由到正确路径。",
       "ctaButton": "申请访问",
-      "formCtaMeta": "Free trial · 创始价格直降90% · €29 / €79 · Pico Pilot €1,000+ 起",
+      "formCtaMeta": "免费试用 · 创始价格 90% 折扣 · €29 / €79 · Pico Pilot €1,000+ 起",
       "secondaryButton": "预约规划通话"
     },
     "contactForm": {
       "dialogLabel": "联系表单",
       "closeLabel": "关闭",
       "title": "申请 Pico 访问",
-      "subtitle": "告诉我们你想 build 什么、救回什么、控制什么。我们会把你引到正确的下一步。",
+      "subtitle": "告诉我们你想交付、修复或控制什么。我们会路由到正确的下一步。",
       "emailLabel": "工作邮箱",
       "emailPlaceholder": "you@company.com",
       "nameLabel": "姓名",
       "namePlaceholder": "张三",
       "companyLabel": "公司",
       "companyPlaceholder": "Acme Inc.",
-      "interestLabel": "你最先需要帮助的是什么？",
+      "interestLabel": "你最先需要哪类帮助？",
       "interestOptions": {
         "building-first": "正在构建我的第一个 AI 智能体",
         "fixing-existing": "正在修复一个跑不通的智能体",
         "evaluating": "正在评估平台或工具",
         "spent-money": "已经花过钱了 - 还是没跑起来",
         "other": "其他",
-        "build": "从零开始构建某个东西",
-        "fix": "救回或修复一个 setup",
-        "control": "把已经在线的 agent 纳入控制"
+        "build": "从零开始构建",
+        "fix": "恢复或修复设置",
+        "control": "管住已经上线的智能体"
       },
-      "messageLabel": "还有什么我们应该知道的吗？",
+      "messageLabel": "还有什么需要我们了解？",
       "messageOptional": "（可选）",
-      "messagePlaceholder": "描述你的 goal、blocker 或 live system…",
-      "submitting": "发送中…",
+      "messagePlaceholder": "描述目标、卡点或线上系统…",
+      "submitting": "发送中...",
       "submit": "申请访问",
-      "disclaimer": "没有泛化 nurture funnel。会有真人回复正确的 route。",
-      "successTitle": "已收到访问申请。",
-      "successBody": "我们已经拿到上下文。接下来会有真人回复，直接指出正确的 lane。",
+      "disclaimer": "没有泛化培育漏斗。会有真人回复诚实的下一条路径。",
+      "successTitle": "已收到申请。",
+      "successBody": "我们已收到你的上下文。请查看邮件，了解进入 Pico 的下一条路径。",
       "successBack": "返回页面",
       "errorFallback": "出了点问题。请重试。",
       "networkError": "网络错误。请重试。"
@@ -277,9 +311,9 @@
       "emailPlaceholder": "you@company.com",
       "submitting": "正在发送申请…",
       "submit": "申请访问",
-      "privacy": "不发垃圾邮件，不要求付款。只会发送访问更新和诚实的下一步。",
+      "privacy": "不发垃圾邮件，不要求付款。只发送访问更新和诚实的下一步。",
       "successTitle": "你已在名单中。",
-      "successBody": "当你的 PicoMUTX 访问波次开放时，我们会联系你。不发垃圾邮件，也不要求付款。",
+      "successBody": "当你的 PicoMUTX 访问批次开放时，我们会联系你。不发垃圾邮件，也不要求付款。",
       "errorFallback": "出了点问题。请重试。"
     },
     "footer": {
@@ -297,18 +331,18 @@
     "waitlistForm": {
       "submit": "申请访问",
       "submitting": "提交中...",
-      "success": "您已加入等候名单。",
-      "successCheckInbox": "您已加入等候名单。请查看您的收件箱。",
-      "alreadyJoined": "您已在等候名单中！",
-      "successNote": "我们会尽快与您联系。",
-      "joinFailed": "加入等候名单失败",
+      "success": "你已在名单中。",
+      "successCheckInbox": "你已在名单中。请查看收件箱。",
+      "alreadyJoined": "你已经在名单中。",
+      "successNote": "我们会尽快联系你。",
+      "joinFailed": "加入候补名单失败",
       "verificationLoading": "正在加载验证挑战...",
       "verificationLoadingTryAgain": "验证仍在加载中，请稍后重试。",
-      "verificationUnavailable": "等候名单验证当前不可用，请稍后重试。",
+      "verificationUnavailable": "候补名单验证当前不可用，请稍后重试。",
       "verificationRequired": "请完成验证挑战。",
       "verificationFailedRefresh": "验证失败，请刷新挑战后重试。",
-      "verificationExpired": "验证已过期，请重新完成挑战。",
-      "verificationTimedOut": "验证超时，请重新完成挑战。"
+      "verificationExpired": "验证已过期，请重新完成。",
+      "verificationTimedOut": "验证超时，请重新完成。"
     },
     "supportPage": {
       "contact": {
@@ -2562,101 +2596,101 @@
       }
     },
     "pricingPage": {
-      "eyebrow": "价格路径",
-      "title": "先选你现在真正需要的 lane。产品计费等真的需要时再看。",
-      "subtitle": "公开的 Pico 目前仍然是 access-first。这一页先展示公开阶梯，再展示给已经在系统里运行的团队看的 product billing layer。",
-      "primaryCta": "申请访问",
+      "eyebrow": "价格",
+      "title": "选择适合你需求的方案。",
+      "subtitle": "从免费开始，随着成长再升级。所有方案都包含完整学院访问和支持资源。",
+      "primaryCta": "开始使用",
       "secondaryCta": "联系支持",
-      "returnToLanding": "返回 landing",
+      "returnToLanding": "返回落地页",
       "routeState": {
         "label": "路径状态",
-        "title": "公开访问会把你放进正确的 lane。产品计费层在系统更深处。",
-        "body": "从与你的 blocker 匹配的 lane 开始。只有当你真的需要认证 workspace、checkout 或 rollout planning 时，再看 live plans。",
+        "title": "公开访问会把你带入正确路径。产品计费在系统更深处。",
+        "body": "从匹配你卡点的路径开始。只有当你真的需要认证工作区、结账或 rollout planning 时，再使用 live plans。",
         "signalLabel": "访问信号",
         "sessionAttached": "已连接托管会话",
         "sessionLoading": "正在检查托管会话",
         "sessionMissing": "还没有托管会话",
         "planLabel": "当前托管方案",
         "planFallback": "暂时没有",
-        "docsLabel": "builder pack 基座",
-        "stacksLabel": "已追踪 stack"
+        "docsLabel": "Builder-pack 基座",
+        "stacksLabel": "已追踪技术栈"
       },
       "accessPlans": {
-        "label": "公开访问阶梯",
-        "title": "从第一价值开始。只有工作真的需要时才加 support。",
-        "body": "公开报价很简单：先免费开始，证明这是一个真实的代理问题，然后在我们按批次开放期间，锁定比未来公开价格低约90%的创始价格。",
-        "recommended": "最佳起点",
-        "meta": "这就是公开商业阶梯。下面的 live billing layer 也是真实的，但重要性会出现在后面。",
-        "noteLabel": "为什么有这一段",
-        "note": "这套价格阶梯故意保持简单。Free trial 先帮你拿到第一价值。之后，创始成员可以锁定大约比未来公开价格低90%的价格：€29 代替 €290，€79 代替 €790，而早期 Pico Pilot 从 €1,000+ 起，之后的定制项目从 €10,000+ 起。",
+        "label": "我们的方案",
+        "title": "从免费开始。需要更多能力时再升级。",
+        "body": "所有方案都包含完整学院访问。选择适合你当前阶段的方案。",
+        "recommended": "热门",
+        "meta": "覆盖 AI 旅程每个阶段的简单透明定价。",
+        "noteLabel": "为什么选择 Pico？",
+        "note": "用清晰定价，今天就开始构建和控制 AI 智能体。没有隐藏费用，可随时取消。",
         "truths": [
-          "免费试用是为了拿到第一价值，不是看功能展厅",
-          "€29 让你在未来 €290/月的公开 tier 之前锁定创始价格",
-          "€79 让你在未来 €790/月的 supported tier 之前锁定引导支持价格"
+          "免费方案非常适合起步",
+          "Starter 提供更多能力和支持",
+          "Pro 包含优先支持和高级功能"
         ],
         "tiers": {
           "trial": {
-            "name": "免费试用",
+            "name": "免费",
             "price": "免费",
-            "period": "第一价值",
-            "description": "先定义或连接一个真实的 agent problem，再在真正承诺之前拿到第一个有用的时刻。",
+            "period": "永久",
+            "description": "在完整引导下构建并控制你的第一个 AI 智能体。",
             "features": [
-              "描述目标或连接现有 agent",
-              "被引导到 build、fix 或 control",
-              "付费前先拿到第一价值",
-              "是否延长取决于 activation",
+              "完整学院访问",
+              "1 个 AI 智能体",
+              "基础支持",
+              "立即开始",
               "是证明认真程度的最佳第一步"
             ],
-            "cta": "申请试用访问",
-            "priceNote": "在定义或接入真实代理问题之前免费。"
+            "cta": "开始使用",
+            "priceNote": "无需信用卡。"
           },
           "starter": {
-            "name": "创始 Tier €29",
-            "price": "29欧元",
+            "name": "入门版",
+            "price": "US$9",
             "period": "/月",
-            "description": "给想尽早进入产品、又不想等公开版更成熟之后再进来的运营者的自助执行层。",
-            "priceNote": "创始成员锁定 €29/月，而不是之后公开价 €290/月。",
+            "description": "适合需要更多能力和支持的个人。",
+            "priceNote": "可随时取消。",
             "recommended": true,
             "features": [
-              "AI 驱动的 onboarding 和诊断",
-              "build、fix、control 引导路径",
-              "可复用模板与技能",
-              "面向下一步的 AI 支持",
-              "为独立执行而设计"
+              "Free 的全部内容",
+              "优先支持",
+              "高级分析",
+              "更多 AI 智能体",
+              "完整产品访问"
             ],
-            "cta": "申请创始访问",
+            "cta": "选择 Starter",
             "anchorPrice": "原价 €290"
           },
           "pro": {
-            "name": "创始 Supported €79",
-            "price": "79欧元",
+            "name": "专业版",
+            "price": "US$29",
             "period": "/月",
-            "description": "同一套产品，但提供更快的群组支持，适合想要实操指导、又不想直接跳到定制项目的团队。",
+            "description": "适合需要更多控制和支持的团队。",
             "features": [
-              "包含创始 Tier 的全部内容",
-              "更贴身的 onboarding",
-              "每周 group troubleshooting",
-              "运营者共享 support 环境",
-              "在实现变复杂时降低摩擦"
+              "Starter 的全部内容",
+              "增强型 onboarding 支持",
+              "每周群组排障",
+              "共享运营者支持环境",
+              "实现变复杂时降低摩擦"
             ],
-            "cta": "申请支持型访问",
+            "cta": "选择 Pro",
             "anchorPrice": "原价 €790",
             "priceNote": "创始成员锁定 €79/月，而不是之后支持价 €790/月。"
           },
           "enterprise": {
-            "name": "Pico 领航",
-            "price": "1,000欧元+",
-            "period": "/结果",
-            "description": "当系统已经坏掉、事情很急，或者继续靠猜已经太贵时，直接进入 hands-on 实施。",
+            "name": "企业版",
+            "price": "定制",
+            "period": "/月",
+            "description": "适合需要定制实施和支持的组织。",
             "priceNote": "创始期 Pico Pilot 从 €1,000+ 起，后续定制项目将从 €10,000+ 起。",
             "features": [
-              "定义清晰范围的目标与诊断",
-              "与你一起完成 fix 或 implementation",
-              "把运行中的 system 绑定到可衡量结果",
-              "让交付本身成为价值证明",
-              "可承接更复杂场景的 custom 项目"
+              "定制实施",
+              "专属支持",
+              "高级安全功能",
+              "定制集成",
+              "SLA 保障"
             ],
-            "cta": "聊聊 implementation",
+            "cta": "联系销售",
             "anchorPrice": "后续原价 €10,000+"
           }
         }

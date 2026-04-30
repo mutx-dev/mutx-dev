@@ -255,16 +255,16 @@ describe('host-aware UI routing proxy', () => {
   })
 
   it.each([
-    ['login', 'https://pico.mutx.dev/login?next=%2Fonboarding'],
-    ['register', 'https://pico.mutx.dev/register?next=%2Facademy'],
-    ['verify email', 'https://pico.mutx.dev/verify-email?token=test-token'],
-    ['forgot password', 'https://pico.mutx.dev/forgot-password'],
-    ['reset password', 'https://pico.mutx.dev/reset-password?token=reset-token'],
-  ])('lets pico-hosted %s render instead of rewriting to WIP', (_label, url) => {
+    ['login', 'https://pico.mutx.dev/login?next=%2Fonboarding', 'https://pico.mutx.dev/pico/wip?next=%2Fonboarding'],
+    ['register', 'https://pico.mutx.dev/register?next=%2Facademy', 'https://pico.mutx.dev/pico/wip?next=%2Facademy'],
+    ['verify email', 'https://pico.mutx.dev/verify-email?token=test-token', 'https://pico.mutx.dev/pico/wip?token=test-token'],
+    ['forgot password', 'https://pico.mutx.dev/forgot-password', 'https://pico.mutx.dev/pico/wip'],
+    ['reset password', 'https://pico.mutx.dev/reset-password?token=reset-token', 'https://pico.mutx.dev/pico/wip?token=reset-token'],
+  ])('keeps pico-hosted %s behind WIP', (_label, url, expectedRewrite) => {
     const response = proxy(mockRequest(url, { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }))
 
     expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
+    expect(response.headers.get('x-middleware-rewrite')).toBe(expectedRewrite)
     expect(response.headers.get('location')).toBeNull()
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
   })
@@ -378,7 +378,7 @@ describe('host-aware UI routing proxy', () => {
   })
 
   it.each(['google', 'github', 'discord', 'apple'])(
-    'lets pico-hosted %s OAuth starts reach the auth handler',
+    'keeps pico-hosted %s OAuth starts behind WIP',
     (provider) => {
       const response = proxy(
         mockRequest(
@@ -387,14 +387,16 @@ describe('host-aware UI routing proxy', () => {
         ),
       )
 
-      expect(response.status).toBe(200)
-      expect(response.headers.get('location')).toBeNull()
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toBe(
+        `https://pico.mutx.dev/wip?intent=login&next=%2Fonboarding`,
+      )
       expect(response.headers.get('x-middleware-rewrite')).toBeNull()
       expect(response.headers.get('cache-control')).toBe('no-store')
     },
   )
 
-  it('lets pico-hosted direct auth API calls reach handlers with auth rate limiting', () => {
+  it('blocks pico-hosted direct auth API calls while account access is private', () => {
     const response = proxy(
       mockRequest(
         'https://pico.mutx.dev/api/auth/register',
@@ -403,10 +405,9 @@ describe('host-aware UI routing proxy', () => {
       ),
     )
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(403)
     expect(response.headers.get('location')).toBeNull()
     expect(response.headers.get('x-middleware-rewrite')).toBeNull()
-    expect(response.headers.get('X-RateLimit-Limit')).toBe('8')
     expect(response.headers.get('cache-control')).toBe('no-store')
   })
 
@@ -442,7 +443,7 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('cache-control')).toBe('no-store')
   })
 
-  it('allows Apple OAuth form_post callbacks to pass CSRF origin checks', () => {
+  it('keeps Apple OAuth form_post callbacks behind WIP on the pico host', () => {
     const response = proxy(
       mockRequest(
         'https://pico.mutx.dev/api/auth/oauth/apple/callback',
@@ -454,9 +455,9 @@ describe('host-aware UI routing proxy', () => {
       ),
     )
 
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(307)
     expect(response.headers.get('x-middleware-rewrite')).toBeNull()
-    expect(response.headers.get('location')).toBeNull()
+    expect(response.headers.get('location')).toBe('https://pico.mutx.dev/wip')
     expect(response.headers.get('cache-control')).toBe('no-store')
   })
 

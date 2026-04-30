@@ -907,6 +907,16 @@ test.describe('mutx.dev QA', () => {
   });
 
   test('pico root stays on the landing page with access-first CTAs only', async ({ page }) => {
+    const contactPayload: { current?: Record<string, unknown> } = {};
+    await page.route('**/api/contact', async (route) => {
+      contactPayload.current = route.request().postDataJSON() as Record<string, unknown>;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, message: 'Request received', notified: false }),
+      });
+    });
+
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('pico-landing')).toBeVisible();
@@ -931,9 +941,28 @@ test.describe('mutx.dev QA', () => {
     await expect(page.locator('main')).not.toContainText(/pre-register/i);
 
     await page.getByRole('button', { name: /request access/i }).first().click();
-    await expect(page.getByRole('dialog', { name: /contact form/i })).toBeVisible();
+    const dialog = page.getByRole('dialog', { name: /contact form/i });
+    await expect(dialog).toBeVisible();
     await expect(page.getByRole('heading', { name: /request pico access/i })).toBeVisible();
+    await dialog.getByLabel(/work email/i).fill('operator@example.com');
+    await dialog.getByLabel(/^name$/i).fill('Pico Operator');
+    await dialog.getByLabel(/company/i).fill('MUTX Lab');
+    await dialog.getByLabel(/anything we should know/i).fill('I need to recover a broken agent setup.');
+    await dialog.getByRole('button', { name: /request access/i }).click();
+    await expect(dialog.getByText(/request received/i)).toBeVisible();
+    expect(contactPayload.current?.source).toBe('pico-waitlist');
     expect(new URL(page.url()).pathname).toBe('/pico');
+  });
+
+  test('pico WIP guard uses the mascot bubble and returns visitors to root', async ({ page }) => {
+    await page.goto('/pico/wip', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByTestId('pico-host-guard')).toBeVisible();
+    await expect(page.getByTestId('pico-wip-speech')).toContainText(/you're not supposed to be here/i);
+    await expect(page.getByRole('link', { name: /back to waitlist/i })).toBeVisible();
+
+    await page.waitForURL('**/', { timeout: 5000 });
+    expect(new URL(page.url()).pathname).toBe('/');
   });
 
   test('pico pricing route keeps access lanes and live billing in one honest surface', async ({

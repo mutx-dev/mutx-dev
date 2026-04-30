@@ -1,155 +1,188 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — AIエージェントを実運用で動かし、制御できる状態にする",
-      "description": "PicoMUTX は、創業者・オペレーター・小規模チームが、AIエージェントを構築し、立て直し、実運用で信頼できる形に制御するのを支援します。"
+      "title": "PicoMUTX — AIエージェントを任せきりにせず、動かして制御する",
+      "description": "PicoMUTX は、創業者やオペレーターが実務で信頼できる AI エージェントを構築・復旧・制御できるよう支援します。"
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
       "cta": "アクセスを申請",
-      "ctaMobile": "アクセス",
+      "ctaMobile": "申請",
       "sectionsLabel": "ページセクション",
       "skipToMain": "メインコンテンツへスキップ"
     },
     "hero": {
-      "badge": "創設アクセス · 申請制",
-      "title": "AIエージェントを動かし、",
-      "titleAccent": "実務で信頼できる状態まで。",
-      "subtitle": "ゼロから始めることも、壊れたセットアップを立て直すことも、稼働中のエージェントを管理下に戻すこともできます。Pico は状況を見て、構築・修復・制御のどこに進むべきかを示します。",
+      "badge": "ウェイトリスト受付中 · 創設アクセス",
+      "title": "AI を見張り続けるのは、",
+      "titleAccent": "もう終わりに。",
+      "subtitle": "ゼロから始める、壊れた設定を立て直す、稼働中のエージェントを制御する。Pico は実際の詰まりを見極め、構築・修復・制御の正しいレーンへ案内します。",
       "cta": "アクセスを申請",
       "ctaSecondary": "仕組みを見る",
-      "meta": "外側はまだ申請制です。内側では Pico が詰まりを診断し、構築・修復・制御のどこに進むかを示します。"
+      "meta": "ウェイトリスト受付中。アカデミーの仕上げ後にプロダクトルートを再開します。"
+    },
+    "agentSlider": {
+      "ariaLabel": "自律型エージェントの種類",
+      "items": {
+        "0": {
+          "name": "Dev Agent",
+          "description": "コードを書き、テストし、自律的に出荷します。"
+        },
+        "1": {
+          "name": "Market Agent",
+          "description": "シグナルを監視し、重要な変化を浮かび上がらせます。"
+        },
+        "2": {
+          "name": "Deal Agent",
+          "description": "機会を評価し、確度の高い打ち手を知らせます。"
+        },
+        "3": {
+          "name": "Ops Agent",
+          "description": "問題を検知し、リアルタイムで修正を実行します。"
+        },
+        "4": {
+          "name": "Growth Agent",
+          "description": "成果に基づいてコンテンツと配信を改善します。"
+        },
+        "5": {
+          "name": "Security Agent",
+          "description": "リスクを継続的にスキャンし、軽減します。"
+        },
+        "6": {
+          "name": "Data Agent",
+          "description": "パイプラインを自動で維持し、進化させます。"
+        }
+      }
     },
     "trustBar": {
       "items": {
-        "0": "ゼロからでも、崩れた build からでも、稼働中の system からでも始められる",
-        "1": "ひとつの診断レイヤーが build・fix・control に振り分ける",
-        "2": "信頼を前提にする前に、可視性・承認・ガードレールを置く"
+        "0": "ゼロからでも、混乱した構築途中でも、稼働中のシステムからでも開始",
+        "1": "ひとつの診断レイヤーが構築・修復・制御へ振り分け",
+        "2": "信頼を前提にする前に、可視性・承認・安全策を確保"
       }
     },
     "problem": {
-      "eyebrow": "なぜ Pico か",
+      "eyebrow": "Pico が必要な理由",
       "title": "多くのエージェント案件は、",
-      "titleLine2": "発想が弱くて失敗するわけではありません。",
-      "body": "プロジェクトが止まるのは、発想が弱いからではありません。技術選択が多すぎ、立て直しの道がなく、壊れたときの運用の見通しもないからです。",
+      "titleLine2": "アイデアが弱くて止まるわけではありません。",
+      "body": "道筋が複雑になるとプロジェクトは止まります。技術選定が多すぎる、復旧ルートがない、壊れた後の運用状況が見えないからです。",
       "scenarios": {
         "0": {
-          "label": "「エージェントに何をさせたいかは分かっている。必要なのは、最短でまともな立ち上げ経路だ。」",
-          "body": "ゼロから始めること自体が問題ではありません。問題なのは、スタック、順序、基準を決める過程が、終わりのない調査に化けることです。"
+          "label": "「何をさせたいかは分かっている。最短でまともに動かす道筋がほしい。」",
+          "body": "ゼロから始めること自体が問題ではありません。問題は、スタック、順序、基準の判断が終わりのない調査に変わることです。"
         },
         "1": {
-          "label": "「途中までは作った。いま必要なのは作り直しではなく、セットアップの立て直しだ。」",
-          "body": "途中で壊れると、失うのは時間だけではありません。必要なのは recovery lane であって、理論を増やすことではありません。"
+          "label": "「途中までは作った。作り直すのではなく、この設定を立て直したい。」",
+          "body": "構築が途中で壊れると、失うのは時間だけではありません。必要なのは復旧ルートであって、また理論を増やすことではありません。"
         },
         "2": {
-          "label": "「すでに live では動いているが、コスト、ロジック、失敗時の振る舞いをまだ信頼できない。」",
-          "body": "その段階では、存在しているだけでは足りません。読めて、制御できて、実務に触れさせても安全である必要があります。"
+          "label": "「すでに動いているが、コスト、ロジック、失敗時の挙動をまだ信頼できない。」",
+          "body": "その段階では、エージェントが存在するだけでは足りません。読めて、制御できて、実務に触れさせても安全である必要があります。"
         },
         "3": {
-          "label": "「説明できて、見直せて、制御できる system でないと依存したくない。」",
-          "body": "実行、しきい値、承認、負荷時の挙動が見えないなら、まだ運用資産とは言えません。"
+          "label": "「頼る前に、説明できて、見直せて、制御できるシステムが必要だ。」",
+          "body": "実行履歴、しきい値、承認、負荷時の挙動が見えないなら、まだ運用資産とは言えません。"
         }
       },
       "close": "Pico はその不確実さを、次に取るべき正直な一手に変えます。"
     },
     "platform": {
       "eyebrow": "Pico の仕組み",
-      "title": "Pico は詰まりを診断し、構築・修復・制御へ振り分けます。",
-      "body": "役に立つものを動かし、信頼できる状態を保つこと。Pico はまず診断し、次の一手を本当の詰まりに合わせます。",
+      "title": "まず診断。その後、構築・修復・制御へ。",
+      "body": "Pico は詰まりを見つけ、次の一手を振り分けます。壊れた瞬間に進捗が消えないようにするためです。",
       "howItWorks": {
         "0": {
           "title": "目的を説明するか、エージェントを接続する",
-          "body": "やりたい仕事、詰まっている点、理解したい live system から始めます。Pico はその文脈で適切な支援を判断します。"
+          "body": "やりたい仕事、詰まっている点、理解したい稼働中システムから始めます。Pico はその文脈から、本当に必要な支援を判断します。"
         },
         "1": {
-          "title": "build・fix・control に振り分けられる",
-          "body": "新規案件には、最初の役立つエージェントまでの実務的な道筋を。壊れた setup には recovery step を。live system には可視性、しきい値、承認、オペレーター向けガードレールを提供します。"
+          "title": "構築・修復・制御のレーンへ進む",
+          "body": "新規構築には、最初の役立つエージェントまでの実務的な道筋を。壊れた設定には復旧手順を。稼働中システムには可視性、しきい値、承認、運用ガードレールを提供します。"
         },
         "2": {
-          "title": "ひとつの運用ループの中で変更を適用する",
-          "body": "挙動を観察し、問題を切り分け、次の変更を入れ、流れを失わずに前へ進みます。"
+          "title": "ひとつの運用ループで変更を進める",
+          "body": "挙動を観察し、ズレを切り分け、次の変更を入れ、流れを失わずに前へ進みます。"
         },
         "3": {
-          "title": "本当に境界ケースなら人にエスカレーションする",
-          "body": "system だけで loop を閉じられないとき、人の支援は丸投げ先ではなく、証拠と調整役として入ります。"
+          "title": "本当の例外だけ人にエスカレーションする",
+          "body": "システムだけでループを閉じられないとき、人の支援は製品そのものの代わりではなく、証拠と調整役として入ります。"
         }
       }
     },
     "who": {
-      "eyebrow": "向いている人",
+      "eyebrow": "適性",
       "title": "PicoMUTX は誰にでも向いているわけではありません。",
       "forYouTitle": "向いているのは…",
       "notForYouTitle": "向いていないのは…",
       "forYou": {
-        "0": "勘だけで stack を組み上げずに、役立つエージェントを実運用に出したい",
-        "1": "中途半端または壊れた setup があり、流れを取り戻したい",
-        "2": "すでに live か、ほぼ live のものがあり、信頼する前に制御を強めたい",
-        "3": "講座ではなく、結果に向いた支援がほしい",
+        "0": "勘でスタック全体を組まずに、役立つエージェントを 1 つ出したい",
+        "1": "半完成または壊れた設定があり、勢いを取り戻したい",
+        "2": "すでに動いている、またはほぼ動いているものがあり、信頼する前に制御を強めたい",
+        "3": "講座や理論の深掘りではなく、成果に直結する支援がほしい",
         "4": "場当たり的な専門家介入への依存を、時間とともに減らしたい"
       },
       "notForYou": {
-        "0": "判断を不要にする汎用 no-code toy がほしい",
-        "1": "成熟した agent fleet に対する enterprise 級 governance がすでに必要",
-        "2": "運用上の前進より、学習コンテンツや hype や流行がほしい",
-        "3": "AI に責任や review や ownership の代替を期待している",
-        "4": "プロダクトを使うより、創業者へのアクセスを買いたい"
+        "0": "判断を不要にする汎用ノーコード玩具がほしい",
+        "1": "成熟したエージェント群に対するエンタープライズ級ガバナンス基盤がすでに必要",
+        "2": "運用の前進より、学習コンテンツ、話題性、流行追いがほしい",
+        "3": "AI が責任、レビュー、説明責任を置き換えると期待している",
+        "4": "製品を使うより、創業者へのアクセスだけを買いたい"
       }
     },
     "beforeAfter": {
       "eyebrow": "変化",
-      "title": "build・recovery・control が一つの場所に揃うと何が変わるか",
+      "title": "PicoMUTX の前と後",
       "beforeLabel": "Before",
       "afterLabel": "After",
       "items": {
         "0": {
-          "before": "まず build すべきか、debug すべきか、control を足すべきか分からない",
-          "after": "本当の詰まり方に合うレーンに振り分けられる"
+          "before": "まず構築すべきか、デバッグすべきか、制御を足すべきか分からない",
+          "after": "本当の詰まりに合うレーンへ案内される"
         },
         "1": {
-          "before": "問題が起きるたびに別の tool や doc や意見ループへ飛ばされる",
-          "after": "構築、回復、制御がひとつの operating system の中に収まる"
+          "before": "問題が起きるたびに別のツール、資料、意見のループへ飛ばされる",
+          "after": "構築、復旧、制御がひとつの運用システムに収まる"
         },
         "2": {
-          "before": "壊れた setup や不透明な runtime が勢いを止める",
-          "after": "次の一手が見え、見直せて、地に足がつく"
+          "before": "壊れた設定や曖昧な実行時挙動で勢いが止まる",
+          "after": "次の行動が見え、見直せて、根拠を持てる"
         },
         "3": {
-          "before": "説明も信頼も十分にできない agent を抱える",
+          "before": "説明も信頼も十分にできないエージェントを抱えている",
           "after": "実行し、点検し、自信を持って改善できるものになる"
         }
       },
-      "close": "AI を抽象的に学ぶことが目的ではありません。役に立つものを動かし、信頼できる状態に保つことが目的です。"
+      "close": "目的は AI を抽象的に学ぶことではありません。役に立つものを動かし、信頼できる状態に保つことです。"
     },
     "earlyAccess": {
       "eyebrow": "創設アクセス",
-      "title": "外側はウェイトリスト制。中身はすでに本物のプロダクトです。",
-      "body": "アクセスは段階的に開きます。真剣なオペレーターを正しいルートに入れ、その間にワークフローを実運用で鍛えるためです。",
+      "title": "外側はウェイトリスト制。中身は本物のプロダクト。",
+      "body": "アクセスは段階的に開きます。真剣なオペレーターを正しいレーンに入れ、実際の利用でワークフローを固めるためです。",
       "benefits": {
-        "0": "ゼロ、壊れた setup、まだ信頼できない live system から始められます",
-        "1": "build・fix・control のどれかに振り分けられます",
-        "2": "access が selective な間に founding pricing を確保できます",
-        "3": "expert input は edge case が本当にあるときだけ使えます",
-        "4": "最初の case study と operating pattern を一緒に形にできます"
+        "0": "ゼロ、壊れた設定、まだ信頼できない稼働中システムから始められる",
+        "1": "構築・修復・制御のどれかへ案内される",
+        "2": "アクセスが限定的な間に創設価格を確保できる",
+        "3": "専門家の入力は、本当の例外があるときだけ使う",
+        "4": "最初の事例と運用パターン作りに関われる"
       }
     },
     "pricing": {
-      "eyebrow": "創業価格",
-      "title": "一般公開前に創業価格を確保。",
+      "eyebrow": "創設価格",
+      "title": "プロダクトルート再開前に創設レーンを確保。",
       "tiers": {
         "starter": {
           "name": "創設 Tier",
           "price": "€29",
           "period": "/月",
-          "description": "磨かれた公開 tier を待たずに、先に製品へ入りたいオペレーター向けのセルフサーブ実行。",
+          "description": "磨かれた公開版を待たず、早く製品を使いたいオペレーター向けのセルフサーブ実行。",
           "features": [
-            "AI 診断 intake",
-            "guided な build・fix・control path",
-            "independent execution 向けに設計"
+            "AI 診断インテーク",
+            "構築・修復・制御のガイド付きパス",
+            "自立実行向けに設計"
           ],
-          "cta": "Founding アクセスを申請",
+          "cta": "創設アクセスを申請",
           "ctaHref": "/pricing",
-          "priceNote": "創業メンバーは後の公開価格 €290/月ではなく、€29/月を固定できます。",
+          "priceNote": "創設メンバーは後の公開価格 €290/月ではなく、€29/月を固定できます。",
           "recommended": true,
           "anchorPrice": "€290"
         },
@@ -157,129 +190,130 @@
           "name": "創設 Supported",
           "price": "€79",
           "period": "/月",
-          "description": "すぐに custom へ飛ばず、実務的なガイダンスを求めるチーム向けの、より速いグループ支援つき同一プロダクト。",
+          "description": "すぐにカスタム案件へ進まず、実務的な支援を求めるチーム向け。より速いグループ支援付きの同じ製品です。",
           "recommended": true,
           "features": [
-            "Founding Tier のすべて",
-            "週次の group troubleshooting",
-            "shared operator accountability"
+            "創設 Tier のすべて",
+            "週次のグループトラブルシュート",
+            "共有オペレーター責任"
           ],
-          "cta": "Supported アクセスを申請",
+          "cta": "支援付きアクセスを申請",
           "ctaHref": "/pricing",
           "anchorPrice": "€790",
-          "priceNote": "創業メンバーは後の supported 価格 €790/月ではなく、€79/月を固定できます。"
+          "priceNote": "創設メンバーは後の supported 価格 €790/月ではなく、€79/月を固定できます。"
         },
         "enterprise": {
           "name": "Pico Pilot",
           "price": "€1,000+",
           "period": "/案件",
-          "description": "壊れている、緊急、または当てずっぽうを続けるには高くつきすぎるシステム向けの hands-on 実装。",
+          "description": "壊れている、緊急、または当てずっぽうを続けるには高くつきすぎる場合のハンズオン実装。",
           "features": [
-            "scoped な diagnosis と implementation",
-            "測定可能な outcome に結びついた working system",
-            "complexity が real なときの custom project"
+            "範囲を絞った診断と実装",
+            "測定可能な成果につながる動くシステム",
+            "複雑さが本物のときのカスタム案件"
           ],
-          "cta": "Planning Call を予約",
+          "cta": "計画相談を予約",
           "ctaHref": "https://calendly.com/mutxdev",
-          "priceNote": "創業期の Pico Pilot は €1,000+ から。後の custom 案件は €10,000+ からになります。",
+          "priceNote": "創設期の Pico Pilot は €1,000+ から。後のカスタム案件は €10,000+ からになります。",
           "anchorPrice": "€10,000+"
         },
         "trial": {
           "name": "無料トライアル",
           "price": "無料",
-          "period": "最初の価値",
-          "description": "本当に取り組む前に、real な problem で first value に到達します。",
+          "period": "最初の価値まで",
+          "description": "申し込む前に、実際のエージェント課題で最初の価値に到達します。",
           "priceNote": "実際のエージェント課題を定義または接続するまで無料。",
           "features": [
-            "goal を説明するか、agent を接続する",
-            "build・fix・control に振り分けられる",
-            "支払う前に first value に到達する"
+            "目的を説明するか、エージェントを接続",
+            "構築・修復・制御へ案内",
+            "支払う前に最初の価値へ到達"
           ],
           "cta": "トライアルアクセスを申請",
           "ctaHref": "/pricing"
         }
       },
-      "lead": "まずは無料で開始。今入れば、段階的にオンボーディングしている間も、後の公開価格より約90%安い創業価格を維持できます。",
-      "recommendedLabel": "創業価格 90%オフ"
+      "lead": "ウェイトリストを再開しました。構築・修復・制御のどれが必要か教えてください。真剣なオペレーターを正しい波に案内します。",
+      "recommendedLabel": "創設価格 90%オフ"
     },
     "faq": {
       "eyebrow": "質問",
-      "title": "腹落ちするまでに確認しておきたい質問",
+      "title": "申し込む前に確認しておきたいこと",
       "items": {
         "0": {
           "q": "コードを書ける必要はありますか？",
-          "a": "いいえ。PicoMUTX は、フルタイムの agent engineer にならずに結果を出したい operator のためのものです。"
+          "a": "いいえ。PicoMUTX は、フルタイムのエージェントエンジニアにならずに成果を出したいオペレーター向けです。"
         },
         "1": {
-          "q": "すでに試して失敗している場合でも使えますか？",
-          "a": "そこが主要な入口のひとつです。最初の高コストで分かりにくい blocker のあとに、勢いを取り戻すために設計されています。"
+          "q": "すでに試して失敗している場合は？",
+          "a": "それは主要な入口のひとつです。PicoMUTX は、最初の分かりにくく高くつく、または信頼を傷つける詰まりの後に勢いを取り戻すために作られています。"
         },
         "2": {
-          "q": "どんな agent の仕事に向いていますか？",
-          "a": "support、社内 copilot、lead capture、sales follow-up、その他の運用 workflow など、実世界で build・fix・control が必要な実用システムに向いています。"
+          "q": "どんなエージェント業務に向いていますか？",
+          "a": "サポート導線、社内コパイロット、リード獲得、営業フォロー、実世界で構築・修復・制御が必要な運用ワークフローなど、実用的なエージェントシステム向けです。"
         },
         "3": {
-          "q": "無料で始める方法はありますか？",
-          "a": "あります。公開の階段は、最初の価値に集中した無料トライアルから始まります。公開面はまだ waitlist-first ですが、trial と創設 tier はすでに定義されています。"
+          "q": "ウェイトリストは開いていますか？",
+          "a": "はい。公開ウェイトリストを再開しました。アカデミーとプロダクトルートは、このランディングページの redesign が先へ進むまで private のままです。"
         },
         "4": {
-          "q": "enterprise 向けですか？",
-          "a": "PicoMUTX は MUTX への商業的 wedge であり、enterprise governance 全体ではありません。重い multi-team governance は、より広い MUTX stack の領域です。"
+          "q": "エンタープライズ向けですか？",
+          "a": "PicoMUTX は MUTX への商業的な入口であり、完全なエンタープライズガバナンス層ではありません。重い複数チームのガバナンスは、より広い MUTX スタックの領域です。"
         }
       }
     },
     "finalCta": {
       "eyebrow": "創設アクセス",
-      "title": "自分に合うルートへのアクセスを申請してください。",
-      "body": "Pico は、役に立つものを動かし、壊れたら立て直し、実運用では制御できる状態に保つための仕組みです。",
-      "formHeadline": "real blocker から始めてください。",
-      "formSubline": "構築・修復・制御のどれが必要か教えてください。適切なルートに案内します。",
+      "title": "正しいレーンへのアクセスを申請してください。",
+      "body": "Pico は、役に立つものを動かし、壊れたら立て直し、実務では制御できる状態に保つための仕組みです。",
+      "faqLabel": "まだ迷っていますか？最後の懸念を解消しましょう。",
+      "formHeadline": "本当の詰まりから始めてください。",
+      "formSubline": "構築・修復・制御のどれが必要か教えてください。正しいレーンへ案内します。",
       "ctaButton": "アクセスを申請",
-      "formCtaMeta": "Free trial · 創業価格は 90%オフ · €29 / €79 · Pico Pilot は €1,000+ から",
-      "secondaryButton": "Planning Call を予約"
+      "formCtaMeta": "無料トライアル · 創設価格 90%オフ · €29 / €79 · Pico Pilot は €1,000+ から",
+      "secondaryButton": "計画相談を予約"
     },
     "contactForm": {
       "dialogLabel": "お問い合わせフォーム",
       "closeLabel": "閉じる",
-      "title": "Pico へのアクセスを申請",
-      "subtitle": "何を build したいのか、何を立て直したいのか、何を control したいのか教えてください。次の正しい一手へ案内します。",
-      "emailLabel": "仕事用メール",
+      "title": "Pico アクセスを申請",
+      "subtitle": "出荷したいもの、復旧したいもの、制御したいものを教えてください。正しい次の一手へ案内します。",
+      "emailLabel": "勤務先メール",
       "emailPlaceholder": "you@company.com",
       "nameLabel": "名前",
       "namePlaceholder": "山田 花子",
-      "companyLabel": "会社名",
+      "companyLabel": "会社",
       "companyPlaceholder": "Acme株式会社",
-      "interestLabel": "最初に助けが必要なのはどれですか？",
+      "interestLabel": "最初に必要な支援は何ですか？",
       "interestOptions": {
         "building-first": "初めての AI エージェントを作っている",
         "fixing-existing": "動いていないエージェントを立て直したい",
         "evaluating": "プラットフォームやツールを比較検討している",
         "spent-money": "すでにお金を使ったが、まだうまくいっていない",
         "other": "その他",
-        "build": "ゼロから何かを作る",
-        "fix": "setup を立て直す・修復する",
-        "control": "すでに live の agent を制御下に置く"
+        "build": "ゼロから構築する",
+        "fix": "設定を復旧または修復する",
+        "control": "稼働中のエージェントを制御する"
       },
-      "messageLabel": "ほかに知っておくべきことはありますか？",
+      "messageLabel": "補足はありますか？",
       "messageOptional": "（任意）",
-      "messagePlaceholder": "goal・blocker・live system を書いてください…",
-      "submitting": "送信中…",
+      "messagePlaceholder": "目的、詰まり、稼働中システムを説明してください…",
+      "submitting": "送信中...",
       "submit": "アクセスを申請",
-      "disclaimer": "汎用 nurture funnel はありません。人が正しい route を返します。",
-      "successTitle": "アクセス申請を受け付けました。",
-      "successBody": "状況は把握しました。適切な lane を示す人間の返信をお送りします。",
+      "disclaimer": "一般的な育成メールはありません。人が正直な次のルートを返信します。",
+      "successTitle": "申請を受け取りました。",
+      "successBody": "状況を受け取りました。Pico への次のルートをメールで確認してください。",
       "successBack": "ページに戻る",
       "errorFallback": "問題が発生しました。もう一度お試しください。",
       "networkError": "ネットワークエラーです。もう一度お試しください。"
     },
     "preRegForm": {
-      "emailLabel": "仕事用メール",
+      "emailLabel": "勤務先メール",
       "emailPlaceholder": "you@company.com",
-      "submitting": "申請を送信中…",
+      "submitting": "送信中…",
       "submit": "アクセスを申請",
-      "privacy": "スパムは送りません。支払いも不要です。届くのは access update と正直な next step だけです。",
-      "successTitle": "リストに入りました。",
-      "successBody": "あなたの PicoMUTX access wave が開いたらご連絡します。スパムも支払い要求もありません。",
+      "privacy": "スパムなし。支払い不要。アクセス更新と正直な次の一手だけを送ります。",
+      "successTitle": "リストに登録されました。",
+      "successBody": "あなたの PicoMUTX アクセス枠が開いたら連絡します。スパムも支払い要求もありません。",
       "errorFallback": "問題が発生しました。もう一度お試しください。"
     },
     "footer": {
@@ -292,23 +326,23 @@
         "contact": "お問い合わせ",
         "privacy": "プライバシー"
       },
-      "copyright": "© MUTX 2026. 導入済みエージェントのオープンコントロール。"
+      "copyright": "© MUTX 2026. デプロイ済みエージェントのオープン制御。"
     },
     "waitlistForm": {
-      "submit": "アクセスをリクエスト",
+      "submit": "アクセスを申請",
       "submitting": "送信中...",
-      "success": "リストに追加されました。",
-      "successCheckInbox": "リストに追加されました。受信箱をご確認ください。",
-      "alreadyJoined": "すでにリストに登録されています！",
-      "successNote": "近日中にご連絡いたします。",
-      "joinFailed": "ウェイティングリストへの参加に失敗しました",
+      "success": "リストに登録されました。",
+      "successCheckInbox": "リストに登録されました。受信箱を確認してください。",
+      "alreadyJoined": "すでにリストに登録されています。",
+      "successNote": "近日中に連絡します。",
+      "joinFailed": "ウェイトリスト登録に失敗しました",
       "verificationLoading": "認証チャレンジを読み込み中...",
-      "verificationLoadingTryAgain": "認証がまだ読み込まれています。しばらくしてからもう一度お試しください。",
-      "verificationUnavailable": "現在、ウェイティングリストの認証は利用できません。後でもう一度お試しください。",
+      "verificationLoadingTryAgain": "認証はまだ読み込み中です。少し待ってからもう一度お試しください。",
+      "verificationUnavailable": "現在ウェイトリスト認証を利用できません。後でもう一度お試しください。",
       "verificationRequired": "認証チャレンジを完了してください。",
-      "verificationFailedRefresh": "認証に失敗しました。チャレンジを更新して再度お試しください。",
-      "verificationExpired": "認証の有効期限が切れました。再度チャレンジを完了してください。",
-      "verificationTimedOut": "認証がタイムアウトしました。再度チャレンジを完了してください。"
+      "verificationFailedRefresh": "認証に失敗しました。チャレンジを更新してもう一度お試しください。",
+      "verificationExpired": "認証の有効期限が切れました。もう一度完了してください。",
+      "verificationTimedOut": "認証がタイムアウトしました。もう一度完了してください。"
     },
     "supportPage": {
       "contact": {
@@ -2562,117 +2596,117 @@
       }
     },
     "pricingPage": {
-      "eyebrow": "価格ルート",
-      "title": "いま必要なレーンを選ぶ。product billing は必要になってから見る。",
-      "subtitle": "public な Pico はまだ access-first です。このページではまず公開向けの ladder を示し、そのあと system 内で既に動いている team 向けに product billing を見せます。",
-      "primaryCta": "アクセスを申請",
-      "secondaryCta": "support に相談",
-      "returnToLanding": "landing に戻る",
+      "eyebrow": "料金",
+      "title": "必要に合うプランを選ぶ。",
+      "subtitle": "無料で始め、成長に合わせてアップグレードできます。すべてのプランにアカデミーとサポートリソースへのフルアクセスが含まれます。",
+      "primaryCta": "始める",
+      "secondaryCta": "サポートに相談",
+      "returnToLanding": "ランディングに戻る",
       "routeState": {
         "label": "ルート状態",
-        "title": "公開アクセスは正しい lane に入るための入口です。product billing はもっと深い場所にあります。",
-        "body": "まずは blocker に合う lane から始めてください。認証済み workspace、checkout、rollout planning が必要になってから live plan を使います。",
+        "title": "公開アクセスは正しいレーンに入るための入口です。製品課金はシステムの奥にあります。",
+        "body": "あなたの詰まりに合うレーンから始めてください。認証済みワークスペース、チェックアウト、ロールアウト計画が必要になったときだけ live plan を使います。",
         "signalLabel": "アクセスシグナル",
-        "sessionAttached": "hosted session 接続済み",
-        "sessionLoading": "hosted session を確認中",
-        "sessionMissing": "hosted session はまだありません",
-        "planLabel": "現在の hosted plan",
+        "sessionAttached": "ホストセッション接続済み",
+        "sessionLoading": "ホストセッションを確認中",
+        "sessionMissing": "ホストセッションはまだありません",
+        "planLabel": "現在のホストプラン",
         "planFallback": "まだなし",
-        "docsLabel": "builder pack の土台",
-        "stacksLabel": "追跡中の stack"
+        "docsLabel": "Builder-pack の土台",
+        "stacksLabel": "追跡中のスタック"
       },
       "accessPlans": {
-        "label": "公開アクセス ladder",
-        "title": "最初の価値から始める。support は本当に必要なときだけ足す。",
-        "body": "公開オファーはシンプルです。無料で始め、実際のエージェント課題を証明し、その後は後の公開価格より約90%低い創業価格を、コホート制のオンボーディング期間中に固定します。",
-        "recommended": "最初のおすすめ",
-        "meta": "これは公開向けの商流 ladder です。下の live billing layer も本物ですが、重要になるのはあとです。",
-        "noteLabel": "この section がある理由",
-        "note": "このラダーは意図的にシンプルです。Free trial は最初の価値まで連れていきます。その後は創業メンバーが後の公開価格に対して約90%オフを固定します。€29 は €290 の代わり、€79 は €790 の代わり、そして早期の Pico Pilot は €1,000+ からで、後の custom 作業は €10,000+ からになります。",
+        "label": "プラン",
+        "title": "無料で始め、必要になったら強化。",
+        "body": "すべてのプランにアカデミーへのフルアクセスが含まれます。今の段階に合うものを選んでください。",
+        "recommended": "人気",
+        "meta": "AI ジャーニーの各段階に向けた、シンプルで透明な料金。",
+        "noteLabel": "Pico を選ぶ理由",
+        "note": "明快な料金で、AI エージェントの構築と制御を今日から始められます。隠れた手数料はなく、いつでも解約できます。",
         "truths": [
-          "無料トライアルは最初の価値のためであり、機能見学のためではない",
-          "€29 は後の公開 tier €290/月の前に創業価格を固定する",
-          "€79 は後の supported tier €790/月の前に guided support を固定する"
+          "無料プランは始めるのに最適",
+          "Starter はより強い機能とサポートを提供",
+          "Pro は優先サポートと高度な機能を含む"
         ],
         "tiers": {
           "starter": {
-            "name": "創設 Tier €29",
-            "price": "€29",
+            "name": "Starter",
+            "price": "$9",
             "anchorPrice": "€290",
             "period": "/月",
-            "description": "磨かれた公開 tier を待たずに、先に製品へ入りたいオペレーター向けのセルフサーブ実行。",
-            "priceNote": "創業メンバーは後の公開価格 €290/月ではなく、€29/月を固定できます。",
+            "description": "より強い機能とサポートが必要な個人向け。",
+            "priceNote": "いつでも解約できます。",
             "recommended": true,
             "features": [
-              "AI 主導の onboarding と診断",
-              "build・fix・control のガイド付きルート",
-              "再利用可能な template と skill",
-              "次の一手への AI 支援",
-              "自立実行向けに設計"
+              "Free のすべて",
+              "優先サポート",
+              "高度な分析",
+              "より多くの AI エージェント",
+              "製品へのフルアクセス"
             ],
-            "cta": "創設アクセスを申請"
+            "cta": "Starter を選ぶ"
           },
           "pro": {
-            "name": "創設 Supported €79",
-            "price": "€79",
+            "name": "Pro",
+            "price": "$29",
             "period": "/月",
-            "description": "すぐに custom へ飛ばず、実務的なガイダンスを求めるチーム向けの、より速いグループ支援つき同一プロダクト。",
+            "description": "より多くの制御とサポートが必要なチーム向け。",
             "priceNote": "創業メンバーは後の supported 価格 €790/月ではなく、€79/月を固定できます。",
             "features": [
-              "創設 Tier の内容をすべて含む",
-              "より手厚い onboarding",
-              "週次の group troubleshooting",
-              "operator 同士の共有 support 環境",
-              "実装が複雑になったときの摩擦を減らす"
+              "Starter のすべて",
+              "強化されたオンボーディング支援",
+              "週次グループトラブルシュート",
+              "共有オペレーターサポート環境",
+              "実装が複雑になったときの摩擦を低減"
             ],
-            "cta": "支援付きアクセスを申請",
+            "cta": "Pro を選ぶ",
             "anchorPrice": "€790"
           },
           "enterprise": {
-            "name": "Pico Pilot",
-            "price": "€1,000+",
-            "period": "/成果",
-            "description": "壊れている、緊急、または当てずっぽうを続けるには高くつきすぎるシステム向けの hands-on 実装。",
+            "name": "Enterprise",
+            "price": "個別見積もり",
+            "period": "/月",
+            "description": "カスタム実装とサポートが必要な組織向け。",
             "priceNote": "創業期の Pico Pilot は €1,000+ から。後の custom 案件は €10,000+ からになります。",
             "features": [
-              "目的と診断を明確な scope で定義",
-              "fix または implementation を一緒に進める",
-              "動く system を measurable な結果に結びつける",
-              "納品自体が価値の証拠になるよう設計",
-              "複雑な案件向けに custom project に対応"
+              "カスタム実装",
+              "専任サポート",
+              "高度なセキュリティ機能",
+              "カスタム連携",
+              "SLA 保証"
             ],
-            "cta": "implementation を相談する",
+            "cta": "営業に相談",
             "anchorPrice": "€10,000+"
           },
           "trial": {
-            "name": "無料トライアル",
+            "name": "Free",
             "price": "無料",
-            "period": "最初の価値",
-            "description": "実際の agent problem を定義または接続し、申し込む前に最初の有用な瞬間へ到達します。",
+            "period": "ずっと",
+            "description": "フルガイド付きで最初の AI エージェントを構築・制御します。",
             "features": [
-              "目的を説明するか、既存 agent を接続する",
-              "build・fix・control のどれかへ案内される",
-              "支払う前に最初の価値に到達する",
-              "延長は activation に応じて決まる",
+              "アカデミーへのフルアクセス",
+              "AI エージェント 1 体",
+              "基本サポート",
+              "すぐに開始",
               "本気度を証明する最初の一歩として最適"
             ],
-            "cta": "トライアルアクセスを申請",
-            "priceNote": "実際のエージェント課題を定義または接続するまで無料。"
+            "cta": "始める",
+            "priceNote": "クレジットカード不要。"
           }
         }
       },
       "livePlans": {
-        "label": "ライブプロダクトプラン",
-        "title": "Pico がすでに動いている前提のライブプラン",
-        "body": "すでにアクセスがある、またはプロダクトの裏側にある課金レイヤーを理解する必要があるなら、ここにあるのが Pico のさらに奥で有効になるプランです。",
+        "label": "ライブ製品プラン",
+        "title": "Pico がすでに動いているときのライブ製品プラン",
+        "body": "すでにアクセスがある、または製品の裏側にある課金レイヤーを理解する必要がある場合、ここにあるプランが Pico の奥で有効になります。",
         "badge": "Pico 内",
-        "badgePopular": "operator の標準",
+        "badgePopular": "オペレーター標準",
         "currentPlan": "現在",
-        "loading": "Checkout を開始中...",
-        "checkoutError": "Checkout に失敗しました。もう一度お試しください。",
+        "loading": "チェックアウトを開始中...",
+        "checkoutError": "チェックアウトに失敗しました。もう一度お試しください。",
         "truths": [
-          "Checkout は waitlist ではなくライブアプリ用です",
-          "ホスト session により進捗同期とランタイム状態が有効になります",
+          "チェックアウトはライブアプリ用です。いつでも無料で開始できます",
+          "ホストセッションで進捗同期とランタイム状態が有効になります",
           "Enterprise は無造作なカード決済ではなく、ロールアウト計画から始まります"
         ],
         "tiers": {
@@ -2680,24 +2714,24 @@
             "name": "Free",
             "price": "$0",
             "period": "/月",
-            "description": "課金する前に onboarding、Academy、ライブプロダクトの形を確認します。",
+            "description": "支払う前にオンボーディング、アカデミー、ライブ製品の形を確認します。",
             "features": [
-              "Onboarding と Academy の画面を開ける",
-              "Tutor と Autopilot のプロダクト形状を確認できる",
-              "サインイン時はホスト進捗を使える",
-              "checkout 前の評価に最適"
+              "オンボーディングとアカデミー画面を開ける",
+              "Tutor と Autopilot の製品形状を確認",
+              "サインイン時にホスト進捗を利用",
+              "チェックアウト前の評価に最適"
             ],
-            "cta": "Onboarding を開く"
+            "cta": "オンボーディングを開く"
           },
           "starter": {
             "name": "Starter",
             "price": "$9",
             "period": "/月",
-            "description": "Academy へのフルアクセスと grounded tutoring を備えた、本気の build lane を 1 本持てます。",
+            "description": "アカデミーへのフルアクセスと根拠あるチュータリングを備えた、本気の構築レーンを 1 本持てます。",
             "features": [
               "毎月 1,000 クレジット",
-              "Academy へフルアクセス",
-              "grounded な Tutor サポート",
+              "アカデミーへのフルアクセス",
+              "根拠ある Tutor サポート",
               "Autopilot モード",
               "最初の有料ステップに最適"
             ],
@@ -2707,13 +2741,13 @@
             "name": "Pro",
             "price": "$29",
             "period": "/月",
-            "description": "より強いランタイム可視性と、より速い operator エスカレーションを備えた複数のライブレーンです。",
+            "description": "より強いランタイム可視性と、より速いオペレーターエスカレーションを備えた複数のライブレーン。",
             "features": [
               "毎月 10,000 クレジット",
               "Tutor フルアクセス + BYOK",
               "API アクセス",
               "優先サポート",
-              "アクティブな workflow owner に最適"
+              "アクティブなワークフロー所有者に最適"
             ],
             "cta": "Pro を選ぶ"
           },
@@ -2721,10 +2755,10 @@
             "name": "Enterprise",
             "price": "個別見積もり",
             "period": "",
-            "description": "ID 管理、制御、直接の operator 支援を含むチーム向けロールアウト計画です。",
+            "description": "ID、制御、直接のオペレーター支援を含むチーム向けロールアウト計画。",
             "features": [
               "SSO とチーム管理",
-              "専用のロールアウト計画",
+              "専用ロールアウト計画",
               "SLA に沿ったサポート",
               "カスタムワークフロー設計",
               "創業者への直接アクセス"
@@ -2735,15 +2769,15 @@
       },
       "stackLabel": "スタックの真実",
       "stackTitle": "アクセスの約束を支えるもの",
-      "stackBody": "このオファーは、追跡された pack docs、順序立てられた lesson、ライブ stack briefing に基づいています。このルートは、上に載ったロゴだけではなく、実際に何がプロダクトを支えているかを示すべきです。",
+      "stackBody": "このオファーは、追跡されたパック資料、順序立てたレッスン、ライブスタックブリーフィングに基づいています。このルートは、上に載ったロゴだけでなく、製品の裏側に実際に何があるかを示すべきです。",
       "stackFooterPrefix": "最後の builder-pack 更新",
       "stackFooterMiddle": "対象",
-      "stackFooterDocs": "表示中の docs と",
-      "stackFooterStacks": "追跡中の stack briefing。",
+      "stackFooterDocs": "表示中の資料と",
+      "stackFooterStacks": "追跡中のスタックブリーフィング。",
       "finalLabel": "次の一手",
-      "finalTitle": "正直なレーン選びに迷いますか？",
-      "finalBody": "緊急度、プラン適合、またはロールアウトの形が質問なら、Support が直接答え、正しい Pico ルートへ戻すべきです。",
-      "finalPrimary": "Support レーンを開く",
+      "finalTitle": "正直なレーン選びに迷っていますか？",
+      "finalBody": "緊急度、プラン適合、ロールアウトの形が問題なら、サポートが直接答え、正しい Pico ルートへ戻します。",
+      "finalPrimary": "サポートレーンを開く",
       "finalSecondary": "ランディングに戻る"
     },
     "lessonPage": {
