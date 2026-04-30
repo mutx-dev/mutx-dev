@@ -133,7 +133,7 @@ const walkthroughSteps = [
   {
     title: "Close the loop on recovery",
     description:
-      "Refresh health after a deployment change so operators can confirm the system recovered from the same control surface.",
+      "Refresh health after a deployment change so teams can confirm the system recovered from the same dashboard.",
   },
 ] as const;
 
@@ -228,7 +228,7 @@ export function AppDashboardClient() {
     return {
       label: "demo ready",
       tone: "bg-emerald-400/10 text-emerald-300 border-emerald-400/20",
-      detail: "Auth, fleet, health, and API key lifecycle are all visible from one operator surface.",
+      detail: "Auth, fleet, health, and API key lifecycle are all visible from one dashboard.",
     };
   }, [activeKeys, agents.length, apiKeyLimitReached, deployments.length, health?.error, health?.status, user]);
   const authBoundaryDetail = useMemo(() => {

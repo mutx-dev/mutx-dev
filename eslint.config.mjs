@@ -20,6 +20,7 @@ export default tseslint.config(
       ".next/**",
       "node_modules/**",
       "dist/**",
+      "gbrain-src/**",
       "out/**",
       "tmp/**",
       "playwright-report/**",

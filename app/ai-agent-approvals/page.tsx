@@ -140,7 +140,7 @@ const featureCards = [
 const approvalCards = [
   {
     title: "Production changes",
-    body: "Deployments, config mutations, and other production-facing actions. Usually the first place teams add approval gates because the risk is obvious and the operator path is clear.",
+    body: "Deployments, config mutations, and other production-facing actions. Usually the first place teams add approval gates because the risk is obvious and the review path is clear.",
   },
   {
     title: "Credential and access changes",

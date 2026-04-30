@@ -1,8 +1,8 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Get an AI Agent Working and Under Control",
-      "description": "PicoMUTX helps founders and operators build, recover, and control AI agents they can actually trust in real-world use."
+      "title": "PicoMUTX — Get an AI Agent Running",
+      "description": "PicoMUTX helps teams install, configure, and run useful AI agents with guidance when setup gets complicated."
     },
     "nav": {
       "brand": "PicoMUTX",
@@ -16,10 +16,10 @@
     "badge": "Waitlist Open · Founding Access",
     "title": "Stop babysitting ",
     "titleAccent": "your AI.",
-    "subtitle": "Start from zero, recover a broken setup, or take control of a live agent. Pico routes one real blocker into build, fix, or control.",
+    "subtitle": "Start from zero, recover a stuck setup, or prepare a live agent for real work. Pico keeps the next setup step clear.",
     "cta": "Request access",
     "ctaSecondary": "See How It Works",
-    "meta": "Waitlist open. Product routes reopen after the academy polish pass."
+    "meta": "Waitlist open. Guided setup access is rolling out."
   },
   "agentSlider": {
     "ariaLabel": "Autonomous agent types",
@@ -30,7 +30,7 @@
       },
       "1": {
         "name": "Market Agent",
-        "description": "Monitors signals and surfaces meaningful changes."
+        "description": "Tracks changes and highlights what needs attention."
       },
       "2": {
         "name": "Deal Agent",
@@ -56,16 +56,16 @@
   },
   "trustBar": {
       "items": {
-        "0": "Start from zero, a messy build, or a live system",
-        "1": "One diagnosis layer routes you into build, fix, or control",
-        "2": "Visibility, approvals, and safeguards before trust is assumed"
+        "0": "Start from zero, a stuck setup, or a live system",
+        "1": "A clear setup path for install, repair, or review",
+        "2": "Runs, approvals, and support before agents work unattended"
       }
     },
     "problem": {
       "eyebrow": "Why Pico",
       "title": "Most agent projects do not fail",
       "titleLine2": "because the idea was weak.",
-      "body": "Projects stall when the path gets messy: too many stack decisions, no recovery path, and no operational clarity once something breaks.",
+      "body": "Projects stall when setup gets unclear: too many stack choices, too many keys, and no simple recovery path when something breaks.",
       "scenarios": {
         "0": {
           "label": "\"I know what I want the agent to do. I still need the fastest sane path to get one working.\"",
@@ -73,7 +73,7 @@
         },
         "1": {
           "label": "\"I already built part of this. Now I need to recover the setup instead of restarting from scratch.\"",
-          "body": "When a build breaks halfway through, losing momentum costs more than time. You need a recovery lane, not another theory loop."
+          "body": "When setup breaks halfway through, you need the next repair step, not another research session."
         },
         "2": {
           "label": "\"Something is already live, but I do not trust the cost, logic, or failure modes yet.\"",
@@ -84,28 +84,28 @@
           "body": "If you cannot see runs, thresholds, approvals, and behavior under pressure, you do not have an operational asset yet."
         }
       },
-      "close": "Pico turns that uncertainty into one honest next move."
+      "close": "Pico turns that uncertainty into one practical next step."
     },
     "platform": {
       "eyebrow": "How Pico Works",
-      "title": "Diagnosis first. Then build, fix, or control.",
-      "body": "Pico finds the blocker and routes the next step so progress does not disappear the moment something breaks.",
+      "title": "Find the blocker. Finish the setup.",
+      "body": "Pico helps you identify what is blocking the agent, then points you to the next install, repair, review, or support step.",
       "howItWorks": {
         "0": {
           "title": "Describe the goal or connect the agent",
-          "body": "Start with the job, the blocker, or the live system you need to understand. Pico uses that context to decide what kind of help is actually relevant."
+          "body": "Start with the job, the blocker, or the live system you need to understand. Pico uses that context to choose the right setup step."
         },
         "1": {
-          "title": "Get routed into build, fix, or control",
-          "body": "New builds get a practical path to one useful agent. Broken setups get recovery steps. Live systems get visibility, thresholds, approvals, and operator guardrails."
+          "title": "Choose install, repair, review, or support",
+          "body": "New builds get a practical path to one useful agent. Stuck setups get repair steps. Live systems get run history, thresholds, and approvals."
         },
         "2": {
-          "title": "Apply changes in one operational loop",
-          "body": "Observe behavior, isolate what is off, implement the next change, and keep moving without losing the thread."
+          "title": "Make the next change without losing context",
+          "body": "Check the run, isolate what is off, make the next change, and keep moving."
         },
         "3": {
           "title": "Escalate when the edge case is real",
-          "body": "When the system cannot close the loop alone, human guidance steps in as proof and calibration, not as the entire product."
+          "body": "When setup needs API keys, hosting, integrations, or custom work, human guidance is available."
         }
       }
     },
@@ -117,16 +117,16 @@
       "forYou": {
         "0": "You want to ship one useful agent without assembling the whole stack by guesswork",
         "1": "You already have a half-built or broken setup and need to recover momentum",
-        "2": "You have something live or nearly live and need more control before you trust it",
+        "2": "You have something live or nearly live and need better review before it works unattended",
         "3": "You want outcome-first help, not a course or theory rabbit hole",
-        "4": "You want a system that reduces dependence on ad hoc expert intervention over time"
+        "4": "You want a setup that gets easier to run over time"
       },
       "notForYou": {
         "0": "You want a generic no-code toy that removes judgment from the work",
-        "1": "You already need enterprise-grade governance infrastructure across a mature agent estate",
+        "1": "You already need enterprise governance across a mature agent fleet",
         "2": "You want education, hype, or trend-chasing more than operational progress",
         "3": "You expect AI to replace ownership, review, or accountability",
-        "4": "You are only looking to buy access to a founder instead of using a product"
+        "4": "You only want consulting without using the product"
       }
     },
     "beforeAfter": {
@@ -136,40 +136,40 @@
       "afterLabel": "After",
       "items": {
         "0": {
-          "before": "You are not sure whether you need to build, debug, or add controls first",
-          "after": "You get routed to the lane that matches the real blocker"
+          "before": "You are not sure whether to install, repair, or review the agent first",
+          "after": "You get the next setup step for the actual blocker"
         },
         "1": {
           "before": "Every issue sends you into a different tool, doc, or opinion loop",
-          "after": "Build, recovery, and control live inside one operating system"
+          "after": "Install, recovery, and review stay in one product"
         },
         "2": {
           "before": "A broken setup or vague runtime behavior kills momentum",
-          "after": "The next action is visible, reviewable, and grounded"
+          "after": "The next action is visible and specific"
         },
         "3": {
-          "before": "You have an agent you cannot fully explain or trust",
-          "after": "You have something you can run, inspect, and improve with confidence"
+          "before": "You have an agent you cannot fully explain or review",
+          "after": "You have something you can run, inspect, and improve"
         }
       },
-      "close": "The goal is not to learn AI in the abstract. The goal is to get something useful working and keep it trustworthy."
+      "close": "The goal is not to learn AI in the abstract. The goal is to get something useful working and keep it maintainable."
     },
     "earlyAccess": {
       "eyebrow": "Founding Access",
       "title": "Waitlist-first outside. Real product underneath.",
-      "body": "Access opens in waves so serious operators land in the right lane while workflows harden on real use.",
+      "body": "Access opens in waves so new users can get the right setup path while the product improves from real use.",
       "benefits": {
-        "0": "Start from zero, a broken setup, or a live system you do not trust yet",
-        "1": "Get routed into build, fix, or control",
+        "0": "Start from zero, a broken setup, or a live system you need to review",
+        "1": "Get a path for install, repair, or review",
         "2": "Lock founding pricing while access is still selective",
         "3": "Use expert input only when the edge case is real",
-        "4": "Help shape the first case studies and operating patterns"
+        "4": "Help shape the first setup guides and examples"
       }
     },
     "pricing": {
       "eyebrow": "Founding Pricing",
-      "title": "Lock the founding lane before the product routes reopen.",
-      "lead": "The waitlist is open again. Tell us whether you need to build, fix, or control, and we will route serious operators into the right wave.",
+      "title": "Lock founding pricing before wider access opens.",
+      "lead": "The waitlist is open again. Tell us whether you need to install, repair, review, or customize an agent setup.",
       "recommendedLabel": "90% Off Founding",
       "tiers": {
         "trial": {
@@ -180,7 +180,7 @@
           "priceNote": "Free until a real agent problem is defined or connected.",
           "features": [
             "Describe a goal or connect an agent",
-            "Get routed into build, fix, or control",
+            "Get a path for install, repair, or review",
             "Reach first value before paying"
           ],
           "cta": "Request Trial Access",
@@ -190,12 +190,12 @@
           "name": "Founding Tier",
           "price": "€29",
           "period": "/mo",
-          "description": "Self-serve execution for operators who want the product early without waiting for the polished public tier.",
+          "description": "Self-serve setup for users who want early product access.",
           "priceNote": "Founding members lock €29/mo instead of the later €290/mo public rate.",
           "recommended": true,
           "features": [
-            "AI diagnostic intake",
-            "Guided build, fix, and control paths",
+            "AI setup intake",
+            "Guided install, repair, and review paths",
             "Built for independent execution"
           ],
           "cta": "Request Founding Access",
@@ -210,7 +210,7 @@
           "features": [
             "Everything in the Founding Tier",
             "Weekly group troubleshooting",
-            "Shared operator accountability"
+            "Shared setup accountability"
           ],
           "cta": "Request Supported Access",
           "ctaHref": "/pricing",
@@ -221,7 +221,7 @@
           "name": "Pico Pilot",
           "price": "€1,000+",
           "period": "/engagement",
-          "description": "Hands-on implementation when the system is broken, urgent, or too expensive to keep guessing on.",
+          "description": "Hands-on implementation when setup is urgent, unclear, or too expensive to keep guessing on.",
           "features": [
             "Scoped diagnosis and implementation",
             "A working system tied to measurable outcome",
@@ -236,16 +236,16 @@
     },
     "pricingPage": {
       "eyebrow": "Pricing",
-      "title": "Choose the plan that fits your needs.",
-      "subtitle": "Start free and upgrade as you grow. All plans include full access to our academy and support resources.",
+      "title": "Start free. Get help when setup needs it.",
+      "subtitle": "PicoMUTX helps you install, prepare an agent packet, and get human help for keys, hosting, integrations, or custom implementation.",
       "primaryCta": "Get Started",
       "secondaryCta": "Talk to support",
       "returnToLanding": "Return to landing",
       "routeState": {
-        "label": "Route state",
-        "title": "Public access gets you into the right lane. Product billing lives deeper in the system.",
-        "body": "Start with the lane that matches your blocker. Use the live plans only when you already need an authenticated workspace, checkout, or rollout planning.",
-        "signalLabel": "Access signal",
+        "label": "Access state",
+        "title": "Start with setup. Choose a plan when you need support.",
+        "body": "Most users start with onboarding and then decide whether they need 1-on-1 guidance, managed setup, or a custom rollout.",
+        "signalLabel": "Access status",
         "sessionAttached": "Hosted session attached",
         "sessionLoading": "Checking hosted session",
         "sessionMissing": "No hosted session yet",
@@ -255,68 +255,70 @@
         "stacksLabel": "Tracked stacks"
       },
       "accessPlans": {
-        "label": "Our Plans",
-        "title": "Start with free. Upgrade when you need more power.",
-        "body": "All plans include full academy access. Choose what's right for your journey.",
-        "recommended": "Popular",
-        "meta": "Simple, transparent pricing for every stage of your AI journey.",
-        "noteLabel": "Why choose Pico?",
-        "note": "Start building and controlling AI agents today with our straightforward pricing. No hidden fees, cancel anytime.",
+        "label": "Plans",
+        "title": "Use Pico yourself or get guided setup",
+        "body": "Free is enough to inspect the setup flow. Paid plans add more product access and support when setup gets practical.",
+        "recommended": "Recommended",
+        "meta": "Start with onboarding. Upgrade when API keys, hosting, integrations, or support time matter.",
+        "noteLabel": "What you get",
+        "note": "Pico is designed to move from install to agent packet to a running agent, with human help available when self-serve setup is too much.",
         "truths": [
-          "Free plan is perfect for getting started",
-          "Starter plan gives you more power and support",
-          "Pro plan includes priority support and advanced features"
+          "Onboarding prepares the agent packet",
+          "Support helps with keys, hosting, and rollout",
+          "Custom work is available when self-serve setup is not enough"
         ],
         "tiers": {
           "trial": {
-            "name": "Free",
+            "name": "Free trial",
             "price": "Free",
-            "period": "forever",
-            "description": "Build and control your first AI agent with full guidance.",
+            "period": "trial",
+            "description": "Inspect the setup flow and see how the agent packet works.",
             "features": [
-              "Full academy access",
-              "1 AI agent",
-              "Basic support",
-              "Start immediately"
+              "Onboarding and academy access",
+              "Agent packet preview",
+              "Tutor evaluation",
+              "Best fit for first setup"
             ],
-            "cta": "Get Started",
+            "cta": "Request free trial",
             "priceNote": "No credit card required."
           },
           "starter": {
             "name": "Starter",
-            "price": "$9",
+            "price": "€29",
             "period": "/mo",
-            "description": "For individuals needing more power and support.",
+            "description": "For a first serious build with more product access and support.",
             "priceNote": "Cancel anytime.",
             "recommended": true,
             "features": [
-              "Everything in Free",
-              "Priority support",
-              "Advanced analytics",
-              "More AI agents",
-              "Full product access"
+              "€290 annual option",
+              "Everything in Free trial",
+              "Agent packet workflow",
+              "Human reply when setup gets unclear",
+              "More product access",
+              "Best fit for first-time builders"
             ],
             "cta": "Choose Starter"
           },
           "pro": {
             "name": "Pro",
-            "price": "$29",
+            "price": "€79",
             "period": "/mo",
-            "description": "For teams needing more control and support.",
+            "description": "For teams that want closer guidance through setup and rollout.",
             "features": [
+              "€790 annual option",
               "Everything in Starter",
               "Enhanced onboarding support",
               "Weekly group troubleshooting",
-              "Shared operator support environment",
-              "Lower friction when implementation gets messy"
+              "Help with hosting and integrations",
+              "Closer support during implementation"
             ],
             "cta": "Choose Pro"
           },
           "enterprise": {
-            "name": "Enterprise",
+            "name": "Pico Pilot",
             "price": "Custom",
             "period": "/month",
-            "description": "For organizations needing custom implementation and support.",
+            "description": "For organizations needing custom implementation, hosting guidance, or private rollout.",
             "features": [
               "Custom implementation",
               "Dedicated support",
@@ -330,26 +332,26 @@
       },
       "livePlans": {
         "label": "Live product plans",
-        "title": "Live product plans once Pico is already in play",
-        "body": "If you already have access, or you need to understand the billing layer behind the product, these are the plans that activate deeper inside Pico.",
+        "title": "Live product plans after setup starts",
+        "body": "Use these once you know whether you are self-serving, bringing a team, or asking Pico to help implement the setup.",
         "badge": "Inside Pico",
-        "badgePopular": "Operator default",
+        "badgePopular": "Recommended",
         "currentPlan": "Current",
         "loading": "Starting checkout...",
         "checkoutError": "Checkout failed. Please try again.",
         "truths": [
-          "Checkout is for the live app, start free anytime",
+          "Checkout is for the live app",
           "Hosted session unlocks progress sync and runtime state",
-          "Enterprise starts with rollout planning, not a blind card swipe"
+          "Custom work starts with planning"
         ],
         "tiers": {
           "free": {
             "name": "Free",
             "price": "$0",
             "period": "/mo",
-            "description": "Inspect onboarding, academy, and live product shape before you spend.",
+            "description": "Inspect onboarding, academy, and product shape before you spend.",
             "features": [
-              "Open onboarding and academy surfaces",
+              "Open onboarding and academy",
               "See tutor and Autopilot product shape",
               "Use hosted progress when signed in",
               "Best fit for evaluation before checkout"
@@ -360,11 +362,11 @@
             "name": "Starter",
             "price": "$9",
             "period": "/mo",
-            "description": "One serious build lane with full academy access and grounded tutoring.",
+            "description": "One serious setup path with full academy access and tutor support.",
             "features": [
               "1,000 monthly credits",
               "Full academy access",
-              "Grounded tutor support",
+              "Tutor support",
               "Autopilot mode",
               "Best first paid step"
             ],
@@ -374,7 +376,7 @@
             "name": "Pro",
             "price": "$29",
             "period": "/mo",
-            "description": "Multiple live lanes with stronger runtime visibility and faster operator escalation.",
+            "description": "More runtime visibility, BYOK, and faster support for active workflows.",
             "features": [
               "10,000 monthly credits",
               "Full tutor + BYOK",
@@ -388,7 +390,7 @@
             "name": "Enterprise",
             "price": "Custom",
             "period": "",
-            "description": "Team rollout planning with identity, controls, and direct operator support.",
+            "description": "Team rollout planning with identity, controls, and direct implementation support.",
             "features": [
               "SSO and team management",
               "Dedicated rollout planning",
@@ -400,17 +402,17 @@
           }
         }
       },
-      "stackLabel": "Stack truth",
-      "stackTitle": "What backs the access promise",
-      "stackBody": "The offer is grounded in tracked pack docs, sequenced lessons, and live stack briefings. This route should show what is actually behind the product, not just the logo on top.",
+      "stackLabel": "Stack notes",
+      "stackTitle": "What Pico uses during setup",
+      "stackBody": "Pico uses tracked pack docs, sequenced lessons, and live stack briefings so the setup path and agent packet stay practical.",
       "stackFooterPrefix": "Last builder-pack refresh",
       "stackFooterMiddle": "across",
       "stackFooterDocs": "visible docs and",
       "stackFooterStacks": "tracked stack briefings.",
       "finalLabel": "Next move",
-      "finalTitle": "Need help choosing the honest lane?",
-      "finalBody": "If the question is urgency, plan fit, or rollout shape, support should answer it directly and send you back into the right Pico route.",
-      "finalPrimary": "Open support lane",
+      "finalTitle": "Need help choosing the right setup?",
+      "finalBody": "Start free if you want to inspect Pico. Talk to support if you need help with API keys, hosting, integrations, or a custom implementation.",
+      "finalPrimary": "Talk to support",
       "finalSecondary": "Return to landing"
     },
     "faq": {
@@ -419,7 +421,7 @@
       "items": {
         "0": {
           "q": "Do I need to know how to code?",
-          "a": "No. PicoMUTX is for operators who need outcomes without turning themselves into full-time agent engineers."
+          "a": "No. PicoMUTX is for people who need outcomes without turning themselves into full-time agent engineers."
         },
         "1": {
           "q": "What if I already tried and failed?",
@@ -427,25 +429,25 @@
         },
         "2": {
           "q": "What kind of agent work is this for?",
-          "a": "Practical agent systems: support flows, internal copilots, lead capture, sales follow-up, and operational workflows that need to get built, fixed, or controlled in the real world."
+          "a": "Practical agent systems: support flows, internal copilots, lead capture, sales follow-up, and workflows that need to get built, fixed, or reviewed in the real world."
         },
         "3": {
           "q": "Is the waitlist open?",
-          "a": "Yes. The public waitlist is open again. The academy and product routes are still private until this redesign pass moves beyond the landing page."
+          "a": "Yes. The public waitlist is open again. Academy and product access are rolling out gradually."
         },
         "4": {
           "q": "Is this for enterprises?",
-          "a": "PicoMUTX is the commercial wedge into MUTX, not the full enterprise governance layer. Heavier multi-team governance belongs in the broader MUTX stack."
+          "a": "PicoMUTX is the setup-focused entry point into MUTX. Heavier multi-team governance belongs in the broader MUTX stack."
         }
       }
     },
     "finalCta": {
       "eyebrow": "Founding Access",
-      "title": "Request access to the right lane.",
-      "body": "Pico helps you get something useful working, recover it when it breaks, and keep it under control in real work.",
+      "title": "Request Pico access.",
+      "body": "Pico helps you get something useful working, recover it when it breaks, and keep it reviewable in real work.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
-      "formHeadline": "Start with the real blocker.",
-      "formSubline": "Tell us whether you need to build, fix, or control. We will route you to the right lane.",
+      "formHeadline": "Start with the actual blocker.",
+      "formSubline": "Tell us whether you need to install, repair, review, or customize an agent setup.",
       "ctaButton": "Request access",
       "secondaryButton": "Book a Planning Call",
       "formCtaMeta": "Free trial · Founding rates at 90% off · €29 / €79 · Pico Pilot from €1,000+"
@@ -454,7 +456,7 @@
       "dialogLabel": "Contact form",
       "closeLabel": "Close",
       "title": "Request Pico access",
-      "subtitle": "Tell us what you are trying to ship, recover, or control. We will route you to the right next step.",
+      "subtitle": "Tell us what you are trying to ship, recover, review, or customize. We will reply with a practical next step.",
       "emailLabel": "Work email",
       "emailPlaceholder": "you@company.com",
       "nameLabel": "Name",
@@ -465,7 +467,7 @@
       "interestOptions": {
         "build": "Building something from scratch",
         "fix": "Recovering or repairing a setup",
-        "control": "Getting a live agent under control",
+        "control": "Reviewing a live agent before it runs unattended",
         "other": "Something else"
       },
       "messageLabel": "Anything we should know?",
@@ -473,9 +475,9 @@
       "messagePlaceholder": "Describe the goal, blocker, or live system…",
       "submitting": "Sending...",
       "submit": "Request access",
-      "disclaimer": "No generic nurture funnel. A human will reply with the honest next route.",
+      "disclaimer": "No generic nurture funnel. A human will reply with a practical next step.",
       "successTitle": "Request received.",
-      "successBody": "We have your context. Check your email for the next route into Pico.",
+      "successBody": "We have your context. Check your email for the next step into Pico.",
       "successBack": "Back to the page",
       "errorFallback": "Something went wrong. Please try again.",
       "networkError": "Network error. Please try again."
@@ -485,7 +487,7 @@
       "emailPlaceholder": "you@company.com",
       "submitting": "Sending request…",
       "submit": "Request access",
-      "privacy": "No spam. No payment required. Just access updates and honest next steps.",
+      "privacy": "No spam. No payment required. Just access updates and practical next steps.",
       "successTitle": "You are on the list.",
       "successBody": "We will be in touch when your PicoMUTX access wave opens. No spam, no payment required.",
       "errorFallback": "Something went wrong. Please try again."

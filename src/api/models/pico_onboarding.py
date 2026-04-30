@@ -63,7 +63,7 @@ class PicoChatResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     reply: str
-    session_id: str
+    session_id: str = ""
     onboarding_state: OnboardingState | None = None
     ready_for_package: bool = False
 

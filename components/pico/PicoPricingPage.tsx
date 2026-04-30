@@ -233,7 +233,7 @@ export function PicoPricingPage() {
                 <span className="grid gap-0.5">
                   <span className={picoClasses.label}>PicoMUTX</span>
                   <span className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                    access atlas
+                    setup options
                   </span>
                 </span>
               </Link>

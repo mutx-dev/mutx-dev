@@ -16,11 +16,10 @@ export default function NotFound() {
         </div>
 
         <div className="space-y-4">
-          <p className="text-sm uppercase tracking-[0.28em] text-cyan-200">MUTX Webmaster Surface</p>
-          <h1 className="text-4xl font-medium tracking-tight sm:text-6xl">This route does not exist.</h1>
+          <p className="text-sm uppercase tracking-[0.28em] text-cyan-200">MUTX Website</p>
+          <h1 className="text-4xl font-medium tracking-tight sm:text-6xl">This page does not exist.</h1>
           <p className="max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
-            The page you requested is missing, moved, or was never part of the public MUTX surface. Use the
-            links below to get back to a real product surface.
+            The page you requested is missing, moved, or unavailable. Use the links below to get back to MUTX.
           </p>
         </div>
 

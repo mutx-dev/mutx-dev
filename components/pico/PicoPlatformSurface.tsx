@@ -52,12 +52,12 @@ const surfaceOptions: Array<{
   {
     surface: 'autopilot',
     label: 'Autopilot',
-    note: 'Runtime control room',
+    note: 'Runtime review',
   },
   {
     surface: 'support',
     label: 'Support',
-    note: 'Human escalation lane',
+    note: 'Human setup help',
   },
 ] as const
 
@@ -121,12 +121,11 @@ export function PicoPlatformSurface({
         <div>
           <p className={picoClasses.label}>Platform desk</p>
           <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-4xl">
-            Identity, route memory, and limits in one place
+            Identity, page memory, and limits in one place
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            This is the operator-facing control desk for the Pico account. It should tell the truth
-            about plan limits, where the operator was last working, and whether the product chrome
-            is tuned for focus or recovery.
+            This account panel shows plan limits, the last Pico page used, and whether the interface
+            is set for a tighter workspace.
           </p>
         </div>
         <span className={picoClasses.chip}>{formatSyncState(syncState, ready)}</span>
@@ -163,10 +162,9 @@ export function PicoPlatformSurface({
             <div className="grid gap-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className={picoClasses.label}>Route memory</p>
+                  <p className={picoClasses.label}>Page memory</p>
                   <p className="mt-1 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    The current surface should match what the operator is actually doing. Keep this
-                    updated when the product shifts lanes.
+                    Keep this aligned with the page you are actually using.
                   </p>
                 </div>
                 <span className={picoClasses.chip} data-testid="pico-platform-active-surface">
@@ -198,7 +196,7 @@ export function PicoPlatformSurface({
                         <p className="mt-2 text-xl font-medium text-[color:var(--pico-text)]">{option.label}</p>
                       </div>
                       <span className={cn(picoClasses.chip, selected && 'text-[color:var(--pico-text)]')}>
-                        {selected ? 'active now' : 'set route'}
+                        {selected ? 'active now' : 'set page'}
                       </span>
                     </button>
                   )
@@ -208,13 +206,12 @@ export function PicoPlatformSurface({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className={picoSoft('p-4')}>
-                <p className={picoClasses.label}>Current surface</p>
+                  <p className={picoClasses.label}>Current page</p>
                 <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
                   {activeSurface ?? 'not recorded'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Route memory should follow the operator through Pico instead of resetting every
-                  time the page changes.
+                  Page memory should follow you through Pico instead of resetting every time the page changes.
                 </p>
               </div>
 
@@ -224,7 +221,7 @@ export function PicoPlatformSurface({
                   {lastOpenedLesson ?? 'not recorded'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  This is the recovery point when the operator needs to re-enter the lesson spine.
+                  This is the recovery point when you need to re-enter the lesson flow.
                 </p>
               </div>
             </div>
@@ -240,8 +237,7 @@ export function PicoPlatformSurface({
                 <span>
                   <span className="block font-medium text-[color:var(--pico-text)]">Collapse rail</span>
                   <span className="block text-[color:var(--pico-text-secondary)]">
-                    Use a tighter chrome when the operator already knows the route and needs more
-                    room for the live surface.
+                    Use a tighter layout when you already know the page and need more room.
                   </span>
                 </span>
               </label>
@@ -254,10 +250,9 @@ export function PicoPlatformSurface({
                   className="mt-1 h-4 w-4 rounded border-[color:var(--pico-border)] bg-transparent text-[color:var(--pico-accent)] accent-[color:var(--pico-accent)]"
                 />
                 <span>
-                  <span className="block font-medium text-[color:var(--pico-text)]">Keep help lane open</span>
+                  <span className="block font-medium text-[color:var(--pico-text)]">Keep help panel open</span>
                   <span className="block text-[color:var(--pico-text-secondary)]">
-                    Keep recovery guidance visible when the operator is still learning the product
-                    routes.
+                    Keep guidance visible while the setup path is still unfamiliar.
                   </span>
                 </span>
               </label>
@@ -286,7 +281,7 @@ export function PicoPlatformSurface({
                 Reset platform memory
               </button>
               <Link href={toHref('/autopilot')} className={picoClasses.tertiaryButton}>
-                Open live control room
+                Open Autopilot
               </Link>
             </div>
           </div>
@@ -313,7 +308,7 @@ export function PicoPlatformSurface({
 
         <div className="grid gap-4">
           <div className={picoInset('p-5')}>
-            <p className={picoClasses.label}>Route ledger</p>
+            <p className={picoClasses.label}>Page record</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
                 <p className="text-sm text-[color:var(--pico-text-muted)]">Current path</p>
@@ -335,11 +330,10 @@ export function PicoPlatformSurface({
           </div>
 
           <div className={picoInset('p-5')}>
-            <p className={picoClasses.label}>Operator truth</p>
+            <p className={picoClasses.label}>Stored page state</p>
             <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              The product should remember the route and lesson context without pretending it knows
-              more than it does. `activeSurface`, `lastOpenedLessonSlug`, the rail state, and the
-              help lane are the minimum persisted memory needed to make Pico feel like one platform.
+              Pico remembers the current page, last lesson, rail state, and help panel so setup can
+              resume without asking you to rebuild context.
             </p>
           </div>
         </div>

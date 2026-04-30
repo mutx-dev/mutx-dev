@@ -196,7 +196,7 @@ export function OpenclawSetupSurface() {
         hint={{
           tone: "beta",
           detail:
-            "Setup on the web is still a guided operator surface. The dashboard reflects synced state truthfully, but installation and machine-local runtime actions still complete in the CLI or TUI.",
+            "Setup on the web is still guided. The dashboard reflects synced state, but installation and machine-local runtime actions still complete in the CLI or TUI.",
         }}
         actions={(
           <button

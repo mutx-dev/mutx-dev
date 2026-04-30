@@ -50,6 +50,7 @@ def test_app_factory_mounts_expected_public_routes():
         "/v1/clawhub",
         "/v1/deployments",
         "/v1/documents",
+        "/v1/events",
         "/v1/governance",
         "/v1/ingest",
         "/v1/leads",

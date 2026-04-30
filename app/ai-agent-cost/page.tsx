@@ -148,7 +148,7 @@ const operationsCards = [
   },
   {
     title: "Approval-aware budgets",
-    body: "High-cost actions are governance events. Budgets, approvals, and runtime controls share one operator surface — not three disconnected tools.",
+    body: "High-cost actions are governance events. Budgets, approvals, and runtime controls share one review dashboard, not three disconnected tools.",
   },
   {
     title: "Trace-linked investigations",

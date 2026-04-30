@@ -19,7 +19,7 @@ export default function DashboardAutonomyPage() {
             hint={{
               tone: 'beta',
               detail:
-                'Autonomy is tied directly to the local daemon and repo state. The feed is real, but the operator surface is still evolving around internal workflows.',
+                'Autonomy is tied directly to the local daemon and repo state. The feed is real, but the dashboard is still evolving around internal workflows.',
             }}
             stats={[
               { label: "Source", value: ".autonomy + queue", tone: "success" },

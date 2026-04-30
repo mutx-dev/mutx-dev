@@ -46,7 +46,7 @@ const controlProtocol = [
   {
     id: '01',
     title: 'Start with the last run',
-    body: 'If the latest execution does not make sense, the rest of this surface is just decoration.',
+    body: 'If the latest execution does not make sense, pause before changing automation settings.',
     href: '#recent-runs',
     action: 'Open recent runs',
   },
@@ -565,34 +565,34 @@ export function PicoAutopilotPageClient() {
     : `Inspect run ${latestRun.id.slice(0, 8)}`
   const latestRunTimestamp = latestRun?.completed_at ?? latestRun?.started_at ?? latestRun?.created_at ?? null
   const latestRunTraces = latestRun ? tracesByRunId[latestRun.id] ?? [] : []
-  const operatorDoctrine = [
+  const reviewFlow = [
     {
       label: '01 • Read',
-      title: 'Start with the strongest live signal',
+      title: 'Start with the latest run',
       body: authRequired
-        ? 'Without a hosted session this room should refuse to improvise. Attach the live feed first.'
+        ? 'Attach the hosted session before reviewing runs or approvals.'
         : latestRun
           ? `Run ${latestRun.id.slice(0, 8)} is the first thing to read. ${describeRunDetail(latestRun, latestRunTraces)}`
-          : 'No live run exists yet. The honest move is to trigger one real task before tuning anything else.',
+          : 'No live run exists yet. Trigger one real task before tuning anything else.',
     },
     {
       label: '02 • Judge',
-      title: 'Make the decision line explicit',
+      title: 'Set a clear review line',
       body: authRequired
         ? 'Budget review is unavailable until the live account is attached.'
         : budget
           ? `${formatPercent(budget.usage_percentage)} usage against a ${formatPercent(progress.autopilot.costThresholdPercent)} threshold. That line should tell you when a human steps in.`
-          : 'No live budget snapshot yet. Do not pretend a threshold matters until it meets real spend.',
+          : 'No live budget snapshot yet. Set the threshold after spend is visible.',
     },
     {
       label: '03 • Intervene',
-      title: 'Keep risky actions reviewable',
+      title: 'Review risky actions',
       body:
         pendingApprovals.length > 0
-          ? `${pendingApprovals.length} approval item${pendingApprovals.length === 1 ? '' : 's'} is waiting. Good. The dangerous work is still visible.`
+          ? `${pendingApprovals.length} approval item${pendingApprovals.length === 1 ? '' : 's'} is waiting. Review it before it runs.`
           : progress.autopilot.approvalGateEnabled
-            ? 'The gate is configured, but nothing is waiting right now. Keep it reviewable and boring.'
-            : 'The gate is still off. Turn it on before a risky action becomes an invisible side effect.',
+            ? 'The gate is configured, but nothing is waiting right now.'
+            : 'The gate is still off. Turn it on before risky actions run unattended.',
     },
   ]
   const recoveryWorkspace = usePicoLessonWorkspace(derived.nextLesson?.slug ?? 'autopilot', derived.nextLesson?.steps.length ?? 0, {
@@ -631,8 +631,8 @@ export function PicoAutopilotPageClient() {
   return (
     <PicoShell
       eyebrow="Autopilot bridge"
-      title="Trust the runtime because the surface tells the truth"
-      description="Inspect the latest run, compare it to live spend, then decide which risky actions deserve a gate. That is how trust gets earned here."
+      title="Run agents with review where it matters"
+      description="Inspect the latest run, compare it to spend, and decide which actions need approval before they run autonomously."
       heroContent={
         <div
           className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(8,14,9,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
@@ -653,16 +653,16 @@ export function PicoAutopilotPageClient() {
           <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
             <div className="grid gap-5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={picoClasses.chip}>Runtime pulse</span>
+                <span className={picoClasses.chip}>Runtime status</span>
                 <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
                   {loadStateLabel}
                 </span>
               </div>
               <h2 className="font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
-                Keep the run, spend, and gate in the same frame.
+                Keep run state, spend, and approvals together.
               </h2>
               <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                Start with the latest execution, compare it to the current budget line, then decide whether a human gate belongs in the way. That order keeps the control room honest.
+                Start with the latest execution, compare it to the current budget line, then decide whether a human needs to review the next action.
               </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
@@ -704,14 +704,14 @@ export function PicoAutopilotPageClient() {
                   <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
                 </div>
                 <div className="min-w-0">
-                  <p className={picoClasses.label}>Next operator check</p>
+                  <p className={picoClasses.label}>Next review check</p>
                   <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                     {latestRun ? `Inspect run ${latestRun.id.slice(0, 8)}` : 'Create the first live run'}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                     {latestRun
                       ? describeRunDetail(latestRun, latestRunTraces)
-                      : 'No run is visible yet, so the honest move is still back on the lesson path.'}
+                      : 'No run is visible yet. Finish setup, trigger one task, then come back here.'}
                   </p>
                 </div>
               </div>
@@ -728,10 +728,10 @@ export function PicoAutopilotPageClient() {
                 <p className={picoClasses.label}>Decision line</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                   {thresholdBreached
-                    ? 'Spend is already across the line. Decide whether the next risky action needs a human gate.'
+                    ? 'Spend is already across the line. Decide whether the next risky action needs review.'
                     : pendingApprovals.length > 0
-                      ? 'The queue is holding risky actions in view. Review them before the surface gets noisier.'
-                      : 'If the line is still clear, keep reading the run until the next decision becomes obvious.'}
+                      ? 'The queue has actions waiting. Review them before they run.'
+                      : 'If the line is still clear, keep watching the run until a decision is needed.'}
                 </p>
               </div>
             </div>
@@ -757,8 +757,8 @@ export function PicoAutopilotPageClient() {
     >
       <PicoSessionBanner session={session} nextPath={pathname} />
       <PicoSurfaceCompass
-        title="Stay here only when the live runtime is the real source of truth"
-        body="Autopilot is for reading the current run, spend, alerts, and approvals. If the product still needs a lesson answer, go back to academy or tutor. If the runtime truth is visible but still not enough, escalate with the evidence attached."
+        title="Use Autopilot after setup is running"
+        body="Autopilot is for current runs, spend, alerts, and approvals. If setup is still incomplete, go back to Academy or Tutor. If hosting, keys, or implementation are unclear, get human help."
         status={
           authRequired
             ? 'hosted session required'
@@ -766,32 +766,32 @@ export function PicoAutopilotPageClient() {
               ? 'runtime visible'
               : 'waiting for first run'
         }
-        aside="A control room should not ask for faith. If there is no live signal, leave and create one. If the signal exists, use it to decide the next move immediately."
+        aside="This page should stay simple: no run means finish setup first; a visible run means review state, spend, and approvals."
         items={[
           {
             href: derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy'),
             label: derived.nextLesson ? `Finish ${derived.nextLesson.title}` : 'Go back to academy',
             caption: 'Return here when the real blocker is still on the lesson path rather than in the runtime.',
-            note: 'Back to lane',
+            note: 'Setup',
           },
           {
             href: toHref(`/tutor${derived.nextLesson ? `?lesson=${derived.nextLesson.slug}` : ''}`),
             label: 'Ask tutor about the next move',
-            caption: 'Use tutor when the product likely still knows the answer and the issue is not live runtime state.',
+            caption: 'Use Tutor when one command or setting is blocking setup.',
             note: 'Knowable',
           },
           {
             href: '#recent-runs',
             label: 'Stay on recent runs',
-            caption: 'Remain here when the latest execution, trace, or alert feed is the actual decision surface.',
+            caption: 'Remain here when the latest execution, trace, or alert feed is the current decision.',
             note: 'Stay here',
             tone: 'primary',
           },
           {
             href: toHref('/support'),
-            label: 'Escalate with evidence',
-            caption: 'Escalate only after you have the packet, the run context, and the live signal that proves where the truth broke.',
-            note: 'Messy edge',
+            label: 'Get human help',
+            caption: 'Use support for hosting, provider keys, rollout planning, or custom implementation.',
+            note: 'Guidance',
             tone: 'soft',
           },
         ]}
@@ -799,7 +799,7 @@ export function PicoAutopilotPageClient() {
 
       {authRequired ? (
         <div className="mb-6 rounded-[28px] border border-amber-400/20 bg-amber-400/10 p-6 text-sm leading-6 text-amber-50">
-          Live Autopilot needs an authenticated MUTX session. Until then, there is no honest run, alert, budget, or approval feed to show you.
+          Live Autopilot needs an authenticated MUTX session. Until then, runs, alerts, budgets, and approvals are unavailable.
         </div>
       ) : null}
 
@@ -814,16 +814,16 @@ export function PicoAutopilotPageClient() {
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Operator doctrine</p>
+                <p className={picoClasses.label}>Review flow</p>
                 <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                   Read, judge, then intervene
                 </h2>
               </div>
-              <span className={picoClasses.chip}>signal • line • gate</span>
+              <span className={picoClasses.chip}>run • spend • approval</span>
             </div>
 
             <div className={storyRailClass}>
-              {operatorDoctrine.map((item) => (
+              {reviewFlow.map((item) => (
                 <article key={item.label} className={picoInset('snap-start flex h-full flex-col p-5')}>
                   <p className={picoClasses.label}>{item.label}</p>
                   <h3 className="mt-5 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
@@ -839,7 +839,7 @@ export function PicoAutopilotPageClient() {
 
           <div className="grid gap-4">
             <div className={picoEmber('p-5')}>
-              <p className={picoClasses.label}>Control room posture</p>
+              <p className={picoClasses.label}>Autopilot rule</p>
               <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                 Use this room to review live state, not to celebrate movement for its own sake.
               </p>
@@ -853,7 +853,7 @@ export function PicoAutopilotPageClient() {
             </div>
 
             <div className={picoInset('p-4')}>
-              <p className={picoClasses.label}>Operator cues</p>
+                <p className={picoClasses.label}>Review cues</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                 {autopilotVisuals.map((item) => (
                   <div
@@ -888,19 +888,19 @@ export function PicoAutopilotPageClient() {
         <div className={picoPanel('overflow-hidden p-0')}>
           <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
             <div className="p-6 sm:p-7">
-              <p className={picoClasses.label}>Control brief</p>
+              <p className={picoClasses.label}>Run review</p>
               <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
-                Read the runtime before you trust the automation
+                Check runtime state before automation runs alone
               </h2>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
-                Autopilot earns trust when the last run, the live spend, and the risky actions stay visible in one control surface.
+                Keep the last run, live spend, and risky actions visible before you let agents run unattended.
               </p>
 
               <div className={picoEmber('mt-6 p-5')}>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={picoClasses.chip}>{loadStateLabel}</span>
                   <span className={picoClasses.chip}>
-                    {authRequired ? 'Hosted session required' : 'Live control-plane feed'}
+                    {authRequired ? 'Hosted session required' : 'Live runtime feed'}
                   </span>
                   <span className={picoClasses.chip}>
                     {progress.autopilot.approvalGateEnabled ? 'Gate configured in Pico' : 'Gate still off in Pico'}
@@ -908,17 +908,17 @@ export function PicoAutopilotPageClient() {
                 </div>
                 <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
                   {authRequired
-                    ? 'Until a MUTX session is attached, this surface refuses to invent truth. Use the academy to finish the setup path, then come back to read the real runtime.'
+                    ? 'Attach a MUTX session before reading runtime data. Use Academy to finish setup, then come back here.'
                     : latestRun
                       ? `Latest run ${latestRun.id.slice(0, 8)} is ${humanizeRunStatus(latestRun.status).toLowerCase()}${latestRunTimestamp ? ` as of ${formatTimestamp(latestRunTimestamp)}` : ''}. ${describeRunDetail(latestRun, latestRunTraces)}`
-                      : 'No live run is visible yet. The next honest move is to finish the academy path, trigger one real task, and return here only once the runtime has something to say.'}
+                      : 'No live run is visible yet. Finish setup, trigger one real task, then return here.'}
                 </p>
               </div>
 
             </div>
 
             <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-l lg:border-t-0">
-              <p className={picoClasses.label}>Operator rail</p>
+              <p className={picoClasses.label}>Autopilot rail</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoSoft('p-4')}>
                   <p className="text-sm text-[color:var(--pico-text-muted)]">Session status</p>
@@ -943,13 +943,13 @@ export function PicoAutopilotPageClient() {
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">Active surface</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Active page</p>
                   <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {progress.platform.activeSurface ?? 'none'}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">Help lane</p>
+                  <p className="text-sm text-[color:var(--pico-text-muted)]">Help panel</p>
                   <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
                     {progress.platform.helpLaneOpen ? 'open' : 'closed'}
                   </p>
@@ -977,7 +977,7 @@ export function PicoAutopilotPageClient() {
               <div className={picoInset('mt-4 p-4')}>
                 <p className={picoClasses.label}>If the feed is empty</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Do not dress up missing runtime data. Finish the academy path, trigger one real action, and come back only when MUTX has something to report.
+                  Finish the academy path, trigger one real action, and come back when MUTX has data to show.
                 </p>
                 <Link
                   href={derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy')}
@@ -1017,7 +1017,7 @@ export function PicoAutopilotPageClient() {
               value={liveValue(String(alerts.filter((alert) => !alert.resolved).length))}
               hint={liveHint(
                 alerts.some((alert) => !alert.resolved)
-                  ? 'Unresolved operator pain from the monitoring feed.'
+                  ? 'Unresolved monitoring event from the live feed.'
                   : integrationStatus.hasRuns
                     ? 'No unresolved alerts right now.'
                     : 'No alerts yet because nothing has executed.',
@@ -1053,7 +1053,7 @@ export function PicoAutopilotPageClient() {
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className={picoPanel('p-5')}>
-            <p className={picoClasses.label}>Control brief</p>
+            <p className={picoClasses.label}>Review brief</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
                 <p className="text-sm text-[color:var(--pico-text-muted)]">Latest run</p>
@@ -1080,13 +1080,13 @@ export function PicoAutopilotPageClient() {
                       {recoveryWorkspace.completedStepCount}/{derived.nextLesson.steps.length} steps
                     </p>
                     <p className="mt-2 text-sm font-medium text-[color:var(--pico-text)]">
-                      {recoveryWorkspace.workspace.evidence.trim() ? 'captured' : 'missing'}
+                      {recoveryWorkspace.workspace.evidence.trim() ? 'saved' : 'missing'}
                     </p>
                   </div>
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">Workspace proof</p>
+                    <p className="text-sm text-[color:var(--pico-text-muted)]">Saved output</p>
                     <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
-                      {recoveryWorkspace.workspace.evidence.trim() ? 'captured' : 'missing'}
+                      {recoveryWorkspace.workspace.evidence.trim() ? 'saved' : 'missing'}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                       {recoveryWorkspace.completedStepCount}/{derived.nextLesson.steps.length} steps • {recoveryFocusedStep}
@@ -1109,12 +1109,12 @@ export function PicoAutopilotPageClient() {
                 Ask tutor about the next move
               </Link>
               <Link href={toHref('/support')} className={picoClasses.tertiaryButton}>
-                Escalate to human help
+                Get human help
               </Link>
             </div>
             <div className={picoSoft('mt-4 p-4')}>
               <p className={picoClasses.body}>
-                Stay here when the runtime is the source of truth. If the lesson workspace is still incomplete, the academy remains the cleaner route back to a real answer.
+                Stay here when runtime state is the blocker. If setup is still incomplete, return to Academy.
               </p>
             </div>
           </section>
@@ -1124,15 +1124,15 @@ export function PicoAutopilotPageClient() {
       <section className={picoPanel('mt-6 p-6 sm:p-7')} data-testid="pico-autopilot-control-protocol">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className={picoClasses.label}>Control protocol</p>
+            <p className={picoClasses.label}>Review checklist</p>
             <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
-              Three operator checks before automation earns trust
+              Three checks before unattended runs
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              The control room should stage the first decisions in plain sight. Read the last run, read the spend line, and keep risky actions exposed before you touch anything more abstract.
+              Read the last run, check spend, and review risky actions before changing automation settings.
             </p>
           </div>
-          <span className={picoClasses.chip}>live operator checklist</span>
+          <span className={picoClasses.chip}>live checklist</span>
         </div>
 
         <div className={storyRailClass}>
@@ -1142,7 +1142,7 @@ export function PicoAutopilotPageClient() {
                 <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-accent)]">
                   {item.id}
                 </span>
-                <span className={picoClasses.label}>Operator check</span>
+                <span className={picoClasses.label}>Review check</span>
               </div>
               <h3 className="mt-6 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                 {item.title}
@@ -1161,12 +1161,12 @@ export function PicoAutopilotPageClient() {
           <div id="timeline-section" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className={picoClasses.label}>Signal narrative</p>
+                <p className={picoClasses.label}>Run timeline</p>
                 <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   Read the live story before you touch settings
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  This is the operator narrative. If the timeline is empty, the correct answer is that nothing meaningful has happened yet.
+                  If the timeline is empty, no meaningful runtime event has landed yet.
                 </p>
               </div>
               <span className={picoClasses.chip}>{loadStateLabel}</span>
@@ -1174,7 +1174,7 @@ export function PicoAutopilotPageClient() {
             <div className="mt-5 space-y-4">
               {authRequired ? (
                 <div className="rounded-[24px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-5 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  No timeline without live control-plane access. That is the honest answer.
+                  Sign in to load the live timeline.
                 </div>
               ) : timeline.length === 0 ? (
                 <EmptyStatePanel state={runEmptyState} />
@@ -1184,7 +1184,7 @@ export function PicoAutopilotPageClient() {
                   {timeline.length > visibleTimeline.length ? (
                     <div className={picoSoft('p-4')}>
                       <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                        {timeline.length - visibleTimeline.length} older signal{timeline.length - visibleTimeline.length === 1 ? '' : 's'} stayed out of view on purpose. Start with the strongest four.
+                        {timeline.length - visibleTimeline.length} older event{timeline.length - visibleTimeline.length === 1 ? '' : 's'} stayed out of view. Start with the most important four.
                       </p>
                     </div>
                   ) : null}
@@ -1245,7 +1245,7 @@ export function PicoAutopilotPageClient() {
 
                       <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr),18rem]">
                         <div className={picoInset('p-4')}>
-                          <p className={picoClasses.label}>Operator read</p>
+                          <p className={picoClasses.label}>Review note</p>
                           <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                             {['FAILED', 'ERROR', 'CANCELLED'].includes(run.status.toUpperCase())
                               ? 'This job failed. If the agent is still trusted, it should be because you understand this failure.'
@@ -1270,7 +1270,7 @@ export function PicoAutopilotPageClient() {
                       </div>
 
                       <div className={picoInset('mt-4 p-4')}>
-                        <p className={picoClasses.label}>Trace signals</p>
+                        <p className={picoClasses.label}>Trace events</p>
                         {traces.length === 0 ? (
                           <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
                             No run traces were returned for this run.
@@ -1339,7 +1339,7 @@ export function PicoAutopilotPageClient() {
               <div className={picoSoft('p-5')}>
                 <p className={picoClasses.label}>Threshold</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Pico stores the local budget line here. Real alert delivery still follows the live MUTX monitoring setup, so this surface refuses to pretend email or webhook routing is active when it is not.
+                  Pico stores the local budget line here. Alert delivery still follows the live MUTX monitoring setup.
                 </p>
 
                 <label className="mt-4 block text-sm text-[color:var(--pico-text-secondary)]">
@@ -1433,7 +1433,7 @@ export function PicoAutopilotPageClient() {
               Meaningful monitoring events
             </h2>
             <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              This is the live alert feed. No fake warning badges, no synthetic incidents.
+              This is the live alert feed from MUTX.
             </p>
 
             <div className="mt-5 space-y-4">
@@ -1475,7 +1475,7 @@ export function PicoAutopilotPageClient() {
                   {alerts.length > visibleAlerts.length ? (
                     <div className={picoSoft('p-4')}>
                       <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                        {alerts.length - visibleAlerts.length} additional alert{alerts.length - visibleAlerts.length === 1 ? '' : 's'} are suppressed so the feed stays editorial instead of turning into a wall of badges.
+                        {alerts.length - visibleAlerts.length} additional alert{alerts.length - visibleAlerts.length === 1 ? '' : 's'} are hidden so the feed stays focused.
                       </p>
                     </div>
                   ) : null}
@@ -1493,7 +1493,7 @@ export function PicoAutopilotPageClient() {
             Risky actions and their decisions
           </h2>
           <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            This queue is now the approval source of truth for Pico. It should not disappear because a process restarted.
+            This queue keeps approval requests visible across the Pico session.
           </p>
 
           <div className="mt-5 space-y-4">
@@ -1509,7 +1509,7 @@ export function PicoAutopilotPageClient() {
 
                 {integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured ? (
                   <div className="rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm leading-6 text-amber-50">
-                    Approval records already exist in MUTX, but Pico still shows the gate as off locally. Turn on the gate here so the product state matches the control-plane reality.
+                    Approval records already exist in MUTX, but Pico still shows the gate as off locally. Turn on the gate here so the local state matches the backend.
                   </div>
                 ) : null}
 
@@ -1556,7 +1556,7 @@ export function PicoAutopilotPageClient() {
                 {pendingApprovals.length > visiblePendingApprovals.length ? (
                   <div className={picoSoft('p-4')}>
                     <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      {pendingApprovals.length - visiblePendingApprovals.length} more pending approval{pendingApprovals.length - visiblePendingApprovals.length === 1 ? '' : 's'} stayed out of view so the queue keeps the sharpest decisions on top.
+                      {pendingApprovals.length - visiblePendingApprovals.length} more pending approval{pendingApprovals.length - visiblePendingApprovals.length === 1 ? '' : 's'} stayed out of view so the queue stays focused.
                     </p>
                   </div>
                 ) : null}
@@ -1571,7 +1571,7 @@ export function PicoAutopilotPageClient() {
               <div>
                 <p className={picoClasses.label}>Create a gated action</p>
                 <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Exercise the live approval queue here instead of waiting for another surface to create the request first.
+                  Create a live approval request here when you need to test the review flow.
                 </p>
               </div>
               <span className={picoClasses.chip}>live queue write</span>

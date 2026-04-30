@@ -46,7 +46,7 @@ const DEFAULT_AGENTS: AgentSliderAgent[] = [
   {
     kind: 'market',
     name: 'Market Agent',
-    description: 'Monitors signals and surfaces meaningful changes.',
+    description: 'Tracks changes and highlights what needs attention.',
   },
   {
     kind: 'deal',

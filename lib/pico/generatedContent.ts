@@ -86,18 +86,18 @@ export const PICO_GENERATED_CONTENT = {
       "name": "OpenClaw",
       "productProfile": "OpenClaw is the right recommendation when the user wants a broad multi-channel ecosystem, strong gateway workflow, multi-agent routing, companion apps, and a visual workspace/canvas style interface.",
       "strengths": [
-        "local-first gateway control plane",
+        "local-first gateway controls",
         "wide messaging and channel support",
         "multi-agent routing",
         "live canvas / visual workspace",
         "onboarding-driven setup with daemon install",
         "companion apps",
         "strong channel/login workflow",
-        "mobile and desktop node surfaces"
+        "mobile and desktop nodes"
       ],
       "fitSignals": [
         "“I want the most integrations.”",
-        "“I want companion apps and messaging surfaces.”",
+        "“I want companion apps and messaging.”",
         "“I want multiple channels and multiple agents.”",
         "“I want the canvas / visual workspace idea.”",
         "“I want broad ecosystem reach.”"
@@ -106,7 +106,7 @@ export const PICO_GENERATED_CONTENT = {
         "current official materials still disagree on the minimum Node floor: the getting-started docs say Node 22.14+ while the repo README says Node 22.16+; Node 24 remains the safe target",
         "the current happy path is install first, then `openclaw onboard`; add `--install-daemon` when the user wants an always-on gateway service",
         "the current docs verify success with `openclaw gateway status` and then `openclaw dashboard`, so use those before sending the user into channel auth",
-        "current docs and repo materials still expose multiple install paths, but the global install plus onboarding flow is the cleanest default for operators",
+        "current docs and repo materials still expose multiple install paths, but the global install plus onboarding flow is the cleanest default for most users",
         "both native Windows and WSL2 are supported, but WSL2 is still the steadier recommendation",
         "the gateway and Control UI are separate concepts from channel auth, so verify those layers independently",
         "daemon installs are happier on a stable system Node than on `nvm` / `fnm` / `asdf` paths"
@@ -153,7 +153,7 @@ export const PICO_GENERATED_CONTENT = {
     {
       "id": "nanoclaw",
       "name": "NanoClaw",
-      "productProfile": "NanoClaw is the recommendation for users who want a smaller, easier-to-audit codebase and stronger isolation via containers rather than a giant all-in-one surface.",
+      "productProfile": "NanoClaw is the recommendation for users who want a smaller, easier-to-audit codebase and stronger isolation via containers rather than a giant all-in-one app.",
       "strengths": [
         "lightweight mental model",
         "container isolation for agent runtime",
@@ -277,10 +277,10 @@ export const PICO_GENERATED_CONTENT = {
   ],
   "remoteAccess": {
     "title": "Private-first remote access",
-    "why": "For self-hosted agents, Tailscale is usually the safest default because it avoids the need to expose admin surfaces directly to the public internet.",
+    "why": "For self-hosted agents, Tailscale is usually the safest default because it avoids the need to expose admin pages directly to the public internet.",
     "decisionDefaults": [
       "tailscale ssh for shell",
-      "tailscale serve for private web surfaces",
+      "tailscale serve for private web apps",
       "tailscale funnel only for intentional public exposure"
     ],
     "officialSources": [
@@ -296,8 +296,8 @@ export const PICO_GENERATED_CONTENT = {
   },
   "landing": {
     "meta": {
-      "title": "PicoMUTX — Real Operator Guidance For Hermes, OpenClaw, NanoClaw, and PicoClaw",
-      "description": "PicoMUTX turns 17 builder-pack playbooks, 12 guided lessons, and live repo signals across Hermes, OpenClaw, NanoClaw, and PicoClaw into one safer operator path."
+      "title": "PicoMUTX — Guided Setup For Hermes, OpenClaw, NanoClaw, and PicoClaw",
+      "description": "PicoMUTX turns 17 builder-pack playbooks, 12 guided lessons, and current repo notes across Hermes, OpenClaw, NanoClaw, and PicoClaw into one setup path."
     },
     "nav": {
       "brand": "PicoMUTX",
@@ -308,25 +308,25 @@ export const PICO_GENERATED_CONTENT = {
       "badge": "Product path live now",
       "title": "Build, deploy, and govern real ",
       "titleAccent": "Hermes, OpenClaw, NanoClaw, and PicoClaw stacks without stale guesswork.",
-      "subtitle": "PicoMUTX is grounded in the official install, dashboard, security, and troubleshooting surfaces for Hermes, OpenClaw, NanoClaw, and PicoClaw. It gives founders and operators one guided path instead of another pile of tabs.",
+      "subtitle": "PicoMUTX uses official install, dashboard, security, and troubleshooting docs for Hermes, OpenClaw, NanoClaw, and PicoClaw. It gives users one guided path instead of another pile of tabs.",
       "cta": "Open onboarding",
       "ctaSecondary": "See pricing",
       "meta": "Live now: onboarding, academy, tutor, support, and autopilot in one Pico flow"
     },
     "trustItems": [
-      "17 builder-pack docs mapped into one product surface",
+      "17 builder-pack docs mapped into one product flow",
       "4 tracked stacks with live repo snapshots",
-      "Safer launch posture: approval-aware tutoring and private-first remote access"
+      "Safer setup: approval-aware tutoring and private-first remote access"
     ],
     "problem": {
       "eyebrow": "The Actual Friction",
       "title": "The hard part is not wanting an agent.",
-      "titleLine2": "It is keeping up with the moving surface area after you pick a stack.",
+      "titleLine2": "It is keeping up with changing setup details after you pick a stack.",
       "body": "Hermes, OpenClaw, NanoClaw, and PicoClaw each have different install paths, auth models, dashboards, and security traps. The product has to translate that moving reality into one sequence you can actually follow.",
       "scenarios": [
         {
           "label": "\"I do not know which stack fits my job.\"",
-          "body": "Pico starts with fit signals, install realities, and tradeoffs instead of pretending every stack is interchangeable."
+          "body": "Pico starts with fit, install realities, and tradeoffs instead of pretending every stack is interchangeable."
         },
         {
           "label": "\"The guide I followed is already stale.\"",
@@ -337,16 +337,16 @@ export const PICO_GENERATED_CONTENT = {
           "body": "Dashboards and launchers should not become public just because the first path was the fastest path."
         },
         {
-          "label": "\"I can install things, but I still do not have an operator loop.\"",
+          "label": "\"I can install things, but I still do not have a working loop.\"",
           "body": "A working agent needs lessons, tutoring, support, monitoring, and approval-aware controls that line up with each other."
         }
       ],
-      "close": "That is the product lane PicoMUTX is filling in."
+      "close": "That is the setup gap PicoMUTX is filling in."
     },
     "platform": {
       "eyebrow": "What The Platform Now Knows",
-      "title": "One product surface fed by actual stack knowledge.",
-      "body": "The app is now being filled from 17 pack docs, 12 structured lessons, and live repo signals. That means the landing, onboarding, tutor, and support surfaces can start telling the truth about what these stacks actually require.",
+      "title": "One product flow fed by actual stack knowledge.",
+      "body": "The app is now being filled from 17 pack docs, 12 structured lessons, and current repo notes. That means landing, onboarding, tutor, and support can explain what these stacks actually require.",
       "howItWorks": [
         {
           "title": "Compare stacks with current install and security realities",
@@ -358,37 +358,37 @@ export const PICO_GENERATED_CONTENT = {
         },
         {
           "title": "Route blockers into evidence-first tutoring and support",
-          "body": "Tutor prompts and support lanes now begin from real failure modes pulled from the pack instead of generic motivation copy."
+          "body": "Tutor prompts and support now begin from real failure modes pulled from the pack instead of generic motivation copy."
         },
         {
           "title": "Keep remote access private by default",
-          "body": "Tailscale stays the default posture for dashboards, launchers, and API surfaces that should not be open to the public internet."
+          "body": "Tailscale stays the default for dashboards, launchers, and APIs that should not be open to the public internet."
         }
       ]
     },
     "who": {
       "eyebrow": "Who This Fits",
-      "title": "PicoMUTX is for operators who need current truth, not hype.",
+      "title": "PicoMUTX is for users who need current setup guidance, not hype.",
       "forYouTitle": "This is for you if…",
       "notForYouTitle": "This is not for you if…",
       "forYou": [
         "You need to choose between Hermes, OpenClaw, NanoClaw, or PicoClaw with less wasted motion",
         "You want a guided install-to-operations sequence instead of stitched-together docs",
-        "You care about safer remote access and approval-aware control surfaces",
-        "You want tutoring and human help tied to the same underlying stack truth",
-        "You are willing to produce proof artifacts instead of collecting vague setup feelings"
+        "You care about safer remote access and approval-aware review",
+        "You want tutoring and human help tied to the same underlying stack details",
+        "You are willing to save real outputs instead of collecting vague setup notes"
       ],
       "notForYou": [
         "You want broad AI-agent marketing without touching the real install details",
         "You plan to expose dashboards or launchers publicly before you understand the risk boundary",
-        "You already have a mature internal control plane and only need custom enterprise governance",
+        "You already have mature internal infrastructure and only need custom enterprise governance",
         "You want a toy demo more than a runtime that survives operations",
         "You expect one frozen tutorial to stay accurate while the repos keep shipping"
       ]
     },
     "beforeAfter": {
       "eyebrow": "What Changes",
-      "title": "What changes when the UI is grounded in live stack facts",
+      "title": "What changes when the UI uses current stack facts",
       "beforeLabel": "Before",
       "afterLabel": "After",
       "items": [
@@ -398,15 +398,15 @@ export const PICO_GENERATED_CONTENT = {
         },
         {
           "before": "Onboarding is generic even when the lessons are specific",
-          "after": "The first moves mirror the actual lesson objectives and proof requirements"
+          "after": "The first moves mirror the actual lesson objectives and saved outputs"
         },
         {
           "before": "Tutor examples are detached from current stack failure modes",
           "after": "Tutor prompts start from real install, dashboard, and launcher breakpoints"
         },
         {
-          "before": "A WIP route apologizes for being empty",
-          "after": "The route becomes a live build ledger with tracked repos, docs, and remote-access defaults"
+          "before": "A WIP page apologizes for being empty",
+          "after": "The page becomes a build ledger with tracked repos, docs, and remote-access defaults"
         }
       ],
       "close": "The point is not prettier filler. The point is a UI that stays attached to the stack reality underneath it."
@@ -417,31 +417,31 @@ export const PICO_GENERATED_CONTENT = {
       "body": "Start in onboarding, move into the academy, use tutor when the exact next step is unclear, open support when the blocker needs a human, and use autopilot when you need live run and budget visibility.",
       "benefits": [
         "Onboarding is live as the canonical first step",
-        "Academy lessons stay inside the same Pico surface",
+        "Academy lessons stay inside the same Pico flow",
         "Tutor keeps the lesson and stack context attached",
-        "Support keeps the blocker packet and return lane visible",
+        "Support keeps the blocker packet and return step visible",
         "Autopilot shows live runs, spend, and gates when you sign in"
       ]
     },
     "faq": {
       "eyebrow": "Questions",
-      "title": "Questions worth answering honestly",
+      "title": "Questions worth answering clearly",
       "items": [
         {
           "q": "Do I need to code to use PicoMUTX?",
-          "a": "You still need to run real commands and verify real runtime state, but Pico is designed to turn that work into a guided operator path instead of an engineer-only maze."
+          "a": "You still need to run real commands and verify real runtime state, but Pico is designed to turn that work into a guided setup path instead of an engineer-only maze."
         },
         {
           "q": "How does Pico decide between Hermes, OpenClaw, NanoClaw, and PicoClaw?",
-          "a": "It uses fit signals, install realities, troubleshooting themes, and live repo status pulled from the builder pack and current official sources."
+          "a": "It uses fit, install realities, troubleshooting themes, and repo status pulled from the builder pack and current official sources."
         },
         {
           "q": "Does Pico replace the official docs?",
-          "a": "No. It compresses them into a product path and keeps links back to the official sources so the stack truth stays inspectable."
+          "a": "No. It compresses them into a product path and keeps links back to the official sources so the stack details stay inspectable."
         },
         {
           "q": "Why does Tailscale keep showing up across the product?",
-          "a": "Because private tailnet access is usually the safer default for dashboards, launchers, and admin surfaces than exposing them directly to the public internet."
+          "a": "Because private tailnet access is usually the safer default for dashboards, launchers, and admin pages than exposing them directly to the public internet."
         },
         {
           "q": "Will this content keep updating as the repos move?",
@@ -452,7 +452,7 @@ export const PICO_GENERATED_CONTENT = {
     "finalCta": {
       "eyebrow": "Open the real Pico flow",
       "title": "Do not join a list. Start the product path.",
-      "body": "The fastest honest next step is onboarding. Pricing, tutor, support, and autopilot stay inside the same product surface after that.",
+      "body": "The fastest next step is onboarding. Pricing, tutor, support, and autopilot stay inside the same product flow after that.",
       "formHeadline": "Open onboarding",
       "formSubline": "Start with the first step now, then use tutor or human help only when the product path stops being enough.",
       "ctaButton": "Open onboarding",
@@ -461,13 +461,13 @@ export const PICO_GENERATED_CONTENT = {
   },
   "pricing": {
     "pageTitle": "Choose the product depth you actually need",
-    "pageSubtitle": "The plans map to real product surfaces: 12 lessons, grounded tutoring, monitored runtime context, and live stack briefs across Hermes, OpenClaw, NanoClaw, and PicoClaw.",
+      "pageSubtitle": "The plans map to real product areas: 12 lessons, tutoring, monitored runtime context, and stack briefs across Hermes, OpenClaw, NanoClaw, and PicoClaw.",
     "pageFooter": "Current content sync tracks 17 pack docs and 4 live repos. Enterprise is for teams that need deeper rollout help, identity controls, and direct support.",
     "planDescriptions": {
-      "free": "Inspect the stack map, lesson flow, and product truth before you spend.",
-      "starter": "Run one serious build lane with full academy access and grounded tutoring.",
-      "pro": "Operate multiple live lanes with BYOK, stronger runtime visibility, and faster escalation.",
-      "enterprise": "Roll out across a team with SSO, SLA expectations, and direct operator support."
+      "free": "Inspect the stack map and lesson flow before you spend.",
+      "starter": "Run one serious build with full academy access and tutoring.",
+      "pro": "Run multiple live workflows with BYOK, stronger runtime visibility, and faster escalation.",
+      "enterprise": "Roll out across a team with SSO, SLA expectations, and direct support."
     },
     "truthStrip": [
       "12 sequenced Academy lessons",
@@ -490,7 +490,7 @@ export const PICO_GENERATED_CONTENT = {
       },
       {
         "chapter": "03",
-        "title": "Keep proof",
+        "title": "Save output",
         "body": "Hermes answers one small prompt and the transcript is saved in a file you can reopen."
       }
     ],
@@ -504,7 +504,7 @@ export const PICO_GENERATED_CONTENT = {
       {
         "id": "openclaw",
         "name": "OpenClaw",
-        "whyNow": "local-first gateway control plane",
+        "whyNow": "local-first gateway controls",
         "latestSignal": "Release v2026.4.15 · Apr 16, 2026"
       },
       {
@@ -525,7 +525,7 @@ export const PICO_GENERATED_CONTENT = {
     "questionProtocol": [
       "Name the exact step, command, or dashboard action you were on.",
       "Paste the evidence: output, error, transcript, or runtime state.",
-      "Ask for the one next move that proves the route is live again."
+      "Ask for the one next move that gets setup moving again."
     ],
     "examplePrompts": [
       "Hermes opens locally but the VPS run fails. What should I verify before changing anything?",
@@ -543,25 +543,25 @@ export const PICO_GENERATED_CONTENT = {
       },
       {
         "id": "other",
-        "title": "Operator walkthrough",
-        "body": "Use this when you need a guided session across multiple surfaces instead of one isolated fix."
+        "title": "Guided walkthrough",
+        "body": "Use this when you need a guided session across multiple product areas instead of one isolated fix."
       }
     ],
     "escalationStandards": [
       {
-        "label": "01 • Route",
-        "title": "Name the stack and surface",
-        "body": "Say whether the problem belongs to Hermes, OpenClaw, NanoClaw, PicoClaw, Tutor, Academy, Autopilot, or the hosted account lane."
+        "label": "01 • Page",
+        "title": "Name the stack and page",
+        "body": "Say whether the problem belongs to Hermes, OpenClaw, NanoClaw, PicoClaw, Tutor, Academy, Autopilot, or the hosted account."
       },
       {
         "label": "02 • Evidence",
-        "title": "Attach the proof packet",
-        "body": "Bring the command, dashboard state, launcher state, or approval signal that shows exactly where the path stopped."
+        "title": "Attach the setup packet",
+        "body": "Bring the command, dashboard state, launcher state, or approval status that shows exactly where the path stopped."
       },
       {
         "label": "03 • Return",
         "title": "Ask for the path back into motion",
-        "body": "A good escalation should end with the shortest route back into a lesson, tutor answer, or live control action."
+        "body": "A good escalation should end with the shortest path back into a lesson, tutor answer, or live review step."
       }
     ]
   },
@@ -571,8 +571,8 @@ export const PICO_GENERATED_CONTENT = {
       "description": "Inspect the 17 builder-pack docs, tracked repo snapshots, and remote-access defaults now feeding the PicoMUTX experience."
     },
     "title": "Live build ledger",
-    "subtitle": "This route no longer exists to apologize for being unfinished. It now shows the source material actively feeding Pico: pack docs, Academy lessons, tracked repos, and the remote-access posture they imply.",
+    "subtitle": "This page now shows the source material feeding Pico: pack docs, Academy lessons, tracked repos, and the remote-access defaults they imply.",
     "overviewTitle": "What is already wired in",
-    "overviewBody": "The content path now reads the local builder pack, optional updated pack drops, structured Academy lessons, and live GitHub metadata. This page is the honest place to inspect that feed."
+    "overviewBody": "The content path now reads the local builder pack, optional updated pack drops, structured Academy lessons, and GitHub metadata. This page is where to inspect that feed."
   }
 } as const

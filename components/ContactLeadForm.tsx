@@ -24,7 +24,7 @@ const MESSAGE_PLACEHOLDERS: Record<string, string> = {
   funding: 'What kind of financing conversation is relevant, what stage are you evaluating, and what part of the MUTX roadmap matters most?',
   partnerships: 'Describe the partnership, infrastructure, integration, or distribution angle you want to explore.',
   contributions: 'Tell us what you want to contribute: code, docs, design, infrastructure, GTM support, or ecosystem work.',
-  ideas: 'Share the operator workflow, feature gap, or design-partner use case you think MUTX should support.',
+  ideas: 'Share the workflow, feature gap, or design-partner use case you think MUTX should support.',
   'demo-hosted-access': 'Tell us what you need to validate in a hosted evaluation and which deployment, auth, or runtime workflow matters most.',
   general: 'Summarize the context, what you need, and how MUTX can help.',
 }
@@ -81,7 +81,7 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
       setName('')
       setOrganization('')
       setMessage('')
-      setSuccess(payload?.message || 'Message received. The right MUTX lane will follow up.')
+      setSuccess(payload?.message || 'Message received. The MUTX team will follow up.')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send contact request')
     } finally {

@@ -121,7 +121,7 @@ async function stubPicoProductApis(
     connected: false,
     model: 'gpt-5-mini',
     maskedKey: null as string | null,
-    message: 'No OpenAI key is connected. Tutor will use platform access if available, or fall back to grounded local synthesis.',
+    message: 'No OpenAI key is connected. Tutor will use platform access if available, or fall back to local synthesis.',
   };
 
   await page.route('**/api/auth/me', async (route) => {
@@ -207,7 +207,7 @@ async function stubPicoProductApis(
         gateway_url: 'http://localhost:4111',
         updated_at: '2026-04-12T10:15:00.000Z',
         steps: [
-          { id: 'auth', title: 'Authenticate operator', completed: true },
+          { id: 'auth', title: 'Authenticate user', completed: true },
           { id: 'provider', title: 'Select provider', completed: true },
           { id: 'install', title: 'Install runtime', completed: false },
           { id: 'onboard', title: 'Onboard gateway', completed: false },
@@ -262,7 +262,7 @@ async function stubPicoProductApis(
         nextActions: [
           'Open the first prompt lesson.',
           'Run one bounded prompt.',
-          'Save the transcript as proof.',
+          'Save the transcript as output.',
         ],
         lessons: [
           {
@@ -273,7 +273,7 @@ async function stubPicoProductApis(
         ],
         docs: [
           {
-            label: 'Support lane',
+            label: 'Support',
             href: '/pico/support',
             sourcePath: 'pico/support',
           },
@@ -282,15 +282,15 @@ async function stubPicoProductApis(
         escalate: false,
         structured: {
           situation: 'Hermes is installed, and the current blocker is proving one real run with a visible transcript.',
-          diagnosis: 'The operator should move into the first prompt lesson instead of branching into more setup.',
+          diagnosis: 'The user should move into the first prompt lesson instead of branching into more setup.',
           steps: [
             'Open the first prompt lesson.',
             'Run one bounded prompt.',
-            'Save the transcript as proof.',
+            'Save the transcript as output.',
           ],
           commands: [
             {
-              label: 'Save the proof artifact',
+              label: 'Save the output',
               code: 'printf "Prompt: Give me exactly 3 next steps to test this runtime locally.\\nAnswer: <paste the actual answer here>\\n" > ~/pico-first-run.txt',
               language: 'bash',
             },
@@ -310,7 +310,7 @@ async function stubPicoProductApis(
               title: 'Run your first agent',
               sourcePath: 'pico/academy/run-your-first-agent',
               href: '/pico/academy/run-your-first-agent',
-              excerpt: 'Run one real prompt, get one visible answer, and save the transcript as proof.',
+              excerpt: 'Run one real prompt, get one visible answer, and save the transcript as output.',
             },
             {
               kind: 'knowledge_pack',
@@ -360,7 +360,7 @@ async function stubPicoProductApis(
         connected: false,
         model: 'gpt-5-mini',
         maskedKey: null,
-        message: 'No OpenAI key is connected. Tutor will use platform access if available, or fall back to grounded local synthesis.',
+        message: 'No OpenAI key is connected. Tutor will use platform access if available, or fall back to local synthesis.',
       };
     }
 
@@ -592,11 +592,11 @@ test.describe('mutx.dev QA', () => {
 
     await expect(page.getByTestId('homepage-lockup')).toBeVisible();
     await expect(page.getByTestId('homepage-lockup-mark')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /see it\. control it\. prove it\./i })).toBeVisible({
+    await expect(page.getByRole('heading', { name: /run agents with review built in\./i })).toBeVisible({
       timeout: 10000,
     });
     await expect(
-      page.getByText(/live visibility, hard boundaries, and reviewable history for every agent run\./i)
+      page.getByText(/live runs, clear permissions, approvals, and readable history in one place\./i)
     ).toBeVisible();
     await expect(page.getByRole('link', { name: /go to picomutx/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
@@ -758,7 +758,7 @@ test.describe('mutx.dev QA', () => {
     expect(storyAsset.endsWith('.mp4')).toBe(true);
   });
 
-  test('download page exposes the mac release lane and release-notes path', async ({ page }) => {
+  test('download page exposes the mac release notes and checksum path', async ({ page }) => {
     await page.goto('/download/macos', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('public-auth-nav')).toBeVisible();
@@ -773,7 +773,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: 'Release summary', exact: true }).first()).toBeVisible();
     await expect(
       page.getByText(
-        /downloads, notes, and checksums stay in one public lane\./i
+        /downloads, notes, and checksums stay in one place\./i
       )
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: /^Release summary$/i })).toBeVisible();
@@ -943,7 +943,7 @@ test.describe('mutx.dev QA', () => {
     await page.getByRole('button', { name: /request access/i }).first().click();
     const dialog = page.getByRole('dialog', { name: /contact form/i });
     await expect(dialog).toBeVisible();
-    await expect(page.getByRole('heading', { name: /request pico access/i })).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: /^request pico access$/i })).toBeVisible();
     await dialog.getByLabel(/work email/i).fill('operator@example.com');
     await dialog.getByLabel(/^name$/i).fill('Pico Operator');
     await dialog.getByLabel(/company/i).fill('MUTX Lab');
@@ -965,14 +965,14 @@ test.describe('mutx.dev QA', () => {
     expect(new URL(page.url()).pathname).toBe('/');
   });
 
-  test('pico pricing route keeps access lanes and live billing in one honest surface', async ({
+  test('pico pricing route keeps setup access and live billing together', async ({
     page,
   }) => {
     await page.goto('/pico/pricing', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('pico-pricing-route')).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /choose the lane you need now\. see product billing only when it matters\./i }),
+      page.getByRole('heading', { name: /start free\. get help when setup needs it\./i }),
     ).toBeVisible();
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/free trial/i);
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€29/i);
@@ -981,13 +981,13 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€790/i);
     await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/pico pilot/i);
     await expect(page.getByTestId('pico-pricing-live-plans')).toContainText(
-      /live product plans once pico is already in play/i,
+      /live product plans after setup starts/i,
     );
-    await expect(page.getByText(/public access gets you into the right lane\./i)).toBeVisible();
+    await expect(page.getByText(/need help choosing the right setup\?/i)).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/pricing');
   });
 
-  test('pico support route keeps triage, packet, and return lane in one surface', async ({
+  test('pico support route keeps setup context, packet, and return step together', async ({
     page,
   }) => {
     await stubPicoProductApis(page)
@@ -995,17 +995,17 @@ test.describe('mutx.dev QA', () => {
 
     await expect(page.getByTestId('pico-support-hero-signal')).toBeVisible()
     await expect(
-      page.getByRole('heading', { name: /send the blocker with enough proof to fix it fast\./i }),
+      page.getByRole('heading', { name: /send the setup context we need to help\./i }),
     ).toBeVisible()
     await expect(page.getByTestId('pico-support-escalation-standards')).toBeVisible()
     await expect(page.getByTestId('pico-support-return-map')).toBeVisible()
     await expect(
-      page.getByText(/name the route, attach the signal, and point to the return lane/i),
+      page.getByText(/human help is for the parts most users do not want to handle alone/i),
     ).toBeVisible()
     expect(new URL(page.url()).pathname).toBe('/pico/support')
   })
 
-  test('pico tutor route keeps the crit packet and grounded next move visible', async ({
+  test('pico tutor route keeps the question packet and next move visible', async ({
     page,
   }) => {
     await stubPicoProductApis(page)
@@ -1016,11 +1016,11 @@ test.describe('mutx.dev QA', () => {
       page.getByRole('heading', { name: /attach the blocked lesson and narrow the answer to one move\./i }),
     ).toBeVisible()
     await expect(page.getByTestId('pico-tutor-crit-desk')).toBeVisible()
-    await expect(page.getByText(/this is not a general chat surface/i)).toBeVisible()
+    await expect(page.getByText(/this is not general chat/i)).toBeVisible()
     expect(new URL(page.url()).pathname).toBe('/pico/tutor')
   })
 
-  test('pico autopilot route keeps run, spend, and gate in one control surface', async ({
+  test('pico autopilot route keeps run, spend, and approvals together', async ({
     page,
   }) => {
     await stubPicoProductApis(page)
@@ -1028,11 +1028,11 @@ test.describe('mutx.dev QA', () => {
 
     await expect(page.getByTestId('pico-autopilot-hero-signal')).toBeVisible()
     await expect(
-      page.getByRole('heading', { name: /keep the run, spend, and gate in the same frame\./i }),
+      page.getByRole('heading', { name: /keep run state, spend, and approvals together\./i }),
     ).toBeVisible()
     await expect(page.getByTestId('pico-autopilot-operator-doctrine')).toBeVisible()
     await expect(page.getByTestId('pico-autopilot-control-protocol')).toBeVisible()
-    await expect(page.getByText(/autopilot earns trust when the last run, the live spend, and the risky actions stay visible/i)).toBeVisible()
+    await expect(page.getByText(/keep the last run, live spend, and risky actions visible/i)).toBeVisible()
     expect(new URL(page.url()).pathname).toBe('/pico/autopilot')
   })
 
@@ -1044,8 +1044,8 @@ test.describe('mutx.dev QA', () => {
       { href: '/pico/academy', heading: /install hermes locally/i },
       { href: '/pico/academy/install-hermes-locally', heading: /install hermes locally/i },
       { href: '/pico/tutor', heading: /ask for the exact next step/i },
-      { href: '/pico/autopilot', heading: /trust the runtime because the surface tells the truth/i },
-      { href: '/pico/support', heading: /get a human when the product path stops being enough/i },
+      { href: '/pico/autopilot', heading: /run agents with review where it matters/i },
+      { href: '/pico/support', heading: /get a human when setup needs guidance/i },
     ];
 
     for (const route of productRoutes) {
@@ -1118,12 +1118,12 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByText(/you are asking about install hermes locally/i)).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/tutor');
 
-    await page.getByRole('link', { name: /open support lane/i }).first().click();
-    await expect(page.getByRole('heading', { name: /get a human when the product path stops being enough/i })).toBeVisible();
+    await page.getByRole('link', { name: /get human help|get setup help/i }).first().click();
+    await expect(page.getByRole('heading', { name: /get a human when setup needs guidance/i })).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/support');
 
     await page.getByRole('link', { name: /open autopilot/i }).first().click();
-    await expect(page.getByRole('heading', { name: /trust the runtime because the surface tells the truth/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /run agents with review where it matters/i })).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/autopilot');
   });
 
@@ -1142,11 +1142,11 @@ test.describe('mutx.dev QA', () => {
     await stubPicoProductApis(page, { authenticated: false });
 
     await page.goto('/pico/support', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: /^get human help$/i }).click();
+    await page.getByRole('button', { name: /^book guidance$/i }).first().click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole('heading', { name: /tell us where the product path broke/i })).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: /tell us where setup is blocked/i })).toBeVisible();
     await expect(dialog.getByRole('button', { name: /send support request/i })).toBeVisible();
     await expect(dialog.getByText(/pre-register|early access|preregistrati|accesso anticipato/i)).toHaveCount(0);
   });
@@ -1161,8 +1161,8 @@ test.describe('mutx.dev QA', () => {
     await page.locator('header').getByRole('button', { name: 'Help', exact: true }).click();
     await expect(page.getByTestId('pico-help-lane-panel')).toBeVisible();
 
-    await page.getByTestId('pico-help-lane-panel').getByRole('link', { name: /open support lane/i }).click();
-    await expect(page.getByRole('heading', { name: /get a human when the product path stops being enough/i })).toBeVisible();
+    await page.getByTestId('pico-help-lane-panel').getByRole('link', { name: /get setup help/i }).click();
+    await expect(page.getByRole('heading', { name: /get a human when setup needs guidance/i })).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/support');
   });
 
@@ -1173,9 +1173,9 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByTestId('pico-welcome-tour')).toHaveCount(0);
     await page.getByTestId('pico-open-tour').click();
     await expect(page.getByTestId('pico-welcome-tour')).toBeVisible();
-    await expect(page.getByTestId('pico-welcome-tour')).toContainText(/learn the codex once, then close it\./i);
+    await expect(page.getByTestId('pico-welcome-tour')).toContainText(/learn the flow once, then close it\./i);
     await page.getByRole('button', { name: /^next$/i }).click();
-    await expect(page.getByTestId('pico-welcome-tour')).toContainText(/the codex only wants one mission to matter\./i);
+    await expect(page.getByTestId('pico-welcome-tour')).toContainText(/work on one setup step at a time\./i);
 
     await page.getByRole('button', { name: /close quick tour/i }).click();
     await expect(page.getByTestId('pico-welcome-tour')).toHaveCount(0);
@@ -1204,7 +1204,7 @@ test.describe('mutx.dev QA', () => {
 
     await page.goto('/pico/support', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /open autopilot/i }).first().click();
-    await expect(page.getByRole('heading', { name: /trust the runtime because the surface tells the truth/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /run agents with review where it matters/i })).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/autopilot');
   });
 
@@ -1253,17 +1253,17 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/pico/academy', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('pico-academy-workspace-summary')).toBeVisible();
     await expect(page.getByTestId('pico-academy-workspace-summary').getByText(/1\/3 steps/i)).toBeVisible();
-    await expect(page.getByTestId('pico-academy-workspace-summary').getByText(/^captured$/i)).toBeVisible();
+    await expect(page.getByTestId('pico-academy-workspace-summary').getByText(/^saved$/i)).toBeVisible();
 
     await page.goto('/pico/onboarding', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('pico-onboarding-mission-board')).toBeVisible();
     await expect(page.getByTestId('pico-onboarding-install-mission').getByText(/1\/3 steps/i)).toBeVisible();
-    await expect(page.getByTestId('pico-onboarding-install-mission').getByText(/^captured$/i)).toBeVisible();
+    await expect(page.getByTestId('pico-onboarding-install-mission').getByText(/^saved$/i)).toBeVisible();
 
     await page.goto('/pico/autopilot', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('pico-autopilot-academy-context')).toBeVisible();
     await expect(page.getByTestId('pico-autopilot-academy-context').getByText(/1\/3/i)).toBeVisible();
-    await expect(page.getByTestId('pico-autopilot-academy-context').getByText(/^captured$/i)).toBeVisible();
+    await expect(page.getByTestId('pico-autopilot-academy-context').getByText(/^saved$/i)).toBeVisible();
   });
 
   test('pico product routes expose hosted provider auth when no session is attached', async ({ page }) => {

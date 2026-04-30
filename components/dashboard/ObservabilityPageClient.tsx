@@ -222,7 +222,7 @@ export function ObservabilityPageClient() {
 
       <div className="grid gap-4 xl:grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)]">
         <div className="space-y-4">
-          <LivePanel title="Telemetry rail" meta={telemetry?.config?.exporter_type || "operator summary"}>
+          <LivePanel title="Telemetry rail" meta={telemetry?.config?.exporter_type || "runtime summary"}>
             <LiveMiniStatGrid>
               <LiveMiniStat
                 label="Exporter"

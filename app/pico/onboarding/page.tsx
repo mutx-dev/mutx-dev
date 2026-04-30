@@ -5,7 +5,7 @@ import { PicoOnboardingPageClient } from '@/components/pico/PicoOnboardingPageCl
 export const metadata: Metadata = {
   title: 'Onboarding — PicoMUTX',
   description:
-    'Install Hermes, run one bounded prompt, capture the first proof artifact, and attach hosted setup state when it is available.',
+    'Install Hermes, run one bounded prompt, save the first output, and prepare the agent packet.',
 }
 
 export default function PicoOnboardingPage() {

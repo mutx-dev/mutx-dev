@@ -234,7 +234,7 @@ export function explainRunImpact(run: AutopilotRunSummary) {
     return 'The run is paused waiting for owner action. Respond to unblock the pipeline.'
   }
 
-  return 'This run completed. Verify the output is actually useful before you automate it harder.'
+  return 'This run completed. Verify the output is useful before you automate more of this work.'
 }
 
 export function explainAlertImpact(alert: AutopilotAlertSummary) {
@@ -242,7 +242,7 @@ export function explainAlertImpact(alert: AutopilotAlertSummary) {
     return 'The alert is cleared, but you still want the root cause to make sense.'
   }
 
-  return 'This is active operator pain. If you ignore it, the runtime will keep surprising you.'
+  return 'This active alert needs review before the runtime keeps running unattended.'
 }
 
 export function explainApprovalImpact(approval: AutopilotApprovalSummary) {
@@ -344,7 +344,7 @@ export function getUsageEmptyState(status: AutopilotIntegrationStatus, nextStep:
 
   return {
     title: 'Budget exists, but usage is empty',
-    body: 'The budget surface is live, but no usage events landed in the current window. Either the agent has not spent anything yet or usage emission is missing.',
+    body: 'The budget page is live, but no usage events landed in the current window. Either the agent has not spent anything yet or usage emission is missing.',
     nextStep,
   }
 }
@@ -361,14 +361,14 @@ export function getApprovalsEmptyState(status: AutopilotIntegrationStatus, nextS
   if (status.hasApprovalRecords && !status.approvalGateConfigured) {
     return {
       title: 'Approval history exists, but the gate is off locally',
-      body: 'MUTX already has approval records, but Pico still says the gate is disabled. Turn the gate on here so local product state matches the control-plane reality.',
+      body: 'MUTX already has approval records, but Pico still says the gate is disabled. Turn the gate on here so local product state matches backend state.',
       nextStep,
     }
   }
 
   return {
     title: 'No approval records yet',
-    body: 'Nothing risky has been routed through the real approval queue yet. Exercise one real gated action before you call this governed.',
+    body: 'No risky action has reached the approval queue yet. Run one gated action before relying on this page for approval review.',
     nextStep,
   }
 }
