@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from typing import Literal
 
@@ -12,6 +13,7 @@ from src.api.middleware.auth import get_current_internal_user
 from src.api.models import User
 
 router = APIRouter(prefix="/governance", tags=["governance"])
+logger = logging.getLogger(__name__)
 
 TrustTier = Literal["unknown", "low", "trusted", "elevated", "critical"]
 CredentialStatus = Literal["unknown", "missing", "brokered", "expired"]
@@ -343,7 +345,7 @@ async def scan_governance_discovery(
                 discovered_at=scanned_at,
             )
     except Exception:
-        pass
+        logger.exception("Governance discovery scan failed while listing supervised agents")
 
     _DISCOVERY_FINDINGS.clear()
     _DISCOVERY_FINDINGS.update(findings)
