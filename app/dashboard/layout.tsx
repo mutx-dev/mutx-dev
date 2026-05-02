@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(getAppUrl()),
   ...buildPageMetadata({
     title: "Dashboard - MUTX",
-    description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
+    description: "Dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
     path: "/",
     host: getAppUrl(),
     siteName: "MUTX App",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     nocache: true,
   },
   title: "Dashboard - MUTX",
-  description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
+  description: "Dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
   keywords: [
     "agent control plane",
     "agent deployments",

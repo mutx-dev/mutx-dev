@@ -30,13 +30,13 @@ export function AuthNav({ hostVariant = "default" }: AuthNavProps) {
                 {isPicoPreview ? "Pico" : "MUTX"}
               </span>
               <span className="font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.22em] text-[rgba(232,221,203,0.56)]">
-                {isPicoPreview ? "preview access" : "auth lane"}
+                {isPicoPreview ? "preview access" : "account access"}
               </span>
             </span>
           </Link>
 
         <span className="hidden rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(255,248,236,0.03)] px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-[rgba(232,221,203,0.6)] lg:inline-flex">
-          {isPicoPreview ? "preview account boundary" : "hosted operator identity"}
+          {isPicoPreview ? "preview account" : "hosted workspace identity"}
         </span>
       </div>
     </nav>

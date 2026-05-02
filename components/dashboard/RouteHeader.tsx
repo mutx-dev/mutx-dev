@@ -126,7 +126,7 @@ export function RouteHeader({
             </div>
           ) : (
             <p className="mt-3 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
-              This route is mounted inside the unified operator shell and ready for live data.
+              This route is mounted inside the unified dashboard shell and ready for live data.
             </p>
           )}
         </div>

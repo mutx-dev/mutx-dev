@@ -172,24 +172,24 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
   const shellCopy = useMemo(() => {
     if (!platformReady) {
       return {
-        eyebrow: "shell bootstrap",
-        title: "Resolving native operator context",
+        eyebrow: "starting up",
+        title: "Opening your workspace",
         detail: "Checking whether this session is running inside MUTX.app and syncing the latest desktop state.",
       };
     }
 
     if (!isDesktop) {
       return {
-        eyebrow: "web shell",
-        title: "Canonical MUTX dashboard",
-        detail: "Desktop-only actions stay gated until this session is running inside MUTX.app.",
+        eyebrow: "web access",
+        title: "MUTX dashboard",
+        detail: "Review agents, runs, keys, alerts, and setup state from one workspace.",
       };
     }
 
     if (!status.authenticated) {
       return {
-        eyebrow: "mission control",
-        title: "The home surface is now the setup surface",
+        eyebrow: "setup",
+        title: "Finish setup from the dashboard",
         detail: "Use /dashboard to sync identity, runtime, and the local desktop contract from one native shell.",
       };
     }
@@ -197,7 +197,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
     if (!status.assistant?.found) {
       return {
         eyebrow: status.mode === "local" ? "local workspace" : "hosted workspace",
-        title: "Bind the first assistant from mission control",
+        title: "Connect the first assistant",
         detail: "Stay on /dashboard to drive runtime choice and assistant setup, then move into advanced control only when needed.",
       };
     }
@@ -206,12 +206,12 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
       return {
         eyebrow: "local runtime",
         title: `${status.assistant.name} is ready, but the local stack is offline`,
-        detail: "Bring the control plane online to turn this machine into an active operator seat.",
+        detail: "Start the local stack before running desktop-only actions from this machine.",
       };
     }
 
     return {
-      eyebrow: status.mode === "local" ? "desktop operator" : "hosted operator",
+      eyebrow: status.mode === "local" ? "desktop workspace" : "hosted workspace",
       title: `${status.assistant.name || "Assistant"} is wired into the control plane`,
       detail:
         status.openclaw?.gatewayUrl ||
@@ -355,7 +355,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
             MUTX
           </p>
         </div>
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#93c5fd]">Operator Console</p>
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#93c5fd]">Workspace</p>
       </div>
     </div>
   );
@@ -365,7 +365,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
       <div className="rounded-[24px] border border-[rgba(191,219,254,0.1)] bg-[linear-gradient(180deg,#121a29_0%,#0a0f18_100%)] px-3.5 py-4">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#93c5fd]">
-            Operator memo
+            Workspace memo
           </p>
           <span className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#0f1728] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#dbeafe]">
             {isDesktop ? "desktop" : "web"}
@@ -373,7 +373,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
         </div>
         <p className="mt-3 text-sm leading-6 text-[#dbe7f8]">
           {isDesktop
-            ? status.user?.name || "Connect this machine to an operator account"
+            ? status.user?.name || "Connect this machine to a workspace account"
             : "Desktop identity and machine-local actions appear here inside MUTX.app."}
         </p>
         <p className="mt-1 text-[12px] leading-5 text-[#9bb4d6]">
@@ -483,7 +483,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                     {activeItem?.title || "Dashboard"}
                   </p>
                   <p className="truncate text-[10px] uppercase tracking-[0.22em] text-[#93c5fd]">
-                    {activeItem?.group === "home" ? "Mission Control" : activeItem?.group || "Operator"}
+                    {activeItem?.group === "home" ? "Workspace" : activeItem?.group || "Dashboard"}
                   </p>
                 </div>
               </div>
@@ -520,7 +520,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                         <Sparkles className="h-3.5 w-3.5" />
                         {shellCopy.eyebrow}
                       </span>
-                      <span>{activeItem?.group === "home" ? "Mission Control" : activeItem?.group || "Operator"}</span>
+                      <span>{activeItem?.group === "home" ? "Workspace" : activeItem?.group || "Dashboard"}</span>
                     </div>
 
                     <div className="max-w-4xl">
@@ -534,7 +534,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
 
                     <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em]">
                       <span className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-2.5 py-1 text-[#c8daf4]">
-                        {status.user?.email || "operator session"}
+                        {status.user?.email || "session needed"}
                       </span>
                       <span className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-2.5 py-1 text-[#c8daf4]">
                         {activeItem?.title || "Dashboard"}
