@@ -129,7 +129,7 @@ export function SecurityPageClient() {
           </div>
         </LivePanel>
 
-        <LivePanel title="Security posture" meta="operator trust">
+        <LivePanel title="Security posture" meta="workspace trust">
           <div className="space-y-3">
             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
               <div className="flex items-center gap-2 text-slate-300">
@@ -137,7 +137,7 @@ export function SecurityPageClient() {
                 <span className="text-sm font-medium">Owned credentials</span>
               </div>
               <p className="mt-3 text-sm leading-6 text-slate-400">
-                MUTX keeps operator keys and deployment actions in the same governance surface so rotation, ownership, and actionability stay connected.
+                MUTX keeps API keys and deployment actions in the same governance surface so rotation, ownership, and actionability stay connected.
               </p>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">

@@ -12,7 +12,7 @@ export default function DashboardAnalyticsPage() {
         <div className="space-y-4">
           <RouteHeader
             title="Analytics"
-            description="Usage trends, latency posture, and operator activity summaries from the live analytics contracts."
+            description="Usage trends, latency posture, and activity summaries from the live analytics contracts."
             icon={BarChart3}
             iconTone="text-fuchsia-300 bg-fuchsia-400/10"
             badge="analytics surface"

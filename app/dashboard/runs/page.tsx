@@ -12,7 +12,7 @@ export default function DashboardRunsPage() {
         <div className="space-y-4">
           <RouteHeader
             title="Runs"
-            description="Recent execution history, terminal state, and operator recovery context from the live runs contract."
+            description="Recent execution history, terminal state, and recovery context from the live runs contract."
             icon={History}
             iconTone="text-cyan-300 bg-cyan-400/10"
             badge="execution surface"
