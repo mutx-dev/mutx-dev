@@ -56,7 +56,7 @@ export function AppDomainDemoIntro() {
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
-  const [introVisible, setIntroVisible] = useState(true);
+  const [introVisible, setIntroVisible] = useState(false);
   const [introArmed, setIntroArmed] = useState(false);
   const completedRef = useRef(false);
 

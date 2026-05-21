@@ -919,6 +919,7 @@ test.describe('mutx.dev QA', () => {
 
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
 
+    await expect(page.getByRole('dialog', { name: /mutx demo intro/i })).toHaveCount(0);
     await expect(page.getByTestId('pico-landing')).toBeVisible();
     await expect(page.locator('main h1').first()).toBeVisible();
     await expect(page.locator('main')).toContainText(/PicoMUTX/i);
@@ -1103,10 +1104,16 @@ test.describe('mutx.dev QA', () => {
     await page.setViewportSize({ width: 390, height: 844 });
 
     await page.goto('/pico/onboarding', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByTestId('pico-mobile-product-masthead')).toBeVisible();
+    await expect(page.getByTestId('pico-mobile-product-nav')).toBeVisible();
     await expect(page.getByRole('heading', { name: /get to your first working agent fast/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /go to next chapter: lessons/i }).first()).toBeVisible();
 
     await page.getByRole('link', { name: /go to next chapter: lessons/i }).first().click();
+    await expect(page.getByTestId('pico-mobile-academy-nav')).toBeVisible();
+    await expect(
+      page.getByTestId('pico-mobile-academy-nav').getByRole('link', { name: /open pico support/i }),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: /install hermes locally/i })).toBeVisible();
     await expect(page.getByTestId('pico-academy-mission-billboard')).toBeVisible();
     await expect(page.getByTestId('pico-academy-progress-strip')).toBeVisible();

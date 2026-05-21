@@ -330,7 +330,7 @@ export function PicoShell({
 
         <PicoFooter />
 
-        <div className="hidden">
+        <div className="fixed inset-x-3 bottom-3 z-40 lg:hidden" data-testid="pico-mobile-academy-nav">
           <div className={picoCodexFrame('px-2 py-2 shadow-[0_18px_44px_rgba(0,0,0,0.38)]')}>
             <div className="grid grid-cols-3 gap-2">
               {isAcademyLessonRoute ? (
@@ -369,13 +369,13 @@ export function PicoShell({
                   >
                     Map
                   </button>
-                  <button
-                    type="button"
-                    onClick={onToggleHelpLane}
+                  <Link
+                    href={picoHref(pathname, '/support')}
+                    aria-label="Open Pico support"
                     className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-secondary)]"
                   >
                     Help
-                  </button>
+                  </Link>
                 </>
               )}
             </div>
@@ -441,8 +441,20 @@ export function PicoShell({
           </aside>
 
           <div className="min-w-0 space-y-5">
+            <div className="lg:hidden" data-testid="pico-mobile-product-masthead">
+              <div className={picoPanel('px-4 py-4')}>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <PicoWordmark pathname={pathname} />
+                  <span className={picoCodex.stamp}>Chapter {currentItem.chapter}</span>
+                </div>
+                <p className="mt-3 text-xs leading-5 text-[color:var(--pico-text-secondary)]">
+                  {currentItem.note}
+                </p>
+              </div>
+            </div>
+
             <header className={picoPanel('overflow-hidden')}>
-              <div className="border-b border-[color:var(--pico-border)] px-4 py-3 sm:px-5">
+              <div className="hidden border-b border-[color:var(--pico-border)] px-4 py-3 sm:block sm:px-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="inline-flex rounded-[9px] border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.13em] text-[color:var(--pico-accent-bright)]">
@@ -564,15 +576,24 @@ export function PicoShell({
 
       <PicoFooter />
 
-      <div className="hidden">
+      <div className="fixed inset-x-3 bottom-3 z-40 lg:hidden" data-testid="pico-mobile-product-nav">
         <div className="grid grid-cols-[auto,1fr,auto,auto] items-center gap-1.5 rounded-[16px] border border-[color:var(--pico-border)] bg-[rgba(6,12,8,0.9)] p-1.5 shadow-[0_18px_44px_rgba(0,0,0,0.36)] backdrop-blur">
-          <Link
-            href={picoHref(pathname, previousItem?.href ?? '/onboarding')}
-            aria-label={previousItem ? `Go to previous chapter: ${previousItem.label}` : 'Go to onboarding'}
-            className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-secondary)]"
-          >
-            Prev
-          </Link>
+          {previousItem ? (
+            <Link
+              href={picoHref(pathname, previousItem.href)}
+              aria-label={`Go to previous chapter: ${previousItem.label}`}
+              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-secondary)]"
+            >
+              Prev
+            </Link>
+          ) : (
+            <span
+              aria-disabled="true"
+              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:rgba(255,255,255,0.035)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-muted)]"
+            >
+              Start
+            </span>
+          )}
 
           <div className="min-w-0 px-1">
             <p className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-muted)]">
@@ -583,13 +604,22 @@ export function PicoShell({
             </p>
           </div>
 
-          <Link
-            href={picoHref(pathname, nextItem?.href ?? '/support')}
-            aria-label={nextItem ? `Go to next chapter: ${nextItem.label}` : 'Go to support'}
-            className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-secondary)]"
-          >
-            Next
-          </Link>
+          {nextItem ? (
+            <Link
+              href={picoHref(pathname, nextItem.href)}
+              aria-label={`Go to next chapter: ${nextItem.label}`}
+              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-secondary)]"
+            >
+              Next
+            </Link>
+          ) : (
+            <span
+              aria-disabled="true"
+              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:rgba(255,255,255,0.035)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-muted)]"
+            >
+              End
+            </span>
+          )}
 
           <Link
             href={picoHref(pathname, currentItem.href === '/support' ? '/academy' : '/support')}
