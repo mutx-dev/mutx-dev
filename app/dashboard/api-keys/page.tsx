@@ -12,7 +12,7 @@ export default function DashboardApiKeysPage() {
         <div className="space-y-4">
           <RouteHeader
             title="API Keys"
-            description="Create, rotate, revoke, and inspect operator keys without leaving the dashboard shell."
+            description="Create, rotate, revoke, and inspect API keys without leaving the dashboard."
             icon={Key}
             iconTone="text-amber-300 bg-amber-400/10"
             badge="credential surface"

@@ -143,6 +143,7 @@ export function PicoTutorPageClient() {
   const [error, setError] = useState<string | null>(null)
   const [reply, setReply] = useState<PicoTutorReply | null>(null)
   const [recentQuestions, setRecentQuestions] = useState<string[]>([])
+  const [formReady, setFormReady] = useState(false)
   const [openAIConnection, setOpenAIConnection] = useState<TutorOpenAIConnection | null>(null)
   const [openAIConnectionLoading, setOpenAIConnectionLoading] = useState(false)
   const [openAIConnectionSaving, setOpenAIConnectionSaving] = useState(false)
@@ -235,6 +236,7 @@ export function PicoTutorPageClient() {
 
   useEffect(() => {
     setRecentQuestions(readRecentQuestions())
+    setFormReady(true)
   }, [])
 
   useEffect(() => {
@@ -778,6 +780,7 @@ export function PicoTutorPageClient() {
               <textarea
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
+                disabled={!formReady || loading}
                 placeholder="Describe the blocker, the exact step, and what you expected to happen."
                 className="mt-6 min-h-[240px] w-full rounded-[28px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-5 py-5 text-sm leading-7 text-[color:var(--pico-text-secondary)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
               />
@@ -788,6 +791,7 @@ export function PicoTutorPageClient() {
                   <select
                     value={lessonSlug}
                     onChange={(event) => setLessonSlug(event.target.value)}
+                    disabled={!formReady || loading}
                     className="mt-3 w-full rounded-[22px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-sm text-[color:var(--pico-text-secondary)] outline-none"
                   >
                     <option value="">No lesson selected</option>
@@ -798,7 +802,7 @@ export function PicoTutorPageClient() {
                     ))}
                   </select>
                 </label>
-                <button type="submit" disabled={loading} className={picoClasses.primaryButton}>
+                <button type="submit" disabled={!formReady || loading} className={picoClasses.primaryButton}>
                   {loading ? 'Finding the next step...' : 'Get next step'}
                 </button>
               </div>
@@ -810,6 +814,7 @@ export function PicoTutorPageClient() {
                       key={prompt}
                       type="button"
                       onClick={() => setQuestion(prompt)}
+                      disabled={!formReady || loading}
                       className={picoClasses.tertiaryButton}
                     >
                       {prompt}

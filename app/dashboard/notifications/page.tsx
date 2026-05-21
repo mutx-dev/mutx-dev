@@ -8,10 +8,10 @@ export default function DashboardNotificationsPage() {
     <div className="space-y-4">
       <RouteHeader
         title="Notifications"
-        description="Operator inbox composed from live alerts, pending approvals, webhook failures, and runtime incident summaries."
+        description="A focused inbox for live alerts, pending approvals, webhook failures, and runtime incident summaries."
         icon={BellRing}
         iconTone="text-amber-300 bg-amber-400/10"
-        badge="operator inbox"
+        badge="signal inbox"
         stats={[
           { label: "Scope", value: "Signals only" },
           { label: "Data", value: "Live API", tone: "success" },

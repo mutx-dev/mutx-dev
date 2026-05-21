@@ -14,12 +14,12 @@ export default function DashboardPage() {
         <div className="space-y-4">
           <RouteHeader
             title="Overview"
-            description="Fleet posture, recent execution, alert pressure, delivery health, and operator budget state in one surface."
+            description="Fleet posture, recent execution, alerts, delivery health, and budget state in one surface."
             icon={Activity}
             iconTone="text-cyan-300 bg-cyan-400/10"
-            badge="operator overview"
+            badge="workspace overview"
             stats={[
-              { label: "Shell", value: "Canonical /dashboard" },
+              { label: "Route", value: "/dashboard" },
               { label: "Data", value: "Live API", tone: "success" },
             ]}
           />

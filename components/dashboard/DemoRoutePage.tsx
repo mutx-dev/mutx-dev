@@ -25,7 +25,7 @@ export function DemoRoutePage({
         hint={{
           tone: "comingSoon",
           detail:
-            "This route is intentionally staged. The layout is real, but operator actions stay hidden until the backend contract ships end to end.",
+            "This route is intentionally staged. The layout is real, but actions stay hidden until the backend contract ships end to end.",
         }}
         stats={[
           { label: "State", value: "Integration pending", tone: "warning" },

@@ -82,8 +82,9 @@ export function PicoSupportPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
   const setup = usePicoSetupState(session.status === 'authenticated')
-  const { actions, progress, derived } = usePicoProgress(session.status === 'authenticated')
+  const { ready: progressReady, actions, progress, derived } = usePicoProgress(session.status === 'authenticated')
   const toHref = usePicoHref()
+  const [interactiveReady, setInteractiveReady] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [interest, setInterest] = useState<string | undefined>()
   const [copied, setCopied] = useState(false)
@@ -119,6 +120,14 @@ export function PicoSupportPageClient() {
     `Return ${returnRouteLabel}`,
     `Packet ${packetState}`,
   ].join('\n')
+  const supportControlsReady = interactiveReady && progressReady && recoveryWorkspace.ready
+  const disabledControlClassName = !supportControlsReady
+    ? 'disabled:cursor-not-allowed disabled:opacity-60'
+    : undefined
+
+  useEffect(() => {
+    setInteractiveReady(true)
+  }, [])
 
   useEffect(() => {
     if (progress.platform.activeSurface !== 'support') {
@@ -182,11 +191,19 @@ export function PicoSupportPageClient() {
   const defaultSupportMessage = `${diagnosticPacket}\n\nProblem:\n`
 
   function openEscalation(defaultInterest: string) {
+    if (!supportControlsReady) {
+      return
+    }
+
     setInterest(defaultInterest)
     setFormOpen(true)
   }
 
   async function copyDiagnosticPacket() {
+    if (!supportControlsReady) {
+      return
+    }
+
     try {
       await navigator.clipboard.writeText(diagnosticPacket)
       setCopied(true)
@@ -329,21 +346,24 @@ export function PicoSupportPageClient() {
             <button
               type="button"
               onClick={() => openEscalation('fixing-existing')}
-              className={picoClasses.primaryButton}
+              disabled={!supportControlsReady}
+              className={cn(picoClasses.primaryButton, disabledControlClassName)}
             >
               Get 1-on-1 help
             </button>
             <button
               type="button"
               onClick={() => void copyDiagnosticPacket()}
-              className={picoClasses.secondaryButton}
+              disabled={!supportControlsReady}
+              className={cn(picoClasses.secondaryButton, disabledControlClassName)}
             >
               {copied ? 'Copied packet' : 'Copy packet'}
             </button>
             <button
               type="button"
               onClick={() => openEscalation('other')}
-              className={picoClasses.tertiaryButton}
+              disabled={!supportControlsReady}
+              className={cn(picoClasses.tertiaryButton, disabledControlClassName)}
             >
               Book guidance
             </button>
@@ -476,7 +496,11 @@ export function PicoSupportPageClient() {
                       <button
                         type="button"
                         onClick={() => openEscalation(option.id)}
-                        className={option.id === 'fixing-existing' ? picoClasses.primaryButton : picoClasses.secondaryButton}
+                        disabled={!supportControlsReady}
+                        className={cn(
+                          option.id === 'fixing-existing' ? picoClasses.primaryButton : picoClasses.secondaryButton,
+                          disabledControlClassName,
+                        )}
                       >
                         {option.id === 'fixing-existing' ? 'Start support request' : 'Book guidance'}
                       </button>
@@ -560,14 +584,16 @@ export function PicoSupportPageClient() {
                 <button
                   type="button"
                   onClick={() => void copyDiagnosticPacket()}
-                  className={picoClasses.secondaryButton}
+                  disabled={!supportControlsReady}
+                  className={cn(picoClasses.secondaryButton, disabledControlClassName)}
                 >
                   {copied ? 'Copied packet' : 'Copy packet'}
                 </button>
                 <button
                   type="button"
                   onClick={() => openEscalation('fixing-existing')}
-                  className={picoClasses.primaryButton}
+                  disabled={!supportControlsReady}
+                  className={cn(picoClasses.primaryButton, disabledControlClassName)}
                 >
                   Open form with packet
                 </button>

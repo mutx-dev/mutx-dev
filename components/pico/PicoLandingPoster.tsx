@@ -215,7 +215,7 @@ export function PicoLandingPoster() {
           className={s.agentSliderBand}
           ariaLabel={t('agentSlider.ariaLabel')}
           agents={agentSliderAgents}
-          onAgentClick={() => openForm('build')}
+          pauseOnHover={false}
           speed={46}
         />
 

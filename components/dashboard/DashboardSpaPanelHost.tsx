@@ -514,7 +514,7 @@ export function DashboardSpaPanelHost() {
             </div>
             <div>
               <h2 className='font-[family:var(--font-site-display)] text-[1.7rem] leading-[0.98] tracking-[-0.06em] text-white'>
-                Mission Control shell is routing this dashboard from one surface
+                The dashboard shell is routing everything from one surface
               </h2>
               <p className='mt-2 max-w-4xl text-sm leading-6 text-slate-300'>
                 The panel switchboard now owns boot, routing, gating, and failure isolation. Legacy
@@ -573,7 +573,7 @@ export function DashboardSpaPanelHost() {
 
         <div className='mt-4 flex flex-wrap items-center gap-2 text-[11px] text-slate-300'>
           <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
-            {currentUser?.display_name || 'Operator pending'}
+            {currentUser?.display_name || 'Sign-in pending'}
           </span>
           <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
             {subscription || 'free'} subscription
@@ -603,7 +603,7 @@ export function DashboardSpaPanelHost() {
                   Live feed
                 </p>
                 <p className='mt-2 text-sm text-slate-300'>
-                  Shell posture, boot state, and operator mode in one side rail.
+                  Shell posture, boot state, and interface mode in one side rail.
                 </p>
               </div>
               <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-200'>
@@ -627,7 +627,7 @@ export function DashboardSpaPanelHost() {
                     <span className='text-slate-400'>{desktopRuntimeActive ? 'local' : 'gateway'}</span>
                   </div>
                   <div className='flex items-center justify-between gap-3'>
-                    <span>Operator</span>
+                    <span>Account</span>
                     <span className='truncate text-slate-400'>{currentUser?.display_name || 'pending'}</span>
                   </div>
                 </div>
@@ -691,7 +691,7 @@ export function DashboardSpaPanelHost() {
           <div className='space-y-4 px-5 py-5'>
             <p className='text-sm leading-6 text-slate-300'>
               The shell keeps chat as a first-class panel. Open the session surface to work the live
-              session list without leaving Mission Control.
+              session list without leaving the dashboard.
             </p>
 
             <div className='grid gap-3 sm:grid-cols-2'>
@@ -737,7 +737,7 @@ export function DashboardSpaPanelHost() {
                 </div>
                 <div>
                   <h2 className='font-[family:var(--font-site-display)] text-[1.95rem] tracking-[-0.06em] text-white'>
-                    Bringing Mission Control online
+                    Bringing the dashboard online
                   </h2>
                   <p className='mt-2 max-w-2xl text-sm leading-6 text-slate-300'>
                     The shell is walking auth, capabilities, config, and the initial data preload before

@@ -252,8 +252,10 @@ export function LiveAuthRequired({
   title: string;
   message: string;
 }) {
+  const displayTitle = title.replace(/^Operator session/i, "Sign-in");
+
   return (
-    <LivePanel title={title} meta="auth required">
+    <LivePanel title={displayTitle} meta="auth required">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(260px,0.92fr)]">
         <div
           className="rounded-[24px] border p-5"
@@ -284,7 +286,7 @@ export function LiveAuthRequired({
                 className="mt-2 font-[family:var(--font-site-display)] text-lg font-semibold"
                 style={{ color: dashboardTokens.textPrimary }}
               >
-                {title}
+                {displayTitle}
               </p>
               <p className="mt-2 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
                 {message}
@@ -295,8 +297,8 @@ export function LiveAuthRequired({
 
         <div className="grid gap-3">
           {[
-            "Run the MUTX setup lane or sign back in with the active operator account.",
-            "Once authenticated, this route swaps the gate state for the real control-plane payload.",
+            "Open setup or sign back in with the account for this workspace.",
+            "After sign-in, this page loads live data from the control plane.",
           ].map((note) => (
             <div
               key={note}

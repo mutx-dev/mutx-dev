@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { PicoShell } from '@/components/pico/PicoShell'
@@ -58,8 +58,9 @@ function formatDifficulty(difficulty: PicoLesson['difficulty']) {
 
 export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const session = usePicoSession()
-  const { progress, derived, actions } = usePicoProgress()
+  const { ready: progressReady, progress, derived, actions } = usePicoProgress()
   const toHref = usePicoHref()
+  const [interactiveReady, setInteractiveReady] = useState(false)
 
   const started = progress.startedLessons.includes(lesson.slug)
   const completed = progress.completedLessons.includes(lesson.slug)
@@ -79,6 +80,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const previousLesson = lessonIndex > 0 ? trackLessons[lessonIndex - 1] ?? null : null
 
   const {
+    ready: workspaceReady,
     workspace,
     completedStepCount,
     progressPercent,
@@ -92,6 +94,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const activeStepIndex = workspace.activeStepIndex >= 0 ? workspace.activeStepIndex : 0
   const activeWorkspaceStep = lesson.steps[activeStepIndex] ?? lesson.steps[0] ?? null
   const evidenceReady = workspace.evidence.trim().length > 0
+  const lessonControlsReady = interactiveReady && progressReady && workspaceReady
   const hostedStamp =
     session.status === 'authenticated'
       ? session.user.isEmailVerified === false
@@ -135,6 +138,10 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
       value: `${lesson.estimatedMinutes}m • ${lesson.xp} xp • ${formatDifficulty(lesson.difficulty)}`,
     },
   ]
+
+  useEffect(() => {
+    setInteractiveReady(true)
+  }, [])
 
   useEffect(() => {
     if (!missingPrerequisiteLesson && !started && !completed) {
@@ -191,7 +198,11 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
           <button
             type="button"
             onClick={() => actions.completeLesson(lesson.slug)}
-            className={picoClasses.secondaryButton}
+            disabled={!lessonControlsReady}
+            className={cn(
+              picoClasses.secondaryButton,
+              !lessonControlsReady && 'disabled:cursor-not-allowed disabled:opacity-60',
+            )}
           >
             {getCompleteLabel(lesson.slug)}
           </button>
@@ -203,7 +214,11 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
       <button
         type="button"
         onClick={() => actions.completeLesson(lesson.slug)}
-        className={buttonClassName}
+        disabled={!lessonControlsReady}
+        className={cn(
+          buttonClassName,
+          !lessonControlsReady && 'disabled:cursor-not-allowed disabled:opacity-60',
+        )}
       >
         {getCompleteLabel(lesson.slug)}
       </button>
@@ -397,11 +412,13 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                   key={step.title}
                   type="button"
                   onClick={() => workspaceActions.setActiveStep(index)}
+                  disabled={!lessonControlsReady}
                   className={cn(
                     'grid min-w-[13rem] gap-2 rounded-[24px] border px-4 py-4 text-left transition',
                     active
                       ? 'border-[color:var(--pico-accent)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.22),rgba(8,16,10,0.32))] text-[color:var(--pico-text)]'
                       : 'border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] text-[color:var(--pico-text-secondary)]',
+                    !lessonControlsReady && 'disabled:cursor-not-allowed disabled:opacity-60',
                   )}
                 >
                   <div className="flex flex-wrap items-center gap-2">
@@ -447,11 +464,13 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                       key={step.title}
                       type="button"
                       onClick={() => workspaceActions.setActiveStep(index)}
+                      disabled={!lessonControlsReady}
                       className={cn(
                         'grid gap-2 border-l pl-4 text-left transition',
                         active
                           ? 'border-[color:var(--pico-accent)] text-[color:var(--pico-text)]'
                           : 'border-[color:var(--pico-border)] text-[color:var(--pico-text-secondary)] hover:border-[color:var(--pico-border-hover)] hover:text-[color:var(--pico-text)]',
+                        !lessonControlsReady && 'disabled:cursor-not-allowed disabled:opacity-60',
                       )}
                     >
                       <div className="flex flex-wrap items-center gap-2">
@@ -482,17 +501,25 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
               <button
                 type="button"
                 onClick={() => workspaceActions.reset()}
-                className={picoClasses.tertiaryButton}
+                disabled={!lessonControlsReady}
+                className={cn(
+                  picoClasses.tertiaryButton,
+                  !lessonControlsReady && 'disabled:cursor-not-allowed disabled:opacity-60',
+                )}
               >
                 Reset workspace
               </button>
               <button
                 type="button"
                 onClick={() => workspaceActions.toggleStep(activeStepIndex)}
+                disabled={!lessonControlsReady}
                 className={
-                  workspace.completedStepIndexes.includes(activeStepIndex)
-                    ? picoClasses.secondaryButton
-                    : picoClasses.primaryButton
+                  cn(
+                    workspace.completedStepIndexes.includes(activeStepIndex)
+                      ? picoClasses.secondaryButton
+                      : picoClasses.primaryButton,
+                    !lessonControlsReady && 'disabled:cursor-not-allowed disabled:opacity-60',
+                  )
                 }
                 data-testid={activeStepIndex === 0 ? 'pico-step-toggle-first' : undefined}
               >
@@ -528,8 +555,9 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                 <textarea
                   value={workspace.evidence}
                   onChange={(event) => workspaceActions.setEvidence(event.target.value)}
+                  disabled={!lessonControlsReady}
                   placeholder="Paste the output, transcript note, or file path from this step."
-                  className="min-h-40 rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-sm text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                  className="min-h-40 rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-sm text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)] disabled:cursor-not-allowed disabled:opacity-60"
                   data-testid="pico-lesson-proof"
                 />
               </label>
@@ -539,8 +567,9 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                 <textarea
                   value={workspace.notes}
                   onChange={(event) => workspaceActions.setNotes(event.target.value)}
+                  disabled={!lessonControlsReady}
                   placeholder="Capture the blocker, file path, or command variation that mattered."
-                  className="min-h-40 rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-sm text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                  className="min-h-40 rounded-[18px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-sm text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)] disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </label>
             </div>

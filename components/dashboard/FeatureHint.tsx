@@ -62,7 +62,7 @@ export function FeatureHint({
 
       <div
         className={cn(
-          "absolute top-[calc(100%+0.5rem)] z-30 w-[min(20rem,calc(100vw-2rem))] rounded-[18px] border p-4 shadow-[0_20px_50px_rgba(2,2,5,0.34)]",
+          "absolute top-[calc(100%+0.5rem)] z-30 hidden w-[min(20rem,calc(100vw-2rem))] rounded-[18px] border p-4 shadow-[0_20px_50px_rgba(2,2,5,0.34)] group-open:block",
           align === "left" ? "left-0" : "right-0",
           copy.detailClassName,
         )}

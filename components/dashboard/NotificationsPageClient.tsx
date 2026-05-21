@@ -125,13 +125,13 @@ export function NotificationsPageClient() {
         <LiveStatCard
           label="Alerts"
           value={String(payload.summary.alerts)}
-          detail="Open monitoring alerts sampled into the operator inbox."
+          detail="Open monitoring alerts sampled into the signal inbox."
           status={payload.summary.alerts > 0 ? "error" : "success"}
         />
         <LiveStatCard
           label="Approvals"
           value={String(payload.summary.approvals)}
-          detail="Pending approval requests still waiting on an operator decision."
+          detail="Pending approval requests still waiting on review."
           status={payload.summary.approvals > 0 ? "warning" : "success"}
         />
         <LiveStatCard

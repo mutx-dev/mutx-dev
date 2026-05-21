@@ -106,16 +106,9 @@ export function AgentSlider({
         {agents.map((agent, index) => {
           const kind = agent.kind ?? DEFAULT_AGENTS[index % DEFAULT_AGENTS.length]?.kind ?? 'dev'
           const Icon = ICONS[kind]
-
-          return (
-            <button
-              key={`${isDuplicate ? 'duplicate' : 'primary'}-${agent.name}-${index}`}
-              type="button"
-              className="agent-card"
-              tabIndex={isDuplicate ? -1 : undefined}
-              aria-label={`${agent.name}: ${agent.description}`}
-              onClick={() => onAgentClick?.(agent, index)}
-            >
+          const label = `${agent.name}: ${agent.description}`
+          const content = (
+            <>
               <span className="agent-icon" aria-hidden="true">
                 <Icon />
               </span>
@@ -123,6 +116,33 @@ export function AgentSlider({
                 <span className="agent-name">{agent.name}</span>
                 <span className="agent-description">{agent.description}</span>
               </span>
+            </>
+          )
+
+          if (!onAgentClick) {
+            return (
+              <article
+                key={`${isDuplicate ? 'duplicate' : 'primary'}-${agent.name}-${index}`}
+                className="agent-card"
+                data-agent-slider-card={isDuplicate ? 'duplicate' : 'primary'}
+                aria-label={label}
+              >
+                {content}
+              </article>
+            )
+          }
+
+          return (
+            <button
+              key={`${isDuplicate ? 'duplicate' : 'primary'}-${agent.name}-${index}`}
+              type="button"
+              className="agent-card"
+              data-agent-slider-card={isDuplicate ? 'duplicate' : 'primary'}
+              tabIndex={isDuplicate ? -1 : undefined}
+              aria-label={label}
+              onClick={() => onAgentClick?.(agent, index)}
+            >
+              {content}
             </button>
           )
         })}
@@ -136,6 +156,7 @@ export function AgentSlider({
       style={style}
       aria-label={ariaLabel}
       data-direction={direction}
+      data-interactive={onAgentClick ? 'true' : 'false'}
       data-pause={pauseOnHover ? 'true' : 'false'}
     >
       <div className="agent-viewport">
@@ -247,16 +268,27 @@ export function AgentSlider({
             border-color 170ms ease,
             background 170ms ease,
             box-shadow 170ms ease;
+          cursor: default;
+          touch-action: pan-y;
+          user-select: none;
+        }
+
+        button.agent-card {
+          cursor: pointer;
           touch-action: manipulation;
         }
 
-        .agent-slider:is(:hover, :focus-within) .agent-card {
+        .agent-slider[data-interactive='false'] .agent-card {
+          touch-action: pan-x pan-y;
+        }
+
+        .agent-slider[data-interactive='true']:is(:hover, :focus-within) .agent-card {
           opacity: 0.58;
         }
 
-        .agent-card:hover,
-        .agent-card:focus,
-        .agent-card:active {
+        .agent-slider[data-interactive='true'] .agent-card:hover,
+        .agent-slider[data-interactive='true'] .agent-card:focus,
+        .agent-slider[data-interactive='true'] .agent-card:active {
           z-index: 3;
           opacity: 1;
           transform: scale(1.065);
@@ -275,7 +307,7 @@ export function AgentSlider({
             inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
-        .agent-card:focus-visible {
+        .agent-slider[data-interactive='true'] .agent-card:focus-visible {
           outline: none;
           box-shadow:
             0 0 0 3px rgba(var(--pico-accent-rgb, 164, 255, 92), 0.24),
@@ -347,16 +379,18 @@ export function AgentSlider({
             transform 160ms ease;
         }
 
-        .agent-card:hover .agent-name,
-        .agent-card:focus .agent-name,
-        .agent-card:active .agent-name {
+        .agent-slider[data-interactive='true'] .agent-card:hover .agent-name,
+        .agent-slider[data-interactive='true'] .agent-card:focus .agent-name,
+        .agent-slider[data-interactive='true'] .agent-card:active .agent-name,
+        .agent-slider[data-interactive='false'] .agent-name {
           color: var(--pico-accent-bright, #ebffbf);
           transform: translateY(0);
         }
 
-        .agent-card:hover .agent-description,
-        .agent-card:focus .agent-description,
-        .agent-card:active .agent-description {
+        .agent-slider[data-interactive='true'] .agent-card:hover .agent-description,
+        .agent-slider[data-interactive='true'] .agent-card:focus .agent-description,
+        .agent-slider[data-interactive='true'] .agent-card:active .agent-description,
+        .agent-slider[data-interactive='false'] .agent-description {
           opacity: 1;
           transform: translateY(0);
         }

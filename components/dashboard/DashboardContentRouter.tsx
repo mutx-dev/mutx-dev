@@ -176,7 +176,7 @@ function UpgradeNudge({
       description={`The ${panel} panel is gated in essential mode so the shell stays focused on the core workflow.`}
       badge='essential mode'
       checks={[
-        'Switch the interface mode to full once you need the broader Mission Control surface.',
+        'Switch the interface mode to full once you need the broader dashboard surface.',
         `Current subscription: ${subscription || 'free'}.`,
         'Essential mode keeps overview, agents, tasks, chat, activity, logs, and settings available.',
       ]}
@@ -211,12 +211,12 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <ShellRoute
           title='Overview'
-          description='Fleet posture, recent execution, alert pressure, delivery health, and operator budget state in one surface.'
+          description='Fleet posture, recent execution, alerts, delivery health, and budget state in one surface.'
           icon={Activity}
           iconTone='text-cyan-300 bg-cyan-400/10'
-          badge='operator overview'
+          badge='workspace overview'
           stats={[
-            { label: 'Shell', value: 'Mission Control' },
+            { label: 'Route', value: '/dashboard' },
             { label: 'Data', value: 'Live API', tone: 'success' },
           ]}
         >
@@ -291,7 +291,7 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <ShellRoute
           title='Runs'
-          description='Recent execution history, terminal state, and operator recovery context from the live runs contract.'
+          description='Recent execution history, terminal state, and recovery context from the live runs contract.'
           icon={History}
           iconTone='text-cyan-300 bg-cyan-400/10'
           badge='execution surface'
@@ -387,7 +387,7 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <ShellRoute
           title='API Keys'
-          description='Create, rotate, revoke, and inspect operator keys without leaving the dashboard shell.'
+          description='Create, rotate, revoke, and inspect API keys without leaving the dashboard.'
           icon={Key}
           iconTone='text-amber-300 bg-amber-400/10'
           badge='credential surface'
@@ -435,7 +435,7 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <ShellRoute
           title='Security'
-          description='Credential inventory, auth posture, and operator trust boundaries in the same surface as deployment and recovery.'
+          description='Credential inventory, auth posture, and trust boundaries in the same surface as deployment and recovery.'
           icon={ShieldCheck}
           iconTone='text-amber-300 bg-amber-400/10'
           badge='security surface'
@@ -454,7 +454,7 @@ function renderPanel(panel: DashboardPanelId) {
           description='Workflow and handoff control will land here once the backend owns orchestration entities end to end.'
           badge='demo orchestration'
           notes={[
-            'Show truthful workflow topology once orchestration endpoints ship instead of inventing queue theater.',
+            'Show truthful workflow topology once orchestration endpoints ship.',
             'Keep pause, resume, and concurrency controls hidden until they map to auditable backend actions.',
             'Use the same shell and density rules as the live routes so this page is ready for backend wiring, not another redesign.',
           ]}
@@ -464,11 +464,11 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <DemoRoutePage
           title='Memory'
-          description='Memory and context-management need real retention and retrieval contracts before they deserve operator controls.'
+          description='Memory and context management need real retention and retrieval contracts before controls belong here.'
           badge='demo memory'
           notes={[
             'Do not ship pretend vector-store or retention controls before the product semantics exist.',
-            'This surface should become the place operators inspect memory pressure, retention windows, and context ownership.',
+            'This page should become the place to inspect memory pressure, retention windows, and context ownership.',
             'Until then, keep the route compact, honest, and visually aligned with the rest of the control plane.',
           ]}
         />
@@ -477,7 +477,7 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <ShellRoute
           title='Analytics'
-          description='Usage trends, latency posture, and operator activity summaries from the live analytics contracts.'
+          description='Usage trends, latency posture, and activity summaries from the live analytics contracts.'
           icon={BarChart3}
           iconTone='text-fuchsia-300 bg-fuchsia-400/10'
           badge='analytics surface'
@@ -538,7 +538,7 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <ShellRoute
           title='Settings'
-          description='Bridge diagnostics, runtime repair, and setup flow for this operator seat.'
+          description='Bridge diagnostics, runtime repair, and setup flow for this workspace.'
           icon={Network}
           iconTone='text-cyan-300 bg-cyan-400/10'
           badge='advanced diagnostics'
@@ -554,7 +554,7 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <ShellRoute
           title='Autonomy'
-          description='Local operator view for the live autonomy daemon, lane state, queue depth, active runners, and recent reports.'
+          description='Local view for the live autonomy daemon, queue depth, active runners, and recent reports.'
           icon={Bot}
           iconTone='text-fuchsia-300 bg-fuchsia-400/10'
           badge='local autonomy surface'
@@ -609,7 +609,7 @@ function renderPanel(panel: DashboardPanelId) {
       return (
         <MissingPanel
           title='Standup'
-          description='Mission Control expects a standup panel, but MUTX does not have a real standup workflow in this checkout yet.'
+          description='MUTX does not have a real standup workflow in this checkout yet, so this panel stays reserved.'
         />
       )
   }

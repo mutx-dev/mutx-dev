@@ -12,7 +12,7 @@ export default function DashboardAutonomyPage() {
         <div className="space-y-4">
           <RouteHeader
             title="Autonomy"
-            description="Local-only operator view for the live autonomy daemon, lane state, queue depth, active runners, and recent reports."
+            description="Local view for the live autonomy daemon, queue depth, active runners, and recent reports."
             icon={Bot}
             iconTone="text-fuchsia-300 bg-fuchsia-400/10"
             badge="local autonomy surface"
