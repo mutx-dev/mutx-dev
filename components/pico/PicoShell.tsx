@@ -193,6 +193,7 @@ export function PicoShell({
 }: PicoShellProps) {
   const pathname = usePathname()
   const [tourOpen, setTourOpen] = useState(false)
+  const [interactiveReady, setInteractiveReady] = useState(false)
   const academyMode = mode === 'academy'
   const currentItem = navItems.find((item) => routeIsActive(pathname, item.href)) ?? navItems[0]
   const routeRobot = getPicoRouteRobot(pathname, academyMode)
@@ -200,6 +201,10 @@ export function PicoShell({
   const previousItem = currentIndex > 0 ? navItems[currentIndex - 1] : null
   const nextItem = currentIndex < navItems.length - 1 ? navItems[currentIndex + 1] : null
   const isAcademyLessonRoute = pathname.startsWith('/pico/academy/')
+
+  useEffect(() => {
+    setInteractiveReady(true)
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -236,6 +241,7 @@ export function PicoShell({
                   <button
                     type="button"
                     onClick={() => setTourOpen(true)}
+                    disabled={!interactiveReady}
                     className={picoClasses.tertiaryButton}
                     data-testid="pico-open-tour"
                   >
@@ -245,6 +251,7 @@ export function PicoShell({
                     <button
                       type="button"
                       onClick={onToggleRail}
+                      disabled={!interactiveReady}
                       aria-pressed={!railCollapsed}
                       className={cn(
                         picoClasses.tertiaryButton,
@@ -259,6 +266,7 @@ export function PicoShell({
                     <button
                       type="button"
                       onClick={onToggleHelpLane}
+                      disabled={!interactiveReady}
                       aria-pressed={helpLaneOpen}
                       className={cn(
                         picoClasses.tertiaryButton,
@@ -279,6 +287,7 @@ export function PicoShell({
                   <button
                     type="button"
                     onClick={() => setTourOpen(true)}
+                    disabled={!interactiveReady}
                     className={picoClasses.tertiaryButton}
                     data-testid="pico-open-tour-mobile"
                   >
@@ -365,6 +374,7 @@ export function PicoShell({
                   <button
                     type="button"
                     onClick={onToggleRail}
+                    disabled={!interactiveReady}
                     className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-secondary)]"
                   >
                     Map
@@ -469,6 +479,7 @@ export function PicoShell({
                     <button
                       type="button"
                       onClick={() => setTourOpen(true)}
+                      disabled={!interactiveReady}
                       className={picoClasses.tertiaryButton}
                       data-testid="pico-open-tour"
                     >
@@ -493,7 +504,12 @@ export function PicoShell({
                       </Link>
                     ) : null}
                     {onToggleHelpLane ? (
-                      <button type="button" onClick={onToggleHelpLane} className={picoClasses.tertiaryButton}>
+                      <button
+                        type="button"
+                        onClick={onToggleHelpLane}
+                        disabled={!interactiveReady}
+                        className={picoClasses.tertiaryButton}
+                      >
                         {helpLaneOpen ? 'Hide recovery' : 'Show recovery'}
                       </button>
                     ) : null}
@@ -507,6 +523,7 @@ export function PicoShell({
                     <button
                       type="button"
                       onClick={() => setTourOpen(true)}
+                      disabled={!interactiveReady}
                       className={picoClasses.tertiaryButton}
                       data-testid="pico-open-tour-mobile"
                     >

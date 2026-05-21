@@ -112,12 +112,24 @@ export function usePicoLessonWorkspace(
 
   const touch = useCallback(
     (updater: (current: PicoLessonWorkspaceState) => PicoLessonWorkspaceState) => {
-      persist({
-        ...updater(workspace),
-        updatedAt: new Date().toISOString(),
+      setWorkspace((current) => {
+        const normalized = normalizeLessonWorkspace(
+          {
+            ...updater(current),
+            updatedAt: new Date().toISOString(),
+          },
+          stepCount,
+        )
+
+        const workspaceMap = readWorkspaceMap()
+        workspaceMap[lessonSlug] = normalized
+        writeWorkspaceMap(workspaceMap)
+
+        options?.persistRemote?.(lessonSlug, normalized)
+        return normalized
       })
     },
-    [persist, workspace],
+    [lessonSlug, options, stepCount],
   )
 
   const completedStepCount = workspace.completedStepIndexes.length

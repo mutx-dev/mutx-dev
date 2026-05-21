@@ -89,8 +89,9 @@ export function usePicoProgress(remoteSyncEnabled = true) {
         }
 
         const payload = normalizePicoProgress(await response.json())
-        writeLocalProgress(payload)
-        setProgress(payload)
+        const merged = resolveHydratedPicoProgress(payload, readLocalProgress())
+        writeLocalProgress(merged)
+        setProgress(merged)
         setSyncState('synced')
       } catch {
         setSyncState('offline')

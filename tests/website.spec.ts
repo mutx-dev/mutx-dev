@@ -941,6 +941,18 @@ test.describe('mutx.dev QA', () => {
     await expect(page.locator('main')).toContainText(/founding access|waitlist-first|request access/i);
     await expect(page.locator('main')).not.toContainText(/pre-register/i);
 
+    const agentGallery = page.getByRole('region', { name: /autonomous agent types/i });
+    await expect(agentGallery).toHaveAttribute('data-interactive', 'false');
+    await expect(agentGallery).toHaveAttribute('data-pause', 'false');
+    await expect(agentGallery.getByRole('button')).toHaveCount(0);
+    const agentGalleryBox = await agentGallery.boundingBox();
+    expect(agentGalleryBox).not.toBeNull();
+    await page.mouse.click(
+      agentGalleryBox!.x + agentGalleryBox!.width / 2,
+      agentGalleryBox!.y + agentGalleryBox!.height / 2,
+    );
+    await expect(page.getByRole('dialog', { name: /contact form/i })).toHaveCount(0);
+
     await page.getByRole('button', { name: /request access/i }).first().click();
     const dialog = page.getByRole('dialog', { name: /contact form/i });
     await expect(dialog).toBeVisible();
