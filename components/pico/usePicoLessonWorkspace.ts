@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   createDefaultLessonWorkspace,
@@ -58,16 +58,17 @@ function hasMeaningfulWorkspaceState(workspace: PicoLessonWorkspaceState) {
   )
 }
 
+function getWorkspaceTimestamp(workspace: PicoLessonWorkspaceState) {
+  const timestamp = workspace.updatedAt ? Date.parse(workspace.updatedAt) : 0
+  return Number.isFinite(timestamp) ? timestamp : 0
+}
+
 export function usePicoLessonWorkspace(
   lessonSlug: string,
   stepCount: number,
   options?: PicoLessonWorkspaceOptions,
 ) {
   const persistedWorkspace = options?.progress?.lessonWorkspaces[lessonSlug]
-  const [workspace, setWorkspace] = useState<PicoLessonWorkspaceState>(() =>
-    createDefaultLessonWorkspace(stepCount),
-  )
-
   const resolvedWorkspace = useMemo(() => {
     if (persistedWorkspace) {
       return normalizeLessonWorkspace(persistedWorkspace, stepCount)
@@ -75,10 +76,39 @@ export function usePicoLessonWorkspace(
 
     return readLessonWorkspace(lessonSlug, stepCount)
   }, [lessonSlug, persistedWorkspace, stepCount])
+  const [workspace, setWorkspace] = useState<PicoLessonWorkspaceState>(() =>
+    createDefaultLessonWorkspace(stepCount),
+  )
+  const [ready, setReady] = useState(false)
+  const workspaceRef = useRef<PicoLessonWorkspaceState>(createDefaultLessonWorkspace(stepCount))
+  const workspaceLessonRef = useRef(lessonSlug)
 
   useEffect(() => {
+    const lessonChanged = workspaceLessonRef.current !== lessonSlug
+    const currentTimestamp = getWorkspaceTimestamp(workspaceRef.current)
+    const resolvedTimestamp = getWorkspaceTimestamp(resolvedWorkspace)
+
+    if (!lessonChanged && currentTimestamp > resolvedTimestamp) {
+      setReady(true)
+      return
+    }
+
+    workspaceLessonRef.current = lessonSlug
+    workspaceRef.current = resolvedWorkspace
     setWorkspace(resolvedWorkspace)
-  }, [resolvedWorkspace])
+    setReady(true)
+  }, [lessonSlug, resolvedWorkspace])
+
+  const writePersistedWorkspace = useCallback(
+    (nextWorkspace: PicoLessonWorkspaceState) => {
+      const workspaceMap = readWorkspaceMap()
+      workspaceMap[lessonSlug] = nextWorkspace
+      writeWorkspaceMap(workspaceMap)
+
+      options?.persistRemote?.(lessonSlug, nextWorkspace)
+    },
+    [lessonSlug, options],
+  )
 
   useEffect(() => {
     if (!options?.persistRemote || persistedWorkspace) {
@@ -99,37 +129,32 @@ export function usePicoLessonWorkspace(
   const persist = useCallback(
     (nextWorkspace: PicoLessonWorkspaceState) => {
       const normalized = normalizeLessonWorkspace(nextWorkspace, stepCount)
+      workspaceLessonRef.current = lessonSlug
+      workspaceRef.current = normalized
       setWorkspace(normalized)
-
-      const workspaceMap = readWorkspaceMap()
-      workspaceMap[lessonSlug] = normalized
-      writeWorkspaceMap(workspaceMap)
-
-      options?.persistRemote?.(lessonSlug, normalized)
+      setReady(true)
+      writePersistedWorkspace(normalized)
     },
-    [lessonSlug, options, stepCount],
+    [lessonSlug, stepCount, writePersistedWorkspace],
   )
 
   const touch = useCallback(
     (updater: (current: PicoLessonWorkspaceState) => PicoLessonWorkspaceState) => {
-      setWorkspace((current) => {
-        const normalized = normalizeLessonWorkspace(
-          {
-            ...updater(current),
-            updatedAt: new Date().toISOString(),
-          },
-          stepCount,
-        )
+      const normalized = normalizeLessonWorkspace(
+        {
+          ...updater(workspaceRef.current),
+          updatedAt: new Date().toISOString(),
+        },
+        stepCount,
+      )
 
-        const workspaceMap = readWorkspaceMap()
-        workspaceMap[lessonSlug] = normalized
-        writeWorkspaceMap(workspaceMap)
-
-        options?.persistRemote?.(lessonSlug, normalized)
-        return normalized
-      })
+      workspaceLessonRef.current = lessonSlug
+      workspaceRef.current = normalized
+      setWorkspace(normalized)
+      setReady(true)
+      writePersistedWorkspace(normalized)
     },
-    [lessonSlug, options, stepCount],
+    [lessonSlug, stepCount, writePersistedWorkspace],
   )
 
   const completedStepCount = workspace.completedStepIndexes.length
@@ -137,6 +162,7 @@ export function usePicoLessonWorkspace(
     stepCount > 0 ? Math.round((completedStepCount / stepCount) * 100) : 0
 
   return {
+    ready: ready && workspaceLessonRef.current === lessonSlug,
     workspace,
     completedStepCount,
     progressPercent,

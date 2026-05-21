@@ -945,6 +945,16 @@ test.describe('mutx.dev QA', () => {
     await expect(agentGallery).toHaveAttribute('data-interactive', 'false');
     await expect(agentGallery).toHaveAttribute('data-pause', 'false');
     await expect(agentGallery.getByRole('button')).toHaveCount(0);
+    const agentGalleryInteraction = await agentGallery.evaluate((node) => {
+      const primaryCard = node.querySelector('[data-agent-slider-card="primary"]');
+
+      return {
+        pointerEvents: getComputedStyle(node).pointerEvents,
+        cardTouchAction: primaryCard ? getComputedStyle(primaryCard).touchAction : null,
+      };
+    });
+    expect(agentGalleryInteraction.pointerEvents).toBe('auto');
+    expect(agentGalleryInteraction.cardTouchAction).toContain('pan-x');
     const agentGalleryBox = await agentGallery.boundingBox();
     expect(agentGalleryBox).not.toBeNull();
     await page.mouse.click(
@@ -1263,6 +1273,11 @@ test.describe('mutx.dev QA', () => {
   });
 
   test('pico lesson workspace persists execution context back into the academy', async ({ page }) => {
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => {
+      pageErrors.push(error.message);
+    });
+
     await stubPicoProductApis(page);
 
     await page.goto('/pico/academy/install-hermes-locally', { waitUntil: 'domcontentloaded' });
@@ -1283,6 +1298,9 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByTestId('pico-autopilot-academy-context')).toBeVisible();
     await expect(page.getByTestId('pico-autopilot-academy-context').getByText(/1\/3/i)).toBeVisible();
     await expect(page.getByTestId('pico-autopilot-academy-context').getByText(/^saved$/i)).toBeVisible();
+    expect(
+      pageErrors.filter((error) => /hydration failed|server rendered text didn't match/i.test(error))
+    ).toHaveLength(0);
   });
 
   test('pico product routes expose hosted provider auth when no session is attached', async ({ page }) => {

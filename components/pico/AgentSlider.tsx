@@ -210,10 +210,6 @@ export function AgentSlider({
           background: linear-gradient(270deg, rgba(5, 8, 13, 0.98), transparent);
         }
 
-        .agent-slider[data-interactive='false'] {
-          pointer-events: none;
-        }
-
         .agent-viewport {
           overflow: hidden;
           padding: 0.82rem 0;
@@ -280,6 +276,10 @@ export function AgentSlider({
         button.agent-card {
           cursor: pointer;
           touch-action: manipulation;
+        }
+
+        .agent-slider[data-interactive='false'] .agent-card {
+          touch-action: pan-x pan-y;
         }
 
         .agent-slider[data-interactive='true']:is(:hover, :focus-within) .agent-card {
