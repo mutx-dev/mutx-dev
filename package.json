@@ -160,7 +160,7 @@
     "jest": "^30.2.0",
     "openapi-typescript": "^7.13.0",
     "playwright": "^1.59.1",
-    "postcss": "^8.4.35",
+    "postcss": "^8.5.10",
     "remark-rehype": "^11.1.2",
     "sharp": "^0.34.5",
     "sonner": "^1.7.4",
