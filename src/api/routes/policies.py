@@ -3,15 +3,24 @@ Policy management routes — CRUD + SSE hot-reload endpoint.
 """
 
 import asyncio
+import hashlib
 import json
 import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.dependencies import get_current_user
+from src.api.database import get_db
 from src.api.models import User
+from src.api.routes.approvals import (
+    ApprovalCreate,
+    _list_approval_settings,
+    create_approval_record,
+)
+from src.api.services.approval import ApprovalRequest, ApprovalStatus
 from src.api.services.policy_store import (
     Policy,
     PolicyEvaluationContext,
@@ -71,6 +80,117 @@ async def evaluate_policies(
 ):
     """Evaluate enabled stored policies against a pending action context."""
     return await store.evaluate(context)
+
+
+class PolicyApprovalEvaluationResult(PolicyEvaluationResult):
+    """Policy evaluation result plus optional linked approval request."""
+
+    approval_request: ApprovalRequest | None = None
+    approval_created: bool = False
+    approval_dedupe_key: str | None = None
+
+
+def _policy_approval_dedupe_key(
+    context: PolicyEvaluationContext,
+    result: PolicyEvaluationResult,
+    user: User,
+) -> str:
+    key_payload = {
+        "user_id": str(user.id),
+        "run_id": context.run_id,
+        "session_id": context.session_id,
+        "agent_id": context.agent_id,
+        "tool": context.tool,
+        "input": context.input,
+        "output": context.output,
+        "tool_args": context.tool_args or {},
+        "metadata": context.metadata,
+        "matches": [match.model_dump(mode="json") for match in result.matches],
+    }
+    serialized = json.dumps(
+        key_payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    return f"policy-approval:{hashlib.sha256(serialized.encode()).hexdigest()}"
+
+
+async def _find_existing_policy_approval(
+    db: AsyncSession,
+    *,
+    dedupe_key: str,
+) -> ApprovalRequest | None:
+    limit = 200
+    offset = 0
+    while True:
+        approvals, total = await _list_approval_settings(db, offset=offset, limit=limit)
+        for approval in approvals:
+            if approval.status != ApprovalStatus.PENDING:
+                continue
+            if approval.payload.get("policy_approval_dedupe_key") == dedupe_key:
+                return approval
+
+        offset += limit
+        if offset >= total:
+            return None
+    return None
+
+
+def _approval_payload(
+    context: PolicyEvaluationContext,
+    result: PolicyEvaluationResult,
+    dedupe_key: str,
+) -> dict:
+    return {
+        "policy_approval_dedupe_key": dedupe_key,
+        "policy_decision": result.decision,
+        "policy_reason": result.reason,
+        "policy_matches": [match.model_dump(mode="json") for match in result.matches],
+        "context": {
+            "run_id": context.run_id,
+            "session_id": context.session_id,
+            "agent_id": context.agent_id,
+            "tool": context.tool,
+            "tool_args": context.tool_args or {},
+            "metadata": context.metadata,
+        },
+    }
+
+
+@router.post("/evaluate-and-request-approval", response_model=PolicyApprovalEvaluationResult)
+async def evaluate_policies_and_request_approval(
+    context: PolicyEvaluationContext,
+    store: Annotated[PolicyStore, Depends(_require_store)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(get_current_user)],
+):
+    """Evaluate policies and create one linked approval when approval is required."""
+    result = await store.evaluate(context)
+    response = PolicyApprovalEvaluationResult(**result.model_dump())
+    if result.decision != "require_approval":
+        return response
+
+    dedupe_key = _policy_approval_dedupe_key(context, result, user)
+    response.approval_dedupe_key = dedupe_key
+    existing = await _find_existing_policy_approval(db, dedupe_key=dedupe_key)
+    if existing is not None:
+        response.approval_request = existing
+        return response
+
+    approval = await create_approval_record(
+        ApprovalCreate(
+            agent_id=context.agent_id or "",
+            session_id=context.session_id or context.run_id or "",
+            action_type=context.tool or "policy.require_approval",
+            payload=_approval_payload(context, result, dedupe_key),
+        ),
+        db,
+        user,
+    )
+    response.approval_request = approval
+    response.approval_created = True
+    return response
 
 
 @router.get("/{name}", response_model=Policy)

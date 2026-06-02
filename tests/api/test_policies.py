@@ -7,7 +7,11 @@ from datetime import datetime, timezone
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.models import User, UserSetting
+from src.api.routes.approvals import APPROVAL_KEY_PREFIX
+from src.api.services.approval import ApprovalRequest
 from src.api.services.policy_store import Policy, PolicyEvaluationContext, PolicyStore, Rule
 
 
@@ -399,6 +403,290 @@ class TestPolicyRoutes:
         assert data["decision"] == "require_approval"
         assert data["run_id"] == "run-123"
         assert data["matches"][0]["policy_name"] == "route-evaluate-policy"
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_creates_linked_approval(self, client: AsyncClient):
+        policy_id = str(uuid.uuid4())
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": policy_id,
+                "name": "approval-bridge-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*deploy_database*",
+                        "action": "require_approval",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+
+        response = await client.post(
+            "/v1/policies/evaluate-and-request-approval",
+            json={
+                "tool": "deploy_database",
+                "tool_args": {"target": "production"},
+                "run_id": "run-policy-approval",
+                "session_id": "session-policy-approval",
+                "agent_id": "agent-policy-approval",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        approval = data["approval_request"]
+        payload = approval["payload"]
+
+        assert data["decision"] == "require_approval"
+        assert data["approval_created"] is True
+        assert approval["status"] == "PENDING"
+        assert approval["agent_id"] == "agent-policy-approval"
+        assert approval["session_id"] == "session-policy-approval"
+        assert approval["action_type"] == "deploy_database"
+        assert payload["policy_decision"] == "require_approval"
+        assert payload["context"]["run_id"] == "run-policy-approval"
+        assert payload["context"]["tool_args"] == {"target": "production"}
+        assert payload["policy_matches"][0]["policy_id"] == policy_id
+        assert payload["policy_matches"][0]["policy_name"] == "approval-bridge-policy"
+        assert payload["policy_matches"][0]["policy_version"] == 1
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_dedupes_pending_approval(
+        self, client: AsyncClient
+    ):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-dedupe-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*rotate_secret*",
+                        "action": "require_approval",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+        payload = {
+            "tool": "rotate_secret",
+            "run_id": "run-dedupe",
+            "session_id": "session-dedupe",
+            "agent_id": "agent-dedupe",
+        }
+
+        first = await client.post("/v1/policies/evaluate-and-request-approval", json=payload)
+        second = await client.post("/v1/policies/evaluate-and-request-approval", json=payload)
+
+        assert first.status_code == 200
+        assert second.status_code == 200
+        first_data = first.json()
+        second_data = second.json()
+        assert first_data["approval_created"] is True
+        assert second_data["approval_created"] is False
+        assert first_data["approval_request"]["id"] == second_data["approval_request"]["id"]
+        assert first_data["approval_dedupe_key"] == second_data["approval_dedupe_key"]
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_keys_distinct_action_context(
+        self, client: AsyncClient
+    ):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-distinct-context-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*kubectl*",
+                        "action": "require_approval",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+        base_payload = {
+            "tool": "kubectl",
+            "run_id": "run-distinct-context",
+            "session_id": "session-distinct-context",
+            "agent_id": "agent-distinct-context",
+        }
+
+        first = await client.post(
+            "/v1/policies/evaluate-and-request-approval",
+            json={**base_payload, "tool_args": {"command": "delete pod api-1"}},
+        )
+        second = await client.post(
+            "/v1/policies/evaluate-and-request-approval",
+            json={**base_payload, "tool_args": {"command": "delete pod api-2"}},
+        )
+
+        assert first.status_code == 200
+        assert second.status_code == 200
+        first_data = first.json()
+        second_data = second.json()
+        assert first_data["approval_created"] is True
+        assert second_data["approval_created"] is True
+        assert first_data["approval_request"]["id"] != second_data["approval_request"]["id"]
+        assert first_data["approval_dedupe_key"] != second_data["approval_dedupe_key"]
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_dedupes_beyond_first_page(
+        self, client: AsyncClient, db_session: AsyncSession, test_user: User
+    ):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-deep-dedupe-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*rotate_key*",
+                        "action": "require_approval",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+        payload = {
+            "tool": "rotate_key",
+            "tool_args": {"key": "production-api"},
+            "run_id": "run-deep-dedupe",
+            "session_id": "session-deep-dedupe",
+            "agent_id": "agent-deep-dedupe",
+        }
+        first = await client.post("/v1/policies/evaluate-and-request-approval", json=payload)
+        assert first.status_code == 200
+
+        for index in range(205):
+            request = ApprovalRequest(
+                agent_id="agent-noise",
+                session_id=f"session-noise-{index}",
+                action_type="noise",
+                payload={"index": index},
+                requester=test_user.email,
+            )
+            db_session.add(
+                UserSetting(
+                    user_id=test_user.id,
+                    key=f"{APPROVAL_KEY_PREFIX}{request.id}",
+                    value=request.model_dump(mode="json"),
+                )
+            )
+        await db_session.commit()
+
+        second = await client.post("/v1/policies/evaluate-and-request-approval", json=payload)
+
+        assert second.status_code == 200
+        first_data = first.json()
+        second_data = second.json()
+        assert first_data["approval_created"] is True
+        assert second_data["approval_created"] is False
+        assert first_data["approval_request"]["id"] == second_data["approval_request"]["id"]
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_does_not_create_for_non_approval_decisions(
+        self, client: AsyncClient
+    ):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-noncreate-warn",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*log_only*",
+                        "action": "log",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-noncreate-block",
+                "rules": [
+                    {
+                        "type": "block",
+                        "pattern": "*delete_cluster*",
+                        "action": "reject",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+
+        cases = [
+            ({"tool": "safe_status_check"}, "allow"),
+            ({"tool": "log_only"}, "warn"),
+            ({"tool": "delete_cluster"}, "block"),
+        ]
+        for payload, expected_decision in cases:
+            response = await client.post(
+                "/v1/policies/evaluate-and-request-approval",
+                json=payload,
+            )
+            assert response.status_code == 200
+            data = response.json()
+            assert data["decision"] == expected_decision
+            assert data["approval_created"] is False
+            assert data["approval_request"] is None
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_handles_missing_optional_context(
+        self, client: AsyncClient
+    ):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-missing-context-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*needs_review*",
+                        "action": "require_approval",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+
+        response = await client.post(
+            "/v1/policies/evaluate-and-request-approval",
+            json={"tool": "needs_review"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        approval = data["approval_request"]
+        assert data["decision"] == "require_approval"
+        assert approval["agent_id"] == ""
+        assert approval["session_id"] == ""
+        assert approval["action_type"] == "needs_review"
+        assert approval["payload"]["context"]["run_id"] is None
 
     @pytest.mark.asyncio
     async def test_get_policy_not_found(self, client: AsyncClient):
