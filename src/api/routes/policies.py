@@ -12,7 +12,13 @@ from fastapi.responses import StreamingResponse
 
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
-from src.api.services.policy_store import Policy, PolicyStore, get_policy_store
+from src.api.services.policy_store import (
+    Policy,
+    PolicyEvaluationContext,
+    PolicyEvaluationResult,
+    PolicyStore,
+    get_policy_store,
+)
 
 router = APIRouter(prefix="/policies", tags=["policies"])
 logger = logging.getLogger(__name__)
@@ -55,6 +61,16 @@ async def create_policy(
             detail=f"Policy '{policy.name}' already exists",
         )
     return await store.upsert_policy(policy)
+
+
+@router.post("/evaluate", response_model=PolicyEvaluationResult)
+async def evaluate_policies(
+    context: PolicyEvaluationContext,
+    store: Annotated[PolicyStore, Depends(_require_store)],
+    _user: Annotated[User, Depends(get_current_user)],
+):
+    """Evaluate enabled stored policies against a pending action context."""
+    return await store.evaluate(context)
 
 
 @router.get("/{name}", response_model=Policy)

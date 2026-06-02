@@ -3596,6 +3596,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/policies/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Evaluate Policies
+         * @description Evaluate enabled stored policies against a pending action context.
+         */
+        post: operations["evaluate_policies_v1_policies_evaluate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/policies/{name}": {
         parameters: {
             query?: never;
@@ -6219,6 +6239,7 @@ export interface components {
             /** Skill Id */
             skill_id: string;
         };
+        JsonValue: unknown;
         /** LangChainAgentConfig */
         LangChainAgentConfig: {
             /** Name */
@@ -7604,6 +7625,81 @@ export interface components {
             created_at?: string | null;
             /** Updated At */
             updated_at?: string | null;
+        };
+        /**
+         * PolicyEvaluationContext
+         * @description Inputs used to evaluate stored policies against a pending action.
+         */
+        PolicyEvaluationContext: {
+            /** Input */
+            input?: string | null;
+            /** Output */
+            output?: string | null;
+            /** Tool */
+            tool?: string | null;
+            /** Tool Args */
+            tool_args?: {
+                [key: string]: components["schemas"]["JsonValue"];
+            } | null;
+            /** Run Id */
+            run_id?: string | null;
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Session Id */
+            session_id?: string | null;
+            /** Metadata */
+            metadata?: {
+                [key: string]: components["schemas"]["JsonValue"];
+            };
+        };
+        /**
+         * PolicyEvaluationResult
+         * @description Decision returned by policy evaluation.
+         */
+        PolicyEvaluationResult: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "allow" | "warn" | "block" | "require_approval";
+            /** Reason */
+            reason: string;
+            /** Matches */
+            matches?: components["schemas"]["PolicyRuleMatch"][];
+            /** Evaluated Policy Count */
+            evaluated_policy_count: number;
+            /** Run Id */
+            run_id?: string | null;
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Session Id */
+            session_id?: string | null;
+        };
+        /**
+         * PolicyRuleMatch
+         * @description A stored policy rule that matched an evaluation context.
+         */
+        PolicyRuleMatch: {
+            /** Policy Id */
+            policy_id: string;
+            /** Policy Name */
+            policy_name: string;
+            /** Policy Version */
+            policy_version: number;
+            /**
+             * Rule Type
+             * @enum {string}
+             */
+            rule_type: "block" | "allow" | "warn";
+            /**
+             * Rule Scope
+             * @enum {string}
+             */
+            rule_scope: "input" | "output" | "tool";
+            /** Pattern */
+            pattern: string;
+            /** Action */
+            action: string;
         };
         /** ProviderOptionResponse */
         ProviderOptionResponse: {
@@ -16785,6 +16881,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Policy"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluate_policies_v1_policies_evaluate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PolicyEvaluationContext"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyEvaluationResult"];
                 };
             };
             /** @description Validation Error */
