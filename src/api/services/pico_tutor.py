@@ -10,7 +10,6 @@ from typing import Any, Literal
 from urllib.parse import urlparse
 
 import httpx
-from openai import AsyncOpenAI
 from opentelemetry.trace import Status, StatusCode
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,6 +32,19 @@ from src.api.services.pico_tutor_openai import resolve_pico_tutor_api_key
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+
+class _MissingAsyncOpenAI:
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+        raise RuntimeError(
+            "openai package is not installed; install project dependencies to use Pico tutor"
+        )
+
+
+try:
+    from openai import AsyncOpenAI
+except ModuleNotFoundError:
+    AsyncOpenAI = _MissingAsyncOpenAI
 
 KNOWLEDGE_ROOT = Path(__file__).resolve().parents[1] / "knowledge" / "pico_ops"
 TOKEN_RE = re.compile(r"[a-z0-9][a-z0-9_./+-]*")

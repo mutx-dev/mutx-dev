@@ -89,8 +89,11 @@ def build_openapi_document() -> dict[str, Any]:
 def main() -> None:
     output_path = Path("docs/api/openapi.json")
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w") as file_handle:
-        json.dump(build_openapi_document(), file_handle, indent=2)
+    document = build_openapi_document()
+    temp_path = output_path.with_suffix(f"{output_path.suffix}.tmp")
+    with temp_path.open("w") as file_handle:
+        json.dump(document, file_handle, indent=2)
+    temp_path.replace(output_path)
     print(f"OpenAPI spec generated at {output_path}.")
 
 
