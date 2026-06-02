@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
+
+import pytest
 
 
 def _load_generate_openapi_module():
@@ -63,3 +66,22 @@ def test_normalize_openapi_document_keeps_multi_entry_allof() -> None:
     }
 
     assert module.normalize_openapi_document(document) == document
+
+
+def test_main_preserves_existing_snapshot_when_generation_fails(monkeypatch, tmp_path) -> None:
+    module = _load_generate_openapi_module()
+    openapi_path = tmp_path / "docs" / "api" / "openapi.json"
+    openapi_path.parent.mkdir(parents=True)
+    openapi_path.write_text('{"openapi":"3.1.0"}')
+
+    def fail_generation() -> dict[str, object]:
+        raise RuntimeError("missing dependency")
+
+    monkeypatch.setattr(module, "build_openapi_document", fail_generation)
+    monkeypatch.chdir(tmp_path)
+
+    with pytest.raises(RuntimeError, match="missing dependency"):
+        module.main()
+
+    assert openapi_path.read_text() == '{"openapi":"3.1.0"}'
+    assert not os.path.exists(f"{openapi_path}.tmp")
