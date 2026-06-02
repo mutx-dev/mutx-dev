@@ -7,7 +7,6 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-import stripe
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +14,19 @@ from src.api.models.subscription import Subscription, Payment
 from src.api.models.models import User
 
 logger = logging.getLogger(__name__)
+
+
+class _MissingStripe:
+    def __getattr__(self, name: str) -> Any:
+        raise AttributeError(
+            "stripe package is not installed; install project dependencies to use payments"
+        )
+
+
+try:
+    import stripe
+except ModuleNotFoundError:
+    stripe = _MissingStripe()
 
 
 def _configured_plan_prices() -> dict[str, str]:
