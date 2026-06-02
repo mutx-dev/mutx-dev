@@ -9,7 +9,7 @@ dist/
 build/
 out/
 public/_next/
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Capacitor / mobile
 android/app/src/main/assets/
@@ -71,6 +71,7 @@ infrastructure/terraform/*.backup
 # Runtime / tooling workspace
 .autonomy/
 .minimax/
+.playwright-mcp/
 
 # Generated
 next-env.d.ts
@@ -123,7 +124,11 @@ pnpm-lock.yaml
 .worktrees/
 public/docs-search-index.json
 *.bak
+*.backup
 ALL_MUTX_PDFs_Extracted.txt
+
+# Local visual review captures
+/pico-*.png
 
 # GTM data — local only, never in repo
 docs/pico-gtm/
