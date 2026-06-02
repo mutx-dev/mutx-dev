@@ -13911,6 +13911,66 @@
         }
       }
     },
+    "/v1/policies/evaluate": {
+      "post": {
+        "tags": [
+          "policies"
+        ],
+        "summary": "Evaluate Policies",
+        "description": "Evaluate enabled stored policies against a pending action context.",
+        "operationId": "evaluate_policies_v1_policies_evaluate_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyEvaluationContext"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyEvaluationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/policies/{name}": {
       "get": {
         "tags": [
@@ -20334,6 +20394,7 @@
         ],
         "title": "InstallSkillRequest"
       },
+      "JsonValue": {},
       "LangChainAgentConfig": {
         "properties": {
           "name": {
@@ -24120,6 +24181,224 @@
         ],
         "title": "Policy",
         "description": "A named collection of rules with versioning and enablement."
+      },
+      "PolicyEvaluationContext": {
+        "properties": {
+          "input": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input"
+          },
+          "output": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output"
+          },
+          "tool": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool"
+          },
+          "tool_args": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Args"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "title": "PolicyEvaluationContext",
+        "description": "Inputs used to evaluate stored policies against a pending action."
+      },
+      "PolicyEvaluationResult": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "allow",
+              "warn",
+              "block",
+              "require_approval"
+            ],
+            "title": "Decision"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "matches": {
+            "items": {
+              "$ref": "#/components/schemas/PolicyRuleMatch"
+            },
+            "type": "array",
+            "title": "Matches"
+          },
+          "evaluated_policy_count": {
+            "type": "integer",
+            "title": "Evaluated Policy Count"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "reason",
+          "evaluated_policy_count"
+        ],
+        "title": "PolicyEvaluationResult",
+        "description": "Decision returned by policy evaluation."
+      },
+      "PolicyRuleMatch": {
+        "properties": {
+          "policy_id": {
+            "type": "string",
+            "title": "Policy Id"
+          },
+          "policy_name": {
+            "type": "string",
+            "title": "Policy Name"
+          },
+          "policy_version": {
+            "type": "integer",
+            "title": "Policy Version"
+          },
+          "rule_type": {
+            "type": "string",
+            "enum": [
+              "block",
+              "allow",
+              "warn"
+            ],
+            "title": "Rule Type"
+          },
+          "rule_scope": {
+            "type": "string",
+            "enum": [
+              "input",
+              "output",
+              "tool"
+            ],
+            "title": "Rule Scope"
+          },
+          "pattern": {
+            "type": "string",
+            "title": "Pattern"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          }
+        },
+        "type": "object",
+        "required": [
+          "policy_id",
+          "policy_name",
+          "policy_version",
+          "rule_type",
+          "rule_scope",
+          "pattern",
+          "action"
+        ],
+        "title": "PolicyRuleMatch",
+        "description": "A stored policy rule that matched an evaluation context."
       },
       "ProviderOptionResponse": {
         "properties": {
