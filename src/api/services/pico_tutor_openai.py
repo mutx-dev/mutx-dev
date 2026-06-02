@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import logging
 import os
+from typing import Any
 
-from openai import AsyncOpenAI
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,6 +17,19 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 PICO_TUTOR_OPENAI_KEY = "pico.tutor.openai"
+
+
+class _MissingAsyncOpenAI:
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+        raise RuntimeError(
+            "openai package is not installed; install project dependencies to use Pico tutor"
+        )
+
+
+try:
+    from openai import AsyncOpenAI
+except ModuleNotFoundError:
+    AsyncOpenAI = _MissingAsyncOpenAI
 
 
 class PicoTutorOpenAIConnectionError(ValueError):
