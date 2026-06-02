@@ -4,9 +4,11 @@ Policy store service — in-memory policy repository with hot-reload support.
 
 import asyncio
 from datetime import datetime, timezone
+from fnmatch import fnmatch
+import json
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, JsonValue
 
 
 class Rule(BaseModel):
@@ -28,6 +30,79 @@ class Policy(BaseModel):
     version: int
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+
+class PolicyEvaluationContext(BaseModel):
+    """Inputs used to evaluate stored policies against a pending action."""
+
+    input: str | None = None
+    output: str | None = None
+    tool: str | None = None
+    tool_args: dict[str, JsonValue] | None = None
+    run_id: str | None = None
+    agent_id: str | None = None
+    session_id: str | None = None
+    metadata: dict[str, JsonValue] = Field(default_factory=dict)
+
+
+class PolicyRuleMatch(BaseModel):
+    """A stored policy rule that matched an evaluation context."""
+
+    policy_id: str
+    policy_name: str
+    policy_version: int
+    rule_type: Literal["block", "allow", "warn"]
+    rule_scope: Literal["input", "output", "tool"]
+    pattern: str
+    action: str
+
+
+class PolicyEvaluationResult(BaseModel):
+    """Decision returned by policy evaluation."""
+
+    decision: Literal["allow", "warn", "block", "require_approval"]
+    reason: str
+    matches: list[PolicyRuleMatch] = Field(default_factory=list)
+    evaluated_policy_count: int
+    run_id: str | None = None
+    agent_id: str | None = None
+    session_id: str | None = None
+
+
+def _normalize_match_value(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    return json.dumps(value, sort_keys=True, default=str)
+
+
+def _rule_matches(pattern: str, value: object) -> bool:
+    candidate = _normalize_match_value(value).casefold()
+    normalized_pattern = pattern.casefold()
+    return fnmatch(candidate, normalized_pattern) or normalized_pattern in candidate
+
+
+def _decision_for_match(
+    match: PolicyRuleMatch,
+) -> Literal["allow", "warn", "block", "require_approval"]:
+    if match.action.casefold() in {"approval", "require_approval", "request_approval"}:
+        return "require_approval"
+    if match.rule_type == "block":
+        return "block"
+    if match.rule_type == "warn":
+        return "warn"
+    return "allow"
+
+
+def _select_decision(
+    matches: list[PolicyRuleMatch],
+) -> Literal["allow", "warn", "block", "require_approval"]:
+    decisions = {_decision_for_match(match) for match in matches}
+    for decision in ("block", "require_approval", "warn"):
+        if decision in decisions:
+            return decision
+    return "allow"
 
 
 class PolicyStore:
@@ -102,6 +177,56 @@ class PolicyStore:
         if deleted:
             await self._notify_reload(name)
         return deleted
+
+    async def evaluate(self, context: PolicyEvaluationContext) -> PolicyEvaluationResult:
+        """Evaluate enabled policies against the supplied action context."""
+        async with self._lock:
+            policies = [policy for policy in self._policies.values() if policy.enabled]
+
+        matches: list[PolicyRuleMatch] = []
+        for policy in policies:
+            for rule in policy.rules:
+                scoped_value: object
+                if rule.scope == "input":
+                    scoped_value = context.input
+                elif rule.scope == "output":
+                    scoped_value = context.output
+                else:
+                    scoped_value = {
+                        "tool": context.tool,
+                        "tool_args": context.tool_args or {},
+                    }
+
+                if not _rule_matches(rule.pattern, scoped_value):
+                    continue
+
+                matches.append(
+                    PolicyRuleMatch(
+                        policy_id=policy.id,
+                        policy_name=policy.name,
+                        policy_version=policy.version,
+                        rule_type=rule.type,
+                        rule_scope=rule.scope,
+                        pattern=rule.pattern,
+                        action=rule.action,
+                    )
+                )
+
+        decision = _select_decision(matches)
+        if matches:
+            reason = f"{len(matches)} policy rule(s) matched"
+        else:
+            reason = "No enabled policy rules matched"
+
+        return PolicyEvaluationResult(
+            decision=decision,
+            reason=reason,
+            matches=matches,
+            evaluated_policy_count=len(policies),
+            run_id=context.run_id,
+            agent_id=context.agent_id,
+            session_id=context.session_id,
+        )
 
     # ------------------------------------------------------------------
     # SSE hot-reload
