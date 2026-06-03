@@ -1574,10 +1574,10 @@ When `faramesh run -- <command>` is used, it intercepts tool calls from these fr
 ### Unix Domain Socket Communication
 
 ```python
-FAREMESH_SOCKET_PATH = "/tmp/faramesh.sock"
+FAREMESH_SOCKET_PATH = _default_faramesh_socket_path()
 ```
 
-Faramesh communicates with supervised processes via Unix domain socket for low-latency governance checks.
+Faramesh communicates with supervised processes via Unix domain socket for low-latency governance checks. `_default_faramesh_socket_path()` honors `FAREMESH_SOCKET_PATH`, then `$XDG_RUNTIME_DIR/faramesh.sock`, then `~/.mutx/run/faramesh.sock`.
 
 ### SupervisionConfig
 
@@ -1751,10 +1751,10 @@ class AgentIdentity:
 @dataclass
 class SPIREConfig:
     server_address: str = "localhost:8081"
-    socket_path: str = "/tmp/spire-agent/public/api.sock"
+    socket_path: str = field(default_factory=_default_spire_socket_path)
     trust_bundle_path: Optional[str]
     agent_config_path: Optional[str]
-    workload_api_path: str = "/tmp/spire-agent/public/api.sock"
+    workload_api_path: str = field(default_factory=_default_spire_socket_path)
     spire_bin: Optional[str]
 ```
 

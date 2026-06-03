@@ -8,7 +8,6 @@ import sys
 import tarfile
 import tempfile
 import time
-import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -317,8 +316,21 @@ def _materialize_source_ref(source_ref: str, destination: Path) -> Path:
 
     if source_ref.startswith(("http://", "https://")):
         archive_path = destination / "control-plane.tar.gz"
-        with urllib.request.urlopen(source_ref) as response, open(archive_path, "wb") as handle:
-            shutil.copyfileobj(response, handle)
+        try:
+            with httpx.stream(
+                "GET",
+                source_ref,
+                timeout=30.0,
+                follow_redirects=True,
+            ) as response:
+                response.raise_for_status()
+                with open(archive_path, "wb") as handle:
+                    for chunk in response.iter_bytes():
+                        handle.write(chunk)
+        except httpx.HTTPError as exc:
+            raise LocalControlPlaneError(
+                "MUTX could not download the local control plane source."
+            ) from exc
         _extract_archive(archive_path, destination)
         return destination
 
@@ -349,7 +361,27 @@ def _extract_archive(archive_path: Path, destination: Path) -> None:
                     "Archive contains unsafe paths."
                 )
 
-        archive.extractall(destination_root, members=members)
+        for member in members:
+            extraction_target = (destination_root / member.name).resolve()
+            if member.isdir():
+                extraction_target.mkdir(parents=True, exist_ok=True)
+                continue
+            if not member.isfile():
+                raise LocalControlPlaneError(
+                    "MUTX could not provision the local control plane source. "
+                    "Archive contains unsupported special file entries."
+                )
+
+            extraction_target.parent.mkdir(parents=True, exist_ok=True)
+            source = archive.extractfile(member)
+            if source is None:
+                raise LocalControlPlaneError(
+                    "MUTX could not provision the local control plane source. "
+                    "Archive contains unreadable file entries."
+                )
+            with source, open(extraction_target, "wb") as target:
+                shutil.copyfileobj(source, target)
+            extraction_target.chmod(member.mode & 0o777)
 
 
 def _resolve_checkout_root(path: Path) -> Path:

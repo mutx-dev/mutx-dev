@@ -8,7 +8,7 @@ MUTX integrates [Faramesh](https://faramesh.dev) by [Faramesh Technologies](http
 
 ## Overview
 
-Faramesh runs as a daemon alongside MUTX, communicating via Unix socket at `/tmp/faramesh.sock`. When an agent attempts a tool call, Faramesh evaluates it against the active policy and returns PERMIT, DENY, or DEFER.
+Faramesh runs as a daemon alongside MUTX, communicating via Unix socket. The socket path is configured by `FAREMESH_SOCKET_PATH`; when it is unset, MUTX uses `$XDG_RUNTIME_DIR/faramesh.sock` or `~/.mutx/run/faramesh.sock`. When an agent attempts a tool call, Faramesh evaluates it against the active policy and returns PERMIT, DENY, or DEFER.
 
 ## CLI Commands
 
@@ -148,7 +148,7 @@ agent payment-bot {
 ┌─────────────────────────────────────────────────────────┐
 │                      MUTX CLI / TUI                      │
 └────────────────────────┬────────────────────────────────┘
-                         │ socket /tmp/faramesh.sock
+                         │ Unix socket
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │              Faramesh Governance Daemon                  │

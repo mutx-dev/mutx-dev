@@ -13,18 +13,18 @@ greenlet==3.0.3
 alembic==1.13.1
 # Infrastructure
 python-digitalocean==1.17.0
-boto3==1.34.25
-botocore==1.34.25
+boto3>=1.43.20,<2
+botocore>=1.43.20,<2
 # Security
 python-jose[cryptography]==3.5.0
 passlib==1.7.4
-Authlib==1.6.9
-python-multipart==0.0.26
+Authlib==1.6.11
+python-multipart==0.0.27
 email-validator==2.1.0
 # Agent & AI
-openai>=1.68.2
-anthropic>=0.52.0,<1
-httpx==0.26.0
+openai==2.30.0
+anthropic==0.93.0
+httpx==0.28.1
 langchain>=0.3.26,<1.0.0
 langchain-openai>=0.3.0,<1.0.0
 langchain-anthropic>=0.3.0,<1.0.0
@@ -34,7 +34,7 @@ pgvector==0.2.3
 numpy==1.26.3
 # Configuration
 pyyaml==6.0.1
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 hvac==2.1.0
 prometheus-client==0.19.0
 # Utilities
@@ -47,7 +47,8 @@ aiosqlite==0.20.0
 langchain-core>=0.3.83,<0.4.0
 bcrypt>=4.0.0
 pillow>=11.1.0
-predict-rlm>=0.2.2,<1
+predict-rlm>=0.6.1,<1
+litellm==1.87.0
 # Updated Mon Mar 16 10:24:07 CET 2026
 
 

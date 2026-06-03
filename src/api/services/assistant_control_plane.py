@@ -5,12 +5,12 @@ import logging
 import os
 import re
 import time
-import urllib.error
-import urllib.request
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+import httpx
 
 from src.api.models import Agent, AgentType
 from src.api.services.orchestra_research_catalog import (
@@ -846,22 +846,21 @@ def _request_gateway_json(paths: tuple[str, ...]) -> Any | None:
     if not base_url:
         return None
 
-    for path in paths:
-        request = urllib.request.Request(f"{base_url}{path}", headers=_gateway_headers())
-        try:
-            with urllib.request.urlopen(request, timeout=3) as response:
-                payload = response.read().decode("utf-8")
+    headers = _gateway_headers()
+    with httpx.Client(timeout=3.0, follow_redirects=False) as client:
+        for path in paths:
+            try:
+                response = client.get(f"{base_url}{path}", headers=headers)
+                if response.status_code == 404:
+                    continue
+                response.raise_for_status()
+                payload = response.text
                 if not payload:
                     return None
                 return json.loads(payload)
-        except urllib.error.HTTPError as exc:
-            if exc.code == 404:
-                continue
-            logger.debug("Gateway request failed for %s: %s", path, exc)
-            return None
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-            logger.debug("Gateway request failed for %s: %s", path, exc)
-            return None
+            except (httpx.HTTPError, json.JSONDecodeError) as exc:
+                logger.debug("Gateway request failed for %s: %s", path, exc)
+                return None
     return None
 
 
