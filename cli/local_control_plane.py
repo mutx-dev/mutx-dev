@@ -321,7 +321,7 @@ def _materialize_source_ref(source_ref: str, destination: Path) -> Path:
                 "GET",
                 source_ref,
                 timeout=30.0,
-                follow_redirects=False,
+                follow_redirects=True,
             ) as response:
                 response.raise_for_status()
                 with open(archive_path, "wb") as handle:
