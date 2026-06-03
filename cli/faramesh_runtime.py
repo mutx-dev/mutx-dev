@@ -31,6 +31,12 @@ def _default_faramesh_socket_path() -> str:
 FAREMESH_SOCKET_PATH = _default_faramesh_socket_path()
 
 
+def _ensure_socket_parent(socket_path: str) -> None:
+    parent = Path(socket_path).expanduser().parent
+    if parent != Path("."):
+        parent.mkdir(parents=True, exist_ok=True)
+
+
 @dataclass
 class FarameshDaemonHealth:
     daemon_reachable: bool = False
@@ -406,6 +412,7 @@ def start_faramesh_daemon(
     cmd.extend(["--socket", socket_path])
 
     try:
+        _ensure_socket_parent(socket_path)
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,

@@ -11,6 +11,7 @@ from cli.faramesh_runtime import (
     get_pending_defers,
     get_recent_decisions,
     is_socket_reachable,
+    start_faramesh_daemon,
     _count_decisions_by_effect,
 )
 
@@ -209,6 +210,31 @@ class TestGetFarameshHealth:
 
         assert health.version == "faramesh v1.0.0"
         assert "not running" in health.doctor_summary.lower()
+
+
+class TestStartFarameshDaemon:
+    @patch("cli.faramesh_runtime.time.sleep")
+    @patch("cli.faramesh_runtime.subprocess.Popen")
+    @patch("cli.faramesh_runtime.find_faramesh_bin")
+    def test_creates_socket_parent_directory(self, mock_bin, mock_popen, mock_sleep, tmp_path):
+        socket_path = tmp_path / "run" / "faramesh.sock"
+        proc = MagicMock()
+        proc.poll.return_value = None
+        mock_bin.return_value = "/usr/local/bin/faramesh"
+        mock_popen.return_value = proc
+
+        result = start_faramesh_daemon(socket_path=str(socket_path))
+
+        assert result is proc
+        assert socket_path.parent.exists()
+        mock_popen.assert_called_once()
+        command = mock_popen.call_args.args[0]
+        assert command == [
+            "/usr/local/bin/faramesh",
+            "serve",
+            "--socket",
+            str(socket_path),
+        ]
 
 
 class TestCollectFarameshSnapshot:
