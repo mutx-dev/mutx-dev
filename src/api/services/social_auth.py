@@ -6,12 +6,16 @@ from typing import Any
 from urllib.parse import urlencode
 
 import httpx
-from jose import jwt
+from jose import JWTError, jwt
 from pydantic import BaseModel
 
 from src.api.config import get_settings
 
 settings = get_settings()
+
+APPLE_ID_TOKEN_ISSUER = "https://appleid.apple.com"
+APPLE_JWKS_URL = "https://appleid.apple.com/auth/keys"
+APPLE_ID_TOKEN_ALGORITHMS = ["RS256"]
 
 
 class OAuthProvider(str, Enum):
@@ -409,13 +413,7 @@ async def _exchange_apple_code(
     if not isinstance(id_token_raw, str) or not id_token_raw:
         raise SocialAuthError("Apple did not return an id_token.")
 
-    # Decode the id_token without strict verification — Apple's id_token
-    # is a standard JWT signed by Apple's own keys.  We trust it because
-    # it arrived over the TLS-protected token exchange.
-    try:
-        claims = jwt.decode(id_token_raw, options={"verify_signature": False})
-    except Exception as exc:
-        raise SocialAuthError("Could not decode Apple id_token.") from exc
+    claims = await _decode_apple_id_token(client, id_token_raw, client_id)
 
     apple_user_id = claims.get("sub")
     if not isinstance(apple_user_id, str) or not apple_user_id:
@@ -444,6 +442,46 @@ async def _exchange_apple_code(
             "id_token_claims": claims,
         },
     )
+
+
+async def _decode_apple_id_token(
+    client: httpx.AsyncClient,
+    id_token_raw: str,
+    client_id: str,
+) -> dict[str, Any]:
+    try:
+        header = jwt.get_unverified_header(id_token_raw)
+    except JWTError as exc:
+        raise SocialAuthError("Could not read Apple id_token header.") from exc
+
+    kid = header.get("kid")
+    if not isinstance(kid, str) or not kid:
+        raise SocialAuthError("Apple id_token did not include a key identifier.")
+
+    jwks_response = await client.get(APPLE_JWKS_URL)
+    _raise_for_provider_error(jwks_response, "Apple key lookup failed")
+
+    jwks_payload = jwks_response.json()
+    keys = jwks_payload.get("keys") if isinstance(jwks_payload, dict) else None
+    if not isinstance(keys, list) or not keys:
+        raise SocialAuthError("Apple key lookup did not return signing keys.", status_code=502)
+
+    signing_key = next(
+        (key for key in keys if isinstance(key, dict) and key.get("kid") == kid), None
+    )
+    if signing_key is None:
+        raise SocialAuthError("Apple id_token signing key was not found.", status_code=401)
+
+    try:
+        return jwt.decode(
+            id_token_raw,
+            signing_key,
+            algorithms=APPLE_ID_TOKEN_ALGORITHMS,
+            audience=client_id,
+            issuer=APPLE_ID_TOKEN_ISSUER,
+        )
+    except JWTError as exc:
+        raise SocialAuthError("Apple id_token verification failed.", status_code=401) from exc
 
 
 def _pick_github_email(items: Any) -> dict[str, Any] | None:

@@ -114,8 +114,8 @@
     "highlight.js": "^11.11.1",
     "lenis": "^1.1.9",
     "lucide-react": "^0.323.0",
-    "next": "16.2.3",
-    "next-intl": "^4.9.1",
+    "next": "16.2.7",
+    "next-intl": "^4.13.0",
     "pg": "^8.20.0",
     "postgres": "^3.4.8",
     "react": "^18.2.0",
@@ -131,7 +131,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "resend": "^6.9.3",
+    "resend": "^6.12.4",
     "satori": "^0.26.0",
     "sharp": "^0.34.5",
     "sonner": "^1.7.4",
@@ -160,7 +160,7 @@
     "jest": "^30.2.0",
     "openapi-typescript": "^7.13.0",
     "playwright": "^1.59.1",
-    "postcss": "^8.4.35",
+    "postcss": "^8.5.10",
     "remark-rehype": "^11.1.2",
     "sharp": "^0.34.5",
     "sonner": "^1.7.4",
@@ -172,7 +172,11 @@
     "zod": "^4.3.6"
   },
   "overrides": {
-    "@xmldom/xmldom": "^0.8.12",
-    "app-builder-bin": "5.0.0-alpha.13"
+    "@xmldom/xmldom": "^0.9.10",
+    "app-builder-bin": "5.0.0-alpha.13",
+    "brace-expansion": "^5.0.6",
+    "ip-address": "^10.2.0",
+    "postcss": "^8.5.10",
+    "tmp": "^0.2.7"
   }
 }

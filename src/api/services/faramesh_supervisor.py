@@ -24,7 +24,20 @@ from src.api.config import get_settings
 
 logger = logging.getLogger(__name__)
 
-FAREMESH_SOCKET_PATH = "/tmp/faramesh.sock"
+
+def _default_faramesh_socket_path() -> str:
+    configured_path = os.environ.get("FAREMESH_SOCKET_PATH")
+    if configured_path:
+        return configured_path
+
+    runtime_dir = os.environ.get("XDG_RUNTIME_DIR")
+    if runtime_dir:
+        return str(Path(runtime_dir).expanduser() / "faramesh.sock")
+
+    return str(Path.home() / ".mutx" / "run" / "faramesh.sock")
+
+
+FAREMESH_SOCKET_PATH = _default_faramesh_socket_path()
 
 
 class SupervisionState(str, Enum):

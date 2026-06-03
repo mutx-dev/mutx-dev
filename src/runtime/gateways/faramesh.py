@@ -19,6 +19,8 @@ https://github.com/faramesh/faramesh-core/blob/main/LICENSE
 
 import json
 import logging
+import os
+from pathlib import Path
 import socket
 import time
 from dataclasses import dataclass, field
@@ -29,9 +31,23 @@ from typing import Any, Optional
 logger = logging.getLogger(__name__)
 
 
-FAREMESH_SOCKET_PATH = "/tmp/faramesh.sock"
 FAREMESH_DEFAULT_DAEMON_PORT = 7777
 FAREMESH_INSTALL_URL = "https://raw.githubusercontent.com/faramesh/faramesh-core/main/install.sh"
+
+
+def _default_faramesh_socket_path() -> str:
+    configured_path = os.environ.get("FAREMESH_SOCKET_PATH")
+    if configured_path:
+        return configured_path
+
+    runtime_dir = os.environ.get("XDG_RUNTIME_DIR")
+    if runtime_dir:
+        return str(Path(runtime_dir).expanduser() / "faramesh.sock")
+
+    return str(Path.home() / ".mutx" / "run" / "faramesh.sock")
+
+
+FAREMESH_SOCKET_PATH = _default_faramesh_socket_path()
 
 
 class FarameshDecision(str, Enum):

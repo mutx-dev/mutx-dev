@@ -276,13 +276,19 @@ class AuditLog:
         if conditions:
             where_clause = "WHERE " + " AND ".join(conditions)
 
-        query_sql = f"""
-            SELECT event_id, agent_id, session_id, span_id, event_type, payload, timestamp, trace_id
-            FROM audit_events
-            {where_clause}
-            ORDER BY timestamp DESC
-            LIMIT ? OFFSET ?
-        """
+        query_parts = [
+            "SELECT event_id, agent_id, session_id, span_id, event_type, payload, timestamp, trace_id",
+            "FROM audit_events",
+        ]
+        if where_clause:
+            query_parts.append(where_clause)
+        query_parts.extend(
+            [
+                "ORDER BY timestamp DESC",
+                "LIMIT ? OFFSET ?",
+            ]
+        )
+        query_sql = "\n".join(query_parts)
         params.extend([filters.limit, filters.skip])
 
         async with self._lock:

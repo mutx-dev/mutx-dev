@@ -14,13 +14,31 @@ import asyncio
 import logging
 import os
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+
+
+def _normalize_socket_path(value: str) -> str:
+    return value.removeprefix("unix://")
+
+
+def _default_spire_socket_path() -> str:
+    configured_path = os.environ.get("SPIRE_AGENT_SOCKET_PATH") or os.environ.get(
+        "SPIFFE_ENDPOINT_SOCKET"
+    )
+    if configured_path:
+        return _normalize_socket_path(configured_path)
+
+    runtime_dir = os.environ.get("XDG_RUNTIME_DIR")
+    if runtime_dir:
+        return str(Path(runtime_dir).expanduser() / "spire-agent" / "api.sock")
+
+    return str(Path.home() / ".mutx" / "run" / "spire-agent-api.sock")
 
 
 class IdentitySource(str, Enum):
@@ -44,10 +62,10 @@ class AgentIdentity:
 @dataclass
 class SPIREConfig:
     server_address: str = "localhost:8081"
-    socket_path: str = "/tmp/spire-agent/public/api.sock"
+    socket_path: str = field(default_factory=_default_spire_socket_path)
     trust_bundle_path: Optional[str] = None
     agent_config_path: Optional[str] = None
-    workload_api_path: str = "/tmp/spire-agent/public/api.sock"
+    workload_api_path: str = field(default_factory=_default_spire_socket_path)
     spire_bin: Optional[str] = None
 
 

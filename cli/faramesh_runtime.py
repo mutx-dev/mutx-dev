@@ -5,15 +5,30 @@ import os
 import shutil
 import socket
 import subprocess
+import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
 FAREMESH_PROVIDER_ID = "faramesh"
-FAREMESH_SOCKET_PATH = "/tmp/faramesh.sock"
 FAREMESH_DEFAULT_DAEMON_PORT = 7777
 FAREMESH_INSTALL_URL = "https://raw.githubusercontent.com/faramesh/faramesh-core/main/install.sh"
+
+
+def _default_faramesh_socket_path() -> str:
+    configured_path = os.environ.get("FAREMESH_SOCKET_PATH")
+    if configured_path:
+        return configured_path
+
+    runtime_dir = os.environ.get("XDG_RUNTIME_DIR")
+    if runtime_dir:
+        return str(Path(runtime_dir).expanduser() / "faramesh.sock")
+
+    return str(Path.home() / ".mutx" / "run" / "faramesh.sock")
+
+
+FAREMESH_SOCKET_PATH = _default_faramesh_socket_path()
 
 
 @dataclass
@@ -217,28 +232,41 @@ def ensure_faramesh_installed(
         return False, None
 
     try:
-        install_script_path = Path("/tmp/faramesh_install.sh")
-        subprocess.run(
-            ["curl", "-fsSL", FAREMESH_INSTALL_URL, "-o", str(install_script_path)],
-            check=True,
-            timeout=30,
-        )
-        subprocess.run(
-            ["chmod", "+x", str(install_script_path)],
-            check=True,
-            timeout=5,
-        )
+        with tempfile.NamedTemporaryFile(
+            prefix="faramesh-install-",
+            suffix=".sh",
+            delete=False,
+        ) as install_script:
+            install_script_path = Path(install_script.name)
 
-        cmd = [str(install_script_path), "--install-dir", str(Path.home() / ".local" / "bin")]
-        if non_interactive:
-            cmd.append("--no-interactive")
+        try:
+            subprocess.run(
+                ["curl", "-fsSL", FAREMESH_INSTALL_URL, "-o", str(install_script_path)],
+                check=True,
+                timeout=30,
+            )
+            subprocess.run(
+                ["chmod", "+x", str(install_script_path)],
+                check=True,
+                timeout=5,
+            )
 
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=120,
-        )
+            cmd = [
+                str(install_script_path),
+                "--install-dir",
+                str(Path.home() / ".local" / "bin"),
+            ]
+            if non_interactive:
+                cmd.append("--no-interactive")
+
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=120,
+            )
+        finally:
+            install_script_path.unlink(missing_ok=True)
 
         if result.returncode == 0:
             bin_path = find_faramesh_bin()

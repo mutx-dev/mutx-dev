@@ -23,7 +23,7 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("DATABASE_SSL_MODE", "DB_SSL_MODE"),
     )
-    api_host: str = "0.0.0.0"
+    api_host: str = "0.0.0.0"  # nosec B104 - server bind address; host validation is separate.
     api_port: int = Field(
         default=8000,
         validation_alias=AliasChoices("API_PORT", "PORT"),
