@@ -38,12 +38,6 @@ else
   RUFF_BIN="ruff"
 fi
 
-if [ -x ".venv/bin/black" ]; then
-  BLACK_BIN=".venv/bin/black"
-else
-  BLACK_BIN="black"
-fi
-
 echo "Using Python interpreter: $PYTHON_BIN"
 
 echo "Running Python lint and format checks..."
