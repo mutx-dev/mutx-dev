@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class _MissingStripe:
     def __getattr__(self, name: str) -> Any:
-        raise RuntimeError(
+        raise AttributeError(
             "stripe package is not installed; install project dependencies to use payments"
         )
 
@@ -27,6 +27,14 @@ try:
     import stripe
 except ModuleNotFoundError:
     stripe = _MissingStripe()
+
+
+def _require_stripe() -> Any:
+    if isinstance(stripe, _MissingStripe):
+        raise RuntimeError(
+            "stripe package is not installed; install project dependencies to use payments"
+        )
+    return stripe
 
 
 def _configured_plan_prices() -> dict[str, str]:
@@ -146,7 +154,7 @@ async def _resolve_subscription_user_id(
     if existing_subscription:
         return existing_subscription.user_id
 
-    customer = stripe.Customer.retrieve(stripe_customer, api_key=_get_secret_key())
+    customer = _require_stripe().Customer.retrieve(stripe_customer, api_key=_get_secret_key())
     customer_user_id = customer.get("metadata", {}).get("user_id")
     if not customer_user_id:
         return None
@@ -178,7 +186,7 @@ async def _get_or_create_customer(
     if existing:
         return existing.stripe_customer_id, existing.stripe_subscription_id
 
-    customer = stripe.Customer.create(
+    customer = _require_stripe().Customer.create(
         email=user.email,
         name=user.name,
         metadata={"user_id": str(user.id)},
@@ -200,6 +208,7 @@ async def create_checkout_session(
     plan_id: str | None = None,
 ) -> dict[str, str]:
     """Create a Stripe Checkout Session for subscription signup."""
+    stripe_client = _require_stripe()
     resolved_plan_id, resolved_price_id = _resolve_checkout_plan_and_price(
         plan_id=plan_id,
         price_id=price_id,
@@ -235,7 +244,7 @@ async def create_checkout_session(
 
     params["subscription_data"] = subscription_data
 
-    session = stripe.checkout.Session.create(**params)
+    session = stripe_client.checkout.Session.create(**params)
     return {"checkout_url": session.url, "session_id": session.id}
 
 
@@ -257,7 +266,7 @@ async def create_customer_portal(
     if not sub:
         raise ValueError("No subscription found for user")
 
-    session = stripe.billing_portal.Session.create(
+    session = _require_stripe().billing_portal.Session.create(
         customer=sub.stripe_customer_id,
         return_url=return_url,
         api_key=_get_secret_key(),
@@ -270,7 +279,7 @@ async def create_customer_portal(
 
 def verify_webhook_signature(payload: bytes, sig_header: str) -> stripe.Event:
     """Verify and parse a Stripe webhook event."""
-    return stripe.Webhook.construct_event(payload, sig_header, _get_webhook_secret())
+    return _require_stripe().Webhook.construct_event(payload, sig_header, _get_webhook_secret())
 
 
 async def handle_checkout_complete(session_data: dict[str, Any], db: AsyncSession) -> None:
@@ -291,7 +300,7 @@ async def handle_checkout_complete(session_data: dict[str, Any], db: AsyncSessio
         return
 
     # Fetch subscription details from Stripe
-    sub_details = stripe.Subscription.retrieve(stripe_sub, api_key=_get_secret_key())
+    sub_details = _require_stripe().Subscription.retrieve(stripe_sub, api_key=_get_secret_key())
     sub_status = sub_details.get("status")
     price_id = _subscription_price_id(sub_details)
     plan = _price_id_to_plan(price_id) or session_data.get("metadata", {}).get("plan_id")
@@ -571,7 +580,7 @@ async def cancel_subscription(
     if not sub:
         raise ValueError("No active subscription found")
 
-    stripe.Subscription.modify(
+    _require_stripe().Subscription.modify(
         sub.stripe_subscription_id,
         cancel_at_period_end=True,
         api_key=_get_secret_key(),
