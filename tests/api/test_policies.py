@@ -11,8 +11,43 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import User, UserSetting
 from src.api.routes.approvals import APPROVAL_KEY_PREFIX
+from src.api.routes.policies import _redact_secret_text
 from src.api.services.approval import ApprovalRequest
 from src.api.services.policy_store import Policy, PolicyEvaluationContext, PolicyStore, Rule
+
+
+@pytest.mark.parametrize(
+    ("value", "secret"),
+    [
+        (
+            r'{"password": "two \"word\" passphrase", "ticket": "OPS-42"}',
+            r"two \"word\" passphrase",
+        ),
+        ("Authorization: Bearer bearer-value", "bearer-value"),
+        ("token=eyJheader.payload.signature", "eyJheader.payload.signature"),
+        ("key sk-abcdefghijklmnopqrstuvwxyz", "sk-abcdefghijklmnopqrstuvwxyz"),
+        ("AWS key AKIAIOSFODNN7EXAMPLE", "AKIAIOSFODNN7EXAMPLE"),
+        (
+            "-----BEGIN PRIVATE KEY-----\nprivate-material\n-----END PRIVATE KEY-----",
+            "private-material",
+        ),
+    ],
+)
+def test_policy_approval_secret_text_redaction(value: str, secret: str):
+    safe_value, redacted = _redact_secret_text(value)
+
+    assert redacted is True
+    assert secret not in safe_value
+    assert "[REDACTED]" in safe_value
+
+
+def test_policy_approval_secret_text_redaction_preserves_safe_text():
+    value = "Deployment preview for OPS-42 is ready."
+
+    safe_value, redacted = _redact_secret_text(value)
+
+    assert safe_value == value
+    assert redacted is False
 
 
 class TestPolicyStore:
@@ -450,9 +485,125 @@ class TestPolicyRoutes:
         assert payload["policy_decision"] == "require_approval"
         assert payload["context"]["run_id"] == "run-policy-approval"
         assert payload["context"]["tool_args"] == {"target": "production"}
+        assert payload["context"]["input"] is None
+        assert payload["context"]["output"] is None
+        assert payload["context_redaction"] == {
+            "policy": "secret-values-v1",
+            "marker": "[REDACTED]",
+            "applied": False,
+        }
         assert payload["policy_matches"][0]["policy_id"] == policy_id
         assert payload["policy_matches"][0]["policy_name"] == "approval-bridge-policy"
         assert payload["policy_matches"][0]["policy_version"] == 1
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_preserves_scoped_context_and_redacts_secrets(
+        self, client: AsyncClient
+    ):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-input-context-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*deploy production*",
+                        "action": "require_approval",
+                        "scope": "input",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+
+        response = await client.post(
+            "/v1/policies/evaluate-and-request-approval",
+            json={
+                "input": (
+                    "Deploy production with password=hunter2 after review; "
+                    "Authorization: Bearer bearer-value"
+                ),
+                "output": "Deployment preview is ready for approval.",
+                "tool": "deploy_database",
+                "tool_args": {
+                    "target": "production",
+                    "api_key": "sk-this-must-never-be-stored",
+                    "nested": {
+                        "region": "eu-west-1",
+                        "auth_token": "token-value",
+                        "clientSecret": "camel-case-secret",
+                    },
+                },
+                "metadata": {
+                    "ticket": "OPS-42",
+                    "authorization": "Bearer bearer-value",
+                },
+            },
+        )
+
+        assert response.status_code == 200
+        payload = response.json()["approval_request"]["payload"]
+        expected_input = (
+            "Deploy production with password=[REDACTED] after review; " "Authorization: [REDACTED]"
+        )
+        assert payload["context"]["input"] == expected_input
+        assert payload["context"]["output"] == "Deployment preview is ready for approval."
+        assert payload["context"]["tool_args"] == {
+            "target": "production",
+            "api_key": "[REDACTED]",
+            "nested": {
+                "region": "eu-west-1",
+                "auth_token": "[REDACTED]",
+                "clientSecret": "[REDACTED]",
+            },
+        }
+        assert payload["context"]["metadata"] == {
+            "ticket": "OPS-42",
+            "authorization": "[REDACTED]",
+        }
+        assert payload["context_redaction"] == {
+            "policy": "secret-values-v1",
+            "marker": "[REDACTED]",
+            "applied": True,
+        }
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_preserves_output_scoped_context(
+        self, client: AsyncClient
+    ):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "approval-output-context-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*customer export*",
+                        "action": "require_approval",
+                        "scope": "output",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+
+        response = await client.post(
+            "/v1/policies/evaluate-and-request-approval",
+            json={
+                "input": "Prepare a summary.",
+                "output": "Customer export prepared with token=secret-value",
+            },
+        )
+
+        assert response.status_code == 200
+        payload = response.json()["approval_request"]["payload"]
+        assert payload["context"]["input"] == "Prepare a summary."
+        assert payload["context"]["output"] == "Customer export prepared with token=[REDACTED]"
+        assert payload["context_redaction"]["applied"] is True
 
     @pytest.mark.asyncio
     async def test_evaluate_and_request_approval_dedupes_pending_approval(
