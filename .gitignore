@@ -9,7 +9,7 @@ dist/
 build/
 out/
 public/_next/
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Capacitor / mobile
 android/app/src/main/assets/
@@ -29,6 +29,8 @@ yarn-error.log*
 coverage/
 playwright-report/
 test-results/
+.playwright-cli/
+.playwright-mcp/
 .eslintcache
 
 # Cache
@@ -41,10 +43,8 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.venv/
 .venv*/
 env/
-venv/
 venv*/
 ENV/
 .pytest_cache/
@@ -66,14 +66,12 @@ infrastructure/terraform/*.backup
 .ssh/
 *.tfvars
 *.tfvars.json
-.terraform.lock.hcl
 
 # Runtime / tooling workspace
 .autonomy/
 .minimax/
 
 # Generated
-next-env.d.ts
 
 # Internal planning scratchpads
 CONTENT_MAP.md
@@ -104,6 +102,8 @@ docs/archive/
 signals/
 reports/
 tmp/
+.tmp/
+output/
 audit.db
 autonomy-queue.json
 autonomy-queue-health.json
@@ -123,7 +123,11 @@ pnpm-lock.yaml
 .worktrees/
 public/docs-search-index.json
 *.bak
+*.backup
 ALL_MUTX_PDFs_Extracted.txt
+
+# Local visual review captures
+/pico-*.png
 
 # GTM data — local only, never in repo
 docs/pico-gtm/

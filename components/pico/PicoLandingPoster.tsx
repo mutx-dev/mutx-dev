@@ -2,14 +2,13 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowRight, Check, Map, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 import s from './PicoLandingPoster.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
-import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 
@@ -33,8 +32,6 @@ type LandingPricingTierContent = {
 export function PicoLandingPoster() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
-  const [formOpen, setFormOpen] = useState(false)
-  const [formInterest, setFormInterest] = useState<string | undefined>()
   const heroRef = useRef<HTMLElement | null>(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -71,11 +68,6 @@ export function PicoLandingPoster() {
 
   const heroRobot = picoRobotArtById.heroWave
 
-  function openForm(interest?: string) {
-    setFormInterest(interest)
-    setFormOpen(true)
-  }
-
   function handlePricingAction(tier: (typeof PRICING_TIERS)[number], href: string) {
     if (href.startsWith('http')) {
       window.open(href, '_blank', 'noopener,noreferrer')
@@ -102,13 +94,6 @@ export function PicoLandingPoster() {
       <a href="#main-content" className={s.skipLink}>
         {t('nav.skipToMain')}
       </a>
-
-      <PicoContactForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        defaultInterest={formInterest}
-        source="pico-support"
-      />
 
       <header className={s.nav}>
         <div className={s.navInner}>
