@@ -2,7 +2,7 @@
 Observability and Security API service for CLI and TUI.
 
 Provides access to MUTX Observability Schema (MutxRun, MutxStep, etc.)
-and AARM Security Layer (evaluations, approvals, receipts, compliance).
+and AARM-alignment security capabilities (evaluations, approvals, receipts, gap checks).
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ class ObservabilityService(APIService):
 
 
 class SecurityService(APIService):
-    """Service for MUTX AARM Security API."""
+    """Service for MUTX runtime-security and AARM-alignment API."""
 
     def evaluate_action(
         self,
@@ -112,7 +112,7 @@ class SecurityService(APIService):
         return response.json()
 
     def get_compliance_report(self) -> dict[str, Any]:
-        """Run AARM conformance checks."""
+        """Run the local AARM-alignment gap check (not conformance)."""
         response = self._request("GET", "/v1/security/compliance")
         self._expect_status(response, {200})
         return response.json()

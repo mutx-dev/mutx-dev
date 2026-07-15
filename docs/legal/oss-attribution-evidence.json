@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-07-15",
+  "projects": [
+    {
+      "id": "agent-run",
+      "name": "agent-run",
+      "status": "adapted-upstream-quarantined",
+      "repository": "https://github.com/builderz-labs/agent-run",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 Builderz Labs",
+      "current_ref": "9c7c3fa68413de878fae2d605c90fb334a0201f6",
+      "current_version": null,
+      "release_url": "https://github.com/builderz-labs/agent-run/commit/9c7c3fa68413de878fae2d605c90fb334a0201f6",
+      "license_url": "https://github.com/builderz-labs/agent-run/blob/9c7c3fa68413de878fae2d605c90fb334a0201f6/LICENSE",
+      "security_review_url": "https://github.com/builderz-labs/agent-run/blob/9c7c3fa68413de878fae2d605c90fb334a0201f6/typescript/src/index.ts",
+      "security_status": "quarantined-do-not-import-package-execute-or-update-pending-maintainer-review",
+      "local_paths": [
+        "src/api/models/observability.py",
+        "src/api/models/observability_models.py",
+        "src/api/routes/observability.py",
+        "sdk/mutx/observability.py"
+      ]
+    },
+    {
+      "id": "aarm-docs",
+      "name": "AARM documentation",
+      "status": "specification-alignment",
+      "repository": "https://github.com/aarm-dev/docs",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2023 Mintlify",
+      "current_ref": "8eff208b98786b2c9a578b26cb7eaca440ec4020",
+      "current_version": null,
+      "release_url": "https://github.com/aarm-dev/docs/commit/8eff208b98786b2c9a578b26cb7eaca440ec4020",
+      "license_url": "https://github.com/aarm-dev/docs/blob/8eff208b98786b2c9a578b26cb7eaca440ec4020/LICENSE.txt",
+      "requirements_url": "https://github.com/aarm-dev/docs/blob/8eff208b98786b2c9a578b26cb7eaca440ec4020/conformance/requirements.mdx",
+      "local_paths": [
+        "src/security/mediator.py",
+        "src/security/context.py",
+        "src/security/policy.py",
+        "src/security/approvals.py",
+        "src/security/receipts.py",
+        "src/security/telemetry.py",
+        "src/security/compliance.py",
+        "docs/legal/aarm-alignment.md"
+      ]
+    },
+    {
+      "id": "faramesh-core",
+      "name": "Faramesh Core",
+      "status": "integrated",
+      "repository": "https://github.com/faramesh/faramesh-core",
+      "license": "Apache-2.0",
+      "copyright": null,
+      "current_ref": "e230a9ac2d12d80ed6f632db42b6e1983ccbce82",
+      "current_version": null,
+      "release_url": "https://github.com/faramesh/faramesh-core/commit/e230a9ac2d12d80ed6f632db42b6e1983ccbce82",
+      "license_url": "https://github.com/faramesh/faramesh-core/blob/e230a9ac2d12d80ed6f632db42b6e1983ccbce82/LICENSE",
+      "latest_semver_tag": "v1.2.9",
+      "latest_semver_tag_ref": "c85237e4e6b13745169291f60b9c6b985285dbaa",
+      "latest_semver_tag_url": "https://github.com/faramesh/faramesh-core/tree/c85237e4e6b13745169291f60b9c6b985285dbaa",
+      "latest_semver_tag_license": "MPL-2.0",
+      "latest_semver_tag_license_url": "https://github.com/faramesh/faramesh-core/blob/c85237e4e6b13745169291f60b9c6b985285dbaa/LICENSE",
+      "installer_ref": "ae3ebc9066d65e4e930164881c2f2ce2be554c7f",
+      "installer_version": "v0.2.0",
+      "installer_release_url": "https://github.com/faramesh/faramesh-core/releases/tag/v0.2.0",
+      "installer_source_url": "https://github.com/faramesh/faramesh-core/blob/ae3ebc9066d65e4e930164881c2f2ce2be554c7f/install.sh",
+      "installer_license": "MPL-2.0",
+      "installer_license_url": "https://github.com/faramesh/faramesh-core/blob/ae3ebc9066d65e4e930164881c2f2ce2be554c7f/LICENSE",
+      "notice_url": null,
+      "local_paths": [
+        "cli/faramesh_runtime.py",
+        "cli/commands/governance.py",
+        "src/runtime/gateways/faramesh.py",
+        "third_party/licenses/Apache-2.0.txt",
+        "third_party/licenses/MPL-2.0.txt"
+      ]
+    },
+    {
+      "id": "fpl-lang",
+      "name": "Faramesh Policy Language",
+      "status": "format-integration",
+      "repository": "https://github.com/faramesh/fpl-lang",
+      "license": "Apache-2.0",
+      "copyright": null,
+      "current_ref": "b7aa0b7ad56f60428d692278a435c5e6640cec2b",
+      "current_version": null,
+      "release_url": "https://github.com/faramesh/fpl-lang/commit/b7aa0b7ad56f60428d692278a435c5e6640cec2b",
+      "license_url": "https://github.com/faramesh/fpl-lang/blob/b7aa0b7ad56f60428d692278a435c5e6640cec2b/LICENSE",
+      "notice_url": null,
+      "local_paths": [
+        "cli/policies",
+        "third_party/licenses/Apache-2.0.txt"
+      ]
+    },
+    {
+      "id": "mission-control",
+      "name": "Mission Control",
+      "status": "adapted",
+      "repository": "https://github.com/builderz-labs/mission-control",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 Builderz Labs",
+      "current_ref": "b4ebc5418bea4fa9288a5c17fbddb9ba99740964",
+      "current_version": "v2.1.0",
+      "release_url": "https://github.com/builderz-labs/mission-control/commit/b4ebc5418bea4fa9288a5c17fbddb9ba99740964",
+      "license_url": "https://github.com/builderz-labs/mission-control/blob/b4ebc5418bea4fa9288a5c17fbddb9ba99740964/LICENSE",
+      "provenance_ref": "eb7c35e950b83f73d6fd61e89f7d4b377db2ad50",
+      "source_urls": [
+        "https://github.com/builderz-labs/mission-control/blob/eb7c35e950b83f73d6fd61e89f7d4b377db2ad50/src/components/dashboard/widgets/briefing-bar-widget.tsx",
+        "https://github.com/builderz-labs/mission-control/blob/eb7c35e950b83f73d6fd61e89f7d4b377db2ad50/src/components/dashboard/widget-primitives.tsx"
+      ],
+      "local_port_commit": "972ab49b0af83d15042b2301679246103cbdbab6",
+      "local_paths": [
+        "components/dashboard/DashboardOverviewPageClient.tsx",
+        "components/dashboard/livePrimitives.tsx"
+      ]
+    },
+    {
+      "id": "orchestra-research",
+      "name": "Orchestra Research AI-Research-SKILLs",
+      "status": "integrated-behind-upstream",
+      "repository": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2025 Claude AI Research Skills Contributors",
+      "current_ref": "773a52944ba4747a18bd4ae9ade53fff041adcbc",
+      "current_version": "v1.7.2",
+      "release_url": "https://github.com/Orchestra-Research/AI-Research-SKILLs/commit/773a52944ba4747a18bd4ae9ade53fff041adcbc",
+      "license_url": "https://github.com/Orchestra-Research/AI-Research-SKILLs/blob/773a52944ba4747a18bd4ae9ade53fff041adcbc/LICENSE",
+      "integration_ref": "05f1958727bfc2bc22240f41d060504473c4f236",
+      "local_paths": [
+        "scripts/sync_orchestra_research_skills.py",
+        "src/api/data/orchestra_research_catalog.json",
+        "docs/orchestra-research.md"
+      ]
+    },
+    {
+      "id": "predict-rlm",
+      "name": "predict-rlm",
+      "status": "adapted-behind-upstream",
+      "repository": "https://github.com/Trampoline-AI/predict-rlm",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2026 Trampoline AI",
+      "current_ref": "4ff334dea79a2f27e96b7a50a358b0427050899e",
+      "current_version": "v0.7.2",
+      "release_url": "https://github.com/Trampoline-AI/predict-rlm/commit/4ff334dea79a2f27e96b7a50a358b0427050899e",
+      "license_url": "https://github.com/Trampoline-AI/predict-rlm/blob/4ff334dea79a2f27e96b7a50a358b0427050899e/LICENSE",
+      "integration_ref": "5c7387afa1980b62b21a34ad0261256a95d8caa1",
+      "local_paths": [
+        "src/api/services/document_engine.py",
+        "src/api/services/document_jobs.py",
+        "src/api/routes/documents.py",
+        "src/api/document_worker.py",
+        "cli/commands/documents.py",
+        "cli/services/documents.py",
+        "app/dashboard/documents/page.tsx",
+        "components/dashboard/DocumentsPageClient.tsx",
+        "docs/document-workflows.md"
+      ]
+    },
+    {
+      "id": "guild-ai",
+      "name": "Guild AI",
+      "status": "candidate-no-reuse",
+      "repository": "https://github.com/guildai/guildai",
+      "license": "Apache-2.0",
+      "copyright": null,
+      "current_ref": "dfbefedb6ca5ce3a1341f9f00a4016420f6fc76d",
+      "current_version": "0.9.0",
+      "release_url": "https://github.com/guildai/guildai/commit/dfbefedb6ca5ce3a1341f9f00a4016420f6fc76d",
+      "license_url": "https://github.com/guildai/guildai/blob/dfbefedb6ca5ce3a1341f9f00a4016420f6fc76d/LICENSE.txt",
+      "local_paths": []
+    },
+    {
+      "id": "lacp",
+      "name": "LACP (unresolved)",
+      "status": "unresolved-no-reuse",
+      "repository": null,
+      "license": null,
+      "copyright": null,
+      "current_ref": null,
+      "current_version": null,
+      "release_url": null,
+      "license_url": null,
+      "local_paths": []
+    }
+  ]
+}

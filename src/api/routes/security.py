@@ -1,7 +1,7 @@
 """
 MUTX Security API Routes.
 
-REST API for MUTX Security Layer - AARM-compliant runtime security.
+REST API for MUTX runtime-security capabilities.
 
 Routes:
 - POST   /v1/security/actions/evaluate        - Evaluate action without executing
@@ -10,14 +10,14 @@ Routes:
 - POST   /v1/security/approvals/{id}/deny   - Deny deferred action
 - GET    /v1/security/approvals/{id}        - Get approval status
 - GET    /v1/security/receipts/{id}         - Get action receipt
-- GET    /v1/security/compliance             - Run AARM conformance checks
+- GET    /v1/security/compliance             - Run local AARM-alignment checks
 - GET    /v1/security/metrics               - Get governance metrics
 
-Based on the AARM (Autonomous Action Runtime Management) specification.
-https://github.com/aarm-dev/docs
+Informed by the AARM specification. The local check is not an AARM conformance
+report and does not establish Core, Extended, or organizational conformance.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs/blob/main/LICENSE.txt
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
 """
 
 from typing import Any, Optional
@@ -108,7 +108,7 @@ class ApprovalActionRequest(BaseModel):
 
 
 class ComplianceResponse(BaseModel):
-    """AARM compliance check response."""
+    """Backward-compatible local AARM-alignment check response."""
 
     overall_satisfied: bool
     version: str
@@ -451,7 +451,7 @@ async def get_session_receipts(
 async def run_compliance_check(
     current_user: User = Depends(get_current_user),
 ):
-    """Run AARM conformance checks."""
+    """Run local capability checks mapped to AARM; not a conformance report."""
     checker = AARMComplianceChecker(
         mediator=_mediator,
         context_accumulator=_context_accumulator,

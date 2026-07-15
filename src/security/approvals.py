@@ -4,10 +4,11 @@ Approval Service.
 Human-in-the-loop mechanism for high-risk or ambiguous actions.
 Handles timeouts, multi-reviewer workflows, and escalation chains.
 
-AARM Requirement: R5 (MUST support human approval workflows with timeout handling)
+AARM alignment: contributes to the STEP_UP portion of current R4. The wider
+execution, timeout, and receipt requirements are not demonstrated by this service.
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 """
 
 import secrets

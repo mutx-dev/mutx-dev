@@ -20,11 +20,11 @@ These are **adjacent, not identical**. AGT is SDK-first (developer tooling). MUT
 | Capability | MUTX | AGT v3.1.0 | MUTX Advantage |
 |-----------|------|------------|----------------|
 | Policy engine | ✅ PolicyEngine + REST API | ✅ <0.1ms eval | Parity |
-| Action interception | ✅ ActionMediator (R1,R2) | ✅ Pre-execution gate | Parity |
-| Approval workflows | ✅ Built-in (R5) | ⚠️ Delegates to custom code | **MUTX ahead** |
-| Audit receipts | ✅ Crypto-signed (R6) | ✅ Audit trails | Parity |
+| Action interception | ⚠️ Partial current AARM R1/R3; universal path coverage not demonstrated | ✅ Pre-execution gate | Unverified |
+| Approval workflows | ⚠️ Built-in flow; current AARM R4 STEP_UP/DEFER distinction incomplete | ⚠️ Delegates to custom code | Unverified |
+| Audit receipts | ⚠️ Optional signing; complete current AARM R5 evidence not demonstrated | ✅ Audit trails | AGT evidence stronger |
 | Credential brokering | ✅ 6 backends + TTL | ❌ None | **MUTX ahead** |
-| Context-aware eval | ✅ Session + intent (R3,R4) | ⚠️ Partial | **MUTX ahead** |
+| Context-aware eval | ⚠️ Session context plus heuristic intent signal; current AARM R2/R3/R7 incomplete | ⚠️ Partial | Unverified |
 | Runtime supervision | ✅ Faramesh 13-framework | ❌ SDK-level only | **MUTX ahead** |
 | OWASP ASI 2026 | ❌ No mapping | ✅ 10/10 | AGT ahead |
 | Shadow AI discovery | ❌ None | ✅ agent-discovery | AGT ahead |
@@ -43,10 +43,12 @@ These are **adjacent, not identical**. AGT is SDK-first (developer tooling). MUT
 ### Lead with (MUTX-only strengths)
 1. **Credential brokering** — "The only agent governance platform with built-in secret management across 6 backends"
 2. **Runtime supervision** — "Govern agents at runtime, not just at build time — Faramesh auto-patches 13 frameworks"
-3. **AARM compliance** — "Formal AARM conformance (R1-R9) with automated compliance reporting"
+3. **Evidence-based AARM alignment** — publish the current R1-R9 gap map and
+   close every Core verification before considering a conformance claim
 4. **In-product approvals** — "Human-in-the-loop approvals built into the platform, not bolted on"
 
 ### Don't claim until built
+- AARM Core or Extended conformance (technical and organizational evidence is incomplete)
 - OWASP Agentic Top 10 coverage (need mapping doc)
 - Multi-language SDK (TypeScript priority)
 - Shadow AI discovery
@@ -76,7 +78,8 @@ This means AGT is not a direct revenue competitor — it's a mindshare competito
 
 ### 2026-04-20
 - AGT stable at v3.1.0 (no new releases since April 11)
-- MUTX major advances: full AARM security layer, credential broker, Faramesh supervision
+- Historical note corrected: MUTX expanded AARM-informed capability modules,
+  credential-broker surfaces, and Faramesh supervision; “full” was not verified
 - Gap reduction: 6 capabilities moved from Large to Small/None
 - New gaps: quantum-safe crypto, prompt injection evaluator (from AGT v3.1.0)
 - MUTX now has 4 capabilities where it leads AGT (was 0 at initial audit)

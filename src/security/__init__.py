@@ -1,32 +1,22 @@
 """
-MUTX Security Layer - AARM-Compliant Runtime Security for AI Agents.
+MUTX runtime-security capability modules.
 
-Based on the AARM (Autonomous Action Runtime Management) specification.
-https://github.com/aarm-dev/docs
+These modules are informed by the AARM specification audited at
+aarm-dev/docs@8eff208b98786b2c9a578b26cb7eaca440ec4020. They provide pieces of
+the current R1-R9 model, but MUTX has not demonstrated all AARM Core technical
+tests or the organizational conditions required for a conformance claim.
 
-AARM defines what a runtime security system must do - MUTX implements it.
+Current alignment:
+- ActionMediator and PolicyEngine: partial R1 and R3
+- ContextAccumulator: partial R2; heuristic only for R7
+- PolicyEngine and ApprovalService: partial R4
+- ReceiptGenerator: partial R5
+- NormalizedAction and API authentication: partial R6
+- TelemetryExporter: partial R8
+- Least-privilege credential issuance: R9 gap
 
-Components:
-- ActionMediator: Intercepts and normalizes tool invocations (R1, R2)
-- ContextAccumulator: Tracks session state and intent (R3, R4)
-- PolicyEngine: Evaluates actions against policy (R1, R2, R4)
-- ApprovalService: Human-in-the-loop for deferred actions (R5)
-- ReceiptGenerator: Cryptographic audit receipts (R6)
-- TelemetryExporter: SIEM/SOAR integration (R9)
-
-Conformance:
-- R1: MUST block actions before execution based on policy
-- R2: MUST validate action parameters against type, range, and pattern constraints
-- R3: MUST accumulate session context including prior actions and data accessed
-- R4: MUST evaluate intent consistency for context-dependent actions
-- R5: MUST support human approval workflows with timeout handling
-- R6: MUST generate cryptographically signed receipts with full context
-- R7: MUST bind actions to human, service, agent, and session identity
-- R8: SHOULD enforce least privilege through scoped, just-in-time credentials
-- R9: SHOULD export structured telemetry to security platforms
-
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs/blob/main/LICENSE.txt
+See docs/legal/aarm-alignment.md for the evidence and remaining gaps.
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
 """
 
 from src.security.mediator import ActionCategory, ActionMediator, NormalizedAction

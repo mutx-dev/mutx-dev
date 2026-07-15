@@ -241,13 +241,15 @@ async def test_get_session_receipts(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_compliance_check(client: AsyncClient):
-    """Compliance check returns AARM conformance report."""
+    """Compatibility route returns a local AARM-alignment gap report."""
     response = await client.get("/v1/security/compliance")
     assert response.status_code == 200
     data = response.json()
     assert "overall_satisfied" in data
     assert "version" in data
     assert "results" in data
+    assert data["overall_satisfied"] is False
+    assert data["summary"]["conformance_claim"] == "none"
 
 
 # ---------------------------------------------------------------------------

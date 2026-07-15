@@ -74,6 +74,8 @@
 * [Contributing](contributing/README.md)
 * [Security Policy](security.md)
 * [Licensing](docs/legal/index.md)
+  * [OSS Attribution Ledger](docs/legal/oss-attribution-ledger.md)
+  * [AARM Alignment Status](docs/legal/aarm-alignment.md)
 * [Contributor Covenant Code of Conduct](code_of_conduct.md)
 * [AGENTS.md](AGENTS.md)
 * [App Dashboard](docs/app-dashboard.md)

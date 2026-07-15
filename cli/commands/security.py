@@ -1,21 +1,21 @@
 """
 MUTX Security CLI Commands.
 
-CLI commands for MUTX Security Layer - AARM-compliant runtime security.
+CLI commands for MUTX runtime-security capabilities.
 
 Commands:
 - mutx security evaluate <tool> <args>   - Dry-run policy evaluation
 - mutx security approve <token>          - Approve deferred action
 - mutx security deny <token>             - Deny deferred action
-- mutx security audit                   - Run AARM compliance check
+- mutx security audit                   - Run local AARM-alignment gap check
 - mutx security receipts                 - View recent receipts
 - mutx security metrics                 - View governance metrics
 
-Based on the AARM (Autonomous Action Runtime Management) specification.
-https://github.com/aarm-dev/docs
+Informed by the AARM specification. The local audit is not an AARM conformance
+report and does not establish Core, Extended, or organizational conformance.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs/blob/main/LICENSE.txt
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
 """
 
 import json
@@ -37,7 +37,7 @@ def _get_client_instance():
 
 @click.group(name="security")
 def security_group():
-    """MUTX Security - AARM-compliant runtime security for AI agents."""
+    """MUTX runtime-security capabilities and local alignment checks."""
     pass
 
 
@@ -223,9 +223,9 @@ def deny_action(token: str, reviewer: str, reason: str, output_json: bool):
 @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
 def run_audit(output_json: bool):
     """
-    Run AARM conformance checks.
+    Run the local AARM-alignment gap check.
 
-    Verifies that MUTX Security Layer satisfies all 9 AARM requirements.
+    Reports current capability gaps. This is not an AARM conformance assessment.
     """
     client = _get_client_instance()
 
@@ -234,7 +234,7 @@ def run_audit(output_json: bool):
         response.raise_for_status()
         report = response.json()
     except Exception as exc:
-        click.echo(f"Error running compliance check: {exc}", err=True)
+        click.echo(f"Error running alignment check: {exc}", err=True)
         return
 
     if output_json:
@@ -245,9 +245,10 @@ def run_audit(output_json: bool):
     summary = report.get("summary", {})
 
     if overall:
-        click.echo("\033[92m✓ AARM Compliance: PASSED\033[0m")
+        click.echo("\033[92m✓ Local AARM alignment checks: COMPLETE\033[0m")
+        click.echo("This is not an AARM conformance designation.")
     else:
-        click.echo("\033[91m✗ AARM Compliance: FAILED\033[0m")
+        click.echo("\033[93m! Local AARM alignment checks: GAPS REMAIN\033[0m")
 
     click.echo("")
     click.echo("Summary:")

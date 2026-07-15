@@ -1,4 +1,4 @@
-"""Security API SDK - /security endpoints (AARM)."""
+"""Security API SDK - /security capability and AARM-alignment endpoints."""
 
 from __future__ import annotations
 
@@ -58,7 +58,7 @@ class GovernanceMetrics:
 
 
 class Security:
-    """SDK resource for /security endpoints (AARM)."""
+    """SDK resource for runtime-security and AARM-alignment endpoints."""
 
     def __init__(self, client: httpx.Client | httpx.AsyncClient):
         self._client = client
@@ -336,14 +336,14 @@ class Security:
         return response.json()
 
     def run_compliance_check(self) -> dict[str, Any]:
-        """Run AARM conformance checks."""
+        """Run the local AARM-alignment gap check (not conformance)."""
         self._require_sync_client()
         response = self._client.get("/security/compliance")
         response.raise_for_status()
         return response.json()
 
     async def arun_compliance_check(self) -> dict[str, Any]:
-        """Run AARM conformance checks (async)."""
+        """Run the local AARM-alignment gap check asynchronously."""
         self._require_async_client()
         response = await self._client.get("/security/compliance")
         response.raise_for_status()

@@ -4,10 +4,11 @@ Telemetry Exporter.
 Structured events exported to SIEM/SOAR platforms for security monitoring
 and incident response.
 
-AARM Requirement: R9 (SHOULD export structured telemetry to security platforms)
+AARM alignment: contributes to current R8 structured telemetry. The complete
+filtering, delivery, DEFER, and historical-export checks are not demonstrated.
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 """
 
 import json

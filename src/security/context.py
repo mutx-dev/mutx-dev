@@ -8,15 +8,15 @@ Tracks session state throughout an agent's execution:
 - Tool outputs
 - Intermediate model responses
 
-AARM Requirement: R3 (MUST accumulate session context including prior actions)
-AARM Requirement: R4 (MUST evaluate intent consistency for context-dependent actions)
+AARM alignment: contributes to current R2 context accumulation. Its heuristic
+intent signal is not the calibrated semantic-distance implementation described by R7.
 
 The ContextAccumulator builds a picture of the ongoing session to enable
 context-aware policy evaluation. An action that looks fine in isolation might
 be a breach in context.
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 """
 
 from dataclasses import dataclass, field
