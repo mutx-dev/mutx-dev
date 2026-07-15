@@ -23,6 +23,7 @@ from src.api.services.stripe_service import (
     create_customer_portal,
     dispatch_webhook_event,
     get_subscription_status,
+    StripeUnavailableError,
     verify_webhook_signature,
 )
 
@@ -48,7 +49,7 @@ async def checkout(
             cancel_url=payload.cancel_url,
             trial_days=payload.trial_days,
         )
-    except RuntimeError as exc:
+    except StripeUnavailableError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -72,6 +73,8 @@ async def customer_portal(
             user=current_user,
             return_url=payload.return_url,
         )
+    except StripeUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
@@ -95,12 +98,16 @@ async def stripe_webhook(
 
     try:
         event = verify_webhook_signature(body, sig_header)
+    except StripeUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         logger.warning("Webhook signature verification failed: %s", exc)
         raise HTTPException(status_code=400, detail="Invalid signature") from exc
 
     try:
         await dispatch_webhook_event(event, db)
+    except StripeUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("Webhook handler error for event %s", event.type)
         raise HTTPException(status_code=500, detail="Failed to process webhook") from exc
@@ -126,6 +133,8 @@ async def cancel(
     """Cancel the current subscription at period end."""
     try:
         result = await cancel_subscription(db, user_id=current_user.id)
+    except StripeUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:

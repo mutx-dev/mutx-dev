@@ -16,6 +16,10 @@ from src.api.models.models import User
 logger = logging.getLogger(__name__)
 
 
+class StripeUnavailableError(RuntimeError):
+    """Raised when the Stripe integration cannot serve requests."""
+
+
 class _MissingStripe:
     def __getattr__(self, name: str) -> Any:
         raise AttributeError(
@@ -31,7 +35,7 @@ except ModuleNotFoundError:
 
 def _require_stripe() -> Any:
     if isinstance(stripe, _MissingStripe):
-        raise RuntimeError(
+        raise StripeUnavailableError(
             "stripe package is not installed; install project dependencies to use payments"
         )
     return stripe
@@ -54,7 +58,7 @@ def _get_secret_key() -> str:
 
     key = os.getenv("STRIPE_SECRET_KEY", "")
     if not key:
-        raise RuntimeError("STRIPE_SECRET_KEY not configured")
+        raise StripeUnavailableError("STRIPE_SECRET_KEY not configured")
     return key
 
 
@@ -86,7 +90,7 @@ def _resolve_checkout_plan_and_price(
     if plan_id:
         resolved_price_id = configured_prices.get(plan_id)
         if not resolved_price_id:
-            raise RuntimeError(f"Stripe price for plan '{plan_id}' is not configured")
+            raise StripeUnavailableError(f"Stripe price for plan '{plan_id}' is not configured")
         return plan_id, resolved_price_id
 
     if price_id:

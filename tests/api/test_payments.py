@@ -143,6 +143,95 @@ async def test_checkout_route_rejects_unsupported_price_id(client, monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_portal_returns_503_when_stripe_dependency_is_missing(client, monkeypatch):
+    async def raise_missing_stripe(*_args, **_kwargs):
+        raise stripe_service.StripeUnavailableError("stripe package is not installed")
+
+    monkeypatch.setattr(
+        "src.api.routes.payments.create_customer_portal",
+        raise_missing_stripe,
+    )
+
+    response = await client.post(
+        "/v1/payments/portal",
+        json={"return_url": "https://pico.mutx.dev/settings"},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "stripe package is not installed"
+
+
+@pytest.mark.asyncio
+async def test_cancel_returns_503_when_stripe_dependency_is_missing(client, monkeypatch):
+    async def raise_missing_stripe(*_args, **_kwargs):
+        raise stripe_service.StripeUnavailableError("stripe package is not installed")
+
+    monkeypatch.setattr(
+        "src.api.routes.payments.cancel_subscription",
+        raise_missing_stripe,
+    )
+
+    response = await client.post("/v1/payments/cancel")
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "stripe package is not installed"
+
+
+@pytest.mark.asyncio
+async def test_webhook_returns_503_when_stripe_dependency_is_missing(
+    client_no_auth,
+    monkeypatch,
+):
+    def raise_missing_stripe(*_args, **_kwargs):
+        raise stripe_service.StripeUnavailableError("stripe package is not installed")
+
+    monkeypatch.setattr(
+        "src.api.routes.payments.verify_webhook_signature",
+        raise_missing_stripe,
+    )
+
+    response = await client_no_auth.post(
+        "/v1/payments/webhook",
+        content=b"{}",
+        headers={"stripe-signature": "sig_test"},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "stripe package is not installed"
+
+
+@pytest.mark.asyncio
+async def test_webhook_returns_503_when_handler_dependency_is_missing(
+    client_no_auth,
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        "src.api.routes.payments.verify_webhook_signature",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            type="checkout.session.completed",
+            data=SimpleNamespace(object={}),
+        ),
+    )
+
+    async def raise_missing_stripe(*_args, **_kwargs):
+        raise stripe_service.StripeUnavailableError("stripe package is not installed")
+
+    monkeypatch.setattr(
+        "src.api.routes.payments.dispatch_webhook_event",
+        raise_missing_stripe,
+    )
+
+    response = await client_no_auth.post(
+        "/v1/payments/webhook",
+        content=b"{}",
+        headers={"stripe-signature": "sig_test"},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "stripe package is not installed"
+
+
+@pytest.mark.asyncio
 async def test_webhook_returns_500_when_dispatch_fails(client_no_auth, monkeypatch):
     monkeypatch.setattr(
         "src.api.routes.payments.verify_webhook_signature",
