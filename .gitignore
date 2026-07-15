@@ -104,6 +104,8 @@ docs/archive/
 signals/
 reports/
 tmp/
+output/
+.playwright-cli/
 audit.db
 autonomy-queue.json
 autonomy-queue-health.json
