@@ -32,6 +32,14 @@ dependencies = [
 tui = [
     "textual>=0.58.0,<2.0.0",
 ]
+langchain = [
+    "langchain>=0.3.30,<0.4.0",
+    "langchain-core>=0.3.86,<0.4.0",
+    "langchain-openai>=0.3.35,<0.4.0",
+    "langchain-anthropic>=0.3.22,<0.4.0",
+    "langchain-community>=0.3.31,<0.4.0",
+    "langchain-text-splitters>=0.3.11,<0.4.0",
+]
 dev = [
     "pytest>=9.0.3",
     "pytest-asyncio>=0.23.0",

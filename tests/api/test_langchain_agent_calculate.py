@@ -9,6 +9,7 @@ def _load_langchain_agent_module():
     stubbed_modules = [
         "langchain_openai",
         "langchain_anthropic",
+        "langchain_community.chat_message_histories",
         "langchain_community.chat_models",
         "langchain_core.messages",
         "langchain_core.tools",
@@ -30,6 +31,10 @@ def _load_langchain_agent_module():
     chat_models = types.ModuleType("langchain_community.chat_models")
     chat_models.ChatOllama = type("ChatOllama", (), {})
     sys.modules["langchain_community.chat_models"] = chat_models
+
+    chat_message_histories = types.ModuleType("langchain_community.chat_message_histories")
+    chat_message_histories.ChatMessageHistory = type("ChatMessageHistory", (), {})
+    sys.modules["langchain_community.chat_message_histories"] = chat_message_histories
 
     messages = types.ModuleType("langchain_core.messages")
     for name in ("HumanMessage", "AIMessage", "SystemMessage", "BaseMessage"):
@@ -56,7 +61,6 @@ def _load_langchain_agent_module():
 
     memory = types.ModuleType("langchain.memory")
     memory.ConversationBufferMemory = type("ConversationBufferMemory", (), {})
-    memory.ChatMessageHistory = type("ChatMessageHistory", (), {})
     sys.modules["langchain.memory"] = memory
 
     prompts = types.ModuleType("langchain_core.prompts")
