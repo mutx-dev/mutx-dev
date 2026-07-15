@@ -2,16 +2,21 @@
 Tests for /policies endpoints.
 """
 
+import asyncio
 import uuid
 from datetime import datetime, timezone
 
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 from src.api.models import User, UserSetting
-from src.api.routes.approvals import APPROVAL_KEY_PREFIX
-from src.api.routes.policies import _redact_secret_text
+from src.api.routes.approvals import APPROVAL_KEY_PREFIX, _list_approval_settings
+from src.api.routes.policies import (
+    _redact_secret_text,
+    evaluate_policies_and_request_approval,
+)
 from src.api.services.approval import ApprovalRequest
 from src.api.services.policy_store import Policy, PolicyEvaluationContext, PolicyStore, Rule
 
@@ -24,6 +29,11 @@ from src.api.services.policy_store import Policy, PolicyEvaluationContext, Polic
             r"two \"word\" passphrase",
         ),
         ("Authorization: Bearer bearer-value", "bearer-value"),
+        ("Set-Cookie: sid=session-secret; Path=/; HttpOnly", "session-secret"),
+        ("credentials=service-account-secret", "service-account-secret"),
+        ("DATABASE_PASSWORD=database-secret", "database-secret"),
+        ("tenantRefreshToken=refresh-secret", "refresh-secret"),
+        ("callback=https://example.test/?token=url-secret", "url-secret"),
         ("token=eyJheader.payload.signature", "eyJheader.payload.signature"),
         ("key sk-abcdefghijklmnopqrstuvwxyz", "sk-abcdefghijklmnopqrstuvwxyz"),
         ("AWS key AKIAIOSFODNN7EXAMPLE", "AKIAIOSFODNN7EXAMPLE"),
@@ -546,7 +556,7 @@ class TestPolicyRoutes:
         assert response.status_code == 200
         payload = response.json()["approval_request"]["payload"]
         expected_input = (
-            "Deploy production with password=[REDACTED] after review; " "Authorization: [REDACTED]"
+            "Deploy production with password=[REDACTED] after review; Authorization: [REDACTED]"
         )
         assert payload["context"]["input"] == expected_input
         assert payload["context"]["output"] == "Deployment preview is ready for approval."
@@ -644,6 +654,64 @@ class TestPolicyRoutes:
         assert second_data["approval_created"] is False
         assert first_data["approval_request"]["id"] == second_data["approval_request"]["id"]
         assert first_data["approval_dedupe_key"] == second_data["approval_dedupe_key"]
+
+    @pytest.mark.asyncio
+    async def test_evaluate_and_request_approval_dedupes_concurrent_requests(
+        self,
+        test_engine,
+        test_user: User,
+    ):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="approval-concurrent-dedupe-policy",
+                rules=[
+                    Rule(
+                        type="warn",
+                        pattern="*rotate_secret*",
+                        action="require_approval",
+                        scope="tool",
+                    )
+                ],
+                enabled=True,
+                version=1,
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+            )
+        )
+        context = PolicyEvaluationContext(
+            tool="rotate_secret",
+            run_id="run-concurrent-dedupe",
+            session_id="session-concurrent-dedupe",
+            agent_id="agent-concurrent-dedupe",
+        )
+        session_factory = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
+
+        async def evaluate_with_new_session():
+            async with session_factory() as session:
+                return await evaluate_policies_and_request_approval(
+                    context=context,
+                    store=store,
+                    db=session,
+                    user=test_user,
+                )
+
+        first, second = await asyncio.gather(
+            evaluate_with_new_session(),
+            evaluate_with_new_session(),
+        )
+
+        assert sorted((first.approval_created, second.approval_created)) == [False, True]
+        assert first.approval_request is not None
+        assert second.approval_request is not None
+        assert first.approval_request.id == second.approval_request.id
+        assert first.approval_dedupe_key == second.approval_dedupe_key
+
+        async with session_factory() as session:
+            approvals, total = await _list_approval_settings(session)
+        assert total == 1
+        assert [approval.id for approval in approvals] == [first.approval_request.id]
 
     @pytest.mark.asyncio
     async def test_evaluate_and_request_approval_keys_distinct_action_context(

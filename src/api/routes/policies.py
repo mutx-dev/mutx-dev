@@ -7,10 +7,14 @@ import hashlib
 import json
 import logging
 import re
+import weakref
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.dependencies import get_current_user
@@ -69,10 +73,8 @@ _PRIVATE_KEY_PATTERN = re.compile(
     r"-----BEGIN(?: [A-Z0-9]+)? PRIVATE KEY-----.*?" r"-----END(?: [A-Z0-9]+)? PRIVATE KEY-----",
     re.DOTALL,
 )
-_SECRET_ASSIGNMENT_PATTERN = re.compile(
-    r"(?i)([\"']?\b(?:access[_-]?key|api[_-]?key|auth[_-]?token|authorization|"
-    r"client[_-]?secret|credential|password|passwd|private[_-]?key|"
-    r"refresh[_-]?token|secret(?:[_-]?access[_-]?key)?|token)\b[\"']?\s*[:=]\s*)"
+_CONTEXT_ASSIGNMENT_PATTERN = re.compile(
+    r"(?i)(?P<prefix>[\"']?(?P<label>\b[a-z][a-z0-9_-]*\b)[\"']?\s*[:=]\s*)"
     r"(?:(?P<quote>[\"'])(?P<quoted>(?:\\.|(?!(?P=quote)).)*)(?P=quote)|"
     r"(?P<bare>(?:Bearer\s+)?[^\s,;}]+))"
 )
@@ -81,6 +83,9 @@ _SECRET_TOKEN_PATTERNS = (
     re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{16,})\b"),
     re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
     re.compile(r"\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b"),
+)
+_SQLITE_POLICY_APPROVAL_LOCKS: weakref.WeakValueDictionary[str, asyncio.Lock] = (
+    weakref.WeakValueDictionary()
 )
 
 
@@ -106,11 +111,23 @@ def _is_sensitive_context_key(key: object) -> bool:
 def _redact_secret_text(value: str) -> tuple[str, bool]:
     redacted = _PRIVATE_KEY_PATTERN.sub(APPROVAL_CONTEXT_REDACTION_MARKER, value)
 
-    def redact_assignment(match: re.Match[str]) -> str:
+    chunks: list[str] = []
+    cursor = 0
+    search_from = 0
+    while match := _CONTEXT_ASSIGNMENT_PATTERN.search(redacted, search_from):
+        if not _is_sensitive_context_key(match.group("label")):
+            # Resume inside a safe assignment so a nested query-string secret,
+            # such as ``callback=https://host/?token=...``, is still found.
+            search_from = match.start() + 1
+            continue
         quote = match.group("quote") or ""
-        return f"{match.group(1)}{quote}{APPROVAL_CONTEXT_REDACTION_MARKER}{quote}"
-
-    redacted = _SECRET_ASSIGNMENT_PATTERN.sub(redact_assignment, redacted)
+        chunks.append(redacted[cursor : match.start()])
+        chunks.append(f"{match.group('prefix')}{quote}{APPROVAL_CONTEXT_REDACTION_MARKER}{quote}")
+        cursor = match.end()
+        search_from = match.end()
+    if chunks:
+        chunks.append(redacted[cursor:])
+        redacted = "".join(chunks)
     redacted = _BEARER_TOKEN_PATTERN.sub(
         rf"\1{APPROVAL_CONTEXT_REDACTION_MARKER}",
         redacted,
@@ -242,6 +259,40 @@ async def _find_existing_policy_approval(
     return None
 
 
+@asynccontextmanager
+async def _policy_approval_creation_lock(
+    db: AsyncSession,
+    *,
+    dedupe_key: str,
+) -> AsyncIterator[None]:
+    """Serialize lookup-and-create for one evaluated action.
+
+    PostgreSQL advisory transaction locks coordinate all API workers without a
+    schema migration. SQLite is only supported for tests and local development,
+    where an in-process lock provides the same critical section.
+    """
+    bind = db.get_bind()
+    if bind.dialect.name == "postgresql":
+        lock_id = int.from_bytes(
+            hashlib.sha256(dedupe_key.encode()).digest()[:8],
+            byteorder="big",
+            signed=True,
+        )
+        await db.execute(
+            text("SELECT pg_advisory_xact_lock(:lock_id)"),
+            {"lock_id": lock_id},
+        )
+        yield
+        return
+
+    lock = _SQLITE_POLICY_APPROVAL_LOCKS.get(dedupe_key)
+    if lock is None:
+        lock = asyncio.Lock()
+        _SQLITE_POLICY_APPROVAL_LOCKS[dedupe_key] = lock
+    async with lock:
+        yield
+
+
 def _approval_payload(
     context: PolicyEvaluationContext,
     result: PolicyEvaluationResult,
@@ -288,23 +339,24 @@ async def evaluate_policies_and_request_approval(
 
     dedupe_key = _policy_approval_dedupe_key(context, result, user)
     response.approval_dedupe_key = dedupe_key
-    existing = await _find_existing_policy_approval(db, dedupe_key=dedupe_key)
-    if existing is not None:
-        response.approval_request = existing
-        return response
+    async with _policy_approval_creation_lock(db, dedupe_key=dedupe_key):
+        existing = await _find_existing_policy_approval(db, dedupe_key=dedupe_key)
+        if existing is not None:
+            response.approval_request = existing
+            return response
 
-    approval = await create_approval_record(
-        ApprovalCreate(
-            agent_id=context.agent_id or "",
-            session_id=context.session_id or context.run_id or "",
-            action_type=context.tool or "policy.require_approval",
-            payload=_approval_payload(context, result, dedupe_key),
-        ),
-        db,
-        user,
-    )
-    response.approval_request = approval
-    response.approval_created = True
+        approval = await create_approval_record(
+            ApprovalCreate(
+                agent_id=context.agent_id or "",
+                session_id=context.session_id or context.run_id or "",
+                action_type=context.tool or "policy.require_approval",
+                payload=_approval_payload(context, result, dedupe_key),
+            ),
+            db,
+            user,
+        )
+        response.approval_request = approval
+        response.approval_created = True
     return response
 
 
