@@ -80,12 +80,12 @@ npm run generate-types
 ```bash
 ruff check src/api cli sdk
 ruff check src/api/routes/agents.py
-black --check src/api cli sdk
-black src/api/routes/agents.py
+ruff format --check src/api cli sdk src/security
+ruff format src/api/routes/agents.py
 python -m compileall src/api cli sdk/mutx
 ```
 
-* If `ruff` or `black` is missing, install dev extras with `pip install -e ".[dev]"`.
+* If `ruff` is missing, install dev extras with `pip install -e ".[dev]"`.
 
 **Pytest API tests**
 

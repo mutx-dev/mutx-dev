@@ -102,7 +102,7 @@ npm run build
 
 ```bash
 ruff check src/api cli sdk
-black --check src/api cli sdk
+ruff format --check src/api cli sdk src/security
 python3 -m compileall src/api cli sdk/mutx
 ```
 
