@@ -257,6 +257,7 @@ export function RebrandHomePage() {
                     src="/landing/webp/victory-core.webp"
                     alt="MUTX control surface"
                     fill
+                    loading="eager"
                     sizes="(max-width: 900px) 90vw, 44vw"
                     className={styles.instrumentImageAsset}
                   />
