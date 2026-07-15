@@ -1,0 +1,4 @@
+docs/api/openapi.json linguist-generated=true
+app/types/api.ts linguist-generated=true
+lib/pico/generatedContent.ts linguist-generated=true
+next-env.d.ts linguist-generated=true
