@@ -19,7 +19,7 @@ export default function DashboardPage() {
             iconTone="text-cyan-300 bg-cyan-400/10"
             badge="workspace overview"
             stats={[
-              { label: "Route", value: "/dashboard" },
+              { label: "Workspace", value: "Browser" },
               { label: "Data", value: "Live API", tone: "success" },
             ]}
           />

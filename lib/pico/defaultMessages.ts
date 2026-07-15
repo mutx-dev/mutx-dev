@@ -413,9 +413,9 @@ export function getPicoDefaultMessages() {
         stackFooterDocs: 'visible docs and',
         stackFooterStacks: 'tracked stack briefings.',
         finalLabel: 'Next move',
-        finalTitle: 'Need help choosing the right setup?',
-        finalBody: 'Start free if you want to inspect Pico. Talk to support if you need help with API keys, hosting, integrations, or a custom implementation.',
-        finalPrimary: 'Talk to support',
+        finalTitle: 'Need help choosing?',
+        finalBody: 'If the question is urgency, plan fit, or rollout shape, support should answer it directly and send you back into the right Pico route.',
+        finalPrimary: 'Open support lane',
         finalSecondary: 'Return to landing',
       },
       auth: {

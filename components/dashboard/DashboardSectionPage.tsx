@@ -72,9 +72,8 @@ export function DashboardSectionPage({
                   className="mt-4 max-w-3xl text-sm leading-7"
                   style={{ color: dashboardTokens.textSubtle }}
                 >
-                  The shell is stable. The next additions should read like an operating ledger,
-                  not placeholder product chrome: one live surface, one source of truth, one
-                  useful next action.
+                  Each section centers one live capability, the state behind it, and the next
+                  useful action.
                 </p>
               </div>
 

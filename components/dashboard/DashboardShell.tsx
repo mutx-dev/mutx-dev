@@ -180,9 +180,9 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
 
     if (!isDesktop) {
       return {
-        eyebrow: "web access",
-        title: "MUTX dashboard",
-        detail: "Review agents, runs, keys, alerts, and setup state from one workspace.",
+        eyebrow: "web workspace",
+        title: "MUTX operator workspace",
+        detail: "Review runs, deployments, and policy from the browser. Machine-local actions stay in the desktop app.",
       };
     }
 
@@ -365,7 +365,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
       <div className="rounded-[24px] border border-[rgba(191,219,254,0.1)] bg-[linear-gradient(180deg,#121a29_0%,#0a0f18_100%)] px-3.5 py-4">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#93c5fd]">
-            Workspace memo
+            Runtime status
           </p>
           <span className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#0f1728] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#dbeafe]">
             {isDesktop ? "desktop" : "web"}

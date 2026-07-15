@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { AlertTriangle, ArrowRight, Lock, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
@@ -255,8 +256,8 @@ export function LiveAuthRequired({
   const displayTitle = title.replace(/^Operator session/i, "Sign-in");
 
   return (
-    <LivePanel title={displayTitle} meta="auth required">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(260px,0.92fr)]">
+    <LivePanel title={title} meta="auth required">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(280px,0.92fr)]">
         <div
           className="rounded-[24px] border p-5"
           style={{
@@ -291,14 +292,29 @@ export function LiveAuthRequired({
               <p className="mt-2 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
                 {message}
               </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Link
+                  href="/login?next=%2Fdashboard"
+                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#60a5fa] bg-[#60a5fa] px-4 text-xs font-semibold text-[#07111e] transition hover:-translate-y-0.5 hover:bg-[#93c5fd]"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register?next=%2Fdashboard"
+                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-[rgba(191,219,254,0.18)] bg-[#101722] px-4 text-xs font-semibold text-[#dbeafe] transition hover:border-[#60a5fa]"
+                >
+                  Create account
+                </Link>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="grid gap-3">
           {[
-            "Open setup or sign back in with the account for this workspace.",
-            "After sign-in, this page loads live data from the control plane.",
+            "Fleet health and current deployment state.",
+            "Recent runs, alerts, and budget pressure.",
+            "The permissions attached to your account.",
           ].map((note) => (
             <div
               key={note}

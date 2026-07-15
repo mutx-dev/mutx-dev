@@ -1,61 +1,128 @@
-import Link from "next/link";
-import { marketingPublicRailLinks } from "@/lib/marketingContent";
+"use client";
 
-export function PublicNav() {
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight, ChevronRight, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+
+import styles from "./PublicNav.module.css";
+
+const NAV_ITEMS = [
+  { label: "Docs", href: "/docs" },
+  { label: "Releases", href: "/releases" },
+  { label: "Contact", href: "/contact" },
+];
+
+const PRODUCT_LINKS = [
+  { label: "Control plane", href: "/ai-agent-control-plane", note: "Run the fleet" },
+  { label: "Monitoring", href: "/ai-agent-monitoring", note: "Read every run" },
+  { label: "Guardrails", href: "/ai-agent-guardrails", note: "Stop risky actions" },
+  { label: "Governance", href: "/ai-agent-governance", note: "Set the boundary" },
+  { label: "Cost", href: "/ai-agent-cost", note: "Control spend" },
+  { label: "Deployment", href: "/ai-agent-deployment", note: "Ship with proof" },
+];
+
+export function PublicNav({ overlay = false }: { overlay?: boolean }) {
+  const pathname = usePathname() ?? "/";
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <div className="sticky top-0 z-30 px-4 pt-4 sm:px-6">
-      <nav
-        data-testid="public-auth-nav"
-        aria-label="Public navigation"
-        className="mx-auto flex w-full max-w-[1360px] items-center justify-between gap-4 rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(10,9,12,0.78)] px-3 py-2.5 text-[#f7f0e4] shadow-[0_20px_60px_rgba(2,2,5,0.32)] backdrop-blur-xl"
-      >
-        <Link
-          href="/"
-          className="inline-flex min-w-0 items-center gap-3 rounded-full border border-[rgba(255,240,214,0.08)] bg-[rgba(255,248,236,0.04)] px-2.5 py-2 pr-4 transition hover:border-[rgba(212,171,115,0.28)] hover:bg-[rgba(255,248,236,0.06)]"
-        >
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(212,171,115,0.2)] bg-[radial-gradient(circle_at_top,rgba(212,171,115,0.2),transparent_58%),linear-gradient(180deg,rgba(255,248,236,0.08),rgba(255,248,236,0.02))]">
-            <img src="/logo.webp" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
+    <header className={`${styles.nav} ${overlay ? styles.overlay : ""}`}>
+      <div className={styles.navInner}>
+        <Link href="/" className={styles.brand} aria-label="MUTX home">
+          <span className={styles.brandMark}>
+            <Image src="/logo.webp" alt="" aria-hidden="true" width={22} height={22} />
           </span>
-          <span className="grid min-w-0">
-            <span className="truncate font-[family:var(--font-site-display)] text-[1rem] leading-none tracking-[-0.06em]">
-              MUTX
-            </span>
-            <span className="font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.22em] text-[rgba(232,221,203,0.56)]">
-              deployed agents
-            </span>
+          <span className={styles.brandCopy}>
+            <span className={styles.brandName}>MUTX</span>
+            <span className={styles.brandDescriptor}>agent operations</span>
           </span>
         </Link>
 
-        <div className="hidden items-center gap-2 xl:flex">
-          {marketingPublicRailLinks.map((link) =>
-            link.external ? (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full px-4 py-2 text-[13px] text-[rgba(232,221,203,0.76)] transition hover:bg-[rgba(255,248,236,0.06)] hover:text-[#f7f0e4]"
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full px-4 py-2 text-[13px] text-[rgba(232,221,203,0.76)] transition hover:bg-[rgba(255,248,236,0.06)] hover:text-[#f7f0e4]"
-              >
-                {link.label}
-              </Link>
-            ),
-          )}
-        </div>
+        <nav className={styles.navLinks} aria-label="Primary navigation">
+          <div className={styles.productCluster}>
+            <Link
+              href="/ai-agent-control-plane"
+              className={`${styles.navLink} ${pathname.startsWith("/ai-agent-") ? styles.navLinkActive : ""}`}
+            >
+              Product
+            </Link>
+            <div className={styles.productMenu}>
+              <div className={styles.productMenuIntro}>
+                <span>Agent operations</span>
+                <strong>One system for the work after the prompt.</strong>
+              </div>
+              <div className={styles.productMenuGrid}>
+                {PRODUCT_LINKS.map((item, index) => (
+                  <Link key={item.href} href={item.href}>
+                    <span className={styles.productIndex}>{String(index + 1).padStart(2, "0")}</span>
+                    <span>
+                      <strong>{item.label}</strong>
+                      <small>{item.note}</small>
+                    </span>
+                    <ChevronRight aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${styles.navLink} ${pathname === item.href || pathname.startsWith(`${item.href}/`) ? styles.navLinkActive : ""}`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
-          <span className="rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(255,248,236,0.03)] px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-[rgba(232,221,203,0.6)]">
-            platform / docs / pico
-          </span>
+        <div className={styles.navActions}>
+          <Link href="/download" className={styles.quietAction}>Download</Link>
+          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className={styles.picoAction}>
+            <span className={styles.liveDot} />
+            Pico beta status
+            <ArrowUpRight aria-hidden="true" />
+          </a>
+          <button
+            type="button"
+            className={styles.menuButton}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((open) => !open)}
+          >
+            {mobileOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </button>
         </div>
-      </nav>
-    </div>
+      </div>
+
+      {mobileOpen ? (
+        <nav className={styles.mobileMenu} aria-label="Mobile navigation">
+          <p className={styles.mobileLabel}>Product</p>
+          {PRODUCT_LINKS.map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
+              {item.label}
+              <ChevronRight aria-hidden="true" />
+            </Link>
+          ))}
+          <p className={styles.mobileLabel}>Company</p>
+          {NAV_ITEMS.map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
+              {item.label}
+              <ChevronRight aria-hidden="true" />
+            </Link>
+          ))}
+          <Link href="/download" onClick={() => setMobileOpen(false)}>
+            Download
+            <ChevronRight aria-hidden="true" />
+          </Link>
+          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>
+            Pico beta status
+            <ArrowUpRight aria-hidden="true" />
+          </a>
+        </nav>
+      ) : null}
+    </header>
   );
 }

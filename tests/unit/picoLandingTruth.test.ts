@@ -14,17 +14,17 @@ describe('pico landing copy', () => {
     expect(JSON.stringify(picoMessages)).not.toMatch(preregPattern)
   })
 
-  it('keeps the commercial ladder aligned with setup and support', () => {
-    const picoMessages = en.pico
+  it('keeps the commercial ladder aligned with build, fix, and control', () => {
+    const truthMessages = en.pico
+    const livePlans = truthMessages.pricingPage.livePlans
 
-    expect(picoMessages.platform.title).toMatch(/find the blocker/i)
-    expect(JSON.stringify(picoMessages.pricing)).toMatch(/90%/i)
-    expect(JSON.stringify(picoMessages.pricing)).toMatch(/€29/)
-    expect(JSON.stringify(picoMessages.pricing)).toMatch(/€290/)
-    expect(JSON.stringify(picoMessages.pricing)).toMatch(/€79/)
-    expect(JSON.stringify(picoMessages.pricing)).toMatch(/€790/)
-    expect(JSON.stringify(picoMessages.pricing)).toMatch(/€1,000\+/)
-    expect(JSON.stringify(picoMessages.pricing)).toMatch(/€10,000\+/)
+    expect(truthMessages.platform.title).toMatch(/build, fix, or control/i)
+    expect(livePlans.tiers.free.price).toBe('$0')
+    expect(livePlans.tiers.starter.price).toBe('$9')
+    expect(livePlans.tiers.pro.price).toBe('$29')
+    expect(livePlans.tiers.enterprise.price).toBe('Custom')
+    expect(livePlans.tiers.starter.features).toContain('1,000 monthly credits')
+    expect(livePlans.tiers.pro.features).toContain('10,000 monthly credits')
   })
 
   it('keeps onboarding href helpers host-aware for protected Pico routes', () => {

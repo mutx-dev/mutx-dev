@@ -176,6 +176,7 @@ export default async function ReleasesPage() {
                   src="/landing/webp/running-agent.webp"
                   alt="MUTX runtime scene showing the operator lane in motion"
                   fill
+                  priority
                   sizes="(max-width: 1024px) 100vw, 34rem"
                   className={styles.routeVisualImage}
                 />

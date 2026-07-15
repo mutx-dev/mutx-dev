@@ -14,7 +14,6 @@ import {
   picoClasses,
   picoCodex,
   picoCodexFrame,
-  picoCodexNote,
   picoCodexSheet,
   picoEmber,
   picoInset,
@@ -27,18 +26,6 @@ import { usePicoHref } from '@/lib/pico/navigation'
 import { picoRobotArtById } from '@/lib/picoRobotArt'
 import { cn } from '@/lib/utils'
 
-type AccessTierContent = {
-  name: string
-  price: string
-  period: string
-  description: string
-  features: string[]
-  cta: string
-  anchorPrice?: string
-  priceNote?: string
-  recommended?: boolean
-}
-
 type LivePlanId = 'free' | 'starter' | 'pro' | 'enterprise'
 
 type LivePlanContent = {
@@ -49,8 +36,6 @@ type LivePlanContent = {
   features: string[]
   cta: string
 }
-
-const ACCESS_TIER_IDS = ['trial', 'starter', 'pro', 'enterprise'] as const
 
 const LIVE_PLAN_CONFIG: Array<{
   id: LivePlanId
@@ -119,11 +104,6 @@ export function PicoPricingPage() {
   const packSnapshot = generated.packSnapshot
   const currentPlanId =
     session.status === 'authenticated' ? session.user.plan?.toLowerCase() ?? null : null
-
-  const accessPlans = ACCESS_TIER_IDS.map((id) => ({
-    id,
-    ...(pageT.raw(`accessPlans.tiers.${id}`) as AccessTierContent),
-  }))
 
   const accessTruths = pageT.raw('accessPlans.truths') as string[]
 
@@ -344,124 +324,6 @@ export function PicoPricingPage() {
 
           <main className="mt-6 space-y-6">
             <PicoSessionBanner session={session} nextPath={pathname} />
-
-            <section
-              className={picoPanel('overflow-hidden')}
-              data-testid="pico-pricing-access-lanes"
-            >
-              <div className="grid gap-6 px-6 py-6 sm:px-7 lg:grid-cols-[minmax(0,0.82fr),minmax(0,1.18fr)]">
-                <div className="grid gap-4">
-                  <div>
-                    <p className={picoClasses.label}>{pageT('accessPlans.label')}</p>
-                    <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
-                      {pageT('accessPlans.title')}
-                    </h2>
-                    <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
-                      {pageT('accessPlans.body')}
-                    </p>
-                  </div>
-
-                  <div className={picoCodexNote('p-4 sm:p-5')}>
-                    <p className={picoClasses.label}>{pageT('accessPlans.noteLabel')}</p>
-                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      {pageT('accessPlans.note')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 xl:grid-cols-4">
-                  {accessPlans.map((plan) => {
-                    const isHighlighted = plan.recommended ?? false
-
-                    return (
-                      <article
-                        key={plan.id}
-                        className={cn(
-                          picoInset('flex h-full flex-col gap-5 p-5'),
-                          isHighlighted &&
-                            'border-[color:var(--pico-border-hover)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.16),rgba(10,19,11,0.34))] shadow-[0_24px_56px_rgba(var(--pico-accent-rgb),0.08)]',
-                        )}
-                      >
-                        <div className="grid gap-4">
-                          <div className="flex flex-wrap items-center justify-between gap-3">
-                            <p className="text-sm font-semibold text-[color:var(--pico-text)]">
-                              {plan.name}
-                            </p>
-                            {isHighlighted ? (
-                              <span className={picoClasses.chip}>{pageT('accessPlans.recommended')}</span>
-                            ) : null}
-                          </div>
-
-                          <div className="grid gap-1">
-                            {plan.anchorPrice ? (
-                              <span className="text-sm font-semibold tracking-[0.01em] text-[rgba(255,255,255,0.48)] [text-decoration:line-through] [text-decoration-color:rgba(var(--pico-accent-rgb),0.7)]">
-                                {plan.anchorPrice}
-                              </span>
-                            ) : null}
-                            <div className="flex items-end gap-2">
-                              <span className="font-[family:var(--font-site-display)] text-5xl leading-none tracking-[-0.07em] text-[color:var(--pico-text)]">
-                                {plan.price}
-                              </span>
-                              <span className="pb-1 text-sm text-[color:var(--pico-text-muted)]">
-                                {plan.period}
-                              </span>
-                            </div>
-                          </div>
-
-                          {plan.priceNote ? (
-                            <p className="text-xs leading-5 text-[color:var(--pico-accent-bright)]">
-                              {plan.priceNote}
-                            </p>
-                          ) : null}
-
-                          <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                            {plan.description}
-                          </p>
-                        </div>
-
-                        <ul className="grid gap-3">
-                          {plan.features.map((feature) => (
-                            <li
-                              key={feature}
-                              className="flex items-start gap-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]"
-                            >
-                              <Check className="mt-1 h-4 w-4 flex-shrink-0 text-[color:var(--pico-accent)]" />
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-
-                        <div className="mt-auto pt-2">
-                          {plan.id === 'enterprise' ? (
-                            <Link href={toHref('/support')} className={picoClasses.secondaryButton}>
-                              {plan.cta}
-                            </Link>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (plan.id === 'trial' || plan.id === 'starter') {
-                                  openPricingForm('build')
-                                  return
-                                }
-
-                                openPricingForm('fix')
-                              }}
-                              className={cn(
-                                'w-full',
-                                isHighlighted ? picoClasses.primaryButton : picoClasses.secondaryButton,
-                              )}
-                            >
-                              {plan.cta}
-                            </button>
-                          )}
-                        </div>
-                      </article>
-                    )
-                  })}
-                </div>
-              </div>
-            </section>
 
             <section className={picoPanel('overflow-hidden')} data-testid="pico-pricing-live-plans">
               <div className="border-b border-[color:var(--pico-border)] px-6 py-4 sm:px-7">
