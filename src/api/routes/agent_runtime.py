@@ -23,7 +23,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_agent, get_current_user
+from src.api.auth.dependencies import get_current_agent, get_current_user
 from src.api.models import (
     Agent,
     AgentLog,

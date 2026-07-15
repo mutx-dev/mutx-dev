@@ -10,7 +10,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import User
 from src.api.services.policy_store import Policy, PolicyStore, get_policy_store
 

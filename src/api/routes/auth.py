@@ -12,7 +12,7 @@ from src.api.database import get_db
 from src.api.models.models import User
 from src.api.services.user_service import UserService
 from src.api.services.analytics import log_analytics_event, AnalyticsEventType
-from src.api.middleware.auth import get_current_user, get_current_user_optional
+from src.api.auth.dependencies import get_current_user, get_current_user_optional
 from src.api.auth.jwt import (
     issue_token_pair,
     revoke_refresh_token,

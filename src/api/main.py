@@ -345,7 +345,7 @@ def _build_lifespan(
 
 def _register_application_routes(app: FastAPI) -> None:
     from fastapi import Depends
-    from src.api.dependencies import get_current_user
+    from src.api.auth.dependencies import get_current_sso_user
 
     app.include_router(metrics_router, tags=["monitoring"])
 
@@ -360,7 +360,7 @@ def _register_application_routes(app: FastAPI) -> None:
     # Register private routes with authentication
     for registration in PRIVATE_ROUTE_REGISTRATIONS:
         include_kwargs: dict[str, object] = {
-            "dependencies": [Depends(get_current_user)],
+            "dependencies": [Depends(get_current_sso_user)],
         }
         if registration.prefix:
             include_kwargs["prefix"] = registration.prefix

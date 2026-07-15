@@ -140,6 +140,21 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("APPLE_PRIVATE_KEY"),
     )
+    oidc_issuer: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("OIDC_ISSUER"),
+        description="Expected issuer for externally issued OIDC tokens.",
+    )
+    oidc_client_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("OIDC_CLIENT_ID"),
+        description="Expected audience for externally issued OIDC tokens.",
+    )
+    oidc_jwks_uri: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("OIDC_JWKS_URI"),
+        description="JWKS endpoint used to verify externally issued OIDC tokens.",
+    )
     database_required_on_startup: bool = Field(
         default=False,
         validation_alias=AliasChoices(
@@ -472,6 +487,18 @@ class Settings(BaseSettings):
             errors.append(
                 "SECRET_ENCRYPTION_KEY must not match JWT_SECRET. "
                 "Use a dedicated encryption key to keep token signing and secret encryption separate."
+            )
+
+        # OIDC is optional, but partial configuration is unsafe and unusable.
+        oidc_values = {
+            "OIDC_ISSUER": self.oidc_issuer,
+            "OIDC_CLIENT_ID": self.oidc_client_id,
+            "OIDC_JWKS_URI": self.oidc_jwks_uri,
+        }
+        if any(oidc_values.values()) and not all(oidc_values.values()):
+            missing = ", ".join(name for name, value in oidc_values.items() if not value)
+            errors.append(
+                f"OIDC configuration must be provided as a complete set. Missing: {missing}"
             )
 
         # Validate DATABASE_URL when database is required on startup

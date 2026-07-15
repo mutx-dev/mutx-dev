@@ -230,7 +230,9 @@ Set the following environment variables to enable OIDC validation:
 | `OIDC_CLIENT_ID` | Expected `aud` claim for your MUTX client | `0oa1abc2def3ghi4jkl5` |
 | `OIDC_JWKS_URI` | JWKS endpoint for public key retrieval | `https://your-org.okta.com/oauth2/v1/keys` |
 
-These map to the provider configuration resolved in `src/api/services/auth.py`. Each supported provider has a well-known OIDC config and JWKS URL template built in:
+Set all three values together. They map to `src/api/auth/oidc.py`, the canonical
+OIDC validator. Provider-specific SSO callbacks also retain well-known OIDC
+config and JWKS URL templates:
 
 ```python
 PROVIDER_OIDC_CONFIG = {
@@ -243,10 +245,13 @@ PROVIDER_OIDC_CONFIG = {
 
 ### Validation Flow
 
-1. **JWKS fetch** -- The server fetches the provider's JWKS from the configured URI and caches matching public keys.
+1. **JWKS fetch** -- The server fetches the provider's JWKS from the configured URI and caches the document for one hour per URI.
 2. **Signature check** -- The token's RS256/ES256 signature is verified against the matching JWKS key (by `kid`).
-3. **Claims validation** -- The `iss` (issuer) and `exp` (expiry) claims are validated. If `OIDC_CLIENT_ID` is set, the `aud` (audience) claim is also checked.
-4. **Fallback** -- If the token cannot be verified as a JWT (opaque access tokens), the server falls back to the provider's `/userinfo` endpoint.
+3. **Claims validation** -- The `iss` (issuer), `aud` (audience), and `exp` (expiry) claims are validated.
+
+The configured OIDC path fails closed when signature or claim validation fails.
+The legacy provider-specific callback can still use `/userinfo` for opaque
+access tokens when the canonical `OIDC_*` settings are not enabled.
 
 ### OIDC-to-SSOTokenUser Mapping
 
@@ -268,7 +273,9 @@ Role extraction checks multiple claim locations in order:
 - `realm_access.roles` (Keycloak)
 - `resource_access.roles` (Keycloak)
 
-See `src/api/services/auth.py` (`_extract_roles_from_payload`) and `src/api/dependencies.py` (`SSOTokenUser`) for the full implementation.
+See `src/api/auth/oidc.py` for validation and claim normalization and
+`src/api/auth/dependencies.py` for the canonical route dependency facade and
+`SSOTokenUser` mapping.
 
 ## Token Lifetimes
 

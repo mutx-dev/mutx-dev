@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import User
 from src.api.models.schemas import OnboardingStateResponse, OnboardingUpdateRequest
 from src.api.services.operator_state import get_onboarding_state, update_onboarding_state

@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user, get_current_user_optional, require_plan
+from src.api.auth.dependencies import get_current_user, get_current_user_optional, require_plan
 from src.api.models import User
 from src.api.models.pico_onboarding import (
     CoachMessage,

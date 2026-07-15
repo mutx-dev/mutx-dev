@@ -26,7 +26,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel, Field
 
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import User
 from src.security import (
     ActionMediator,

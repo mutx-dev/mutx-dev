@@ -14,7 +14,7 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import UsageEvent, Agent, User
 from src.api.services.billing import get_current_billing_period, get_plan_credits, get_usage_credits
 

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from src.api.config import get_settings
 from src.api.integrations.local_embeddings import LocalHashEmbeddings
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import User
 from src.api.services.usage import track_usage_best_effort
 
