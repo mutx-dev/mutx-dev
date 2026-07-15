@@ -242,9 +242,36 @@ function NavItem({ item, pathname }: NavItemProps) {
   );
 }
 
-export function DocsLayout({ nav, children }: DocsLayoutProps) {
+export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
   useDocsLiveReload();
   const pathname = usePathname();
+  const editorialRoutes = ['/manifesto', '/whitepaper', '/roadmap'];
+  const resourceRoutes = ['/infrastructure', '/sdk', '/security', '/support'];
+  const isEditorial = editorialRoutes.includes(pathname);
+  const isResource = resourceRoutes.includes(pathname);
+  const isStandalone = isEditorial || isResource;
+  const standaloneDescriptions: Record<string, string> = {
+    '/manifesto': 'What MUTX believes about autonomous software, operational trust, and the work after the demo.',
+    '/whitepaper': 'The architecture, operating model, and technical choices behind MUTX.',
+    '/roadmap': 'What is shipping now, what comes next, and what remains deliberately out of scope.',
+    '/infrastructure': 'The production foundation for running MUTX across containers, clusters, and monitored environments.',
+    '/sdk': 'Build agents, deployments, keys, and webhooks with the MUTX Python client.',
+    '/security': 'How to report a vulnerability, what the policy covers, and what happens next.',
+    '/support': 'The fastest path to help with setup, bugs, security, or a product decision.',
+  };
+  const standaloneDescription = standaloneDescriptions[pathname] ?? '';
+  const standaloneLinks = isEditorial
+    ? [
+        { label: 'Manifesto', href: '/manifesto' },
+        { label: 'Whitepaper', href: '/whitepaper' },
+        { label: 'Roadmap', href: '/roadmap' },
+      ]
+    : [
+        { label: 'Infrastructure', href: '/infrastructure' },
+        { label: 'Python SDK', href: '/sdk' },
+        { label: 'Security', href: '/security' },
+        { label: 'Support', href: '/support' },
+      ];
 
   function handleNavigate() {
     document.documentElement.removeAttribute('data-mobile-nav-open');
@@ -252,7 +279,7 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
   return (
     <DocsNavContext.Provider value={{ nav, onNavigate: handleNavigate }}>
-    <div className="docs-shell">
+    <div className={`docs-shell${isStandalone ? ' docs-shell-standalone' : ''}${isResource ? ' docs-shell-resource' : ''}`}>
       {/* ── Top header ── */}
       <header className="docs-header">
         <button
@@ -353,9 +380,13 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
         >
           GitHub
         </a>
-        <span style={{ color: 'var(--gb-text-3)' }}>·</span>
-        <a href="https://mutx.dev" className="docs-header-link">
-          mutx.dev
+        <span className="docs-header-divider" style={{ color: 'var(--gb-text-3)' }}>·</span>
+        <Link href="/" className="docs-header-link">
+          MUTX site
+        </Link>
+        <span className="docs-header-divider" style={{ color: 'var(--gb-text-3)' }}>·</span>
+        <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className="docs-header-link">
+          Pico beta
         </a>
       </header>
 
@@ -388,6 +419,26 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
         <main className="docs-content">
           <div className="docs-content-shell">
             <DocsBreadcrumbs />
+            {isStandalone ? (
+              <header className="docs-standalone-masthead">
+                <div>
+                  <p className="docs-standalone-kicker">MUTX / {title}</p>
+                  <h1 className="docs-standalone-title">{title}</h1>
+                  <p className="docs-standalone-description">{standaloneDescription}</p>
+                </div>
+                <nav className="docs-standalone-rail" aria-label={isEditorial ? 'MUTX long-form pages' : 'MUTX resources'}>
+                  {standaloneLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={pathname === item.href ? 'active' : undefined}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+              </header>
+            ) : null}
             {children}
           </div>
         </main>

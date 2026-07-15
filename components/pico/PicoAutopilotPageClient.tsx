@@ -757,8 +757,8 @@ export function PicoAutopilotPageClient() {
     >
       <PicoSessionBanner session={session} nextPath={pathname} />
       <PicoSurfaceCompass
-        title="Use Autopilot after setup is running"
-        body="Autopilot is for current runs, spend, alerts, and approvals. If setup is still incomplete, go back to Academy or Tutor. If hosting, keys, or implementation are unclear, get human help."
+        title="Use live signals to make the next call"
+        body="Autopilot shows the current run, spend, alerts, and approvals. Go back to Academy for setup guidance, or send the evidence to support when the signal is not enough."
         status={
           authRequired
             ? 'hosted session required'
@@ -1114,7 +1114,7 @@ export function PicoAutopilotPageClient() {
             </div>
             <div className={picoSoft('mt-4 p-4')}>
               <p className={picoClasses.body}>
-                Stay here when runtime state is the blocker. If setup is still incomplete, return to Academy.
+                Use Academy to finish setup. Return here when you need to inspect a live run.
               </p>
             </div>
           </section>
@@ -1475,7 +1475,7 @@ export function PicoAutopilotPageClient() {
                   {alerts.length > visibleAlerts.length ? (
                     <div className={picoSoft('p-4')}>
                       <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                        {alerts.length - visibleAlerts.length} additional alert{alerts.length - visibleAlerts.length === 1 ? '' : 's'} are hidden so the feed stays focused.
+                        {alerts.length - visibleAlerts.length} additional alert{alerts.length - visibleAlerts.length === 1 ? '' : 's'} hidden. Resolve the visible alerts first.
                       </p>
                     </div>
                   ) : null}
@@ -1493,7 +1493,7 @@ export function PicoAutopilotPageClient() {
             Risky actions and their decisions
           </h2>
           <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            This queue keeps approval requests visible across the Pico session.
+            Decisions persist across restarts, so every risky action keeps its review history.
           </p>
 
           <div className="mt-5 space-y-4">

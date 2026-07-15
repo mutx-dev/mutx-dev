@@ -86,6 +86,7 @@ export default function ContactPage() {
                   src="/marketing/call-me.png"
                   alt="Contact MUTX"
                   fill
+                  priority
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className={styles.contactHeroImage}
                 />

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -14,13 +14,22 @@ import {
   getCanonicalUrl,
   getSiteUrl,
 } from "@/lib/seo";
-import { type DocNavItem, parseSummary } from "@/lib/docs";
+import { type DocNavItem, flatNav, parseSummary } from "@/lib/docs";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
 
 function docsDir() {
   return path.join(process.cwd(), "docs");
+}
+
+function isPublishedDocSlug(slugSegments: string[]): boolean {
+  if (slugSegments.length === 0 || (slugSegments.length === 1 && slugSegments[0] === "README")) {
+    return true;
+  }
+
+  const route = `/docs/${slugSegments.join("/")}`;
+  return flatNav(parseSummary()).some((item) => item.route === route);
 }
 
 // Root-level content directories (mirrored from repo root, not inside docs/)
@@ -309,6 +318,7 @@ export async function generateMetadata({
   params: Promise<{ slug?: string[] }>;
 }): Promise<Metadata> {
   const { slug = [] } = await params;
+  if (!isPublishedDocSlug(slug)) return { title: "Not Found" };
   const filePath = resolveSlug(slug);
   if (!filePath) return { title: "Not Found" };
 
@@ -350,19 +360,19 @@ const FEATURED = [
     desc: "See the code-accurate map behind the app, backend, CLI, SDK, and infrastructure.",
   },
   {
-    title: "Autonomous Agent Team",
-    href: "/docs/agents",
-    desc: "Understand the specialist agent roles, ownership boundaries, and review-safe shipping model.",
+    title: "API Reference",
+    href: "/docs/reference",
+    desc: "Work from the public authentication, agent, deployment, and webhook contracts.",
   },
   {
-    title: "AI Agent Cost Management",
-    href: "/ai-agent-cost",
-    desc: "Learn how MUTX handles LLM spend tracking, attribution, and budget enforcement.",
+    title: "Python SDK",
+    href: "/docs/sdk",
+    desc: "Connect Python services and agents to MUTX without rebuilding the transport layer.",
   },
   {
-    title: "AI Agent Approvals",
-    href: "/ai-agent-approvals",
-    desc: "See how human-in-the-loop approval workflows and authorization gates work in the control plane.",
+    title: "Troubleshooting",
+    href: "/docs/troubleshooting",
+    desc: "Diagnose common setup, runtime, and deployment failures with direct checks.",
   },
 ];
 
@@ -373,7 +383,6 @@ const AREA_LABELS: Record<string, string> = {
   deployment: "Deployment",
   releases: "Releases",
   troubleshooting: "Troubleshooting",
-  agents: "Agents",
 };
 
 function DocsHomePage() {
@@ -461,10 +470,8 @@ function DocsHomePage() {
             <h2 className="docs-home-section-title">When docs drift, trust the executable system.</h2>
           </div>
           <p className="docs-home-truth">
-            Source of truth order: <code>src/api/routes/</code> for backend behavior,{" "}
-            <code>app/api/</code> for browser-facing proxy behavior, <code>app/</code> for site
-            and app surfaces, <code>cli/</code> for terminal workflows, and{" "}
-            <code>sdk/mutx/</code> for SDK behavior.
+            Use the API reference for contracts, the SDK guide for integration, and the
+            architecture section when you need to understand the system behind them.
           </p>
         </section>
       </div>
@@ -483,6 +490,10 @@ export default async function DocPage({
   // Also handle /docs/README which Next.js serves for docs/README.md
   if (slug.length === 0 || (slug.length === 1 && slug[0] === "README")) {
     return <DocsHomePage />;
+  }
+
+  if (!isPublishedDocSlug(slug)) {
+    redirect("/docs");
   }
 
   const filePath = resolveSlug(slug);
@@ -516,22 +527,6 @@ export default async function DocPage({
         <div className="docs-article-main">
           <DocsRenderer source={content} currentSlug={slug} />
           <PrevNextNav currentRoute={currentRoute} />
-          {data.icon && (
-            <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
-              Last updated via GitBook sync — source at{" "}
-              <a
-                href={`https://github.com/mutx-dev/mutx-dev/blob/main/${path.relative(
-                  process.cwd(),
-                  filePath
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-gray-600"
-              >
-                GitHub
-              </a>
-            </p>
-          )}
         </div>
         <TableOfContents sourceHeadings={headings} />
       </div>

@@ -579,7 +579,7 @@ export function PicoAcademyDashboard() {
               </span>
             </div>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-              The current track stays prominent. Other chapters stay visible without competing with the next setup step.
+              Stay on the current track without losing sight of what comes next.
             </p>
           </div>
 
@@ -766,9 +766,9 @@ export function PicoAcademyDashboard() {
         <section className={picoCodexFrame('px-6 py-6 sm:px-8')}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-                <p className={picoClasses.label}>Reference</p>
-                <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-                Extra tools stay below the active setup work
+              <p className={picoClasses.label}>Reference and settings</p>
+              <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                Open the deeper material only when you need it.
               </h2>
             </div>
             <span className={picoCodex.stamp}>
@@ -880,12 +880,17 @@ export function PicoAcademyDashboard() {
                 </div>
               </div>
 
-              <div className={picoCodexSheet('p-5')}>
-                <p className={picoClasses.label}>Account panel</p>
-                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  Platform memory stays available below the lesson flow. Academy leads with the setup step, saved output, and the next action.
-                </p>
-                <div className="mt-5">
+              <details className={picoCodexSheet('group p-5')}>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  <div>
+                    <p className={picoClasses.label}>Platform settings</p>
+                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      Manage Academy state, help, and saved progress.
+                    </p>
+                  </div>
+                  <span className={picoCodex.stamp}>open</span>
+                </summary>
+                <div className="mt-5 border-t border-[color:var(--pico-border)] pt-5">
                   <PicoPlatformSurface
                     session={session}
                     progress={progress}
@@ -904,7 +909,7 @@ export function PicoAcademyDashboard() {
                     currentPath={pathname}
                   />
                 </div>
-              </div>
+              </details>
             </div>
           </div>
         </section>

@@ -605,7 +605,12 @@ export function MarketingHomePage() {
                 </p>
                 <div className={home.picoActions}>
                   <ActionLink
-                    action={{ label: 'Open PicoMUTX', href: '/pico', tone: 'secondary' }}
+                    action={{
+                      label: 'Pico beta status',
+                      href: 'https://pico.mutx.dev',
+                      external: true,
+                      tone: 'secondary',
+                    }}
                     className={core.buttonPrimary}
                   />
                   <ActionLink

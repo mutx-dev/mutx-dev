@@ -124,8 +124,8 @@ export function PicoPlatformSurface({
             Identity, page memory, and limits in one place
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-            This account panel shows plan limits, the last Pico page used, and whether the interface
-            is set for a tighter workspace.
+            Review plan limits, your last workspace, and the display settings that keep Pico
+            focused on the work in front of you.
           </p>
         </div>
         <span className={picoClasses.chip}>{formatSyncState(syncState, ready)}</span>

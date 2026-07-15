@@ -94,7 +94,7 @@ export type MarketingHomepage = {
 
 const homepageActions: MarketingActionLink[] = [
   {
-    label: 'Go to PicoMUTX',
+    label: 'Pico beta status',
     href: 'https://pico.mutx.dev',
     external: true,
     tone: 'pico',
@@ -319,6 +319,9 @@ export const marketingPublicRailLinks: MarketingActionLink[] = [
 ]
 
 export const marketingFooterLinks: MarketingFooterLink[] = [
+  { label: 'Product', href: '/ai-agent-control-plane' },
+  { label: 'Monitoring', href: '/ai-agent-monitoring' },
+  { label: 'Guardrails', href: '/ai-agent-guardrails' },
   { label: 'Releases', href: '/releases' },
   { label: 'Docs', href: '/docs' },
   { label: 'GitHub', href: 'https://github.com/mutx-dev/mutx-dev', external: true },
@@ -326,11 +329,12 @@ export const marketingFooterLinks: MarketingFooterLink[] = [
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Contact', href: '/contact' },
   { label: 'Privacy', href: '/privacy-policy' },
+  { label: 'Security', href: '/security' },
 ]
 
 export const marketingFooterCallout: MarketingFooterCallout = {
-  title: 'YOUR AI AGENTS, UNDER CONTROL.',
-  body: 'Start with the Mac app and inspect one real run.',
+  title: 'See what your agents are doing.',
+  body: 'Open one run, follow every step, and keep the record.',
   action: {
     label: 'Download for Mac',
     href: '/download',
