@@ -5457,7 +5457,7 @@
           "events"
         ],
         "summary": "Ingest Event",
-        "description": "Accept structured events from SDK adapters (LangChain, CrewAI, AutoGen).\n\nWhen ``agent_id`` is provided the event is persisted as an ``AgentLog``\nfor audit trail; otherwise it is accepted and logged without persistent\nstorage.",
+        "description": "Accept structured events from SDK adapters (LangChain, CrewAI, AutoGen).",
         "operationId": "ingest_event_v1_events_post",
         "parameters": [
           {
@@ -5765,7 +5765,7 @@
           "ingest"
         ],
         "summary": "Ingest Event",
-        "description": "Canonical event ingestion endpoint for SDK adapters.\n\nAccepts structured events from LangChain, CrewAI, AutoGen, and future\nadapter integrations.  When ``agent_id`` is provided the event is\npersisted as an ``AgentLog`` for audit trail; otherwise it is accepted\nand logged without persistent storage (a dedicated events table is\nplanned for Wave 2).",
+        "description": "Accept structured events from SDK adapters through the legacy alias.",
         "operationId": "ingest_event_v1_ingest_events_post",
         "parameters": [
           {

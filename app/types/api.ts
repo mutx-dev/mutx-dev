@@ -1372,10 +1372,6 @@ export interface paths {
         /**
          * Ingest Event
          * @description Accept structured events from SDK adapters (LangChain, CrewAI, AutoGen).
-         *
-         *     When ``agent_id`` is provided the event is persisted as an ``AgentLog``
-         *     for audit trail; otherwise it is accepted and logged without persistent
-         *     storage.
          */
         post: operations["ingest_event_v1_events_post"];
         delete?: never;
@@ -1455,13 +1451,7 @@ export interface paths {
         put?: never;
         /**
          * Ingest Event
-         * @description Canonical event ingestion endpoint for SDK adapters.
-         *
-         *     Accepts structured events from LangChain, CrewAI, AutoGen, and future
-         *     adapter integrations.  When ``agent_id`` is provided the event is
-         *     persisted as an ``AgentLog`` for audit trail; otherwise it is accepted
-         *     and logged without persistent storage (a dedicated events table is
-         *     planned for Wave 2).
+         * @description Accept structured events from SDK adapters through the legacy alias.
          */
         post: operations["ingest_event_v1_ingest_events_post"];
         delete?: never;
