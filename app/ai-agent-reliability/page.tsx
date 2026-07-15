@@ -63,11 +63,11 @@ const structuredData = {
 const featureCards = [
   {
     title: "Health checks",
-    body: "Not just &ldquo;is the process running&rdquo; but &ldquo;is the agent responsive, is the control plane reachable, is the toolchain intact.&rdquo; MUTX confirms health before declaring an agent operational.",
+    body: "Not just “is the process running” but “is the agent responsive, is the control plane reachable, is the toolchain intact.” MUTX confirms health before declaring an agent operational.",
   },
   {
     title: "Readiness probes",
-    body: "An agent that just started isn&rsquo;t ready. MUTX defines readiness as an explicit state — context warmed, tools loaded, ready to handle requests.",
+    body: "An agent that just started isn’t ready. MUTX defines readiness as an explicit state — context warmed, tools loaded, ready to handle requests.",
   },
   {
     title: "Circuit breakers",
@@ -95,15 +95,14 @@ export default function AIAgentReliabilityPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Reliability</p>
                   <h1 className={feat.heroTitle}>
-                    Agents that
+                    Keep agents running
                     <br />
-                    survive production.
+                    when things go wrong.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Shipping an agent to production and hoping for the best
-                    isn&apos;t a reliability strategy. MUTX runs health probes,
-                    enforces circuit breakers, and routes around failures — so
-                    operators catch degradation before users report it.
+                    Health checks, circuit breakers, and clear failure records
+                    give operators something to act on before users report a
+                    problem.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -129,7 +128,7 @@ export default function AIAgentReliabilityPage() {
                 </h2>
                 <p className={feat.sectionBody}>
                   Most agent tooling assumes the model will behave. MUTX
-                  doesn&apos;t. Health checks, circuit breakers, and explicit
+                  doesn’t. Health checks, circuit breakers, and explicit
                   operational state give operators something to read and act on —
                   before the model has a bad day.
                 </p>
@@ -178,7 +177,7 @@ export default function AIAgentReliabilityPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Health checks are part of the deployment record. The agent
-                    isn&rsquo;t &ldquo;deployed&rdquo; in MUTX until it passes
+                    isn’t “deployed” in MUTX until it passes
                     its health probe — not just until the deploy command exits.
                   </p>
                 </div>

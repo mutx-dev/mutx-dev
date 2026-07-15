@@ -95,17 +95,14 @@ export default function AIAgentMonitoringPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Monitoring</p>
                   <h1 className={feat.heroTitle}>
-                    See what agents
+                    See what
                     <br />
-                    actually did.
+                    happened.
                   </h1>
                   <p className={feat.heroSupport}>
-                    When something breaks in production, you need to reason
-                    backward from what the agent actually executed — not forward
-                    from what the model promised. MUTX captures the full
-                    execution trace: model calls, tool invocations, context
-                    changes, and outcomes. Built for investigation, not just
-                    alerting.
+                    Follow model calls, tools, context changes, and outcomes in
+                    one trace. When something breaks, you have the sequence —
+                    not a guess based on what the model said.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -202,7 +199,7 @@ export default function AIAgentMonitoringPage() {
                   <p className={feat.featureCardBody}>
                     Traces feed the audit log. Every action recorded with enough
                     context to satisfy a compliance review — not a generic
-                    &ldquo;agent ran successfully&rdquo; entry.
+                    “agent ran successfully” entry.
                   </p>
                 </div>
               </div>

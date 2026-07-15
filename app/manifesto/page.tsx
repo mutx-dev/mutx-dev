@@ -5,6 +5,8 @@ import matter from "gray-matter";
 import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
 import { buildPageMetadata, buildWebPageStructuredData } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,7 +41,13 @@ export default async function ManifestoPage() {
       <article className="docs-prose">
         <div
           dangerouslySetInnerHTML={{
-            __html: String(await remark().use(remarkGfm).process(content)),
+            __html: String(
+              await remark()
+                .use(remarkGfm)
+                .use(remarkRehype)
+                .use(rehypeStringify)
+                .process(content),
+            ),
           }}
         />
       </article>

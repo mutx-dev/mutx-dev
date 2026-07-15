@@ -8,7 +8,10 @@ export async function GET() {
   return NextResponse.json(
     { siteKey },
     {
-      status: siteKey ? 200 : 503,
+      // An empty key is a valid local/development state. Returning the
+      // payload normally lets the client render its disabled fallback without
+      // turning an optional integration into a browser console error.
+      status: 200,
       headers: {
         'Cache-Control': 'no-store',
       },

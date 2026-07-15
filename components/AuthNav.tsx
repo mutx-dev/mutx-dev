@@ -10,13 +10,13 @@ export function AuthNav({ hostVariant = "default" }: AuthNavProps) {
 
   return (
     <nav data-testid="public-auth-nav" className="sticky top-0 z-30 px-4 pt-4 sm:px-6">
-      <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between gap-4 rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(10,9,12,0.78)] px-3 py-2.5 text-[#f7f0e4] shadow-[0_20px_60px_rgba(2,2,5,0.32)] backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between gap-4 rounded-[1rem] border border-[rgba(233,241,232,0.14)] bg-[rgba(6,9,13,0.78)] px-3 py-2.5 text-[#e9f1e8] shadow-[0_20px_60px_rgba(0,0,0,0.32)] backdrop-blur-xl">
           <Link
             href="/"
-            className="inline-flex min-w-0 items-center gap-3 rounded-full border border-[rgba(255,240,214,0.08)] bg-[rgba(255,248,236,0.04)] px-2.5 py-2 pr-4 transition hover:border-[rgba(212,171,115,0.28)] hover:bg-[rgba(255,248,236,0.06)]"
+            className="inline-flex min-w-0 items-center gap-3 rounded-[0.75rem] border border-[rgba(233,241,232,0.1)] bg-[rgba(233,241,232,0.04)] px-2.5 py-2 pr-4 transition hover:border-[rgba(198,255,99,0.34)] hover:bg-[rgba(198,255,99,0.08)]"
             aria-label="Back to MUTX home"
           >
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(212,171,115,0.2)] bg-[radial-gradient(circle_at_top,rgba(212,171,115,0.2),transparent_58%),linear-gradient(180deg,rgba(255,248,236,0.08),rgba(255,248,236,0.02))]">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-[0.65rem] border border-[rgba(198,255,99,0.24)] bg-[radial-gradient(circle_at_top,rgba(198,255,99,0.16),transparent_58%),linear-gradient(180deg,rgba(233,241,232,0.08),rgba(233,241,232,0.02))]">
               <Image
                 src={isPicoPreview ? "/pico/logo.png" : "/logo.webp"}
                 alt={isPicoPreview ? "Pico" : "MUTX"}
@@ -29,13 +29,13 @@ export function AuthNav({ hostVariant = "default" }: AuthNavProps) {
               <span className="truncate font-[family:var(--font-site-display)] text-[1rem] leading-none tracking-[-0.06em]">
                 {isPicoPreview ? "Pico" : "MUTX"}
               </span>
-              <span className="font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.22em] text-[rgba(232,221,203,0.56)]">
+              <span className="font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.22em] text-[rgba(156,170,163,0.68)]">
                 {isPicoPreview ? "preview access" : "auth lane"}
               </span>
             </span>
           </Link>
 
-        <span className="hidden rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(255,248,236,0.03)] px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-[rgba(232,221,203,0.6)] lg:inline-flex">
+        <span className="hidden rounded-full border border-[rgba(233,241,232,0.12)] bg-[rgba(233,241,232,0.03)] px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-[rgba(156,170,163,0.68)] lg:inline-flex">
           {isPicoPreview ? "preview account boundary" : "hosted operator identity"}
         </span>
       </div>

@@ -46,12 +46,12 @@ const faqItems = [
   {
     question: "Do approvals actually block the agent?",
     answer:
-      "Yes — that&rsquo;s the entire point. MUTX approvals are control plane gates, not advisory notifications. High-risk actions wait for a decision instead of racing ahead.",
+      "Yes — that’s the entire point. MUTX approvals are control plane gates, not advisory notifications. High-risk actions wait for a decision instead of racing ahead.",
   },
   {
     question: "Which actions usually need human approval?",
     answer:
-      "Teams typically start with destructive actions, production changes, credential access, policy exceptions, or high-cost operations that shouldn&rsquo;t run fully autonomously.",
+      "Teams typically start with destructive actions, production changes, credential access, policy exceptions, or high-cost operations that shouldn’t run fully autonomously.",
   },
   {
     question: "Can operators tell which actions were autonomous and which were approved?",
@@ -148,7 +148,7 @@ const approvalCards = [
   },
   {
     title: "High-cost actions",
-    body: "Some actions aren&rsquo;t dangerous — they&rsquo;re expensive. Approval workflows slow down high-cost runs before they burn through budget.",
+    body: "Some actions aren’t dangerous — they’re expensive. Approval workflows slow down high-cost runs before they burn through budget.",
   },
   {
     title: "Policy exceptions",
@@ -172,16 +172,14 @@ export default function AIAgentApprovalsPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Approvals</p>
                   <h1 className={feat.heroTitle}>
-                    Real gates,
+                    Review the actions
                     <br />
-                    not rubber stamps.
+                    that matter.
                   </h1>
                   <p className={feat.heroSupport}>
-                    You can&rsquo;t review every agent action, but you can
-                    require a human on the ones that matter. MUTX lets you
-                    define approval workflows for high-stakes agent operations,
-                    route those decisions to the right people, and keep the
-                    record attached to the runtime history.
+                    Send high-impact actions to the right person before they
+                    run. MUTX keeps the decision with the run, so a review is a
+                    real control and not another notification to lose.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -210,7 +208,7 @@ export default function AIAgentApprovalsPage() {
                 </h2>
                 <p className={feat.sectionBody}>
                   Most approval systems are advisory — they suggest a review but
-                  don&rsquo;t stop the agent. MUTX approvals are control plane
+                  don’t stop the agent. MUTX approvals are control plane
                   gates. The agent waits for the decision, and that decision
                   travels with the trace.
                 </p>
@@ -238,7 +236,7 @@ export default function AIAgentApprovalsPage() {
                 <p className={feat.sectionBody}>
                   The first approval workflows are usually obvious: destructive
                   operations, privileged access, policy exceptions, or actions
-                  expensive enough that they shouldn&rsquo;t run without a
+                  expensive enough that they shouldn’t run without a
                   second pair of eyes.
                 </p>
               </div>
@@ -299,7 +297,7 @@ export default function AIAgentApprovalsPage() {
                     The distinction between automated and approved actions is
                     visible in every trace. During an incident, you see
                     immediately which actions required human sign-off and which
-                    didn&rsquo;t.
+                    didn’t.
                   </p>
                 </div>
                 <div className={feat.featureCard}>
@@ -308,8 +306,8 @@ export default function AIAgentApprovalsPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     A guardrail violation can require approval before the agent
-                    proceeds. The response to a safety boundary hit isn&rsquo;t
-                    just a log entry — it&rsquo;s a workflow that pulls in a
+                    proceeds. The response to a safety boundary hit isn’t
+                    just a log entry — it’s a workflow that pulls in a
                     human operator.
                   </p>
                 </div>

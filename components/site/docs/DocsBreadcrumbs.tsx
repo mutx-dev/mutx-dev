@@ -34,10 +34,9 @@ export function DocsBreadcrumbs() {
 
   const items = [
     { title: "Docs", href: "/docs" },
-    ...ancestors.map((item) => ({
-      title: item.title,
-      href: item.route,
-    })),
+    ...ancestors
+      .map((item) => ({ title: item.title, href: item.route }))
+      .filter((item, index, list) => index === 0 || item.href !== list[index - 1]?.href),
   ];
 
   return (
@@ -46,7 +45,7 @@ export function DocsBreadcrumbs() {
         {items.map((item, i) => {
           const isLast = i === items.length - 1;
           return (
-            <li key={item.href} className="docs-breadcrumbs-item">
+            <li key={`${item.href}:${i}`} className="docs-breadcrumbs-item">
               {!isLast ? (
                 <>
                   <Link href={item.href} className="docs-breadcrumbs-link">

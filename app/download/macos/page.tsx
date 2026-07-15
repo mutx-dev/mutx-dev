@@ -89,7 +89,7 @@ export default async function MacDownloadPage() {
             <div className={styles.routeDownloadStage}>
               <div className={`${styles.routeHeroMain} ${styles.routeDownloadCopy}`}>
                 <div className={styles.intro}>
-                  <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Desktop release</p>
+                  <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Get MUTX</p>
                   <h1 className={`${styles.displayTitle} ${styles.darkText}`}>
                     Download MUTX for macOS.
                   </h1>
@@ -153,8 +153,8 @@ export default async function MacDownloadPage() {
             <div className={`${styles.routeReleaseBand} ${styles.routeHeroPanel}`}>
               <div className={styles.routeReleaseBandCopy}>
                 <div className={styles.intro}>
-                  <p className={styles.eyebrow}>Stable operator lane</p>
-                  <h2 className={styles.sectionTitle}>Mac app first.</h2>
+                  <p className={styles.eyebrow}>After install</p>
+                  <h2 className={styles.sectionTitle}>Open the control plane.</h2>
                   <p className={styles.bodyText}>
                     Downloads, notes, and checksums stay in one public lane.
                   </p>

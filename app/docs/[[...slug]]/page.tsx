@@ -387,11 +387,11 @@ function DocsHomePage() {
       <div className="docs-article-main docs-home">
         <section className="docs-home-billboard">
           <div className="docs-home-billboard-copy">
-            <p className="docs-home-kicker">Field manual</p>
-            <h1 className="docs-home-title">Read MUTX like a shipped system, not a static help center.</h1>
+            <p className="docs-home-kicker">MUTX Docs</p>
+            <h1 className="docs-home-title">Move from first run to full control.</h1>
             <p className="docs-home-sub">
-              This is the code-accurate route into setup, platform references, and operator
-              behavior. Start with one guided entry point, then move through the product by area.
+              Start quickly, understand the architecture, and build the operating habits that keep
+              autonomous work reliable.
             </p>
             <div className="docs-home-actions">
               <Link href="/docs/deployment/quickstart" className="docs-home-primary">
@@ -404,7 +404,7 @@ function DocsHomePage() {
           </div>
 
           <div className="docs-home-ledger">
-            <p className="docs-home-ledger-label">Manual index</p>
+            <p className="docs-home-ledger-label">Start here</p>
             {FEATURED.slice(0, 3).map((card, index) => (
               <Link key={card.href} href={card.href} className="docs-home-ledger-item">
                 <span className="docs-home-ledger-index">{String(index + 1).padStart(2, "0")}</span>
@@ -419,8 +419,8 @@ function DocsHomePage() {
 
         <section className="docs-home-featured">
           <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">High-signal routes</p>
-            <h2 className="docs-home-section-title">Start from the pages people actually need first.</h2>
+            <p className="docs-home-kicker">Start here</p>
+            <h2 className="docs-home-section-title">The shortest path to useful work.</h2>
           </div>
           <div className="docs-home-featured-list">
             {FEATURED.map((card) => (
@@ -434,8 +434,8 @@ function DocsHomePage() {
 
         <section className="docs-home-areas">
           <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">By area</p>
-            <h2 className="docs-home-section-title">Move through the platform one surface at a time.</h2>
+            <p className="docs-home-kicker">Explore by area</p>
+            <h2 className="docs-home-section-title">Everything stays close to the work.</h2>
           </div>
 
           <div className="docs-home-area-list">
@@ -457,14 +457,13 @@ function DocsHomePage() {
 
         <section className="docs-home-appendix">
           <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">Truth rules</p>
-            <h2 className="docs-home-section-title">When docs drift, trust the executable system.</h2>
+            <p className="docs-home-kicker">For builders</p>
+            <h2 className="docs-home-section-title">Build from the same contracts we ship.</h2>
           </div>
           <p className="docs-home-truth">
-            Source of truth order: <code>src/api/routes/</code> for backend behavior,{" "}
-            <code>app/api/</code> for browser-facing proxy behavior, <code>app/</code> for site
-            and app surfaces, <code>cli/</code> for terminal workflows, and{" "}
-            <code>sdk/mutx/</code> for SDK behavior.
+            Backend behavior lives in <code>src/api/routes/</code>. Browser-facing APIs live in{" "}
+            <code>app/api/</code>. Product surfaces, CLI workflows, and SDK behavior stay close to
+            the code that owns them.
           </p>
         </section>
       </div>

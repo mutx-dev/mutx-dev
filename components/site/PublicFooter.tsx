@@ -20,7 +20,7 @@ export function PublicFooter({ className, showCallout = true }: PublicFooterProp
           <div className="grid gap-6 border-b border-[rgba(233,241,232,0.12)] px-5 py-7 lg:grid-cols-[minmax(0,1.2fr)_auto] lg:items-end lg:px-8 lg:py-9">
             <div className="max-w-3xl">
               <p className="font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.22em] text-[#c6ff63]">
-                Final lane
+                Next step
               </p>
               <p className="mt-3 font-[family:var(--font-site-display)] text-[2.2rem] font-bold leading-[0.94] tracking-[-0.07em] text-[#e9f1e8]">
                 {marketingFooterCallout.title}
@@ -59,7 +59,7 @@ export function PublicFooter({ className, showCallout = true }: PublicFooterProp
                 </p>
               </div>
               <p className="mt-3 max-w-xl text-sm leading-7 text-[rgba(156,170,163,0.72)]">
-                One operating frame for the public site, docs, auth, dashboard, and Pico product.
+                Control, visibility, and proof for the work your agents do.
               </p>
             </div>
 

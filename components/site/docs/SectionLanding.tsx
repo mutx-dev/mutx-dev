@@ -32,9 +32,9 @@ export function SectionLanding({
         <p className="docs-section-landing-desc">{description}</p>
       )}
       <div className="docs-section-grid">
-        {children.map((child) => (
+        {children.map((child, index) => (
           <Link
-            key={child.route}
+            key={`${child.route}:${child.slug}:${index}`}
             href={child.route}
             className="docs-section-card"
           >

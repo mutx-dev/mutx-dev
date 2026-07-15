@@ -5,9 +5,9 @@ import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import { DEFAULT_X_HANDLE, buildPageMetadata, getSiteUrl } from "@/lib/seo";
 
-const homeTitle = "MUTX | See the move. Hold the line.";
+const homeTitle = "MUTX | Run agents like software.";
 const homeDescription =
-  "MUTX is the operating layer for autonomous work: visible signals, enforced boundaries, and receipts for every AI agent run.";
+  "MUTX helps teams deploy, monitor, and govern AI agents with a clear record of what happened.";
 
 export const metadata: Metadata = {
   title: homeTitle,

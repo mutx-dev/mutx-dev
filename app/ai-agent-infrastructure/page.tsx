@@ -63,19 +63,19 @@ const structuredData = {
 const featureCards = [
   {
     title: "Compute management",
-    body: "Where agents run is part of the control plane record. Compute allocation, scheduling, and scaling are surfaced as explicit properties — not buried in a hosting provider&rsquo;s console you check after something breaks.",
+    body: "Where agents run is part of the control plane record. Compute allocation, scheduling, and scaling are surfaced as explicit properties — not buried in a hosting provider’s console you check after something breaks.",
   },
   {
     title: "Secrets management",
-    body: "API keys and credentials live in the control plane — not scattered across .env files, CI variables, and someone&rsquo;s notes app. Rotated, versioned, and attached to the agents that use them.",
+    body: "API keys and credentials live in the control plane — not scattered across .env files, CI variables, and someone’s notes app. Rotated, versioned, and attached to the agents that use them.",
   },
   {
     title: "Storage layer",
-    body: "What the agent reads, what it writes, and how long that state persists — all explicit. No orphaned state blobs living outside the system&rsquo;s awareness.",
+    body: "What the agent reads, what it writes, and how long that state persists — all explicit. No orphaned state blobs living outside the system’s awareness.",
   },
   {
     title: "Network topology",
-    body: "Which services the agent can reach, which endpoints it&rsquo;s allowed to call, and how traffic routes out — defined in the control plane, not discovered during an incident.",
+    body: "Which services the agent can reach, which endpoints it’s allowed to call, and how traffic routes out — defined in the control plane, not discovered during an incident.",
   },
 ];
 
@@ -95,16 +95,14 @@ export default function AIAgentInfrastructurePage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Infrastructure</p>
                   <h1 className={feat.heroTitle}>
-                    Infrastructure you
+                    See what your agents
                     <br />
-                    can actually see.
+                    depend on.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Your agent infrastructure shouldn&rsquo;t be a pile of
-                    one-off scripts, stale docs, and secrets nobody remembers
-                    provisioning. MUTX makes compute, storage, and secrets
-                    legible and versioned — so you own what runs in production,
-                    not just hope it works.
+                    Track compute, storage, network access, and secrets without
+                    a pile of scripts and stale notes. Know what each agent can
+                    reach and where it runs.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -127,12 +125,12 @@ export default function AIAgentInfrastructurePage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Infrastructure properties</p>
                 <h2 className={feat.sectionTitle}>
-                  Know what&rsquo;s running.
+                  Know what’s running.
                   <br />
                   Own why.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most agent infra is implicit — a shared doc that hasn&rsquo;t
+                  Most agent infra is implicit — a shared doc that hasn’t
                   been updated since Q1, a hosting console disconnected from the
                   agent definition, and a tribal knowledge base that walks out
                   the door with your senior engineer. MUTX makes infrastructure
@@ -155,9 +153,9 @@ export default function AIAgentInfrastructurePage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Connected surfaces</p>
                 <h2 className={feat.sectionTitle}>
-                  Infra isn&rsquo;t a side quest.
+                  Infra isn’t a side quest.
                   <br />
-                  It&rsquo;s the foundation.
+                  It’s the foundation.
                 </h2>
                 <p className={feat.sectionBody}>
                   When infrastructure lives in the control plane, it connects to
@@ -225,7 +223,7 @@ export default function AIAgentInfrastructurePage() {
                 <p className={feat.finalBody}>
                   Download the Mac app and open the infrastructure surface.
                   See where agents run, what secrets they hold, and what your
-                  network topology actually looks like when it&rsquo;s defined
+                  network topology actually looks like when it’s defined
                   instead of assumed.
                 </p>
                 <div className={feat.finalActions}>

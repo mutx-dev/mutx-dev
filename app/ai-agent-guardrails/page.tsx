@@ -95,16 +95,14 @@ export default function AIAgentGuardrailsPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Guardrails</p>
                   <h1 className={feat.heroTitle}>
-                    Draw the line on
+                    Stop risky actions
                     <br />
-                    what agents can&rsquo;t do.
+                    before they run.
                   </h1>
                   <p className={feat.heroSupport}>
-                    An agent without guardrails will probe every edge case —
-                    especially the ones you never wanted it to find. MUTX lets
-                    you write safety policies, enforce them at runtime, and
-                    surface violations as first-class events instead of silent
-                    failures buried in a log file nobody opens.
+                    Write the policy once, enforce it at runtime, and keep the
+                    violation in the run record. The team can see what was
+                    blocked and why.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -193,8 +191,8 @@ export default function AIAgentGuardrailsPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Guardrail violations can trip circuit breakers. A repeated
-                    policy violation isn&rsquo;t just a compliance issue —
-                    it&rsquo;s a reliability signal the control plane can act on.
+                    policy violation isn’t just a compliance issue —
+                    it’s a reliability signal the control plane can act on.
                   </p>
                 </div>
                 <div className={feat.featureCard}>

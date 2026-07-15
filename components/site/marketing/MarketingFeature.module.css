@@ -1,6 +1,6 @@
 /* ============================================================
    FEATURE PAGE — dark editorial style
-   Matches the MUTX homepage: dark surfaces, gold accents, high contrast
+   Matches the MUTX homepage: dark surfaces, lime/cobalt accents, high contrast
    Used by all /ai-agent-* SEO pages
    ============================================================ */
 
@@ -9,7 +9,7 @@
   position: relative;
   overflow: hidden;
   background: #05070c;
-  color: #f7f4ef;
+  color: #e9f1e8;
 }
 
 /* Geometric accent — top left corner */
@@ -22,8 +22,8 @@
   height: 120%;
   background: radial-gradient(
     ellipse at 30% 50%,
-    rgba(212, 171, 115, 0.1) 0%,
-    rgba(212, 171, 115, 0.03) 40%,
+    rgba(198, 255, 99, 0.1) 0%,
+    rgba(198, 255, 99, 0.03) 40%,
     transparent 70%
   );
   pointer-events: none;
@@ -40,6 +40,24 @@
   padding: clamp(5rem, 10vw, 8rem) 0 clamp(3.5rem, 7vw, 6rem);
 }
 
+.heroStage::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 12%;
+  right: 3rem;
+  width: min(42vw, 38rem);
+  height: 72%;
+  border: 1px solid rgba(233, 241, 232, 0.16);
+  background:
+    linear-gradient(180deg, rgba(6, 9, 13, 0.08), rgba(6, 9, 13, 0.9)),
+    linear-gradient(90deg, rgba(6, 9, 13, 0.08), rgba(6, 9, 13, 0.68)),
+    url('/landing/webp/running-agent.webp') center / cover;
+  box-shadow: 1.2rem 1.2rem 0 rgba(198, 255, 99, 0.08), 0 2rem 5rem rgba(0, 0, 0, 0.35);
+  opacity: 0.84;
+  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+}
+
 .heroShell {
   width: min(100% - 3rem, 112rem);
   margin: 0 auto;
@@ -47,6 +65,8 @@
 
 .heroColumn {
   max-width: 48rem;
+  position: relative;
+  z-index: 1;
 }
 
 /* Eyebrow pill */
@@ -57,14 +77,14 @@
   gap: 0.6rem;
   padding: 0.35rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(212, 171, 115, 0.35);
-  background: rgba(212, 171, 115, 0.08);
+  border: 1px solid rgba(198, 255, 99, 0.35);
+  background: rgba(198, 255, 99, 0.08);
   font-family: var(--font-mono), monospace;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(141, 203, 255, 0.95);
+  color: #c6ff63;
   flex-shrink: 0;
 }
 
@@ -74,7 +94,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #d4ab73;
+  background: #c6ff63;
   flex-shrink: 0;
 }
 
@@ -86,7 +106,7 @@
   font-weight: 300;
   line-height: 0.9;
   letter-spacing: -0.065em;
-  color: #f7f4ef;
+  color: #e9f1e8;
 }
 
 /* Support line */
@@ -97,7 +117,7 @@
   font-weight: 500;
   line-height: 1.6;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.72);
+  color: rgba(211, 224, 215, 0.82);
 }
 
 .heroActions {
@@ -117,12 +137,12 @@
 /* ---- Content sections — dark background ---- */
 .contentSection {
   padding: clamp(5rem, 9vw, 8rem) 0;
-  background: #09080b;
-  color: #f7f4ef;
+  background: #06090d;
+  color: #e9f1e8;
 }
 
 .contentSection + .contentSection {
-  border-top: 1px solid rgba(255, 233, 204, 0.07);
+  border-top: 1px solid rgba(233, 241, 232, 0.1);
 }
 
 /* Intro block */
@@ -138,7 +158,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #d4ab73;
+  color: #c6ff63;
 }
 
 .sectionTitle {
@@ -148,7 +168,7 @@
   font-weight: 300;
   line-height: 1.05;
   letter-spacing: -0.055em;
-  color: #f7f4ef;
+  color: #e9f1e8;
 }
 
 .sectionBody {
@@ -157,7 +177,7 @@
   font-weight: 500;
   line-height: 1.65;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.68);
+  color: rgba(211, 224, 215, 0.78);
 }
 
 /* Feature cards — dark surfaces */
@@ -170,8 +190,8 @@
 .featureCard {
   padding: 2rem 2.2rem 2.2rem;
   border-radius: 1.1rem;
-  border: 1px solid rgba(255, 233, 204, 0.09);
-  background: rgba(24, 21, 28, 0.7);
+  border: 1px solid rgba(233, 241, 232, 0.12);
+  background: rgba(16, 26, 32, 0.7);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease;
 }
@@ -179,7 +199,7 @@
 .featureCard:hover {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   transform: translateY(-3px);
-  border-color: rgba(212, 171, 115, 0.18);
+  border-color: rgba(198, 255, 99, 0.28);
 }
 
 .featureCardTitle {
@@ -189,7 +209,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #f7f4ef;
+  color: #e9f1e8;
 }
 
 .featureCardTitle a {
@@ -198,7 +218,7 @@
 }
 
 .featureCardTitle a:hover {
-  color: #d4ab73;
+  color: #c6ff63;
 }
 
 .featureCardBody {
@@ -206,14 +226,14 @@
   font-size: clamp(0.9rem, 0.95vw, 0.97rem);
   font-weight: 500;
   line-height: 1.62;
-  color: rgba(247, 244, 239, 0.62);
+  color: rgba(211, 224, 215, 0.72);
 }
 
 /* ---- Final CTA section — dark ---- */
 .finalSection {
   padding: clamp(6rem, 11vw, 9rem) 0;
-  background: #05070c;
-  color: #f7f4ef;
+  background: #05080b;
+  color: #e9f1e8;
   position: relative;
   overflow: hidden;
 }
@@ -228,7 +248,7 @@
   height: 160%;
   background: radial-gradient(
     ellipse at 70% 50%,
-    rgba(212, 171, 115, 0.08) 0%,
+    rgba(198, 255, 99, 0.08) 0%,
     transparent 65%
   );
   pointer-events: none;
@@ -247,7 +267,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(141, 203, 255, 0.75);
+  color: rgba(198, 255, 99, 0.82);
 }
 
 .finalTitle {
@@ -257,7 +277,7 @@
   font-weight: 300;
   line-height: 0.95;
   letter-spacing: -0.06em;
-  color: #f7f4ef;
+  color: #e9f1e8;
 }
 
 .finalBody {
@@ -267,7 +287,7 @@
   font-weight: 500;
   line-height: 1.62;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.68);
+  color: rgba(211, 224, 215, 0.78);
 }
 
 .finalActions {
@@ -288,7 +308,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(247, 244, 239, 0.82);
+  color: rgba(211, 224, 215, 0.86);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
@@ -320,6 +340,14 @@
     min-height: 52vh;
     padding-top: 4rem;
     justify-content: flex-end;
+  }
+
+  .heroStage::after {
+    top: 8%;
+    right: 0.75rem;
+    width: 78%;
+    height: 56%;
+    opacity: 0.34;
   }
 
   .featureGrid {

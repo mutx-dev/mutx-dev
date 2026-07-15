@@ -233,8 +233,8 @@ function NavItem({ item, pathname }: NavItemProps) {
 
       {hasChildren && open && (
         <div className="docs-nav-children">
-          {item.children.map((child) => (
-            <NavItem key={child.route} item={child} pathname={pathname} />
+          {item.children.map((child, index) => (
+            <NavItem key={`${child.route}:${child.slug}:${index}`} item={child} pathname={pathname} />
           ))}
         </div>
       )}
@@ -305,7 +305,7 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
           </span>
           <span className="docs-header-logo-copy">
             <span className="docs-header-logo-title">MUTX Docs</span>
-            <span className="docs-header-logo-meta">operator manual</span>
+            <span className="docs-header-logo-meta">product documentation</span>
           </span>
         </Link>
 
@@ -354,8 +354,12 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
           GitHub
         </a>
         <span style={{ color: 'var(--gb-text-3)' }}>·</span>
-        <a href="https://mutx.dev" className="docs-header-link">
-          mutx.dev
+        <Link href="/" className="docs-header-link">
+          MUTX site
+        </Link>
+        <span style={{ color: 'var(--gb-text-3)' }}>·</span>
+        <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className="docs-header-link">
+          Pico
         </a>
       </header>
 
@@ -370,17 +374,33 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
           aria-label="Documentation navigation"
         >
           <div className="docs-sidebar-intro">
-            <p className="docs-sidebar-kicker">Canonical reference</p>
-            <h2 className="docs-sidebar-title">Read the product the same way the repo works.</h2>
+            <p className="docs-sidebar-kicker">Explore MUTX</p>
+            <h2 className="docs-sidebar-title">Everything you need to ship with confidence.</h2>
             <p className="docs-sidebar-copy">
-              Setup, platform contracts, and operating notes stay here in the same brand frame as
-              the product, not in a detached knowledge base.
+              Start with the path that matches your work, then go deeper when you need to.
             </p>
           </div>
           <nav aria-label="Docs nav">
-            {nav.map((item) => (
-              <NavItem key={item.route} item={item} pathname={pathname} />
-            ))}
+            {nav.length > 0 ? (
+              nav.map((item, index) => (
+                <NavItem key={`${item.route}:${item.slug}:${index}`} item={item} pathname={pathname} />
+              ))
+            ) : (
+              <div className="docs-standalone-links">
+                <Link href="/docs" className="docs-standalone-link">
+                  <span>Documentation hub</span>
+                  <span aria-hidden="true">↗</span>
+                </Link>
+                <Link href="/ai-agent-control-plane" className="docs-standalone-link">
+                  <span>Product overview</span>
+                  <span aria-hidden="true">↗</span>
+                </Link>
+                <Link href="/download" className="docs-standalone-link">
+                  <span>Download MUTX</span>
+                  <span aria-hidden="true">↗</span>
+                </Link>
+              </div>
+            )}
           </nav>
         </aside>
 

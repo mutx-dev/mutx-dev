@@ -172,16 +172,13 @@ export default function AIAgentCostPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Cost Management</p>
                   <h1 className={feat.heroTitle}>
-                    Know what your AI
+                    See the cost
                     <br />
-                    agents cost — per run.
+                    of every run.
                   </h1>
                   <p className={feat.heroSupport}>
-                    API bills don&apos;t tell you which agent ran up $4k last
-                    Tuesday, which model earns its price, or which workflow is
-                    about to blow up the monthly budget. MUTX attributes LLM
-                    spend to the agent, the run, and the decision — with budgets
-                    enforced at the control plane.
+                    Track spend by agent, model, and workflow. Set budgets before
+                    a retry storm or broken workflow turns into a surprise bill.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -207,7 +204,7 @@ export default function AIAgentCostPage() {
                 </h2>
                 <p className={feat.sectionBody}>
                   Most teams discover agent cost problems from the provider
-                  invoice. By then it&apos;s too late. MUTX treats cost
+                  invoice. By then it’s too late. MUTX treats cost
                   visibility and budget enforcement as first-class control plane
                   properties — not afterthoughts bolted onto a billing export.
                 </p>
@@ -233,7 +230,7 @@ export default function AIAgentCostPage() {
                   while the runtime is live.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Agent cost management isn&apos;t a finance dashboard. It&apos;s a way to catch retry storms, stale workers, and runaway workflows before the billing cycle closes.
+                  Agent cost management isn’t a finance dashboard. It’s a way to catch retry storms, stale workers, and runaway workflows before the billing cycle closes.
                 </p>
               </div>
               <div className={feat.featureGrid}>
@@ -344,7 +341,7 @@ export default function AIAgentCostPage() {
                 </h2>
                 <p className={feat.finalBody}>
                   Download the Mac app. Define spend limits for your first
-                  agents. See what cost attribution looks like when it&apos;s
+                    agents. See what cost attribution looks like when it’s
                   built into the control plane from day one.
                 </p>
                 <div className={feat.finalActions}>

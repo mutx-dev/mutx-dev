@@ -12,9 +12,9 @@ import {
 
 const siteUrl = getSiteUrl();
 const rootSocialMetadata = buildPageMetadata({
-  title: "MUTX | See the move. Hold the line.",
+  title: "MUTX | Run agents like software.",
   description:
-    "MUTX is the operating layer for autonomous work: visible signals, enforced boundaries, and receipts for every AI agent run.",
+    "MUTX helps teams deploy, monitor, and govern AI agents with a clear record of what happened.",
   path: "/",
   socialDescription:
     "See what your agents are doing, hold the line, and keep a receipt for every consequential move.",
@@ -32,9 +32,9 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   ...rootSocialMetadata,
-  title: "MUTX | See the move. Hold the line.",
+  title: "MUTX | Run agents like software.",
   description:
-    "MUTX is the operating layer for autonomous work: visible signals, enforced boundaries, and receipts for every AI agent run.",
+    "MUTX helps teams deploy, monitor, and govern AI agents with a clear record of what happened.",
   applicationName: "MUTX",
   category: "developer tools",
   keywords: [

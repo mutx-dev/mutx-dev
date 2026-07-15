@@ -95,16 +95,14 @@ export default function AIAgentAuditLogsPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Audit Logs</p>
                   <h1 className={feat.heroTitle}>
-                    A record of what
+                    Know what
                     <br />
-                    your agents decided.
+                    your agents did.
                   </h1>
                   <p className={feat.heroSupport}>
-                    When compliance asks what the agent decided and why, vague
-                    chat logs and &ldquo;it ran successfully&rdquo; messages
-                    won&apos;t cut it. MUTX keeps a complete trace history with
-                    full execution context — so you can answer that question
-                    definitively, not with a summary.
+                    Keep the full run history — decisions, tools, inputs, and
+                    outcomes — in one record. When someone asks what happened,
+                    you can show them instead of reconstructing it from chat.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -156,7 +154,7 @@ export default function AIAgentAuditLogsPage() {
                   the audit log.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Audit logs aren&apos;t a separate system in MUTX — they&apos;re
+                  Audit logs aren’t a separate system in MUTX — they’re
                   where everything in the control plane ends up. Governance
                   evaluations, approval decisions, deployment records, and
                   monitoring traces all attach to one record. The full picture in

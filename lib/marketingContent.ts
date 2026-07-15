@@ -124,17 +124,17 @@ const homepageActions: MarketingActionLink[] = [
 
 export const marketingHomepage: MarketingHomepage = {
   hero: {
-    tagline: 'AI Agent Infrastructure',
-    title: 'See it. Control it. Prove it.',
-    support: 'Live visibility, hard boundaries, and reviewable history for every agent run.',
+    tagline: 'Agent operations for teams that ship',
+    title: 'Run agents like software.',
+    support: 'Deploy, monitor, and govern AI agents with a clear record of what happened.',
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
   },
   socialProof: {
-    tagline: 'Built for teams running AI agents in production',
-    title: 'Deep control-plane depth, not a thin wrapper.',
-    body: 'Audit history, RBAC, approvals, observability, and hard execution boundaries stay in one operating surface.',
+    tagline: 'For teams running AI agents in production',
+    title: 'The parts you need to operate safely.',
+    body: 'See what ran, control what it can touch, and keep the record when someone needs to understand the result.',
     items: [
       {
         value: '100%',
@@ -215,7 +215,7 @@ export const marketingHomepage: MarketingHomepage = {
       items: [
         {
           eyebrow: 'File deletion',
-          title: 'Cleanup deleted work.',
+          title: 'Cleanup deleted the wrong files.',
           userPrompt: 'Clean up my Downloads folder',
           apology: [
             'I removed 847 files from ~/Downloads.',
@@ -223,11 +223,11 @@ export const marketingHomepage: MarketingHomepage = {
             'I noticed some files looked like work documents,',
             'but I assumed you wanted everything removed.',
           ],
-          fallout: 'See the file action before it sticks, then stop it at the boundary.',
+          fallout: 'Preview the action before it runs, then stop it at the boundary.',
         },
         {
           eyebrow: 'Data leak',
-          title: 'Sharing widened the audience.',
+          title: 'The report went to the wrong room.',
           userPrompt: 'Share the Q3 report with the team',
           apology: [
             'I sent the Q3 financials to your Slack workspace.',
@@ -235,11 +235,11 @@ export const marketingHomepage: MarketingHomepage = {
             'I also attached the raw database export',
             'because it was in the same folder.',
           ],
-          fallout: 'Keep destinations explicit so “helpful” never becomes “public.”',
+          fallout: 'Make the destination explicit before anything gets sent.',
         },
         {
           eyebrow: 'Production incident',
-          title: 'Optimization widened the blast radius.',
+          title: 'A quick fix caused an outage.',
           userPrompt: 'Fix the slow database query',
           apology: [
             'I restarted the database server to apply optimizations.',
@@ -247,29 +247,29 @@ export const marketingHomepage: MarketingHomepage = {
             'I also dropped the query cache to free memory.',
             'The cache rebuild will take approximately 4 hours.',
           ],
-          fallout: 'Review the move before execution, not after the outage report starts.',
+          fallout: 'Put a review step in front of changes that can take production down.',
         },
       ],
     },
     proof: {
       eyebrow: 'Why teams switch',
-      title: 'From hoping to knowing.',
-      body: 'Runs stay legible, boundaries stay explicit, and the record still makes sense later.',
+      title: 'Know what happened.',
+      body: 'Keep the run, the boundary, and the result together so the answer is there when you need it.',
       items: [
         {
           title: 'Visibility',
-          before: 'An agent ran for an hour and you have no idea what it did, what it accessed, or what it changed.',
-          after: 'MUTX shows you every step, every decision, and every result in a clear timeline you can actually read.',
+          before: 'You have a transcript, but no reliable timeline of what changed.',
+          after: 'Every run keeps a readable timeline of calls, tools, and outcomes.',
         },
         {
           title: 'Control',
-          before: 'Your agents run with full permissions and you have no way to limit what they can access or change.',
-          after: 'MUTX lets you set clear permissions and guardrails — so agents stay productive without overstepping.',
+          before: 'Permissions live in scattered configs and drift between environments.',
+          after: 'Set access once and enforce it wherever the agent runs.',
         },
         {
           title: 'Trust',
-          before: 'Another AI demo that looks impressive for five minutes but falls apart the first time something goes wrong.',
-          after: 'A real product with audit trails, run history, and clear boundaries — so you can trust AI in production.',
+          before: 'A demo works until something goes wrong and nobody can reconstruct it.',
+          after: 'Keep the decision, context, and result in the same record.',
         },
       ],
     },

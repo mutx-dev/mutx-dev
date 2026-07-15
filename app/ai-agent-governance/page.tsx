@@ -96,15 +96,13 @@ export default function AIAgentGovernancePage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Governance</p>
                   <h1 className={feat.heroTitle}>
-                    Lock down what
+                    Set the boundaries
                     <br />
-                    every agent can touch.
+                    before the run.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Agents with implicit permissions, undocumented tool access,
-                    and loose API keys are how projects implode in production.
-                    MUTX makes every agent&rsquo;s access boundaries explicit,
-                    versioned, and enforced — everywhere the agent runs.
+                    Define who can do what, then enforce it wherever the agent
+                    runs. Access stays explicit, versioned, and easy to audit.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -156,12 +154,12 @@ export default function AIAgentGovernancePage() {
               <div className={feat.contentIntro}>
                 <p className={feat.sectionEyebrow}>Runs through every layer</p>
                 <h2 className={feat.sectionTitle}>
-                  Governance isn&rsquo;t a bolt-on.
+                  Governance isn’t a bolt-on.
                   <br />
-                  It&rsquo;s the foundation.
+                  It’s the foundation.
                 </h2>
                 <p className={feat.sectionBody}>
-                  MUTX governance isn&rsquo;t an add-on. It runs through the
+                  MUTX governance isn’t an add-on. It runs through the
                   control plane from deployment to monitoring. Every agent
                   action is evaluated against your policies automatically — not
                   enforced by convention or hope.
@@ -174,8 +172,8 @@ export default function AIAgentGovernancePage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Auth boundaries and operator access controls enforced at
-                    the runtime layer. Governance starts here — it&rsquo;s not
-                    just documented, it&rsquo;s enforced.
+                    the runtime layer. Governance starts here — it’s not
+                    just documented, it’s enforced.
                   </p>
                 </div>
                 <div className={feat.featureCard}>

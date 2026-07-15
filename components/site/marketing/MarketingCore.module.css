@@ -1,20 +1,20 @@
 .page {
-  --marketing-bg: #09080b;
-  --marketing-bg-soft: #131117;
-  --marketing-bg-strong: #07060a;
-  --marketing-surface: rgba(24, 21, 28, 0.94);
-  --marketing-surface-soft: rgba(255, 248, 236, 0.05);
-  --marketing-text: #f7f0e4;
-  --marketing-text-soft: rgba(232, 221, 203, 0.82);
-  --marketing-text-muted: rgba(188, 172, 149, 0.6);
-  --marketing-text-reverse: #fff5e8;
-  --marketing-text-reverse-soft: rgba(255, 241, 223, 0.72);
-  --marketing-border: rgba(255, 233, 204, 0.11);
-  --marketing-border-strong: rgba(212, 171, 115, 0.22);
-  --marketing-border-reverse: rgba(255, 241, 223, 0.14);
-  --marketing-accent: #3b82f6;
-  --marketing-accent-soft: #60a5fa;
-  --marketing-shadow: 0 28px 80px rgba(2, 2, 5, 0.28);
+  --marketing-bg: #06090d;
+  --marketing-bg-soft: #0b1217;
+  --marketing-bg-strong: #05080b;
+  --marketing-surface: rgba(16, 26, 32, 0.94);
+  --marketing-surface-soft: rgba(233, 241, 232, 0.04);
+  --marketing-text: #e9f1e8;
+  --marketing-text-soft: rgba(211, 224, 215, 0.82);
+  --marketing-text-muted: rgba(156, 170, 163, 0.68);
+  --marketing-text-reverse: #e9f1e8;
+  --marketing-text-reverse-soft: rgba(211, 224, 215, 0.76);
+  --marketing-border: rgba(233, 241, 232, 0.14);
+  --marketing-border-strong: rgba(198, 255, 99, 0.28);
+  --marketing-border-reverse: rgba(233, 241, 232, 0.16);
+  --marketing-accent: #c6ff63;
+  --marketing-accent-soft: #e8ffb6;
+  --marketing-shadow: 0 28px 80px rgba(0, 0, 0, 0.3);
   position: relative;
   min-height: 100vh;
   background: var(--marketing-bg);
@@ -34,30 +34,30 @@
 
 .homePage {
   background:
-    radial-gradient(circle at 14% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 86% 12%, rgba(137, 120, 184, 0.12), transparent 28rem),
-    linear-gradient(180deg, #111014 0%, #08070b 100%);
+    radial-gradient(circle at 14% 0%, rgba(198, 255, 99, 0.1), transparent 24rem),
+    radial-gradient(circle at 86% 12%, rgba(109, 167, 255, 0.12), transparent 28rem),
+    linear-gradient(180deg, #0b1217 0%, #06090d 100%);
 }
 
 .publicPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.1), transparent 28rem),
-    linear-gradient(180deg, #111014 0 28rem, #0c0b10 28rem 38rem, var(--marketing-bg) 38rem 100%);
+    radial-gradient(circle at 12% 0%, rgba(198, 255, 99, 0.1), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(109, 167, 255, 0.1), transparent 28rem),
+    linear-gradient(180deg, #0b1217 0 28rem, #080f14 28rem 38rem, var(--marketing-bg) 38rem 100%);
 }
 
 .downloadPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
-    linear-gradient(180deg, #111014 0%, #0c0b10 46rem, #08070b 100%);
+    radial-gradient(circle at 12% 0%, rgba(198, 255, 99, 0.1), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(109, 167, 255, 0.12), transparent 30rem),
+    linear-gradient(180deg, #0b1217 0%, #080f14 46rem, #06090d 100%);
 }
 
 .releasesPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
-    linear-gradient(180deg, #111014 0%, #0c0b10 58rem, #08070b 100%);
+    radial-gradient(circle at 12% 0%, rgba(198, 255, 99, 0.1), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(109, 167, 255, 0.12), transparent 30rem),
+    linear-gradient(180deg, #0b1217 0%, #080f14 58rem, #06090d 100%);
 }
 
 .shell {
@@ -86,7 +86,7 @@
   border-radius: 0.9rem;
   border: 1px solid rgba(248, 247, 245, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.22), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(198, 255, 99, 0.16), transparent 72%),
     linear-gradient(180deg, rgba(16, 20, 30, 0.92), rgba(5, 7, 11, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
@@ -96,7 +96,7 @@
 .brandLight .brandMarkWrap {
   border-color: rgba(19, 26, 36, 0.12);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.16), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(198, 255, 99, 0.12), transparent 72%),
     linear-gradient(180deg, rgba(19, 26, 36, 0.96), rgba(8, 10, 14, 0.98));
 }
 
@@ -146,9 +146,9 @@
   justify-content: space-between;
   min-height: 0;
   padding: 0.85rem 1rem;
-  border: 1px solid rgba(255, 240, 221, 0.1);
-  border-radius: 1.4rem;
-  background: rgba(27, 19, 15, 0.5);
+  border: 1px solid rgba(233, 241, 232, 0.14);
+  border-radius: 1rem;
+  background: rgba(6, 9, 13, 0.62);
   box-shadow: 0 20px 44px rgba(10, 6, 4, 0.18);
   backdrop-filter: blur(18px);
   color: var(--marketing-text-reverse);
@@ -170,10 +170,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 240, 221, 0.16);
+  border: 1px solid rgba(233, 241, 232, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.18), transparent 72%),
-    linear-gradient(180deg, rgba(49, 35, 28, 0.98), rgba(20, 14, 11, 1));
+    radial-gradient(circle at 50% 0%, rgba(198, 255, 99, 0.16), transparent 72%),
+    linear-gradient(180deg, rgba(16, 26, 32, 0.98), rgba(5, 8, 11, 1));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 18px 42px rgba(0, 7, 18, 0.28);
@@ -242,8 +242,8 @@
   min-height: 2.4rem;
   padding: 0 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 240, 221, 0.12);
-  background: rgba(255, 247, 235, 0.05);
+  border: 1px solid rgba(233, 241, 232, 0.14);
+  background: rgba(233, 241, 232, 0.04);
   color: rgba(248, 247, 245, 0.92);
   font-size: 0.86rem;
   font-weight: 600;
@@ -255,8 +255,8 @@
 
 .publicRailLink:hover {
   transform: translateY(-1px);
-  background: rgba(212, 171, 115, 0.16);
-  border-color: rgba(255, 240, 221, 0.22);
+  background: rgba(198, 255, 99, 0.12);
+  border-color: rgba(198, 255, 99, 0.32);
 }
 
 .section {
@@ -427,18 +427,24 @@
 }
 
 .buttonPrimary {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.4) 0%, var(--marketing-accent) 100%);
-  color: #eff6ff;
+  background: linear-gradient(135deg, var(--marketing-accent-soft) 0%, var(--marketing-accent) 100%);
+  color: #07100b;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 18px 42px rgba(30, 64, 175, 0.25);
+    0 18px 42px rgba(127, 194, 54, 0.2);
+}
+
+/* The page-wide anchor reset is intentionally broad; restore the CTA
+   contrast explicitly so lime actions never inherit muted body text. */
+.page .buttonPrimary {
+  color: #07100b;
 }
 
 .buttonPrimary:hover {
-  background: linear-gradient(135deg, rgba(147, 197, 253, 0.5) 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #f1ffc9 0%, var(--marketing-accent) 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 24px 50px rgba(30, 64, 175, 0.3);
+    0 24px 50px rgba(127, 194, 54, 0.28);
 }
 
 .buttonSecondary {
@@ -452,13 +458,13 @@
 }
 
 .buttonGhost {
-  background: rgba(255, 247, 235, 0.05);
+  background: rgba(233, 241, 232, 0.04);
   color: var(--marketing-text-reverse);
   border-color: var(--marketing-border-reverse);
 }
 
 .buttonGhost:hover {
-  background: rgba(212, 171, 115, 0.14);
+  background: rgba(198, 255, 99, 0.12);
 }
 
 .utilityLinks {
@@ -551,7 +557,7 @@
   padding: 0.95rem 1rem;
   border-radius: 1.05rem;
   border: 1px solid var(--marketing-border);
-  background: rgba(255, 251, 244, 0.72);
+  background: rgba(233, 241, 232, 0.04);
   color: var(--marketing-text-soft);
   font-size: 0.96rem;
   line-height: 1.45;
@@ -568,7 +574,7 @@
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid var(--marketing-border);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.9));
+  background: linear-gradient(180deg, rgba(16, 26, 32, 0.9), rgba(8, 15, 20, 0.98));
   min-height: 19rem;
 }
 
@@ -609,8 +615,8 @@
   width: 100%;
   border: 1px solid var(--marketing-border-strong);
   border-radius: 0.95rem;
-  background: rgba(255, 255, 255, 0.96);
-  color: var(--marketing-text);
+  background: rgba(233, 241, 232, 0.96);
+  color: #0b1217;
   font: inherit;
   padding: 0.95rem 1rem;
   transition: border-color 160ms ease, box-shadow 160ms ease;
@@ -625,8 +631,8 @@
 .textarea:focus,
 .select:focus {
   outline: none;
-  border-color: rgba(212, 171, 115, 0.82);
-  box-shadow: 0 0 0 3px rgba(212, 171, 115, 0.14);
+  border-color: rgba(198, 255, 99, 0.82);
+  box-shadow: 0 0 0 3px rgba(198, 255, 99, 0.14);
 }
 
 .error,
@@ -681,9 +687,9 @@
 .routeDarkSection {
   padding: clamp(6rem, 9vw, 7.8rem) 0 clamp(3rem, 6vw, 4.5rem);
   background:
-    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.22), transparent 24rem),
-    radial-gradient(circle at 86% 10%, rgba(212, 171, 115, 0.11), transparent 28rem),
-    linear-gradient(180deg, #18110d 0%, #2a1e17 100%);
+    radial-gradient(circle at 16% 0%, rgba(109, 167, 255, 0.12), transparent 24rem),
+    radial-gradient(circle at 86% 10%, rgba(198, 255, 99, 0.08), transparent 28rem),
+    linear-gradient(180deg, #0b1217 0%, #06090d 100%);
   color: var(--marketing-text-reverse);
 }
 
@@ -692,8 +698,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 82% 24%, rgba(212, 171, 115, 0.12), transparent 26rem),
-    radial-gradient(circle at 22% 18%, rgba(212, 171, 115, 0.12), transparent 18rem);
+    radial-gradient(circle at 82% 24%, rgba(198, 255, 99, 0.09), transparent 26rem),
+    radial-gradient(circle at 22% 18%, rgba(109, 167, 255, 0.1), transparent 18rem);
   opacity: 0.9;
   animation: ambientShift 18s ease-in-out infinite;
   pointer-events: none;
@@ -713,16 +719,16 @@
 }
 
 .routeLightSection {
-  --marketing-surface-soft: rgba(255, 251, 244, 0.72);
-  --marketing-text: #2c1d15;
-  --marketing-text-soft: rgba(57, 36, 22, 0.82);
-  --marketing-text-muted: rgba(77, 58, 45, 0.62);
-  --marketing-border: rgba(73, 46, 26, 0.12);
-  --marketing-border-strong: rgba(139, 99, 59, 0.24);
-  --marketing-shadow: 0 24px 64px rgba(10, 8, 10, 0.12);
+  --marketing-surface-soft: rgba(233, 241, 232, 0.72);
+  --marketing-text: #0b1217;
+  --marketing-text-soft: rgba(11, 18, 23, 0.76);
+  --marketing-text-muted: rgba(35, 52, 57, 0.62);
+  --marketing-border: rgba(11, 18, 23, 0.12);
+  --marketing-border-strong: rgba(49, 93, 74, 0.28);
+  --marketing-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
   padding: clamp(1.5rem, 3vw, 2.3rem) 0 clamp(4rem, 8vw, 5.5rem);
   background:
-    linear-gradient(180deg, rgba(255, 247, 235, 0.62), rgba(245, 237, 225, 0.96) 6rem),
+    linear-gradient(180deg, rgba(233, 241, 232, 0.62), rgba(213, 226, 216, 0.96) 6rem),
     var(--marketing-bg);
   color: var(--marketing-text);
 }
@@ -847,7 +853,7 @@
   min-height: 100%;
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.14), transparent 16rem),
+    radial-gradient(circle at 16% 0%, rgba(198, 255, 99, 0.1), transparent 16rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.96), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.24);
   min-height: 14.5rem;
@@ -864,7 +870,7 @@
 .routeDownloadCard .routeCardIcon {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.18), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(198, 255, 99, 0.14), transparent 70%),
     rgba(255, 255, 255, 0.04);
 }
 
@@ -877,7 +883,7 @@
 .routeArtifactPanel {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.14), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(109, 167, 255, 0.12), transparent 22rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.94), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.22);
 }
@@ -965,7 +971,7 @@
 .routeHeroPanel {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.16), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(109, 167, 255, 0.12), transparent 22rem),
     linear-gradient(180deg, rgba(14, 17, 26, 0.96), rgba(9, 11, 18, 0.98));
   color: var(--marketing-text-reverse);
   box-shadow: 0 30px 80px rgba(3, 8, 20, 0.24);
@@ -1021,7 +1027,7 @@
 
 .routeCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(212, 171, 115, 0.24);
+  border-color: rgba(198, 255, 99, 0.36);
   box-shadow: 0 28px 68px rgba(10, 18, 38, 0.14);
 }
 
@@ -1034,7 +1040,7 @@
   border-radius: 1rem;
   border: 1px solid rgba(7, 7, 7, 0.1);
   background:
-    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.14), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(198, 255, 99, 0.12), transparent 70%),
     rgba(7, 7, 7, 0.04);
 }
 
@@ -1053,7 +1059,7 @@
   border-radius: 1.5rem;
   border: 1px solid rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 20% 20%, rgba(92, 165, 255, 0.26), transparent 28%),
+    radial-gradient(circle at 20% 20%, rgba(109, 167, 255, 0.26), transparent 28%),
     linear-gradient(180deg, rgba(12, 13, 18, 0.86), rgba(8, 8, 10, 0.98));
   box-shadow: 0 30px 70px rgba(3, 3, 8, 0.32);
   animation: visualFloat 15s ease-in-out infinite;
@@ -1065,7 +1071,7 @@
   width: 16rem;
   height: 16rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(212, 171, 115, 0.24), transparent 64%);
+  background: radial-gradient(circle, rgba(198, 255, 99, 0.22), transparent 64%);
   filter: blur(4px);
   pointer-events: none;
   animation: glowPulse 10s ease-in-out infinite;
@@ -1088,8 +1094,8 @@
   border-radius: 1.4rem;
   border: 1px solid var(--marketing-border);
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8), transparent 60%),
-    rgba(255, 255, 255, 0.65);
+    radial-gradient(circle at 50% 0%, rgba(233, 241, 232, 0.64), transparent 60%),
+    rgba(233, 241, 232, 0.58);
   box-shadow: 0 12px 40px rgba(2, 2, 5, 0.06);
 }
 
@@ -1107,8 +1113,8 @@
   position: sticky;
   top: 2rem;
   background:
-    radial-gradient(circle at 20% 0%, rgba(212, 171, 115, 0.08), transparent 20rem),
-    rgba(255, 255, 255, 0.88);
+    radial-gradient(circle at 20% 0%, rgba(198, 255, 99, 0.08), transparent 20rem),
+    rgba(233, 241, 232, 0.78);
 }
 
 .routeMetaList {
@@ -1188,10 +1194,10 @@
   padding: clamp(2.5rem, 6vw, 4rem);
   border-radius: 1.8rem;
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(236, 223, 205, 0.94));
-  border: 1px solid rgba(58, 38, 25, 0.08);
-  box-shadow: 0 30px 80px rgba(50, 28, 16, 0.12);
+    radial-gradient(circle at 50% 0%, rgba(198, 255, 99, 0.16), transparent 24rem),
+    linear-gradient(180deg, rgba(233, 241, 232, 0.98), rgba(205, 220, 210, 0.94));
+  border: 1px solid rgba(11, 18, 23, 0.1);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.16);
   animation: fadeUpIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 

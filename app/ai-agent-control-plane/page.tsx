@@ -16,17 +16,17 @@ import feat from "@/components/site/marketing/MarketingFeature.module.css";
 export const metadata: Metadata = {
   title: "AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX",
   description:
-    "The control plane isn&rsquo;t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
+    "The control plane isn’t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
   ...buildPageMetadata({
     title: "AI Agent Control Plane — Runtime Traces, Lifecycle, Operator Surface | MUTX",
     description:
-      "The control plane isn&rsquo;t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
+      "The control plane isn’t a dashboard bolt-on. MUTX gives you runtime traces, agent lifecycle records, and a legible operator surface for every agent in your fleet.",
     path: "/ai-agent-control-plane",
     socialDescription:
-      "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.",
+      "The control plane isn’t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.",
     twitterTitle: "AI Agent Control Plane | MUTX",
     twitterDescription:
-      "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and operator surfaces — built in from day one.",
+      "The control plane isn’t a bolt-on. Runtime traces, lifecycle records, and operator surfaces — built in from day one.",
   }),
 };
 
@@ -54,7 +54,7 @@ const structuredData = {
       name: "AI Agent Control Plane | MUTX",
       url: getCanonicalUrl("/ai-agent-control-plane"),
       description:
-        "The control plane isn&rsquo;t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.",
+        "The control plane isn’t a bolt-on. Runtime traces, lifecycle records, and a legible operator surface — built in.",
       isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
@@ -67,11 +67,11 @@ const featureCards = [
   },
   {
     title: "Agent lifecycle",
-    body: "Every agent has a record. Who created it, what runtime it uses, what toolchain version was active. Lifecycle state is durable — not trapped in a Slack thread or someone&rsquo;s memory.",
+    body: "Every agent has a record. Who created it, what runtime it uses, what toolchain version was active. Lifecycle state is durable — not trapped in a Slack thread or someone’s memory.",
   },
   {
     title: "Operator surface",
-    body: "Operators shouldn&rsquo;t need to SSH into a box or grep a log to figure out what happened. MUTX gives you a readable surface for every agent action, every time.",
+    body: "Operators shouldn’t need to SSH into a box or grep a log to figure out what happened. MUTX gives you a readable surface for every agent action, every time.",
   },
   {
     title: "Consistency guarantees",
@@ -95,16 +95,14 @@ export default function AIAgentControlPlanePage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Control Plane</p>
                   <h1 className={feat.heroTitle}>
-                    The control plane
+                    Run every agent
                     <br />
-                    is the product.
+                    from one place.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Most agent tooling treats the control plane as an
-                    afterthought — something bolted on after the demo impresses
-                    the room. MUTX makes it the foundation. Runtime visibility,
-                    operator workflows, and consistency guarantees ship built in,
-                    not retrofitted after the first production fire.
+                    See runtime state, tool calls, and outcomes without jumping
+                    between logs, dashboards, and chat. MUTX gives every agent a
+                    place to run and every operator a clear view of the work.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -129,7 +127,7 @@ export default function AIAgentControlPlanePage() {
                 <h2 className={feat.sectionTitle}>
                   Read the runtime.
                   <br />
-                  Don&rsquo;t guess.
+                  Don’t guess.
                 </h2>
                 <p className={feat.sectionBody}>
                   When something breaks in production, you need to trace
@@ -159,8 +157,8 @@ export default function AIAgentControlPlanePage() {
                   Every concern.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Governance, cost, deployment, and observability aren&rsquo;t
-                  four tools that happen to share a billing account. They&rsquo;re
+                  Governance, cost, deployment, and observability aren’t
+                  four tools that happen to share a billing account. They’re
                   first-class properties of the same control plane — so policies
                   and traces stay coherent as your agent fleet scales.
                 </p>
@@ -222,7 +220,7 @@ export default function AIAgentControlPlanePage() {
                 <p className={feat.finalBody}>
                   Download the Mac app and open the runtime surface. See real
                   agent traces, what the control plane enforces, and what an
-                  operator surface looks like when it&rsquo;s built for
+                  operator surface looks like when it’s built for
                   legibility — not for screenshots.
                 </p>
                 <div className={feat.finalActions}>

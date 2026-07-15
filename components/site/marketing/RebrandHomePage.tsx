@@ -11,9 +11,7 @@ import {
   ArrowUpRight,
   Check,
   ChevronDown,
-  Menu,
   ShieldCheck,
-  X,
 } from 'lucide-react'
 import {
   AnimatePresence,
@@ -27,6 +25,7 @@ import {
 
 import { picoRobotMarketingHighlights } from '@/lib/picoRobotArt'
 import { marketingHomepage, type MarketingActionLink } from '@/lib/marketingContent'
+import { PublicNav } from '@/components/site/PublicNav'
 
 import { MarketingReveal } from './MarketingReveal'
 import styles from './RebrandHomePage.module.css'
@@ -35,13 +34,6 @@ type ActionLinkProps = {
   action: MarketingActionLink
   className: string
 }
-
-const NAV_ITEMS = [
-  { label: 'System', href: '#system' },
-  { label: 'Proof', href: '#proof' },
-  { label: 'Pico', href: 'https://pico.mutx.dev', external: true },
-  { label: 'Docs', href: '/docs' },
-]
 
 const SIGNALS = [
   { code: '01', label: 'Observe', body: 'Every run becomes a readable signal.' },
@@ -86,7 +78,6 @@ export function RebrandHomePage() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const heroContentY = useTransform(scrollYProgress, [0, 1], [0, -56])
   const heroContentOpacity = useTransform(scrollYProgress, [0, 0.84], [1, 0.22])
-  const [mobileOpen, setMobileOpen] = useState(false)
   const [activeDemoIndex, setActiveDemoIndex] = useState(0)
   const demoTabs = marketingHomepage.salesSections.demo.tabs
   const activeDemo = demoTabs[activeDemoIndex] ?? demoTabs[0]
@@ -106,76 +97,7 @@ export function RebrandHomePage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.nav}>
-        <div className={styles.navInner}>
-          <Link href="/" className={styles.brand} aria-label="MUTX home">
-            <span className={styles.brandMark}>
-              <Image src="/logo.webp" alt="" width={32} height={32} priority />
-            </span>
-            <span className={styles.brandCopy}>
-              <span className={styles.brandName}>MUTX</span>
-              <span className={styles.brandDescriptor}>agent operations</span>
-            </span>
-          </Link>
-
-          <nav className={styles.navLinks} aria-label="Main navigation">
-            {NAV_ITEMS.map((item) =>
-              item.external ? (
-                <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">
-                  {item.label}
-                </a>
-              ) : (
-                <a key={item.label} href={item.href}>
-                  {item.label}
-                </a>
-              ),
-            )}
-          </nav>
-
-          <div className={styles.navActions}>
-            <Link href="/download" className={styles.navQuietAction}>
-              Download
-            </Link>
-            <a
-              href="https://pico.mutx.dev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.navPicoAction}
-            >
-              <span className={styles.liveDot} />
-              Open Pico
-              <ArrowUpRight aria-hidden="true" />
-            </a>
-            <button
-              type="button"
-              className={styles.menuButton}
-              aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
-              aria-expanded={mobileOpen}
-              onClick={() => setMobileOpen((open) => !open)}
-            >
-              {mobileOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-            </button>
-          </div>
-        </div>
-
-        {mobileOpen ? (
-          <div className={styles.mobileMenu}>
-            {NAV_ITEMS.map((item) =>
-              item.external ? (
-                <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>
-                  {item.label}
-                  <ArrowUpRight aria-hidden="true" />
-                </a>
-              ) : (
-                <a key={item.label} href={item.href} onClick={() => setMobileOpen(false)}>
-                  {item.label}
-                  <ArrowRight aria-hidden="true" />
-                </a>
-              ),
-            )}
-          </div>
-        ) : null}
-      </header>
+      <PublicNav overlay />
 
       <main>
         <section
@@ -206,25 +128,25 @@ export function RebrandHomePage() {
                 <div className={styles.lockup} data-testid="homepage-lockup">
                   <span className={styles.lockupRule} />
                   <span className={styles.lockupWord} data-testid="homepage-lockup-word">MUTX</span>
-                  <span className={styles.lockupMeta} data-testid="homepage-lockup-meta">/ 00.01</span>
+                  <span className={styles.lockupMeta} data-testid="homepage-lockup-meta">/ AGENT OPERATIONS</span>
                 </div>
               </MarketingReveal>
 
               <MarketingReveal delay={0.12}>
-                <p className={styles.heroEyebrow}>The operating layer for autonomous work</p>
+                <p className={styles.heroEyebrow}>Agent operations for teams that ship</p>
                 <h1 className={styles.heroTitle}>
-                  See the move.
-                  <span>Hold the line.</span>
+                  Run agents.
+                  <span>Like software.</span>
                 </h1>
               </MarketingReveal>
 
               <MarketingReveal delay={0.2}>
                 <p className={styles.heroBody}>
-                  MUTX gives AI agents room to work — and gives humans the signal, boundary, and receipt to trust what happens next.
+                  Deploy agents, watch them work, and keep a record of every important decision.
                 </p>
                 <div className={styles.heroActions}>
                   <ActionLink
-                    action={{ label: 'Go to PicoMUTX', href: 'https://pico.mutx.dev', external: true, tone: 'pico' }}
+                    action={{ label: 'Open Pico', href: 'https://pico.mutx.dev', external: true, tone: 'pico' }}
                     className={styles.primaryButton}
                   />
                   <ActionLink
@@ -239,7 +161,7 @@ export function RebrandHomePage() {
 
               <MarketingReveal delay={0.28}>
                 <div className={styles.heroFootnote}>
-                  <span>Built for the moment after the demo.</span>
+                  <span>Hosted workspace · local desktop · open source.</span>
                   <span className={styles.heroFootnoteLine} />
                   <span>macOS · API · CLI</span>
                 </div>
@@ -247,10 +169,10 @@ export function RebrandHomePage() {
             </div>
 
             <MarketingReveal className={styles.heroInstrumentWrap} delay={0.22} distance={26}>
-              <div className={styles.heroInstrument}>
+                  <div className={styles.heroInstrument}>
                 <div className={styles.instrumentTopline}>
-                  <span>LIVE / CONTROL PLANE</span>
-                  <span className={styles.instrumentStatus}><span className={styles.liveDot} /> Nominal</span>
+                  <span>WORKSPACE STATUS</span>
+                  <span className={styles.instrumentStatus}><span className={styles.liveDot} /> Running</span>
                 </div>
                 <div className={styles.instrumentImage}>
                   <Image
@@ -262,12 +184,12 @@ export function RebrandHomePage() {
                     className={styles.instrumentImageAsset}
                   />
                   <div className={styles.instrumentReticle} aria-hidden="true"><span /><span /></div>
-                  <span className={styles.instrumentImageLabel}>RUN / 4812</span>
+                    <span className={styles.instrumentImageLabel}>CURRENT RUN</span>
                 </div>
                 <div className={styles.instrumentReadout}>
                   <div>
-                    <span className={styles.readoutLabel}>Current posture</span>
-                    <strong>bounded / observable</strong>
+                    <span className={styles.readoutLabel}>Current run</span>
+                    <strong>healthy / in progress</strong>
                   </div>
                   <Activity aria-hidden="true" />
                 </div>
@@ -283,9 +205,9 @@ export function RebrandHomePage() {
             </MarketingReveal>
           </motion.div>
 
-          <div className={styles.heroIndex} aria-hidden="true">MUTX / SYSTEM 01</div>
+          <div className={styles.heroIndex} aria-hidden="true">MUTX / PRODUCT</div>
           <div className={styles.scrollCue} aria-hidden="true">
-            <span>Scroll to inspect</span>
+            <span>See how it works</span>
             <span className={styles.scrollCueLine}><span /></span>
             <ArrowDown />
           </div>
@@ -293,7 +215,7 @@ export function RebrandHomePage() {
 
         <section className={styles.signalStrip} data-testid="homepage-social-proof">
           <div className={styles.sectionFrame}>
-            <div className={styles.signalIntro}>One surface.<br /><span>Three truths.</span></div>
+            <div className={styles.signalIntro}>What MUTX<br /><span>gives you.</span></div>
             {SIGNALS.map((signal) => (
               <div key={signal.code} className={styles.signalItem}>
                 <span className={styles.signalCode}>{signal.code}</span>
@@ -307,10 +229,10 @@ export function RebrandHomePage() {
           <div className={styles.sectionFrame}>
             <div className={styles.sectionHeadingRow}>
               <div>
-                <p className={styles.sectionKicker}>The control plane</p>
-                <h2 className={styles.sectionTitle}>A clearer view of the work.</h2>
+                <p className={styles.sectionKicker}>The product</p>
+                <h2 className={styles.sectionTitle}>Everything that matters, in one place.</h2>
               </div>
-              <p className={styles.sectionIntro}>Every agent gets a context. Every context gets a boundary. Every boundary leaves a record.</p>
+              <p className={styles.sectionIntro}>See runs, permissions, and outcomes without stitching together logs, dashboards, and chat.</p>
             </div>
 
             <div className={styles.systemGrid}>
@@ -348,8 +270,8 @@ export function RebrandHomePage() {
                 transition={{ duration: 0.25 }}
               >
                 <div className={styles.productFrameTopline}>
-                  <span>OPERATIONS / {activeDemo?.label.toUpperCase()}</span>
-                  <span>09:41:22 UTC</span>
+                  <span>MUTX / {activeDemo?.label.toUpperCase()}</span>
+                  <span>LIVE VIEW</span>
                 </div>
                 <div className={styles.productImageWrap}>
                   <AnimatePresence mode="wait" initial={false}>
@@ -401,10 +323,10 @@ export function RebrandHomePage() {
           <div className={styles.sectionFrame}>
             <div className={styles.sectionHeadingRow}>
               <div>
-                <p className={styles.sectionKicker}>The edge cases are the product</p>
-                <h2 className={styles.sectionTitle}>When “helpful” gets expensive.</h2>
+                <p className={styles.sectionKicker}>The failure modes</p>
+                <h2 className={styles.sectionTitle}>The damage is usually quiet.</h2>
               </div>
-              <p className={styles.sectionIntro}>MUTX brings the invisible failure into view while there is still time to choose differently.</p>
+              <p className={styles.sectionIntro}>MUTX shows the risky action before it becomes an incident.</p>
             </div>
             <div className={styles.failureGrid}>
               {marketingHomepage.salesSections.examples.items.map((item, index) => (
@@ -425,9 +347,9 @@ export function RebrandHomePage() {
         <section className={`${styles.section} ${styles.proofSection}`} data-testid="homepage-proof-section">
           <div className={styles.sectionFrame}>
             <div className={styles.proofIntro}>
-              <p className={styles.sectionKicker}>From hoping to knowing</p>
-              <h2 className={styles.sectionTitle}>Trust is a system property.</h2>
-              <p className={styles.sectionIntro}>Not a feeling. Not a demo. A stack of visible decisions that holds up when the room gets busy.</p>
+              <p className={styles.sectionKicker}>Why teams use it</p>
+              <h2 className={styles.sectionTitle}>Know what happened.</h2>
+              <p className={styles.sectionIntro}>A readable record beats a confident guess when the work gets serious.</p>
             </div>
             <div className={styles.proofList}>
               {marketingHomepage.salesSections.proof.items.map((item, index) => (
@@ -446,20 +368,20 @@ export function RebrandHomePage() {
           <div className={styles.sectionFrame}>
             <div className={styles.picoGrid}>
               <div className={styles.picoVisual}>
-                <Image src="/pico/robot/hero-wave.png" alt="PicoMUTX operator robot" fill sizes="(max-width: 900px) 90vw, 45vw" className={styles.picoImage} />
-                <div className={styles.picoVisualLabel}>PICO / SIGNAL 01</div>
+                <Image src="/pico/robot/hero-wave.png" alt="PicoMUTX operator robot" fill loading="eager" sizes="(max-width: 900px) 90vw, 45vw" className={styles.picoImage} />
+                <div className={styles.picoVisualLabel}>PICO / WORKSPACE</div>
               </div>
               <MarketingReveal className={styles.picoCopy} distance={24}>
-                <p className={styles.sectionKicker}>The fast lane into MUTX</p>
-                <h2 className={styles.sectionTitle}>Meet Pico. Start with the next honest move.</h2>
-                <p className={styles.sectionIntro}>Pico turns the first confusing moment into a guided path — build, fix, or control — without losing the operational truth underneath.</p>
+                <p className={styles.sectionKicker}>A faster way in</p>
+                <h2 className={styles.sectionTitle}>Pico gets you to the useful part.</h2>
+                <p className={styles.sectionIntro}>Use Pico to set up, troubleshoot, and operate without losing sight of the work underneath.</p>
                 <div className={styles.picoHighlights}>
                   {picoRobotMarketingHighlights.slice(0, 3).map((item) => (
                     <div key={item.title} className={styles.picoHighlight}><Check aria-hidden="true" /><span>{item.title}</span></div>
                   ))}
                 </div>
                 <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className={styles.picoButton}>
-                  <span>Open PicoMUTX</span><ArrowUpRight aria-hidden="true" />
+                  <span>Open Pico</span><ArrowUpRight aria-hidden="true" />
                 </a>
               </MarketingReveal>
             </div>
@@ -469,8 +391,8 @@ export function RebrandHomePage() {
         <section className={styles.finalSection} data-testid="homepage-final-cta">
           <div className={styles.finalFrame}>
             <div>
-              <p className={styles.sectionKicker}>Your next run is already telling you something</p>
-              <h2 className={styles.finalTitle}>Make the signal useful.</h2>
+              <p className={styles.sectionKicker}>Start here</p>
+              <h2 className={styles.finalTitle}>Put the work somewhere you can see it.</h2>
             </div>
             <div className={styles.finalActions}>
               <Link href="/download" className={styles.primaryButton}>Download for Mac <ArrowRight aria-hidden="true" /></Link>

@@ -134,7 +134,7 @@ export default async function ReleasesPage() {
             <div className={styles.routeDownloadStage}>
               <div className={`${styles.routeHeroMain} ${styles.routeDownloadCopy}`}>
                 <div className={styles.intro}>
-                  <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Release lane</p>
+                  <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Latest build</p>
                   <h1 className={`${styles.displayTitle} ${styles.darkText}`}>
                     MUTX {releaseLabel}
                     <span className={styles.displayAccent}>Signed desktop release.</span>
@@ -185,8 +185,8 @@ export default async function ReleasesPage() {
             <div className={`${styles.routeReleaseBand} ${styles.routeHeroPanel}`}>
               <div className={styles.routeReleaseBandCopy}>
                 <div className={styles.intro}>
-                  <p className={styles.eyebrow}>What ships now</p>
-                  <h2 className={styles.sectionTitle}>One release lane.</h2>
+                  <p className={styles.eyebrow}>Included</p>
+                  <h2 className={styles.sectionTitle}>Everything for this build.</h2>
                   <p className={styles.bodyText}>
                     Downloads, notes, checksums, and the GitHub tag all point at the same build.
                   </p>

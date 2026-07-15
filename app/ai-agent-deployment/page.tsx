@@ -75,7 +75,7 @@ const featureCards = [
   },
   {
     title: "Environment parity",
-    body: "Local, staging, and production should behave the same because the control plane enforces it — not because the team agreed they &lsquo;probably should&rsquo; and moved on.",
+    body: "Local, staging, and production should behave the same because the control plane enforces it — not because the team agreed they ‘probably should’ and moved on.",
   },
 ];
 
@@ -95,16 +95,14 @@ export default function AIAgentDeploymentPage() {
                 <div className={feat.heroColumn}>
                   <p className={feat.heroEyebrow}>AI Agent Deployment</p>
                   <h1 className={feat.heroTitle}>
-                    Ship agents
+                    Deploy agents
                     <br />
-                    like services.
+                    the same way every time.
                   </h1>
                   <p className={feat.heroSupport}>
-                    Agents shouldn&rsquo;t need custom deployment scripts held
-                    together by convention and prayer. MUTX treats deployment as
-                    a first-class record — repeatable environments, rollback
-                    paths, and audit trails that make what shipped visible to
-                    your whole team.
+                    Keep environments, versions, rollback paths, and deploy
+                    history together. Everyone can see what shipped, where it
+                    went, and how to get back.
                   </p>
                   <div className={feat.heroActions}>
                     <Link href="/download" className={core.buttonPrimary}>
@@ -132,7 +130,7 @@ export default function AIAgentDeploymentPage() {
                   Not a prayer.
                 </h2>
                 <p className={feat.sectionBody}>
-                  Most agent tooling doesn&rsquo;t have a deployment concept —
+                  Most agent tooling doesn’t have a deployment concept —
                   just a script that runs and crosses its fingers. MUTX makes
                   deployment a durable record. Audit what changed. Roll back
                   what broke. Reason about production state without guessing.
@@ -203,7 +201,7 @@ export default function AIAgentDeploymentPage() {
                   </h3>
                   <p className={feat.featureCardBody}>
                     Health checks and readiness probes are part of the deployment
-                    record. The agent isn&rsquo;t &ldquo;running&rdquo; until
+                    record. The agent isn’t “running” until
                     the control plane confirms it — not when a process starts in
                     the background and everyone hopes for the best.
                   </p>
@@ -223,7 +221,7 @@ export default function AIAgentDeploymentPage() {
                 </h2>
                 <p className={feat.finalBody}>
                   Download the Mac app, deploy your first agent, and see what
-                  the deployment record looks like when it&rsquo;s built around
+                    the deployment record looks like when it’s built around
                   auditability and rollback — not around whatever was easiest
                   to hack together.
                 </p>
