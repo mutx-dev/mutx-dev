@@ -45,7 +45,6 @@ dev = [
     "pytest-asyncio>=0.23.0",
     "pytest-cov>=4.0.0",
     "build>=1.2.2",
-    "black>=23.0.0",
     "ruff>=0.1.0",
     "aiosqlite>=0.20.0",
     "mutmut>=3.0.0",
@@ -67,10 +66,6 @@ cli = ["policies/*.fpl"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-
-[tool.black]
-line-length = 100
-target-version = ["py310"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

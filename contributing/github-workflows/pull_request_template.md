@@ -19,7 +19,7 @@ Use this template to keep PRs small, explicit, and easy to review.
 
 * [ ] `npm run build`
 * [ ] `ruff check src/api cli sdk`
-* [ ] `black --check src/api cli sdk`
+* [ ] `ruff format --check src/api cli sdk src/security`
 * [ ] `python -m compileall src/api cli sdk/mutx`
 * [ ] targeted manual or automated verification
 

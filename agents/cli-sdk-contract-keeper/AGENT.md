@@ -32,7 +32,7 @@ Keep the Python CLI and SDK aligned with the live backend contract.
 ## Validation
 
 * `ruff check cli sdk`
-* `black --check cli sdk`
+* `ruff format --check cli sdk`
 * `python -m compileall cli sdk/mutx`
 
 ## Guardrails
