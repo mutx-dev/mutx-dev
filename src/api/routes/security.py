@@ -28,13 +28,8 @@ from pydantic import BaseModel, Field
 
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
+from src.api.services.governance_runtime import get_governance_runtime
 from src.security import (
-    ActionMediator,
-    ContextAccumulator,
-    PolicyEngine,
-    ApprovalService,
-    ReceiptGenerator,
-    TelemetryExporter,
     AARMComplianceChecker,
     NormalizedAction,
 )
@@ -43,12 +38,13 @@ from src.security.telemetry import TelemetryEventType
 router = APIRouter(prefix="/security", tags=["security"])
 
 
-_mediator = ActionMediator()
-_context_accumulator = ContextAccumulator()
-_policy_engine = PolicyEngine()
-_approval_service = ApprovalService()
-_receipt_generator = ReceiptGenerator()
-_telemetry_exporter = TelemetryExporter()
+_governance = get_governance_runtime()
+_mediator = _governance.mediator
+_context_accumulator = _governance.context_accumulator
+_policy_engine = _governance.policy_engine
+_approval_service = _governance.approval_service
+_receipt_generator = _governance.receipt_generator
+_telemetry_exporter = _governance.telemetry_exporter
 
 
 class ActionEvaluateRequest(BaseModel):

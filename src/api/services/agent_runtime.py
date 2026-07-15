@@ -1,5 +1,6 @@
 import os
 import asyncio
+from contextvars import ContextVar, copy_context
 import logging
 import uuid
 from typing import Optional, List, Dict, Any, AsyncIterator, Callable
@@ -7,6 +8,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
+
+from src.api.services.governance_runtime import GovernanceRuntime, get_governance_runtime
 
 from ..integrations.langchain_agent import (
     LangChainAgent,
@@ -69,44 +72,184 @@ class RuntimeState:
 
 
 class ToolExecutionHandler:
-    def __init__(self):
+    def __init__(self, governance: GovernanceRuntime):
         self._handlers: Dict[str, Callable] = {}
+        self._governance = governance
 
     def register_handler(self, tool_name: str, handler: Callable):
+        if tool_name in self._governance.SAFE_BUILTIN_TOOLS:
+            raise ValueError(f"Tool name is reserved for a runtime built-in: {tool_name}")
+        self._register_handler(tool_name, handler)
+
+    def _register_builtin_handler(self, tool_name: str, handler: Callable) -> None:
+        if tool_name not in self._governance.SAFE_BUILTIN_TOOLS:
+            raise ValueError(f"Tool name is not a runtime built-in: {tool_name}")
+        self._register_handler(tool_name, handler)
+
+    def _register_handler(self, tool_name: str, handler: Callable) -> None:
         self._handlers[tool_name] = handler
         logger.info(f"Registered handler for tool: {tool_name}")
 
     def get_handler(self, tool_name: str) -> Optional[Callable]:
         return self._handlers.get(tool_name)
 
-    async def execute_tool(self, tool_name: str, parameters: Dict[str, Any]) -> Any:
-        handler = self.get_handler(tool_name)
+    async def execute_tool(
+        self,
+        tool_name: str,
+        parameters: Dict[str, Any],
+        *,
+        agent_id: str = "runtime-agent",
+        session_id: str | None = None,
+        run_id: str | None = None,
+        user_id: str = "",
+        actor_type: str = "agent",
+        actor_id: str | None = None,
+        actor_display: str | None = None,
+        handler_override: Callable | None = None,
+    ) -> Any:
+        resolved_run_id = run_id or str(uuid.uuid4())
+        resolved_session_id = session_id or resolved_run_id
+        evaluation = self._governance.authorize(
+            tool_name=tool_name,
+            tool_args=parameters,
+            agent_id=agent_id,
+            session_id=resolved_session_id,
+            run_id=resolved_run_id,
+            user_id=user_id,
+            actor_type=actor_type,
+            actor_id=actor_id,
+            actor_display=actor_display,
+        )
+
+        if evaluation.decision.is_denied:
+            receipt, audit_event = await self._governance.record_outcome(
+                evaluation,
+                outcome="blocked",
+                outcome_detail=evaluation.decision.reason,
+            )
+            return {
+                "error": "Tool execution denied by policy",
+                "decision": evaluation.decision.decision.value,
+                "reason": evaluation.decision.reason,
+                "receipt_id": receipt.receipt_id,
+                "integrity_hash": audit_event.integrity_hash,
+            }
+
+        if evaluation.decision.is_deferred:
+            receipt, audit_event = await self._governance.record_outcome(
+                evaluation,
+                outcome="approval_required",
+                outcome_detail=evaluation.decision.reason,
+            )
+            return {
+                "error": "Tool execution requires approval",
+                "decision": evaluation.decision.decision.value,
+                "reason": evaluation.decision.reason,
+                "approval_id": evaluation.approval.id if evaluation.approval else None,
+                "receipt_id": receipt.receipt_id,
+                "integrity_hash": audit_event.integrity_hash,
+            }
+
+        handler = handler_override or self.get_handler(tool_name)
         if not handler:
             logger.warning(f"No handler registered for tool: {tool_name}")
-            return {"error": f"Tool {tool_name} not found"}
+            error = f"Tool {tool_name} not found"
+            receipt, audit_event = await self._governance.record_outcome(
+                evaluation,
+                outcome="error",
+                outcome_detail=error,
+                error=error,
+            )
+            return {
+                "error": error,
+                "receipt_id": receipt.receipt_id,
+                "integrity_hash": audit_event.integrity_hash,
+            }
 
         try:
+            authorization_receipt, _ = await self._governance.record_authorization(evaluation)
+        except Exception:
+            logger.exception(
+                "Tool execution blocked because authorization evidence could not be persisted: %s",
+                tool_name,
+            )
+            return {
+                "error": "Tool execution blocked because authorization evidence could not be persisted",
+                "decision": evaluation.decision.decision.value,
+                "reason": evaluation.decision.reason,
+            }
+
+        modification_envelope = evaluation.decision.modifications or {}
+        effective_parameters = modification_envelope.get("modified_args", parameters)
+        try:
             if asyncio.iscoroutinefunction(handler):
-                return await handler(parameters)
-            return handler(parameters)
+                result = await handler(effective_parameters)
+            else:
+                result = handler(effective_parameters)
         except Exception as e:
             logger.error(f"Tool execution error for {tool_name}: {str(e)}")
+            try:
+                await self._governance.record_execution_result(
+                    evaluation,
+                    authorization_receipt=authorization_receipt,
+                    outcome="error",
+                    error=str(e),
+                )
+            except Exception:
+                logger.exception("Failed to persist tool execution failure evidence: %s", tool_name)
             return {"error": str(e)}
+
+        try:
+            await self._governance.record_execution_result(
+                evaluation,
+                authorization_receipt=authorization_receipt,
+                outcome="executed",
+                output_preview=str(result)[:500],
+            )
+        except Exception:
+            logger.exception(
+                "Tool executed but outcome evidence could not be persisted: %s", tool_name
+            )
+            return {
+                "error": "Tool executed but outcome evidence could not be persisted",
+                "result": result,
+                "receipt_id": authorization_receipt.receipt_id,
+            }
+        return result
 
 
 class AgentRuntime:
-    def __init__(self, config: RuntimeConfig):
+    def __init__(
+        self,
+        config: RuntimeConfig,
+        governance: GovernanceRuntime | None = None,
+    ):
         self.config = config
         self.runtime_id = str(uuid.uuid4())
         self.state = RuntimeState(
             runtime_id=self.runtime_id,
             status=RuntimeStatus.STOPPED,
         )
-        self.tool_handler = ToolExecutionHandler()
+        self.governance = governance or get_governance_runtime()
+        self.tool_handler = ToolExecutionHandler(self.governance)
         self._execution_callbacks: Dict[str, Callable] = {}
         self._running_tasks: Dict[str, asyncio.Task] = {}
+        self._execution_scope: ContextVar[tuple[str, str] | None] = ContextVar(
+            f"mutx_runtime_execution_{self.runtime_id}", default=None
+        )
+        self._event_loop: asyncio.AbstractEventLoop | None = None
+
+    def _bind_event_loop(self) -> asyncio.AbstractEventLoop:
+        """Bind governed operations to one owning loop for shared async state."""
+        event_loop = asyncio.get_running_loop()
+        if self._event_loop is not None and self._event_loop is not event_loop:
+            if self._event_loop.is_running():
+                raise RuntimeError("AgentRuntime is already bound to another event loop")
+        self._event_loop = event_loop
+        return event_loop
 
     async def start(self):
+        self._bind_event_loop()
         if self.state.status == RuntimeStatus.RUNNING:
             logger.warning(f"Runtime {self.runtime_id} already running")
             return
@@ -151,9 +294,11 @@ class AgentRuntime:
             logger.error(f"Failed to initialize vector store: {str(e)}")
 
     def _register_default_tool_handlers(self):
-        self.tool_handler.register_handler("search_documents", self._handle_search_documents)
-        self.tool_handler.register_handler("get_time", self._handle_get_time)
-        self.tool_handler.register_handler("calculator", self._handle_calculator)
+        self.tool_handler._register_builtin_handler(
+            "search_documents", self._handle_search_documents
+        )
+        self.tool_handler._register_builtin_handler("get_time", self._handle_get_time)
+        self.tool_handler._register_builtin_handler("calculator", self._handle_calculator)
 
     async def _handle_search_documents(self, params: Dict[str, Any]) -> str:
         store_name = params.get("store_name", "default")
@@ -200,6 +345,7 @@ class AgentRuntime:
             system_prompt=system_prompt,
             tools=tools or [],
             vector_store_name=vector_store_name,
+            tool_executor=self._execute_langchain_tool,
             **kwargs,
         )
         agent = AgentRegistry.create_agent(config)
@@ -207,12 +353,51 @@ class AgentRuntime:
         logger.info(f"Created agent {agent.agent_id} in runtime {self.runtime_id}")
         return agent
 
+    def _execute_langchain_tool(
+        self,
+        agent_id: str,
+        tool_name: str,
+        parameters: Dict[str, Any],
+        handler: Callable,
+    ) -> Any:
+        """Bridge synchronous LangChain tools through async governance enforcement."""
+        scope = self._execution_scope.get()
+        run_id, session_id = scope or (str(uuid.uuid4()), str(uuid.uuid4()))
+
+        async def execute() -> Any:
+            return await self.tool_handler.execute_tool(
+                tool_name,
+                parameters,
+                agent_id=agent_id,
+                session_id=session_id,
+                run_id=run_id,
+                handler_override=handler,
+            )
+
+        owner_loop = self._event_loop
+        if owner_loop is None or not owner_loop.is_running():
+            return asyncio.run(execute())
+
+        try:
+            current_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            current_loop = None
+        if current_loop is owner_loop:
+            raise RuntimeError(
+                "Synchronous governed tool calls cannot block the runtime event loop"
+            )
+
+        worker_context = copy_context()
+        future = worker_context.run(asyncio.run_coroutine_threadsafe, execute(), owner_loop)
+        return future.result()
+
     async def execute_agent(
         self,
         agent_id: str,
         input_text: str,
         timeout: Optional[int] = None,
     ) -> ExecutionContext:
+        self._bind_event_loop()
         execution_id = str(uuid.uuid4())
         context = ExecutionContext(
             execution_id=execution_id,
@@ -229,6 +414,7 @@ class AgentRuntime:
             return context
 
         timeout = timeout or self.config.default_timeout
+        scope_token = self._execution_scope.set((execution_id, execution_id))
 
         try:
             result = await asyncio.wait_for(
@@ -258,6 +444,8 @@ class AgentRuntime:
             context.completed_at = datetime.now(timezone.utc)
             self.state.failed_executions += 1
             logger.error(f"Execution {execution_id} error: {str(e)}")
+        finally:
+            self._execution_scope.reset(scope_token)
 
         if self._execution_callbacks.get(execution_id):
             callback = self._execution_callbacks.pop(execution_id)
@@ -270,13 +458,27 @@ class AgentRuntime:
         agent_id: str,
         input_text: str,
     ) -> AsyncIterator[str]:
+        self._bind_event_loop()
         agent = AgentRegistry.get_agent(agent_id)
         if not agent:
             yield f"Error: Agent {agent_id} not found"
             return
 
+        execution_id = str(uuid.uuid4())
+        scope_token = self._execution_scope.set((execution_id, execution_id))
         try:
-            for chunk in agent.stream_run(input_text):
+            stream = iter(agent.stream_run(input_text))
+
+            def next_chunk() -> tuple[bool, Any]:
+                try:
+                    return True, next(stream)
+                except StopIteration:
+                    return False, None
+
+            while True:
+                has_chunk, chunk = await asyncio.to_thread(next_chunk)
+                if not has_chunk:
+                    break
                 if isinstance(chunk, str):
                     yield chunk
                 else:
@@ -284,13 +486,20 @@ class AgentRuntime:
         except Exception as e:
             logger.error(f"Stream execution error: {str(e)}")
             yield f"Error: {str(e)}"
+        finally:
+            self._execution_scope.reset(scope_token)
 
     def execute_agent_sync(self, agent_id: str, input_text: str) -> Dict[str, Any]:
         agent = AgentRegistry.get_agent(agent_id)
         if not agent:
             return {"success": False, "error": f"Agent {agent_id} not found"}
 
-        return agent.run(input_text)
+        execution_id = str(uuid.uuid4())
+        scope_token = self._execution_scope.set((execution_id, execution_id))
+        try:
+            return agent.run(input_text)
+        finally:
+            self._execution_scope.reset(scope_token)
 
     def get_agent(self, agent_id: str) -> Optional[LangChainAgent]:
         return AgentRegistry.get_agent(agent_id)

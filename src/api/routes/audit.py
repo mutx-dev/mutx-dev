@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from src.api.dependencies import get_current_user, require_roles, SSOTokenUser
 from src.api.services.audit_log import (
@@ -33,11 +33,24 @@ class AuditEventResponse(BaseModel):
     event_id: str
     agent_id: str
     session_id: str
+    run_id: str | None = None
     span_id: str | None = None
+    parent_span_id: str | None = None
     event_type: str
     payload: dict
     timestamp: datetime
     trace_id: str | None = None
+    actor_type: str = "agent"
+    actor_id: str | None = None
+    actor_display: str | None = None
+    policy_decision_id: str | None = None
+    policy_refs: list[str] = Field(default_factory=list)
+    approval_id: str | None = None
+    cost_record: dict[str, object] | None = None
+    redaction_status: str = "none"
+    schema_version: str = "1.0"
+    previous_hash: str | None = None
+    integrity_hash: str | None = None
 
     @classmethod
     def from_audit_event(cls, event: AuditEvent) -> "AuditEventResponse":
@@ -46,11 +59,24 @@ class AuditEventResponse(BaseModel):
             event_id=str(event.event_id),
             agent_id=event.agent_id,
             session_id=event.session_id,
+            run_id=event.run_id,
             span_id=event.span_id,
+            parent_span_id=event.parent_span_id,
             event_type=event.event_type.value,
             payload=event.payload,
             timestamp=event.timestamp,
             trace_id=event.trace_id,
+            actor_type=event.actor_type,
+            actor_id=event.actor_id,
+            actor_display=event.actor_display,
+            policy_decision_id=event.policy_decision_id,
+            policy_refs=event.policy_refs,
+            approval_id=event.approval_id,
+            cost_record=event.cost_record,
+            redaction_status=event.redaction_status,
+            schema_version=event.schema_version,
+            previous_hash=event.previous_hash,
+            integrity_hash=event.integrity_hash,
         )
 
 
@@ -59,6 +85,20 @@ class AuditEventsResponse(BaseModel):
 
     events: list[AuditEventResponse]
     total: int | None = None
+
+
+class AuditEvidenceExportResponse(BaseModel):
+    """Verified governed-operation evidence chain export."""
+
+    schema_version: str
+    algorithm: str
+    run_id: str | None = None
+    session_id: str | None = None
+    event_count: int
+    chain_root: str | None = None
+    verified: bool
+    errors: list[str]
+    events: list[AuditEventResponse]
 
 
 @router.get(
@@ -70,6 +110,7 @@ async def query_audit_events(
     current_user: Annotated[SSOTokenUser, Depends(get_current_user)],
     agent_id: Annotated[str | None, Query(description="Filter by agent ID")] = None,
     session_id: Annotated[str | None, Query(description="Filter by session ID")] = None,
+    run_id: Annotated[str | None, Query(description="Filter by run ID")] = None,
     time_range_start: Annotated[
         datetime | None,
         Query(
@@ -97,6 +138,7 @@ async def query_audit_events(
         current_user: The authenticated user.
         agent_id: Optional agent ID filter.
         session_id: Optional session ID filter.
+        run_id: Optional run ID filter.
         time_range_start: Optional start time filter.
         time_range_end: Optional end time filter.
         event_type: Optional event type filter.
@@ -109,6 +151,7 @@ async def query_audit_events(
     filters = AuditQuery(
         agent_id=agent_id,
         session_id=session_id,
+        run_id=run_id,
         time_range_start=time_range_start,
         time_range_end=time_range_end,
         event_type=event_type,
@@ -127,6 +170,33 @@ async def query_audit_events(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to query audit events: {str(e)}",
         )
+
+
+@router.get(
+    "/export",
+    response_model=AuditEvidenceExportResponse,
+    dependencies=[Depends(require_roles("ADMIN", "AUDIT_ADMIN"))],
+)
+async def export_audit_evidence(
+    current_user: Annotated[SSOTokenUser, Depends(get_current_user)],
+    run_id: Annotated[str | None, Query(description="Run ID to export")] = None,
+    session_id: Annotated[str | None, Query(description="Session ID to export")] = None,
+) -> AuditEvidenceExportResponse:
+    """Export a verified SHA-256 evidence chain for one run or session."""
+    try:
+        audit_log = await get_audit_log()
+        export = await audit_log.export_evidence(run_id=run_id, session_id=session_id)
+        return AuditEvidenceExportResponse(**export)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Failed to export audit evidence: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to export audit evidence",
+        ) from exc
 
 
 @router.get(
