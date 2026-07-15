@@ -9,11 +9,14 @@ def read_text(relative_path: str) -> str:
 
 
 def test_test_requirements_do_not_drift_from_runtime_core_pins() -> None:
+    runtime_requirements = read_text("requirements.txt")
     test_requirements = read_text("test-requirements.txt")
 
+    assert "fastapi==0.135.3" in runtime_requirements
+    assert "fastapi>=" not in runtime_requirements
     assert "-r requirements.txt" in test_requirements
     assert "passlib[bcrypt]" not in test_requirements
-    assert "httpx==0.26.0" in test_requirements
+    assert "httpx==0.28.1" in test_requirements
     assert "aiosqlite==0.20.0" in test_requirements
     assert "sqlalchemy==2.0.25" in test_requirements
 
