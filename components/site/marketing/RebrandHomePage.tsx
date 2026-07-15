@@ -2,9 +2,11 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
 import {
   Activity,
+  ArrowDown,
   ArrowRight,
   ArrowUpRight,
   Check,
@@ -13,7 +15,15 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react'
-import { motion, useReducedMotion } from 'framer-motion'
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion'
 
 import { picoRobotMarketingHighlights } from '@/lib/picoRobotArt'
 import { marketingHomepage, type MarketingActionLink } from '@/lib/marketingContent'
@@ -67,10 +77,32 @@ function ActionLink({ action, className }: ActionLinkProps) {
 
 export function RebrandHomePage() {
   const prefersReducedMotion = useReducedMotion()
+  const heroRef = useRef<HTMLElement>(null)
+  const pointerX = useMotionValue(0)
+  const pointerY = useMotionValue(0)
+  const imageX = useSpring(useTransform(pointerX, [-1, 1], [-16, 16]), { stiffness: 90, damping: 22 })
+  const imageY = useSpring(useTransform(pointerY, [-1, 1], [-10, 10]), { stiffness: 90, damping: 22 })
+  const gridY = useTransform(pointerY, [-1, 1], [-4, 4])
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const heroContentY = useTransform(scrollYProgress, [0, 1], [0, -56])
+  const heroContentOpacity = useTransform(scrollYProgress, [0, 0.84], [1, 0.22])
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeDemoIndex, setActiveDemoIndex] = useState(0)
   const demoTabs = marketingHomepage.salesSections.demo.tabs
   const activeDemo = demoTabs[activeDemoIndex] ?? demoTabs[0]
+
+  const handleHeroPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (prefersReducedMotion || event.pointerType === 'touch') return
+
+    const bounds = event.currentTarget.getBoundingClientRect()
+    pointerX.set(((event.clientX - bounds.left) / bounds.width) * 2 - 1)
+    pointerY.set(((event.clientY - bounds.top) / bounds.height) * 2 - 1)
+  }
+
+  const resetHeroPointer = () => {
+    pointerX.set(0)
+    pointerY.set(0)
+  }
 
   return (
     <div className={styles.page}>
@@ -146,23 +178,29 @@ export function RebrandHomePage() {
       </header>
 
       <main>
-        <section className={styles.hero}>
-          <div className={styles.heroImage} aria-hidden="true">
+        <section
+          ref={heroRef}
+          className={styles.hero}
+          onPointerMove={handleHeroPointerMove}
+          onPointerLeave={resetHeroPointer}
+        >
+          <motion.div className={styles.heroImage} style={{ x: imageX, y: imageY, scale: 1.06 }} aria-hidden="true">
             <Image
               src="/landing/webp/victory-core.webp"
               alt=""
               fill
               priority
+              loading="eager"
               sizes="100vw"
               className={styles.heroImageAsset}
             />
-          </div>
+          </motion.div>
           <div className={styles.heroScrim} aria-hidden="true" />
-          <div className={styles.heroGrid} aria-hidden="true" />
+          <motion.div className={styles.heroGrid} style={{ y: gridY }} aria-hidden="true" />
           <div className={`${styles.heroCorner} ${styles.heroCornerTop}`} aria-hidden="true" />
           <div className={`${styles.heroCorner} ${styles.heroCornerBottom}`} aria-hidden="true" />
 
-          <div className={styles.heroInner}>
+          <motion.div className={styles.heroInner} style={{ y: heroContentY, opacity: heroContentOpacity }}>
             <div className={styles.heroCopy} data-testid="homepage-hero-content">
               <MarketingReveal delay={0.04}>
                 <div className={styles.lockup} data-testid="homepage-lockup">
@@ -242,9 +280,14 @@ export function RebrandHomePage() {
                 </div>
               </div>
             </MarketingReveal>
-          </div>
+          </motion.div>
 
           <div className={styles.heroIndex} aria-hidden="true">MUTX / SYSTEM 01</div>
+          <div className={styles.scrollCue} aria-hidden="true">
+            <span>Scroll to inspect</span>
+            <span className={styles.scrollCueLine}><span /></span>
+            <ArrowDown />
+          </div>
         </section>
 
         <section className={styles.signalStrip} data-testid="homepage-social-proof">
@@ -289,6 +332,12 @@ export function RebrandHomePage() {
                   <ShieldCheck aria-hidden="true" />
                   <p>Designed for the decision before the action, not the postmortem after it.</p>
                 </div>
+                <div className={styles.stateMeter} aria-hidden="true">
+                  <span>VIEW 0{activeDemoIndex + 1} / 0{demoTabs.length}</span>
+                  <span className={styles.stateMeterTrack}>
+                    <span style={{ width: `${((activeDemoIndex + 1) / demoTabs.length) * 100}%` }} />
+                  </span>
+                </div>
               </div>
 
               <motion.div
@@ -302,25 +351,46 @@ export function RebrandHomePage() {
                   <span>09:41:22 UTC</span>
                 </div>
                 <div className={styles.productImageWrap}>
+                  <AnimatePresence mode="wait" initial={false}>
+                    {activeDemo ? (
+                      <motion.div
+                        key={activeDemo.id}
+                        className={styles.productMediaLayer}
+                        initial={{ opacity: 0, scale: 1.035, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.985, y: -10 }}
+                        transition={{ duration: prefersReducedMotion ? 0.01 : 0.42, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <Image
+                          src={activeDemo.mediaSrc}
+                          alt={activeDemo.mediaAlt}
+                          fill
+                          sizes="(max-width: 900px) 92vw, 62vw"
+                          className={styles.productImage}
+                        />
+                        <div className={styles.productImageShade} aria-hidden="true" />
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+                <AnimatePresence mode="wait" initial={false}>
                   {activeDemo ? (
-                    <Image
+                    <motion.div
                       key={activeDemo.id}
-                      src={activeDemo.mediaSrc}
-                      alt={activeDemo.mediaAlt}
-                      fill
-                      sizes="(max-width: 900px) 92vw, 62vw"
-                      className={styles.productImage}
-                    />
+                      className={styles.productCaption}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: prefersReducedMotion ? 0.01 : 0.28 }}
+                    >
+                      <div>
+                        <span className={styles.sectionKicker}>{activeDemo.label}</span>
+                        <h3>{activeDemo.title}</h3>
+                      </div>
+                      <p>{activeDemo.body}</p>
+                    </motion.div>
                   ) : null}
-                  <div className={styles.productImageShade} aria-hidden="true" />
-                </div>
-                <div className={styles.productCaption}>
-                  <div>
-                    <span className={styles.sectionKicker}>{activeDemo?.label}</span>
-                    <h3>{activeDemo?.title}</h3>
-                  </div>
-                  <p>{activeDemo?.body}</p>
-                </div>
+                </AnimatePresence>
               </motion.div>
             </div>
           </div>

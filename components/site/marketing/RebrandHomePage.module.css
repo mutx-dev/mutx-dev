@@ -556,6 +556,57 @@
   letter-spacing: 0.12em;
 }
 
+.scrollCue {
+  position: absolute;
+  z-index: 4;
+  bottom: 30px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--rebrand-dim);
+  font-family: var(--font-site-mono), monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.scrollCueLine {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 1px;
+  overflow: hidden;
+  background: var(--rebrand-line);
+}
+
+.scrollCueLine span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 18px;
+  background: var(--rebrand-lime);
+  animation: cueScan 2.8s ease-in-out infinite;
+}
+
+.scrollCue svg {
+  width: 13px;
+  height: 13px;
+  color: var(--rebrand-lime);
+}
+
+@keyframes cueScan {
+  0%,
+  100% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(320%);
+  }
+}
+
 .signalStrip {
   border-top: 1px solid var(--rebrand-line);
   border-bottom: 1px solid var(--rebrand-line);
@@ -694,6 +745,31 @@
   margin: 0;
 }
 
+.stateMeter {
+  display: grid;
+  gap: 10px;
+  margin-top: 32px;
+  color: var(--rebrand-dim);
+  font-family: var(--font-site-mono), monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stateMeterTrack {
+  display: block;
+  height: 1px;
+  overflow: hidden;
+  background: var(--rebrand-line);
+}
+
+.stateMeterTrack > span {
+  display: block;
+  height: 100%;
+  background: var(--rebrand-lime);
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .productFrame {
   position: relative;
   padding: 14px;
@@ -722,6 +798,11 @@
   overflow: hidden;
   aspect-ratio: 1.68;
   background: #151d23;
+}
+
+.productMediaLayer {
+  position: absolute;
+  inset: 0;
 }
 
 .productImage {
@@ -1100,6 +1181,10 @@
     object-position: 66% center;
   }
 
+  .scrollCue {
+    display: none;
+  }
+
   .signalStrip > .sectionFrame {
     width: min(100% - 36px, 1440px);
   }
@@ -1176,5 +1261,9 @@
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+  }
+
+  .scrollCueLine span {
+    animation: none;
   }
 }
