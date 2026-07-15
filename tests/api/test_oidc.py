@@ -25,7 +25,7 @@ def test_settings_load_complete_oidc_configuration(monkeypatch: pytest.MonkeyPat
     resolved = oidc.get_oidc_settings(settings)
 
     assert resolved == oidc.OIDCSettings(
-        issuer="https://id.example.com",
+        issuer="https://id.example.com/",
         client_id="mutx-api",
         jwks_uri="https://id.example.com/keys",
     )
@@ -130,13 +130,76 @@ async def test_validate_oidc_token_rejects_unknown_key(monkeypatch: pytest.Monke
         lambda _token: {"kid": "missing", "alg": "RS256"},
     )
 
-    async def fake_fetch_jwks(_uri: str) -> dict[str, object]:
+    refreshes: list[bool] = []
+
+    async def fake_fetch_jwks(
+        _uri: str,
+        *,
+        force_refresh: bool = False,
+    ) -> dict[str, object]:
+        refreshes.append(force_refresh)
         return {"keys": [{"kid": "different"}]}
 
     monkeypatch.setattr(oidc, "fetch_jwks", fake_fetch_jwks)
 
     with pytest.raises(oidc.OIDCTokenValidationError, match="matches the token key id"):
         await oidc.validate_oidc_token("signed-token", settings=settings)
+
+    assert refreshes == [False, True]
+
+
+@pytest.mark.asyncio
+async def test_validate_oidc_token_refreshes_rotated_signing_keys(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = oidc.OIDCSettings("https://id.example.com/", "mutx-api", "https://keys")
+    requests: list[bool] = []
+
+    monkeypatch.setattr(
+        oidc.jwt,
+        "get_unverified_header",
+        lambda _token: {"kid": "rotated", "alg": "RS256"},
+    )
+
+    async def fake_fetch_jwks(
+        _uri: str,
+        *,
+        force_refresh: bool = False,
+    ) -> dict[str, object]:
+        requests.append(force_refresh)
+        kid = "rotated" if force_refresh else "previous"
+        return {"keys": [{"kid": kid, "kty": "RSA"}]}
+
+    monkeypatch.setattr(oidc, "fetch_jwks", fake_fetch_jwks)
+    monkeypatch.setattr(
+        oidc.jwt,
+        "decode",
+        lambda *_args, **_kwargs: {"sub": "rotated-user"},
+    )
+
+    payload = await oidc.validate_oidc_token("signed-token", settings=settings)
+
+    assert payload == {"sub": "rotated-user"}
+    assert requests == [False, True]
+
+
+def test_resource_access_roles_are_scoped_to_the_configured_client() -> None:
+    payload = oidc._normalize_payload(
+        {
+            "sub": "oidc-user",
+            "email": "oidc@example.com",
+            "exp": 4_102_444_800,
+            "realm_access": {"roles": ["USER"]},
+            "resource_access": {
+                "mutx-api": {"roles": ["AUDIT_ADMIN"]},
+                "unrelated-client": {"roles": ["ADMIN"]},
+            },
+        },
+        oidc.SSOProvider.KEYCLOAK,
+        client_id="mutx-api",
+    )
+
+    assert payload.roles == ["USER", "AUDIT_ADMIN"]
 
 
 @pytest.mark.asyncio

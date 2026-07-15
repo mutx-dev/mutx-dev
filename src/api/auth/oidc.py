@@ -87,17 +87,17 @@ def get_oidc_settings(source: Settings | None = None) -> OIDCSettings | None:
         raise RuntimeError("OIDC configuration is incomplete")
 
     return OIDCSettings(
-        issuer=source.oidc_issuer.rstrip("/"),
+        issuer=source.oidc_issuer,
         client_id=source.oidc_client_id,
         jwks_uri=source.oidc_jwks_uri,
     )
 
 
-async def fetch_jwks(jwks_uri: str) -> dict[str, Any]:
+async def fetch_jwks(jwks_uri: str, *, force_refresh: bool = False) -> dict[str, Any]:
     """Fetch and cache a JWKS document by URI for one hour."""
     now = time.monotonic()
     cached = _JWKS_CACHE.get(jwks_uri)
-    if cached and now < cached[0]:
+    if not force_refresh and cached and now < cached[0]:
         return cached[1]
 
     async with httpx.AsyncClient(timeout=10.0) as client:
@@ -123,6 +123,17 @@ def _find_key_by_kid(jwks: dict[str, Any], kid: str | None) -> dict[str, Any] | 
     return next((key for key in jwks.get("keys", []) if key.get("kid") == kid), None)
 
 
+async def _get_signing_key(jwks_uri: str, kid: str | None) -> dict[str, Any] | None:
+    """Resolve a signing key, refreshing once when a provider rotates keys."""
+    jwks = await fetch_jwks(jwks_uri)
+    signing_key = _find_key_by_kid(jwks, kid)
+    if signing_key is not None:
+        return signing_key
+
+    refreshed_jwks = await fetch_jwks(jwks_uri, force_refresh=True)
+    return _find_key_by_kid(refreshed_jwks, kid)
+
+
 async def validate_oidc_token(
     token: str,
     *,
@@ -144,13 +155,12 @@ async def validate_oidc_token(
         raise OIDCTokenValidationError("OIDC token uses an unsupported signing algorithm")
 
     try:
-        jwks = await fetch_jwks(settings.jwks_uri)
+        signing_key = await _get_signing_key(settings.jwks_uri, header.get("kid"))
     except OIDCTokenValidationError:
         raise
     except (httpx.HTTPError, ValueError) as exc:
         raise OIDCTokenValidationError("Unable to fetch OIDC provider signing keys") from exc
 
-    signing_key = _find_key_by_kid(jwks, header.get("kid"))
     if signing_key is None:
         raise OIDCTokenValidationError("No OIDC signing key matches the token key id")
 
@@ -178,7 +188,12 @@ def _get_provider_config(provider: SSOProvider, domain: str, realm: str | None =
     }
 
 
-def _extract_roles_from_payload(payload: dict[str, Any], provider: SSOProvider) -> list[str]:
+def _extract_roles_from_payload(
+    payload: dict[str, Any],
+    provider: SSOProvider,
+    *,
+    client_id: str | None = None,
+) -> list[str]:
     roles: list[str] = []
     for location in ("roles", "groups", "custom:roles", "realm_access.roles"):
         value: Any = payload
@@ -190,10 +205,10 @@ def _extract_roles_from_payload(payload: dict[str, Any], provider: SSOProvider) 
             roles.append(value)
 
     resource_access = payload.get("resource_access", {})
-    if isinstance(resource_access, dict):
-        for resource in resource_access.values():
-            if isinstance(resource, dict) and isinstance(resource.get("roles"), list):
-                roles.extend(str(role) for role in resource["roles"])
+    if isinstance(resource_access, dict) and client_id:
+        client_access = resource_access.get(client_id)
+        if isinstance(client_access, dict) and isinstance(client_access.get("roles"), list):
+            roles.extend(str(role) for role in client_access["roles"])
 
     if provider == SSOProvider.GOOGLE and isinstance(payload.get("mutable-roles"), list):
         roles.extend(str(role) for role in payload["mutable-roles"])
@@ -201,11 +216,16 @@ def _extract_roles_from_payload(payload: dict[str, Any], provider: SSOProvider) 
     return list(dict.fromkeys(roles))
 
 
-def _normalize_payload(payload: dict[str, Any], provider: SSOProvider) -> TokenPayload:
+def _normalize_payload(
+    payload: dict[str, Any],
+    provider: SSOProvider,
+    *,
+    client_id: str | None = None,
+) -> TokenPayload:
     return TokenPayload(
         sub=str(payload.get("sub", "")),
         email=str(payload.get("email", payload.get("preferred_username", ""))),
-        roles=_extract_roles_from_payload(payload, provider),
+        roles=_extract_roles_from_payload(payload, provider, client_id=client_id),
         exp=datetime.fromtimestamp(payload.get("exp", 0), tz=timezone.utc),
     )
 
@@ -223,6 +243,7 @@ async def verify_oauth_token(
             return _normalize_payload(
                 await validate_oidc_token(token, settings=oidc_settings),
                 provider,
+                client_id=oidc_settings.client_id,
             )
         except OIDCTokenValidationError as exc:
             raise HTTPException(
@@ -240,9 +261,8 @@ async def verify_oauth_token(
 
     config = _get_provider_config(provider, domain, realm)
     try:
-        jwks = await fetch_jwks(config["jwks_uri"])
         header = jwt.get_unverified_header(token)
-        signing_key = _find_key_by_kid(jwks, header.get("kid"))
+        signing_key = await _get_signing_key(config["jwks_uri"], header.get("kid"))
         if signing_key is None:
             return await _verify_via_userinfo(token, config["userinfo_endpoint"])
         payload = jwt.decode(
