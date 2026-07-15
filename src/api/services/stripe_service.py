@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class _MissingStripe:
     def __getattr__(self, name: str) -> Any:
-        raise AttributeError(
+        raise RuntimeError(
             "stripe package is not installed; install project dependencies to use payments"
         )
 

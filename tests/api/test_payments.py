@@ -6,6 +6,13 @@ import pytest
 from src.api.services import stripe_service
 
 
+def test_missing_stripe_dependency_raises_actionable_runtime_error():
+    missing_stripe = stripe_service._MissingStripe()
+
+    with pytest.raises(RuntimeError, match="stripe package is not installed"):
+        missing_stripe.Customer
+
+
 @pytest.mark.asyncio
 async def test_create_checkout_session_uses_server_side_plan_mapping(
     db_session,
