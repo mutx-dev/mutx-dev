@@ -4,30 +4,30 @@
 
 @layer base {
   :root {
-    --background: #09080b;
-    --surface: #131217;
-    --surface-strong: #1b1920;
-    --foreground: #f7f0e4;
-    --muted: #b8a892;
-    --line: rgba(255, 238, 212, 0.14);
-    --primary: #f2dfc4;
-    --accent: #c89b62;
-    --site-bg: #09080b;
+    --background: #06090d;
+    --surface: #0b1217;
+    --surface-strong: #101a20;
+    --foreground: #e9f1e8;
+    --muted: #9caaa3;
+    --line: rgba(233, 241, 232, 0.14);
+    --primary: #e9f1e8;
+    --accent: #c6ff63;
+    --site-bg: #06090d;
     --site-surface:
-      linear-gradient(180deg, rgba(20, 18, 23, 0.94), rgba(12, 11, 15, 0.98));
+      linear-gradient(180deg, rgba(11, 18, 23, 0.94), rgba(6, 9, 13, 0.98));
     --site-surface-strong:
-      radial-gradient(circle at top right, rgba(200, 155, 98, 0.14), transparent 28%),
-      linear-gradient(180deg, rgba(28, 25, 31, 0.98) 0%, rgba(13, 12, 16, 0.98) 100%);
-    --site-line: rgba(255, 233, 204, 0.11);
-    --site-line-strong: rgba(200, 155, 98, 0.32);
-    --site-text: rgba(247, 240, 228, 0.98);
-    --site-text-soft: rgba(232, 221, 203, 0.8);
-    --site-text-muted: rgba(188, 172, 149, 0.62);
-    --site-accent: #d4ab73;
-    --site-accent-strong: #f1d6ae;
-    --site-accent-soft: rgba(212, 171, 115, 0.12);
-    --site-warm: #c89b62;
-    --site-warm-soft: rgba(200, 155, 98, 0.14);
+      radial-gradient(circle at top right, rgba(109, 167, 255, 0.14), transparent 28%),
+      linear-gradient(180deg, rgba(16, 26, 32, 0.98) 0%, rgba(6, 9, 13, 0.98) 100%);
+    --site-line: rgba(233, 241, 232, 0.11);
+    --site-line-strong: rgba(198, 255, 99, 0.32);
+    --site-text: rgba(233, 241, 232, 0.98);
+    --site-text-soft: rgba(211, 224, 215, 0.8);
+    --site-text-muted: rgba(156, 170, 163, 0.68);
+    --site-accent: #c6ff63;
+    --site-accent-strong: #e8ffb6;
+    --site-accent-soft: rgba(198, 255, 99, 0.12);
+    --site-warm: #6da7ff;
+    --site-warm-soft: rgba(109, 167, 255, 0.14);
     --site-glow: 0 30px 90px rgba(4, 4, 8, 0.42);
     --site-glow-soft: 0 18px 54px rgba(4, 4, 8, 0.24);
     --site-radius-md: 1rem;
@@ -120,13 +120,13 @@
     min-height: 100%;
     min-height: 100vh;
     background:
-      radial-gradient(circle at top left, rgba(212, 171, 115, 0.1), transparent 22rem),
-      radial-gradient(circle at 86% 0%, rgba(117, 96, 163, 0.08), transparent 26rem),
-      linear-gradient(180deg, #0d0b10 0%, #08070b 100%);
+      radial-gradient(circle at top left, rgba(198, 255, 99, 0.08), transparent 22rem),
+      radial-gradient(circle at 86% 0%, rgba(109, 167, 255, 0.1), transparent 26rem),
+      linear-gradient(180deg, #0b1217 0%, #06090d 100%);
   }
 
   body:not(:has(.pico-root)) ::selection {
-    background: rgba(212, 171, 115, 0.24);
+    background: rgba(198, 255, 99, 0.24);
     color: #0b0a0e;
   }
 
@@ -139,7 +139,7 @@
   body:not(:has(.pico-root)) input:focus-visible,
   body:not(:has(.pico-root)) textarea:focus-visible,
   body:not(:has(.pico-root)) select:focus-visible {
-    outline: 2px solid rgba(212, 171, 115, 0.68);
+    outline: 2px solid rgba(198, 255, 99, 0.68);
     outline-offset: 3px;
   }
 

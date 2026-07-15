@@ -12,29 +12,29 @@ import {
 
 const siteUrl = getSiteUrl();
 const rootSocialMetadata = buildPageMetadata({
-  title: "MUTX | Open Control Plane for AI Agents",
+  title: "MUTX | See the move. Hold the line.",
   description:
-    "Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.",
+    "MUTX is the operating layer for autonomous work: visible signals, enforced boundaries, and receipts for every AI agent run.",
   path: "/",
   socialDescription:
-    "MUTX is the open control plane for agents that have to survive real deployments, auth boundaries, webhooks, and runtime operations.",
+    "See what your agents are doing, hold the line, and keep a receipt for every consequential move.",
   twitterDescription:
-    "Operate deployed agents across auth, deployments, traces, webhooks, and runtime posture.",
+    "Operate autonomous work with visible signals, enforced boundaries, and durable receipts.",
 });
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#09080b',
+  themeColor: '#06090d',
 } as const
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   ...rootSocialMetadata,
-  title: "MUTX | Open Control Plane for AI Agents",
+  title: "MUTX | See the move. Hold the line.",
   description:
-    "Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.",
+    "MUTX is the operating layer for autonomous work: visible signals, enforced boundaries, and receipts for every AI agent run.",
   applicationName: "MUTX",
   category: "developer tools",
   keywords: [
@@ -100,7 +100,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           as="image"
           type="image/webp"
         />
-        <meta name="theme-color" content="#09080b" />
+        <meta name="theme-color" content="#06090d" />
       </head>
       <body className={`${appFontVariables} h-full min-h-screen antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>

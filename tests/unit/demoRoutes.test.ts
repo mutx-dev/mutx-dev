@@ -10,19 +10,19 @@ describe('demo dashboard routes', () => {
       '/dashboard/agents',
       '/dashboard/deployments',
       '/dashboard/runs',
-      '/dashboard/environments',
-      '/dashboard/access',
-      '/dashboard/connectors',
-      '/dashboard/audit',
-      '/dashboard/usage',
-      '/dashboard/settings',
+      '/dashboard/monitoring',
+      '/dashboard/security',
+      '/dashboard/webhooks',
+      '/dashboard/history',
+      '/dashboard/budgets',
+      '/dashboard/control',
     ])
   })
 
   it('builds stable dashboard hrefs for known demo sections', () => {
     expect(getDemoSectionHref('overview')).toBe('/dashboard')
     expect(getDemoSectionHref('agents')).toBe('/dashboard/agents')
-    expect(getDemoSectionHref('settings')).toBe('/dashboard/settings')
+    expect(getDemoSectionHref('settings')).toBe('/dashboard/control')
   })
 
   it('recognizes the sections used by the demo app route handler', () => {

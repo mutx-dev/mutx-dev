@@ -6,18 +6,24 @@ import {
 } from '../../lib/dashboardPanels'
 
 describe('dashboard panel routing helpers', () => {
-  it('resolves mission control panel ids from dashboard paths and aliases', () => {
+  it('resolves mission control panel ids from canonical dashboard paths', () => {
     expect(resolveDashboardPanel('/dashboard')).toBe('overview')
     expect(resolveDashboardPanel('/dashboard/sessions')).toBe('chat')
-    expect(resolveDashboardPanel('/dashboard/chat')).toBe('chat')
     expect(resolveDashboardPanel('/dashboard/orchestration')).toBe('tasks')
-    expect(resolveDashboardPanel('/dashboard/tasks')).toBe('tasks')
     expect(resolveDashboardPanel('/dashboard/analytics')).toBe('tokens')
     expect(resolveDashboardPanel('/dashboard/control')).toBe('settings')
     expect(resolveDashboardPanel('/dashboard/history')).toBe('activity')
     expect(resolveDashboardPanel('/dashboard/autonomy')).toBe('cron')
     expect(resolveDashboardPanel('/dashboard/notifications')).toBe('notifications')
     expect(resolveDashboardPanel('/dashboard/standup')).toBe('standup')
+  })
+
+  it('does not keep legacy catch-all dashboard aliases alive', () => {
+    expect(resolveDashboardPanel('/dashboard/chat')).toBe('overview')
+    expect(resolveDashboardPanel('/dashboard/tasks')).toBe('overview')
+    expect(resolveDashboardPanel('/dashboard/tokens')).toBe('overview')
+    expect(resolveDashboardPanel('/dashboard/settings')).toBe('overview')
+    expect(resolveDashboardPanel('/dashboard/cron')).toBe('overview')
   })
 
   it('maps panel ids to the existing MUTX routes instead of inventing new namespaces', () => {
