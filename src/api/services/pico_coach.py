@@ -7,8 +7,7 @@ import logging
 import re
 from functools import lru_cache
 from pathlib import Path
-
-from openai import AsyncOpenAI
+from typing import Any
 
 from src.api.models.pico_onboarding import (
     CoachMessage,
@@ -18,6 +17,19 @@ from src.api.models.pico_onboarding import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class _MissingAsyncOpenAI:
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+        raise RuntimeError(
+            "openai package is not installed; install project dependencies to use Pico coach"
+        )
+
+
+try:
+    from openai import AsyncOpenAI
+except ModuleNotFoundError:
+    AsyncOpenAI = _MissingAsyncOpenAI
 
 # ---------------------------------------------------------------------------
 # Paths & constants
@@ -176,9 +188,8 @@ async def handle_coach_chat(
     messages = build_coach_messages(history, request.message)
 
     # --- Call the model ----------------------------------------------------
-    client = AsyncOpenAI(api_key=api_key)
-
     try:
+        client = AsyncOpenAI(api_key=api_key)
         response = await client.chat.completions.create(
             model=_MODEL_NAME,
             temperature=_TEMPERATURE,
