@@ -1,15 +1,15 @@
 # Multi-stage build for MUTX Next.js application
-FROM node:20-alpine3.22 AS base
+FROM node:24-alpine3.23 AS base
 
-# Install patched npm + pnpm
-RUN apk upgrade --no-cache && npm install -g npm@11.12.1 && corepack enable && corepack prepare pnpm@latest --activate
+# Keep the container package manager aligned with packageManager and CI.
+RUN apk upgrade --no-cache && npm install -g npm@11.12.1
 
 # Dependencies stage
 FROM base AS deps
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci --legacy-peer-deps
 
 # Builder stage
 FROM base AS builder
@@ -20,7 +20,7 @@ COPY . .
 RUN rm -rf public/_next
 
 # Build the Next.js app
-RUN pnpm run build
+RUN npm run build
 
 # Runner stage
 FROM base AS runner
