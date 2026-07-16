@@ -194,6 +194,27 @@ class TestPolicyStore:
         assert result.evaluated_policy_count == 0
 
     @pytest.mark.asyncio
+    async def test_evaluate_does_not_match_wildcards_against_absent_scopes(self):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="scope-specific-catchalls",
+                rules=[
+                    Rule(type="block", pattern="*", action="reject", scope="output"),
+                    Rule(type="block", pattern="*", action="reject", scope="tool"),
+                ],
+                enabled=True,
+                version=1,
+            )
+        )
+
+        result = await store.evaluate(PolicyEvaluationContext(input="input only"))
+
+        assert result.decision == "allow"
+        assert result.matches == []
+
+    @pytest.mark.asyncio
     async def test_evaluate_requires_approval_for_matching_tool_rule(self):
         store = PolicyStore()
         await store.upsert_policy(

@@ -78,6 +78,8 @@ def _normalize_match_value(value: object) -> str:
 
 
 def _rule_matches(pattern: str, value: object) -> bool:
+    if value is None:
+        return False
     candidate = _normalize_match_value(value).casefold()
     normalized_pattern = pattern.casefold()
     return fnmatch(candidate, normalized_pattern) or normalized_pattern in candidate
@@ -192,10 +194,14 @@ class PolicyStore:
                 elif rule.scope == "output":
                     scoped_value = context.output
                 else:
-                    scoped_value = {
-                        "tool": context.tool,
-                        "tool_args": context.tool_args or {},
-                    }
+                    scoped_value = (
+                        {
+                            "tool": context.tool,
+                            "tool_args": context.tool_args or {},
+                        }
+                        if context.tool is not None or context.tool_args
+                        else None
+                    )
 
                 if not _rule_matches(rule.pattern, scoped_value):
                     continue
