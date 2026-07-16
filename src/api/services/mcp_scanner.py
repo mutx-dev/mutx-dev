@@ -436,9 +436,14 @@ def _iter_schema_strings(
         yield path, value
     elif isinstance(value, Mapping):
         for key, nested in value.items():
+            if state.nodes >= MAX_SCHEMA_NODES:
+                state.truncate(path, f"metadata traversal exceeds {MAX_SCHEMA_NODES} nodes")
+                return
+            key_path = f"{path}/{str(key).replace('~', '~0').replace('/', '~1')}"
+            yield key_path, str(key)
             yield from _iter_schema_strings(
                 nested,
-                path=f"{path}/{str(key).replace('~', '~0').replace('/', '~1')}",
+                path=key_path,
                 depth=depth + 1,
                 state=state,
             )
