@@ -567,7 +567,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
             </div>
           </div>
 
-          <div className="flex min-h-[calc(100vh-1.5rem-3rem)]">
+          <div className="flex min-h-[calc(100vh-1.5rem-3rem)] lg:h-[calc(100vh-1.5rem-3rem)] lg:min-h-0">
             <aside className="hidden w-[290px] shrink-0 flex-col border-r border-[rgba(233,241,232,0.08)] bg-[#070706] lg:flex">
               <div className="border-b border-[rgba(233,241,232,0.08)] px-4 py-5">{sidebarBrand}</div>
               <div className="flex-1 overflow-y-auto px-3 py-3">

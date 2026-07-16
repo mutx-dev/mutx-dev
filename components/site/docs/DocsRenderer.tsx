@@ -30,24 +30,39 @@ function remarkResolveDocLinks(currentSlug: string[]): Plugin<[], Root> {
   return () => (tree: Root) => {
     visit(tree, "link", (node) => {
       const href = node.url || "";
-      if (!href || href.startsWith("#") || href.startsWith("/") || href.startsWith("http")) return;
+      if (
+        !href ||
+        href.startsWith("#") ||
+        href.startsWith("/") ||
+        /^[a-z][a-z0-9+.-]*:/i.test(href) ||
+        href.startsWith("//")
+      ) return;
 
-      let resolved = href.replace(/\.md$/, "");
-
-      if (currentSlug.length > 0) {
-        const dir = currentSlug[currentSlug.length - 1] === "README"
-          ? currentSlug.slice(0, -1)
-          : currentSlug;
-        if (dir.length > 0) {
-          resolved = `/docs/${dir.join("/")}/${resolved}`;
-        } else {
-          resolved = `/docs/${resolved}`;
-        }
-      } else {
-        resolved = `/docs/${resolved}`;
+      const [hrefPath, hash = ""] = href.split("#", 2);
+      const cleanHref = hrefPath.replace(/\.md$/i, "");
+      const base = currentSlug.slice(0, -1);
+      const segments = [...base, ...cleanHref.split("/")];
+      const normalized: string[] = [];
+      for (const segment of segments) {
+        if (!segment || segment === ".") continue;
+        if (segment === "..") normalized.pop();
+        else normalized.push(segment);
       }
 
-      const filename = href.replace(/\.md$/, "");
+      let route: string;
+      if (normalized[0] === "api") {
+        const apiPath = normalized.slice(1).join("/").replace(/^(index|reference)$/, "");
+        route = apiPath ? `/docs/reference/${apiPath}` : "/docs/reference";
+      } else if (normalized.join("/") === "sdk") {
+        route = "/sdk";
+      } else if (normalized.join("/") === "support") {
+        route = "/support";
+      } else {
+        route = `/docs/${normalized.join("/")}`.replace(/\/(README|index)$/i, "");
+      }
+
+      const resolved = hash ? `${route}#${hash}` : route;
+      const filename = cleanHref;
       const firstChild = node.children?.[0];
       const linkText = (firstChild && "value" in firstChild ? firstChild.value : "") || "";
       if (linkText === href || linkText === filename) {

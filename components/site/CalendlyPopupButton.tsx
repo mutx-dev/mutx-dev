@@ -61,6 +61,11 @@ export function CalendlyPopupButton({
   }, []);
 
   async function handleClick() {
+    if (!turnstileSiteKey) {
+      window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     if (!captchaToken) {
       setShowChallenge(true);
       return;
@@ -117,7 +122,7 @@ export function CalendlyPopupButton({
       onClick={handleClick}
       aria-label={ariaLabel}
       className={cn(fallbackClassName, className)}
-      disabled={loadingSiteKey || !turnstileSiteKey}
+      aria-busy={loadingSiteKey || undefined}
     >
       {children}
     </button>
