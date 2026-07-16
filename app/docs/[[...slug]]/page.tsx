@@ -107,10 +107,12 @@ function resolveSlug(slugSegments: string[]): string | null {
   // e.g. /docs/reference → docs/api/reference.md
   // e.g. /docs/reference/authentication → docs/api/authentication.md
   // e.g. /docs/reference/index → docs/api/index.md (API Overview)
+  const apiSegments = slugSegments[0] === "reference" ? slugSegments.slice(1) : slugSegments;
   const apiCandidates = [
-    path.join("api", ...slugSegments) + ".md",
-    path.join("api", ...slugSegments, "README.md"),
-    path.join("api", ...slugSegments, "index.md"),
+    ...(apiSegments.length === 0 ? [path.join("api", "reference.md"), path.join("api", "index.md")] : []),
+    path.join("api", ...apiSegments) + ".md",
+    path.join("api", ...apiSegments, "README.md"),
+    path.join("api", ...apiSegments, "index.md"),
     // Special case: /docs/X/index → serve docs/api/index.md
     path.join("api", slugSegments[0], "index.md"),
   ];
