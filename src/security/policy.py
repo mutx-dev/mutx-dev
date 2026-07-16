@@ -4,13 +4,12 @@ Policy Engine.
 Evaluates actions against static policy rules AND contextual intent alignment.
 Makes binary authorization decisions: allow, deny, modify, or require approval.
 
-AARM Requirements:
-- R1: MUST block actions before execution based on policy
-- R2: MUST validate action parameters against type, range, and pattern constraints
-- R4: MUST evaluate intent consistency for context-dependent actions
+AARM alignment: contributes to current R1 interception, R3 policy evaluation,
+and R4 decisions. MUTX does not yet implement all current R3 deferral conditions
+or the distinct STEP_UP and DEFER semantics required by R4.
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 """
 
 from dataclasses import dataclass, field

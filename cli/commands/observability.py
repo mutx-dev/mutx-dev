@@ -11,8 +11,11 @@ Commands:
 Based on the agent-run open standard for agent observability.
 https://github.com/builderz-labs/agent-run
 
-MIT License - Copyright (c) 2024 builderz-labs
-https://github.com/builderz-labs/agent-run/blob/main/LICENSE
+MIT License - Copyright (c) 2026 Builderz Labs
+https://github.com/builderz-labs/agent-run/blob/9c7c3fa68413de878fae2d605c90fb334a0201f6/LICENSE
+
+Schema adaptation only. Do not import or execute the current upstream package;
+it is quarantined pending maintainer security review.
 """
 
 import json

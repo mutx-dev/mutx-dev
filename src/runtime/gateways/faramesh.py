@@ -1,7 +1,7 @@
 """
-Faramesh Gateway - Faramesh as AARM Implementation.
+Faramesh Gateway - MUTX integration with Faramesh.
 
-Use Faramesh as the AARM-compliant policy enforcement backend.
+Use Faramesh as an AARM-aligned policy enforcement backend.
 Faramesh provides deterministic policy evaluation via FPL (Faramesh Policy Language).
 
 https://github.com/faramesh/faramesh-core
@@ -13,8 +13,12 @@ Faramesh integration provides:
 - Credential broker for API key management
 - Cryptographic decision audit trail
 
-MIT License - Copyright (c) 2024 faramesh
-https://github.com/faramesh/faramesh-core/blob/main/LICENSE
+Faramesh Core current main and FPL current main are Apache-2.0. The pinned
+Faramesh Core v0.2.0 release and historical v1.2.9 tag are MPL-2.0; honor the
+license at the exact installed ref.
+https://github.com/faramesh/faramesh-core/blob/e230a9ac2d12d80ed6f632db42b6e1983ccbce82/LICENSE
+https://github.com/faramesh/faramesh-core/blob/v0.2.0/LICENSE
+https://github.com/faramesh/faramesh-core/blob/v1.2.9/LICENSE
 """
 
 import json
@@ -32,7 +36,11 @@ logger = logging.getLogger(__name__)
 
 
 FAREMESH_DEFAULT_DAEMON_PORT = 7777
-FAREMESH_INSTALL_URL = "https://raw.githubusercontent.com/faramesh/faramesh-core/main/install.sh"
+FAREMESH_INSTALL_REF = "ae3ebc9066d65e4e930164881c2f2ce2be554c7f"
+FAREMESH_INSTALL_VERSION = "0.2.0"
+FAREMESH_INSTALL_URL = (
+    f"https://raw.githubusercontent.com/faramesh/faramesh-core/{FAREMESH_INSTALL_REF}/install.sh"
+)
 
 
 def _default_faramesh_socket_path() -> str:
@@ -139,10 +147,10 @@ def _send_socket_request(socket_path: str, request: dict, timeout: float = 5.0) 
 
 class FarameshGateway:
     """
-    Faramesh as AARM-compliant policy enforcement backend.
+    Faramesh as an AARM-aligned policy enforcement backend.
 
     The FarameshGateway wraps the Faramesh daemon to provide
-    AARM-compliant governance for MUTX.
+    Faramesh-backed governance for MUTX; this does not establish AARM conformance.
 
     Usage:
         gateway = FarameshGateway()
@@ -402,12 +410,13 @@ class FarameshGateway:
 
             install_script = result.stdout
 
-            cmd = ["bash", "-c", install_script]
+            cmd = ["bash", "-s", "--", "--version", FAREMESH_INSTALL_VERSION]
             if non_interactive:
-                cmd = ["bash", "-c", install_script + " --non-interactive"]
+                cmd.append("--no-interactive")
 
             install_result = subprocess.run(
                 cmd,
+                input=install_script,
                 capture_output=True,
                 text=True,
                 timeout=60,

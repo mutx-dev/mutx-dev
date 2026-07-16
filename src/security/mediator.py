@@ -4,14 +4,15 @@ Action Mediation Layer.
 Intercepts tool invocations and normalizes them to a canonical schema,
 enabling policy evaluation against a consistent format.
 
-AARM Requirement: R1 (MUST block actions before execution based on policy)
+AARM alignment: contributes to current R1 pre-execution interception and R3
+parameter validation. This component alone does not demonstrate either requirement.
 
 The ActionMediator is the entry point for all tool calls in the MUTX security layer.
 It normalizes any tool invocation to a canonical NormalizedAction format that the
 PolicyEngine can evaluate consistently.
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 """
 
 import hashlib

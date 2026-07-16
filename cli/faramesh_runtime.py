@@ -13,7 +13,11 @@ from pathlib import Path
 
 FAREMESH_PROVIDER_ID = "faramesh"
 FAREMESH_DEFAULT_DAEMON_PORT = 7777
-FAREMESH_INSTALL_URL = "https://raw.githubusercontent.com/faramesh/faramesh-core/main/install.sh"
+FAREMESH_INSTALL_REF = "ae3ebc9066d65e4e930164881c2f2ce2be554c7f"
+FAREMESH_INSTALL_VERSION = "0.2.0"
+FAREMESH_INSTALL_URL = (
+    f"https://raw.githubusercontent.com/faramesh/faramesh-core/{FAREMESH_INSTALL_REF}/install.sh"
+)
 
 
 def _default_faramesh_socket_path() -> str:
@@ -259,6 +263,8 @@ def ensure_faramesh_installed(
 
             cmd = [
                 str(install_script_path),
+                "--version",
+                FAREMESH_INSTALL_VERSION,
                 "--install-dir",
                 str(Path.home() / ".local" / "bin"),
             ]

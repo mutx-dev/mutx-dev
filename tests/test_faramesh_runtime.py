@@ -3,9 +3,12 @@ from __future__ import annotations
 from unittest.mock import patch, MagicMock
 
 from cli.faramesh_runtime import (
+    FAREMESH_INSTALL_REF,
+    FAREMESH_INSTALL_VERSION,
     FarameshDaemonHealth,
     FarameshDecision,
     collect_faramesh_snapshot,
+    ensure_faramesh_installed,
     get_daemon_status,
     get_faramesh_health,
     get_pending_defers,
@@ -14,6 +17,28 @@ from cli.faramesh_runtime import (
     start_faramesh_daemon,
     _count_decisions_by_effect,
 )
+
+
+class TestFarameshInstall:
+    @patch("cli.faramesh_runtime.find_faramesh_bin")
+    @patch("cli.faramesh_runtime.subprocess.run")
+    def test_uses_immutable_installer_and_pinned_release(self, mock_run, mock_bin):
+        mock_bin.side_effect = [None, "/home/user/.local/bin/faramesh"]
+        mock_run.side_effect = [
+            MagicMock(returncode=0),
+            MagicMock(returncode=0),
+            MagicMock(returncode=0, stdout="", stderr=""),
+        ]
+
+        installed, bin_path = ensure_faramesh_installed()
+
+        assert installed is True
+        assert bin_path == "/home/user/.local/bin/faramesh"
+        download_command = mock_run.call_args_list[0].args[0]
+        assert FAREMESH_INSTALL_REF in download_command[2]
+        install_command = mock_run.call_args_list[2].args[0]
+        assert install_command[1:3] == ["--version", FAREMESH_INSTALL_VERSION]
+        assert "--no-interactive" in install_command
 
 
 class TestSocketReachability:

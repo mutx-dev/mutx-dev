@@ -1,35 +1,46 @@
 ---
-description: Ledger and process for direct open-source feature ports into MUTX.
+description: Provenance ledger and process for direct open-source adaptations in MUTX.
 ---
 
-# OSS Attribution Ledger
+# OSS attribution ledger
 
-This ledger exists for direct reuse from external projects. The goal is to keep provenance obvious when code, schemas, prompts, docs, or UI flows are ported or materially adapted into MUTX.
+This ledger records direct or material reuse of external code, schemas,
+documentation, prompts, or UI structures. Loose inspiration belongs in design
+documentation instead. Immutable links, audited upstream versions, license
+facts, and machine-validated local paths are maintained in
+[`oss-attribution-evidence.json`](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/docs/legal/oss-attribution-evidence.json).
 
-Use this ledger for direct reuse from:
+## Required process
 
-- Mission Control (`MIT`)
-- LACP (`MIT`)
-- Guild AI (`Apache-2.0`)
-- predict-rlm (`MIT`)
+When a direct adaptation lands:
 
-Do not use this ledger for loose inspiration. If MUTX only borrows an idea, product direction, or naming pattern, document that elsewhere instead of calling it a port.
+1. Update the project in `CREDITS.md`.
+2. Add or update its evidence object in
+   `docs/legal/oss-attribution-evidence.json` with immutable source and license
+   URLs, an exact upstream ref, and every affected local path.
+3. Append a row here with the evidence ID and the local port commit.
+4. Preserve all copyright and license notices required by the upstream license.
+5. For Apache-2.0 sources, retain the Apache-2.0 text and any upstream `NOTICE`
+   material in the distribution. Record explicitly when the audited ref has no
+   `NOTICE` file.
+6. For MPL-2.0 sources, retain the MPL-2.0 text and satisfy file-level source and
+   modification-notice obligations for any Covered Software that is distributed.
+7. Keep provenance and code in the same pull request whenever possible.
 
-## Required Process
+## Recorded adaptations
 
-When a direct port lands:
+| Ledger ID | Date | Evidence ID | Upstream provenance | MUTX scope | Reuse mode | Local port commit |
+| --- | --- | --- | --- | --- | --- | --- |
+| `agent-run-2026-03-25-01` | 2026-03-25 | `agent-run` | Schema family under [`builderz-labs/agent-run@9c7c3fa`](https://github.com/builderz-labs/agent-run/tree/9c7c3fa68413de878fae2d605c90fb334a0201f6/schemas) | `src/api/models/observability.py`, `src/api/models/observability_models.py`, `src/api/routes/observability.py`, `sdk/mutx/observability.py` | Material schema and vocabulary adaptation | `67d0904972d5a3ddcb27844b5b85b2dc4b37d6f2` |
+| `mc-2026-04-04-01` | 2026-04-04 | `mission-control` | [`briefing-bar-widget.tsx`](https://github.com/builderz-labs/mission-control/blob/eb7c35e950b83f73d6fd61e89f7d4b377db2ad50/src/components/dashboard/widgets/briefing-bar-widget.tsx) and [`widget-primitives.tsx`](https://github.com/builderz-labs/mission-control/blob/eb7c35e950b83f73d6fd61e89f7d4b377db2ad50/src/components/dashboard/widget-primitives.tsx) at `eb7c35e950b83f73d6fd61e89f7d4b377db2ad50` | `components/dashboard/DashboardOverviewPageClient.tsx`, `components/dashboard/livePrimitives.tsx` | Adapted briefing-bar and signal-display structure | `972ab49b0af83d15042b2301679246103cbdbab6` |
+| `predict-rlm-2026-04-13-01` | 2026-04-13 | `predict-rlm` | `Trampoline-AI/predict-rlm@5c7387afa1980b62b21a34ad0261256a95d8caa1` | Document engine, job, route, worker, CLI, dashboard, and operator-documentation paths listed in the evidence file | Adapted workflow contracts and example families with MUTX-specific lifecycle and observability | `7cde8ce0890cbb07c36d93c941e487986e56ea38` |
 
-1. Add or update the relevant project entry in `CREDITS.md`.
-2. Append a row here with the upstream project, license, upstream repo/ref, MUTX files, and a short summary of what was reused.
-3. Keep the upstream copyright and license notice intact anywhere the upstream license requires it.
-4. For Apache-2.0 sources, carry forward any upstream `NOTICE` material when the upstream project provides it.
-5. Prefer one PR to carry both the code change and the attribution update so provenance does not drift.
+## Candidates and unresolved identities
 
-## Ledger
+| Evidence ID | State | Rule |
+| --- | --- | --- |
+| `guild-ai` | Apache-2.0 candidate; no direct reuse recorded | A future port must pin an exact source ref, retain the Apache-2.0 text, and carry forward any `NOTICE` material present at that ref. |
+| `lacp` | Project identity and license unresolved; no direct reuse recorded | Do not port or make a license claim until the canonical owner, repository URL, exact ref, and license are established. |
 
-| Ledger ID | Date | Upstream | License | Upstream ref | MUTX scope | Reuse mode | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `mc-2026-04-04-01` | 2026-04-04 | Mission Control | MIT | `builderz-labs/mission-control` family; repo evidence in `UI-PORT-PLAN.md` and commit `972ab49b0af83d15042b2301679246103cbdbab6` | `components/dashboard/DashboardOverviewPageClient.tsx`, `components/dashboard/livePrimitives.tsx` | Adapted dashboard orchestration patterns | Existing repo history already records direct Mission Control reuse; this ledger entry makes that provenance durable in the legal docs. |
-| `lacp-pending` | 2026-04-04 | LACP | MIT | Record the exact upstream repo URL and commit/tag when the first direct port lands | None recorded yet | No direct reuse recorded yet | Keep LACP on this ledger so any future direct feature port ships with provenance on day one. |
-| `guild-ai-pending` | 2026-04-04 | Guild AI | Apache-2.0 | Record the exact upstream repo URL and commit/tag when the first direct port lands | None recorded yet | No direct reuse recorded yet | If Guild AI code or docs are ported later, also capture any required Apache-2.0 `NOTICE` material here and in the distribution path. |
-| `predict-rlm-2026-04-13-01` | 2026-04-13 | predict-rlm | MIT | `Trampoline-AI/predict-rlm` @ `5c7387afa1980b62b21a34ad0261256a95d8caa1` | `src/api/services/document_engine.py`, `src/api/services/document_jobs.py`, `src/api/routes/documents.py`, `src/api/document_worker.py`, `cli/commands/documents.py`, `cli/services/documents.py`, `app/dashboard/documents/page.tsx`, `components/dashboard/DocumentsPageClient.tsx`, `docs/document-workflows.md` | Adapted workflow contracts and operator documentation around upstream examples | MUTX integrates the upstream engine directly and intentionally mirrors the document analysis, contract comparison, invoice processing, and document redaction surface with MUTX-specific job, artifact, and observability layers. |
+An empty candidate row is not evidence of reuse. It is a guardrail that prevents
+an unattributed port from landing later.

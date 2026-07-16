@@ -17,17 +17,17 @@ Operating autonomous agents in production fails in predictable ways:
 
 | Failure Mode | What Happens | MUTX Mitigation |
 |---|---|---|
-| Unbounded tool execution | Agent calls destructive tools (shell, file delete, network) without constraint | PolicyEngine evaluates NormalizedAction before execution (R1) |
-| Context-blind gating | Individual actions look safe but the sequence is dangerous (e.g., read-credit-cards → send-email) | ContextAccumulator tracks session state; IntentSignal detects drift (R3, R4) |
-| No human override | High-risk actions execute automatically with no approval path | ApprovalService with PENDING→APPROVED/DENIED/EXPIRED lifecycle (R5) |
-| No audit trail | After an incident, there is no record of what the agent did, why, or who approved it | ReceiptGenerator creates signed ActionReceipts chained via prior_action_hashes (R6) |
+| Unbounded tool execution | Agent calls destructive tools (shell, file delete, network) without constraint | Supported supervised paths can evaluate a NormalizedAction before execution; complete current AARM R1 coverage is not yet demonstrated |
+| Context-blind gating | Individual actions look safe but the sequence is dangerous (e.g., read-credit-cards → send-email) | ContextAccumulator stores session actions and data access (partial current R2/R3); IntentSignal is a heuristic, not current R7 semantic distance |
+| No human override | High-risk actions execute automatically with no approval path | ApprovalService provides a human decision lifecycle (partial current R4; STEP_UP and DEFER are not yet distinct) |
+| No audit trail | After an incident, there is no record of what the agent did, why, or who approved it | ReceiptGenerator can create and sign ActionReceipts (partial current R5; full receipt evidence is not yet demonstrated) |
 | Credential sprawl | API keys and secrets embedded in agent configs or environment variables permanently | CredentialBroker retrieves on-demand with TTL, injects as ephemeral env vars |
 | Agent zombie processes | Agent crashes but its status remains "running" indefinitely | MonitorRuntimeState tracks heartbeats; SelfHealer recovers via RESTART/ROLLBACK |
-| Identity ambiguity | Cannot distinguish agent actions from developer actions or from different agents | JWT/API key auth + SPIFFE identity binding agent→session→human (R7) |
+| Identity ambiguity | Cannot distinguish agent actions from developer actions or from different agents | JWT/API key auth plus agent, session, and user identifiers (partial current R6; service identity and privilege scope remain gaps) |
 
 ## 3. Design Principles
 
-1. **Pre-execution gating.** Every tool call passes through ActionMediator → PolicyEngine before execution. There is no "log and allow" mode.
+1. **Pre-execution gating target.** Supported supervised paths should pass through ActionMediator → PolicyEngine before execution. Complete path coverage and fail-closed behavior must be proven before making a universal claim.
 2. **Context-aware decisions.** Policy evaluation considers accumulated session state, not just the current action in isolation.
 3. **Cryptographic receipts.** Every evaluated action produces a tamper-evident receipt with chain integrity.
 4. **Defense in depth.** Auth middleware, ownership enforcement, rate limiting, and input validation are independent layers.
@@ -108,7 +108,7 @@ src/security/                    # Governance engine (framework-agnostic)
   policy.py                      # Policy engine (465 lines)
   approvals.py                   # Approval service (395 lines)
   receipts.py                    # Cryptographic receipts (407 lines)
-  compliance.py                  # AARM conformance checker (556 lines)
+  compliance.py                  # Local AARM-alignment gap checker
   telemetry.py                   # Security telemetry exporter
 
 sdk/mutx/                        # Python SDK
@@ -955,7 +955,10 @@ Uses `selectinload` for eager loading of deployments and their events, avoiding 
 
 ## 8. Governance Engine
 
-The governance engine is the deepest subsystem in MUTX. It implements the AARM (Agent Action Rights Management) conformance requirements and provides the complete security pipeline from tool invocation interception through to cryptographic receipt generation.
+The governance engine is the deepest subsystem in MUTX. It is designed toward
+the current AARM runtime-security requirements and provides capability modules
+from tool invocation normalization through receipt generation. It is not a
+complete AARM Core implementation and is not an AARM conformance claim.
 
 The pipeline flows:
 
@@ -1481,21 +1484,26 @@ class ReceiptGenerator:
 
 ### AARMComplianceChecker
 
-Source: `src/security/compliance.py` (556 lines)
+Source: `src/security/compliance.py`
 
-Verifies 9 conformance requirements:
+The historical class and `/v1/security/compliance` route are retained for API
+compatibility. They now return a local capability-gap assessment against the
+current AARM model; they do not certify conformance.
 
-| Requirement | Level | Description | Satisfied By |
+| Requirement | Level | Current requirement | MUTX status |
 |---|---|---|---|
-| R1 | MUST | Block actions before execution based on policy | ActionMediator + PolicyEngine |
-| R2 | MUST | Validate action parameters against type, range, pattern | ParameterConstraint in ToolSchema |
-| R3 | MUST | Accumulate session context including prior actions | ContextAccumulator |
-| R4 | MUST | Evaluate intent consistency for context-dependent actions | IntentSignal + PolicyRule.require_context_alignment |
-| R5 | MUST | Support human approval workflows with timeout | ApprovalService |
-| R6 | MUST | Generate cryptographically signed receipts with full context | ReceiptGenerator + Ed25519 |
-| R7 | MUST | Bind actions to human, service, agent, and session identity | NormalizedAction (user_id, agent_id, session_id) |
-| R8 | SHOULD | Enforce least privilege through scoped, just-in-time credentials | CredentialBroker with TTL |
-| R9 | SHOULD | Export structured telemetry to security platforms | TelemetryExporter |
+| R1 | MUST | Pre-execution interception, blocking/deferral, and fail-closed behavior | Partial; not demonstrated |
+| R2 | MUST | Accumulated actions, data classifications, and original request | Partial; not demonstrated |
+| R3 | MUST | Static and contextual policy evaluation with mandatory deferral conditions | Partial; not demonstrated |
+| R4 | MUST | Distinct ALLOW, DENY, MODIFY, STEP_UP, and DEFER decisions | Partial; STEP_UP is missing as a distinct decision |
+| R5 | MUST | Complete signed, offline-verifiable receipts for every decision | Partial; not demonstrated |
+| R6 | MUST | Multi-level trusted identity binding and preservation | Partial; not demonstrated |
+| R7 | SHOULD | Calibrated cumulative semantic-distance tracking | Gap; current heuristic is not sufficient |
+| R8 | SHOULD | Structured near-real-time telemetry and historical export | Partial; not demonstrated |
+| R9 | SHOULD | Just-in-time operation-scoped credentials | Gap; not demonstrated |
+
+See [`docs/legal/aarm-alignment.md`](legal/aarm-alignment.md) for exact evidence,
+upstream verification links, technical gaps, and organizational conditions.
 
 ```python
 @dataclass
@@ -1509,7 +1517,7 @@ class ConformanceResult:
 
 @dataclass
 class AARMComplianceReport:
-    version: str = "1.0"
+    version: str = "2026-03-26"
     overall_satisfied: bool = True    # False if any MUST requirement fails
     results: list[ConformanceResult]
 
@@ -2008,7 +2016,9 @@ This is called when logging audit events to correlate them with distributed trac
 
 Source: `src/api/routes/observability.py` (580 lines)
 
-Based on the agent-run open standard for agent observability.
+Based on a local adaptation of the agent-run observability schemas. The current
+upstream package is quarantined pending maintainer security review and is not a
+runtime dependency.
 
 **Models:**
 
@@ -2486,8 +2496,9 @@ Hierarchy: **source code > OpenAPI spec (`/openapi.json`) > prose docs**
 | Metrics | prometheus_client | Apache 2.0 |
 | Tracing | OpenTelemetry SDK | Apache 2.0 |
 | Audit storage | aiosqlite | MIT |
-| Agent-run standard | builderz-labs/agent-run | MIT |
-| AARM specification | aarm-dev/docs | MIT |
+| Agent-run schema source | builderz-labs/agent-run | MIT (current package quarantined; local adaptation only) |
+| AARM documentation | aarm-dev/docs | MIT, Copyright (c) 2023 Mintlify |
+| Faramesh Core and FPL | faramesh/faramesh-core, faramesh/fpl-lang | Core main/FPL main: Apache-2.0; pinned Core `v0.2.0` and historical `v1.2.9`: MPL-2.0 |
 | Database | PostgreSQL 16 | PostgreSQL License |
 | Cache | Redis 7 | BSD 3-Clause |
 | Frontend | Next.js | MIT |
@@ -2497,4 +2508,8 @@ Hierarchy: **source code > OpenAPI spec (`/openapi.json`) > prose docs**
 
 ## 22. License
 
-MUTX is proprietary software. The governance engine (AARM) components are based on the AARM specification, which is MIT-licensed. The agent-run observability schema is based on builderz-labs/agent-run, which is MIT-licensed.
+MUTX core is source-available under BUSL-1.1 and the Python SDK is Apache-2.0.
+Runtime-security components are informed by the MIT-licensed AARM documentation
+but are not presented as AARM-conformant. The observability schema is a local
+adaptation of MIT-licensed agent-run schemas; MUTX does not execute the
+quarantined current upstream package. See `CREDITS.md` for exact refs and notices.

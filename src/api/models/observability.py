@@ -7,8 +7,11 @@ https://github.com/builderz-labs/agent-run
 This module provides MUTX-native schemas for tracking agent executions,
 inspired by agent-run but rebranded as MutxRun, MutxStep, etc.
 
-MIT License - Copyright (c) 2024 builderz-labs
-https://github.com/builderz-labs/agent-run/blob/main/LICENSE
+MIT License - Copyright (c) 2026 Builderz Labs
+https://github.com/builderz-labs/agent-run/blob/9c7c3fa68413de878fae2d605c90fb334a0201f6/LICENSE
+
+Schema adaptation only. The current upstream package is quarantined pending
+maintainer security review and is not required by this module.
 """
 
 import uuid

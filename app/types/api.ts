@@ -2098,7 +2098,7 @@ export interface paths {
         };
         /**
          * Run Compliance Check
-         * @description Run AARM conformance checks.
+         * @description Run local capability checks mapped to AARM; not a conformance report.
          */
         get: operations["run_compliance_check_v1_security_compliance_get"];
         put?: never;
@@ -5245,7 +5245,7 @@ export interface components {
         };
         /**
          * ComplianceResponse
-         * @description AARM compliance check response.
+         * @description Backward-compatible local AARM-alignment check response.
          */
         ComplianceResponse: {
             /** Overall Satisfied */

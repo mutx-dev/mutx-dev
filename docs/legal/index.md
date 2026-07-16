@@ -46,18 +46,30 @@ See [LICENSE-FAQ](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/LICEN
 
 ## Third-Party Code
 
-MUTX incorporates MIT-licensed components:
+MUTX includes integrations, specification alignment, and material adaptations
+from projects under more than one license:
 
-- **agent-run** (builderz-labs) — Observability schema
-- **AARM** (aarm-dev) — Security layer specification
-- **Faramesh** (Faramesh Technologies) — Governance engine
-- **Mission Control** (builderz-labs) — Dashboard inspiration and tracked direct dashboard-pattern reuse
-- **Orchestra Research AI-Research-SKILLs** — Imported skill catalog metadata, curated bundles, and runtime sync path for research/operator workflows
-- **predict-rlm** (Trampoline AI) — Document workflow engine integration plus adapted template contracts and operator docs aligned to the upstream document analysis, contract comparison, invoice processing, and document redaction examples
+| Project | Audited license | Relationship |
+| --- | --- | --- |
+| agent-run | MIT | Observability schema adaptation; current upstream is quarantined for dependency/vendor use pending security review |
+| AARM documentation | MIT (Copyright (c) 2023 Mintlify) | Runtime-security specification alignment; no Core or Extended conformance claim |
+| Faramesh Core and FPL | Core main: Apache-2.0; pinned Core `v0.2.0` and historical `v1.2.9`: MPL-2.0; FPL main: Apache-2.0 | Governance daemon and policy-format integration; installer and license follow exact refs |
+| Mission Control | MIT | Tracked dashboard briefing-pattern adaptation |
+| Orchestra Research AI-Research-SKILLs | MIT | Pinned catalog, bundles, and sync integration |
+| predict-rlm | MIT | Document-engine integration and workflow adaptation |
+| Guild AI | Apache-2.0 | Candidate only; no direct reuse recorded |
+| LACP | Unresolved | No canonical repository or license established; no reuse recorded |
 
-All third-party code remains under its original license. See [CREDITS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/CREDITS.md) for full attribution and license texts.
+All third-party work remains under its original license. See
+[CREDITS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/CREDITS.md)
+for attribution and the
+[machine-readable evidence](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/docs/legal/oss-attribution-evidence.json) for immutable refs,
+license links, and validated local paths.
 
-Direct feature ports and materially adapted upstream workflow surfaces from Mission Control (MIT), LACP (MIT), Guild AI (Apache-2.0), and predict-rlm (MIT) are tracked in the [OSS Attribution Ledger](oss-attribution-ledger.md). The ledger records the upstream source, local MUTX scope, and whether the reuse was direct or still pending.
+Direct adaptations are tracked in the
+[OSS Attribution Ledger](oss-attribution-ledger.md). The current AARM
+requirement mapping and the gaps that prevent a conformance claim are documented
+in [AARM Alignment Status](aarm-alignment.md).
 
 ## Trademark Policy
 

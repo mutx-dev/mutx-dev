@@ -4,10 +4,11 @@ Receipt Generator.
 Cryptographically signed records binding action, context, policy decision,
 and outcome. Enables forensic reconstruction and compliance audit trails.
 
-AARM Requirement: R6 (MUST generate cryptographically signed receipts with full context)
+AARM alignment: contributes to current R5 tamper-evident receipts. Signing is
+optional and the full current R5 receipt schema is not yet demonstrated.
 
-MIT License - Copyright (c) 2024 aarm-dev
-https://github.com/aarm-dev/docs
+AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
+https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 """
 
 import hashlib
