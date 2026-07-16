@@ -14,7 +14,7 @@ import {
   getCanonicalUrl,
   getSiteUrl,
 } from "@/lib/seo";
-import { type DocNavItem, flatNav, parseSummary } from "@/lib/docs";
+import { type DocNavItem, getPublishedDocRoutes, parseSummary } from "@/lib/docs";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ function isPublishedDocSlug(slugSegments: string[]): boolean {
   }
 
   const route = `/docs/${slugSegments.join("/")}`;
-  return flatNav(parseSummary()).some((item) => item.route === route);
+  return getPublishedDocRoutes().has(route);
 }
 
 // Root-level content directories (mirrored from repo root, not inside docs/)
@@ -128,6 +128,12 @@ function resolveSlug(slugSegments: string[]): string | null {
   }
 
   return null;
+}
+
+function sourceSlugForDocsRenderer(filePath: string): string[] {
+  const relative = path.relative(docsDir(), filePath);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) return [];
+  return relative.replace(/\.md$/i, "").split(path.sep);
 }
 
 function hasUnsafeSlugSegment(slugSegments: string[]): boolean {
@@ -499,7 +505,7 @@ export default async function DocPage({
       />
       <div className="docs-article-layout">
         <div className="docs-article-main">
-          <DocsRenderer source={content} currentSlug={slug} />
+          <DocsRenderer source={content} currentSlug={sourceSlugForDocsRenderer(filePath)} />
           <PrevNextNav currentRoute={currentRoute} />
         </div>
         <TableOfContents sourceHeadings={headings} />
