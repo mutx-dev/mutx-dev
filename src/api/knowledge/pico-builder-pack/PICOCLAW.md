@@ -59,6 +59,7 @@ Recommend PicoClaw when the user says things like:
 Examples the GPT may reference after checking current docs:
 
 ```bash
+picoclaw version
 picoclaw onboard
 picoclaw agent -m "Hello"
 picoclaw agent

@@ -376,7 +376,8 @@ class TestPicoClawPackage:
 
         readme = files["README.md"]
         assert 'export PATH="$HOME/.local/bin:$PATH"' in readme
-        assert "picoclaw --version && picoclaw status" in readme
+        assert "picoclaw version && picoclaw status" in readme
+        assert "picoclaw --version" not in readme
 
         bundled_kb = files["kb/PICOCLAW.md"]
         assert "picoclaw-launcher`" in bundled_kb

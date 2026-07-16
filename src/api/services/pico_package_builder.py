@@ -386,7 +386,7 @@ def _build_readme(state: OnboardingState) -> str:
             "hermes": 'cd "${HERMES_HOME:-$HOME/.hermes}/hermes-agent" && uv run hermes doctor',
             "openclaw": "openclaw --version && openclaw gateway status",
             "nanoclaw": "cd nanoclaw-v2 && docker ps",
-            "picoclaw": 'export PATH="$HOME/.local/bin:$PATH" && picoclaw --version && picoclaw status',
+            "picoclaw": 'export PATH="$HOME/.local/bin:$PATH" && picoclaw version && picoclaw status',
         }
         lines.append(f"```bash\n{verify_cmds.get(stack, 'echo check-your-setup')}\n```")
 
