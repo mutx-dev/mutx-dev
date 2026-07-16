@@ -172,10 +172,9 @@ def _build_install_sh(state: OnboardingState) -> str:
     elif stack == "openclaw":
         lines += [
             "OPENCLAW_VERSION='2026.7.1'",
-            "command -v node >/dev/null || { echo 'OpenClaw requires Node 22.22.3+, 24.15+, or 25.9+ (Node 24 recommended)'; exit 1; }",
-            "command -v npm >/dev/null || { echo 'npm is required'; exit 1; }",
-            "node -e \"const [major, minor, patch] = process.versions.node.split('.').map(Number); const atLeast = ([requiredMajor, requiredMinor, requiredPatch]) => major > requiredMajor || (major === requiredMajor && (minor > requiredMinor || (minor === requiredMinor && patch >= requiredPatch))); const supported = (major === 22 && atLeast([22, 22, 3])) || (major === 24 && atLeast([24, 15, 0])) || atLeast([25, 9, 0]); if (!supported) { console.error('OpenClaw requires Node 22.22.3+, 24.15+, or 25.9+; Node 24 is recommended'); process.exit(1) }\"",
-            'npm install -g "openclaw@$OPENCLAW_VERSION"',
+            "OPENCLAW_INSTALL_COMMIT='2d2ddc43d0dcf71f31283d780f9fe9ff4cc04fe4'",
+            "command -v curl >/dev/null || { echo 'curl is required'; exit 1; }",
+            'curl -fsSL --proto \'=https\' --tlsv1.2 "https://raw.githubusercontent.com/openclaw/openclaw/$OPENCLAW_INSTALL_COMMIT/scripts/install.sh" | bash -s -- --install-method npm --version "$OPENCLAW_VERSION" --no-onboard --no-prompt',
             "openclaw onboard --install-daemon",
         ]
     elif stack == "nanoclaw":

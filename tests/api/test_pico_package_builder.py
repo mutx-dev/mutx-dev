@@ -207,11 +207,13 @@ class TestOpenClawPackage:
         assert lock["ref"] == "v2026.7.1"
         assert lock["version"] == "2026.7.1"
         assert lock["runtime"] == "Node >=22.22.3,<23 or >=24.15.0,<25 or >=25.9.0"
-        assert "openclaw@$OPENCLAW_VERSION" in files["install.sh"]
+        assert "$OPENCLAW_INSTALL_COMMIT/scripts/install.sh" in files["install.sh"]
+        assert "--install-method npm" in files["install.sh"]
+        assert '--version "$OPENCLAW_VERSION"' in files["install.sh"]
+        assert "--no-onboard --no-prompt" in files["install.sh"]
         assert "openclaw@latest" not in files["install.sh"]
-        assert "major === 22" in files["install.sh"]
-        assert "major === 24" in files["install.sh"]
-        assert "atLeast([25, 9, 0])" in files["install.sh"]
+        assert "command -v node" not in files["install.sh"]
+        assert "command -v npm" not in files["install.sh"]
 
     def test_no_tailscale_script(self, files):
         assert "tailscale-setup.sh" not in files
