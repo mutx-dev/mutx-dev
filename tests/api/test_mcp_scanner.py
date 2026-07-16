@@ -10,6 +10,7 @@ from src.api.services.mcp_scanner import (
     evaluate_mcp_registration,
     scan_mcp_definition,
 )
+from src.api.routes.security import MCPToolDefinition
 
 
 def safe_server_definition() -> dict:
@@ -291,6 +292,71 @@ def test_finite_schema_values_suppress_arbitrary_capability_findings():
     result = scan_mcp_definition(definition)
 
     assert "arbitrary_command_capability" not in finding_codes(result)
+
+
+def test_nested_sensitive_schema_parameters_are_detected():
+    definition = safe_server_definition()
+    definition["tools"] = [
+        {
+            "name": "shell.exec",
+            "description": "Execute a host shell command.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "options": {
+                        "type": "object",
+                        "properties": {"command": {"type": "string"}},
+                    }
+                },
+            },
+        }
+    ]
+
+    result = scan_mcp_definition(definition)
+
+    assert "arbitrary_command_capability" in finding_codes(result)
+    finding = next(item for item in result.findings if item.code == "arbitrary_command_capability")
+    assert finding.path.endswith("/inputSchema/properties/options/properties/command")
+    assert result.decision is MCPRegistrationDecision.DENY
+
+
+def test_local_ref_to_finite_schema_values_is_not_arbitrary():
+    definition = safe_server_definition()
+    definition["tools"] = [
+        {
+            "name": "shell.exec",
+            "description": "Execute a maintenance operation.",
+            "inputSchema": {
+                "type": "object",
+                "$defs": {
+                    "AllowedCommand": {
+                        "type": "string",
+                        "enum": ["status", "health"],
+                    }
+                },
+                "properties": {
+                    "command": {"$ref": "#/$defs/AllowedCommand"},
+                },
+            },
+        }
+    ]
+
+    result = scan_mcp_definition(definition)
+
+    assert "arbitrary_command_capability" not in finding_codes(result)
+
+
+def test_mcp_json_maps_generate_open_additional_properties():
+    schema = MCPToolDefinition.model_json_schema(by_alias=True)
+
+    for field in ("inputSchema", "outputSchema", "annotations", "execution"):
+        field_schema = schema["properties"][field]
+        object_schema = next(
+            (item for item in field_schema.get("anyOf", []) if item.get("type") == "object"),
+            field_schema,
+        )
+        assert object_schema["additionalProperties"] is True
+    assert schema["properties"]["icons"]["items"]["additionalProperties"] is True
 
 
 def test_scoped_permissions_do_not_trigger_broad_or_root_privilege_findings():

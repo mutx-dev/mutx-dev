@@ -21,11 +21,11 @@ https://github.com/aarm-dev/docs/tree/8eff208b98786b2c9a578b26cb7eaca440ec4020
 AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
 """
 
-from typing import Any, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import PlainTextResponse, Response
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, WithJsonSchema, model_validator
 
 from src.api.auth.dependencies import get_current_user
 from src.api.models import User
@@ -43,6 +43,11 @@ from src.security import (
 from src.security.telemetry import TelemetryEventType
 
 router = APIRouter(prefix="/security", tags=["security"])
+
+MCPJSONMap = Annotated[
+    dict[str, Any],
+    WithJsonSchema({"type": "object", "additionalProperties": True}),
+]
 
 
 _governance = get_governance_runtime()
@@ -221,11 +226,11 @@ class MCPToolDefinition(BaseModel):
     name: str = Field(..., min_length=1, max_length=256)
     title: Optional[str] = Field(default=None, max_length=1_024)
     description: Optional[str] = Field(default=None, max_length=8_192)
-    input_schema: dict[str, Any] = Field(alias="inputSchema")
-    output_schema: Optional[dict[str, Any]] = Field(default=None, alias="outputSchema")
-    annotations: Optional[dict[str, Any]] = None
-    execution: Optional[dict[str, Any]] = None
-    icons: list[dict[str, Any]] = Field(default_factory=list, max_length=32)
+    input_schema: MCPJSONMap = Field(alias="inputSchema")
+    output_schema: Optional[MCPJSONMap] = Field(default=None, alias="outputSchema")
+    annotations: Optional[MCPJSONMap] = None
+    execution: Optional[MCPJSONMap] = None
+    icons: list[MCPJSONMap] = Field(default_factory=list, max_length=32)
 
 
 class MCPServerDefinition(BaseModel):

@@ -296,17 +296,99 @@ def _edit_distance_at_most_one(left: str, right: str) -> bool:
     return True
 
 
-def _schema_property(
-    schema: Mapping[str, object], names: set[str]
-) -> tuple[str, Mapping[str, object]] | None:
-    properties = schema.get("properties")
-    if not isinstance(properties, Mapping):
-        return None
-    for raw_name, raw_definition in properties.items():
-        name = str(raw_name)
-        if name.casefold() in names and isinstance(raw_definition, Mapping):
-            return name, raw_definition
-    return None
+def _resolve_local_schema_ref(
+    definition: Mapping[str, object], root_schema: Mapping[str, object]
+) -> Mapping[str, object]:
+    """Resolve bounded document-local JSON Schema references without I/O."""
+    current = definition
+    seen: set[str] = set()
+    for _ in range(MAX_SCHEMA_DEPTH):
+        reference = current.get("$ref")
+        if not isinstance(reference, str) or not reference.startswith("#/"):
+            return current
+        if reference in seen:
+            return definition
+        seen.add(reference)
+
+        target: object = root_schema
+        for raw_token in reference[2:].split("/"):
+            token = raw_token.replace("~1", "/").replace("~0", "~")
+            if not isinstance(target, Mapping) or token not in target:
+                return definition
+            target = target[token]
+        if not isinstance(target, Mapping):
+            return definition
+
+        siblings = {key: value for key, value in current.items() if key != "$ref"}
+        current = {**target, **siblings}
+    return definition
+
+
+def _schema_properties(
+    schema: Mapping[str, object],
+    names: set[str],
+    *,
+    root_schema: Mapping[str, object] | None = None,
+    path: str = "/inputSchema",
+    depth: int = 0,
+    active_refs: frozenset[str] = frozenset(),
+) -> Iterable[tuple[str, Mapping[str, object], str]]:
+    """Yield matching properties nested in objects, arrays, and compositions."""
+    if depth > MAX_SCHEMA_DEPTH:
+        return
+    if root_schema is None:
+        root_schema = schema
+
+    reference = schema.get("$ref")
+    if isinstance(reference, str) and reference in active_refs:
+        return
+    next_refs = active_refs | ({reference} if isinstance(reference, str) else set())
+    resolved = _resolve_local_schema_ref(schema, root_schema)
+
+    properties = resolved.get("properties")
+    if isinstance(properties, Mapping):
+        for raw_name, raw_definition in properties.items():
+            if not isinstance(raw_definition, Mapping):
+                continue
+            name = str(raw_name)
+            escaped_name = name.replace("~", "~0").replace("/", "~1")
+            property_path = f"{path}/properties/{escaped_name}"
+            resolved_definition = _resolve_local_schema_ref(raw_definition, root_schema)
+            if name.casefold() in names:
+                yield name, resolved_definition, property_path
+            yield from _schema_properties(
+                raw_definition,
+                names,
+                root_schema=root_schema,
+                path=property_path,
+                depth=depth + 1,
+                active_refs=frozenset(next_refs),
+            )
+
+    items = resolved.get("items")
+    if isinstance(items, Mapping):
+        yield from _schema_properties(
+            items,
+            names,
+            root_schema=root_schema,
+            path=f"{path}/items",
+            depth=depth + 1,
+            active_refs=frozenset(next_refs),
+        )
+
+    for keyword in ("allOf", "anyOf", "oneOf"):
+        branches = resolved.get(keyword)
+        if isinstance(branches, Sequence) and not isinstance(branches, (str, bytes, bytearray)):
+            for index, branch in enumerate(branches):
+                if isinstance(branch, Mapping):
+                    yield from _schema_properties(
+                        branch,
+                        names,
+                        root_schema=root_schema,
+                        path=f"{path}/{keyword}/{index}",
+                        depth=depth + 1,
+                        active_refs=frozenset(next_refs),
+                    )
 
 
 def _is_unrestricted_string(definition: Mapping[str, object]) -> bool:
@@ -1004,74 +1086,78 @@ class MCPDefinitionScanner:
         schema: Mapping[str, object],
         path: str,
     ) -> None:
-        command_property = _schema_property(schema, {"cmd", "command", "script", "shell"})
-        if (
-            command_property
-            and _is_unrestricted_string(command_property[1])
-            and (
-                _COMMAND_TOOL_WORDS.search(name)
-                or re.search(r"\b(?:command|shell|terminal)\b", description, re.IGNORECASE)
-            )
-        ):
-            self._add(
-                code="arbitrary_command_capability",
-                severity=MCPFindingSeverity.HIGH,
-                category="excessive_permissions",
-                path=f"{path}/inputSchema/properties/{command_property[0]}",
-                title="Tool accepts an unrestricted host command",
-                explanation=(
-                    "An unconstrained command string gives the model the effective privileges of "
-                    "the MCP server process."
-                ),
-                evidence=command_property[0],
-                recommendation="Replace arbitrary commands with an allowlisted operation enum.",
-            )
+        command_context = bool(
+            _COMMAND_TOOL_WORDS.search(name)
+            or re.search(r"\b(?:command|shell|terminal)\b", description, re.IGNORECASE)
+        )
+        if command_context:
+            for property_name, definition, property_path in _schema_properties(
+                schema, {"cmd", "command", "script", "shell"}
+            ):
+                if _is_unrestricted_string(definition):
+                    self._add(
+                        code="arbitrary_command_capability",
+                        severity=MCPFindingSeverity.HIGH,
+                        category="excessive_permissions",
+                        path=f"{path}{property_path}",
+                        title="Tool accepts an unrestricted host command",
+                        explanation=(
+                            "An unconstrained command string gives the model the effective "
+                            "privileges of the MCP server process."
+                        ),
+                        evidence=property_name,
+                        recommendation="Replace arbitrary commands with an allowlisted operation enum.",
+                    )
 
-        path_property = _schema_property(schema, {"file", "file_path", "filepath", "path"})
-        if (
-            path_property
-            and _is_unrestricted_string(path_property[1])
-            and (
-                _FILESYSTEM_TOOL_WORDS.search(name)
-                or re.search(r"\bfile(?:system)?\b", description, re.IGNORECASE)
-            )
-        ):
-            self._add(
-                code="unbounded_filesystem_path",
-                severity=MCPFindingSeverity.MEDIUM,
-                category="excessive_permissions",
-                path=f"{path}/inputSchema/properties/{path_property[0]}",
-                title="Filesystem path is not constrained",
-                explanation=(
-                    "The schema permits arbitrary host paths. A legitimate filesystem tool should "
-                    "be rooted to an operator-approved directory at runtime."
-                ),
-                evidence=path_property[0],
-                recommendation="Enforce an approved root directory and reject traversal after resolution.",
-            )
+        filesystem_context = bool(
+            _FILESYSTEM_TOOL_WORDS.search(name)
+            or re.search(r"\bfile(?:system)?\b", description, re.IGNORECASE)
+        )
+        if filesystem_context:
+            for property_name, definition, property_path in _schema_properties(
+                schema, {"file", "file_path", "filepath", "path"}
+            ):
+                if _is_unrestricted_string(definition):
+                    self._add(
+                        code="unbounded_filesystem_path",
+                        severity=MCPFindingSeverity.MEDIUM,
+                        category="excessive_permissions",
+                        path=f"{path}{property_path}",
+                        title="Filesystem path is not constrained",
+                        explanation=(
+                            "The schema permits arbitrary host paths. A legitimate filesystem tool "
+                            "should be rooted to an operator-approved directory at runtime."
+                        ),
+                        evidence=property_name,
+                        recommendation=(
+                            "Enforce an approved root directory and reject traversal after resolution."
+                        ),
+                    )
 
-        url_property = _schema_property(schema, {"endpoint", "target", "uri", "url"})
-        if (
-            url_property
-            and _is_unrestricted_string(url_property[1])
-            and (
-                _NETWORK_TOOL_WORDS.search(name)
-                or re.search(r"\b(?:fetch|request|url|web)\b", description, re.IGNORECASE)
-            )
-        ):
-            self._add(
-                code="unbounded_network_target",
-                severity=MCPFindingSeverity.MEDIUM,
-                category="excessive_permissions",
-                path=f"{path}/inputSchema/properties/{url_property[0]}",
-                title="Network target is not constrained",
-                explanation=(
-                    "An arbitrary URL can expose internal services or cloud metadata to SSRF. The "
-                    "schema alone cannot prove runtime protections."
-                ),
-                evidence=url_property[0],
-                recommendation="Use a destination allowlist and block private, loopback, and metadata ranges.",
-            )
+        network_context = bool(
+            _NETWORK_TOOL_WORDS.search(name)
+            or re.search(r"\b(?:fetch|request|url|web)\b", description, re.IGNORECASE)
+        )
+        if network_context:
+            for property_name, definition, property_path in _schema_properties(
+                schema, {"endpoint", "target", "uri", "url"}
+            ):
+                if _is_unrestricted_string(definition):
+                    self._add(
+                        code="unbounded_network_target",
+                        severity=MCPFindingSeverity.MEDIUM,
+                        category="excessive_permissions",
+                        path=f"{path}{property_path}",
+                        title="Network target is not constrained",
+                        explanation=(
+                            "An arbitrary URL can expose internal services or cloud metadata to "
+                            "SSRF. The schema alone cannot prove runtime protections."
+                        ),
+                        evidence=property_name,
+                        recommendation=(
+                            "Use a destination allowlist and block private, loopback, and metadata ranges."
+                        ),
+                    )
 
         if not isinstance(schema.get("type"), str) or schema.get("type") != "object":
             self._add(
@@ -1127,7 +1213,7 @@ class MCPDefinitionScanner:
             )
 
         url_property = (
-            _schema_property(schema, {"endpoint", "target", "uri", "url"})
+            next(_schema_properties(schema, {"endpoint", "target", "uri", "url"}), None)
             if isinstance(schema, Mapping)
             else None
         )
