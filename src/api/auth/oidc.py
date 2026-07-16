@@ -270,7 +270,12 @@ async def verify_oauth_token(
         header = jwt.get_unverified_header(token)
         signing_key = await _get_signing_key(config["jwks_uri"], header.get("kid"))
         if signing_key is None:
-            return await _verify_via_userinfo(token, config["userinfo_endpoint"])
+            if allow_userinfo_fallback:
+                return await _verify_via_userinfo(token, config["userinfo_endpoint"])
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="No OIDC signing key matches the token key id",
+            )
         payload = jwt.decode(
             token,
             signing_key,
@@ -279,8 +284,13 @@ async def verify_oauth_token(
             issuer=domain,
         )
         return _normalize_payload(payload, provider)
-    except (JWTError, OIDCTokenValidationError, httpx.HTTPError):
-        return await _verify_via_userinfo(token, config["userinfo_endpoint"])
+    except (JWTError, OIDCTokenValidationError, httpx.HTTPError) as exc:
+        if allow_userinfo_fallback:
+            return await _verify_via_userinfo(token, config["userinfo_endpoint"])
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="OIDC token validation failed",
+        ) from exc
 
 
 async def _verify_via_userinfo(token: str, userinfo_uri: str) -> TokenPayload:

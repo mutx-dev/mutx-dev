@@ -304,6 +304,39 @@ async def test_verify_oauth_token_rejects_invalid_id_tokens_without_userinfo_fal
 
 
 @pytest.mark.asyncio
+async def test_legacy_verifier_honors_disabled_userinfo_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    provider_settings = SimpleNamespace(
+        okta_domain="https://id.example.com",
+        okta_realm=None,
+    )
+    monkeypatch.setattr(oidc, "get_oidc_settings", lambda: None)
+    monkeypatch.setattr(oidc, "get_settings", lambda: provider_settings)
+    monkeypatch.setattr(oidc.jwt, "get_unverified_header", lambda _token: {"kid": "key-1"})
+
+    async def fake_signing_key(*_args: object) -> dict[str, str]:
+        return {"kid": "key-1"}
+
+    def reject_invalid_token(*_args: object, **_kwargs: object) -> dict[str, object]:
+        raise oidc.JWTError("invalid signature")
+
+    async def fail_userinfo(*_args: object) -> oidc.TokenPayload:
+        pytest.fail("legacy ID token validation must not fall back to userinfo")
+
+    monkeypatch.setattr(oidc, "_get_signing_key", fake_signing_key)
+    monkeypatch.setattr(oidc.jwt, "decode", reject_invalid_token)
+    monkeypatch.setattr(oidc, "_verify_via_userinfo", fail_userinfo)
+
+    with pytest.raises(oidc.HTTPException, match="OIDC token validation failed"):
+        await oidc.verify_oauth_token(
+            "invalid-id-token",
+            oidc.SSOProvider.OKTA,
+            allow_userinfo_fallback=False,
+        )
+
+
+@pytest.mark.asyncio
 async def test_require_roles_uses_canonical_sso_principal() -> None:
     principal = SSOTokenUser(
         oidc.TokenPayload(
