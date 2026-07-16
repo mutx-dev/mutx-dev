@@ -21,7 +21,7 @@ export function useDocsLiveReload() {
 
   useEffect(() => {
     // Only connect in browser after mount — SSE endpoint 404s in production
-    if (!isMounted) return;
+    if (!isMounted || process.env.NODE_ENV !== "development") return;
 
     let es: EventSource | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;

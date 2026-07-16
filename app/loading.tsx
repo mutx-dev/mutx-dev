@@ -1,26 +1,11 @@
-import { MarketingHeroBackdrop } from "@/components/site/marketing/MarketingHeroBackdrop";
-import styles from "@/components/site/marketing/MarketingHome.module.css";
-
 export default function Loading() {
   return (
-    <div className={styles.loaderFallback} aria-hidden="true">
-      <MarketingHeroBackdrop fetchPriority="high" />
-      <div className={styles.loaderVeil} />
-      <div className={`${styles.loaderFallbackStage} ${styles.loaderMarkShell}`}>
-        <div className={styles.loaderStageGlow} />
-        <video
-          poster="/marketing/loader/mutx-logo-loader-poster.webp"
-          className={styles.loaderMarkVideo}
-          muted
-          playsInline
-          autoPlay
-          loop
-          preload="auto"
-        >
-          <source src="/marketing/loader/mutx-logo-loader-60fps-2x.webm" type="video/webm" />
-          <source src="/marketing/loader/mutx-logo-loader-60fps-2x.mp4" type="video/mp4" />
-        </video>
+    <div className="grid min-h-screen place-items-center bg-[#f3f0e8] text-[#0a0a09]" role="status" aria-label="Loading MUTX">
+      <div className="grid grid-cols-2 border-l border-t border-[#0a0a09] bg-[#ff4d00] font-[family:var(--font-site-body)] text-5xl font-bold tracking-[-.08em]">
+        {['M', 'U', 'T', 'X'].map((letter, index) => (
+          <span key={letter} className={`grid h-24 w-24 place-items-center border-b border-r border-[#0a0a09] ${index === 1 || index === 2 ? 'bg-[#0a0a09] text-[#f3f0e8]' : ''}`}>{letter}</span>
+        ))}
       </div>
     </div>
-  );
+  )
 }

@@ -9,7 +9,7 @@ If you find a security issue, please do not open a public GitHub issue.
 
 ## How To Report
 
-Email `hello@mutx.dev` with the subject line `[security]` and include:
+[Email the security team](mailto:hello@mutx.dev?subject=%5Bsecurity%5D) and include:
 
 - a clear description of the issue
 - affected files, routes, or components

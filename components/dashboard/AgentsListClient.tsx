@@ -173,7 +173,7 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-lg"
-              style={{ backgroundColor: "rgba(59, 130, 246, 0.14)", color: "#60a5fa" }}
+              style={{ backgroundColor: "rgba(255, 77, 0, 0.14)", color: "#ff4d00" }}
             >
               <Server className="h-5 w-5" />
             </div>

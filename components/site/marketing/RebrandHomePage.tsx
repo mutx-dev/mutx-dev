@@ -1,123 +1,83 @@
-'use client'
-
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowDown, ArrowRight, ArrowUpRight } from 'lucide-react'
 
 import { PublicNav } from '@/components/site/PublicNav'
-
 import styles from './RebrandHomePage.module.css'
 
-const CAPABILITIES = [
-  { index: '01', label: 'Observe', note: 'Every run, readable.', href: '/ai-agent-monitoring' },
-  { index: '02', label: 'Bound', note: 'Every risky move, checked.', href: '/ai-agent-guardrails' },
-  { index: '03', label: 'Prove', note: 'Every decision, kept.', href: '/ai-agent-audit-logs' },
+const SYSTEM = [
+  { number: '01', name: 'Observe', line: 'Read every run.', href: '/ai-agent-monitoring' },
+  { number: '02', name: 'Govern', line: 'Bound every move.', href: '/ai-agent-guardrails' },
+  { number: '03', name: 'Prove', line: 'Keep every record.', href: '/ai-agent-audit-logs' },
 ]
 
-const PRODUCT_LINKS = [
-  { label: 'Control plane', href: '/ai-agent-control-plane' },
-  { label: 'Governance', href: '/ai-agent-governance' },
-  { label: 'Deployment', href: '/ai-agent-deployment' },
-  { label: 'Cost', href: '/ai-agent-cost' },
-]
+const INDEX = [
+  ['Control plane', '/ai-agent-control-plane'],
+  ['Approvals', '/ai-agent-approvals'],
+  ['Deployment', '/ai-agent-deployment'],
+  ['Reliability', '/ai-agent-reliability'],
+  ['Governance', '/ai-agent-governance'],
+  ['Cost', '/ai-agent-cost'],
+] as const
 
 export function RebrandHomePage() {
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <section className={styles.hero}>
         <PublicNav overlay />
-        <div className={styles.heroGrid} aria-hidden="true" />
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <p className={styles.kicker}><span /> AI agent operations</p>
-            <h1>Agents.<br /><em>Under control.</em></h1>
-            <p className={styles.lede}>See the work. Stop the wrong move. Keep the record.</p>
+            <p className={styles.overline}>MUTX / Agent operations</p>
+            <h1>Control for<br />agents in motion.</h1>
+            <p className={styles.lede}>See the run. Bound the action. Keep the proof.</p>
             <div className={styles.actions}>
-              <Link href="/download" className={styles.primary}>Download for Mac <ArrowRight /></Link>
-              <Link href="/ai-agent-control-plane" className={styles.secondary}>Explore MUTX <ArrowUpRight /></Link>
+              <Link href="/download">Download for Mac <ArrowRight /></Link>
+              <Link href="/docs">Read the docs <ArrowUpRight /></Link>
             </div>
           </div>
 
-          <div className={styles.heroVisual}>
-            <div className={styles.visualFrame}>
-              <Image
-                src="/landing/webp/victory-core.webp"
-                alt="MUTX agent in an operational control environment"
-                fill
-                priority
-                sizes="(max-width: 860px) 92vw, 48vw"
-                className={styles.heroImage}
-              />
-              <div className={styles.visualHud}>
-                <span>run / 9f2a</span>
-                <strong>healthy</strong>
-              </div>
-            </div>
-            <p className={styles.visualCaption}>01 / Runtime visible</p>
+          <div className={styles.wordmark} aria-label="MUTX">
+            <span>M</span><span>U</span><span>T</span><span>X</span>
           </div>
         </div>
 
-        <div className={styles.heroRail}>
+        <div className={styles.heroBottom}>
           <span>Observe</span><span>Govern</span><span>Prove</span>
-          <a href="#system" aria-label="Continue to the MUTX system"><ArrowDown /></a>
+          <a href="#system" aria-label="Continue"><ArrowDown /></a>
         </div>
       </section>
 
       <section id="system" className={styles.system}>
-        <div className={styles.systemHeading}>
-          <p className={styles.kicker}><span /> The operating layer</p>
-          <h2>One screen.<br />The whole story.</h2>
-        </div>
+        <header className={styles.sectionHead}>
+          <p>What MUTX does</p>
+          <h2>Every action.<br />Accounted for.</h2>
+        </header>
 
-        <div className={styles.systemVisual}>
-          <Image
-            src="/landing/webp/wiring-bay.webp"
-            alt="MUTX runtime control surface"
-            fill
-            sizes="(max-width: 900px) 100vw, 72vw"
-            className={styles.systemImage}
-          />
-          <div className={styles.systemReadout}>
-            <p>Live run</p>
-            <strong>12 tools</strong>
-            <span>0 violations</span>
-          </div>
-        </div>
-
-        <div className={styles.capabilityGrid}>
-          {CAPABILITIES.map((item) => (
-            <Link key={item.href} href={item.href} className={styles.capability}>
-              <span>{item.index}</span>
-              <h3>{item.label}</h3>
-              <p>{item.note}</p>
+        <div className={styles.systemGrid}>
+          {SYSTEM.map((item) => (
+            <Link key={item.name} href={item.href}>
+              <span>{item.number}</span>
+              <div><strong>{item.name}</strong><p>{item.line}</p></div>
               <ArrowUpRight />
             </Link>
           ))}
         </div>
       </section>
 
-      <section className={styles.statement}>
-        <div className={styles.statementInner}>
-          <p className={styles.kickerDark}><span /> What matters</p>
-          <div className={styles.statementLines}>
-            <p>Read the run.</p>
-            <p>Set the boundary.</p>
-            <p>Keep the proof.</p>
-          </div>
-          <p className={styles.statementNote}>No mystery layer. No trust fall.</p>
-        </div>
+      <section className={styles.manifesto}>
+        <p>Move fast.</p>
+        <p>Leave proof.</p>
       </section>
 
-      <section className={styles.explore}>
-        <div className={styles.exploreIntro}>
-          <p className={styles.kicker}><span /> Explore MUTX</p>
-          <h2>Built for<br />the hard part.</h2>
-        </div>
-        <nav className={styles.exploreLinks} aria-label="MUTX product areas">
-          {PRODUCT_LINKS.map((item, index) => (
-            <Link key={item.href} href={item.href}>
+      <section className={styles.index}>
+        <header className={styles.sectionHeadDark}>
+          <p>Product index</p>
+          <h2>The operating layer.</h2>
+        </header>
+        <nav aria-label="MUTX product index">
+          {INDEX.map(([label, href], index) => (
+            <Link key={href} href={href}>
               <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{item.label}</strong>
+              <strong>{label}</strong>
               <ArrowUpRight />
             </Link>
           ))}
@@ -125,19 +85,10 @@ export function RebrandHomePage() {
       </section>
 
       <section className={styles.pico}>
-        <div className={styles.picoArt}>
-          <Image
-            src="/pico/robot/hero-wave.png"
-            alt="Pico assistant"
-            fill
-            sizes="(max-width: 860px) 100vw, 44vw"
-            className={styles.picoImage}
-          />
-        </div>
-        <div className={styles.picoCopy}>
-          <p className={styles.kickerDark}><span /> Pico</p>
-          <h2>A smaller way in.</h2>
-          <p>Guided setup. Grounded help. The same control underneath.</p>
+        <div className={styles.picoMark}>P</div>
+        <div>
+          <p>Pico / Setup</p>
+          <h2>Less guessing.<br />More shipping.</h2>
           <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer">
             Pico beta status <ArrowUpRight />
           </a>
@@ -145,11 +96,8 @@ export function RebrandHomePage() {
       </section>
 
       <section className={styles.finalCta}>
-        <p>Run agents.<br />Know what happened.</p>
-        <div>
-          <Link href="/download">Download for Mac <ArrowRight /></Link>
-          <Link href="/docs">Read the docs <ArrowUpRight /></Link>
-        </div>
+        <p>Run agents.<br />Know why.</p>
+        <Link href="/download">Get MUTX <ArrowRight /></Link>
       </section>
     </main>
   )

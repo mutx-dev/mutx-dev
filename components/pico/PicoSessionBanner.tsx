@@ -107,18 +107,18 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={picoClasses.chip}>hosted session live</span>
-              <span className={picoClasses.chip}>
+              <span className={picoClasses.chipSuccess}>hosted session live</span>
+              <span className={picoClasses.chipNeutral}>
                 {session.user.plan ? `${session.user.plan.toLowerCase()} plan` : 'plan unknown'}
               </span>
-              <span className={picoClasses.chip}>
+              <span className={session.user.isEmailVerified === false ? picoClasses.chipWarning : session.user.isEmailVerified === true ? picoClasses.chipSuccess : picoClasses.chipNeutral}>
                 {session.user.isEmailVerified === false
                   ? 'verification pending'
                   : session.user.isEmailVerified === true
                     ? 'email verified'
                     : 'email status unknown'}
               </span>
-              <span className={picoClasses.chip}>
+              <span className={readiness.loading ? picoClasses.chipNeutral : readiness.webhookCount != null ? picoClasses.chipSuccess : picoClasses.chipWarning}>
                 {readiness.loading
                   ? 'checking webhooks'
                   : readiness.webhookCount != null
@@ -196,8 +196,8 @@ export function PicoSessionBanner({ session, nextPath }: PicoSessionBannerProps)
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={picoClasses.chip}>hosted session required</span>
-            <span className={picoClasses.chip}>local preview</span>
+            <span className={picoClasses.chipWarning}>hosted session required</span>
+            <span className={picoClasses.chipNeutral}>local preview</span>
           </div>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
             Sign in to persist progress, read live runtime state, and use hosted approvals on this Pico domain.

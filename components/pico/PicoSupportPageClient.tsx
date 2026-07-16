@@ -231,20 +231,20 @@ export function PicoSupportPageClient() {
         description="Use this for API keys, local or cloud hosting, integrations, team rollout, or custom implementation."
         heroContent={
           <div
-            className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(9,15,10,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+            className="relative overflow-hidden border border-[color:var(--pico-border-hover)] bg-[color:var(--pico-bg-panel)] p-5 sm:p-6"
             data-testid="pico-support-hero-signal"
           >
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_30%,transparent_72%,rgba(255,255,255,0.02))]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[color:var(--pico-accent)]"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.14)] blur-3xl"
+              className="hidden"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[rgba(var(--pico-accent-rgb),0.1)] blur-3xl"
+              className="hidden"
             />
             <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
               <div className="grid gap-5">

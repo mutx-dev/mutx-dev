@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpenText, ShieldCheck } from "lucide-react";
 
 import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
+import { OperationalVisual } from "@/components/site/marketing/OperationalVisual";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
 import {
   MUTX_GITHUB_RELEASES_URL,
@@ -83,7 +83,7 @@ export default async function MacDownloadPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
           <div className={styles.shell}>
             <div className={styles.routeDownloadStage}>
@@ -94,8 +94,7 @@ export default async function MacDownloadPage() {
                     Download MUTX for macOS.
                   </h1>
                   <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>
-                    MUTX {releaseLabel} is the signed macOS app for Apple Silicon
-                    and Intel. Install it, then move straight into the dashboard.
+                    Signed for Apple Silicon and Intel. Install, then open the control plane.
                   </p>
                 </div>
 
@@ -139,14 +138,7 @@ export default async function MacDownloadPage() {
               </div>
 
               <div className={styles.routeVisualFrame}>
-                <div className={styles.routeVisualGlow} aria-hidden="true" />
-                <Image
-                  src="/landing/webp/victory-core.webp"
-                  alt="MUTX robot presenting the MUTX mark"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 34rem"
-                  className={styles.routeVisualImage}
-                />
+                <OperationalVisual variant="download" />
               </div>
             </div>
 

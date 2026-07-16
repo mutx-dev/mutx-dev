@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DocNavItem } from '@/lib/docs';
 import { DocsNavContext, useDocsNav } from "./DocsNavContext";
 import { DocsSearch } from "./DocsSearch";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 import { DocsBreadcrumbs } from "./DocsBreadcrumbs";
 import { useDocsLiveReload } from "./useDocsLiveReload";
 import "@/app/docs/docs.css";
@@ -225,6 +224,7 @@ function NavItem({ item, pathname }: NavItemProps) {
           }`}
           style={{ paddingLeft: showChevron ? '4px' : `${item.depth * 16 + 16}px` }}
           onClick={() => onNavigate?.()}
+          aria-current={isActive ? 'page' : undefined}
         >
           {renderIcon(item.icon)}
           <span className={item.icon ? 'docs-nav-label' : undefined}>{item.title}</span>
@@ -245,6 +245,10 @@ function NavItem({ item, pathname }: NavItemProps) {
 export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
   useDocsLiveReload();
   const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const mobileToggleRef = useRef<HTMLButtonElement>(null);
+  const mobileSidebarRef = useRef<HTMLElement>(null);
+  const docsContentRef = useRef<HTMLElement>(null);
   const editorialRoutes = ['/manifesto', '/whitepaper', '/roadmap'];
   const resourceRoutes = ['/infrastructure', '/sdk', '/security', '/support'];
   const isEditorial = editorialRoutes.includes(pathname);
@@ -274,17 +278,66 @@ export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
       ];
 
   function handleNavigate() {
-    document.documentElement.removeAttribute('data-mobile-nav-open');
+    setMobileNavOpen(false);
   }
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setMobileNavOpen(false);
+        return;
+      }
+
+      if (event.key === 'Tab' && mobileSidebarRef.current) {
+        const focusable = Array.from(
+          mobileSidebarRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    docsContentRef.current?.setAttribute('inert', '');
+    window.requestAnimationFrame(() => {
+      mobileSidebarRef.current?.querySelector<HTMLElement>('a[href], button:not([disabled])')?.focus();
+    });
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape);
+      docsContentRef.current?.removeAttribute('inert');
+      mobileToggleRef.current?.focus();
+    };
+  }, [mobileNavOpen]);
 
   return (
     <DocsNavContext.Provider value={{ nav, onNavigate: handleNavigate }}>
-    <div className={`docs-shell${isStandalone ? ' docs-shell-standalone' : ''}${isResource ? ' docs-shell-resource' : ''}`}>
+    <div
+      className={`docs-shell${isStandalone ? ' docs-shell-standalone' : ''}${isResource ? ' docs-shell-resource' : ''}`}
+      data-mobile-nav-open={mobileNavOpen ? '1' : undefined}
+    >
       {/* ── Top header ── */}
       <header className="docs-header">
         <button
+          ref={mobileToggleRef}
           className="lg:hidden p-1.5 -ml-1.5 text-gb-text-2 hover:text-white transition-colors rounded"
           aria-label="Toggle navigation"
+          aria-expanded={mobileNavOpen}
+          aria-controls="docs-mobile-navigation"
+          onClick={() => setMobileNavOpen((open) => !open)}
         >
           <svg
             width="18"
@@ -301,31 +354,6 @@ export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
             />
           </svg>
         </button>
-        {/* Mobile nav toggle — inline script bypasses React event system failures */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-(function() {
-  document.addEventListener('click', function(e) {
-    var btn = e.target.closest('button[aria-label="Toggle navigation"]');
-    var overlay = e.target.closest('.docs-mobile-overlay');
-    if (btn) {
-      var isOpen = document.documentElement.dataset.mobileNavOpen === '1';
-      if (isOpen) {
-        delete document.documentElement.dataset.mobileNavOpen;
-      } else {
-        document.documentElement.dataset.mobileNavOpen = '1';
-      }
-    }
-    if (overlay) {
-      delete document.documentElement.dataset.mobileNavOpen;
-    }
-  });
-})();
-            `,
-          }}
-        />
-
         <Link href="/docs" className="docs-header-logo">
           <span className="docs-header-logo-mark" aria-hidden="true">
             <span className="docs-header-logo-mark-inner">M</span>
@@ -370,8 +398,6 @@ export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
 
         <DocsSearch />
 
-        <ThemeSwitcher />
-
         <a
           href="https://github.com/mutx-dev/mutx-dev"
           target="_blank"
@@ -392,22 +418,22 @@ export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
 
       {/* ── Body layout ── */}
       <div className="docs-layout">
-        {/* Mobile overlay — controlled by data-mobile-nav-open on <html> */}
-        <div className="docs-sidebar-overlay lg:hidden docs-mobile-overlay" />
+        <button
+          type="button"
+          className="docs-sidebar-overlay lg:hidden docs-mobile-overlay"
+          aria-label="Close documentation navigation"
+          onClick={() => setMobileNavOpen(false)}
+        />
 
         {/* ── Left sidebar ── */}
         <aside
+          ref={mobileSidebarRef}
+          id="docs-mobile-navigation"
           className="docs-sidebar docs-mobile-sidebar"
           aria-label="Documentation navigation"
+          role={mobileNavOpen ? 'dialog' : undefined}
+          aria-modal={mobileNavOpen ? true : undefined}
         >
-          <div className="docs-sidebar-intro">
-            <p className="docs-sidebar-kicker">Canonical reference</p>
-            <h2 className="docs-sidebar-title">Read the product the same way the repo works.</h2>
-            <p className="docs-sidebar-copy">
-              Setup, platform contracts, and operating notes stay here in the same brand frame as
-              the product, not in a detached knowledge base.
-            </p>
-          </div>
           <nav aria-label="Docs nav">
             {nav.map((item) => (
               <NavItem key={item.route} item={item} pathname={pathname} />
@@ -416,7 +442,7 @@ export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
         </aside>
 
         {/* ── Main content ── */}
-        <main className="docs-content">
+        <main ref={docsContentRef} id="main-content" className="docs-content">
           <div className="docs-content-shell">
             <DocsBreadcrumbs />
             {isStandalone ? (
@@ -432,6 +458,7 @@ export function DocsLayout({ nav, children, title = 'MUTX' }: DocsLayoutProps) {
                       key={item.href}
                       href={item.href}
                       className={pathname === item.href ? 'active' : undefined}
+                      aria-current={pathname === item.href ? 'page' : undefined}
                     >
                       {item.label}
                     </Link>

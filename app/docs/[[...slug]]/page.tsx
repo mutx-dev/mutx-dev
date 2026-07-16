@@ -347,32 +347,32 @@ const FEATURED = [
   {
     title: "MUTX Quickstart",
     href: "/docs/quickstart",
-    desc: "Read the shortest setup guide before you choose the full hosted or local path.",
+    desc: "The shortest path to a working MUTX setup.",
   },
   {
     title: "Deployment Quickstart",
     href: "/docs/deployment/quickstart",
-    desc: "Get from clone to a working stack with the shortest validated path.",
+    desc: "Clone, configure, deploy.",
   },
   {
     title: "Architecture Overview",
     href: "/docs/architecture/overview",
-    desc: "See the code-accurate map behind the app, backend, CLI, SDK, and infrastructure.",
+    desc: "The system map.",
   },
   {
     title: "API Reference",
     href: "/docs/reference",
-    desc: "Work from the public authentication, agent, deployment, and webhook contracts.",
+    desc: "Public contracts and endpoints.",
   },
   {
     title: "Python SDK",
-    href: "/docs/sdk",
-    desc: "Connect Python services and agents to MUTX without rebuilding the transport layer.",
+    href: "/sdk",
+    desc: "Build against MUTX in Python.",
   },
   {
     title: "Troubleshooting",
     href: "/docs/troubleshooting",
-    desc: "Diagnose common setup, runtime, and deployment failures with direct checks.",
+    desc: "Find and clear common failures.",
   },
 ];
 
@@ -396,15 +396,12 @@ function DocsHomePage() {
       <div className="docs-article-main docs-home">
         <section className="docs-home-billboard">
           <div className="docs-home-billboard-copy">
-            <p className="docs-home-kicker">Field manual</p>
-            <h1 className="docs-home-title">Read MUTX like a shipped system, not a static help center.</h1>
-            <p className="docs-home-sub">
-              This is the code-accurate route into setup, platform references, and operator
-              behavior. Start with one guided entry point, then move through the product by area.
-            </p>
+            <p className="docs-home-kicker">Operator manual</p>
+            <h1 className="docs-home-title">Know the system.</h1>
+            <p className="docs-home-sub">Set up MUTX. Run agents. Clear failures.</p>
             <div className="docs-home-actions">
-              <Link href="/docs/deployment/quickstart" className="docs-home-primary">
-                Open quickstart
+              <Link href="/docs/quickstart" className="docs-home-primary">
+                Open MUTX quickstart
               </Link>
               <Link href="/docs/reference" className="docs-home-secondary">
                 Read API reference
@@ -413,7 +410,7 @@ function DocsHomePage() {
           </div>
 
           <div className="docs-home-ledger">
-            <p className="docs-home-ledger-label">Manual index</p>
+            <p className="docs-home-ledger-label">Start here</p>
             {FEATURED.slice(0, 3).map((card, index) => (
               <Link key={card.href} href={card.href} className="docs-home-ledger-item">
                 <span className="docs-home-ledger-index">{String(index + 1).padStart(2, "0")}</span>
@@ -426,25 +423,10 @@ function DocsHomePage() {
           </div>
         </section>
 
-        <section className="docs-home-featured">
-          <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">High-signal routes</p>
-            <h2 className="docs-home-section-title">Start from the pages people actually need first.</h2>
-          </div>
-          <div className="docs-home-featured-list">
-            {FEATURED.map((card) => (
-              <Link key={card.href} href={card.href} className="docs-home-featured-item">
-                <span className="docs-home-featured-title">{card.title}</span>
-                <span className="docs-home-featured-desc">{card.desc}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
         <section className="docs-home-areas">
           <div className="docs-home-section-heading">
             <p className="docs-home-kicker">By area</p>
-            <h2 className="docs-home-section-title">Move through the platform one surface at a time.</h2>
+            <h2 className="docs-home-section-title">Go by surface.</h2>
           </div>
 
           <div className="docs-home-area-list">
@@ -457,23 +439,13 @@ function DocsHomePage() {
                     <span className="docs-home-area-index">{String(index + 1).padStart(2, "0")}</span>
                     <h3 className="docs-home-area-title">{label}</h3>
                   </div>
-                  <SectionLanding title={label} children={section.children} />
+                  <SectionLanding title="" children={section.children} />
                 </div>
               );
             })}
           </div>
         </section>
 
-        <section className="docs-home-appendix">
-          <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">Truth rules</p>
-            <h2 className="docs-home-section-title">When docs drift, trust the executable system.</h2>
-          </div>
-          <p className="docs-home-truth">
-            Use the API reference for contracts, the SDK guide for integration, and the
-            architecture section when you need to understand the system behind them.
-          </p>
-        </section>
       </div>
     </div>
   );

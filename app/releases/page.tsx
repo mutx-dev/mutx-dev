@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   AppWindow,
@@ -11,6 +10,7 @@ import {
 import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
+import { OperationalVisual } from "@/components/site/marketing/OperationalVisual";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
 import {
   MUTX_GITHUB_RELEASES_URL,
@@ -128,7 +128,7 @@ export default async function ReleasesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
           <div className={styles.shell}>
             <div className={styles.routeDownloadStage}>
@@ -136,7 +136,7 @@ export default async function ReleasesPage() {
                 <div className={styles.intro}>
                   <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Release lane</p>
                   <h1 className={`${styles.displayTitle} ${styles.darkText}`}>
-                    MUTX {releaseLabel}
+                    MUTX <span className={styles.releaseVersion}>{releaseLabel}</span>
                     <span className={styles.displayAccent}>Signed desktop release.</span>
                   </h1>
                   <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>
@@ -171,15 +171,7 @@ export default async function ReleasesPage() {
               </div>
 
               <div className={styles.routeVisualFrame}>
-                <div className={styles.routeVisualGlow} aria-hidden="true" />
-                <Image
-                  src="/landing/webp/running-agent.webp"
-                  alt="MUTX runtime scene showing the operator lane in motion"
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 34rem"
-                  className={styles.routeVisualImage}
-                />
+                <OperationalVisual variant="release" />
               </div>
             </div>
 

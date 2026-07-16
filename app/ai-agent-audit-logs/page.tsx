@@ -88,7 +88,7 @@ export default function AIAgentAuditLogsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <div className={`${core.page} ${core.publicPage}`}>
-        <main className={core.main}>
+        <main id="main-content" className={core.main}>
           <section className={feat.heroSection}>
             <div className={feat.heroStage}>
               <div className={feat.heroShell}>
