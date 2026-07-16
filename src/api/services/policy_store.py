@@ -15,7 +15,7 @@ class Rule(BaseModel):
     """A policy rule matching mechanism and enforcement action."""
 
     type: Literal["block", "allow", "warn"]
-    pattern: str
+    pattern: str = Field(min_length=1)
     action: str
     scope: Literal["input", "output", "tool"]
 
@@ -78,7 +78,7 @@ def _normalize_match_value(value: object) -> str:
 
 
 def _rule_matches(pattern: str, value: object) -> bool:
-    if value is None:
+    if not pattern or value is None:
         return False
     candidate = _normalize_match_value(value).casefold()
     normalized_pattern = pattern.casefold()

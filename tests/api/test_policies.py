@@ -14,6 +14,10 @@ from src.api.services.policy_store import Policy, PolicyEvaluationContext, Polic
 class TestPolicyStore:
     """Unit tests for PolicyStore."""
 
+    def test_rule_rejects_empty_patterns(self):
+        with pytest.raises(ValueError):
+            Rule(type="block", pattern="", action="reject", scope="input")
+
     @pytest.mark.asyncio
     async def test_get_policy_not_found(self):
         store = PolicyStore()
