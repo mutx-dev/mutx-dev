@@ -9,6 +9,7 @@
     * [API Overview](docs/api/index.md)
     * [Authentication API](docs/api/authentication.md)
     * [API Keys](docs/api/api-keys.md)
+    * [MCP Definition Scanning](docs/api/mcp-security.md)
     * [Agents API](docs/api/agents.md)
     * [Deployments API](docs/api/deployments.md)
     * [Leads API](docs/api/leads.md)

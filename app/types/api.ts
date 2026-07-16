@@ -1923,6 +1923,30 @@ export interface paths {
         patch: operations["update_run_status_v1_observability_runs__run_id__status_patch"];
         trace?: never;
     };
+    "/v1/security/mcp/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scan Mcp Server Definition
+         * @description Statically scan untrusted MCP metadata without contacting or launching it.
+         *
+         *     This authenticated read-only analysis endpoint is available to every MUTX
+         *     user role.  ``registration_allowed`` is the reusable policy hook: medium
+         *     findings require review and high/critical findings deny registration.
+         */
+        post: operations["scan_mcp_server_definition_v1_security_mcp_scan_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/security/actions/evaluate": {
         parameters: {
             query?: never;
@@ -6430,6 +6454,116 @@ export interface components {
         LogoutRequest: {
             /** Refresh Token */
             refresh_token?: string | null;
+        };
+        /**
+         * MCPFindingResponse
+         * @description One structured MCP scanner finding.
+         */
+        MCPFindingResponse: {
+            /** Code */
+            code: string;
+            severity: components["schemas"]["MCPFindingSeverity"];
+            /** Category */
+            category: string;
+            /** Path */
+            path: string;
+            /** Title */
+            title: string;
+            /** Explanation */
+            explanation: string;
+            /** Evidence */
+            evidence: string;
+            /** Recommendation */
+            recommendation: string;
+        };
+        /**
+         * MCPFindingSeverity
+         * @description Severity assigned to an MCP definition finding.
+         * @enum {string}
+         */
+        MCPFindingSeverity: "low" | "medium" | "high" | "critical";
+        /**
+         * MCPRegistrationDecision
+         * @description Pre-registration disposition for a scanned definition.
+         * @enum {string}
+         */
+        MCPRegistrationDecision: "allow" | "review" | "deny";
+        /**
+         * MCPScanRequest
+         * @description Request to statically inspect an MCP definition.
+         */
+        MCPScanRequest: {
+            server: components["schemas"]["MCPServerDefinition"];
+            /** Trustedtoolnames */
+            trustedToolNames?: string[];
+        };
+        /**
+         * MCPScanResponse
+         * @description Static scan result and pre-registration policy disposition.
+         */
+        MCPScanResponse: {
+            /** Scanner Version */
+            scanner_version: string;
+            /** Protocol Revision */
+            protocol_revision: string;
+            decision: components["schemas"]["MCPRegistrationDecision"];
+            /** Registration Allowed */
+            registration_allowed: boolean;
+            highest_severity: components["schemas"]["MCPFindingSeverity"] | null;
+            /** Scanned Tools */
+            scanned_tools: number;
+            /** Finding Count */
+            finding_count: number;
+            /** Findings */
+            findings: components["schemas"]["MCPFindingResponse"][];
+        };
+        /**
+         * MCPServerDefinition
+         * @description Static MCP server configuration and advertised tools.
+         */
+        MCPServerDefinition: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Transport */
+            transport?: ("stdio" | "streamable_http" | "sse") | null;
+            /** Command */
+            command?: string | null;
+            /** Args */
+            args?: string[];
+            /** Url */
+            url?: string | null;
+            /** Env */
+            env?: {
+                [key: string]: string;
+            };
+            /** Requestedpermissions */
+            requestedPermissions?: string[];
+            /** Tools */
+            tools: components["schemas"]["MCPToolDefinition"][];
+        };
+        /**
+         * MCPToolDefinition
+         * @description MCP 2025-11-25 tool fields relevant to static scanning.
+         */
+        MCPToolDefinition: {
+            /** Name */
+            name: string;
+            /** Title */
+            title?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Inputschema */
+            inputSchema: Record<string, never>;
+            /** Outputschema */
+            outputSchema?: Record<string, never> | null;
+            /** Annotations */
+            annotations?: Record<string, never> | null;
+            /** Execution */
+            execution?: Record<string, never> | null;
+            /** Icons */
+            icons?: Record<string, never>[];
         };
         /** MessageResponse */
         MessageResponse: {
@@ -13587,6 +13721,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MutxRunResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scan_mcp_server_definition_v1_security_mcp_scan_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MCPScanRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPScanResponse"];
                 };
             };
             /** @description Validation Error */
