@@ -5,7 +5,8 @@ icon: chart-bar
 
 # Competitive Notes
 
-Last updated: 2026-04-20
+Last full competitive review: 2026-04-20
+OWASP mapping updated: 2026-07-16
 Primary benchmark: Microsoft Agent Governance Toolkit v3.1.0
 
 ## Market Positioning
@@ -26,7 +27,7 @@ These are **adjacent, not identical**. AGT is SDK-first (developer tooling). MUT
 | Credential brokering | ✅ 6 backends + TTL | ❌ None | **MUTX ahead** |
 | Context-aware eval | ⚠️ Session context plus heuristic intent signal; current AARM R2/R3/R7 incomplete | ⚠️ Partial | Unverified |
 | Runtime supervision | ✅ Faramesh 13-framework | ❌ SDK-level only | **MUTX ahead** |
-| OWASP ASI 2026 | ❌ No mapping | ✅ 10/10 | AGT ahead |
+| [OWASP Top 10 for Agentic Applications 2026](../security/agentic_risk_matrix.md) | ⚠️ All 10 mapped: 8 partial, 2 gaps; not 10/10 coverage | ✅ Claims 10/10 | AGT evidence stronger; mapping parity only |
 | Shadow AI discovery | ❌ None | ✅ agent-discovery | AGT ahead |
 | MCP security scanner | ❌ None | ✅ MCPServerPolicy | AGT ahead |
 | Prompt injection eval | ❌ None | ✅ 12-vector audit | AGT ahead |
@@ -49,7 +50,8 @@ These are **adjacent, not identical**. AGT is SDK-first (developer tooling). MUT
 
 ### Don't claim until built
 - AARM Core or Extended conformance (technical and organizational evidence is incomplete)
-- OWASP Agentic Top 10 coverage (need mapping doc)
+- OWASP 10/10 coverage (the evidence matrix records partial controls and gaps,
+  not comprehensive coverage)
 - Multi-language SDK (TypeScript priority)
 - Shadow AI discovery
 - MCP security scanning

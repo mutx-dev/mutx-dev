@@ -54,6 +54,7 @@ echo "Running expanded Python validation suite..."
   tests/api \
   tests/unit/python \
   tests/test_cli_*.py \
+  tests/test_agentic_risk_matrix_docs.py \
   tests/test_generate_homebrew_formula.py \
   tests/test_release_soft_launch.py \
   tests/test_sdk_*.py \
