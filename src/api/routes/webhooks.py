@@ -16,7 +16,7 @@ from src.api.models.schemas import (
     WebhookDeliveryListResponse,
     WebhookRetryRequest,
 )
-from src.api.middleware.auth import get_current_user_or_api_key
+from src.api.auth.dependencies import get_current_user_or_api_key
 from src.api.security import encrypt_secret_value
 from src.api.services.webhook_service import (
     UnsafeWebhookDestinationError,

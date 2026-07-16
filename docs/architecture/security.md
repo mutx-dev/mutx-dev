@@ -437,7 +437,7 @@ fail2ban is configured to protect against brute force:
 
 ## RBAC Enforcement
 
-MUTX v1.4.0 enforces role-based access control (RBAC) across protected API routes. The RBAC system is implemented in `src/api/services/auth.py` (Role enum, `check_role`) and `src/api/dependencies.py` (`require_role`, `SSOTokenUser`).
+MUTX v1.4.0 enforces role-based access control (RBAC) across protected API routes. Role evaluation lives in `src/api/services/auth.py`; routes import auth and RBAC dependencies from the canonical `src/api/auth/dependencies.py` facade.
 
 ### Roles
 
@@ -455,7 +455,7 @@ The `ADMIN` role is a super-role: `check_role` returns `True` for any required r
 RBAC is enforced via FastAPI dependencies:
 
 ```python
-from src.api.dependencies import require_role
+from src.api.auth.dependencies import require_role
 
 # Example: restrict an endpoint to ADMIN and DEVELOPER
 @router.get("/admin", dependencies=[Depends(require_role(["ADMIN", "DEVELOPER"]))])
@@ -495,7 +495,10 @@ OIDC_CLIENT_ID=your-client-id
 OIDC_JWKS_URI=https://your-org.okta.com/oauth2/v1/keys
 ```
 
-The OIDC module (`src/api/services/auth.py`) resolves provider config from these env vars, fetches JWKS, verifies signatures, and maps the token to `SSOTokenUser` with roles extracted from the token claims. See [Authentication docs](../api/authentication.md#oidc-token-validation) for full details.
+The OIDC module (`src/api/auth/oidc.py`) resolves these settings, fetches JWKS,
+verifies signatures and claims, and normalizes role-bearing token claims. Routes
+consume the resulting SSO principal through `src/api/auth/dependencies.py`. See
+[Authentication docs](../api/authentication.md#oidc-token-validation) for full details.
 
 ***
 

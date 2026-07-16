@@ -6,12 +6,61 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from types import SimpleNamespace
 import uuid
 
 from src.api.models.models import ExternalAuthIdentity, User
 from src.api.database import get_db
 from src.api.main import create_app
 from src.api.services.social_auth import OAuthProvider, OAuthUserProfile
+
+
+@pytest.mark.asyncio
+async def test_sso_callback_prefers_id_token_for_identity_validation(monkeypatch):
+    from datetime import datetime, timezone
+
+    from src.api.routes import auth as auth_routes
+    from src.api.services import auth as auth_service
+
+    monkeypatch.setattr(
+        auth_routes,
+        "settings",
+        SimpleNamespace(
+            okta_client_id="mutx-client",
+            okta_client_secret="client-secret",
+            jwt_secret="test-secret",
+        ),
+    )
+
+    async def fake_exchange(**_kwargs):
+        return {
+            "access_token": "opaque-access-token",
+            "id_token": "signed-id-token",
+        }
+
+    async def fake_verify(*, token, provider, client_id, allow_userinfo_fallback):
+        assert token == "signed-id-token"
+        assert provider is auth_service.SSOProvider.OKTA
+        assert client_id == "mutx-client"
+        assert allow_userinfo_fallback is False
+        return auth_service.TokenPayload(
+            sub="oidc-user",
+            email="oidc@example.com",
+            roles=["USER"],
+            exp=datetime.fromtimestamp(4_102_444_800, tz=timezone.utc),
+        )
+
+    monkeypatch.setattr(auth_routes, "_exchange_code_for_token", fake_exchange)
+    monkeypatch.setattr(auth_service, "verify_oauth_token", fake_verify)
+    monkeypatch.setattr(auth_service, "create_access_token", lambda **_kwargs: "mutx-token")
+
+    response = await auth_routes.sso_callback(
+        provider="okta",
+        code="authorization-code",
+        session=None,
+    )
+
+    assert response.access_token == "mutx-token"
 
 
 class TestAuthEndpoints:

@@ -12,7 +12,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.api.dependencies import get_current_user, require_roles, SSOTokenUser
+from src.api.auth.dependencies import SSOTokenUser, get_current_sso_user, require_roles
 from src.api.services.audit_log import (
     AuditEvent,
     AuditEventType,
@@ -107,7 +107,7 @@ class AuditEvidenceExportResponse(BaseModel):
     dependencies=[Depends(require_roles("ADMIN", "AUDIT_ADMIN"))],
 )
 async def query_audit_events(
-    current_user: Annotated[SSOTokenUser, Depends(get_current_user)],
+    current_user: Annotated[SSOTokenUser, Depends(get_current_sso_user)],
     agent_id: Annotated[str | None, Query(description="Filter by agent ID")] = None,
     session_id: Annotated[str | None, Query(description="Filter by session ID")] = None,
     run_id: Annotated[str | None, Query(description="Filter by run ID")] = None,
@@ -206,7 +206,7 @@ async def export_audit_evidence(
 )
 async def get_trace_events(
     trace_id: str,
-    current_user: Annotated[SSOTokenUser, Depends(get_current_user)],
+    current_user: Annotated[SSOTokenUser, Depends(get_current_sso_user)],
 ) -> AuditEventsResponse:
     """Get all events for a specific trace.
 

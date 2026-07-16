@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.ownership import get_owned_agent
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import AgentLog, User
 from src.api.models.schemas import AssistantSkillResponse, ClawHubSkillBundleResponse
 from src.api.services.assistant_control_plane import (

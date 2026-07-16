@@ -9,7 +9,7 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import Agent, AgentRun, Deployment, UsageEvent, Metrics, AgentMetric, User
 from src.api.models.schemas import (
     AnalyticsSummaryResponse,
@@ -511,7 +511,7 @@ async def get_revenue_overview(
     current_user: User = Depends(get_current_user),
 ):
     """Revenue overview — MRR, active subs, payments. Internal users only."""
-    from src.api.middleware.auth import assert_internal_user
+    from src.api.auth.dependencies import assert_internal_user
 
     assert_internal_user(current_user)
 
@@ -570,7 +570,7 @@ async def get_subscriptions_list(
     current_user: User = Depends(get_current_user),
 ):
     """List subscriptions with user info. Internal users only."""
-    from src.api.middleware.auth import assert_internal_user
+    from src.api.auth.dependencies import assert_internal_user
 
     assert_internal_user(current_user)
 
@@ -617,7 +617,7 @@ async def get_payments_list(
     current_user: User = Depends(get_current_user),
 ):
     """List recent payments. Internal users only."""
-    from src.api.middleware.auth import assert_internal_user
+    from src.api.auth.dependencies import assert_internal_user
 
     assert_internal_user(current_user)
 

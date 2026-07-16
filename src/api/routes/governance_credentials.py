@@ -8,7 +8,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from src.api.middleware.auth import get_current_internal_user
+from src.api.auth.dependencies import get_current_internal_user
 from src.api.models import User
 from src.api.services.credential_broker import (
     CredentialBackend,

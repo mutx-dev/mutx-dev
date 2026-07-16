@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.auth.dependencies import get_current_user_or_api_key
 from src.api.database import get_db
 from src.api.models import (
     Agent,
@@ -22,7 +23,6 @@ from src.api.models.schemas import (
     IngestEvent,
     MetricsReportRequest,
 )
-from src.api.middleware.auth import get_current_user_or_api_key
 from src.api.services.event_ingestion import process_ingest_event
 from src.api.services.webhook_service import (
     trigger_agent_status_event,

@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 from src.api.config import get_settings
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.models import User
 from src.api.services.faramesh_supervisor import (
     SupervisionValidationError,

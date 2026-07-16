@@ -12,7 +12,7 @@ from src.api.database import get_db
 from src.api.models.models import User
 from src.api.services.user_service import UserService
 from src.api.services.analytics import log_analytics_event, AnalyticsEventType
-from src.api.middleware.auth import get_current_user, get_current_user_optional
+from src.api.auth.dependencies import get_current_user, get_current_user_optional
 from src.api.auth.jwt import (
     issue_token_pair,
     revoke_refresh_token,
@@ -853,18 +853,24 @@ async def sso_callback(
             client_secret=client_secret,
         )
 
-        # Get the access token
+        # Prefer the OIDC ID token for local signature/issuer/audience validation.
+        # When a provider omits it, the access token may be opaque or scoped to a
+        # resource server, so allow the verifier to resolve identity via userinfo.
         access_token = token_response.get("access_token")
-        if not access_token:
+        id_token = token_response.get("id_token")
+        verification_token = id_token or access_token
+        if not verification_token:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No access token returned from SSO provider",
+                detail="No identity token returned from SSO provider",
             )
 
         # Verify the OAuth token and extract user info
         token_payload = await verify_oauth_token(
-            token=access_token,
+            token=verification_token,
             provider=sso_provider,
+            client_id=client_id,
+            allow_userinfo_fallback=id_token is None,
         )
 
         # Issue MUTX JWT access token

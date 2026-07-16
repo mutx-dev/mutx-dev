@@ -31,7 +31,7 @@ from src.api.models.schemas import (
     DeploymentVersionHistoryResponse,
     DeploymentRollbackRequest,
 )
-from src.api.middleware.auth import get_current_user
+from src.api.auth.dependencies import get_current_user
 from src.api.services.deployment_lifecycle import create_deployment_record
 from src.api.services.usage import track_usage_best_effort
 from src.api.time_utils import utc_now_naive

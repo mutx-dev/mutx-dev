@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import assert_internal_user, get_current_user
+from src.api.auth.dependencies import assert_internal_user, get_current_user
 from src.api.models.models import Lead, User
 from src.api.models.schemas import LeadCreate, LeadListResponse, LeadResponse, LeadUpdate
 

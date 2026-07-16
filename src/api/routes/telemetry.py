@@ -9,7 +9,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from src.api.middleware.auth import get_current_internal_user
+from src.api.auth.dependencies import get_current_internal_user
 from src.api.services.telemetry_backend import (
     configure_telemetry_backend,
     get_telemetry_health,

@@ -4,7 +4,7 @@
 
 ## Configuration
 
-Set via environment variables:
+Set all three values together via environment variables:
 
 - `OIDC_ISSUER`
 - `OIDC_CLIENT_ID`
@@ -19,4 +19,6 @@ Set via environment variables:
 
 ## Implementation
 
-JWKS fetcher with TTL cache, JWT signature validation, iss/aud/exp claim checks.
+`src/api/auth/oidc.py` provides the per-URI TTL cache, JWT signature
+validation, and `iss`/`aud`/`exp` claim checks. Route auth and RBAC dependencies
+are exposed through `src/api/auth/dependencies.py`.
