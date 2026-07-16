@@ -313,8 +313,10 @@ def _is_unrestricted_string(definition: Mapping[str, object]) -> bool:
     declared_type = definition.get("type")
     if declared_type not in (None, "string"):
         return False
-    constraints = {"const", "enum", "format", "maxLength", "pattern"}
-    return not any(key in definition for key in constraints)
+    # Shape validation (format, length, regex) does not provide a destination or
+    # operation allowlist. Only explicit finite values can prove that this field
+    # does not accept an arbitrary command/path/URL.
+    return not any(key in definition for key in {"const", "enum"})
 
 
 def _iter_schema_strings(
@@ -521,6 +523,15 @@ class MCPDefinitionScanner:
                 if isinstance(annotation_title, str):
                     self._scan_text(annotation_title, path=f"{path}/annotations/title")
                 self._scan_annotations(name, description or "", schema, annotations, path)
+
+            execution = raw_tool.get("execution")
+            if isinstance(execution, Mapping):
+                for execution_path, text in _iter_schema_strings(
+                    execution, path=f"{path}/execution"
+                ):
+                    self._scan_text(text, path=execution_path)
+                    self._scan_urls_in_text(text, execution_path)
+                    self._scan_command(text, execution_path, description_context=True)
 
             icons = raw_tool.get("icons", [])
             if isinstance(icons, Sequence) and not isinstance(icons, str):
@@ -829,7 +840,7 @@ class MCPDefinitionScanner:
                 evidence=url,
                 recommendation="Reject this endpoint and block metadata ranges with egress policy.",
             )
-        elif hostname.startswith("xn--"):
+        elif any(label.startswith("xn--") for label in hostname.split(".")):
             self._add(
                 code="punycode_hostname",
                 severity=MCPFindingSeverity.MEDIUM,
