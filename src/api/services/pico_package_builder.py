@@ -174,8 +174,7 @@ def _build_install_sh(state: OnboardingState) -> str:
             "OPENCLAW_VERSION='2026.7.1'",
             "OPENCLAW_INSTALL_COMMIT='2d2ddc43d0dcf71f31283d780f9fe9ff4cc04fe4'",
             "command -v curl >/dev/null || { echo 'curl is required'; exit 1; }",
-            'curl -fsSL --proto \'=https\' --tlsv1.2 "https://raw.githubusercontent.com/openclaw/openclaw/$OPENCLAW_INSTALL_COMMIT/scripts/install.sh" | bash -s -- --install-method npm --version "$OPENCLAW_VERSION" --no-onboard --no-prompt',
-            "openclaw onboard --install-daemon",
+            'curl -fsSL --proto \'=https\' --tlsv1.2 "https://raw.githubusercontent.com/openclaw/openclaw/$OPENCLAW_INSTALL_COMMIT/scripts/install.sh" | bash -s -- --install-method npm --version "$OPENCLAW_VERSION"',
         ]
     elif stack == "nanoclaw":
         lines += [
