@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_core.documents import Document
+from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sqlalchemy import JSON, Column, String, Text, create_engine
 from sqlalchemy.dialects.postgresql import JSONB

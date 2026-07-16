@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain_core.tools import BaseTool
@@ -18,7 +19,7 @@ from langchain.agents import (
     create_openai_functions_agent,
     create_structured_chat_agent,
 )
-from langchain.memory import ConversationBufferMemory, ChatMessageHistory
+from langchain.memory import ConversationBufferMemory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from .vector_store import VectorStoreRegistry
