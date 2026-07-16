@@ -119,6 +119,7 @@ async def test_validate_oidc_token_checks_key_issuer_and_audience(
         "algorithms": ["RS256"],
         "audience": "mutx-api",
         "issuer": "https://id.example.com",
+        "options": {"require_exp": True},
     }
 
 

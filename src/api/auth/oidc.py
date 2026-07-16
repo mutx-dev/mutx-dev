@@ -171,6 +171,7 @@ async def validate_oidc_token(
             algorithms=[algorithm],
             audience=settings.client_id,
             issuer=settings.issuer,
+            options={"require_exp": True},
         )
     except jwt.ExpiredSignatureError as exc:
         raise OIDCTokenValidationError("OIDC token has expired") from exc
