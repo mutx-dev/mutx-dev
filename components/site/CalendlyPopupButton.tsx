@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import Turnstile, { type BoundTurnstileObject } from "react-turnstile";
 
 import { cn } from "@/lib/utils";
+import { getCalendlyGateAction } from "@/lib/calendly";
 
 const CALENDLY_URL = "https://calendly.com/mutxdev";
 
@@ -61,17 +62,17 @@ export function CalendlyPopupButton({
   }, []);
 
   async function handleClick() {
-    if (!turnstileSiteKey) {
+    const action = getCalendlyGateAction({
+      loadingSiteKey,
+      siteKey: turnstileSiteKey,
+      captchaToken,
+    });
+    if (action === "wait") return;
+    if (action === "open") {
       window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
       return;
     }
-
-    if (!captchaToken) {
-      setShowChallenge(true);
-      return;
-    }
-
-    window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
+    setShowChallenge(true);
   }
 
   function handleTurnstileVerify(token: string, boundTurnstile: BoundTurnstileObject) {
@@ -123,6 +124,7 @@ export function CalendlyPopupButton({
       aria-label={ariaLabel}
       className={cn(fallbackClassName, className)}
       aria-busy={loadingSiteKey || undefined}
+      disabled={loadingSiteKey}
     >
       {children}
     </button>

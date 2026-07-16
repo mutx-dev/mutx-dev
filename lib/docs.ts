@@ -156,14 +156,97 @@ export function summaryHrefToDocsRoute(href: string): string | null {
 }
 
 export function getDocSitemapRoutes(): string[] {
-  const seen = new Set<string>(["/docs"]);
+  return Array.from(getPublishedDocRoutes());
+}
+
+const INTERNAL_PUBLIC_DOC_PATTERNS = [
+  /(^|\/)AGENTS?\.md$/i,
+  /(^|\/)(?:runbooks?|internal)(\/|$)/i,
+  /claim-to-reality-gap-matrix/i,
+  /mutation-testing/i,
+  /deployment\/(?:cli-release|release-v0\.1)\.md$/i,
+];
+
+function isSafePublicDocPath(filePath: string, docsRoot: string): boolean {
+  const resolved = path.resolve(filePath);
+  const relative = path.relative(docsRoot, resolved);
+  return Boolean(relative) &&
+    !relative.startsWith("..") &&
+    !path.isAbsolute(relative) &&
+    relative.endsWith(".md") &&
+    !INTERNAL_PUBLIC_DOC_PATTERNS.some((pattern) => pattern.test(relative));
+}
+
+function docsFileToRoute(filePath: string, docsRoot: string): string {
+  let relative = path.relative(docsRoot, filePath).replace(/\\/g, "/");
+  relative = relative.replace(/\.md$/i, "");
+  relative = relative.replace(/\/(README|index)$/i, "");
+  relative = relative.replace(/^(README|index)$/i, "");
+  if (relative === "api/reference" || relative === "api/index") return "/docs/reference";
+  if (relative.startsWith("api/")) relative = `reference/${relative.slice(4)}`;
+  return relative ? `/docs/${relative}` : "/docs";
+}
+
+function linkedMarkdownPaths(source: string): string[] {
+  const hrefs = new Set<string>();
+  for (const match of source.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) hrefs.add(match[1]);
+  for (const match of source.matchAll(/href=["']([^"']+)["']/gi)) hrefs.add(match[1]);
+  return Array.from(hrefs);
+}
+
+function resolveLinkedDocPath(href: string, fromFile: string, docsRoot: string): string | null {
+  const clean = href.split("#", 1)[0].split("?", 1)[0].trim();
+  if (!clean || /^[a-z][a-z0-9+.-]*:/i.test(clean) || clean.startsWith("//")) return null;
+
+  let candidate: string;
+  if (clean.startsWith("/docs/")) {
+    let routePath = clean.slice("/docs/".length);
+    if (routePath === "reference") routePath = "api/reference";
+    else if (routePath.startsWith("reference/")) routePath = `api/${routePath.slice("reference/".length)}`;
+    candidate = path.join(docsRoot, routePath);
+  } else if (clean.startsWith("/")) {
+    return null;
+  } else {
+    candidate = path.resolve(path.dirname(fromFile), clean);
+  }
+
+  const candidates = /\.md$/i.test(candidate)
+    ? [candidate]
+    : [`${candidate}.md`, path.join(candidate, "README.md"), path.join(candidate, "index.md")];
+  return candidates.find((filePath) => fs.existsSync(filePath) && isSafePublicDocPath(filePath, docsRoot)) ?? null;
+}
+
+/**
+ * Public docs are the curated SUMMARY tree plus safe Markdown pages linked from
+ * that tree. This keeps internal repo material hidden without turning valid
+ * links in published docs into redirect dead ends.
+ */
+export function getPublishedDocRoutes(): Set<string> {
+  const docsRoot = path.resolve(process.cwd(), "docs");
+  const routes = new Set<string>(["/docs"]);
+  const queue: string[] = [];
+  const visited = new Set<string>();
 
   for (const item of flatNav(parseSummary())) {
     const route = summaryHrefToDocsRoute(item.href);
-    if (route?.startsWith("/docs")) {
-      seen.add(route);
+    if (route?.startsWith("/docs")) routes.add(route);
+    if (!item.href.startsWith("docs/")) continue;
+    const filePath = path.resolve(process.cwd(), item.href);
+    if (fs.existsSync(filePath) && isSafePublicDocPath(filePath, docsRoot)) queue.push(filePath);
+  }
+
+  while (queue.length > 0) {
+    const filePath = queue.shift()!;
+    if (visited.has(filePath)) continue;
+    visited.add(filePath);
+    routes.add(docsFileToRoute(filePath, docsRoot));
+
+    const source = fs.readFileSync(filePath, "utf-8");
+    for (const href of linkedMarkdownPaths(source)) {
+      const linkedPath = resolveLinkedDocPath(href, filePath, docsRoot);
+      if (linkedPath && !visited.has(linkedPath)) queue.push(linkedPath);
     }
   }
 
-  return Array.from(seen);
+  return routes;
 }
