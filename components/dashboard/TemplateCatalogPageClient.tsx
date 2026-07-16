@@ -293,7 +293,6 @@ export function TemplateCatalogPageClient() {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  const importedCount = templates.filter((template) => !template.is_official).length;
   const recommendedTemplateIds = filteredTemplates.slice(0, 3).map((template) => template.id);
 
   useEffect(() => {
