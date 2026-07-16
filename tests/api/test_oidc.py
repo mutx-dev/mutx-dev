@@ -355,6 +355,7 @@ async def test_legacy_verifier_validates_id_token_audience(
 
     def fake_decode(*_args: object, **kwargs: object) -> dict[str, object]:
         assert kwargs["audience"] == "mutx-client"
+        assert kwargs["options"] == {"require_exp": True}
         return {
             "sub": "oidc-user",
             "email": "oidc@example.com",

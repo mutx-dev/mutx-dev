@@ -284,6 +284,7 @@ async def verify_oauth_token(
             algorithms=["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"],
             audience=client_id,
             issuer=domain,
+            options={"require_exp": True},
         )
         return _normalize_payload(payload, provider, client_id=client_id)
     except (JWTError, OIDCTokenValidationError, httpx.HTTPError) as exc:
