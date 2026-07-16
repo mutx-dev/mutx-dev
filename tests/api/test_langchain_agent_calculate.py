@@ -9,13 +9,11 @@ def _load_langchain_agent_module():
     stubbed_modules = [
         "langchain_openai",
         "langchain_anthropic",
-        "langchain_community.chat_message_histories",
-        "langchain_community.chat_models",
+        "langchain_ollama",
+        "langchain_core.chat_history",
         "langchain_core.messages",
         "langchain_core.tools",
         "langchain.agents",
-        "langchain.memory",
-        "langchain_core.prompts",
         "src.api.integrations.vector_store",
     ]
     original_modules = {name: sys.modules.get(name) for name in stubbed_modules}
@@ -28,13 +26,13 @@ def _load_langchain_agent_module():
     langchain_anthropic.ChatAnthropic = type("ChatAnthropic", (), {})
     sys.modules["langchain_anthropic"] = langchain_anthropic
 
-    chat_models = types.ModuleType("langchain_community.chat_models")
-    chat_models.ChatOllama = type("ChatOllama", (), {})
-    sys.modules["langchain_community.chat_models"] = chat_models
+    langchain_ollama = types.ModuleType("langchain_ollama")
+    langchain_ollama.ChatOllama = type("ChatOllama", (), {})
+    sys.modules["langchain_ollama"] = langchain_ollama
 
-    chat_message_histories = types.ModuleType("langchain_community.chat_message_histories")
-    chat_message_histories.ChatMessageHistory = type("ChatMessageHistory", (), {})
-    sys.modules["langchain_community.chat_message_histories"] = chat_message_histories
+    chat_history = types.ModuleType("langchain_core.chat_history")
+    chat_history.InMemoryChatMessageHistory = type("InMemoryChatMessageHistory", (), {})
+    sys.modules["langchain_core.chat_history"] = chat_history
 
     messages = types.ModuleType("langchain_core.messages")
     for name in ("HumanMessage", "AIMessage", "SystemMessage", "BaseMessage"):
@@ -54,19 +52,8 @@ def _load_langchain_agent_module():
     sys.modules["langchain_core.tools"] = tools
 
     agents = types.ModuleType("langchain.agents")
-    agents.AgentExecutor = type("AgentExecutor", (), {})
-    agents.create_openai_functions_agent = lambda *args, **kwargs: None
-    agents.create_structured_chat_agent = lambda *args, **kwargs: None
+    agents.create_agent = lambda *args, **kwargs: None
     sys.modules["langchain.agents"] = agents
-
-    memory = types.ModuleType("langchain.memory")
-    memory.ConversationBufferMemory = type("ConversationBufferMemory", (), {})
-    sys.modules["langchain.memory"] = memory
-
-    prompts = types.ModuleType("langchain_core.prompts")
-    prompts.ChatPromptTemplate = type("ChatPromptTemplate", (), {})
-    prompts.MessagesPlaceholder = type("MessagesPlaceholder", (), {})
-    sys.modules["langchain_core.prompts"] = prompts
 
     vector_store = types.ModuleType("src.api.integrations.vector_store")
     vector_store.VectorStoreRegistry = type(

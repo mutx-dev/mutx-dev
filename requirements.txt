@@ -24,16 +24,19 @@ Authlib==1.6.12
 python-multipart==0.0.31
 email-validator==2.1.0
 # Agent & AI
-openai==2.30.0
-anthropic==0.93.0
+openai==2.45.0
+anthropic==0.116.0
 httpx==0.28.1
-# Latest mutually compatible 0.3 security line. Keep this family below 0.4
-# until the explicit LangChain 1 / LangGraph migration tracked in #3688.
-langchain>=0.3.30,<0.4.0
-langchain-openai>=0.3.35,<0.4.0
-langchain-anthropic>=0.3.22,<0.4.0
-langchain-community>=0.3.31,<0.4.0
-langchain-text-splitters>=0.3.11,<0.4.0
+# LangChain v1's agent runtime is backed by LangGraph. Keep the ecosystem on
+# compatible current majors and use provider packages instead of langchain-classic.
+langchain>=1.3.13,<2.0.0
+langchain-core>=1.4.9,<2.0.0
+langgraph>=1.2.9,<1.3.0
+langchain-openai>=1.3.5,<2.0.0
+langchain-anthropic>=1.4.8,<2.0.0
+langchain-text-splitters>=1.1.2,<2.0.0
+langchain-ollama>=1.1.0,<2.0.0
+langchain-huggingface>=1.2.2,<2.0.0
 pgvector==0.2.3
 numpy==1.26.3
 # Configuration
@@ -48,7 +51,6 @@ aiofiles==23.2.1
 tenacity==8.2.3
 psutil==5.9.8
 aiosqlite==0.20.0
-langchain-core>=0.3.86,<0.4.0
 bcrypt>=4.0.0
 pillow>=11.1.0
 predict-rlm>=0.6.1,<1

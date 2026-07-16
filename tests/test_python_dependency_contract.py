@@ -29,40 +29,50 @@ def test_requirements_compat_script_checks_test_requirements_too() -> None:
     assert "test-requirements drift detected" in compat_script
 
 
-def test_langchain_runtime_stays_on_patched_03_compatibility_line() -> None:
+def test_langchain_runtime_uses_current_v1_ecosystem() -> None:
     runtime_requirements = read_text("requirements.txt")
 
     expected_constraints = {
-        "langchain>=0.3.30,<0.4.0",
-        "langchain-core>=0.3.86,<0.4.0",
-        "langchain-openai>=0.3.35,<0.4.0",
-        "langchain-anthropic>=0.3.22,<0.4.0",
-        "langchain-community>=0.3.31,<0.4.0",
-        "langchain-text-splitters>=0.3.11,<0.4.0",
+        "langchain>=1.3.13,<2.0.0",
+        "langchain-core>=1.4.9,<2.0.0",
+        "langgraph>=1.2.9,<1.3.0",
+        "langchain-openai>=1.3.5,<2.0.0",
+        "langchain-anthropic>=1.4.8,<2.0.0",
+        "langchain-text-splitters>=1.1.2,<2.0.0",
+        "langchain-ollama>=1.1.0,<2.0.0",
+        "langchain-huggingface>=1.2.2,<2.0.0",
     }
 
     assert expected_constraints.issubset(set(runtime_requirements.splitlines()))
+    assert "langchain-community" not in runtime_requirements
 
 
-def test_langchain_sdk_extra_is_capped_below_v1() -> None:
+def test_langchain_sdk_extra_requires_v1_and_python_310() -> None:
     sdk_project = read_text("sdk/pyproject.toml")
 
-    assert '"langchain>=0.3.30,<1.0.0"' in sdk_project
-    assert '"langchain-core>=0.3.86,<1.0.0"' in sdk_project
-    assert '"langchain-openai>=0.3.35,<1.0.0"' in sdk_project
+    assert 'requires-python = ">=3.10"' in sdk_project
+    assert '"langchain>=1.3.13,<2.0.0"' in sdk_project
+    assert '"langchain-core>=1.4.9,<2.0.0"' in sdk_project
+    assert '"langgraph>=1.2.9,<1.3.0"' in sdk_project
+    assert '"langchain-openai>=1.3.5,<2.0.0"' in sdk_project
 
 
-def test_uv_lock_covers_the_langchain_03_compatibility_line() -> None:
+def test_uv_lock_covers_langchain_v1_without_classic_compatibility_packages() -> None:
     lockfile = read_text("uv.lock")
 
     expected_versions = {
-        'name = "langchain"\nversion = "0.3.30"',
-        'name = "langchain-core"\nversion = "0.3.86"',
-        'name = "langchain-openai"\nversion = "0.3.35"',
-        'name = "langchain-anthropic"\nversion = "0.3.22"',
-        'name = "langchain-community"\nversion = "0.3.31"',
-        'name = "langchain-text-splitters"\nversion = "0.3.11"',
+        'name = "langchain"\nversion = "1.3.13"',
+        'name = "langchain-core"\nversion = "1.4.9"',
+        'name = "langgraph"\nversion = "1.2.9"',
+        'name = "langchain-openai"\nversion = "1.3.5"',
+        'name = "langchain-anthropic"\nversion = "1.4.8"',
+        'name = "langchain-text-splitters"\nversion = "1.1.2"',
+        'name = "langchain-ollama"\nversion = "1.1.0"',
+        'name = "langchain-huggingface"\nversion = "1.2.2"',
     }
 
     for locked_package in expected_versions:
         assert locked_package in lockfile
+
+    assert 'name = "langchain-classic"' not in lockfile
+    assert 'name = "langchain-community"' not in lockfile

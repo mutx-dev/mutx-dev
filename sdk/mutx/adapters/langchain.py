@@ -5,18 +5,22 @@ This module provides:
 - MutxAgentKit: High-level agent kit with guardrails and event streaming
 
 Example:
-    >>> from langchain.agents import AgentExecutor, create_react_agent
+    >>> from langchain.agents import create_agent
     >>> from langchain_openai import ChatOpenAI
     >>> from mutx.adapters.langchain import MutxLangChainCallbackHandler
     >>>
     >>> handler = MutxLangChainCallbackHandler(api_url="https://api.mutx.dev", api_key="...")
-    >>> llm = ChatOpenAI(callbacks=[handler])
-    >>> agent = create_react_agent(llm, tools, prompt)
-    >>> executor = AgentExecutor(agent=agent, tools=tools, callbacks=[handler])
+    >>> agent = create_agent(ChatOpenAI(model="gpt-5.4-mini"), tools)
+    >>> result = agent.invoke(
+    ...     {"messages": [{"role": "user", "content": "Hello"}]},
+    ...     {"callbacks": [handler]},
+    ... )
 """
 
 from __future__ import annotations
 
+import asyncio
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
@@ -93,6 +97,26 @@ class MutxLangChainCallbackHandler(BaseCallbackHandler):
         }
         self._tracer.start_span(span_name, attributes=attributes)
 
+    def on_chat_model_start(
+        self,
+        serialized: dict[str, Any],
+        messages: list[list[Any]],
+        **kwargs: Any,
+    ) -> None:
+        """Emit the same LLM span for LangChain v1 chat-model callbacks."""
+        model_name = serialized.get("name")
+        if not model_name:
+            identifier = serialized.get("id") or []
+            model_name = identifier[-1] if identifier else "unknown"
+        self._tracer.start_span(
+            "mutx.llm.call",
+            attributes={
+                "llm.model": model_name,
+                "llm.prompt_count": len(messages),
+                "agent.name": self.agent_name,
+            },
+        )
+
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
         """Record span when LLM call ends.
 
@@ -155,7 +179,7 @@ class MutxLangChainCallbackHandler(BaseCallbackHandler):
 
     def on_tool_end(
         self,
-        output: str,
+        output: Any,
         *,
         run_id: str | None = None,
         parent_run_id: str | None = None,
@@ -174,7 +198,7 @@ class MutxLangChainCallbackHandler(BaseCallbackHandler):
 
             span = trace.get_current_span()
             if span:
-                span.set_attribute("tool.output_length", len(output))
+                span.set_attribute("tool.output_length", len(str(output)))
                 span.set_attribute("tool.success", True)
                 span.end()
         except Exception:
@@ -272,6 +296,54 @@ class MutxLangChainCallbackHandler(BaseCallbackHandler):
         except httpx.HTTPError:
             pass  # Fail silently
 
+    def emit_v1_graph_events(self, messages: list[Any], output: str) -> None:
+        """Emit the action and finish events removed with legacy AgentExecutor callbacks."""
+        for message in messages:
+            if isinstance(message, Mapping):
+                tool_calls = message.get("tool_calls") or []
+            else:
+                tool_calls = getattr(message, "tool_calls", None) or []
+
+            for tool_call in tool_calls:
+                if not isinstance(tool_call, Mapping):
+                    continue
+                function = tool_call.get("function")
+                if not isinstance(function, Mapping):
+                    function = {}
+                tool_name = tool_call.get("name") or function.get("name") or "unknown"
+                tool_input = tool_call.get("args")
+                if tool_input is None:
+                    tool_input = function.get("arguments") or {}
+                run_id = tool_call.get("id")
+                event = {
+                    "event_type": "agent_action",
+                    "agent_name": self.agent_name,
+                    "tool": tool_name,
+                    "tool_input": tool_input,
+                    "log": f"Calling {tool_name}",
+                    "timestamp": datetime.now().isoformat(),
+                    "run_id": str(run_id) if run_id is not None else None,
+                    "parent_run_id": None,
+                }
+                try:
+                    self._http.post("/v1/events", json=event)
+                except httpx.HTTPError:
+                    pass  # Audit delivery is best-effort and must not fail agent execution.
+
+        finish_event = {
+            "event_type": "agent_finish",
+            "agent_name": self.agent_name,
+            "output": output,
+            "return_values": {"output": output},
+            "timestamp": datetime.now().isoformat(),
+            "run_id": None,
+            "parent_run_id": None,
+        }
+        try:
+            self._http.post("/v1/events", json=finish_event)
+        except httpx.HTTPError:
+            pass  # Audit delivery is best-effort and must not fail agent execution.
+
     def __del__(self) -> None:
         """Clean up HTTP client on deletion."""
         try:
@@ -361,12 +433,30 @@ class MutxAgentKit:
         self._agent_executor: Any = None
 
     def set_agent_executor(self, executor: Any) -> None:
-        """Set the agent executor for this kit.
+        """Set the LangChain v1 agent graph for this kit.
 
         Args:
-            executor: A LangChain AgentExecutor or similar executor.
+            executor: A graph returned by ``langchain.agents.create_agent``.
         """
         self._agent_executor = executor
+
+    @staticmethod
+    def _extract_output(result: dict[str, Any]) -> str:
+        """Extract text from either a v1 message state or a legacy output mapping."""
+        if "output" in result:
+            return str(result.get("output") or "")
+
+        messages = result.get("messages") or []
+        if not messages:
+            return ""
+
+        message = messages[-1]
+        text = getattr(message, "text", "")
+        if text:
+            return str(text)
+        if isinstance(message, dict):
+            return str(message.get("content") or "")
+        return str(getattr(message, "content", "") or "")
 
     def arun(self, input: str) -> str:
         """Run the agent synchronously.
@@ -388,15 +478,17 @@ class MutxAgentKit:
             raise RuntimeError("No agent executor set. Call set_agent_executor() first.")
 
         result = self._agent_executor.invoke(
-            {"input": input},
+            {"messages": [{"role": "user", "content": input}]},
             {"callbacks": [self._callback_handler]},
         )
+        output = self._extract_output(result)
+        if "messages" in result:
+            self._callback_handler.emit_v1_graph_events(result["messages"], output)
 
         if self._guardrail_middleware:
-            output = result.get("output", "")
             self._guardrail_middleware.check_output_text(output)
 
-        return result.get("output", "")
+        return output
 
     async def arun_async(self, input: str) -> str:
         """Run the agent asynchronously.
@@ -418,15 +510,21 @@ class MutxAgentKit:
             raise RuntimeError("No agent executor set. Call set_agent_executor() first.")
 
         result = await self._agent_executor.ainvoke(
-            {"input": input},
+            {"messages": [{"role": "user", "content": input}]},
             {"callbacks": [self._callback_handler]},
         )
+        output = self._extract_output(result)
+        if "messages" in result:
+            await asyncio.to_thread(
+                self._callback_handler.emit_v1_graph_events,
+                result["messages"],
+                output,
+            )
 
         if self._guardrail_middleware:
-            output = result.get("output", "")
             self._guardrail_middleware.check_output_text(output)
 
-        return result.get("output", "")
+        return output
 
     def stream_events(self):
         """Yield events for streaming back to the MUTX backend.
