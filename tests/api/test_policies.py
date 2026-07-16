@@ -248,6 +248,30 @@ class TestPolicyStore:
         assert result.session_id == "session-1"
         assert result.matches[0].action == "require_approval"
 
+    @pytest.mark.asyncio
+    async def test_evaluate_never_downgrades_a_block_rule_to_approval(self):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="block-wins",
+                rules=[
+                    Rule(
+                        type="block",
+                        pattern="*production*",
+                        action="require_approval",
+                        scope="tool",
+                    )
+                ],
+                enabled=True,
+                version=1,
+            )
+        )
+
+        result = await store.evaluate(PolicyEvaluationContext(tool="deploy_production"))
+
+        assert result.decision == "block"
+
 
 class _DummySSEClient:
     """Minimal async send-capable stand-in for EventSourceResponse."""

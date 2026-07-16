@@ -88,10 +88,10 @@ def _rule_matches(pattern: str, value: object) -> bool:
 def _decision_for_match(
     match: PolicyRuleMatch,
 ) -> Literal["allow", "warn", "block", "require_approval"]:
-    if match.action.casefold() in {"approval", "require_approval", "request_approval"}:
-        return "require_approval"
     if match.rule_type == "block":
         return "block"
+    if match.action.casefold() in {"approval", "require_approval", "request_approval"}:
+        return "require_approval"
     if match.rule_type == "warn":
         return "warn"
     return "allow"
