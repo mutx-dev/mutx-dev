@@ -38,9 +38,10 @@ async def test_sso_callback_prefers_id_token_for_identity_validation(monkeypatch
             "id_token": "signed-id-token",
         }
 
-    async def fake_verify(*, token, provider, allow_userinfo_fallback):
+    async def fake_verify(*, token, provider, client_id, allow_userinfo_fallback):
         assert token == "signed-id-token"
         assert provider is auth_service.SSOProvider.OKTA
+        assert client_id == "mutx-client"
         assert allow_userinfo_fallback is False
         return auth_service.TokenPayload(
             sub="oidc-user",

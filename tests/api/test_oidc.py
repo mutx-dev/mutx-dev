@@ -333,8 +333,45 @@ async def test_legacy_verifier_honors_disabled_userinfo_fallback(
         await oidc.verify_oauth_token(
             "invalid-id-token",
             oidc.SSOProvider.OKTA,
+            client_id="mutx-client",
             allow_userinfo_fallback=False,
         )
+
+
+@pytest.mark.asyncio
+async def test_legacy_verifier_validates_id_token_audience(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    provider_settings = SimpleNamespace(
+        okta_domain="https://id.example.com",
+        okta_realm=None,
+    )
+    monkeypatch.setattr(oidc, "get_oidc_settings", lambda: None)
+    monkeypatch.setattr(oidc, "get_settings", lambda: provider_settings)
+    monkeypatch.setattr(oidc.jwt, "get_unverified_header", lambda _token: {"kid": "key-1"})
+
+    async def fake_signing_key(*_args: object) -> dict[str, str]:
+        return {"kid": "key-1"}
+
+    def fake_decode(*_args: object, **kwargs: object) -> dict[str, object]:
+        assert kwargs["audience"] == "mutx-client"
+        return {
+            "sub": "oidc-user",
+            "email": "oidc@example.com",
+            "exp": 4_102_444_800,
+        }
+
+    monkeypatch.setattr(oidc, "_get_signing_key", fake_signing_key)
+    monkeypatch.setattr(oidc.jwt, "decode", fake_decode)
+
+    payload = await oidc.verify_oauth_token(
+        "signed-id-token",
+        oidc.SSOProvider.OKTA,
+        client_id="mutx-client",
+        allow_userinfo_fallback=False,
+    )
+
+    assert payload.sub == "oidc-user"
 
 
 @pytest.mark.asyncio

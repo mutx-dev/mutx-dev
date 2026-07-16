@@ -237,6 +237,7 @@ async def verify_oauth_token(
     domain: str | None = None,
     realm: str | None = None,
     *,
+    client_id: str | None = None,
     allow_userinfo_fallback: bool = True,
 ) -> TokenPayload:
     """Verify a provider token, preferring the canonical configured OIDC contract."""
@@ -281,10 +282,10 @@ async def verify_oauth_token(
             token,
             signing_key,
             algorithms=["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"],
-            audience=None,
+            audience=client_id,
             issuer=domain,
         )
-        return _normalize_payload(payload, provider)
+        return _normalize_payload(payload, provider, client_id=client_id)
     except (JWTError, OIDCTokenValidationError, httpx.HTTPError) as exc:
         if allow_userinfo_fallback:
             return await _verify_via_userinfo(token, config["userinfo_endpoint"])

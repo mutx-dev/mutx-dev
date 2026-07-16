@@ -869,6 +869,7 @@ async def sso_callback(
         token_payload = await verify_oauth_token(
             token=verification_token,
             provider=sso_provider,
+            client_id=client_id,
             allow_userinfo_fallback=id_token is None,
         )
 
