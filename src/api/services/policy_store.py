@@ -194,14 +194,7 @@ class PolicyStore:
                 elif rule.scope == "output":
                     scoped_value = context.output
                 else:
-                    scoped_value = (
-                        {
-                            "tool": context.tool,
-                            "tool_args": context.tool_args or {},
-                        }
-                        if context.tool is not None or context.tool_args
-                        else None
-                    )
+                    scoped_value = context.tool
 
                 if not _rule_matches(rule.pattern, scoped_value):
                     continue

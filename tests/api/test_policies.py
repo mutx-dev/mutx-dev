@@ -224,7 +224,7 @@ class TestPolicyStore:
                 rules=[
                     Rule(
                         type="warn",
-                        pattern="*terraform_apply*",
+                        pattern="terraform_*",
                         action="require_approval",
                         scope="tool",
                     )
