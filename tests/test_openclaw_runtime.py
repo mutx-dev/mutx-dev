@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from cli.openclaw_runtime import (
     _build_openclaw_install_command,
     _is_supported_openclaw_node_version,
@@ -12,6 +14,7 @@ from cli.openclaw_runtime import (
     ensure_personal_assistant_binding,
     get_gateway_health,
     inspect_importable_openclaw_runtime,
+    install_openclaw,
     list_local_sessions,
     merge_runtime_binding,
     persist_openclaw_runtime_snapshot,
@@ -58,6 +61,21 @@ def test_openclaw_node_runtime_contract_matches_upstream() -> None:
     assert _is_supported_openclaw_node_version("v22.22.2") is False
     assert _is_supported_openclaw_node_version("v23.11.1") is False
     assert _is_supported_openclaw_node_version("v24.14.9") is False
+
+
+def test_git_installer_can_bootstrap_node(monkeypatch) -> None:
+    commands: list[str] = []
+    monkeypatch.setattr(
+        "cli.openclaw_runtime._require_supported_openclaw_node",
+        lambda: pytest.fail("git installer must own its Node bootstrap"),
+    )
+    monkeypatch.setattr("cli.openclaw_runtime._run_bash", commands.append)
+    monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/usr/bin/openclaw")
+
+    resolved = install_openclaw(install_method="git", non_interactive=True)
+
+    assert resolved == "/usr/bin/openclaw"
+    assert commands and "--install-method git" in commands[0]
 
 
 def test_get_gateway_health_reports_needs_onboard_when_cli_exists_without_config(

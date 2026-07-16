@@ -582,7 +582,8 @@ def _build_openclaw_install_command(*, install_method: str, non_interactive: boo
 
 def install_openclaw(*, install_method: str, non_interactive: bool) -> str:
     method = normalize_install_method(install_method)
-    _require_supported_openclaw_node()
+    if method == "npm":
+        _require_supported_openclaw_node()
     command = _build_openclaw_install_command(
         install_method=method,
         non_interactive=non_interactive,
@@ -637,7 +638,8 @@ def ensure_openclaw_installed(
     )
 
     if command_runner is not None:
-        _require_supported_openclaw_node()
+        if method == "npm":
+            _require_supported_openclaw_node()
         command_runner(command)
         resolved = find_openclaw_bin()
         if resolved:

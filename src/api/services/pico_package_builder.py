@@ -1,7 +1,7 @@
-"""Generate real, stack-specific config ZIP from onboarding state.
+"""Generate a verified, stack-specific setup ZIP from onboarding state.
 
-Produces a ZIP bundle containing actual config files for the user's
-chosen stack, OS, provider, and channels — not fantasy templates.
+The bundle pins upstream identity and emits only MUTX-owned setup material;
+upstream onboarding owns runtime configuration and channel schemas.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ UPSTREAM_RELEASES = {
         "ref": "v2026.7.1",
         "commit": "2d2ddc43d0dcf71f31283d780f9fe9ff4cc04fe4",
         "version": "2026.7.1",
-        "runtime": "Node >=24.15.0,<25",
+        "runtime": "Node >=22.22.3,<23 or >=24.15.0,<25 or >=25.9.0",
     },
     "nanoclaw": {
         "repository": "https://github.com/nanocoai/nanoclaw",
@@ -172,9 +172,9 @@ def _build_install_sh(state: OnboardingState) -> str:
     elif stack == "openclaw":
         lines += [
             "OPENCLAW_VERSION='2026.7.1'",
-            "command -v node >/dev/null || { echo 'Node 24.15+ is required'; exit 1; }",
+            "command -v node >/dev/null || { echo 'OpenClaw requires Node 22.22.3+, 24.15+, or 25.9+ (Node 24 recommended)'; exit 1; }",
             "command -v npm >/dev/null || { echo 'npm is required'; exit 1; }",
-            "node -e \"const [major, minor] = process.versions.node.split('.').map(Number); if (major !== 24 || minor < 15) { console.error('Node 24.15+ and <25 is required'); process.exit(1) }\"",
+            "node -e \"const [major, minor, patch] = process.versions.node.split('.').map(Number); const atLeast = ([requiredMajor, requiredMinor, requiredPatch]) => major > requiredMajor || (major === requiredMajor && (minor > requiredMinor || (minor === requiredMinor && patch >= requiredPatch))); const supported = (major === 22 && atLeast([22, 22, 3])) || (major === 24 && atLeast([24, 15, 0])) || atLeast([25, 9, 0]); if (!supported) { console.error('OpenClaw requires Node 22.22.3+, 24.15+, or 25.9+; Node 24 is recommended'); process.exit(1) }\"",
             'npm install -g "openclaw@$OPENCLAW_VERSION"',
             "openclaw onboard --install-daemon",
         ]
@@ -404,7 +404,7 @@ def _build_readme(state: OnboardingState) -> str:
 
 
 def build_onboarding_package(state: OnboardingState) -> tuple[bytes, str]:
-    """Generate a ZIP file with real, stack-specific config files.
+    """Generate a verified ZIP without inventing upstream runtime config.
 
     Returns:
         (zip_bytes, filename) — filename is '{stack}-setup.zip'
