@@ -6555,15 +6555,27 @@ export interface components {
             /** Description */
             description?: string | null;
             /** Inputschema */
-            inputSchema: Record<string, never>;
+            inputSchema: {
+                [key: string]: unknown;
+            };
             /** Outputschema */
-            outputSchema?: Record<string, never> | null;
+            outputSchema?: {
+                [key: string]: unknown;
+            } | null;
             /** Annotations */
-            annotations?: Record<string, never> | null;
+            annotations?: {
+                [key: string]: unknown;
+            } | null;
             /** Execution */
-            execution?: Record<string, never> | null;
+            execution?: {
+                [key: string]: unknown;
+            } | null;
             /** Icons */
-            icons?: Record<string, never>[];
+            icons?: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
         };
         /** MessageResponse */
         MessageResponse: {
@@ -7380,6 +7392,8 @@ export interface components {
              * @default false
              */
             ready: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** OnboardingStateResponse */
         OnboardingStateResponse: {
@@ -7612,9 +7626,13 @@ export interface components {
              * @default false
              */
             ready_for_package: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** PicoProgressPayload */
-        PicoProgressPayload: Record<string, never>;
+        PicoProgressPayload: {
+            [key: string]: unknown;
+        };
         /** PicoTutorCommand */
         PicoTutorCommand: {
             /** Label */
@@ -7751,6 +7769,8 @@ export interface components {
             runtime?: Record<string, never> | null;
             /** Currentsurface */
             currentSurface?: string | null;
+        } & {
+            [key: string]: unknown;
         };
         /** PicoTutorSource */
         PicoTutorSource: {

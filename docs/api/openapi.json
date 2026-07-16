@@ -21402,12 +21402,14 @@
             "title": "Description"
           },
           "inputSchema": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Inputschema"
           },
           "outputSchema": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -21419,6 +21421,7 @@
           "annotations": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -21430,6 +21433,7 @@
           "execution": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -21440,6 +21444,7 @@
           },
           "icons": {
             "items": {
+              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -21447,6 +21452,7 @@
             "title": "Icons"
           }
         },
+        "additionalProperties": true,
         "type": "object",
         "required": [
           "name",
@@ -23630,6 +23636,7 @@
             "default": false
           }
         },
+        "additionalProperties": true,
         "type": "object",
         "title": "OnboardingState",
         "description": "Structured state extracted from the onboarding conversation."
@@ -24218,6 +24225,7 @@
             "default": false
           }
         },
+        "additionalProperties": true,
         "type": "object",
         "required": [
           "reply"
@@ -24227,6 +24235,7 @@
       },
       "PicoProgressPayload": {
         "properties": {},
+        "additionalProperties": true,
         "type": "object",
         "title": "PicoProgressPayload"
       },
@@ -24635,6 +24644,7 @@
             "title": "Currentsurface"
           }
         },
+        "additionalProperties": true,
         "type": "object",
         "title": "PicoTutorSetupContext"
       },
