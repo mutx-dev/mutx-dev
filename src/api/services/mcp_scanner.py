@@ -319,19 +319,37 @@ def _is_unrestricted_string(definition: Mapping[str, object]) -> bool:
     return not any(key in definition for key in {"const", "enum"})
 
 
+@dataclass
+class _TraversalState:
+    """Mutable limits shared by one bounded metadata traversal."""
+
+    nodes: int = 0
+    truncated_path: str | None = None
+    truncated_reason: str | None = None
+
+    def truncate(self, path: str, reason: str) -> None:
+        if self.truncated_path is None:
+            self.truncated_path = path
+            self.truncated_reason = reason
+
+
 def _iter_schema_strings(
     value: object,
     *,
     path: str,
     depth: int = 0,
-    state: list[int] | None = None,
+    state: _TraversalState | None = None,
 ) -> Iterable[tuple[str, str]]:
     """Yield schema strings with hard bounds against adversarial nesting."""
     if state is None:
-        state = [0]
-    if depth > MAX_SCHEMA_DEPTH or state[0] >= MAX_SCHEMA_NODES:
+        state = _TraversalState()
+    if depth > MAX_SCHEMA_DEPTH:
+        state.truncate(path, f"metadata depth exceeds {MAX_SCHEMA_DEPTH}")
         return
-    state[0] += 1
+    if state.nodes >= MAX_SCHEMA_NODES:
+        state.truncate(path, f"metadata traversal exceeds {MAX_SCHEMA_NODES} nodes")
+        return
+    state.nodes += 1
     if isinstance(value, str):
         yield path, value
     elif isinstance(value, Mapping):
@@ -515,35 +533,20 @@ class MCPDefinitionScanner:
             schema = raw_tool.get("inputSchema", raw_tool.get("input_schema", {}))
             if isinstance(schema, Mapping):
                 self._scan_schema(name, description or "", schema, path)
-                for schema_path, text in _iter_schema_strings(schema, path=f"{path}/inputSchema"):
-                    self._scan_text(text, path=schema_path)
-                    self._scan_urls_in_text(text, schema_path)
-                    self._scan_command(text, schema_path, description_context=True)
+                self._scan_untrusted_tree(schema, path=f"{path}/inputSchema")
 
             output_schema = raw_tool.get("outputSchema", raw_tool.get("output_schema"))
             if isinstance(output_schema, Mapping):
-                for schema_path, text in _iter_schema_strings(
-                    output_schema, path=f"{path}/outputSchema"
-                ):
-                    self._scan_text(text, path=schema_path)
-                    self._scan_urls_in_text(text, schema_path)
-                    self._scan_command(text, schema_path, description_context=True)
+                self._scan_untrusted_tree(output_schema, path=f"{path}/outputSchema")
 
             annotations = raw_tool.get("annotations")
             if isinstance(annotations, Mapping):
-                annotation_title = annotations.get("title")
-                if isinstance(annotation_title, str):
-                    self._scan_text(annotation_title, path=f"{path}/annotations/title")
+                self._scan_untrusted_tree(annotations, path=f"{path}/annotations")
                 self._scan_annotations(name, description or "", schema, annotations, path)
 
             execution = raw_tool.get("execution")
             if isinstance(execution, Mapping):
-                for execution_path, text in _iter_schema_strings(
-                    execution, path=f"{path}/execution"
-                ):
-                    self._scan_text(text, path=execution_path)
-                    self._scan_urls_in_text(text, execution_path)
-                    self._scan_command(text, execution_path, description_context=True)
+                self._scan_untrusted_tree(execution, path=f"{path}/execution")
 
             icons = raw_tool.get("icons", [])
             if isinstance(icons, Sequence) and not isinstance(icons, str):
@@ -556,19 +559,38 @@ class MCPDefinitionScanner:
                             allow_data_image=True,
                         )
 
-            extension_state = [0]
-            for field, extension_value in raw_tool.items():
-                if field in known_fields:
-                    continue
-                escaped_field = str(field).replace("~", "~0").replace("/", "~1")
-                for extension_path, text in _iter_schema_strings(
-                    extension_value,
-                    path=f"{path}/{escaped_field}",
-                    state=extension_state,
-                ):
-                    self._scan_text(text, path=extension_path)
-                    self._scan_urls_in_text(text, extension_path)
-                    self._scan_command(text, extension_path, description_context=True)
+            extensions = {
+                field: extension_value
+                for field, extension_value in raw_tool.items()
+                if field not in known_fields
+            }
+            if extensions:
+                self._scan_untrusted_tree(extensions, path=path)
+
+    def _scan_untrusted_tree(self, value: object, *, path: str) -> None:
+        """Scan every string in a bounded metadata tree and fail closed on truncation."""
+        state = _TraversalState()
+        for nested_path, text in _iter_schema_strings(value, path=path, state=state):
+            self._scan_text(text, path=nested_path)
+            self._scan_urls_in_text(text, nested_path)
+            self._scan_command(text, nested_path, description_context=True)
+
+        if state.truncated_path is not None:
+            self._add(
+                code="scan_traversal_limit_exceeded",
+                severity=MCPFindingSeverity.HIGH,
+                category="resource_limits",
+                path=state.truncated_path,
+                title="Metadata could not be scanned completely",
+                explanation=(
+                    "The definition exceeded a bounded metadata traversal limit. Unscanned "
+                    "server-controlled content cannot be considered safe for automatic registration."
+                ),
+                evidence=state.truncated_reason or "metadata traversal was truncated",
+                recommendation=(
+                    "Reject the definition or reduce its metadata depth and size, then scan it again."
+                ),
+            )
 
     def _scan_tool_name(
         self,
