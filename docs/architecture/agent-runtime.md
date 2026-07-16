@@ -157,6 +157,26 @@ Workflow automation with visual builder integration.
 
 ## Tool Execution
 
+Every LangChain tool registered through `AgentRuntime` is mediated before its
+handler can run. The runtime normalizes the call with `ActionMediator`, evaluates
+the active `PolicyEngine` policy, and then applies the decision:
+
+* `ALLOW` and `MODIFY` execute the original handler (with modified arguments when supplied).
+* `DENY` blocks the handler and emits an action receipt.
+* `DEFER` blocks the handler and opens an `ApprovalService` request.
+
+The default runtime policy allows the low-risk built-ins (`get_time`,
+`calculator`, and `search_documents`) and denies custom tools until a policy is
+configured. Security REST routes and agent execution share the same governance
+composition root, so receipts and approval requests remain visible through the
+existing `/v1/security/*` endpoints.
+
+Each decision also appends a RunEvent v1-compatible audit record with the run,
+actor, policy decision, approval, cost/redaction metadata, and a SHA-256 link to
+the prior event in that run. Administrators can retrieve and verify a chain with
+`GET /v1/audit/export?run_id=<run-id>` (or export all run chains in a session via
+`session_id`).
+
 ### Tool Handler Architecture
 
 ```

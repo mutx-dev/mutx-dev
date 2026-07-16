@@ -22,6 +22,7 @@ from langchain.agents import (
 from langchain.memory import ConversationBufferMemory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
+from .tool_names import RUNTIME_BUILTIN_TOOL_NAMES
 from .vector_store import VectorStoreRegistry
 
 logger = logging.getLogger(__name__)
@@ -149,6 +150,7 @@ class AgentConfig:
     memory_type: str = "buffer"
     max_iterations: int = 10
     verbose: bool = True
+    tool_executor: Optional[Callable[[str, str, Dict[str, Any], Callable], Any]] = None
 
 
 @dataclass
@@ -245,7 +247,11 @@ class ToolFactory:
     def _create_tool_from_definition(tool_def: ToolDefinition) -> BaseTool:
         from langchain_core.tools import tool
 
-        @tool(name=tool_def.name, args_schema=tool_def.parameters)
+        @tool(
+            tool_def.name,
+            args_schema=tool_def.parameters,
+            description=tool_def.description,
+        )
         def wrapper_func(**kwargs):
             return tool_def.function(kwargs)
 
@@ -339,6 +345,13 @@ class LangChainAgent:
         self.agent_executor = None
 
     def _initialize_tools(self) -> List[BaseTool]:
+        reserved_custom_names = sorted(
+            {definition.name for definition in self.config.tools} & set(RUNTIME_BUILTIN_TOOL_NAMES)
+        )
+        if reserved_custom_names:
+            names = ", ".join(reserved_custom_names)
+            raise ValueError(f"Custom tool names are reserved by the runtime: {names}")
+
         tool_definitions = list(self.config.tools)
         vector_store_name = self.config.vector_store_name
 
@@ -369,6 +382,27 @@ class LangChainAgent:
                 ),
             ]
         )
+
+        if self.config.tool_executor:
+            governed_definitions = []
+            for definition in tool_definitions:
+                original_handler = definition.function
+                governed_definitions.append(
+                    ToolDefinition(
+                        name=definition.name,
+                        description=definition.description,
+                        parameters=definition.parameters,
+                        function=lambda kwargs, name=definition.name, handler=original_handler: (
+                            self.config.tool_executor(
+                                self.agent_id,
+                                name,
+                                kwargs,
+                                handler,
+                            )
+                        ),
+                    )
+                )
+            tool_definitions = governed_definitions
 
         return ToolFactory.create_tools(tool_definitions)
 

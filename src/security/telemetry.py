@@ -214,6 +214,7 @@ class TelemetryExporter:
         receipt: Optional[ActionReceipt] = None,
         error: Optional[str] = None,
         metadata: Optional[dict[str, Any]] = None,
+        track_metrics: bool = True,
     ) -> TelemetryEvent:
         """
         Export a security event.
@@ -225,6 +226,7 @@ class TelemetryExporter:
             receipt: Optional receipt for audit
             error: Optional error message
             metadata: Additional metadata
+            track_metrics: Whether this event represents a new policy evaluation
 
         Returns:
             The created TelemetryEvent
@@ -249,7 +251,8 @@ class TelemetryExporter:
         )
 
         self._queue_event(event)
-        self._update_metrics(event_type, decision)
+        if track_metrics:
+            self._update_metrics(event_type, decision)
 
         return event
 

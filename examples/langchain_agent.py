@@ -9,6 +9,9 @@ Run with:
     python examples/langchain_agent.py
 """
 
+import ast
+import operator
+
 # LangChain imports
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.tools import tool
@@ -16,6 +19,47 @@ from langchain_openai import ChatOpenAI
 
 # MUTX adapter imports
 from mutx.adapters.langchain import MutxAgentKit, MutxLangChainCallbackHandler
+
+
+_SAFE_BINARY_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+_SAFE_UNARY_OPERATORS = {ast.UAdd: operator.pos, ast.USub: operator.neg}
+_MAX_EXPRESSION_LENGTH = 200
+_MAX_POWER_EXPONENT = 100
+_MAX_RESULT_MAGNITUDE = 10**18
+
+
+def _evaluate_arithmetic(node: ast.AST) -> int | float:
+    """Evaluate a bounded arithmetic syntax tree without executing code."""
+    if isinstance(node, ast.Expression):
+        return _evaluate_arithmetic(node.body)
+    if isinstance(node, ast.Constant):
+        if isinstance(node.value, bool) or not isinstance(node.value, (int, float)):
+            raise ValueError("Only numeric constants are allowed")
+        result = node.value
+    elif isinstance(node, ast.UnaryOp) and type(node.op) in _SAFE_UNARY_OPERATORS:
+        result = _SAFE_UNARY_OPERATORS[type(node.op)](_evaluate_arithmetic(node.operand))
+    elif isinstance(node, ast.BinOp) and type(node.op) in _SAFE_BINARY_OPERATORS:
+        left = _evaluate_arithmetic(node.left)
+        right = _evaluate_arithmetic(node.right)
+        if type(node.op) is ast.Pow and abs(right) > _MAX_POWER_EXPONENT:
+            raise ValueError("Power exponent is too large")
+        result = _SAFE_BINARY_OPERATORS[type(node.op)](left, right)
+    else:
+        raise ValueError("Unsupported expression")
+
+    if isinstance(result, bool) or not isinstance(result, (int, float)):
+        raise ValueError("Only real numeric results are allowed")
+    if abs(result) > _MAX_RESULT_MAGNITUDE:
+        raise ValueError("Result is too large")
+    return result
 
 
 # Define some simple tools for the agent to use
@@ -48,11 +92,15 @@ def calculator(expression: str) -> str:
         The result of the evaluation.
     """
     try:
-        # Security note: eval can be dangerous, this is for demonstration only
-        result = eval(expression, {"__builtins__": {}}, {})
+        normalized_expression = expression.strip()
+        if not normalized_expression:
+            raise ValueError("Expression is empty")
+        if len(normalized_expression) > _MAX_EXPRESSION_LENGTH:
+            raise ValueError("Expression is too long")
+        result = _evaluate_arithmetic(ast.parse(normalized_expression, mode="eval"))
         return str(result)
-    except Exception as e:
-        return f"Error: {e}"
+    except (ArithmeticError, SyntaxError, TypeError, ValueError) as exc:
+        return f"Error: {exc}"
 
 
 def main():
@@ -152,9 +200,7 @@ Answer the user's question using these tools when appropriate.
 
     # This should be blocked by the guardrail (contains "sensitive" keyword)
     try:
-        result = kit_with_guardrails.arun(
-            "Tell me about sensitive information in the database"
-        )
+        result = kit_with_guardrails.arun("Tell me about sensitive information in the database")
         print(f"\nResult: {result}\n")
     except Exception as e:
         print(f"\nGuardrail blocked the request: {e}\n")

@@ -3746,6 +3746,7 @@ export interface paths {
          *         current_user: The authenticated user.
          *         agent_id: Optional agent ID filter.
          *         session_id: Optional session ID filter.
+         *         run_id: Optional run ID filter.
          *         time_range_start: Optional start time filter.
          *         time_range_end: Optional end time filter.
          *         event_type: Optional event type filter.
@@ -3756,6 +3757,26 @@ export interface paths {
          *         AuditEventsResponse containing list of matching events.
          */
         get: operations["query_audit_events_v1_audit_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/audit/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Audit Evidence
+         * @description Export a verified SHA-256 evidence chain for one run or session.
+         */
+        get: operations["export_audit_evidence_v1_audit_export_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5029,8 +5050,12 @@ export interface components {
             agent_id: string;
             /** Session Id */
             session_id: string;
+            /** Run Id */
+            run_id?: string | null;
             /** Span Id */
             span_id?: string | null;
+            /** Parent Span Id */
+            parent_span_id?: string | null;
             /** Event Type */
             event_type: string;
             /** Payload */
@@ -5042,6 +5067,37 @@ export interface components {
             timestamp: string;
             /** Trace Id */
             trace_id?: string | null;
+            /**
+             * Actor Type
+             * @default agent
+             */
+            actor_type: string;
+            /** Actor Id */
+            actor_id?: string | null;
+            /** Actor Display */
+            actor_display?: string | null;
+            /** Policy Decision Id */
+            policy_decision_id?: string | null;
+            /** Policy Refs */
+            policy_refs?: string[];
+            /** Approval Id */
+            approval_id?: string | null;
+            /** Cost Record */
+            cost_record?: Record<string, never> | null;
+            /**
+             * Redaction Status
+             * @default none
+             */
+            redaction_status: string;
+            /**
+             * Schema Version
+             * @default 1.0
+             */
+            schema_version: string;
+            /** Previous Hash */
+            previous_hash?: string | null;
+            /** Integrity Hash */
+            integrity_hash?: string | null;
         };
         /**
          * AuditEventType
@@ -5058,6 +5114,30 @@ export interface components {
             events: components["schemas"]["AuditEventResponse"][];
             /** Total */
             total?: number | null;
+        };
+        /**
+         * AuditEvidenceExportResponse
+         * @description Verified governed-operation evidence chain export.
+         */
+        AuditEvidenceExportResponse: {
+            /** Schema Version */
+            schema_version: string;
+            /** Algorithm */
+            algorithm: string;
+            /** Run Id */
+            run_id?: string | null;
+            /** Session Id */
+            session_id?: string | null;
+            /** Event Count */
+            event_count: number;
+            /** Chain Root */
+            chain_root?: string | null;
+            /** Verified */
+            verified: boolean;
+            /** Errors */
+            errors: string[];
+            /** Events */
+            events: components["schemas"]["AuditEventResponse"][];
         };
         /** BackendHealthResponse */
         BackendHealthResponse: {
@@ -17070,6 +17150,8 @@ export interface operations {
                 agent_id?: string | null;
                 /** @description Filter by session ID */
                 session_id?: string | null;
+                /** @description Filter by run ID */
+                run_id?: string | null;
                 /** @description Filter events after this timestamp (ISO 8601 format) */
                 time_range_start?: string | null;
                 /** @description Filter events before this timestamp (ISO 8601 format) */
@@ -17096,6 +17178,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AuditEventsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_audit_evidence_v1_audit_export_get: {
+        parameters: {
+            query?: {
+                /** @description Run ID to export */
+                run_id?: string | null;
+                /** @description Session ID to export */
+                session_id?: string | null;
+            };
+            header?: {
+                Authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEvidenceExportResponse"];
                 };
             };
             /** @description Validation Error */

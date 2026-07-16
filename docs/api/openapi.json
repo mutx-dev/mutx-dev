@@ -14443,7 +14443,7 @@
           "audit"
         ],
         "summary": "Query Audit Events",
-        "description": "Query audit events with filters.\n\nRequires authentication. Results are ordered by timestamp descending.\n\nArgs:\n    current_user: The authenticated user.\n    agent_id: Optional agent ID filter.\n    session_id: Optional session ID filter.\n    time_range_start: Optional start time filter.\n    time_range_end: Optional end time filter.\n    event_type: Optional event type filter.\n    limit: Maximum number of events to return (1-1000, default 100).\n    skip: Number of events to skip for pagination.\n\nReturns:\n    AuditEventsResponse containing list of matching events.",
+        "description": "Query audit events with filters.\n\nRequires authentication. Results are ordered by timestamp descending.\n\nArgs:\n    current_user: The authenticated user.\n    agent_id: Optional agent ID filter.\n    session_id: Optional session ID filter.\n    run_id: Optional run ID filter.\n    time_range_start: Optional start time filter.\n    time_range_end: Optional end time filter.\n    event_type: Optional event type filter.\n    limit: Maximum number of events to return (1-1000, default 100).\n    skip: Number of events to skip for pagination.\n\nReturns:\n    AuditEventsResponse containing list of matching events.",
         "operationId": "query_audit_events_v1_audit_events_get",
         "parameters": [
           {
@@ -14481,6 +14481,24 @@
               "title": "Session Id"
             },
             "description": "Filter by session ID"
+          },
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by run ID",
+              "title": "Run Id"
+            },
+            "description": "Filter by run ID"
           },
           {
             "name": "time_range_start",
@@ -14589,6 +14607,92 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuditEventsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/audit/export": {
+      "get": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "Export Audit Evidence",
+        "description": "Export a verified SHA-256 evidence chain for one run or session.",
+        "operationId": "export_audit_evidence_v1_audit_export_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Run ID to export",
+              "title": "Run Id"
+            },
+            "description": "Run ID to export"
+          },
+          {
+            "name": "session_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Session ID to export",
+              "title": "Session Id"
+            },
+            "description": "Session ID to export"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditEvidenceExportResponse"
                 }
               }
             }
@@ -17510,6 +17614,17 @@
             "type": "string",
             "title": "Session Id"
           },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
           "span_id": {
             "anyOf": [
               {
@@ -17520,6 +17635,17 @@
               }
             ],
             "title": "Span Id"
+          },
+          "parent_span_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Span Id"
           },
           "event_type": {
             "type": "string",
@@ -17544,6 +17670,105 @@
               }
             ],
             "title": "Trace Id"
+          },
+          "actor_type": {
+            "type": "string",
+            "title": "Actor Type",
+            "default": "agent"
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Id"
+          },
+          "actor_display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Display"
+          },
+          "policy_decision_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy Decision Id"
+          },
+          "policy_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Policy Refs"
+          },
+          "approval_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approval Id"
+          },
+          "cost_record": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Record"
+          },
+          "redaction_status": {
+            "type": "string",
+            "title": "Redaction Status",
+            "default": "none"
+          },
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "previous_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Hash"
+          },
+          "integrity_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Integrity Hash"
           }
         },
         "type": "object",
@@ -17598,6 +17823,84 @@
         ],
         "title": "AuditEventsResponse",
         "description": "Response model for a list of audit events."
+      },
+      "AuditEvidenceExportResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version"
+          },
+          "algorithm": {
+            "type": "string",
+            "title": "Algorithm"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          },
+          "chain_root": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chain Root"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Errors"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEventResponse"
+            },
+            "type": "array",
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "schema_version",
+          "algorithm",
+          "event_count",
+          "verified",
+          "errors",
+          "events"
+        ],
+        "title": "AuditEvidenceExportResponse",
+        "description": "Verified governed-operation evidence chain export."
       },
       "BackendHealthResponse": {
         "properties": {
