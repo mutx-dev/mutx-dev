@@ -384,6 +384,44 @@ class TestPicoClawPackage:
         assert "do not ship `picoclaw-launcher-tui`" in bundled_kb
         assert "\npicoclaw-launcher-tui\n" not in bundled_kb
 
+    def test_linux_package_maps_every_published_release_architecture(self):
+        state = OnboardingState(
+            stack="picoclaw",
+            os="linux",
+            provider="google",
+            goal="install",
+        )
+        zip_bytes, _ = build_onboarding_package(state)
+        install_script = _extract_zip(zip_bytes)["install.sh"]
+
+        expected_mappings = {
+            "x86_64|amd64": "x86_64",
+            "arm64|aarch64": "arm64",
+            "armv6|armv6l": "armv6",
+            "armv7|armv7l": "armv7",
+            "loong64|loongarch64": "loong64",
+            "mipsle|mipsel": "mipsle",
+            "riscv64": "riscv64",
+            "s390x": "s390x",
+        }
+        for uname_values, release_arch in expected_mappings.items():
+            assert f"{uname_values}) PICOCLAW_ARCH='{release_arch}'" in install_script
+
+    def test_macos_package_does_not_offer_linux_only_release_architectures(self):
+        state = OnboardingState(
+            stack="picoclaw",
+            os="macos",
+            provider="google",
+            goal="install",
+        )
+        zip_bytes, _ = build_onboarding_package(state)
+        install_script = _extract_zip(zip_bytes)["install.sh"]
+
+        assert "x86_64|amd64) PICOCLAW_ARCH='x86_64'" in install_script
+        assert "arm64|aarch64) PICOCLAW_ARCH='arm64'" in install_script
+        for linux_only_arch in ("armv6", "armv7", "loong64", "mipsle", "riscv64", "s390x"):
+            assert f"PICOCLAW_ARCH='{linux_only_arch}'" not in install_script
+
     def test_readme_mentions_stack_os_provider(self, files):
         readme = files["README.md"]
         assert "PicoClaw" in readme

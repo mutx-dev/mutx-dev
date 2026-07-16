@@ -211,14 +211,28 @@ def _build_install_sh(state: OnboardingState) -> str:
             ]
         else:
             platform = "Darwin" if os_name == "macos" else "Linux"
-            lines += [
-                "PICOCLAW_VERSION='0.3.1'",
-                f"PICOCLAW_PLATFORM='{platform}'",
+            architecture_lines = [
                 'case "$(uname -m)" in',
                 "  x86_64|amd64) PICOCLAW_ARCH='x86_64' ;;",
                 "  arm64|aarch64) PICOCLAW_ARCH='arm64' ;;",
+            ]
+            if platform == "Linux":
+                architecture_lines += [
+                    "  armv6|armv6l) PICOCLAW_ARCH='armv6' ;;",
+                    "  armv7|armv7l) PICOCLAW_ARCH='armv7' ;;",
+                    "  loong64|loongarch64) PICOCLAW_ARCH='loong64' ;;",
+                    "  mipsle|mipsel) PICOCLAW_ARCH='mipsle' ;;",
+                    "  riscv64) PICOCLAW_ARCH='riscv64' ;;",
+                    "  s390x) PICOCLAW_ARCH='s390x' ;;",
+                ]
+            architecture_lines += [
                 '  *) echo "Unsupported architecture: $(uname -m)"; exit 1 ;;',
                 "esac",
+            ]
+            lines += [
+                "PICOCLAW_VERSION='0.3.1'",
+                f"PICOCLAW_PLATFORM='{platform}'",
+                *architecture_lines,
                 'ASSET="picoclaw_${PICOCLAW_PLATFORM}_${PICOCLAW_ARCH}.tar.gz"',
                 'BASE="https://github.com/sipeed/picoclaw/releases/download/v${PICOCLAW_VERSION}"',
                 'TMP_DIR="$(mktemp -d)"',
