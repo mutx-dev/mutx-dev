@@ -44,8 +44,9 @@ Recommend PicoClaw when the user says things like:
 - config schema `2` is current
 - `.security.yml` is a first-class place for secrets
 - in schema `2`, model credentials should come from `.security.yml`; `config.json` `api_key` can be ignored for `model_list`
-- the release package includes `picoclaw-launcher` for browser-based setup at `http://localhost:18800`
-- headless installs can use `picoclaw-launcher-tui`
+- the v0.3.1 desktop release archives include both `picoclaw` and `picoclaw-launcher`; generated packages install both into `~/.local/bin`
+- add `~/.local/bin` to `PATH` before using bare PicoClaw commands in a new shell
+- the audited v0.3.1 release and source tree do not ship `picoclaw-launcher-tui`; do not recommend that command
 - adding `-public` to the launcher broadens exposure to all interfaces, so it is not a safe default
 - Docker and Android are now first-class documented install paths
 - the gateway handles all enabled channels concurrently
@@ -63,7 +64,6 @@ picoclaw gateway
 picoclaw status
 picoclaw cron list
 picoclaw-launcher
-picoclaw-launcher-tui
 ```
 
 If the user wants the GUI path, remember that the launcher is local by default. For remote admin, prefer Tailscale or another private path rather than telling them to make the launcher public immediately.

@@ -342,6 +342,31 @@ class TestPicoClawPackage:
         assert "exits with status 2" in readme
         assert "https://docs.picoclaw.io/docs/installation/android/" in readme
 
+    def test_desktop_package_preserves_the_complete_release_toolset(self):
+        state = OnboardingState(
+            stack="picoclaw",
+            os="linux",
+            provider="google",
+            goal="install",
+        )
+        zip_bytes, _ = build_onboarding_package(state)
+        files = _extract_zip(zip_bytes)
+        install_script = files["install.sh"]
+
+        assert "for binary in picoclaw picoclaw-launcher" in install_script
+        assert 'install -m 0755 "$TMP_DIR/$binary" "$HOME/.local/bin/$binary"' in install_script
+        assert 'export PATH="$HOME/.local/bin:$PATH"' in install_script
+        assert '"$HOME/.local/bin/picoclaw" onboard' in install_script
+
+        readme = files["README.md"]
+        assert 'export PATH="$HOME/.local/bin:$PATH"' in readme
+        assert "picoclaw --version && picoclaw status" in readme
+
+        bundled_kb = files["kb/PICOCLAW.md"]
+        assert "picoclaw-launcher`" in bundled_kb
+        assert "do not ship `picoclaw-launcher-tui`" in bundled_kb
+        assert "\npicoclaw-launcher-tui\n" not in bundled_kb
+
     def test_readme_mentions_stack_os_provider(self, files):
         readme = files["README.md"]
         assert "PicoClaw" in readme

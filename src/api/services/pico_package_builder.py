@@ -219,7 +219,11 @@ def _build_install_sh(state: OnboardingState) -> str:
                 'if command -v sha256sum >/dev/null; then (cd "$TMP_DIR" && sha256sum -c selected-checksum.txt); else (cd "$TMP_DIR" && shasum -a 256 -c selected-checksum.txt); fi',
                 'tar -xzf "$TMP_DIR/$ASSET" -C "$TMP_DIR"',
                 'mkdir -p "$HOME/.local/bin"',
-                'install -m 0755 "$TMP_DIR/picoclaw" "$HOME/.local/bin/picoclaw"',
+                "for binary in picoclaw picoclaw-launcher; do",
+                '  [ -f "$TMP_DIR/$binary" ] || { echo "Release archive is missing $binary"; exit 1; }',
+                '  install -m 0755 "$TMP_DIR/$binary" "$HOME/.local/bin/$binary"',
+                "done",
+                'export PATH="$HOME/.local/bin:$PATH"',
                 '"$HOME/.local/bin/picoclaw" onboard',
             ]
 
@@ -367,7 +371,7 @@ def _build_readme(state: OnboardingState) -> str:
         "hermes": 'cd "${HERMES_HOME:-$HOME/.hermes}/hermes-agent" && uv run hermes doctor',
         "openclaw": "openclaw --version && openclaw gateway status",
         "nanoclaw": "cd nanoclaw-v2 && docker ps",
-        "picoclaw": "picoclaw --version && picoclaw status",
+        "picoclaw": 'export PATH="$HOME/.local/bin:$PATH" && picoclaw --version && picoclaw status',
     }
     lines.append(f"```bash\n{verify_cmds.get(stack, 'echo check-your-setup')}\n```")
 
