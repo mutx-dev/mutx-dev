@@ -853,18 +853,23 @@ async def sso_callback(
             client_secret=client_secret,
         )
 
-        # Get the access token
+        # Prefer the OIDC ID token for local signature/issuer/audience validation.
+        # When a provider omits it, the access token may be opaque or scoped to a
+        # resource server, so allow the verifier to resolve identity via userinfo.
         access_token = token_response.get("access_token")
-        if not access_token:
+        id_token = token_response.get("id_token")
+        verification_token = id_token or access_token
+        if not verification_token:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No access token returned from SSO provider",
+                detail="No identity token returned from SSO provider",
             )
 
         # Verify the OAuth token and extract user info
         token_payload = await verify_oauth_token(
-            token=access_token,
+            token=verification_token,
             provider=sso_provider,
+            allow_userinfo_fallback=id_token is None,
         )
 
         # Issue MUTX JWT access token

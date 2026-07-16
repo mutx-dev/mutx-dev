@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
 from pydantic import ValidationError
 import pytest
@@ -225,6 +226,81 @@ async def test_verify_oauth_token_uses_configured_oidc_validator(
     assert payload.sub == "oidc-user"
     assert payload.roles == ["AUDIT_ADMIN"]
     assert payload.exp == datetime.fromtimestamp(4_102_444_800, tz=timezone.utc)
+
+
+@pytest.mark.asyncio
+async def test_verify_oauth_token_uses_userinfo_for_opaque_access_tokens(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    oidc_settings = oidc.OIDCSettings("https://id.example.com", "mutx-api", "https://keys")
+    provider_settings = SimpleNamespace(
+        okta_domain="https://id.example.com",
+        okta_realm=None,
+    )
+    monkeypatch.setattr(oidc, "get_oidc_settings", lambda: oidc_settings)
+    monkeypatch.setattr(oidc, "get_settings", lambda: provider_settings)
+
+    async def reject_opaque_token(
+        _token: str,
+        *,
+        settings: oidc.OIDCSettings,
+    ) -> dict[str, object]:
+        assert settings is oidc_settings
+        raise oidc.OIDCTokenValidationError("Malformed OIDC token header")
+
+    async def fake_userinfo(token: str, uri: str) -> oidc.TokenPayload:
+        assert token == "opaque-access-token"
+        assert uri == "https://id.example.com/oauth2/v1/userinfo"
+        return oidc.TokenPayload(
+            sub="oidc-user",
+            email="oidc@example.com",
+            roles=["USER"],
+            exp=datetime.fromtimestamp(4_102_444_800, tz=timezone.utc),
+        )
+
+    monkeypatch.setattr(oidc, "validate_oidc_token", reject_opaque_token)
+    monkeypatch.setattr(oidc, "_verify_via_userinfo", fake_userinfo)
+
+    payload = await oidc.verify_oauth_token(
+        "opaque-access-token",
+        oidc.SSOProvider.OKTA,
+    )
+
+    assert payload.sub == "oidc-user"
+
+
+@pytest.mark.asyncio
+async def test_verify_oauth_token_rejects_invalid_id_tokens_without_userinfo_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    oidc_settings = oidc.OIDCSettings("https://id.example.com", "mutx-api", "https://keys")
+    provider_settings = SimpleNamespace(
+        okta_domain="https://id.example.com",
+        okta_realm=None,
+    )
+    monkeypatch.setattr(oidc, "get_oidc_settings", lambda: oidc_settings)
+    monkeypatch.setattr(oidc, "get_settings", lambda: provider_settings)
+
+    async def reject_invalid_token(
+        _token: str,
+        *,
+        settings: oidc.OIDCSettings,
+    ) -> dict[str, object]:
+        assert settings is oidc_settings
+        raise oidc.OIDCTokenValidationError("OIDC token validation failed")
+
+    async def fail_userinfo(*_args: object) -> oidc.TokenPayload:
+        pytest.fail("userinfo must not replace validation of a returned ID token")
+
+    monkeypatch.setattr(oidc, "validate_oidc_token", reject_invalid_token)
+    monkeypatch.setattr(oidc, "_verify_via_userinfo", fail_userinfo)
+
+    with pytest.raises(oidc.HTTPException, match="OIDC token validation failed"):
+        await oidc.verify_oauth_token(
+            "invalid-id-token",
+            oidc.SSOProvider.OKTA,
+            allow_userinfo_fallback=False,
+        )
 
 
 @pytest.mark.asyncio

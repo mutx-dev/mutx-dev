@@ -235,8 +235,13 @@ async def verify_oauth_token(
     provider: SSOProvider,
     domain: str | None = None,
     realm: str | None = None,
+    *,
+    allow_userinfo_fallback: bool = True,
 ) -> TokenPayload:
     """Verify a provider token, preferring the canonical configured OIDC contract."""
+    source = get_settings()
+    domain = domain or getattr(source, f"{provider.value}_domain", None)
+    realm = realm or getattr(source, f"{provider.value}_realm", None)
     oidc_settings = get_oidc_settings()
     if oidc_settings is not None:
         try:
@@ -246,13 +251,14 @@ async def verify_oauth_token(
                 client_id=oidc_settings.client_id,
             )
         except OIDCTokenValidationError as exc:
+            if allow_userinfo_fallback and domain is not None:
+                config = _get_provider_config(provider, domain, realm)
+                return await _verify_via_userinfo(token, config["userinfo_endpoint"])
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=str(exc),
             ) from exc
 
-    source = get_settings()
-    domain = domain or getattr(source, f"{provider.value}_domain", None)
     if domain is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
