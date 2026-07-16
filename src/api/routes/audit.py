@@ -178,7 +178,7 @@ async def query_audit_events(
     dependencies=[Depends(require_roles("ADMIN", "AUDIT_ADMIN"))],
 )
 async def export_audit_evidence(
-    current_user: Annotated[SSOTokenUser, Depends(get_current_user)],
+    current_user: Annotated[SSOTokenUser, Depends(get_current_sso_user)],
     run_id: Annotated[str | None, Query(description="Run ID to export")] = None,
     session_id: Annotated[str | None, Query(description="Session ID to export")] = None,
 ) -> AuditEvidenceExportResponse:
