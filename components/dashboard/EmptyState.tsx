@@ -31,7 +31,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "dashboard-entry flex flex-col items-center justify-center rounded-[28px] border px-6 py-12 text-center",
+        "dashboard-entry flex flex-col items-center justify-center rounded-xl border px-6 py-12 text-center",
         className,
       )}
       style={{
@@ -44,7 +44,7 @@ export function EmptyState({
       {...props}
     >
       <div
-        className="flex h-16 w-16 items-center justify-center rounded-[22px] border"
+        className="flex h-14 w-14 items-center justify-center rounded-lg border"
         style={{
           borderColor: dashboardTokens.borderStrong,
           backgroundColor: dashboardTokens.bgSurfaceStrong,

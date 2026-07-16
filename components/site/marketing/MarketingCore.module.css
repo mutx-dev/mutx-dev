@@ -1,18 +1,18 @@
 .page {
-  --marketing-bg: #0a0a09;
+  --marketing-bg: var(--mutx-rail);
   --marketing-bg-soft: #171715;
   --marketing-bg-strong: #030608;
   --marketing-surface: rgba(11, 18, 23, 0.94);
   --marketing-surface-soft: rgba(255, 248, 236, 0.05);
-  --marketing-text: #f3f0e8;
+  --marketing-text: var(--mutx-paper);
   --marketing-text-soft: rgba(211, 224, 215, 0.82);
   --marketing-text-muted: rgba(156, 170, 163, 0.64);
-  --marketing-text-reverse: #f3f0e8;
+  --marketing-text-reverse: var(--mutx-paper);
   --marketing-text-reverse-soft: rgba(211, 224, 215, 0.72);
   --marketing-border: rgba(233, 241, 232, 0.11);
   --marketing-border-strong: rgba(255, 77, 0, 0.24);
   --marketing-border-reverse: rgba(233, 241, 232, 0.16);
-  --marketing-accent: #ff4d00;
+  --marketing-accent: var(--mutx-signal);
   --marketing-accent-soft: #ffb199;
   --marketing-shadow: 0 28px 80px rgba(2, 2, 5, 0.28);
   position: relative;

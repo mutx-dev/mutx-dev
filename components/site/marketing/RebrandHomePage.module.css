@@ -1,9 +1,9 @@
 .page {
-  --paper: #f3f0e8;
-  --ink: #0a0a09;
-  --signal: #ff4d00;
-  --signal-ink: #c83b00;
-  --line: rgba(10, 10, 9, 0.18);
+  --paper: var(--mutx-paper);
+  --ink: var(--mutx-ink);
+  --signal: var(--mutx-signal);
+  --signal-ink: #a63808;
+  --line: color-mix(in srgb, var(--mutx-ink) 18%, transparent);
   overflow: hidden;
   background: var(--paper);
   color: var(--ink);

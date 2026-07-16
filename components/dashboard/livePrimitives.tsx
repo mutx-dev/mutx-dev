@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
-import { AlertTriangle, ArrowRight, Lock, Sparkles } from "lucide-react";
+import { AlertTriangle, Lock, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -109,7 +109,7 @@ export function LivePanel({
   return (
     <section
       className={cn(
-        "dashboard-entry overflow-hidden rounded-[28px] border shadow-[0_20px_56px_rgba(2,2,5,0.24)]",
+        "dashboard-entry overflow-hidden rounded-xl border",
         className,
       )}
       style={{
@@ -119,15 +119,15 @@ export function LivePanel({
       }}
     >
       <header
-        className="flex items-center justify-between gap-3 border-b px-4 py-3"
+        className="flex items-center justify-between gap-3 border-b px-5 py-4"
         style={{
           borderColor: dashboardTokens.borderSubtle,
-          backgroundColor: "color-mix(in srgb, rgba(17, 16, 21, 0.94) 86%, transparent)",
+          backgroundColor: dashboardTokens.bgSurface,
         }}
       >
         <div className="min-w-0">
           <h2
-            className="truncate text-[13px] font-semibold uppercase tracking-[0.14em]"
+            className="truncate text-[14px] font-medium tracking-[-0.01em]"
             style={{ color: dashboardTokens.textPrimary }}
           >
             {title}
@@ -136,7 +136,7 @@ export function LivePanel({
         <div className="flex items-center gap-3">
           {meta ? (
             <span
-              className="hidden text-[10px] font-medium uppercase tracking-[0.18em] sm:inline"
+              className="hidden font-[family:var(--font-mono)] text-[9px] font-medium uppercase tracking-[0.16em] sm:inline"
               style={{ color: dashboardTokens.textLabel }}
             >
               {meta}
@@ -145,7 +145,7 @@ export function LivePanel({
           {action}
         </div>
       </header>
-      <div className="p-4 sm:p-5">{children}</div>
+      <div className="p-5 sm:p-6">{children}</div>
     </section>
   );
 }
@@ -163,7 +163,7 @@ export function LiveStatCard({
 }) {
   return (
     <article
-      className="dashboard-entry rounded-[24px] border p-4"
+      className="dashboard-entry rounded-lg border p-5"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradientStrong,
@@ -172,9 +172,9 @@ export function LiveStatCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: dashboardTokens.textMuted }}>{label}</p>
+          <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: dashboardTokens.textMuted }}>{label}</p>
           <p
-            className="mt-2 truncate font-[family:var(--font-site-display)] text-[1.28rem] font-semibold tracking-[-0.05em]"
+            className="mt-3 truncate font-[family:var(--font-site-display)] text-[2.25rem] font-light leading-none tracking-[-0.065em]"
             style={{ color: dashboardTokens.textPrimary }}
           >
             {value}
@@ -182,7 +182,7 @@ export function LiveStatCard({
         </div>
         {status ? <StatusBadge status={status} /> : null}
       </div>
-      <p className="mt-3 text-[12px] leading-5" style={{ color: dashboardTokens.textSubtle }}>
+      <p className="mt-4 text-[12px] leading-5" style={{ color: dashboardTokens.textSubtle }}>
         {detail}
       </p>
     </article>
@@ -216,7 +216,7 @@ export function LiveMiniStat({
 }) {
   return (
     <div
-          className="rounded-[18px] border p-3"
+          className="rounded-lg border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         backgroundColor: dashboardTokens.bgInset,
@@ -257,80 +257,62 @@ export function LiveAuthRequired({
 
   return (
     <LivePanel title={title} meta="auth required">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(280px,0.92fr)]">
-        <div
-          className="rounded-[24px] border p-5"
-          style={{
-            borderColor: dashboardTokens.borderStrong,
-            background: dashboardTokens.panelGradientStrong,
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border"
-              style={{
-                borderColor: dashboardTokens.borderStrong,
-                backgroundColor: dashboardTokens.bgSurfaceHigher,
-                color: dashboardTokens.brand,
-              }}
-            >
-              <Lock className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <p
-                className="text-[11px] font-semibold uppercase tracking-[0.2em]"
-                style={{ color: dashboardTokens.textLabel }}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)] lg:items-center">
+        <div className="flex items-start gap-4">
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border"
+            style={{
+              borderColor: dashboardTokens.borderStrong,
+              backgroundColor: dashboardTokens.brandSoft,
+              color: dashboardTokens.brand,
+            }}
+          >
+            <Lock className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.2em]" style={{ color: dashboardTokens.textLabel }}>
+              Private workspace
+            </p>
+            <p className="mt-2 font-[family:var(--font-site-display)] text-2xl font-light tracking-[-0.05em]" style={{ color: dashboardTokens.textPrimary }}>
+              {displayTitle}
+            </p>
+            <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
+              {message}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link
+                href="/login?next=%2Fdashboard"
+                className="inline-flex min-h-10 items-center justify-center rounded-md bg-[#f04a00] px-4 text-xs font-semibold text-[#fffaf3] transition hover:bg-[#cf3f00]"
               >
-                Sign-in gate
-              </p>
-              <p
-                className="mt-2 font-[family:var(--font-site-display)] text-lg font-semibold"
-                style={{ color: dashboardTokens.textPrimary }}
+                Sign in
+              </Link>
+              <Link
+                href="/register?next=%2Fdashboard"
+                className="inline-flex min-h-10 items-center justify-center rounded-md border border-[#c9c3b6] bg-[#fbfaf6] px-4 text-xs font-semibold text-[#191916] transition hover:border-[#191916]"
               >
-                {displayTitle}
-              </p>
-              <p className="mt-2 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
-                {message}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Link
-                  href="/login?next=%2Fdashboard"
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ff4d00] bg-[#ff4d00] px-4 text-xs font-semibold text-[#07111e] transition hover:-translate-y-0.5 hover:bg-[#ffb199]"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/register?next=%2Fdashboard"
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(233,241,232,0.18)] bg-[#0b1210] px-4 text-xs font-semibold text-[#f3f0e8] transition hover:border-[#ff4d00]"
-                >
-                  Create account
-                </Link>
-              </div>
+                Create account
+              </Link>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-3">
+        <ul className="border-l border-[#d8d3c7] pl-5">
           {[
             "Fleet health and current deployment state.",
             "Recent runs, alerts, and budget pressure.",
             "The permissions attached to your account.",
-          ].map((note) => (
-            <div
+          ].map((note, index) => (
+            <li
               key={note}
-              className="rounded-[18px] border px-4 py-3"
-              style={{
-                borderColor: dashboardTokens.borderSubtle,
-                backgroundColor: dashboardTokens.bgSurface,
-              }}
+              className="flex items-start gap-3 border-b border-[#e2ddd2] py-3 first:pt-0 last:border-0 last:pb-0"
             >
-              <div className="flex items-start gap-3">
-                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-sky-200" />
-                <p className="text-sm leading-6 text-slate-300">{note}</p>
-              </div>
-            </div>
+              <span className="font-[family:var(--font-mono)] text-[9px] text-[#f04a00]">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <p className="text-[13px] leading-5 text-[#625e57]">{note}</p>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </LivePanel>
   );
@@ -418,10 +400,10 @@ export function BriefingBar({ entries }: { entries: BriefingBarEntry[] }) {
 
   return (
     <div
-      className="flex items-center gap-4 rounded-xl border px-4 py-2.5 overflow-x-auto"
+      className="flex items-center gap-5 overflow-x-auto border-y px-1 py-3"
       style={{
         borderColor: dashboardTokens.borderSubtle,
-        backgroundColor: dashboardTokens.bgInset,
+        backgroundColor: "transparent",
       }}
     >
       {entries.map((entry, index) => (

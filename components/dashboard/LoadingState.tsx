@@ -22,7 +22,7 @@ function SkeletonBlock({ className }: { className?: string }) {
 function CardSkeleton() {
   return (
     <div
-      className="rounded-[20px] border p-4"
+      className="rounded-lg border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradient,
@@ -63,7 +63,7 @@ function RowSkeleton() {
 function DetailSkeleton() {
   return (
     <div
-      className="rounded-[20px] border p-4"
+      className="rounded-lg border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradient,

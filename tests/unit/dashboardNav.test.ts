@@ -3,6 +3,7 @@ import {
   DASHBOARD_NAV_GROUPS,
   DASHBOARD_NAV_ITEMS,
   getDashboardNavHref,
+  getDashboardNavPanel,
   isDashboardNavItemActive,
 } from '../../components/dashboard/dashboardNav'
 import { PRIMARY_DESKTOP_ROUTE_ORDER } from '../../components/desktop/desktopRouteConfig'
@@ -26,6 +27,14 @@ describe('dashboard navigation helpers', () => {
 
   it('uses public hrefs outside the dashboard shells', () => {
     expect(getDashboardNavHref('/pricing', agentsItem)).toBe('/agents')
+  })
+
+  it('maps route metadata keys onto canonical SPA panel identifiers', () => {
+    expect(getDashboardNavPanel('home')).toBe('overview')
+    expect(getDashboardNavPanel('apiKeys')).toBe('api-keys')
+    expect(getDashboardNavPanel('budgets')).toBe('cost-tracker')
+    expect(getDashboardNavPanel('analytics')).toBe('tokens')
+    expect(getDashboardNavPanel('deployments')).toBe('deployments')
   })
 
   it('treats overview aliases as active for the home nav item', () => {

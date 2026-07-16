@@ -8,14 +8,14 @@
 /* ── Theme: Dark (default) ────────────────────────────────────────── */
 :root,
 [data-theme="dark"] {
-  --gb-bg:           #0a0a09;
+  --gb-bg:           var(--mutx-rail);
   --gb-bg-2:         #11110f;
   --gb-bg-3:         #0b1210;
   --gb-surface:      #0b1210;
-  --gb-text:         #f3f0e8;
+  --gb-text:         var(--mutx-paper);
   --gb-text-2:       rgba(211, 224, 215, 0.76);
   --gb-text-3:       rgba(156, 170, 163, 0.62);
-  --gb-accent:       #ff4d00;
+  --gb-accent:       var(--mutx-signal);
   --gb-accent-soft:  rgba(255, 77, 0, 0.1);
   --gb-border:       rgba(233, 241, 232, 0.10);
   --gb-border-strong:rgba(255, 77, 0, 0.22);
@@ -32,14 +32,14 @@
 
 /* ── Theme: Light ─────────────────────────────────────────────────── */
 [data-theme="light"] {
-  --gb-bg:           #f3f0e8;
+  --gb-bg:           var(--mutx-paper);
   --gb-bg-2:         #dce8dd;
   --gb-bg-3:         #cfddd1;
   --gb-surface:      #f1f6f0;
-  --gb-text:         #11110f;
+  --gb-text:         var(--mutx-ink);
   --gb-text-2:       rgba(7, 16, 11, 0.72);
   --gb-text-3:       rgba(49, 93, 74, 0.62);
-  --gb-accent:       #7a2d10;
+  --gb-accent:       var(--mutx-signal);
   --gb-accent-soft:  rgba(49, 93, 74, 0.08);
   --gb-border:       rgba(7, 16, 11, 0.10);
   --gb-border-strong:rgba(49, 93, 74, 0.18);

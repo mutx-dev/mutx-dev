@@ -1,22 +1,22 @@
 .pico-root {
-  --pico-bg: #0a0a09;
+  --pico-bg: var(--mutx-rail);
   --pico-bg-raised: #171715;
   --pico-bg-surface: rgba(255, 77, 0, 0.05);
   --pico-bg-surface-hover: rgba(255, 77, 0, 0.1);
   --pico-bg-panel: #11110f;
   --pico-bg-panel-strong: #171715;
   --pico-bg-input: #11110f;
-  --pico-text: #f3f0e8;
+  --pico-text: var(--mutx-paper);
   --pico-text-secondary: rgba(243, 240, 232, 0.76);
   --pico-text-muted: rgba(243, 240, 232, 0.5);
   --pico-border: rgba(243, 240, 232, 0.18);
   --pico-border-hover: rgba(255, 77, 0, 0.3);
   --pico-border-strong: rgba(255, 177, 153, 0.2);
   --pico-accent-rgb: 255, 77, 0;
-  --pico-accent: #ff4d00;
-  --pico-accent-bright: #ff4d00;
-  --pico-accent-deep: #ff4d00;
-  --pico-accent-contrast: #0a0a09;
+  --pico-accent: var(--mutx-signal);
+  --pico-accent-bright: var(--mutx-signal);
+  --pico-accent-deep: var(--mutx-signal);
+  --pico-accent-contrast: var(--mutx-rail);
   --pico-accent-soft: rgba(255, 77, 0, 0.12);
   --pico-accent-glow: rgba(255, 77, 0, 0.12);
   --pico-accent-fog: rgba(255, 77, 0, 0.06);
@@ -47,12 +47,12 @@
   position: relative;
   isolation: isolate;
   color: var(--pico-text);
-  background: #0a0a09;
+  background: var(--mutx-rail);
   color-scheme: dark;
 }
 
 body:has(.pico-root) {
-  background: #0a0a09;
+  background: var(--mutx-rail);
   color: var(--pico-text);
 }
 

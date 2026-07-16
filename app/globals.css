@@ -4,6 +4,14 @@
 
 @layer base {
   :root {
+    --mutx-paper: #f2efe6;
+    --mutx-paper-raised: #fbfaf6;
+    --mutx-ink: #191916;
+    --mutx-ink-soft: #57534d;
+    --mutx-ink-muted: #8b877e;
+    --mutx-rule: #d8d3c7;
+    --mutx-signal: #f04a00;
+    --mutx-rail: #151512;
     --background: #0a0a09;
     --surface: #171715;
     --surface-strong: #171715;
@@ -34,62 +42,61 @@
     --site-radius-lg: 1.5rem;
     --site-radius-xl: 2rem;
     --site-shell-max: 86rem;
-    --mutx-dashboard-bg-canvas: #0a0a09;
-    --mutx-dashboard-bg-canvas-raised: #11110f;
-    --mutx-dashboard-bg-surface: #11110f;
-    --mutx-dashboard-bg-surface-strong: #171715;
-    --mutx-dashboard-bg-surface-higher: #20201d;
-    --mutx-dashboard-bg-subtle: rgba(255, 77, 0, 0.1);
-    --mutx-dashboard-bg-inset: #030608;
+    --mutx-dashboard-bg-canvas: #f2efe6;
+    --mutx-dashboard-bg-canvas-raised: #ebe6da;
+    --mutx-dashboard-bg-surface: #fbfaf6;
+    --mutx-dashboard-bg-surface-strong: #ffffff;
+    --mutx-dashboard-bg-surface-higher: #f0ece2;
+    --mutx-dashboard-bg-subtle: rgba(240, 74, 0, 0.08);
+    --mutx-dashboard-bg-inset: #ece7dc;
     --mutx-dashboard-panel-gradient:
-      linear-gradient(180deg, rgba(17, 17, 15, 0.98) 0%, rgba(5, 5, 5, 0.98) 100%);
+      linear-gradient(180deg, #ffffff 0%, #faf8f2 100%);
     --mutx-dashboard-panel-gradient-strong:
-      radial-gradient(circle at top right, rgba(255, 77, 0, 0.12), transparent 28%),
-      linear-gradient(180deg, rgba(23, 23, 21, 0.98) 0%, rgba(5, 5, 5, 0.98) 100%);
+      linear-gradient(180deg, #ffffff 0%, #f7f3ea 100%);
     --mutx-dashboard-shell-gradient:
-      linear-gradient(180deg, rgba(17, 17, 15, 0.98) 0%, rgba(3, 3, 3, 0.98) 100%);
-    --mutx-dashboard-text-primary: #f3f0e8;
-    --mutx-dashboard-text-secondary: rgba(211, 224, 215, 0.88);
-    --mutx-dashboard-text-subtle: rgba(156, 170, 163, 0.8);
-    --mutx-dashboard-text-muted: rgba(181, 190, 184, 0.86);
-    --mutx-dashboard-text-label: #ffb199;
-    --mutx-dashboard-border-subtle: rgba(233, 241, 232, 0.12);
-    --mutx-dashboard-border-strong: rgba(255, 77, 0, 0.26);
-    --mutx-dashboard-border-interactive: rgba(255, 77, 0, 0.44);
-    --mutx-dashboard-focus-ring: rgba(255, 77, 0, 0.46);
-    --mutx-dashboard-brand: #ff4d00;
-    --mutx-dashboard-brand-strong: #f3f0e8;
-    --mutx-dashboard-brand-soft: rgba(255, 77, 0, 0.14);
-    --mutx-dashboard-status-active: #ffb199;
+      linear-gradient(180deg, #191916 0%, #11110f 100%);
+    --mutx-dashboard-text-primary: #191916;
+    --mutx-dashboard-text-secondary: #4f4b44;
+    --mutx-dashboard-text-subtle: #6e6a62;
+    --mutx-dashboard-text-muted: #8b877e;
+    --mutx-dashboard-text-label: #a63808;
+    --mutx-dashboard-border-subtle: #d8d3c7;
+    --mutx-dashboard-border-strong: rgba(240, 74, 0, 0.34);
+    --mutx-dashboard-border-interactive: rgba(240, 74, 0, 0.58);
+    --mutx-dashboard-focus-ring: rgba(240, 74, 0, 0.42);
+    --mutx-dashboard-brand: #f04a00;
+    --mutx-dashboard-brand-strong: #191916;
+    --mutx-dashboard-brand-soft: rgba(240, 74, 0, 0.1);
+    --mutx-dashboard-status-active: #146c49;
     --mutx-dashboard-warn: #f59e0b;
     --mutx-dashboard-warn-soft: rgba(245, 158, 11, 0.16);
     --mutx-dashboard-danger: #f87171;
-    --mutx-dashboard-status-idle-bg: rgba(148, 163, 184, 0.14);
-    --mutx-dashboard-status-idle-border: rgba(148, 163, 184, 0.26);
-    --mutx-dashboard-status-idle-text: #d9e2f0;
-    --mutx-dashboard-status-idle-dot: #94a3b8;
-    --mutx-dashboard-status-running-bg: rgba(255, 77, 0, 0.16);
-    --mutx-dashboard-status-running-border: rgba(255, 77, 0, 0.32);
-    --mutx-dashboard-status-running-text: #dbeafe;
-    --mutx-dashboard-status-running-dot: #ffb199;
-    --mutx-dashboard-status-success-bg: rgba(14, 165, 233, 0.16);
-    --mutx-dashboard-status-success-border: rgba(14, 165, 233, 0.3);
-    --mutx-dashboard-status-success-text: #d9f5ff;
-    --mutx-dashboard-status-success-dot: #38bdf8;
-    --mutx-dashboard-status-error-bg: rgba(248, 113, 113, 0.16);
-    --mutx-dashboard-status-error-border: rgba(248, 113, 113, 0.3);
-    --mutx-dashboard-status-error-text: #ffd7d7;
-    --mutx-dashboard-status-error-dot: #f87171;
-    --mutx-dashboard-status-warning-bg: rgba(245, 158, 11, 0.16);
-    --mutx-dashboard-status-warning-border: rgba(245, 158, 11, 0.3);
-    --mutx-dashboard-status-warning-text: #ffe6b6;
-    --mutx-dashboard-status-warning-dot: #f59e0b;
-    --mutx-dashboard-shadow-sm: 0 18px 38px rgba(2, 2, 5, 0.32);
-    --mutx-dashboard-shadow-lg: 0 38px 120px rgba(2, 2, 5, 0.56);
-    --swarm-radius-sm: 12px;
-    --swarm-radius-md: 16px;
-    --swarm-radius-lg: 24px;
-    --swarm-radius-xl: 32px;
+    --mutx-dashboard-status-idle-bg: #eeebe2;
+    --mutx-dashboard-status-idle-border: #d6d1c5;
+    --mutx-dashboard-status-idle-text: #5f5b54;
+    --mutx-dashboard-status-idle-dot: #8b877e;
+    --mutx-dashboard-status-running-bg: #fff0e8;
+    --mutx-dashboard-status-running-border: #f6b493;
+    --mutx-dashboard-status-running-text: #8d2e05;
+    --mutx-dashboard-status-running-dot: #f04a00;
+    --mutx-dashboard-status-success-bg: #e8f5ee;
+    --mutx-dashboard-status-success-border: #a9d8c0;
+    --mutx-dashboard-status-success-text: #146c49;
+    --mutx-dashboard-status-success-dot: #20a36a;
+    --mutx-dashboard-status-error-bg: #fff0ee;
+    --mutx-dashboard-status-error-border: #efb5ae;
+    --mutx-dashboard-status-error-text: #a83226;
+    --mutx-dashboard-status-error-dot: #c8493c;
+    --mutx-dashboard-status-warning-bg: #fff5dc;
+    --mutx-dashboard-status-warning-border: #e8cb82;
+    --mutx-dashboard-status-warning-text: #805600;
+    --mutx-dashboard-status-warning-dot: #c58a00;
+    --mutx-dashboard-shadow-sm: 0 1px 2px rgba(25, 25, 22, 0.06);
+    --mutx-dashboard-shadow-lg: 0 18px 48px rgba(25, 25, 22, 0.1);
+    --swarm-radius-sm: 6px;
+    --swarm-radius-md: 8px;
+    --swarm-radius-lg: 12px;
+    --swarm-radius-xl: 16px;
     --swarm-font-family-sans: var(--font-site-body, var(--font-display));
     --swarm-font-family-mono: var(--font-mono);
   }
@@ -1629,3 +1636,62 @@
 .docs-sidebar::-webkit-scrollbar-track { background: transparent; }
 .docs-sidebar::-webkit-scrollbar-thumb { background: rgba(255, 240, 214, 0.18); border-radius: 3px; }
 .docs-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255, 240, 214, 0.28); }
+
+/* MUTX operator editorial theme. Legacy dashboard routes still carry a small
+   set of dark utility classes; these scoped translations keep every route on
+   the shared light canvas while those screens converge on the core tokens. */
+.dashboard-app {
+  color-scheme: light;
+  --dashboard-card: #fbfaf6;
+  --dashboard-card-muted: #f5f2ea;
+  --dashboard-copy: #4f4b44;
+}
+
+.dashboard-app .dashboard-content [class~="text-white"],
+.dashboard-app .dashboard-content [class~="text-white/70"],
+.dashboard-app .dashboard-content [class~="text-white/80"],
+.dashboard-app .dashboard-content [class~="text-white/90"],
+.dashboard-app .dashboard-content [class~="text-slate-100"],
+.dashboard-app .dashboard-content [class~="text-slate-200"],
+.dashboard-app .dashboard-content [class~="text-slate-300"] {
+  color: #191916 !important;
+}
+
+.dashboard-app .dashboard-content [class~="text-slate-400"] { color: #625e57 !important; }
+.dashboard-app .dashboard-content [class~="text-slate-500"],
+.dashboard-app .dashboard-content [class~="text-slate-600"] { color: #8b877e !important; }
+.dashboard-app .dashboard-content [class~="text-cyan-300"],
+.dashboard-app .dashboard-content [class~="text-sky-300"],
+.dashboard-app .dashboard-content [class~="text-sky-200"] { color: #0f6f80 !important; }
+.dashboard-app .dashboard-content [class~="text-emerald-300"],
+.dashboard-app .dashboard-content [class~="text-emerald-200"] { color: #146c49 !important; }
+.dashboard-app .dashboard-content [class~="text-amber-300"],
+.dashboard-app .dashboard-content [class~="text-amber-200"],
+.dashboard-app .dashboard-content [class~="text-amber-100"] { color: #805600 !important; }
+.dashboard-app .dashboard-content [class~="text-rose-300"],
+.dashboard-app .dashboard-content [class~="text-rose-200"] { color: #a83226 !important; }
+
+.dashboard-app .dashboard-content [class~="border-white/10"],
+.dashboard-app .dashboard-content [class~="border-white/20"] { border-color: #d8d3c7 !important; }
+
+.dashboard-app .dashboard-content [class~="bg-white/[0.02]"],
+.dashboard-app .dashboard-content [class~="bg-white/[0.03]"],
+.dashboard-app .dashboard-content [class~="bg-white/[0.04]"],
+.dashboard-app .dashboard-content [class~="bg-white/5"],
+.dashboard-app .dashboard-content [class~="bg-black/30"],
+.dashboard-app .dashboard-content [class~="bg-black/40"],
+.dashboard-app .dashboard-content [class~="bg-[#0a1428]"],
+.dashboard-app .dashboard-content [class~="bg-[#0b1730]/60"] {
+  background-color: var(--dashboard-card-muted) !important;
+}
+
+.dashboard-app .dashboard-content input,
+.dashboard-app .dashboard-content textarea,
+.dashboard-app .dashboard-content select {
+  color: #191916;
+}
+
+.dashboard-app .dashboard-content input::placeholder,
+.dashboard-app .dashboard-content textarea::placeholder {
+  color: #9b978e;
+}
