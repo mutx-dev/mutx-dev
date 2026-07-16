@@ -65,7 +65,10 @@ def _get_secret_key() -> str:
 def _get_webhook_secret() -> str:
     import os
 
-    return os.getenv("STRIPE_WEBHOOK_SECRET", "")
+    secret = os.getenv("STRIPE_WEBHOOK_SECRET", "").strip()
+    if not secret:
+        raise StripeUnavailableError("STRIPE_WEBHOOK_SECRET not configured")
+    return secret
 
 
 # Map Stripe price IDs to internal plan names

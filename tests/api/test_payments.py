@@ -201,6 +201,23 @@ async def test_webhook_returns_503_when_stripe_dependency_is_missing(
 
 
 @pytest.mark.asyncio
+async def test_webhook_returns_503_when_signing_secret_is_missing(
+    client_no_auth,
+    monkeypatch,
+):
+    monkeypatch.delenv("STRIPE_WEBHOOK_SECRET", raising=False)
+
+    response = await client_no_auth.post(
+        "/v1/payments/webhook",
+        content=b"{}",
+        headers={"stripe-signature": "sig_test"},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "STRIPE_WEBHOOK_SECRET not configured"
+
+
+@pytest.mark.asyncio
 async def test_webhook_returns_503_when_handler_dependency_is_missing(
     client_no_auth,
     monkeypatch,
