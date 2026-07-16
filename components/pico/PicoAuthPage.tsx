@@ -191,6 +191,7 @@ export function PicoAuthPage({
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
+    minHeight: '2.75rem',
     padding: '0.7rem 1rem',
     borderRadius: c.radiusSm,
     border: `1px solid ${c.border}`,
@@ -227,6 +228,9 @@ export function PicoAuthPage({
       <header style={{ width: '100%', padding: '1.25rem 1.5rem' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
           <Link href="/" style={{
+            display: 'inline-flex',
+            minHeight: '2.75rem',
+            alignItems: 'center',
             fontFamily: c.fontDisplay,
             fontSize: '1.15rem',
             fontWeight: 700,
@@ -241,7 +245,7 @@ export function PicoAuthPage({
       </header>
 
       {/* Main */}
-      <main style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '2rem 1rem 4rem' }}>
+      <main id="main-content" style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '2rem 1rem 4rem' }}>
         <div style={{ width: '100%', maxWidth: '420px' }}>
           {/* Title */}
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -291,6 +295,7 @@ export function PicoAuthPage({
                     href={buildOAuthStartHref(provider.id, mode, redirectPath)}
                     style={{
                       display: 'flex',
+                      minHeight: '2.75rem',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.5rem',
@@ -451,6 +456,7 @@ export function PicoAuthPage({
                 disabled={loading}
                 style={{
                   width: '100%',
+                  minHeight: '2.75rem',
                   padding: '0.75rem 1.25rem',
                   borderRadius: c.radiusFull,
                   border: 'none',
@@ -482,7 +488,7 @@ export function PicoAuthPage({
               color: c.muted,
             }}>
               {mode === 'login' && (
-                <Link href="/forgot-password" style={{ color: c.muted, textDecoration: 'none', transition: 'color 0.2s' }}>
+                <Link href="/forgot-password" style={{ display: 'inline-flex', minHeight: '2.75rem', alignItems: 'center', color: c.muted, textDecoration: 'none', transition: 'color 0.2s' }}>
                   Forgot password?
                 </Link>
               )}
@@ -491,7 +497,7 @@ export function PicoAuthPage({
                   type="button"
                   onClick={() => void handleResend()}
                   disabled={resending}
-                  style={{ background: 'none', border: 'none', color: c.muted, cursor: 'pointer', fontSize: '0.82rem', padding: 0, textDecoration: 'underline' }}
+                  style={{ minHeight: '2.75rem', background: 'none', border: 'none', color: c.muted, cursor: 'pointer', fontSize: '0.82rem', padding: '0 0.5rem', textDecoration: 'underline' }}
                 >
                   {resending ? 'Sending\u2026' : 'Resend verification'}
                 </button>
@@ -500,7 +506,7 @@ export function PicoAuthPage({
                 {text.toggleQ}{' '}
                 <Link
                   href={`/${text.toggleMode}?next=${encodeURIComponent(redirectPath)}`}
-                  style={{ color: c.accent, textDecoration: 'none', fontWeight: 600 }}
+                  style={{ display: 'inline-flex', minHeight: '2.75rem', alignItems: 'center', color: c.accent, textDecoration: 'none', fontWeight: 600 }}
                 >
                   {text.toggleA}
                 </Link>

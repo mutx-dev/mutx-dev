@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
 
           <div>
             <h2 className={styles.sectionTitle}>Check your email</h2>
-            <p className={styles.bodyText}>
+            <p className={styles.success} role="status" aria-live="polite">
               We&apos;ve sent password reset instructions to <strong>{email}</strong>.
             </p>
             <p className={styles.bodyText}>
@@ -107,13 +107,14 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
+                autoComplete="email"
                 required
                 className={styles.input}
               />
             </div>
 
             {error && (
-              <div className={styles.error}>
+              <div className={styles.error} role="alert">
                 <AlertCircle className="h-4 w-4" />
                 {error}
               </div>

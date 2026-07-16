@@ -1,18 +1,17 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
 import { PicoSessionBanner } from '@/components/pico/PicoSessionBanner'
 import { PicoShell } from '@/components/pico/PicoShell'
+import { PicoSignalDiagram } from '@/components/pico/PicoSignalDiagram'
 import { PicoSurfaceCompass } from '@/components/pico/PicoSurfaceCompass'
 import { picoClasses, picoEmber, picoInset, picoPanel, picoSoft } from '@/components/pico/picoTheme'
 import { usePicoLessonWorkspace } from '@/components/pico/usePicoLessonWorkspace'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
-import { picoRobotAutopilotHighlights } from '@/lib/picoRobotArt'
 import { usePicoHref } from '@/lib/pico/navigation'
 import { cn } from '@/lib/utils'
 import {
@@ -63,6 +62,27 @@ const controlProtocol = [
     body: 'Approvals should survive restarts, stay reviewable, and read like real decisions.',
     href: '#approvals-section',
     action: 'Open approval queue',
+  },
+] as const
+
+const autopilotVisuals = [
+  {
+    index: '04.A',
+    label: 'Run state',
+    title: 'Read the last run.',
+    caption: 'Understand the latest execution before changing automation settings.',
+  },
+  {
+    index: '04.B',
+    label: 'Budget line',
+    title: 'Measure before escalation.',
+    caption: 'Keep spend pressure beside the run that created it.',
+  },
+  {
+    index: '04.C',
+    label: 'Approval gate',
+    title: 'Hold risky decisions.',
+    caption: 'Approvals stay visible until a person reviews them.',
   },
 ] as const
 
@@ -183,7 +203,6 @@ function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
 export function PicoAutopilotPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
-  const autopilotVisuals = picoRobotAutopilotHighlights
   const { progress, derived, actions, syncState } = usePicoProgress()
   const toHref = usePicoHref()
   const [runs, setRuns] = useState<AutopilotRunSummary[]>([])
@@ -856,27 +875,7 @@ export function PicoAutopilotPageClient() {
                 <p className={picoClasses.label}>Review cues</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                 {autopilotVisuals.map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-[24px] border border-[color:var(--pico-border)] bg-[linear-gradient(180deg,rgba(8,15,9,0.96),rgba(4,7,4,1))] p-3"
-                  >
-                    <div className="overflow-hidden rounded-[20px] border border-[rgba(164,255,92,0.18)] bg-[radial-gradient(circle_at_50%_16%,rgba(var(--pico-accent-rgb),0.18),transparent_50%),linear-gradient(180deg,rgba(6,12,6,0.98),rgba(2,4,2,1))]">
-                      <Image
-                        src={item.src}
-                        alt={item.alt}
-                        width={512}
-                        height={512}
-                        className="h-auto w-full"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 40vw, 20rem"
-                      />
-                    </div>
-                    <p className="mt-3 text-sm font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-accent-bright)]">
-                      {item.title}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      {item.caption}
-                    </p>
-                  </div>
+                  <PicoSignalDiagram key={item.index} {...item} compact />
                 ))}
               </div>
             </div>
@@ -1364,7 +1363,7 @@ export function PicoAutopilotPageClient() {
                     type="button"
                     onClick={saveThreshold}
                     disabled={Boolean(thresholdValidationError)}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[color:var(--pico-accent)] px-4 py-2 text-sm font-semibold text-[color:var(--pico-accent-contrast)] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[color:var(--pico-accent)] px-4 py-2 text-sm font-semibold text-[color:var(--pico-accent-contrast)] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Save threshold
                   </button>

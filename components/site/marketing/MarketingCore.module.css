@@ -1685,6 +1685,38 @@
 .publicPage .input, .publicPage .select, .publicPage .textarea { border: 1px solid rgba(10,10,9,.35); border-radius: 0; background: transparent; color: #0a0a09; }
 .publicPage .input::placeholder, .publicPage .select::placeholder, .publicPage .textarea::placeholder { color: #5f5d59; opacity: 1; }
 .publicPage .input:focus, .publicPage .select:focus, .publicPage .textarea:focus { border-color: #ff4d00; box-shadow: 0 0 0 1px #ff4d00; }
+.publicPage .buttonPrimary::after,
+.publicPage .buttonSecondary::after,
+.publicPage .buttonGhost::after { display: none; }
+.publicPage .routeDarkSection::before,
+.publicPage .routeDarkSection::after { display: none; }
+.publicPage .routeLightSection { animation: none; }
+.publicPage .prosePanel {
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid #0a0a09;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.publicPage .proseSection {
+  grid-template-columns: minmax(11rem, .38fr) minmax(0, 1fr);
+  gap: 1rem clamp(2rem, 5vw, 6rem);
+  padding: 2.25rem 0;
+  border-bottom: 1px solid rgba(10, 10, 9, .3);
+}
+.publicPage .proseSection h2 { grid-column: 1; grid-row: 1 / span 8; font-size: clamp(1.35rem, 2vw, 2rem); }
+.publicPage .proseSection p { grid-column: 2; max-width: 44rem; color: rgba(10, 10, 9, .74); }
+.publicPage .routeLegalGrid { grid-template-columns: minmax(0, 1fr) minmax(20rem, 25rem); gap: clamp(2rem, 5vw, 6rem); }
+.publicPage .routeMetaPanel {
+  top: 1.5rem;
+  border: 1px solid #0a0a09;
+  border-radius: 0;
+  background: #ff4d00;
+  box-shadow: none;
+}
+.publicPage .routeMetaPanel .eyebrow { color: #0a0a09; }
 
 .releaseVersion { margin-left: .12em; }
 
@@ -1698,4 +1730,7 @@
   .publicPage .displayTitle, .publicPage .darkText, .publicPage .contactHeroTitle { font-size: clamp(4rem, 19vw, 6rem); }
   .publicPage .routeCard { border-right-width: 1px; border-bottom-width: 0; }
   .publicPage .routeCard:last-child { border-bottom-width: 1px; }
+  .publicPage .proseSection { grid-template-columns: 1fr; gap: 1rem; padding: 1.75rem 0; }
+  .publicPage .proseSection h2,
+  .publicPage .proseSection p { grid-column: 1; grid-row: auto; }
 }

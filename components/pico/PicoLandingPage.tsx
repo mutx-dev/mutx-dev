@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react'
 
 import s from './PicoLanding.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
-import { picoRobotArtById } from '@/lib/picoRobotArt'
+import { PicoSignalDiagram } from '@/components/pico/PicoSignalDiagram'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
 
@@ -22,7 +22,6 @@ export function PicoLandingPage() {
   const t = useTranslations('pico')
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
-  const heroRobot = picoRobotArtById.heroWave
 
   const openForm = useCallback((interest?: string) => {
     setFormInterest(interest)
@@ -57,7 +56,7 @@ export function PicoLandingPage() {
         </div>
       </nav>
 
-      <main className={s.main}>
+      <main id="main-content" className={s.main}>
         <section className={s.hero}>
           <div className={s.heroAmbient} aria-hidden="true" />
           <div className={s.heroShell}>
@@ -91,21 +90,13 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.18}>
               <div className={s.heroVisualRail}>
-                <div className={s.heroRobotStage} aria-hidden="true">
-                  <div className={s.heroRobotGlow} />
-                  <div className={s.heroVisualLabel}>PicoMUTX / 01</div>
-                  <div className={s.heroRobotFrame}>
-                    <Image
-                      src={heroRobot.src}
-                      alt=""
-                      width={1536}
-                      height={1024}
-                      priority
-                      className={s.heroRobotImage}
-                      sizes="(max-width: 768px) 78vw, (max-width: 1180px) 42vw, 34rem"
-                    />
-                  </div>
-                </div>
+                <PicoSignalDiagram
+                  index="00"
+                  label="Launch marker"
+                  title="From stuck to shipped."
+                  caption="One setup path, one useful run, one recorded next move."
+                  className={s.heroDiagram}
+                />
               </div>
             </SiteReveal>
           </div>

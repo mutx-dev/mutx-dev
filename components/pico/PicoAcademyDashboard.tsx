@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { type ReactNode, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -597,13 +596,7 @@ export function PicoAcademyDashboard() {
                       <span className={picoCodex.stamp}>
                         Track {String(activeTrackIndex + 1).padStart(2, '0')}
                       </span>
-                      <Image
-                        src="/pico/mascot/pico-sprout.svg"
-                        alt="PicoMUTX academy mascot"
-                        width={32}
-                        height={32}
-                        className="drop-shadow-[0_2px_8px_rgba(164,255,92,0.15)]"
-                      />
+                      <span className={picoCodex.stamp}>Signal 02</span>
                     </div>
                     <h3 className="font-[family:var(--font-site-display)] text-5xl tracking-[-0.06em] text-[color:var(--pico-text)]">
                       {activeTrack.title}

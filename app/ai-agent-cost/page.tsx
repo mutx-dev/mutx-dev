@@ -37,29 +37,6 @@ export const metadata: Metadata = {
   }),
 };
 
-const faqItems = [
-  {
-    question: "How do you track AI agent costs per run?",
-    answer:
-      "MUTX attributes every dollar to the agent, model, provider, and workflow that generated it. You see which execution path consumed the budget — not just an aggregate API bill.",
-  },
-  {
-    question: "Can you stop runaway agent spend before the invoice arrives?",
-    answer:
-      "Yes. MUTX enforces budgets and rate limits as control plane policies. Set a spend ceiling. If a retry storm or broken workflow starts burning tokens, the control plane intervenes.",
-  },
-  {
-    question: "Does cost data connect to traces and approvals?",
-    answer:
-      "Yes. Cost records sit next to traces, governance controls, and approval logs. When you investigate an expensive run, you see the full operational context — not a billing export in isolation.",
-  },
-  {
-    question: "What is the difference between LLM billing and AI agent cost management?",
-    answer:
-      "Provider billing tells you what was spent. Agent cost management tells you which agent, workflow, model, and runtime decision created that spend — and lets you enforce limits at the control plane.",
-  },
-];
-
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -103,17 +80,6 @@ const structuredData = {
           item: getCanonicalUrl("/ai-agent-cost"),
         },
       ],
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: faqItems.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer,
-        },
-      })),
     },
   ],
 };
@@ -241,92 +207,6 @@ export default function AIAgentCostPage() {
                   <div key={card.title} className={feat.featureCard}>
                     <h3 className={feat.featureCardTitle}>{card.title}</h3>
                     <p className={feat.featureCardBody}>{card.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className={feat.contentSection}>
-            <div className={core.shell}>
-              <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>Connected surfaces</p>
-                <h2 className={feat.sectionTitle}>
-                  Cost connects to
-                  <br />
-                  everything else.
-                </h2>
-                <p className={feat.sectionBody}>
-                  Spend limits and rate limits are governance controls. When cost
-                  enforcement lives in the same control plane as auth boundaries
-                  and deployment records, you get coherent policies — not
-                  disconnected feature flags.
-                </p>
-              </div>
-              <div className={feat.featureGrid}>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-governance">Governance</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    Spending limits and rate limits are governance controls
-                    enforced through the same policy layer that handles auth
-                    boundaries and operator access.
-                  </p>
-                </div>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-deployment">Deployment</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    Cost budgets travel with deployment configs. Promote an agent
-                    from staging to production and the cost policies go with it —
-                    no manual re-configuration.
-                  </p>
-                </div>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-monitoring">Monitoring</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    Cost anomalies surface through the same monitoring view as
-                    runtime failures. You see the spend spike and the
-                    corresponding traces in one place.
-                  </p>
-                </div>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-reliability">Reliability</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    Circuit breakers and spend limits work together. An agent
-                    that hits its spend ceiling gets throttled before it becomes
-                    a production incident.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className={feat.contentSection}>
-            <div className={core.shell}>
-              <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>FAQ</p>
-                <h2 className={feat.sectionTitle}>
-                  Questions teams ask
-                  <br />
-                  about agent spend.
-                </h2>
-                <p className={feat.sectionBody}>
-                  These come up once teams move past raw model billing and start
-                  running agents in production continuously.
-                </p>
-              </div>
-              <div className={feat.featureGrid}>
-                {faqItems.map((item) => (
-                  <div key={item.question} className={feat.featureCard}>
-                    <h3 className={feat.featureCardTitle}>{item.question}</h3>
-                    <p className={feat.featureCardBody}>{item.answer}</p>
                   </div>
                 ))}
               </div>

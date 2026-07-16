@@ -18,7 +18,6 @@ import {
 
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { FeatureHint } from "@/components/dashboard/FeatureHint";
-import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { dashboardTokens } from "@/components/dashboard/tokens";
 
 type TemplateSourceFilter = "all" | "official" | "imported";
@@ -559,24 +558,6 @@ export function TemplateCatalogPageClient() {
 
   return (
     <div className="space-y-4">
-      <RouteHeader
-        title="Spawn Lab"
-        description="Live starter-template catalog plus a deploy workbench for agent launch, workspace naming, and runtime presets."
-        icon={Sparkles}
-        badge="starter templates"
-        hint={{
-          tone: "beta",
-          detail:
-            "Spawn Lab is functional, but template deployment and custom-template editing are still being hardened. Expect a working operator workbench, not a frozen product contract.",
-        }}
-        stats={[
-          { label: "Catalog", value: String(templates.length) },
-          { label: "Imported", value: String(importedCount), tone: "success" },
-          { label: "Pinned", value: String(pinnedTemplateIds.length) },
-          { label: "Workbench", value: "Live deploy", tone: "success" },
-        ]}
-      />
-
       <div
         className="rounded-[24px] border p-4"
         style={{ borderColor: dashboardTokens.borderSubtle, background: dashboardTokens.panelGradient }}

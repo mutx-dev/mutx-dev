@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 
 import s from './page.module.css'
+import { PicoSignalDiagram } from '@/components/pico/PicoSignalDiagram'
 import { PicoWipReturn } from '@/components/pico/PicoWipReturn'
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default function PicoWipPage() {
     <div className={s.root} data-testid="pico-host-guard">
       <PicoWipReturn />
       <div className={s.shell}>
-        <section className={s.hero}>
+        <main id="main-content" className={s.hero}>
           <div className={s.copy}>
             <p className={s.kicker}>PicoMUTX page guard</p>
             <h1 className={s.title}>This page is still being prepared.</h1>
@@ -40,19 +40,18 @@ export default function PicoWipPage() {
           </div>
 
           <div className={s.visual}>
-            <div className={s.bubble} data-testid="pico-wip-speech">
+            <p className={s.routeNotice} data-testid="pico-wip-speech">
               You&apos;re not supposed to be here!
-            </div>
-            <Image
-              src="/pico/robot/point.png"
-              alt="PicoMUTX robot pointing visitors back to the waitlist"
-              width={320}
-              height={320}
-              className={s.robot}
-              priority
+            </p>
+            <PicoSignalDiagram
+              index="WIP"
+              label="Route guard"
+              title="Return to the public path."
+              caption="This route is intentionally private while the waitlist is open."
+              className={s.diagram}
             />
           </div>
-        </section>
+        </main>
       </div>
     </div>
   )

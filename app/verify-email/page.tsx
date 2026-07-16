@@ -173,7 +173,7 @@ function VerifyEmailContent() {
     <AuthSurface {...authSurfaceProps} variant="recovery">
       <div className={styles.formWrap}>
         {status === "loading" ? (
-          <div className={styles.success}>
+          <div className={styles.success} role="status" aria-live="polite">
             <Loader2 className="h-4 w-4 animate-spin" />
             {message}
           </div>
@@ -181,7 +181,7 @@ function VerifyEmailContent() {
 
         {status === "success" ? (
           <>
-            <div className={styles.success}>
+            <div className={styles.success} role="status" aria-live="polite">
               <CheckCircle2 className="h-4 w-4" />
               {message}
             </div>
@@ -205,7 +205,7 @@ function VerifyEmailContent() {
 
         {status === "pending" ? (
           <>
-            <div className={styles.success}>
+            <div className={styles.success} role="status" aria-live="polite">
               <Mail className="h-4 w-4" />
               {message}
             </div>
@@ -247,7 +247,7 @@ function VerifyEmailContent() {
 
         {status === "error" ? (
           <>
-            <div className={styles.error}>
+            <div className={styles.error} role="alert">
               <AlertCircle className="h-4 w-4" />
               {message}
             </div>

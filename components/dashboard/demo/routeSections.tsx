@@ -188,9 +188,9 @@ function OverviewSection({
               <SectionPill label="Governed rollout" tone="healthy" />
               <SectionPill label="BYOK aware" />
             </div>
-            <h1 className="mt-2 text-[30px] font-semibold leading-none tracking-[-0.06em] text-white sm:text-[34px] lg:text-[38px]">
+            <h2 className="mt-2 text-[30px] font-semibold leading-none tracking-[-0.06em] text-white sm:text-[34px] lg:text-[38px]">
               Environment Matrix
-            </h1>
+            </h2>
             <p className="mt-1.5 max-w-3xl text-[12px] leading-5 text-white/58 sm:text-[13px] sm:leading-5">
               Deployments, runs, policy, secrets, network posture, and readiness across production, staging, and development.
             </p>

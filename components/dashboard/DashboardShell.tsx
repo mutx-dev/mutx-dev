@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,6 +29,7 @@ import {
 } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
+import { dashboardTokens } from "./tokens";
 import {
   ALL_DASHBOARD_NAV_ITEMS,
   DASHBOARD_NAV_GROUPS,
@@ -46,6 +47,12 @@ interface DashboardNavProps {
   prefetchPanel: (panel: string) => void;
   onNavigate?: () => void;
   pathname: string;
+}
+
+interface DashboardShellChip {
+  label: string;
+  tone: string;
+  style?: CSSProperties;
 }
 
 const DASHBOARD_NAV_PANELS: Partial<Record<(typeof ALL_DASHBOARD_NAV_ITEMS)[number]["key"], string>> = {
@@ -95,7 +102,7 @@ function DashboardNav({ navigateToPanel, onNavigate, pathname, prefetchPanel }: 
                 title={item.description}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group relative flex items-center gap-3 px-3.5 py-3 text-[13px] transition-all duration-150",
+                  "group relative flex min-h-11 items-center gap-3 px-3.5 py-3 text-[13px] transition-all duration-150",
                   isActive
                     ? "bg-[rgba(255,77,0,0.16)] text-[#f3f0e8]"
                     : "text-[#a8aaa4] hover:bg-[#171715] hover:text-[#f3f0e8]",
@@ -256,7 +263,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
     };
   }, [isDesktop, platformReady, status]);
 
-  const shellChips = useMemo(
+  const shellChips = useMemo<DashboardShellChip[]>(
     () =>
       !platformReady
         ? [
@@ -269,13 +276,23 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
           ? [
               {
                 label: "Web workspace",
-                tone: "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#f3f0e8]",
+                tone: "border-[rgba(233,241,232,0.12)]",
+                style: {
+                  backgroundColor: dashboardTokens.bgSurface,
+                  color: dashboardTokens.textPrimary,
+                },
               },
               {
                 label: status.user?.email ? "Signed in" : "Not signed in",
                 tone: status.user?.email
                   ? "border-[rgba(255,77,0,0.28)] bg-[rgba(255,77,0,0.14)] text-[#f3f0e8]"
-                  : "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#b6caea]",
+                  : "border-[rgba(233,241,232,0.12)]",
+                style: status.user?.email
+                  ? undefined
+                  : {
+                      backgroundColor: dashboardTokens.bgSurface,
+                      color: dashboardTokens.textSubtle,
+                    },
               },
             ]
           : [
@@ -284,7 +301,14 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
               tone:
                 status.mode === "local"
                   ? "border-[rgba(255, 77, 0,0.28)] bg-[rgba(255, 77, 0,0.14)] text-[#f3f0e8]"
-                  : "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#ffb199]",
+                  : "border-[rgba(233,241,232,0.12)]",
+              style:
+                status.mode === "local"
+                  ? undefined
+                  : {
+                      backgroundColor: dashboardTokens.bgSurface,
+                      color: dashboardTokens.textLabel,
+                    },
             },
             {
               label: `Gateway ${status.openclaw?.health || "unknown"}`,
@@ -297,7 +321,13 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
               label: status.faramesh?.available ? "Governance Active" : "Governance Idle",
               tone: status.faramesh?.available
                 ? "border-[rgba(255, 77, 0,0.28)] bg-[rgba(255, 77, 0,0.14)] text-[#f3f0e8]"
-                : "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#b6caea]",
+                : "border-[rgba(233,241,232,0.12)]",
+              style: status.faramesh?.available
+                ? undefined
+                : {
+                    backgroundColor: dashboardTokens.bgSurface,
+                    color: dashboardTokens.textSubtle,
+                  },
             },
             {
               label: `Bridge ${status.bridge?.state || "unknown"}`,
@@ -421,16 +451,16 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
             {isDesktop ? "desktop" : "web"}
           </span>
         </div>
-        <p className="mt-3 text-sm leading-6 text-[#dbe7f8]">
+        <p className="mt-3 text-sm leading-6" style={{ color: dashboardTokens.textSecondary }}>
           {isDesktop
             ? status.user?.name || "Connect this machine to a workspace account"
             : "Desktop identity and machine-local actions appear here inside MUTX.app."}
         </p>
-        <p className="mt-1 text-[12px] leading-5 text-[#9bb4d6]">
+        <p className="mt-1 text-[12px] leading-5" style={{ color: dashboardTokens.textMuted }}>
           {status.user?.email || "setup pending"}
         </p>
 
-        <div className="mt-4 space-y-2 text-xs text-[#c8daf4]">
+        <div className="mt-4 space-y-2 text-xs" style={{ color: dashboardTokens.textSecondary }}>
           {isDesktop ? (
             <>
               <div className="flex items-center justify-between border-t border-[rgba(233,241,232,0.08)] pt-3">
@@ -438,32 +468,32 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                   <Activity className="h-3.5 w-3.5 text-[#ff4d00]" />
                   Gateway
                 </span>
-                <span className="text-[#9bb4d6]">{status.openclaw?.health || "unknown"}</span>
+                <span style={{ color: dashboardTokens.textMuted }}>{status.openclaw?.health || "unknown"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  <Shield className="h-3.5 w-3.5 text-[#7dd3fc]" />
+                  <Shield className="h-3.5 w-3.5" style={{ color: dashboardTokens.statusActive }} />
                   Governance
                 </span>
-                <span className="text-[#9bb4d6]">{status.faramesh?.available ? "active" : "idle"}</span>
+                <span style={{ color: dashboardTokens.textMuted }}>{status.faramesh?.available ? "active" : "idle"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Server className="h-3.5 w-3.5 text-[#ffb199]" />
                   Local stack
                 </span>
-                <span className="text-[#9bb4d6]">{status.localControlPlane?.ready ? "online" : "stopped"}</span>
+                <span style={{ color: dashboardTokens.textMuted }}>{status.localControlPlane?.ready ? "online" : "stopped"}</span>
               </div>
             </>
           ) : (
             <>
               <div className="flex items-center justify-between border-t border-[rgba(233,241,232,0.08)] pt-3">
                 <span>Account</span>
-                <span className="text-[#9bb4d6]">{status.user?.email ? "signed in" : "not signed in"}</span>
+                <span style={{ color: dashboardTokens.textMuted }}>{status.user?.email ? "signed in" : "not signed in"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Desktop controls</span>
-                <span className="text-[#9bb4d6]">MUTX.app only</span>
+                <span style={{ color: dashboardTokens.textMuted }}>MUTX.app only</span>
               </div>
             </>
           )}
@@ -478,15 +508,17 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
 
   return (
     <div
-      className="dashboard-app min-h-screen bg-[#070b13] text-[#f3f0e8]"
-      style={
-        isDesktop
+      className="dashboard-app min-h-screen"
+      style={{
+        backgroundColor: dashboardTokens.bgCanvas,
+        color: dashboardTokens.textPrimary,
+        ...(isDesktop
           ? {
               fontFamily:
                 "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif",
             }
-          : undefined
-      }
+          : undefined),
+      }}
     >
       <div className="pointer-events-none fixed inset-0 bg-[#0a0a09]" />
 
@@ -602,10 +634,16 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em]">
-                      <span className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-2.5 py-1 text-[#c8daf4]">
+                      <span
+                        className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-2.5 py-1"
+                        style={{ color: dashboardTokens.textSecondary }}
+                      >
                         {status.user?.email || "session needed"}
                       </span>
-                      <span className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-2.5 py-1 text-[#c8daf4]">
+                      <span
+                        className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-2.5 py-1"
+                        style={{ color: dashboardTokens.textSecondary }}
+                      >
                         {activeItem?.title || "Dashboard"}
                       </span>
                       {activeItem?.key &&
@@ -621,6 +659,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                         <span
                           key={chip.label}
                           className={`rounded-full border px-2.5 py-1 ${chip.tone}`}
+                          style={chip.style}
                         >
                           {chip.label}
                         </span>
@@ -633,7 +672,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                       <button
                         type="button"
                         onClick={() => void runDesktopAction("setup")}
-                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8]"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8]"
                       >
                         <Settings2 className="h-4 w-4 text-[#ff4d00]" />
                         Home
@@ -644,9 +683,9 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                         type="button"
                         onClick={() => void runDesktopAction("tui")}
                         disabled={actionBusy === "tui"}
-                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8] disabled:opacity-50"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8] disabled:opacity-50"
                       >
-                        <TerminalSquare className="h-4 w-4 text-[#7dd3fc]" />
+                        <TerminalSquare className="h-4 w-4" style={{ color: dashboardTokens.statusActive }} />
                         TUI
                       </button>
                     ) : null}
@@ -655,7 +694,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                         type="button"
                         onClick={() => void runDesktopAction("workspace")}
                         disabled={actionBusy === "workspace"}
-                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8] disabled:opacity-50"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8] disabled:opacity-50"
                       >
                         <FolderOpen className="h-4 w-4 text-[#ffb199]" />
                         Reveal Workspace

@@ -37,29 +37,6 @@ export const metadata: Metadata = {
   }),
 };
 
-const faqItems = [
-  {
-    question: "What is an AI agent approval workflow?",
-    answer:
-      "A human-in-the-loop gate that blocks selected agent actions until an authorized operator approves, rejects, or escalates — with full execution context visible.",
-  },
-  {
-    question: "Do approvals actually block the agent?",
-    answer:
-      "Yes — that&rsquo;s the entire point. MUTX approvals are control plane gates, not advisory notifications. High-risk actions wait for a decision instead of racing ahead.",
-  },
-  {
-    question: "Which actions usually need human approval?",
-    answer:
-      "Teams typically start with destructive actions, production changes, credential access, policy exceptions, or high-cost operations that shouldn&rsquo;t run fully autonomously.",
-  },
-  {
-    question: "Can operators tell which actions were autonomous and which were approved?",
-    answer:
-      "Yes. Approval state is visible alongside traces, audit logs, and governance records — so you can distinguish autonomous behavior from human-authorized behavior during any investigation.",
-  },
-];
-
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -103,17 +80,6 @@ const structuredData = {
           item: getCanonicalUrl("/ai-agent-approvals"),
         },
       ],
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: faqItems.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer,
-        },
-      })),
     },
   ],
 };
@@ -247,95 +213,6 @@ export default function AIAgentApprovalsPage() {
                   <div key={card.title} className={feat.featureCard}>
                     <h3 className={feat.featureCardTitle}>{card.title}</h3>
                     <p className={feat.featureCardBody}>{card.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className={feat.contentSection}>
-            <div className={core.shell}>
-              <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>How approvals connect</p>
-                <h2 className={feat.sectionTitle}>
-                  Approvals touch
-                  <br />
-                  every surface in the plane.
-                </h2>
-                <p className={feat.sectionBody}>
-                  When approvals live in the control plane, they integrate
-                  cleanly with audit logs, governance policies, and monitoring
-                  traces. The approval record is attached to the trace, recorded
-                  in the audit log, and visible in the governance surface — not
-                  siloed in a separate workflow tool.
-                </p>
-              </div>
-              <div className={feat.featureGrid}>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-governance">Governance</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    Approval requirements are governance policies. Who can
-                    approve what, and under what conditions — defined in the
-                    governance model, enforced by the approval gate.
-                  </p>
-                </div>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-audit-logs">Audit Logs</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    Every approval decision — who approved, what they approved,
-                    the full context — lands in the audit log. Compliance
-                    reviewers see the complete chain from request to outcome.
-                  </p>
-                </div>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-monitoring">Monitoring</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    The distinction between automated and approved actions is
-                    visible in every trace. During an incident, you see
-                    immediately which actions required human sign-off and which
-                    didn&rsquo;t.
-                  </p>
-                </div>
-                <div className={feat.featureCard}>
-                  <h3 className={feat.featureCardTitle}>
-                    <Link href="/ai-agent-guardrails">Guardrails</Link>
-                  </h3>
-                  <p className={feat.featureCardBody}>
-                    A guardrail violation can require approval before the agent
-                    proceeds. The response to a safety boundary hit isn&rsquo;t
-                    just a log entry — it&rsquo;s a workflow that pulls in a
-                    human operator.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className={feat.contentSection}>
-            <div className={core.shell}>
-              <div className={feat.contentIntro}>
-                <p className={feat.sectionEyebrow}>FAQ</p>
-                <h2 className={feat.sectionTitle}>
-                  Questions teams ask
-                  <br />
-                  before adding approvals.
-                </h2>
-                <p className={feat.sectionBody}>
-                  Approval systems only work if operators understand when to use
-                  them and how they connect to the rest of the runtime.
-                </p>
-              </div>
-              <div className={feat.featureGrid}>
-                {faqItems.map((item) => (
-                  <div key={item.question} className={feat.featureCard}>
-                    <h3 className={feat.featureCardTitle}>{item.question}</h3>
-                    <p className={feat.featureCardBody}>{item.answer}</p>
                   </div>
                 ))}
               </div>

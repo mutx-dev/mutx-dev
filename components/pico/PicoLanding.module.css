@@ -169,7 +169,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  min-height: 2.2rem;
+  min-height: 2.75rem;
   padding: 0 1rem;
   border-radius: var(--pico-radius-full);
   background: linear-gradient(135deg, #f3f0e8, #ff4d00);
@@ -248,66 +248,10 @@
   min-height: clamp(24rem, 46vw, 41rem);
 }
 
-.heroRobotStage {
-  position: relative;
-  display: grid;
-  justify-items: end;
-  align-items: center;
-  min-height: inherit;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.heroRobotGlow {
-  position: absolute;
-  right: clamp(-1rem, 2vw, 1rem);
-  width: min(100%, 36rem);
-  aspect-ratio: 4 / 5;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgba(164, 255, 92, 0.24) 0%, rgba(164, 255, 92, 0.1) 38%, transparent 74%);
-  filter: blur(58px);
-  opacity: 0.95;
-}
-
-.heroVisualLabel {
-  position: absolute;
-  top: 8%;
-  right: 0;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-family: var(--pico-font-accent);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(240, 208, 161, 0.45);
-}
-
-.heroRobotFrame {
-  position: relative;
-  width: min(100%, 37rem);
-  aspect-ratio: 3 / 4;
-  opacity: 0.96;
-  filter: drop-shadow(0 34px 80px rgba(0, 0, 0, 0.52));
-  transform: translate(2.5rem, 2rem) scale(1.06);
-}
-
-.heroRobotFrame::after {
-  content: '';
-  position: absolute;
-  inset: auto 10% 2% 10%;
-  height: 14%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(164, 255, 92, 0.16), transparent 72%);
-  filter: blur(18px);
-}
-
-.heroRobotImage {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
+.heroDiagram {
+  align-self: center;
+  width: min(100%, 34rem);
+  margin-left: auto;
 }
 
 .heroBadge {
@@ -415,6 +359,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.75rem 1.6rem;
+  min-height: 2.75rem;
   border-radius: var(--pico-radius-full);
   background: linear-gradient(135deg, #ff4d00, #ff4d00);
   color: #0e0c10;
@@ -439,6 +384,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.75rem 1.4rem;
+  min-height: 2.75rem;
   border-radius: var(--pico-radius-full);
   border: 1px solid var(--pico-border);
   background: rgba(255, 255, 255, 0.03);
@@ -1379,8 +1325,8 @@
   width: 0.32rem;
   height: 0.32rem;
   border-radius: 999px;
-  background: rgba(164, 255, 92, 0.9);
-  box-shadow: 0 0 10px rgba(164, 255, 92, 0.45);
+  background: rgba(255, 77, 0, 0.9);
+  box-shadow: 0 0 10px rgba(255, 77, 0, 0.35);
 }
 
 .trustSep {
@@ -2002,29 +1948,14 @@
     gap: 1.6rem;
   }
 
-  .heroRobotFrame {
-    width: min(76vw, 19rem);
-    aspect-ratio: 1;
-    transform: none;
-  }
-
   .heroVisualRail {
     min-height: auto;
     gap: 1rem;
   }
 
-  .heroRobotStage {
-    justify-items: center;
-    min-height: 0;
-  }
-
-  .heroRobotGlow {
-    right: auto;
-    width: min(78vw, 20rem);
-  }
-
-  .heroVisualLabel {
-    display: none;
+  .heroDiagram {
+    width: min(100%, 28rem);
+    margin-inline: auto;
   }
 
   .heroTitle {

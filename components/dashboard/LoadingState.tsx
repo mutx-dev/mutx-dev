@@ -13,6 +13,7 @@ function SkeletonBlock({ className }: { className?: string }) {
   return (
     <div
       className={cn("animate-pulse rounded-md", className)}
+      aria-hidden="true"
       style={{ backgroundColor: dashboardTokens.bgSubtle }}
     />
   );
@@ -89,7 +90,15 @@ export function LoadingState({
   const items = Array.from({ length: count });
 
   return (
-    <div className={cn("space-y-3", className)} style={style} {...props}>
+    <div
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      className={cn("space-y-3", className)}
+      style={style}
+      {...props}
+    >
+      <span className="sr-only">Loading dashboard content</span>
       {items.map((_, index) => {
         if (variant === "rows") {
           return <RowSkeleton key={`row-${index}`} />;

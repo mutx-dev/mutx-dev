@@ -51,15 +51,17 @@ const structuredData = buildWebPageStructuredData({
 
 export default async function ReleasesPage() {
   const release = await fetchLatestStableDesktopRelease();
-  const version = release?.version ?? "1.3.0";
-  const releaseLabel = `v${version}`;
-  const docsReleaseNotesHref = buildReleaseNotesUrl(version);
+  const version = release?.version;
+  const releaseLabel = version ? `v${version}` : "Latest stable";
+  const docsReleaseNotesHref = version ? buildReleaseNotesUrl(version) : "/download/macos/release-notes";
   const checksumsHref = release?.assets.checksums ?? release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL;
   const releaseHref = release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL;
   const cards: ReadonlyArray<ReleaseCard> = [
     {
       title: "Apple Silicon DMG",
-      body: `${buildDesktopArtifactName(version, "arm64-dmg")} for M-series Macs.`,
+      body: version
+        ? `${buildDesktopArtifactName(version, "arm64-dmg")} for M-series Macs.`
+        : "Latest stable Apple Silicon installer for M-series Macs.",
       href: release?.assets.arm64Dmg ?? "/download/macos/arm64",
       label: "Download arm64",
       icon: AppWindow,
@@ -67,7 +69,9 @@ export default async function ReleasesPage() {
     },
     {
       title: "Intel Mac DMG",
-      body: `${buildDesktopArtifactName(version, "x64-dmg")} for Intel hardware that still needs a supported MUTX lane.`,
+      body: version
+        ? `${buildDesktopArtifactName(version, "x64-dmg")} for supported Intel Macs.`
+        : "Latest stable installer for supported Intel Macs.",
       href: release?.assets.x64Dmg ?? "/download/macos/intel",
       label: "Download x64",
       icon: AppWindow,
@@ -75,7 +79,9 @@ export default async function ReleasesPage() {
     },
     {
       title: "Checksums",
-      body: `${buildDesktopArtifactName(version, "checksums")} for artifact verification and rollout checks.`,
+      body: version
+        ? `${buildDesktopArtifactName(version, "checksums")} for artifact verification.`
+        : "Checksums published with the latest stable release.",
       href: checksumsHref,
       label: "View checksums",
       icon: ShieldCheck,
@@ -94,23 +100,23 @@ export default async function ReleasesPage() {
   const artifactRows = [
     {
       label: "Apple Silicon DMG",
-      value: buildDesktopArtifactName(version, "arm64-dmg"),
+      value: version ? buildDesktopArtifactName(version, "arm64-dmg") : "Resolved from the stable release channel",
     },
     {
       label: "Intel Mac DMG",
-      value: buildDesktopArtifactName(version, "x64-dmg"),
+      value: version ? buildDesktopArtifactName(version, "x64-dmg") : "Resolved from the stable release channel",
     },
     {
       label: "Apple Silicon ZIP",
-      value: buildDesktopArtifactName(version, "arm64-zip"),
+      value: version ? buildDesktopArtifactName(version, "arm64-zip") : "Resolved from the stable release channel",
     },
     {
       label: "Intel Mac ZIP",
-      value: buildDesktopArtifactName(version, "x64-zip"),
+      value: version ? buildDesktopArtifactName(version, "x64-zip") : "Resolved from the stable release channel",
     },
     {
       label: "Checksums",
-      value: buildDesktopArtifactName(version, "checksums"),
+      value: version ? buildDesktopArtifactName(version, "checksums") : "Published with the stable release",
     },
   ] as const;
 

@@ -17,13 +17,19 @@
 
 @media (max-width: 900px) {
   .main { padding: 0; }
-  .stage { grid-template-columns: 1fr; border-inline: 0; }
-  .visual { min-height: 30rem; }
-  .formPanel { min-height: 32rem; }
+  .stage { grid-template-columns: 1fr; min-height: 0; border-inline: 0; }
+  .visual { min-height: 18rem; }
+  .formPanel { order: -1; min-height: 0; }
+  .formInner { padding-block: clamp(2.5rem, 8vw, 4rem); }
 }
 
 @media (max-width: 560px) {
-  .visual { min-height: 25rem; }
-  .title { font-size: clamp(3.5rem, 17vw, 5rem); }
-  .formInner { width: min(100% - 2rem, 31rem); }
+  .visual { min-height: 12rem; padding: 1rem; }
+  .letterGrid { display: none; }
+  .eyebrow { margin-bottom: .75rem; }
+  .title { max-width: 12ch; font-size: clamp(2.5rem, 12vw, 3.25rem); line-height: .9; }
+  .description { display: none; }
+  .formInner { width: min(100% - 2rem, 31rem); padding-block: 1rem; }
+  .formInner :global(input) { padding-block: .75rem; }
+  .formInner :global(a), .formInner :global(button) { min-height: 2.75rem; }
 }

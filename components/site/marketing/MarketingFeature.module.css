@@ -10,6 +10,7 @@
 
 .contentSection { padding: clamp(7rem, 11vw, 12rem) 0; background: #f3f0e8; color: #0a0a09; border-bottom: 1px solid #0a0a09; }
 .contentSection:nth-of-type(3) { background: #0a0a09; color: #f3f0e8; }
+.contentSection:nth-of-type(3) .sectionEyebrow { color: #ffb199; }
 .contentIntro { display: grid; grid-template-columns: minmax(11rem, .45fr) minmax(0, 1.1fr) minmax(18rem, .45fr); gap: clamp(2rem, 5vw, 6rem); align-items: start; margin-bottom: clamp(4rem, 8vw, 8rem); }
 .sectionEyebrow { margin: .5rem 0 0; color: #c83b00; font-family: var(--font-mono), monospace; font-size: .64rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
 .sectionTitle { margin: 0; font-family: var(--font-site-body), sans-serif; font-size: clamp(3.6rem, 6.5vw, 7rem); font-weight: 700; line-height: .84; letter-spacing: -.075em; }
