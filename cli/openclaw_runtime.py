@@ -570,20 +570,17 @@ def get_gateway_health() -> OpenClawGatewayHealth:
 
 def _build_openclaw_install_command(*, install_method: str, non_interactive: bool) -> str:
     method = normalize_install_method(install_method)
-    if method == "npm":
-        return f"npm install -g {shlex.quote(f'openclaw@{OPENCLAW_VERSION}')}"
-
+    version = OPENCLAW_VERSION if method == "npm" else OPENCLAW_SOURCE_COMMIT
     command = (
         f"curl -fsSL --proto '=https' --tlsv1.2 {shlex.quote(OPENCLAW_INSTALL_URL)} "
-        f"| bash -s -- --install-method git --version {OPENCLAW_SOURCE_COMMIT} --no-onboard"
+        f"| bash -s -- --install-method {shlex.quote(method)} "
+        f"--version {shlex.quote(version)} --no-onboard"
     )
     return f"{command} --no-prompt" if non_interactive else command
 
 
 def install_openclaw(*, install_method: str, non_interactive: bool) -> str:
     method = normalize_install_method(install_method)
-    if method == "npm":
-        _require_supported_openclaw_node()
     command = _build_openclaw_install_command(
         install_method=method,
         non_interactive=non_interactive,
@@ -638,8 +635,6 @@ def ensure_openclaw_installed(
     )
 
     if command_runner is not None:
-        if method == "npm":
-            _require_supported_openclaw_node()
         command_runner(command)
         resolved = find_openclaw_bin()
         if resolved:
