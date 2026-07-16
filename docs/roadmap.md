@@ -19,6 +19,11 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Now
 
+- Runtime and dependency modernization (`#3688`)
+  - align React 19.2 with the Next.js 16 runtime and keep the dependency tree peer-valid
+  - migrate Tailwind 3 to 4 and Electron 39 to 43 as separate, fully tested compatibility waves
+  - move the supported Python baseline forward deliberately, then replace abandoned auth/cloud clients
+  - refresh OpenTelemetry exporters and remove the retired Jaeger exporter without breaking trace contracts
 - API, CLI, SDK, and docs contract alignment
   - keep every public example aligned with the mounted `/v1/*` contract
   - keep grouped CLI commands and compatibility aliases documented accurately
@@ -57,6 +62,9 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Shipped (Last 30 Days)
 
+- `2026-07-16` Node 24 and the safe JavaScript dependency baseline are enforced across local, CI, and container builds
+- `2026-07-16` LangChain integrations are on the latest compatible 0.3 line with the remaining 1.x security boundary documented
+- `2026-07-16` OSS attribution and AARM claims are backed by immutable upstream source and license evidence
 - `2026-04-14` Deployment lifecycle history and rollback posture now ship consistently across the dashboard and CLI
 - `2026-04-14` Pico now uses the premium studio surface across onboarding, academy, tutor, autopilot, and support
 - `2026-04-14` Dashboard observability aggregates telemetry config, traces, and session health into `/dashboard/observability`
