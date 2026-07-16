@@ -101,7 +101,7 @@ If `gh` is missing or not authenticated, the run still completes locally and rec
 
 4. For `runtime-openclaw` lane specifically:
    - Verify the OpenClaw health endpoint responds: `curl http://localhost:8080/health`
-   - Confirm Node version requirement in `package.json` or runtime config matches the declared runtime (Node 22.14+)
+   - Confirm Node version requirement in `package.json` or runtime config matches the declared runtime (Node 24.15+ recommended)
 
 5. Merge if all checks pass. The dispatch workflow will close the issue automatically when the PR is merged.
 
@@ -304,7 +304,7 @@ MUTX and OpenClaw require different Node versions and must be kept on separate P
 | Component | Node Version |
 |-----------|-------------|
 | MUTX (CLI, SDK, dashboard build) | Node 20 LTS |
-| OpenClaw (runtime substrate) | Node 22.14+ or Node 24 |
+| OpenClaw (runtime substrate) | Node 24.15+ recommended; 22.22.3+ and 25.9+ supported |
 
 OpenClaw uses ESM-native features and native Addons that are not available in Node 20.
 
@@ -320,7 +320,7 @@ Use explicit absolute paths or shell aliases. Never rely on a single `node` bina
 /node20/bin/npm --version
 
 # OpenClaw runtime
-/node22/bin/node --version   # 22.14+ or 24.x.x
+/node24/bin/node --version   # 24.15+ recommended
 /node22/bin/npm --version
 ```
 
@@ -345,8 +345,8 @@ nvm use 20
 node --version  # 20.x.x
 
 # OpenClaw
-nvm use 22.14
-node --version  # 22.14.x
+nvm use 24.15
+node --version  # 24.15.x or newer 24.x
 ```
 
 #### Option D: Docker Containers (Recommended for Production)
@@ -378,7 +378,7 @@ services:
 node-mutx --version   # Must be 20.x.x
 
 # Verify OpenClaw Node version
-node-openclaw --version  # Must be 22.14+ or 24.x.x
+node-openclaw --version  # Must be 22.22.3+, 24.15+, or 25.9+
 
 # In CI (GitHub Actions), check with:
 node --version  # This is the default runner node (currently Node 20)

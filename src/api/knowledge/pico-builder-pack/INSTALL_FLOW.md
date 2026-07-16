@@ -68,7 +68,7 @@ Use Hermes when the user wants a persistent, self-improving agent. Validate:
 
 Use OpenClaw when the user wants strong channel support or a visual workspace workflow. Validate:
 
-- Node runtime and install path: Node 24 preferred; current docs still permit Node 22.14+
+- Node runtime and install path: Node 24.15+ preferred; 22.22.3+ and 25.9+ are also supported
 - onboarding path: install first, then `openclaw onboard`; add `--install-daemon` when they want the gateway to stay running
 - first verification path: `openclaw gateway status`, then `openclaw dashboard`, before spending time on channel auth
 - gateway state and whether the user expects the Control UI / dashboard
@@ -81,10 +81,10 @@ Use OpenClaw when the user wants strong channel support or a visual workspace wo
 Use NanoClaw when the user wants a smaller, container-isolated stack. Validate:
 
 - fork / clone path, because the current happy path is fork-first
-- Claude Code availability and whether the user understands that `/setup` runs inside Claude Code, not the normal shell
+- Claude Code, OneCLI, and Docker availability before running the v2 `nanoclaw.sh` bootstrap
 - Node 20+ plus Apple Container or Docker prerequisites
 - OneCLI Agent Vault status for modern installs
-- whether `/setup` completed and whether any `/add-*` skills were used for channels
+- whether `nanoclaw.sh` completed, the container is healthy, and the selected channel adapter paired successfully
 - whether the container runtime came up cleanly and the main channel or task loop actually responds
 
 ### PicoClaw
