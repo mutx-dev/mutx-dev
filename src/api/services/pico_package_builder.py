@@ -195,6 +195,9 @@ def _build_install_sh(state: OnboardingState) -> str:
                 "echo 'Use the signed v0.3.1 Android package from:'",
                 "echo 'https://github.com/sipeed/picoclaw/releases/download/v0.3.1/picoclaw-android-universal.zip'",
                 "echo 'Verify it against picoclaw_0.3.1_checksums.txt before installing.'",
+                "echo 'Follow https://docs.picoclaw.io/docs/installation/android/ to install it on Android.'",
+                "echo 'Manual installation required: no runtime was installed and setup is not complete.'",
+                "exit 2",
             ]
         else:
             platform = "Darwin" if os_name == "macos" else "Linux"
@@ -220,8 +223,9 @@ def _build_install_sh(state: OnboardingState) -> str:
                 '"$HOME/.local/bin/picoclaw" onboard',
             ]
 
-    lines.append("")
-    lines.append("echo 'Setup complete. Check README.md for next steps.'")
+    if not (stack == "picoclaw" and os_name == "android"):
+        lines.append("")
+        lines.append("echo 'Setup complete. Check README.md for next steps.'")
 
     return "\n".join(lines)
 
@@ -333,17 +337,31 @@ def _build_readme(state: OnboardingState) -> str:
 
     install_step = 3 if state.channels else 2
     verify_step = install_step + 1
-    lines += [
-        f"### {install_step}. Run the install script",
-        "",
-        "```bash",
-        "chmod +x install.sh",
-        "./install.sh",
-        "```",
-        "",
-        f"### {verify_step}. Verify",
-        "",
-    ]
+    if stack == "picoclaw" and os_name == "android":
+        lines += [
+            f"### {install_step}. Complete the Android installation manually",
+            "",
+            "`install.sh` is an information-only helper. It prints the signed v0.3.1 archive, checksum, and official Android guide, then exits with status 2 so automation cannot mistake guidance for a completed installation.",
+            "",
+            "Download the release archive and checksum, verify the archive, and follow the official Android guide before continuing.",
+            "",
+            "https://docs.picoclaw.io/docs/installation/android/",
+            "",
+            f"### {verify_step}. Verify on Android",
+            "",
+        ]
+    else:
+        lines += [
+            f"### {install_step}. Run the install script",
+            "",
+            "```bash",
+            "chmod +x install.sh",
+            "./install.sh",
+            "```",
+            "",
+            f"### {verify_step}. Verify",
+            "",
+        ]
 
     verify_cmds = {
         "hermes": 'cd "${HERMES_HOME:-$HOME/.hermes}/hermes-agent" && uv run hermes doctor',

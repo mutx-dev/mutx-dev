@@ -66,6 +66,17 @@ def test_openclaw_node_runtime_contract_matches_upstream() -> None:
     assert _is_supported_openclaw_node_version("v24.14.9") is False
 
 
+def test_autonomy_runbook_keeps_node_and_npm_on_the_shared_node24_lane() -> None:
+    runbook = (Path(__file__).resolve().parents[1] / "docs" / "autonomy-runbook.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "/node24/bin/node" in runbook
+    assert "/node24/bin/npm" in runbook
+    assert "/node22/bin/npm" not in runbook
+    assert "Node 24.15+ is the shared supported intersection" in runbook
+
+
 @pytest.mark.parametrize("install_method", ["npm", "git"])
 def test_official_installer_can_bootstrap_node(monkeypatch, install_method: str) -> None:
     commands: list[str] = []

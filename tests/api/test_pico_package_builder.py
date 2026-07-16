@@ -323,6 +323,25 @@ class TestPicoClawPackage:
         assert "picoclaw-android-universal.zip" in files["install.sh"]
         assert "picoclaw_0.3.1_checksums.txt" in files["install.sh"]
 
+    def test_android_helper_cannot_report_a_false_install_success(self, files):
+        install_script = files["install.sh"]
+        result = subprocess.run(
+            ["bash"],
+            input=install_script,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        assert result.returncode == 2
+        assert "no runtime was installed and setup is not complete" in result.stdout
+        assert "Setup complete" not in install_script
+
+        readme = files["README.md"]
+        assert "information-only helper" in readme
+        assert "exits with status 2" in readme
+        assert "https://docs.picoclaw.io/docs/installation/android/" in readme
+
     def test_readme_mentions_stack_os_provider(self, files):
         readme = files["README.md"]
         assert "PicoClaw" in readme
