@@ -48,34 +48,16 @@ function routeIsActive(pathname: string, href: string) {
   return pathname === absoluteHref || pathname.startsWith(`${absoluteHref}/`)
 }
 
-function ShellBackground({ academyMode }: { academyMode: boolean }) {
+function ShellBackground({ academyMode: _academyMode }: { academyMode: boolean }) {
   return (
-    <>
-      <div
-        aria-hidden="true"
-        className={cn(
-          'pointer-events-none absolute inset-0',
-          academyMode
-            ? 'bg-[radial-gradient(circle_at_18%_0%,rgba(var(--pico-accent-rgb),0.18),transparent_22%),radial-gradient(circle_at_82%_10%,rgba(115,239,190,0.08),transparent_18%),linear-gradient(180deg,#091209_0%,#050905_52%,#030603_100%)]'
-            : 'bg-[radial-gradient(circle_at_18%_0%,rgba(var(--pico-accent-rgb),0.14),transparent_24%),radial-gradient(circle_at_88%_16%,rgba(115,239,190,0.08),transparent_18%),linear-gradient(180deg,#081108_0%,#030603_100%)]',
-        )}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:linear-gradient(180deg,rgba(0,0,0,0.95),transparent_92%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(circle_at_50%_-10%,rgba(var(--pico-accent-rgb),0.14),transparent_44%)]"
-      />
-    </>
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[color:var(--pico-bg)]" />
   )
 }
 
 function PicoWordmark({ pathname }: { pathname: string }) {
   return (
     <Link href={picoHref(pathname, '/onboarding')} className="inline-flex items-center gap-3">
-      <span className="inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-[16px] border border-[color:var(--pico-border)] bg-[linear-gradient(145deg,rgba(var(--pico-accent-rgb),0.1),rgba(8,18,10,0.82))] shadow-[0_18px_36px_rgba(0,0,0,0.28),0_0_28px_rgba(var(--pico-accent-rgb),0.12)]">
+      <span className="inline-flex h-12 w-12 items-center justify-center overflow-hidden border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-raised)]">
         <Image src="/pico/logo.png" alt="PicoMUTX logo" width={28} height={28} priority />
       </span>
       <span className="grid gap-1">

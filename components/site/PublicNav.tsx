@@ -1,27 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, ChevronRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import styles from "./PublicNav.module.css";
 
 const NAV_ITEMS = [
+  { label: "Product", href: "/ai-agent-control-plane" },
   { label: "Docs", href: "/docs" },
   { label: "Releases", href: "/releases" },
   { label: "Contact", href: "/contact" },
-];
-
-const PRODUCT_LINKS = [
-  { label: "Control plane", href: "/ai-agent-control-plane", note: "Run the fleet" },
-  { label: "Monitoring", href: "/ai-agent-monitoring", note: "Read every run" },
-  { label: "Guardrails", href: "/ai-agent-guardrails", note: "Stop risky actions" },
-  { label: "Governance", href: "/ai-agent-governance", note: "Set the boundary" },
-  { label: "Cost", href: "/ai-agent-cost", note: "Control spend" },
-  { label: "Deployment", href: "/ai-agent-deployment", note: "Ship with proof" },
-];
+] as const;
 
 export function PublicNav({ overlay = false }: { overlay?: boolean }) {
   const pathname = usePathname() ?? "/";
@@ -31,60 +22,26 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
     <header className={`${styles.nav} ${overlay ? styles.overlay : ""}`}>
       <div className={styles.navInner}>
         <Link href="/" className={styles.brand} aria-label="MUTX home">
-          <span className={styles.brandMark}>
-            <Image src="/logo.webp" alt="" aria-hidden="true" width={22} height={22} />
-          </span>
-          <span className={styles.brandCopy}>
-            <span className={styles.brandName}>MUTX</span>
-            <span className={styles.brandDescriptor}>agent operations</span>
-          </span>
+          MUTX
         </Link>
 
         <nav className={styles.navLinks} aria-label="Primary navigation">
-          <div className={styles.productCluster}>
-            <Link
-              href="/ai-agent-control-plane"
-              className={`${styles.navLink} ${pathname.startsWith("/ai-agent-") ? styles.navLinkActive : ""}`}
-            >
-              Product
-            </Link>
-            <div className={styles.productMenu}>
-              <div className={styles.productMenuIntro}>
-                <span>Agent operations</span>
-                <strong>One system for the work after the prompt.</strong>
-              </div>
-              <div className={styles.productMenuGrid}>
-                {PRODUCT_LINKS.map((item, index) => (
-                  <Link key={item.href} href={item.href}>
-                    <span className={styles.productIndex}>{String(index + 1).padStart(2, "0")}</span>
-                    <span>
-                      <strong>{item.label}</strong>
-                      <small>{item.note}</small>
-                    </span>
-                    <ChevronRight aria-hidden="true" />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.navLink} ${pathname === item.href || pathname.startsWith(`${item.href}/`) ? styles.navLinkActive : ""}`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const productActive = item.label === "Product" && pathname.startsWith("/ai-agent-");
+            const active = productActive || pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link key={item.href} href={item.href} className={active ? styles.active : undefined} aria-current={active ? "page" : undefined}>
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className={styles.navActions}>
-          <Link href="/download" className={styles.quietAction}>Download</Link>
-          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className={styles.picoAction}>
-            <span className={styles.liveDot} />
-            Pico beta status
-            <ArrowUpRight aria-hidden="true" />
+        <div className={styles.actions}>
+          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className={styles.pico}>
+            Pico <ArrowUpRight aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span>
           </a>
+          <Link href="/download" className={styles.download}>Download</Link>
           <button
             type="button"
             className={styles.menuButton}
@@ -99,28 +56,17 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
 
       {mobileOpen ? (
         <nav className={styles.mobileMenu} aria-label="Mobile navigation">
-          <p className={styles.mobileLabel}>Product</p>
-          {PRODUCT_LINKS.map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
-              {item.label}
-              <ChevronRight aria-hidden="true" />
-            </Link>
-          ))}
-          <p className={styles.mobileLabel}>Company</p>
-          {NAV_ITEMS.map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}>
-              {item.label}
-              <ChevronRight aria-hidden="true" />
-            </Link>
-          ))}
-          <Link href="/download" onClick={() => setMobileOpen(false)}>
-            Download
-            <ChevronRight aria-hidden="true" />
-          </Link>
-          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>
-            Pico beta status
-            <ArrowUpRight aria-hidden="true" />
-          </a>
+          {NAV_ITEMS.map((item, index) => {
+            const productActive = item.label === "Product" && pathname.startsWith("/ai-agent-");
+            const active = productActive || pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} aria-current={active ? "page" : undefined}>
+                <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
+              </Link>
+            );
+          })}
+          <Link href="/download" onClick={() => setMobileOpen(false)}><span>05</span>Download</Link>
+          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer"><span>06</span>Pico ↗<span className="sr-only"> (opens in a new tab)</span></a>
         </nav>
       ) : null}
     </header>

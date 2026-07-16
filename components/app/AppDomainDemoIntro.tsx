@@ -378,7 +378,7 @@ export function AppDomainDemoIntro() {
 
                         setIntroVisible(false);
                       }}
-                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgba(240,199,143,0.28)] bg-[linear-gradient(135deg,#f2dfc4_0%,#c89b62_100%)] px-5 text-sm font-semibold text-[#0d0d10] shadow-[0_18px_54px_rgba(200,155,98,0.2)] transition hover:-translate-y-0.5"
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[rgba(240,199,143,0.28)] bg-[linear-gradient(135deg,#f3f0e8_0%,#ff4d00_100%)] px-5 text-sm font-semibold text-[#0d0d10] shadow-[0_18px_54px_rgba(255, 77, 0,0.2)] transition hover:-translate-y-0.5"
                     >
                       Enter demo now
                       <ArrowRight className="h-4 w-4" />

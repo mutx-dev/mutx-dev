@@ -295,13 +295,13 @@ export function LiveAuthRequired({
               <div className="mt-5 flex flex-wrap gap-2">
                 <Link
                   href="/login?next=%2Fdashboard"
-                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#60a5fa] bg-[#60a5fa] px-4 text-xs font-semibold text-[#07111e] transition hover:-translate-y-0.5 hover:bg-[#93c5fd]"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ff4d00] bg-[#ff4d00] px-4 text-xs font-semibold text-[#07111e] transition hover:-translate-y-0.5 hover:bg-[#ffb199]"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/register?next=%2Fdashboard"
-                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-[rgba(191,219,254,0.18)] bg-[#101722] px-4 text-xs font-semibold text-[#dbeafe] transition hover:border-[#60a5fa]"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-[rgba(233,241,232,0.18)] bg-[#0b1210] px-4 text-xs font-semibold text-[#f3f0e8] transition hover:border-[#ff4d00]"
                 >
                   Create account
                 </Link>

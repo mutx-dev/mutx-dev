@@ -1,19 +1,19 @@
 .page {
-  --marketing-bg: #09080b;
-  --marketing-bg-soft: #131117;
-  --marketing-bg-strong: #07060a;
-  --marketing-surface: rgba(24, 21, 28, 0.94);
+  --marketing-bg: #0a0a09;
+  --marketing-bg-soft: #171715;
+  --marketing-bg-strong: #030608;
+  --marketing-surface: rgba(11, 18, 23, 0.94);
   --marketing-surface-soft: rgba(255, 248, 236, 0.05);
-  --marketing-text: #f7f0e4;
-  --marketing-text-soft: rgba(232, 221, 203, 0.82);
-  --marketing-text-muted: rgba(188, 172, 149, 0.6);
-  --marketing-text-reverse: #fff5e8;
-  --marketing-text-reverse-soft: rgba(255, 241, 223, 0.72);
-  --marketing-border: rgba(255, 233, 204, 0.11);
-  --marketing-border-strong: rgba(212, 171, 115, 0.22);
-  --marketing-border-reverse: rgba(255, 241, 223, 0.14);
-  --marketing-accent: #3b82f6;
-  --marketing-accent-soft: #60a5fa;
+  --marketing-text: #f3f0e8;
+  --marketing-text-soft: rgba(211, 224, 215, 0.82);
+  --marketing-text-muted: rgba(156, 170, 163, 0.64);
+  --marketing-text-reverse: #f3f0e8;
+  --marketing-text-reverse-soft: rgba(211, 224, 215, 0.72);
+  --marketing-border: rgba(233, 241, 232, 0.11);
+  --marketing-border-strong: rgba(255, 77, 0, 0.24);
+  --marketing-border-reverse: rgba(233, 241, 232, 0.16);
+  --marketing-accent: #ff4d00;
+  --marketing-accent-soft: #ffb199;
   --marketing-shadow: 0 28px 80px rgba(2, 2, 5, 0.28);
   position: relative;
   min-height: 100vh;
@@ -34,28 +34,28 @@
 
 .homePage {
   background:
-    radial-gradient(circle at 14% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 14% 0%, rgba(255, 77, 0, 0.14), transparent 24rem),
     radial-gradient(circle at 86% 12%, rgba(137, 120, 184, 0.12), transparent 28rem),
     linear-gradient(180deg, #111014 0%, #08070b 100%);
 }
 
 .publicPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
-    radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.1), transparent 28rem),
-    linear-gradient(180deg, #111014 0 28rem, #0c0b10 28rem 38rem, var(--marketing-bg) 38rem 100%);
+    radial-gradient(circle at 12% 0%, rgba(255, 77, 0, 0.09), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(49, 93, 74, 0.16), transparent 28rem),
+    linear-gradient(180deg, #0a0a09 0 28rem, #11110f 28rem 38rem, var(--marketing-bg) 38rem 100%);
 }
 
 .downloadPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 12% 0%, rgba(255, 77, 0, 0.14), transparent 24rem),
     radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
     linear-gradient(180deg, #111014 0%, #0c0b10 46rem, #08070b 100%);
 }
 
 .releasesPage {
   background:
-    radial-gradient(circle at 12% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 12% 0%, rgba(255, 77, 0, 0.14), transparent 24rem),
     radial-gradient(circle at 88% 0%, rgba(137, 120, 184, 0.12), transparent 30rem),
     linear-gradient(180deg, #111014 0%, #0c0b10 58rem, #08070b 100%);
 }
@@ -86,7 +86,7 @@
   border-radius: 0.9rem;
   border: 1px solid rgba(248, 247, 245, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.22), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(255, 77, 0, 0.22), transparent 72%),
     linear-gradient(180deg, rgba(16, 20, 30, 0.92), rgba(5, 7, 11, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
@@ -96,7 +96,7 @@
 .brandLight .brandMarkWrap {
   border-color: rgba(19, 26, 36, 0.12);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.16), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(255, 77, 0, 0.16), transparent 72%),
     linear-gradient(180deg, rgba(19, 26, 36, 0.96), rgba(8, 10, 14, 0.98));
 }
 
@@ -172,7 +172,7 @@
   border-radius: 1rem;
   border: 1px solid rgba(255, 240, 221, 0.16);
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.18), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(255, 77, 0, 0.18), transparent 72%),
     linear-gradient(180deg, rgba(49, 35, 28, 0.98), rgba(20, 14, 11, 1));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
@@ -255,7 +255,7 @@
 
 .publicRailLink:hover {
   transform: translateY(-1px);
-  background: rgba(212, 171, 115, 0.16);
+  background: rgba(255, 77, 0, 0.16);
   border-color: rgba(255, 240, 221, 0.22);
 }
 
@@ -427,18 +427,18 @@
 }
 
 .buttonPrimary {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.4) 0%, var(--marketing-accent) 100%);
-  color: #eff6ff;
+  background: var(--marketing-accent, #ff4d00);
+  color: #0a0a09;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 18px 42px rgba(30, 64, 175, 0.25);
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 18px 42px rgba(255, 77, 0, 0.12);
 }
 
 .buttonPrimary:hover {
-  background: linear-gradient(135deg, rgba(147, 197, 253, 0.5) 0%, #2563eb 100%);
+  background: var(--marketing-accent-soft, #f3f0e8);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 24px 50px rgba(30, 64, 175, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 24px 50px rgba(255, 77, 0, 0.16);
 }
 
 .buttonSecondary {
@@ -458,7 +458,7 @@
 }
 
 .buttonGhost:hover {
-  background: rgba(212, 171, 115, 0.14);
+  background: rgba(255, 77, 0, 0.14);
 }
 
 .utilityLinks {
@@ -616,6 +616,13 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.input::placeholder,
+.textarea::placeholder,
+.select::placeholder {
+  color: #5f5d59;
+  opacity: 1;
+}
+
 .textarea {
   min-height: 10rem;
   resize: vertical;
@@ -625,8 +632,8 @@
 .textarea:focus,
 .select:focus {
   outline: none;
-  border-color: rgba(212, 171, 115, 0.82);
-  box-shadow: 0 0 0 3px rgba(212, 171, 115, 0.14);
+  border-color: rgba(255, 77, 0, 0.82);
+  box-shadow: 0 0 0 3px rgba(255, 77, 0, 0.14);
 }
 
 .error,
@@ -681,9 +688,9 @@
 .routeDarkSection {
   padding: clamp(6rem, 9vw, 7.8rem) 0 clamp(3rem, 6vw, 4.5rem);
   background:
-    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.22), transparent 24rem),
-    radial-gradient(circle at 86% 10%, rgba(212, 171, 115, 0.11), transparent 28rem),
-    linear-gradient(180deg, #18110d 0%, #2a1e17 100%);
+    radial-gradient(circle at 16% 0%, rgba(255, 77, 0, 0.1), transparent 24rem),
+    radial-gradient(circle at 86% 10%, rgba(49, 93, 74, 0.18), transparent 28rem),
+    linear-gradient(180deg, #0a0a09 0%, #11110f 100%);
   color: var(--marketing-text-reverse);
 }
 
@@ -692,8 +699,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 82% 24%, rgba(212, 171, 115, 0.12), transparent 26rem),
-    radial-gradient(circle at 22% 18%, rgba(212, 171, 115, 0.12), transparent 18rem);
+    radial-gradient(circle at 82% 24%, rgba(255, 77, 0, 0.06), transparent 26rem),
+    radial-gradient(circle at 22% 18%, rgba(49, 93, 74, 0.12), transparent 18rem);
   opacity: 0.9;
   animation: ambientShift 18s ease-in-out infinite;
   pointer-events: none;
@@ -714,15 +721,15 @@
 
 .routeLightSection {
   --marketing-surface-soft: rgba(255, 251, 244, 0.72);
-  --marketing-text: #2c1d15;
-  --marketing-text-soft: rgba(57, 36, 22, 0.82);
-  --marketing-text-muted: rgba(77, 58, 45, 0.62);
-  --marketing-border: rgba(73, 46, 26, 0.12);
-  --marketing-border-strong: rgba(139, 99, 59, 0.24);
+  --marketing-text: #11110f;
+  --marketing-text-soft: rgba(7, 16, 11, 0.78);
+  --marketing-text-muted: rgba(49, 93, 74, 0.62);
+  --marketing-border: rgba(7, 16, 11, 0.12);
+  --marketing-border-strong: rgba(49, 93, 74, 0.24);
   --marketing-shadow: 0 24px 64px rgba(10, 8, 10, 0.12);
   padding: clamp(1.5rem, 3vw, 2.3rem) 0 clamp(4rem, 8vw, 5.5rem);
   background:
-    linear-gradient(180deg, rgba(255, 247, 235, 0.62), rgba(245, 237, 225, 0.96) 6rem),
+    linear-gradient(180deg, rgba(233, 241, 232, 0.76), rgba(233, 241, 232, 0.98) 6rem),
     var(--marketing-bg);
   color: var(--marketing-text);
 }
@@ -847,7 +854,7 @@
   min-height: 100%;
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 16% 0%, rgba(212, 171, 115, 0.14), transparent 16rem),
+    radial-gradient(circle at 16% 0%, rgba(255, 77, 0, 0.14), transparent 16rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.96), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.24);
   min-height: 14.5rem;
@@ -864,7 +871,7 @@
 .routeDownloadCard .routeCardIcon {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.18), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(255, 77, 0, 0.18), transparent 70%),
     rgba(255, 255, 255, 0.04);
 }
 
@@ -877,7 +884,7 @@
 .routeArtifactPanel {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.14), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(255, 77, 0, 0.14), transparent 22rem),
     linear-gradient(180deg, rgba(15, 19, 28, 0.94), rgba(8, 10, 16, 0.98));
   box-shadow: 0 26px 60px rgba(2, 7, 18, 0.22);
 }
@@ -965,7 +972,7 @@
 .routeHeroPanel {
   border-color: rgba(248, 247, 245, 0.12);
   background:
-    radial-gradient(circle at 18% 0%, rgba(212, 171, 115, 0.16), transparent 22rem),
+    radial-gradient(circle at 18% 0%, rgba(255, 77, 0, 0.16), transparent 22rem),
     linear-gradient(180deg, rgba(14, 17, 26, 0.96), rgba(9, 11, 18, 0.98));
   color: var(--marketing-text-reverse);
   box-shadow: 0 30px 80px rgba(3, 8, 20, 0.24);
@@ -1021,7 +1028,7 @@
 
 .routeCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(212, 171, 115, 0.24);
+  border-color: rgba(255, 77, 0, 0.24);
   box-shadow: 0 28px 68px rgba(10, 18, 38, 0.14);
 }
 
@@ -1034,7 +1041,7 @@
   border-radius: 1rem;
   border: 1px solid rgba(7, 7, 7, 0.1);
   background:
-    radial-gradient(circle at 30% 20%, rgba(212, 171, 115, 0.14), transparent 70%),
+    radial-gradient(circle at 30% 20%, rgba(255, 77, 0, 0.14), transparent 70%),
     rgba(7, 7, 7, 0.04);
 }
 
@@ -1052,12 +1059,64 @@
   min-height: clamp(24rem, 40vw, 34rem);
   border-radius: 1.5rem;
   border: 1px solid rgba(248, 247, 245, 0.12);
-  background:
-    radial-gradient(circle at 20% 20%, rgba(92, 165, 255, 0.26), transparent 28%),
-    linear-gradient(180deg, rgba(12, 13, 18, 0.86), rgba(8, 8, 10, 0.98));
+  background: #0a0a09;
   box-shadow: 0 30px 70px rgba(3, 3, 8, 0.32);
-  animation: visualFloat 15s ease-in-out infinite;
+  animation: none;
 }
+
+.operationalVisual {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(1.2rem, 2.2vw, 2rem);
+  background:
+    linear-gradient(rgba(233, 241, 232, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(233, 241, 232, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, rgba(255, 77, 0, 0.14), transparent 38%),
+    #0a0a09;
+  background-size: 4rem 4rem, 4rem 4rem, auto, auto;
+  color: #f3f0e8;
+}
+
+.operationalTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(233, 241, 232, 0.14);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.operationalTopline strong { display: flex; align-items: center; gap: 0.45rem; color: #ff4d00; }
+.operationalTopline i { width: 0.45rem; height: 0.45rem; background: currentColor; border-radius: 50%; box-shadow: 0 0 1rem currentColor; }
+
+.operationalBody {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(14rem, 1.1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: end;
+  padding: clamp(2rem, 6vw, 5rem) 0;
+}
+
+.operationalMetric { align-self: center; }
+.operationalMetric span { display: block; color: rgba(233, 241, 232, 0.55); font-family: var(--font-mono), monospace; font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.operationalMetric b { display: block; margin-top: 0.5rem; color: #ff4d00; font-family: var(--font-site-display), serif; font-size: clamp(4.2rem, 8vw, 8rem); font-weight: 400; line-height: 0.8; letter-spacing: -0.08em; }
+
+.operationalRows { border-top: 1px solid rgba(233, 241, 232, 0.14); }
+.operationalRows > div { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center; min-height: 4.6rem; border-bottom: 1px solid rgba(233, 241, 232, 0.14); }
+.operationalRows span, .operationalRows i { color: rgba(233, 241, 232, 0.48); font-family: var(--font-mono), monospace; font-size: 0.6rem; font-style: normal; letter-spacing: 0.12em; text-transform: uppercase; }
+.operationalRows strong { font-size: 0.92rem; font-weight: 500; }
+.operationalRows i { color: #ff4d00; }
+
+.operationalTrace { display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; height: 1rem; }
+.operationalTrace::before { content: ''; position: absolute; right: 2rem; bottom: 2.45rem; left: 2rem; height: 1px; background: rgba(255, 77, 0, 0.34); }
+.operationalTrace span { position: relative; z-index: 1; width: 0.55rem; height: 0.55rem; border: 1px solid #ff4d00; background: #0a0a09; transform: rotate(45deg); }
+.operationalTrace span:last-child { justify-self: end; background: #ff4d00; }
 
 .routeVisualGlow {
   position: absolute;
@@ -1065,7 +1124,7 @@
   width: 16rem;
   height: 16rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(212, 171, 115, 0.24), transparent 64%);
+  background: radial-gradient(circle, rgba(255, 77, 0, 0.24), transparent 64%);
   filter: blur(4px);
   pointer-events: none;
   animation: glowPulse 10s ease-in-out infinite;
@@ -1107,7 +1166,7 @@
   position: sticky;
   top: 2rem;
   background:
-    radial-gradient(circle at 20% 0%, rgba(212, 171, 115, 0.08), transparent 20rem),
+    radial-gradient(circle at 20% 0%, rgba(255, 77, 0, 0.08), transparent 20rem),
     rgba(255, 255, 255, 0.88);
 }
 
@@ -1188,7 +1247,7 @@
   padding: clamp(2.5rem, 6vw, 4rem);
   border-radius: 1.8rem;
   background:
-    radial-gradient(circle at 50% 0%, rgba(212, 171, 115, 0.14), transparent 24rem),
+    radial-gradient(circle at 50% 0%, rgba(255, 77, 0, 0.14), transparent 24rem),
     linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(236, 223, 205, 0.94));
   border: 1px solid rgba(58, 38, 25, 0.08);
   box-shadow: 0 30px 80px rgba(50, 28, 16, 0.12);
@@ -1297,13 +1356,15 @@
   border-radius: 1.25rem;
   overflow: hidden;
   border: 1px solid rgba(248, 247, 245, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  background: #0a0a09;
   box-shadow: 0 24px 64px rgba(3, 3, 8, 0.28);
 }
 
 .contactHeroImage {
   object-fit: contain;
 }
+
+.contactHeroCopy .intro { align-items: center; }
 
 @media (min-width: 768px) {
   .splitGrid {
@@ -1584,4 +1645,57 @@
   .footerBottom {
     animation: none;
   }
+}
+
+/* 2026 public system: paper / ink / signal. */
+.publicPage { background: #f3f0e8; color: #0a0a09; }
+.publicPage .routeDarkSection, .publicPage .routeLightSection { padding: clamp(5rem, 10vw, 11rem) 0; background: #f3f0e8; color: #0a0a09; }
+.publicPage .routeDarkSection { border-bottom: 1px solid #0a0a09; }
+.publicPage .shell { width: min(100% - 3rem, 112rem); }
+.publicPage .routeDownloadStage, .publicPage .contactHeroStage { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(24rem, .85fr); gap: clamp(3rem, 8vw, 10rem); align-items: end; min-height: 36rem; }
+.publicPage .routeHeroMain, .publicPage .contactHeroCopy { align-self: end; }
+.publicPage .eyebrow, .publicPage .eyebrowOnDark { color: #c83b00; font-family: var(--font-mono), monospace; font-size: .65rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.publicPage .displayTitle, .publicPage .darkText, .publicPage .contactHeroTitle { max-width: 10ch; color: #0a0a09; font-family: var(--font-site-body), sans-serif; font-size: clamp(4.5rem, 8vw, 9rem); font-weight: 700; line-height: .82; letter-spacing: -.085em; }
+.publicPage .displayAccent { color: inherit; }
+.publicPage .displayAccent { font-family: var(--font-site-body), sans-serif; font-size: .42em; font-weight: 650; line-height: .9; letter-spacing: -.055em; }
+.publicPage .bodyText, .publicPage .bodyTextOnDark, .publicPage .contactHeroBody { max-width: 35rem; color: rgba(10,10,9,.72); font-size: 1rem; line-height: 1.65; }
+.publicPage .buttonPrimary, .publicPage .buttonGhost { min-height: 3.5rem; padding: 0 1.25rem; border: 1px solid #0a0a09; border-radius: 0; box-shadow: none; font-family: var(--font-mono), monospace; font-size: .64rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.publicPage .buttonPrimary { background: #0a0a09; color: #f3f0e8; }
+.publicPage .buttonPrimary:hover { background: #ff4d00; color: #0a0a09; transform: none; }
+.publicPage .buttonGhost { background: transparent; color: #0a0a09; }
+.publicPage .buttonGhost:hover { background: #ff4d00; color: #0a0a09; transform: none; }
+.publicPage .routeDownloadMeta { border-top: 1px solid #0a0a09; color: rgba(10,10,9,.66); }
+.publicPage .routeDownloadMetaItem, .publicPage .routeDownloadMetaItem span, .publicPage .inlineLink { color: #0a0a09; }
+.publicPage .inlineLink { text-decoration-color: #ff4d00; }
+.routePoster { display: grid; align-self: stretch; border-top: 1px solid #0a0a09; border-left: 1px solid #0a0a09; background: #ff4d00; }
+.routePoster span { display: grid; grid-template-columns: 3rem 1fr; align-items: center; padding: 1.5rem; border-right: 1px solid #0a0a09; border-bottom: 1px solid #0a0a09; font-family: var(--font-site-body), sans-serif; font-size: clamp(2.5rem, 5vw, 5rem); font-style: normal; font-weight: 700; letter-spacing: -.065em; }
+.routePoster i { font-family: var(--font-mono), monospace; font-size: .6rem; font-style: normal; letter-spacing: .12em; }
+.publicPage .routeVisualFrame, .publicPage .contactHeroImageWrap { min-height: 28rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.publicPage .routeReleaseBand, .publicPage .routeHeroPanel, .publicPage .panel, .publicPage .panelDark, .publicPage .routeFormPanel { border: 1px solid #0a0a09; border-radius: 0; background: transparent; color: #0a0a09; box-shadow: none; }
+.publicPage .routeReleaseBand { margin-top: clamp(5rem, 10vw, 10rem); }
+.publicPage .routeDownloadCards { gap: 0; }
+.publicPage .routeCard { border-right-width: 0; }
+.publicPage .routeReleaseCards .routeCard:nth-child(2n) { border-right-width: 1px; }
+.publicPage .routeCard:last-child { border-right-width: 1px; }
+.publicPage .routeCardTitle, .publicPage .sectionTitle, .publicPage .surfaceListItem, .publicPage .surfaceListItemDark { color: #0a0a09; }
+.publicPage .routeCardIcon { border-radius: 0; background: #ff4d00; color: #0a0a09; }
+.publicPage .routeArtifactPanel .routeMetaLabel, .publicPage .routeArtifactPanel .routeMetaValue { color: #0a0a09; }
+.inlineLink { display: inline-flex; min-height: 44px; align-items: center; }
+.publicPage .fieldLabel { color: #0a0a09; }
+.publicPage .input, .publicPage .select, .publicPage .textarea { border: 1px solid rgba(10,10,9,.35); border-radius: 0; background: transparent; color: #0a0a09; }
+.publicPage .input::placeholder, .publicPage .select::placeholder, .publicPage .textarea::placeholder { color: #5f5d59; opacity: 1; }
+.publicPage .input:focus, .publicPage .select:focus, .publicPage .textarea:focus { border-color: #ff4d00; box-shadow: 0 0 0 1px #ff4d00; }
+
+.releaseVersion { margin-left: .12em; }
+
+@media (max-width: 900px) {
+  .publicPage .routeDownloadStage, .publicPage .contactHeroStage { grid-template-columns: 1fr; }
+  .publicPage .routeVisualFrame, .publicPage .contactHeroImageWrap { min-height: 20rem; }
+}
+
+@media (max-width: 600px) {
+  .publicPage .shell { width: min(100% - 2rem, 112rem); }
+  .publicPage .displayTitle, .publicPage .darkText, .publicPage .contactHeroTitle { font-size: clamp(4rem, 19vw, 6rem); }
+  .publicPage .routeCard { border-right-width: 1px; border-bottom-width: 0; }
+  .publicPage .routeCard:last-child { border-bottom-width: 1px; }
 }

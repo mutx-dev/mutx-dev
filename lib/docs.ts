@@ -124,6 +124,9 @@ export function flatNav(items: DocNavItem[]): DocNavItem[] {
 }
 
 export function summaryHrefToDocsRoute(href: string): string | null {
+  if (href === "docs/sdk.md") return "/sdk";
+  if (href === "support.md" || href === "docs/support.md") return "/support";
+
   // GitBook maps docs/api/* → /docs/reference/* (api/ dir → /reference URL path)
   // e.g. docs/api/reference.md → /docs/reference
   // e.g. docs/api/authentication.md → /docs/reference/authentication
@@ -157,7 +160,7 @@ export function getDocSitemapRoutes(): string[] {
 
   for (const item of flatNav(parseSummary())) {
     const route = summaryHrefToDocsRoute(item.href);
-    if (route) {
+    if (route?.startsWith("/docs")) {
       seen.add(route);
     }
   }

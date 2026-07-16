@@ -88,7 +88,7 @@ export default function AIAgentGovernancePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <div className={`${core.page} ${core.publicPage}`}>
-        <main className={core.main}>
+        <main id="main-content" className={core.main}>
           {/* Poster hero */}
           <section className={feat.heroSection}>
             <div className={feat.heroStage}>

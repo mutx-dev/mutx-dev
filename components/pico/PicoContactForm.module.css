@@ -32,6 +32,11 @@
   color: var(--pico-text);
 }
 
+.modal:focus-visible {
+  outline: 3px solid var(--pico-accent-bright);
+  outline-offset: 4px;
+}
+
 /* --- Close button ------------------------------------------------- */
 .closeBtn {
   position: absolute;
@@ -149,9 +154,10 @@
 
 .input:focus-visible,
 .textarea:focus-visible {
-  border-color: rgba(var(--pico-accent-rgb), 0.42);
-  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
-  outline: none;
+  border-color: var(--pico-accent-bright);
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.22);
+  outline: 2px solid var(--pico-accent-bright);
+  outline-offset: 2px;
 }
 
 /* --- Radix Select ------------------------------------------------- */
@@ -179,9 +185,10 @@
 
 .selectTrigger[data-state="open"],
 .selectTrigger:focus-visible {
-  border-color: rgba(var(--pico-accent-rgb), 0.42);
-  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
-  outline: none;
+  border-color: var(--pico-accent-bright);
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.22);
+  outline: 2px solid var(--pico-accent-bright);
+  outline-offset: 2px;
 }
 
 .selectIcon {
@@ -229,11 +236,18 @@
 }
 
 .closeBtn:focus-visible,
-.selectItem:focus-visible,
 .submit:focus-visible,
 .successBtn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.16);
+  outline: 3px solid var(--pico-accent-bright);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--pico-bg-raised);
+}
+
+.selectItem:focus-visible,
+.selectItem[data-highlighted] {
+  outline: 2px solid var(--pico-accent-bright);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 2px rgba(var(--pico-accent-rgb), 0.22);
 }
 
 .selectItem[data-highlighted] {

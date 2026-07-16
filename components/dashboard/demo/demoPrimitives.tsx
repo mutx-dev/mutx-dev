@@ -569,7 +569,7 @@ export function SectionIntroBar({
 }) {
   return (
     <section className="relative overflow-hidden rounded-[22px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(15,21,29,0.96)_0%,rgba(8,12,17,0.98)_100%)] px-4 py-4 shadow-[0_24px_90px_rgba(2,6,12,0.24)]">
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-[38%] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.12),transparent_72%)]" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-[38%] bg-[radial-gradient(circle_at_center,rgba(255, 77, 0,0.12),transparent_72%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.24)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.24)_1px,transparent_1px)] [background-size:40px_40px]" />
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">

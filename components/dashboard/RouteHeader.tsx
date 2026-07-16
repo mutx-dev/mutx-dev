@@ -24,13 +24,13 @@ interface RouteHeaderProps {
 function getStatToneClass(tone: RouteHeaderStat["tone"]) {
   switch (tone) {
     case "success":
-      return "border-[#2563eb]/40 bg-[#0f1f3c] text-[#dbeafe]";
+      return "border-[#72ad12]/40 bg-[#0b1710] text-[#f3f0e8]";
     case "warning":
       return "border-amber-400/30 bg-amber-500/10 text-amber-200";
     case "danger":
       return "border-rose-400/30 bg-rose-500/10 text-rose-200";
     default:
-      return "border-[#2b436e] bg-[#0d1728] text-[#dbeafe]";
+      return "border-[#7a2d10] bg-[#11110f] text-[#f3f0e8]";
   }
 }
 
@@ -38,7 +38,7 @@ export function RouteHeader({
   title,
   description,
   icon: Icon,
-  iconTone = "text-[#dbeafe] bg-[#16233a] border-[#315487]",
+  iconTone = "text-[#f3f0e8] bg-[#111b16] border-[#7a2d10]",
   badge,
   stats = [],
   className,
@@ -53,7 +53,7 @@ export function RouteHeader({
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background:
-          "radial-gradient(circle at top right, rgba(96,165,250,0.14), transparent 22%), linear-gradient(180deg, rgba(20,29,45,0.98) 0%, rgba(8,12,20,0.98) 100%)",
+          "radial-gradient(circle at top right, rgba(255, 77, 0,0.14), transparent 22%), linear-gradient(180deg, rgba(20,29,45,0.98) 0%, rgba(8,12,20,0.98) 100%)",
       }}
     >
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1.4fr)_minmax(260px,0.6fr)]">

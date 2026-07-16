@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -66,7 +66,7 @@ function DashboardNav({ navigateToPanel, onNavigate, pathname, prefetchPanel }: 
       {DASHBOARD_NAV_GROUPS.map((group) => (
         <div key={group.key} className="space-y-1">
           {group.title ? (
-            <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7f97bf]">
+            <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#7e8e86]">
               {group.title}
             </p>
           ) : null}
@@ -93,22 +93,23 @@ function DashboardNav({ navigateToPanel, onNavigate, pathname, prefetchPanel }: 
                 onFocus={() => prefetchPanel(panel)}
                 onMouseEnter={() => prefetchPanel(panel)}
                 title={item.description}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-[16px] px-3.5 py-3 text-[13px] transition-all duration-150",
+                  "group relative flex items-center gap-3 px-3.5 py-3 text-[13px] transition-all duration-150",
                   isActive
-                    ? "bg-[linear-gradient(180deg,rgba(59,130,246,0.18)_0%,rgba(29,78,216,0.24)_100%)] text-[#f4f8ff] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                    : "text-[#a8bfdc] hover:bg-[#152033] hover:text-[#f4f8ff]",
+                    ? "bg-[rgba(255,77,0,0.16)] text-[#f3f0e8]"
+                    : "text-[#a8aaa4] hover:bg-[#171715] hover:text-[#f3f0e8]",
                 )}
               >
                 {isActive ? (
-                  <span className="absolute inset-y-2 left-1 w-[3px] rounded-full bg-[#60a5fa]" />
+                  <span className="absolute inset-y-2 left-1 w-[3px] rounded-full bg-[#ff4d00]" />
                 ) : null}
                 <span
                   className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] transition-colors",
+                    "flex h-8 w-8 shrink-0 items-center justify-center transition-colors",
                     isActive
-                      ? "bg-[#162235] text-[#dbeafe]"
-                      : "bg-[#0f1728] text-[#7f97bf] group-hover:text-[#dbeafe]",
+                      ? "bg-[#171715] text-[#ff4d00]"
+                      : "bg-[#11110f] text-[#7e8e86] group-hover:text-[#f3f0e8]",
                   )}
                 >
                   <item.icon className="h-[15px] w-[15px] shrink-0" />
@@ -136,6 +137,9 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
   const [clockLabel, setClockLabel] = useState("--:--");
   const [actionBusy, setActionBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const appShellRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const closeDrawerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat(undefined, {
@@ -158,15 +162,48 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
   useEffect(() => {
     if (!mobileOpen) return;
 
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const appShell = appShellRef.current;
+    const previousOverflow = document.body.style.overflow;
+    appShell?.setAttribute("inert", "");
+    document.body.style.overflow = "hidden";
+    window.requestAnimationFrame(() => closeDrawerRef.current?.focus());
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMobileOpen(false);
+        return;
+      }
+
+      if (event.key === "Tab" && drawerRef.current) {
+        const focusable = Array.from(
+          drawerRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((element) => !element.hasAttribute("disabled"));
+
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
 
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      appShell?.removeAttribute("inert");
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
   }, [mobileOpen]);
 
   const shellCopy = useMemo(() => {
@@ -225,41 +262,54 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
         ? [
             {
               label: "Shell Resolving",
-              tone: "border-[rgba(96,165,250,0.28)] bg-[rgba(59,130,246,0.14)] text-[#dbeafe]",
+              tone: "border-[rgba(255, 77, 0,0.28)] bg-[rgba(255, 77, 0,0.14)] text-[#f3f0e8]",
             },
           ]
-        : [
+        : !isDesktop
+          ? [
+              {
+                label: "Web workspace",
+                tone: "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#f3f0e8]",
+              },
+              {
+                label: status.user?.email ? "Signed in" : "Not signed in",
+                tone: status.user?.email
+                  ? "border-[rgba(255,77,0,0.28)] bg-[rgba(255,77,0,0.14)] text-[#f3f0e8]"
+                  : "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#b6caea]",
+              },
+            ]
+          : [
             {
               label: status.mode === "local" ? "Local" : status.mode === "hosted" ? "Hosted" : "Unknown",
               tone:
                 status.mode === "local"
-                  ? "border-[rgba(96,165,250,0.28)] bg-[rgba(59,130,246,0.14)] text-[#dbeafe]"
-                  : "border-[rgba(191,219,254,0.12)] bg-[#111827] text-[#bfdbfe]",
+                  ? "border-[rgba(255, 77, 0,0.28)] bg-[rgba(255, 77, 0,0.14)] text-[#f3f0e8]"
+                  : "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#ffb199]",
             },
             {
               label: `Gateway ${status.openclaw?.health || "unknown"}`,
               tone:
                 status.openclaw?.health === "healthy" || status.openclaw?.health === "running"
-                  ? "border-[rgba(96,165,250,0.28)] bg-[rgba(59,130,246,0.14)] text-[#dbeafe]"
-                  : "border-[rgba(96,165,250,0.2)] bg-[rgba(37,99,235,0.12)] text-[#bfdbfe]",
+                  ? "border-[rgba(255, 77, 0,0.28)] bg-[rgba(255, 77, 0,0.14)] text-[#f3f0e8]"
+                  : "border-[rgba(255, 77, 0,0.2)] bg-[rgba(114,173,18,0.12)] text-[#ffb199]",
             },
             {
               label: status.faramesh?.available ? "Governance Active" : "Governance Idle",
               tone: status.faramesh?.available
-                ? "border-[rgba(96,165,250,0.28)] bg-[rgba(59,130,246,0.14)] text-[#dbeafe]"
-                : "border-[rgba(191,219,254,0.12)] bg-[#111827] text-[#b6caea]",
+                ? "border-[rgba(255, 77, 0,0.28)] bg-[rgba(255, 77, 0,0.14)] text-[#f3f0e8]"
+                : "border-[rgba(233,241,232,0.12)] bg-[#111827] text-[#b6caea]",
             },
             {
               label: `Bridge ${status.bridge?.state || "unknown"}`,
               tone:
                 status.bridge?.state === "ready"
-                  ? "border-[rgba(96,165,250,0.28)] bg-[rgba(59,130,246,0.14)] text-[#dbeafe]"
+                  ? "border-[rgba(255, 77, 0,0.28)] bg-[rgba(255, 77, 0,0.14)] text-[#f3f0e8]"
                   : status.bridge?.state === "starting" || status.bridge?.state === "restarting"
-                    ? "border-[rgba(96,165,250,0.24)] bg-[rgba(37,99,235,0.12)] text-[#bfdbfe]"
+                    ? "border-[rgba(255, 77, 0,0.24)] bg-[rgba(114,173,18,0.12)] text-[#ffb199]"
                     : "border-[rgba(215,125,99,0.26)] bg-[rgba(69,29,24,0.42)] text-[#ffc6b5]",
             },
           ],
-    [platformReady, status]
+    [isDesktop, platformReady, status]
   );
 
   const activeItem = useMemo(
@@ -339,7 +389,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
 
   const sidebarBrand = (
     <div className="flex items-center gap-3">
-      <div className="relative flex h-12 w-12 items-center justify-center rounded-[18px] border border-[rgba(191,219,254,0.12)] bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.18),transparent_42%),linear-gradient(180deg,#172235_0%,#0a0f18_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_14px_30px_rgba(2,2,5,0.28)]">
+      <div className="relative flex h-12 w-12 items-center justify-center rounded-[14px] border border-[rgba(233,241,232,0.12)] bg-[#11110f]">
         <Image
           src="/logo-transparent-v2.png"
           alt="MUTX"
@@ -351,23 +401,23 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
       </div>
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
-          <p className="truncate font-[family:var(--font-site-display)] text-[1.08rem] font-semibold tracking-[-0.04em] text-[#f4f8ff]">
+          <p className="truncate font-[family:var(--font-site-display)] text-[1.08rem] font-semibold tracking-[-0.04em] text-[#f3f0e8]">
             MUTX
           </p>
         </div>
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#93c5fd]">Workspace</p>
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#ffb199]">Workspace</p>
       </div>
     </div>
   );
 
   const sidebarFooter = (
-    <div className="mt-auto border-t border-[rgba(191,219,254,0.08)] p-3">
-      <div className="rounded-[24px] border border-[rgba(191,219,254,0.1)] bg-[linear-gradient(180deg,#121a29_0%,#0a0f18_100%)] px-3.5 py-4">
+    <div className="mt-auto border-t border-[rgba(233,241,232,0.08)] p-3">
+      <div className="border border-[rgba(233,241,232,0.1)] bg-[#11110f] px-3.5 py-4">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#93c5fd]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ffb199]">
             Runtime status
           </p>
-          <span className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#0f1728] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#dbeafe]">
+          <span className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#11110f] px-2.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-[#f3f0e8]">
             {isDesktop ? "desktop" : "web"}
           </span>
         </div>
@@ -381,27 +431,42 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
         </p>
 
         <div className="mt-4 space-y-2 text-xs text-[#c8daf4]">
-          <div className="flex items-center justify-between border-t border-[rgba(191,219,254,0.08)] pt-3">
-            <span className="flex items-center gap-2">
-              <Activity className="h-3.5 w-3.5 text-[#60a5fa]" />
-              Gateway
-            </span>
-            <span className="text-[#9bb4d6]">{status.openclaw?.health || "unknown"}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Shield className="h-3.5 w-3.5 text-[#7dd3fc]" />
-              Governance
-            </span>
-            <span className="text-[#9bb4d6]">{status.faramesh?.available ? "active" : "idle"}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Server className="h-3.5 w-3.5 text-[#93c5fd]" />
-              Local stack
-            </span>
-            <span className="text-[#9bb4d6]">{status.localControlPlane?.ready ? "online" : "stopped"}</span>
-          </div>
+          {isDesktop ? (
+            <>
+              <div className="flex items-center justify-between border-t border-[rgba(233,241,232,0.08)] pt-3">
+                <span className="flex items-center gap-2">
+                  <Activity className="h-3.5 w-3.5 text-[#ff4d00]" />
+                  Gateway
+                </span>
+                <span className="text-[#9bb4d6]">{status.openclaw?.health || "unknown"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Shield className="h-3.5 w-3.5 text-[#7dd3fc]" />
+                  Governance
+                </span>
+                <span className="text-[#9bb4d6]">{status.faramesh?.available ? "active" : "idle"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Server className="h-3.5 w-3.5 text-[#ffb199]" />
+                  Local stack
+                </span>
+                <span className="text-[#9bb4d6]">{status.localControlPlane?.ready ? "online" : "stopped"}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center justify-between border-t border-[rgba(233,241,232,0.08)] pt-3">
+                <span>Account</span>
+                <span className="text-[#9bb4d6]">{status.user?.email ? "signed in" : "not signed in"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Desktop controls</span>
+                <span className="text-[#9bb4d6]">MUTX.app only</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -413,7 +478,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
 
   return (
     <div
-      className="dashboard-app min-h-screen bg-[#070b13] text-[#f4f8ff]"
+      className="dashboard-app min-h-screen bg-[#070b13] text-[#f3f0e8]"
       style={
         isDesktop
           ? {
@@ -423,22 +488,26 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
           : undefined
       }
     >
-      <div className="pointer-events-none fixed inset-0 overflow-hidden opacity-70">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_22%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.12),transparent_18%),linear-gradient(180deg,transparent,rgba(0,0,0,0.34))]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(191,219,254,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(191,219,254,0.018)_1px,transparent_1px)] bg-[size:52px_52px] opacity-[0.06]" />
-      </div>
+      <div className="pointer-events-none fixed inset-0 bg-[#0a0a09]" />
 
       {mobileOpen ? (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60 transition-opacity" onClick={() => setMobileOpen(false)} />
 
-          <aside className="absolute left-0 top-0 flex h-full w-80 flex-col border-r border-[rgba(191,219,254,0.08)] bg-[#0b1020] shadow-2xl transition-transform">
-            <div className="flex items-center justify-between border-b border-[rgba(191,219,254,0.08)] px-4 py-4">
+          <aside
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Dashboard navigation"
+            className="absolute left-0 top-0 flex h-full w-80 flex-col border-r border-[rgba(233,241,232,0.08)] bg-[#0a0a09] shadow-2xl transition-transform"
+          >
+            <div className="flex items-center justify-between border-b border-[rgba(233,241,232,0.08)] px-4 py-4">
               <div className="min-w-0">{sidebarBrand}</div>
               <button
+                ref={closeDrawerRef}
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-[14px] border border-[rgba(191,219,254,0.12)] bg-[#101722] p-2 text-[#dbeafe]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] border border-[rgba(233,241,232,0.12)] bg-[#0b1210] p-0 text-[#f3f0e8]"
                 aria-label="Close dashboard sidebar"
               >
                 <X className="h-4 w-4" />
@@ -458,9 +527,9 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
         </div>
       ) : null}
 
-      <div className="relative p-2 sm:p-3">
-        <div className="mx-auto max-w-[1600px] overflow-hidden rounded-[36px] border border-[rgba(191,219,254,0.12)] bg-[linear-gradient(180deg,#0f1728_0%,#070b13_100%)] shadow-[0_38px_120px_rgba(2,2,5,0.58)]">
-          <div className="flex h-12 items-center justify-between border-b border-[rgba(191,219,254,0.08)] bg-[linear-gradient(180deg,#141f33_0%,#0d1422_100%)] px-4">
+      <div ref={appShellRef} className="relative p-2 sm:p-3">
+        <div className="mx-auto max-w-[1600px] overflow-hidden border border-[rgba(233,241,232,0.12)] bg-[#0a0a09]">
+          <div className="flex h-12 items-center justify-between border-b border-[rgba(233,241,232,0.08)] bg-[#11110f] px-4">
             <div className="flex items-center gap-2.5">
               {isDesktop ? (
                 <div className="flex items-center gap-1.5">
@@ -472,35 +541,35 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                 <button
                   type="button"
                   onClick={() => setMobileOpen(true)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-[14px] border border-[rgba(191,219,254,0.12)] bg-[#101722] text-[#dbeafe] lg:hidden"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] border border-[rgba(233,241,232,0.12)] bg-[#0b1210] text-[#f3f0e8] lg:hidden"
                   aria-label="Open dashboard sidebar"
                 >
                   <Menu className="h-4 w-4" />
                 </button>
               )}
               <div className="min-w-0">
-                  <p className="truncate text-[12px] font-semibold tracking-[0.08em] text-[#f4f8ff]">
+                  <p className="truncate text-[12px] font-semibold tracking-[0.08em] text-[#f3f0e8]">
                     {activeItem?.title || "Dashboard"}
                   </p>
-                  <p className="truncate text-[10px] uppercase tracking-[0.22em] text-[#93c5fd]">
+                  <p className="truncate text-[10px] uppercase tracking-[0.22em] text-[#ffb199]">
                     {activeItem?.group === "home" ? "Workspace" : activeItem?.group || "Dashboard"}
                   </p>
                 </div>
               </div>
 
               <div className="hidden items-center gap-2 md:flex">
-              <div className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-3 py-1 text-[11px] text-[#bfdbfe]">
-                {status.user?.email || "desktop session"}
+              <div className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3 py-1 text-[11px] text-[#ffb199]">
+                {status.user?.email || (isDesktop ? "desktop session" : "not signed in")}
               </div>
-              <div className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-3 py-1 font-[family:var(--font-mono)] text-[11px] text-[#dbeafe]">
+              <div className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3 py-1 font-[family:var(--font-mono)] text-[11px] text-[#f3f0e8]">
                 {clockLabel}
               </div>
             </div>
           </div>
 
           <div className="flex min-h-[calc(100vh-1.5rem-3rem)]">
-            <aside className="hidden w-[290px] shrink-0 flex-col border-r border-[rgba(191,219,254,0.08)] bg-[linear-gradient(180deg,#101722_0%,#0a0f18_100%)] lg:flex">
-              <div className="border-b border-[rgba(191,219,254,0.08)] px-4 py-5">{sidebarBrand}</div>
+            <aside className="hidden w-[290px] shrink-0 flex-col border-r border-[rgba(233,241,232,0.08)] bg-[#070706] lg:flex">
+              <div className="border-b border-[rgba(233,241,232,0.08)] px-4 py-5">{sidebarBrand}</div>
               <div className="flex-1 overflow-y-auto px-3 py-3">
                 <DashboardNav
                   navigateToPanel={navigateToPanel}
@@ -511,12 +580,12 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
               {sidebarFooter}
             </aside>
 
-            <div className="flex min-w-0 flex-1 flex-col bg-[linear-gradient(180deg,#0d1422_0%,#070b13_100%)]">
-              <header className="border-b border-[rgba(191,219,254,0.08)] bg-[#0f1728]/92 px-3 py-4 backdrop-blur-xl sm:px-4 lg:px-5">
+            <div className="flex min-w-0 flex-1 flex-col bg-[#11110f]">
+              <header className="border-b border-[rgba(233,241,232,0.08)] bg-[#11110f] px-3 py-4 sm:px-4 lg:px-5">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0 space-y-3">
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#93c5fd]">
-                      <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(96,165,250,0.2)] bg-[rgba(59,130,246,0.12)] px-2.5 py-1 text-[#dbeafe]">
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb199]">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(255, 77, 0,0.2)] bg-[rgba(255, 77, 0,0.12)] px-2.5 py-1 text-[#f3f0e8]">
                         <Sparkles className="h-3.5 w-3.5" />
                         {shellCopy.eyebrow}
                       </span>
@@ -524,19 +593,19 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                     </div>
 
                     <div className="max-w-4xl">
-                      <h1 className="font-[family:var(--font-site-display)] text-[1.6rem] leading-[0.98] tracking-[-0.07em] text-[#f4f8ff] sm:text-[1.95rem]">
+                      <p className="font-[family:var(--font-site-display)] text-[1.6rem] leading-[0.98] tracking-[-0.07em] text-[#f3f0e8] sm:text-[1.95rem]">
                         {shellCopy.title}
-                      </h1>
-                      <p className="mt-2 text-[13px] leading-6 text-[#a9bfde]">
+                      </p>
+                      <p className="mt-2 text-[13px] leading-6 text-[rgba(243,240,232,.72)]">
                         {shellCopy.detail}
                       </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em]">
-                      <span className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-2.5 py-1 text-[#c8daf4]">
+                      <span className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-2.5 py-1 text-[#c8daf4]">
                         {status.user?.email || "session needed"}
                       </span>
-                      <span className="rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-2.5 py-1 text-[#c8daf4]">
+                      <span className="rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-2.5 py-1 text-[#c8daf4]">
                         {activeItem?.title || "Dashboard"}
                       </span>
                       {activeItem?.key &&
@@ -544,7 +613,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                       !DASHBOARD_NAV_GROUPS.some((group) =>
                         group.items.some((item) => item.key === activeItem.key),
                       ) ? (
-                        <span className="rounded-full border border-[rgba(96,165,250,0.24)] bg-[rgba(59,130,246,0.14)] px-2.5 py-1 text-[#dbeafe]">
+                        <span className="rounded-full border border-[rgba(255, 77, 0,0.24)] bg-[rgba(255, 77, 0,0.14)] px-2.5 py-1 text-[#f3f0e8]">
                           preview route
                         </span>
                       ) : null}
@@ -564,9 +633,9 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                       <button
                         type="button"
                         onClick={() => void runDesktopAction("setup")}
-                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-3.5 py-2 text-[12.5px] text-[#dbeafe]"
+                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8]"
                       >
-                        <Settings2 className="h-4 w-4 text-[#60a5fa]" />
+                        <Settings2 className="h-4 w-4 text-[#ff4d00]" />
                         Home
                       </button>
                     ) : null}
@@ -575,7 +644,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                         type="button"
                         onClick={() => void runDesktopAction("tui")}
                         disabled={actionBusy === "tui"}
-                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-3.5 py-2 text-[12.5px] text-[#dbeafe] disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8] disabled:opacity-50"
                       >
                         <TerminalSquare className="h-4 w-4 text-[#7dd3fc]" />
                         TUI
@@ -586,9 +655,9 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                         type="button"
                         onClick={() => void runDesktopAction("workspace")}
                         disabled={actionBusy === "workspace"}
-                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(191,219,254,0.12)] bg-[#101722] px-3.5 py-2 text-[12.5px] text-[#dbeafe] disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(233,241,232,0.12)] bg-[#0b1210] px-3.5 py-2 text-[12.5px] text-[#f3f0e8] disabled:opacity-50"
                       >
-                        <FolderOpen className="h-4 w-4 text-[#93c5fd]" />
+                        <FolderOpen className="h-4 w-4 text-[#ffb199]" />
                         Reveal Workspace
                       </button>
                     ) : null}
@@ -597,7 +666,7 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                         type="button"
                         onClick={() => void runDesktopAction("stack")}
                         disabled={actionBusy === "stack"}
-                        className="inline-flex items-center gap-2 rounded-full border border-[rgba(96,165,250,0.32)] bg-[linear-gradient(180deg,#60a5fa_0%,#2563eb_100%)] px-3.5 py-2 text-[12.5px] font-medium text-[#06111f] disabled:opacity-50"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#ff4d00] bg-[#ff4d00] px-3.5 py-2 text-[12.5px] font-medium text-[#0a0a09] disabled:opacity-50"
                       >
                         <StackActionIcon className="h-4 w-4" />
                         {stackActionLabel}
@@ -613,19 +682,28 @@ export function DashboardShell({ children, spaShellEnabled }: DashboardShellProp
                 ) : null}
               </header>
 
-              <main className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">{children}</main>
+              <main id="main-content" className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">{children}</main>
 
-              <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[rgba(191,219,254,0.08)] bg-[#0f1728] px-4 py-2.5 text-[11px] text-[#7f97bf]">
-                <div className="flex min-w-0 flex-wrap items-center gap-3">
-                  <span>{activeItem?.title || "Dashboard"}</span>
-                  <span>{status.mode === "local" ? "local runtime" : status.mode === "hosted" ? "hosted runtime" : "runtime unknown"}</span>
-                  <span>{status.bridge.pythonCommand || "python unresolved"}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span>{status.uiServer?.state || "ui server unknown"}</span>
-                  <span>{status.openclaw?.gatewayUrl || "gateway unavailable"}</span>
-                  <span>{status.localControlPlane?.ready ? "stack online" : "stack offline"}</span>
-                </div>
+              <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[rgba(233,241,232,0.08)] bg-[#11110f] px-4 py-2.5 text-[11px] text-[#7e8e86]">
+                {isDesktop ? (
+                  <>
+                    <div className="flex min-w-0 flex-wrap items-center gap-3">
+                      <span>{activeItem?.title || "Dashboard"}</span>
+                      <span>{status.mode === "local" ? "local runtime" : status.mode === "hosted" ? "hosted runtime" : "runtime unknown"}</span>
+                      <span>{status.bridge.pythonCommand || "python unresolved"}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span>{status.uiServer?.state || "ui server unknown"}</span>
+                      <span>{status.openclaw?.gatewayUrl || "gateway unavailable"}</span>
+                      <span>{status.localControlPlane?.ready ? "stack online" : "stack offline"}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span>{activeItem?.title || "Dashboard"}</span>
+                    <span>{status.user?.email ? "browser account connected" : "sign in to load workspace data"}</span>
+                  </>
+                )}
               </footer>
             </div>
           </div>

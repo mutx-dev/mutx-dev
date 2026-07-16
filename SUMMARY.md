@@ -28,7 +28,7 @@
   * [Debugging](docs/troubleshooting/debugging.md)
   * [FAQ](docs/troubleshooting/faq.md)
 * [Python SDK](docs/sdk.md)
-* [Support](docs/support.md)
+* [Support](support.md)
 * [Release notes](docs/releases/v1.4.md)
 * [Legal and attribution](docs/legal/index.md)
   * [OSS attribution ledger](docs/legal/oss-attribution-ledger.md)

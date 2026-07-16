@@ -26,7 +26,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#09080b',
+  themeColor: '#0a0a09',
 } as const
 
 export const metadata: Metadata = {
@@ -94,15 +94,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://calendly.com" />
         <link rel="dns-prefetch" href="https://calendly.com" />
         <link rel="preconnect" href="https://challenges.cloudflare.com" />
-        <link
-          rel="preload"
-          href="/landing/webp/victory-core.webp"
-          as="image"
-          type="image/webp"
-        />
-        <meta name="theme-color" content="#09080b" />
+        <meta name="theme-color" content="#0a0a09" />
       </head>
       <body className={`${appFontVariables} h-full min-h-screen antialiased`}>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
           <AppDomainDemoIntro />
