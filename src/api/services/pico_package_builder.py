@@ -44,6 +44,14 @@ UPSTREAM_RELEASES = {
         "runtime": "Precompiled release binary",
     },
 }
+PICOCLAW_ANDROID_RELEASE = {
+    "repository": "https://github.com/sipeed/picoclaw_fui",
+    "ref": "picoclaw_fui-v0.1.4",
+    "commit": "d689c94c1b67f625f70ec4111a9aa3f01be9cbb3",
+    "version": "0.1.4",
+    "asset": "picoclaw_fui-android-universal.apk",
+    "sha256": "7700b209deffb26008c5296c6467e9f6426538f162d978a153bc8313cc25c373",
+}
 COMMON_KB_DOCS = ("INSTALL_FLOW.md", "UPDATE_NOTES.md")
 STACK_KB_DOCS = {
     "hermes": "HERMES.md",
@@ -101,22 +109,20 @@ def _build_upstream_lock(state: OnboardingState) -> str:
 
     stack = state.stack or "hermes"
     release = UPSTREAM_RELEASES[stack]
-    return (
-        json.dumps(
-            {
-                "schema_version": 1,
-                "stack": stack,
-                "repository": release["repository"],
-                "ref": release["ref"],
-                "commit": release["commit"],
-                "version": release["version"],
-                "runtime": release["runtime"],
-                "verified_at": "2026-07-16",
-            },
-            indent=2,
-        )
-        + "\n"
-    )
+    document = {
+        "schema_version": 1,
+        "stack": stack,
+        "repository": release["repository"],
+        "ref": release["ref"],
+        "commit": release["commit"],
+        "version": release["version"],
+        "runtime": release["runtime"],
+        "verified_at": "2026-07-16",
+    }
+    if stack == "picoclaw" and state.os == "android":
+        document["android_distribution"] = PICOCLAW_ANDROID_RELEASE
+
+    return json.dumps(document, indent=2) + "\n"
 
 
 def _build_agents_md(state: OnboardingState) -> str:
@@ -192,10 +198,14 @@ def _build_install_sh(state: OnboardingState) -> str:
     elif stack == "picoclaw":
         if os_name == "android":
             lines += [
-                "echo 'Use the signed v0.3.1 Android package from:'",
-                "echo 'https://github.com/sipeed/picoclaw/releases/download/v0.3.1/picoclaw-android-universal.zip'",
-                "echo 'Verify it against picoclaw_0.3.1_checksums.txt before installing.'",
+                "PICOCLAW_FUI_REF='picoclaw_fui-v0.1.4'",
+                "PICOCLAW_FUI_APK='picoclaw_fui-android-universal.apk'",
+                "PICOCLAW_FUI_SHA256='7700b209deffb26008c5296c6467e9f6426538f162d978a153bc8313cc25c373'",
+                "echo 'Download the audited Android APK from:'",
+                'echo "https://github.com/sipeed/picoclaw_fui/releases/download/$PICOCLAW_FUI_REF/$PICOCLAW_FUI_APK"',
+                'echo "Expected SHA-256: $PICOCLAW_FUI_SHA256"',
                 "echo 'Follow https://docs.picoclaw.io/docs/installation/android/ to install it on Android.'",
+                "echo 'After installation, open PicoClaw, tap Start Service, and verify http://127.0.0.1:18800.'",
                 "echo 'Manual installation required: no runtime was installed and setup is not complete.'",
                 "exit 2",
             ]
@@ -345,13 +355,17 @@ def _build_readme(state: OnboardingState) -> str:
         lines += [
             f"### {install_step}. Complete the Android installation manually",
             "",
-            "`install.sh` is an information-only helper. It prints the signed v0.3.1 archive, checksum, and official Android guide, then exits with status 2 so automation cannot mistake guidance for a completed installation.",
+            "`install.sh` is an information-only helper. It prints the pinned PicoClaw FUI v0.1.4 APK URL, its GitHub-published SHA-256 digest, and the official Android guide, then exits with status 2 so automation cannot mistake guidance for a completed installation.",
             "",
-            "Download the release archive and checksum, verify the archive, and follow the official Android guide before continuing.",
+            "Download the APK, verify its SHA-256 against `upstream.lock.json`, and follow the official Android guide before continuing.",
             "",
             "https://docs.picoclaw.io/docs/installation/android/",
             "",
             f"### {verify_step}. Verify on Android",
+            "",
+            "1. Open the installed PicoClaw app.",
+            "2. Tap **Start Service**.",
+            "3. Open `http://127.0.0.1:18800` on the device and confirm the Web UI loads.",
             "",
         ]
     else:
@@ -367,13 +381,14 @@ def _build_readme(state: OnboardingState) -> str:
             "",
         ]
 
-    verify_cmds = {
-        "hermes": 'cd "${HERMES_HOME:-$HOME/.hermes}/hermes-agent" && uv run hermes doctor',
-        "openclaw": "openclaw --version && openclaw gateway status",
-        "nanoclaw": "cd nanoclaw-v2 && docker ps",
-        "picoclaw": 'export PATH="$HOME/.local/bin:$PATH" && picoclaw --version && picoclaw status',
-    }
-    lines.append(f"```bash\n{verify_cmds.get(stack, 'echo check-your-setup')}\n```")
+    if not (stack == "picoclaw" and os_name == "android"):
+        verify_cmds = {
+            "hermes": 'cd "${HERMES_HOME:-$HOME/.hermes}/hermes-agent" && uv run hermes doctor',
+            "openclaw": "openclaw --version && openclaw gateway status",
+            "nanoclaw": "cd nanoclaw-v2 && docker ps",
+            "picoclaw": 'export PATH="$HOME/.local/bin:$PATH" && picoclaw --version && picoclaw status',
+        }
+        lines.append(f"```bash\n{verify_cmds.get(stack, 'echo check-your-setup')}\n```")
 
     lines += [
         "",

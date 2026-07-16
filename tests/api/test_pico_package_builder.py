@@ -320,8 +320,17 @@ class TestPicoClawPackage:
         lock = json.loads(files["upstream.lock.json"])
         assert lock["repository"] == "https://github.com/sipeed/picoclaw"
         assert lock["ref"] == "v0.3.1"
-        assert "picoclaw-android-universal.zip" in files["install.sh"]
-        assert "picoclaw_0.3.1_checksums.txt" in files["install.sh"]
+        android_release = lock["android_distribution"]
+        assert android_release["repository"] == "https://github.com/sipeed/picoclaw_fui"
+        assert android_release["ref"] == "picoclaw_fui-v0.1.4"
+        assert android_release["commit"] == "d689c94c1b67f625f70ec4111a9aa3f01be9cbb3"
+        assert android_release["asset"] == "picoclaw_fui-android-universal.apk"
+        assert (
+            android_release["sha256"]
+            == "7700b209deffb26008c5296c6467e9f6426538f162d978a153bc8313cc25c373"
+        )
+        assert "picoclaw_fui-android-universal.apk" in files["install.sh"]
+        assert "picoclaw-android-universal.zip" not in files["install.sh"]
 
     def test_android_helper_cannot_report_a_false_install_success(self, files):
         install_script = files["install.sh"]
@@ -341,6 +350,13 @@ class TestPicoClawPackage:
         assert "information-only helper" in readme
         assert "exits with status 2" in readme
         assert "https://docs.picoclaw.io/docs/installation/android/" in readme
+
+    def test_android_verification_uses_the_app_service_instead_of_a_desktop_path(self, files):
+        readme = files["README.md"]
+        assert "Tap **Start Service**" in readme
+        assert "http://127.0.0.1:18800" in readme
+        assert 'export PATH="$HOME/.local/bin:$PATH"' not in readme
+        assert "picoclaw --version" not in readme
 
     def test_desktop_package_preserves_the_complete_release_toolset(self):
         state = OnboardingState(
