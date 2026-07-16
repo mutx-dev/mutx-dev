@@ -481,6 +481,18 @@ class MCPDefinitionScanner:
     def _scan_tools(self, tools: Sequence[object]) -> None:
         seen_names: dict[str, int] = {}
         seen_skeletons: dict[str, tuple[str, int]] = {}
+        known_fields = {
+            "annotations",
+            "description",
+            "execution",
+            "icons",
+            "inputSchema",
+            "input_schema",
+            "name",
+            "outputSchema",
+            "output_schema",
+            "title",
+        }
         for index, raw_tool in enumerate(tools):
             if not isinstance(raw_tool, Mapping):
                 continue
@@ -543,6 +555,20 @@ class MCPDefinitionScanner:
                             configured_transport=False,
                             allow_data_image=True,
                         )
+
+            extension_state = [0]
+            for field, extension_value in raw_tool.items():
+                if field in known_fields:
+                    continue
+                escaped_field = str(field).replace("~", "~0").replace("/", "~1")
+                for extension_path, text in _iter_schema_strings(
+                    extension_value,
+                    path=f"{path}/{escaped_field}",
+                    state=extension_state,
+                ):
+                    self._scan_text(text, path=extension_path)
+                    self._scan_urls_in_text(text, extension_path)
+                    self._scan_command(text, extension_path, description_context=True)
 
     def _scan_tool_name(
         self,
