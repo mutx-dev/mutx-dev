@@ -494,7 +494,7 @@ export function DashboardSpaPanelHost() {
             <button
               type='button'
               onClick={dismissBanner}
-              className='rounded-full border border-sky-200/20 bg-[#0f1728] px-3 py-1.5 text-xs font-medium text-sky-100'
+              className='rounded-full border border-sky-200/20 bg-[#11110f] px-3 py-1.5 text-xs font-medium text-sky-100'
             >
               Dismiss
             </button>
@@ -505,7 +505,7 @@ export function DashboardSpaPanelHost() {
       <div className='rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,#101726_0%,#0b1119_100%)] px-4 py-4'>
         <div className='flex flex-wrap items-start justify-between gap-4'>
           <div className='space-y-3'>
-            <div className='flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]'>
+            <div className='flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ffb199]'>
               <span className='rounded-full border border-sky-400/20 bg-sky-400/10 px-2.5 py-1 text-sky-100'>
                 ContentRouter active
               </span>
@@ -528,7 +528,7 @@ export function DashboardSpaPanelHost() {
             <button
               type='button'
               onClick={toggleLiveFeed}
-              className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#101722] px-3 py-2 text-xs font-medium text-slate-100'
+              className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0b1210] px-3 py-2 text-xs font-medium text-slate-100'
             >
               <PanelRight className='h-4 w-4 text-sky-300' />
               {liveFeedOpen ? 'Hide live feed' : 'Show live feed'}
@@ -536,12 +536,12 @@ export function DashboardSpaPanelHost() {
             <button
               type='button'
               onClick={() => setChatPanelOpen(!chatPanelOpen)}
-              className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#101722] px-3 py-2 text-xs font-medium text-slate-100'
+              className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0b1210] px-3 py-2 text-xs font-medium text-slate-100'
             >
               <MessageSquare className='h-4 w-4 text-cyan-300' />
               {chatPanelOpen ? 'Close chat' : 'Open chat'}
             </button>
-            <div className='inline-flex items-center gap-1 rounded-full border border-white/10 bg-[#101722] p-1 text-xs'>
+            <div className='inline-flex items-center gap-1 rounded-full border border-white/10 bg-[#0b1210] p-1 text-xs'>
               <button
                 type='button'
                 onClick={() => setInterfaceMode('essential')}
@@ -572,13 +572,13 @@ export function DashboardSpaPanelHost() {
         </div>
 
         <div className='mt-4 flex flex-wrap items-center gap-2 text-[11px] text-slate-300'>
-          <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+          <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
             {currentUser?.display_name || 'Sign-in pending'}
           </span>
-          <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+          <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
             {subscription || 'free'} subscription
           </span>
-          <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+          <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
             {isEssentialPanel(panel) ? 'Essential panel' : 'Full panel'}
           </span>
         </div>
@@ -599,20 +599,20 @@ export function DashboardSpaPanelHost() {
           <section className='rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,#101726_0%,#0b1119_100%)] p-4'>
             <div className='flex items-center justify-between gap-3'>
               <div>
-                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[#ffb199]'>
                   Live feed
                 </p>
                 <p className='mt-2 text-sm text-slate-300'>
                   Shell posture, boot state, and interface mode in one side rail.
                 </p>
               </div>
-              <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-200'>
+              <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-200'>
                 {panelLabel}
               </span>
             </div>
 
             <div className='mt-4 grid gap-3'>
-              <div className='rounded-[18px] border border-white/10 bg-[#0f1728] p-3'>
+              <div className='rounded-[18px] border border-white/10 bg-[#11110f] p-3'>
                 <div className='flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400'>
                   <Gauge className='h-3.5 w-3.5 text-sky-300' />
                   Shell state
@@ -633,7 +633,7 @@ export function DashboardSpaPanelHost() {
                 </div>
               </div>
 
-              <div className='rounded-[18px] border border-white/10 bg-[#0f1728] p-3'>
+              <div className='rounded-[18px] border border-white/10 bg-[#11110f] p-3'>
                 <div className='flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400'>
                   <Activity className='h-3.5 w-3.5 text-cyan-300' />
                   Warm state
@@ -654,7 +654,7 @@ export function DashboardSpaPanelHost() {
                 </div>
               </div>
 
-              <div className='rounded-[18px] border border-white/10 bg-[#0f1728] p-3'>
+              <div className='rounded-[18px] border border-white/10 bg-[#11110f] p-3'>
                 <div className='flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400'>
                   <ShieldCheck className='h-3.5 w-3.5 text-emerald-300' />
                   Boot ledger
@@ -672,7 +672,7 @@ export function DashboardSpaPanelHost() {
         <div className='fixed inset-y-6 right-6 z-40 w-[min(28rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#101726_0%,#0b1119_100%)] shadow-[0_38px_120px_rgba(2,2,5,0.58)]'>
           <div className='flex items-start justify-between gap-4 border-b border-white/10 px-5 py-4'>
             <div>
-              <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]'>
+              <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-[#ffb199]'>
                 Chat panel
               </p>
               <h3 className='mt-2 font-[family:var(--font-site-display)] text-[1.3rem] tracking-[-0.05em] text-white'>
@@ -682,7 +682,7 @@ export function DashboardSpaPanelHost() {
             <button
               type='button'
               onClick={() => setChatPanelOpen(false)}
-              className='rounded-full border border-white/10 bg-[#0f1728] p-2 text-slate-200'
+              className='rounded-full border border-white/10 bg-[#11110f] p-2 text-slate-200'
             >
               <X className='h-4 w-4' />
             </button>
@@ -695,13 +695,13 @@ export function DashboardSpaPanelHost() {
             </p>
 
             <div className='grid gap-3 sm:grid-cols-2'>
-              <div className='rounded-[18px] border border-white/10 bg-[#0f1728] p-4'>
+              <div className='rounded-[18px] border border-white/10 bg-[#11110f] p-4'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400'>
                   Sessions
                 </p>
                 <p className='mt-3 text-2xl font-semibold text-white'>{sessions.length}</p>
               </div>
-              <div className='rounded-[18px] border border-white/10 bg-[#0f1728] p-4'>
+              <div className='rounded-[18px] border border-white/10 bg-[#11110f] p-4'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400'>
                   Essential route
                 </p>
@@ -746,7 +746,7 @@ export function DashboardSpaPanelHost() {
                 </div>
               </div>
 
-              <div className='rounded-[22px] border border-white/10 bg-[#0f1728] px-4 py-3 text-right'>
+              <div className='rounded-[22px] border border-white/10 bg-[#11110f] px-4 py-3 text-right'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400'>
                   Progress
                 </p>
@@ -757,9 +757,9 @@ export function DashboardSpaPanelHost() {
               </div>
             </div>
 
-            <div className='mt-6 rounded-full border border-white/10 bg-[#0f1728] p-1'>
+            <div className='mt-6 rounded-full border border-white/10 bg-[#11110f] p-1'>
               <div
-                className='h-2 rounded-full bg-[linear-gradient(90deg,#60a5fa_0%,#22d3ee_100%)] transition-all'
+                className='h-2 rounded-full bg-[linear-gradient(90deg,#ff4d00_0%,#ffb199_100%)] transition-all'
                 style={{ width: `${(completedSteps / bootSteps.length) * 100}%` }}
               />
             </div>
@@ -769,19 +769,19 @@ export function DashboardSpaPanelHost() {
             </div>
 
             <div className='mt-6 flex flex-wrap items-center gap-2 text-[11px] text-slate-400'>
-              <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+              <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
                 {orgName}
               </span>
-              <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+              <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
                 {subscription || 'free'}
               </span>
-              <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+              <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
                 {interfaceMode}
               </span>
-              <span className='rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+              <span className='rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
                 {desktopRuntimeActive ? 'desktop' : 'browser'}
               </span>
-              <span className='inline-flex items-center gap-1 rounded-full border border-white/10 bg-[#0f1728] px-2.5 py-1'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-white/10 bg-[#11110f] px-2.5 py-1'>
                 <ChevronRight className='h-3.5 w-3.5 text-sky-300' />
                 {panelLabel}
               </span>

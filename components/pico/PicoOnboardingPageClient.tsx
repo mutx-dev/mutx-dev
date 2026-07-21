@@ -1,13 +1,13 @@
 'use client'
 
 import { motion, useReducedMotion } from 'framer-motion'
-import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { PicoSessionBanner } from '@/components/pico/PicoSessionBanner'
 import { PicoShell } from '@/components/pico/PicoShell'
+import { PicoSignalDiagram } from '@/components/pico/PicoSignalDiagram'
 import { PicoSurfaceCompass } from '@/components/pico/PicoSurfaceCompass'
 import {
   picoClasses,
@@ -23,7 +23,6 @@ import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
 import { getLessonBySlug, PICO_TRACKS } from '@/lib/pico/academy'
 import { PICO_GENERATED_CONTENT } from '@/lib/pico/generatedContent'
 import { usePicoHref } from '@/lib/pico/navigation'
-import { picoRobotArtById } from '@/lib/picoRobotArt'
 
 const activationChecklist = PICO_GENERATED_CONTENT.onboarding.activationChecklist
 const stackSpotlights = PICO_GENERATED_CONTENT.onboarding.stackSpotlights
@@ -154,7 +153,6 @@ export function PicoOnboardingPageClient() {
   }, [setup.onboarding])
 
   const currentBinding = setup.runtime?.current_binding ?? setup.runtime?.bindings[0] ?? null
-  const onboardingRobot = picoRobotArtById.guide
   const proofCaptured = firstRunWorkspace.workspace.evidence.trim().length > 0 || firstRunDone
   const completedLessonStepCount =
     installWorkspace.completedStepCount + firstRunWorkspace.completedStepCount
@@ -565,24 +563,13 @@ export function PicoOnboardingPageClient() {
               </p>
             </div>
 
-            <div className={picoInset('overflow-hidden p-0')}>
-              <div className="border-b border-[color:var(--pico-border)] p-5">
-                <p className={picoClasses.label}>Guide marker</p>
-                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                  One clear guide cue is enough while the first run is still forming.
-                </p>
-              </div>
-              <div className="flex items-center justify-center p-6">
-                <Image
-                  src={onboardingRobot.src}
-                  alt={onboardingRobot.alt}
-                  width={220}
-                  height={220}
-                  className="h-auto w-full max-w-[11rem] object-contain drop-shadow-[0_12px_28px_rgba(164,255,92,0.18)]"
-                  sizes="176px"
-                />
-              </div>
-            </div>
+            <PicoSignalDiagram
+              index="01"
+              label="Guide marker"
+              title="One visible step."
+              caption="Install the runtime, save the first run, then prepare the agent packet."
+              compact
+            />
 
             <div className={picoInset('p-5')}>
               <p className={picoClasses.label}>Track checklist</p>

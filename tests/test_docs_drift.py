@@ -138,7 +138,8 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
     readme = read_text("README.md")
     quickstart = read_text("docs/deployment/quickstart.md")
     install_surface = read_text("components/site/InstallSurface.tsx")
-    landing_content = read_text("lib/marketingContent.ts")
+    landing_content = read_text("components/site/marketing/RebrandHomePage.tsx")
+    landing_content += read_text("components/site/PublicFooter.tsx")
     install_script = read_text("public/install.sh")
 
     for content in (quickstart, install_surface):

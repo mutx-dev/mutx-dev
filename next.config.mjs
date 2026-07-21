@@ -26,6 +26,21 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/docs/sdk',
+        destination: '/sdk',
+        permanent: true,
+      },
+      {
+        source: '/docs/support',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/docs/api/reference',
+        destination: '/docs/reference',
+        permanent: true,
+      },
+      {
         source: '/docs/api',
         destination: '/docs/reference',
         permanent: true,

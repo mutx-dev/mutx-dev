@@ -1,6 +1,9 @@
 "use client";
 
-import { DashboardSectionPage } from "@/components/dashboard/DashboardSectionPage";
+import { MessagesSquare } from "lucide-react";
+
+import { ChannelsPageClient } from "@/components/dashboard/ChannelsPageClient";
+import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { DesktopRouteBoundary } from "@/components/desktop/DesktopRouteBoundary";
 
 export default function DashboardChannelsPage() {
@@ -8,20 +11,20 @@ export default function DashboardChannelsPage() {
     <DesktopRouteBoundary
       routeKey="channels"
       browserView={
-        <DashboardSectionPage
-          breadcrumbs={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Channels" },
-          ]}
-          title="Channels"
-          description="Assistant channel shell for bindings, policy mode, and safe communication defaults."
-          badge="assistant channels"
-          checks={[
-            "Bind this route to mounted assistant channel state once browser panels consume the control-plane contract.",
-            "Keep channel enablement and policy views grounded in real backend data.",
-            "Use this surface for truthful channel inspection before introducing richer write flows.",
-          ]}
-        />
+        <div className="space-y-4">
+          <RouteHeader
+            title="Channels"
+            description="Inspect assistant channel bindings, policy mode, sessions, and communication readiness from the live contract."
+            icon={MessagesSquare}
+            iconTone="text-cyan-300 bg-cyan-400/10"
+            badge="assistant channels"
+            stats={[
+              { label: "Scope", value: "Bindings + sessions" },
+              { label: "Data", value: "Live API", tone: "success" },
+            ]}
+          />
+          <ChannelsPageClient />
+        </div>
       }
     />
   );

@@ -32,6 +32,11 @@
   color: var(--pico-text);
 }
 
+.modal:focus-visible {
+  outline: 3px solid var(--pico-accent-bright);
+  outline-offset: 4px;
+}
+
 /* --- Close button ------------------------------------------------- */
 .closeBtn {
   position: absolute;
@@ -40,8 +45,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 50%;
   border: 1px solid var(--pico-border);
   background: var(--pico-bg-surface);
@@ -130,7 +135,7 @@
 .input,
 .textarea {
   width: 100%;
-  min-height: 2.6rem;
+  min-height: 2.75rem;
   padding: 0 0.75rem;
   border-radius: 0.6rem;
   border: 1px solid var(--pico-border);
@@ -149,9 +154,10 @@
 
 .input:focus-visible,
 .textarea:focus-visible {
-  border-color: rgba(var(--pico-accent-rgb), 0.42);
-  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
-  outline: none;
+  border-color: var(--pico-accent-bright);
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.22);
+  outline: 2px solid var(--pico-accent-bright);
+  outline-offset: 2px;
 }
 
 /* --- Radix Select ------------------------------------------------- */
@@ -160,7 +166,7 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 2.6rem;
+  min-height: 2.75rem;
   padding: 0 0.75rem;
   border-radius: 0.6rem;
   border: 1px solid var(--pico-border);
@@ -179,9 +185,10 @@
 
 .selectTrigger[data-state="open"],
 .selectTrigger:focus-visible {
-  border-color: rgba(var(--pico-accent-rgb), 0.42);
-  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.12);
-  outline: none;
+  border-color: var(--pico-accent-bright);
+  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.22);
+  outline: 2px solid var(--pico-accent-bright);
+  outline-offset: 2px;
 }
 
 .selectIcon {
@@ -214,6 +221,7 @@
 
 .selectItem {
   display: flex;
+  min-height: 2.75rem;
   align-items: center;
   gap: 0.5rem;
   padding: 0.55rem 0.7rem;
@@ -229,11 +237,18 @@
 }
 
 .closeBtn:focus-visible,
-.selectItem:focus-visible,
 .submit:focus-visible,
 .successBtn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--pico-accent-rgb), 0.16);
+  outline: 3px solid var(--pico-accent-bright);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--pico-bg-raised);
+}
+
+.selectItem:focus-visible,
+.selectItem[data-highlighted] {
+  outline: 2px solid var(--pico-accent-bright);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 2px rgba(var(--pico-accent-rgb), 0.22);
 }
 
 .selectItem[data-highlighted] {
@@ -259,7 +274,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 1.2rem;
+  min-height: 2.75rem;
   color: var(--pico-text-muted);
 }
 
@@ -370,7 +385,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.4rem;
+  min-height: 2.75rem;
   padding: 0 1.2rem;
   border-radius: var(--pico-radius-sm);
   border: 1px solid var(--pico-border);

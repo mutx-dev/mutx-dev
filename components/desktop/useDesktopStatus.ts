@@ -83,10 +83,6 @@ export interface DesktopStatusContextValue {
 
 const DesktopStatusContext = createContext<DesktopStatusContextValue | null>(null);
 
-function readImmediateDesktopFlag() {
-  return typeof window !== "undefined" && Boolean(window.mutxDesktop?.isDesktop);
-}
-
 function useDesktopStatusState(active: boolean): DesktopStatusContextValue {
   const [status, setStatus] = useState<DesktopStatus>(DEFAULT_STATUS);
   const [loading, setLoading] = useState(active);
@@ -126,10 +122,6 @@ function useDesktopStatusState(active: boolean): DesktopStatusContextValue {
     }
   }, [active]);
 
-  const immediateDesktop = readImmediateDesktopFlag();
-  const resolvedIsDesktop = isDesktop || immediateDesktop;
-  const resolvedPlatformReady = platformReady || typeof window !== "undefined";
-
   useEffect(() => {
     if (!active) {
       return;
@@ -162,11 +154,11 @@ function useDesktopStatusState(active: boolean): DesktopStatusContextValue {
 
   return {
     status,
-    loading: loading && resolvedIsDesktop,
+    loading: loading && isDesktop,
     error,
-    platformReady: resolvedPlatformReady,
+    platformReady,
     refetch: fetchStatus,
-    isDesktop: resolvedIsDesktop,
+    isDesktop,
   };
 }
 

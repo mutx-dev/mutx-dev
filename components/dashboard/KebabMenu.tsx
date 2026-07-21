@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useEffect, useId, useRef, useState, type ComponentType } from "react";
 import Link from "next/link";
 import { MoreHorizontal } from "lucide-react";
 
@@ -25,7 +25,10 @@ export interface KebabMenuProps {
 
 export function KebabMenu({ actions, align = "end", className }: KebabMenuProps) {
   const [open, setOpen] = useState(false);
+  const menuId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -36,15 +39,27 @@ export function KebabMenu({ actions, align = "end", className }: KebabMenuProps)
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+
     window.addEventListener("mousedown", handleOutsideClick);
-    return () => window.removeEventListener("mousedown", handleOutsideClick);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("mousedown", handleOutsideClick);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open]);
 
   return (
     <div className={cn("relative inline-flex", className)} ref={containerRef}>
       <button
+        ref={triggerRef}
         type="button"
-        className="inline-flex h-8 w-8 items-center justify-center rounded-md border transition-colors"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md border transition-colors"
         style={{
           borderColor: dashboardTokens.borderSubtle,
           backgroundColor: dashboardTokens.bgSurfaceStrong,
@@ -53,13 +68,24 @@ export function KebabMenu({ actions, align = "end", className }: KebabMenuProps)
         aria-label="Open row actions"
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((value) => !value)}
+        onKeyDown={(event) => {
+          if (event.key !== "ArrowDown") return;
+          event.preventDefault();
+          setOpen(true);
+          window.requestAnimationFrame(() => {
+            menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus();
+          });
+        }}
       >
         <MoreHorizontal className="h-4 w-4" />
       </button>
 
       {open ? (
         <div
+          id={menuId}
+          ref={menuRef}
           role="menu"
           className={cn(
             "absolute top-full z-50 mt-1.5 min-w-[180px] overflow-hidden rounded-lg border py-1 shadow-2xl",
@@ -84,7 +110,7 @@ export function KebabMenu({ actions, align = "end", className }: KebabMenuProps)
             );
 
             const rowClassName = cn(
-              "flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors",
+              "flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors",
               action.disabled ? "cursor-not-allowed opacity-45" : undefined,
             );
 

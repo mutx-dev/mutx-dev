@@ -71,17 +71,17 @@ async function stopAgent(agentId: string): Promise<{ status: string }> {
 
 function AgentCardSkeleton() {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5 animate-pulse">
+    <div className="animate-pulse rounded-[6px] border border-[#2b2b26] bg-[#11120f] p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <div className="h-5 w-32 rounded bg-white/10" />
-          <div className="mt-2 h-4 w-48 rounded bg-white/5" />
+          <div className="h-5 w-32 rounded-[3px] bg-[#24251f]" />
+          <div className="mt-2 h-4 w-48 rounded-[3px] bg-[#1b1c18]" />
         </div>
-        <div className="h-6 w-20 rounded-full bg-white/10" />
+        <div className="h-6 w-20 rounded-[4px] bg-[#24251f]" />
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="h-12 rounded-lg bg-white/5" />
-        <div className="h-12 rounded-lg bg-white/5" />
+        <div className="h-12 rounded-[4px] bg-[#1b1c18]" />
+        <div className="h-12 rounded-[4px] bg-[#1b1c18]" />
       </div>
     </div>
   );
@@ -100,26 +100,26 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
   };
 
   return (
-    <article className="dashboard-entry rounded-[20px] border border-[#273543] bg-[linear-gradient(180deg,#18212b_0%,#0f151d_100%)] p-5 shadow-[0_18px_40px_rgba(1,5,11,0.22)] transition hover:border-sky-300/28">
+    <article className="dashboard-entry rounded-[4px] border border-[#2b2b26] bg-[#11120f] p-5 transition hover:border-[#48463e]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-sky-400/16 bg-sky-400/10 text-sky-200">
-              <Bot className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-[4px] border border-[#663619] bg-[#21150f] text-[#ff8355]">
+              <Bot className="h-5 w-5" aria-hidden="true" />
             </div>
             <div className="min-w-0">
               <h3 className="truncate text-[0.98rem] font-semibold tracking-[-0.02em] text-white">
                 {agent.name}
               </h3>
               <div className="mt-1 flex flex-wrap items-center gap-2">
-                <p className="max-w-full truncate rounded-full border border-[#293543] bg-[#10161d] px-2.5 py-1 text-[11px] text-slate-400 font-[family:var(--font-mono)]">
+                <p className="max-w-full truncate font-[family:var(--font-mono)] text-[9px] text-[#8d867a]">
                   {agent.id}
                 </p>
                 <button
                   onClick={copyId}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#293543] bg-[#10161d] px-2.5 py-1 text-[11px] text-slate-400 transition hover:border-sky-400/30 hover:text-sky-200"
+                  className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#34342e] bg-[#151612] px-2 py-1 text-[9px] text-[#aaa397] transition hover:border-[#ff6a32] hover:text-[#ff9a72]"
                 >
-                  <Copy className="h-3 w-3" />
+                  <Copy className="h-3 w-3" aria-hidden="true" />
                   {copied ? "Copied" : "Copy ID"}
                 </button>
               </div>
@@ -154,11 +154,11 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
       </div>
 
       {agent.config && Object.keys(agent.config).length > 0 && (
-        <div className="mt-4 rounded-[16px] border border-[#253140] bg-[#0b1118] p-3">
-          <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-widest text-slate-500">
-            Configuration
+        <div className="mt-4 rounded-[4px] border border-[#2b2b26] bg-[#0c0d0b] p-3">
+          <div className="mb-2 flex items-center gap-2 font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.16em] text-[#8d867a]">
+            <span className="text-[#58aaff]" aria-hidden="true">CFG /</span> Configuration
           </div>
-          <pre className="overflow-x-auto rounded-[12px] border border-[#1f2a36] bg-[#080d13] px-3 py-2 text-xs text-slate-400">
+          <pre className="overflow-x-auto rounded-[4px] border border-[#34342e] bg-[#090a08] px-3 py-2 text-xs text-[#c8c0b0]">
             {JSON.stringify(agent.config, null, 2)}
           </pre>
         </div>
@@ -168,7 +168,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
         <button
           onClick={() => onStop(agent.id)}
           disabled={isStopping || !canStop}
-          className="inline-flex items-center gap-1.5 rounded-[12px] border border-[#293543] bg-[#0e141b] px-3 py-2 text-xs text-slate-400 transition hover:border-amber-400/30 hover:text-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#34342e] bg-[#151612] px-3 py-2 text-xs text-[#aaa397] transition hover:border-[#8a6d38] hover:text-[#f4cc82] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isStopping ? (
             <Loader2 className="h-3 w-3 animate-spin" />
@@ -180,7 +180,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
         <button
           onClick={() => onDelete(agent.id)}
           disabled={isDeleting}
-          className="inline-flex items-center gap-1.5 rounded-[12px] border border-[#34212a] bg-[#130f14] px-3 py-2 text-xs text-slate-400 transition hover:border-rose-400/30 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#34342e] bg-[#151612] px-3 py-2 text-xs text-[#aaa397] transition hover:border-[#7c3835] hover:text-[#ff9b96] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isDeleting ? (
             <Loader2 className="h-3 w-3 animate-spin" />
@@ -227,7 +227,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fieldClassName =
-    "w-full rounded-[14px] border border-[#2e3946] bg-[#0b1017] px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-sky-300/30 focus:outline-none";
+    "w-full rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-4 py-3 text-sm text-[#eee9dc] placeholder:text-[#8d867a] focus:border-[#ff6a32] focus:outline-none";
 
   if (!isOpen) return null;
 
@@ -267,7 +267,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
           <button
             type="button"
             onClick={onClose}
-            className="rounded-[12px] border border-[#2e3946] bg-[#0d131a] px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-sky-300/24"
+            className="rounded-[4px] border border-[#3b3a33] bg-[#151612] px-4 py-2 text-sm font-medium text-[#c8c0b0] transition hover:border-[#777268] hover:text-white"
           >
             Cancel
           </button>
@@ -275,7 +275,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
             type="submit"
             form="create-agent-form"
             disabled={loading || !name}
-            className="rounded-[12px] bg-sky-300 px-4 py-2 text-sm font-medium text-[#071018] transition hover:bg-sky-200 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-4 py-2 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -334,7 +334,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
           </div>
 
           {error && (
-            <div className="rounded-[14px] border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            <div className="rounded-[4px] border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
               {error}
             </div>
           )}
@@ -365,8 +365,8 @@ class AgentsErrorBoundary extends Component<{ children: ReactNode }, ErrorBounda
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-white/5 bg-white/[0.01] py-16 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/20 text-rose-400">
+        <div className="flex flex-col items-center justify-center rounded-[6px] border border-[#2b2b26] bg-[#11120f] py-16 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[4px] border border-rose-500/30 bg-rose-500/10 text-rose-400">
             <X className="h-8 w-8" />
           </div>
           <h3 className="mt-6 text-lg font-semibold text-white">Something went wrong</h3>
@@ -375,7 +375,7 @@ class AgentsErrorBoundary extends Component<{ children: ReactNode }, ErrorBounda
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] px-6 py-2.5 text-sm font-medium text-white transition hover:bg-white/[0.05]"
+            className="mt-6 rounded-[4px] border border-[#3b3a33] bg-[#151612] px-6 py-2.5 text-sm font-medium text-white transition hover:border-[#777268]"
           >
             Reload Page
           </button>
@@ -564,13 +564,13 @@ export function AgentsPageClient() {
         </LiveKpiGrid>
 
         {error && !authRequired && (
-          <div className="flex items-center justify-between rounded-[18px] border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          <div className="flex items-center justify-between rounded-[4px] border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
             <div className="flex items-center gap-2">
               <span className="font-medium">Error:</span> {error}
             </div>
             <button
               onClick={() => { setError(""); loadAgents(); }}
-              className="rounded-lg border border-rose-500/30 bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-200 transition hover:bg-rose-500/30"
+              className="rounded-[4px] border border-rose-500/30 bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-200 transition hover:bg-rose-500/30"
             >
               Retry
             </button>
@@ -592,14 +592,14 @@ export function AgentsPageClient() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="inline-flex items-center gap-2 rounded-[14px] border border-[#2f3c49] bg-[#10161d] px-3.5 py-2 text-sm text-slate-200 transition hover:border-sky-300/30 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#151612] px-3.5 py-2 text-sm text-[#c8c0b0] transition hover:border-[#777268] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RefreshCcw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
                 {refreshing ? "Refreshing" : "Refresh"}
               </button>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-[14px] bg-sky-300 px-3.5 py-2 text-sm font-medium text-[#071018] transition hover:bg-sky-200"
+                className="inline-flex items-center gap-2 rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-3.5 py-2 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545]"
               >
                 <Plus className="h-4 w-4" />
                 Create Agent
@@ -626,7 +626,7 @@ export function AgentsPageClient() {
             title="Fleet registry"
             meta={`${filteredAgents.length} visible`}
             action={
-              <span className="hidden rounded-full border border-[#2c3947] bg-[#10161d] px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-[#90a2b6] sm:inline-flex">
+              <span className="hidden rounded-[4px] border border-[#294d6c] bg-[#101c26] px-2.5 py-1 font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.14em] text-[#8ac7ff] sm:inline-flex">
                 {isMac ? "⌘K search" : "Ctrl+K search"}
               </span>
             }

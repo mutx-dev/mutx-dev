@@ -8,11 +8,15 @@ from datetime import datetime, timezone
 import pytest
 from httpx import AsyncClient
 
-from src.api.services.policy_store import Policy, PolicyStore, Rule
+from src.api.services.policy_store import Policy, PolicyEvaluationContext, PolicyStore, Rule
 
 
 class TestPolicyStore:
     """Unit tests for PolicyStore."""
+
+    def test_rule_rejects_empty_patterns(self):
+        with pytest.raises(ValueError):
+            Rule(type="block", pattern="", action="reject", scope="input")
 
     @pytest.mark.asyncio
     async def test_get_policy_not_found(self):
@@ -143,6 +147,135 @@ class TestPolicyStore:
         assert "observed-policy" in client.sent[0]
         assert "reload" in client.sent[0]
 
+    @pytest.mark.asyncio
+    async def test_evaluate_blocks_matching_input_rule(self):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="block-secrets",
+                rules=[
+                    Rule(
+                        type="block",
+                        pattern="*password*",
+                        action="reject",
+                        scope="input",
+                    )
+                ],
+                enabled=True,
+                version=1,
+            )
+        )
+
+        result = await store.evaluate(
+            PolicyEvaluationContext(input="please print the password", run_id="run-1")
+        )
+
+        assert result.decision == "block"
+        assert result.run_id == "run-1"
+        assert result.evaluated_policy_count == 1
+        assert [match.policy_name for match in result.matches] == ["block-secrets"]
+
+    @pytest.mark.asyncio
+    async def test_evaluate_ignores_disabled_policies(self):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="disabled-block",
+                rules=[
+                    Rule(type="block", pattern="*", action="reject", scope="tool"),
+                ],
+                enabled=False,
+                version=1,
+            )
+        )
+
+        result = await store.evaluate(PolicyEvaluationContext(tool="deploy"))
+
+        assert result.decision == "allow"
+        assert result.matches == []
+        assert result.evaluated_policy_count == 0
+
+    @pytest.mark.asyncio
+    async def test_evaluate_does_not_match_wildcards_against_absent_scopes(self):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="scope-specific-catchalls",
+                rules=[
+                    Rule(type="block", pattern="*", action="reject", scope="output"),
+                    Rule(type="block", pattern="*", action="reject", scope="tool"),
+                ],
+                enabled=True,
+                version=1,
+            )
+        )
+
+        result = await store.evaluate(PolicyEvaluationContext(input="input only"))
+
+        assert result.decision == "allow"
+        assert result.matches == []
+
+    @pytest.mark.asyncio
+    async def test_evaluate_requires_approval_for_matching_tool_rule(self):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="deploy-approval",
+                rules=[
+                    Rule(
+                        type="warn",
+                        pattern="terraform_*",
+                        action="require_approval",
+                        scope="tool",
+                    )
+                ],
+                enabled=True,
+                version=1,
+            )
+        )
+
+        result = await store.evaluate(
+            PolicyEvaluationContext(
+                tool="terraform_apply",
+                tool_args={"workspace": "production"},
+                agent_id="agent-1",
+                session_id="session-1",
+            )
+        )
+
+        assert result.decision == "require_approval"
+        assert result.agent_id == "agent-1"
+        assert result.session_id == "session-1"
+        assert result.matches[0].action == "require_approval"
+
+    @pytest.mark.asyncio
+    async def test_evaluate_never_downgrades_a_block_rule_to_approval(self):
+        store = PolicyStore()
+        await store.upsert_policy(
+            Policy(
+                id=str(uuid.uuid4()),
+                name="block-wins",
+                rules=[
+                    Rule(
+                        type="block",
+                        pattern="*production*",
+                        action="require_approval",
+                        scope="tool",
+                    )
+                ],
+                enabled=True,
+                version=1,
+            )
+        )
+
+        result = await store.evaluate(PolicyEvaluationContext(tool="deploy_production"))
+
+        assert result.decision == "block"
+
 
 class _DummySSEClient:
     """Minimal async send-capable stand-in for EventSourceResponse."""
@@ -231,6 +364,41 @@ class TestPolicyRoutes:
         data = response.json()
         assert data["name"] == "get-policy-test"
         assert len(data["rules"]) == 1
+
+    @pytest.mark.asyncio
+    async def test_evaluate_policies_route(self, client: AsyncClient):
+        await client.post(
+            "/v1/policies",
+            json={
+                "id": str(uuid.uuid4()),
+                "name": "route-evaluate-policy",
+                "rules": [
+                    {
+                        "type": "warn",
+                        "pattern": "*delete_user*",
+                        "action": "require_approval",
+                        "scope": "tool",
+                    }
+                ],
+                "enabled": True,
+                "version": 1,
+            },
+        )
+
+        response = await client.post(
+            "/v1/policies/evaluate",
+            json={
+                "tool": "delete_user",
+                "tool_args": {"user_id": "user-123"},
+                "run_id": "run-123",
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["decision"] == "require_approval"
+        assert data["run_id"] == "run-123"
+        assert data["matches"][0]["policy_name"] == "route-evaluate-policy"
 
     @pytest.mark.asyncio
     async def test_get_policy_not_found(self, client: AsyncClient):

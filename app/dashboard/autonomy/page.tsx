@@ -7,7 +7,7 @@ import { DesktopRouteBoundary } from "@/components/desktop/DesktopRouteBoundary"
 export default function DashboardAutonomyPage() {
   return (
     <DesktopRouteBoundary
-      routeKey="monitoring"
+      routeKey="autonomy"
       browserView={
         <div className="space-y-4">
           <RouteHeader

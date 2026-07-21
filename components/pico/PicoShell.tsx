@@ -14,17 +14,17 @@ import {
   picoPanel,
 } from '@/components/pico/picoTheme'
 import { PicoFooter } from '@/components/pico/PicoFooter'
+import { getPicoRouteSignal, PicoSignalDiagram } from '@/components/pico/PicoSignalDiagram'
 import { PicoWelcomeTour } from '@/components/pico/PicoWelcomeTour'
-import { getPicoRouteRobot } from '@/lib/picoRobotArt'
 import { picoHref } from '@/lib/pico/navigation'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/onboarding', label: 'Start', chapter: '01', note: 'install and packet' },
-  { href: '/academy', label: 'Lessons', chapter: '02', note: 'step-by-step setup' },
-  { href: '/tutor', label: 'Tutor', chapter: '03', note: 'one blocked command' },
-  { href: '/autopilot', label: 'Autopilot', chapter: '04', note: 'runtime review' },
-  { href: '/support', label: 'Human help', chapter: '05', note: '1-on-1 setup help' },
+  { href: '/onboarding', label: 'Start', chapter: '01', note: 'first visible win' },
+  { href: '/academy', label: 'Lessons', chapter: '02', note: 'the working path' },
+  { href: '/tutor', label: 'Tutor', chapter: '03', note: 'one grounded answer' },
+  { href: '/autopilot', label: 'Autopilot', chapter: '04', note: 'live control room' },
+  { href: '/support', label: 'Human help', chapter: '05', note: 'the messy edge' },
 ] as const
 
 const PICO_WELCOME_TOUR_STORAGE_KEY = 'pico.welcome-tour.dismissed.v2'
@@ -48,83 +48,27 @@ function routeIsActive(pathname: string, href: string) {
   return pathname === absoluteHref || pathname.startsWith(`${absoluteHref}/`)
 }
 
-function ShellBackground({ academyMode }: { academyMode: boolean }) {
+function ShellBackground({ academyMode: _academyMode }: { academyMode: boolean }) {
   return (
-    <>
-      <div
-        aria-hidden="true"
-        className={cn(
-          'pointer-events-none absolute inset-0',
-          academyMode
-            ? 'bg-[radial-gradient(circle_at_18%_0%,rgba(var(--pico-accent-rgb),0.1),transparent_24%),radial-gradient(circle_at_82%_10%,rgba(104,214,255,0.06),transparent_18%),linear-gradient(180deg,#080c0a_0%,#050706_52%,#030504_100%)]'
-            : 'bg-[radial-gradient(circle_at_18%_0%,rgba(var(--pico-accent-rgb),0.08),transparent_24%),radial-gradient(circle_at_88%_16%,rgba(104,214,255,0.055),transparent_18%),linear-gradient(180deg,#080c0a_0%,#030504_100%)]',
-        )}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.035] [background-image:linear-gradient(rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:linear-gradient(180deg,rgba(0,0,0,0.95),transparent_92%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[18rem] bg-[radial-gradient(circle_at_50%_-10%,rgba(var(--pico-accent-rgb),0.08),transparent_44%)]"
-      />
-    </>
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[color:var(--pico-bg)]" />
   )
 }
 
 function PicoWordmark({ pathname }: { pathname: string }) {
   return (
     <Link href={picoHref(pathname, '/onboarding')} className="inline-flex items-center gap-3">
-      <span className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-[12px] border border-[color:var(--pico-border)] bg-[linear-gradient(145deg,rgba(var(--pico-accent-rgb),0.1),rgba(8,18,10,0.82))] shadow-[0_14px_28px_rgba(0,0,0,0.24),0_0_22px_rgba(var(--pico-accent-rgb),0.1)]">
+      <span className="inline-flex h-12 w-12 items-center justify-center overflow-hidden border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-raised)]">
         <Image src="/pico/logo.png" alt="PicoMUTX logo" width={28} height={28} priority />
       </span>
       <span className="grid gap-1">
         <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[color:var(--pico-text-muted)]">
           PicoMUTX
         </span>
-        <span className="font-[family:var(--font-site-display)] text-xl tracking-[-0.035em] text-[color:var(--pico-text)]">
-          cockpit
+        <span className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+          operator atlas
         </span>
       </span>
     </Link>
-  )
-}
-
-function ShellRobotCard({
-  title,
-  caption,
-  src,
-  alt,
-}: {
-  title: string
-  caption: string
-  src: string
-  alt: string
-}) {
-  return (
-    <div className={picoCodexInset('grid gap-3 overflow-hidden p-3')}>
-      <div className="flex items-center gap-3">
-        <div className="w-16 shrink-0 overflow-hidden rounded-[12px] border border-[rgba(var(--pico-accent-rgb),0.18)] bg-[radial-gradient(circle_at_50%_14%,rgba(var(--pico-accent-rgb),0.14),transparent_52%),linear-gradient(180deg,rgba(6,12,8,0.98),rgba(2,4,3,1))]">
-          <Image
-            src={src}
-            alt={alt}
-            width={512}
-            height={512}
-            className="h-auto w-full p-1.5"
-            sizes="4rem"
-          />
-        </div>
-        <div className="min-w-0">
-          <p className={picoClasses.label}>Pico guide</p>
-          <p className="mt-1 truncate font-[family:var(--font-site-display)] text-xl tracking-[-0.035em] text-[color:var(--pico-text)]">
-            {title}
-          </p>
-        </div>
-      </div>
-      <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-        {caption}
-      </p>
-    </div>
   )
 }
 
@@ -152,12 +96,12 @@ function ShellHelpLane({
           'p-4 transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(var(--pico-accent-rgb),0.16)]',
         )}
       >
-        <p className={picoClasses.label}>Setup help</p>
+        <p className={picoClasses.label}>Recovery route</p>
         <p className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
-          Get setup help
+          Open support lane
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-          Use this when setup needs API keys, hosting decisions, or custom implementation.
+          Use this when the product route is no longer honest about the blocker.
         </p>
       </Link>
       <Link
@@ -171,7 +115,7 @@ function ShellHelpLane({
           {nextItem ? nextItem.label : 'Human help'}
         </p>
         <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-          Continue when the next step is already clear.
+          Keep momentum if the next chapter is already the right tool.
         </p>
       </Link>
     </div>
@@ -193,18 +137,13 @@ export function PicoShell({
 }: PicoShellProps) {
   const pathname = usePathname()
   const [tourOpen, setTourOpen] = useState(false)
-  const [interactiveReady, setInteractiveReady] = useState(false)
   const academyMode = mode === 'academy'
   const currentItem = navItems.find((item) => routeIsActive(pathname, item.href)) ?? navItems[0]
-  const routeRobot = getPicoRouteRobot(pathname, academyMode)
+  const routeSignal = getPicoRouteSignal(pathname, academyMode)
   const currentIndex = navItems.findIndex((item) => item.href === currentItem.href)
   const previousItem = currentIndex > 0 ? navItems[currentIndex - 1] : null
   const nextItem = currentIndex < navItems.length - 1 ? navItems[currentIndex + 1] : null
   const isAcademyLessonRoute = pathname.startsWith('/pico/academy/')
-
-  useEffect(() => {
-    setInteractiveReady(true)
-  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -241,7 +180,6 @@ export function PicoShell({
                   <button
                     type="button"
                     onClick={() => setTourOpen(true)}
-                    disabled={!interactiveReady}
                     className={picoClasses.tertiaryButton}
                     data-testid="pico-open-tour"
                   >
@@ -251,7 +189,6 @@ export function PicoShell({
                     <button
                       type="button"
                       onClick={onToggleRail}
-                      disabled={!interactiveReady}
                       aria-pressed={!railCollapsed}
                       className={cn(
                         picoClasses.tertiaryButton,
@@ -266,7 +203,6 @@ export function PicoShell({
                     <button
                       type="button"
                       onClick={onToggleHelpLane}
-                      disabled={!interactiveReady}
                       aria-pressed={helpLaneOpen}
                       className={cn(
                         picoClasses.tertiaryButton,
@@ -287,7 +223,6 @@ export function PicoShell({
                   <button
                     type="button"
                     onClick={() => setTourOpen(true)}
-                    disabled={!interactiveReady}
                     className={picoClasses.tertiaryButton}
                     data-testid="pico-open-tour-mobile"
                   >
@@ -318,12 +253,7 @@ export function PicoShell({
                     <span>{nextItem ? `Next: ${nextItem.label}` : 'Final chapter'}</span>
                   </div>
                 </div>
-                <ShellRobotCard
-                  title={routeRobot.title}
-                  caption={routeRobot.caption}
-                  src={routeRobot.src}
-                  alt={routeRobot.alt}
-                />
+                <PicoSignalDiagram {...routeSignal} compact />
               </div>
             </div>
 
@@ -334,31 +264,35 @@ export function PicoShell({
             ) : null}
           </header>
 
-          <main className="mt-6 space-y-8">{children}</main>
+          <main id="main-content" className="mt-6 space-y-8">{children}</main>
         </div>
 
         <PicoFooter />
 
-        <div className="fixed inset-x-3 bottom-3 z-40 lg:hidden" data-testid="pico-mobile-academy-nav">
-          <div className={picoCodexFrame('px-2 py-2 shadow-[0_18px_44px_rgba(0,0,0,0.38)]')}>
+        <nav
+          aria-label="Pico mobile navigation"
+          className="fixed inset-x-4 bottom-4 z-40 lg:hidden"
+          data-testid="pico-mobile-product-nav"
+        >
+          <div className={picoCodexFrame('px-3 py-3')}>
             <div className="grid grid-cols-3 gap-2">
               {isAcademyLessonRoute ? (
                 <>
                   <Link
                     href={picoHref(pathname, '/academy')}
-                    className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-secondary)]"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
-                    Map
+                    Back to map
                   </Link>
                   <a
                     href="#pico-proof-composer"
-                    className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text)]"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text)]"
                   >
                     Proof
                   </a>
                   <a
                     href="#pico-lesson-recovery"
-                    className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-secondary)]"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
                     Help
                   </a>
@@ -367,30 +301,29 @@ export function PicoShell({
                 <>
                   <a
                     href="#pico-academy-workspace-summary"
-                    className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text)]"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text)]"
                   >
-                    Mission
+                    Open mission
                   </a>
                   <button
                     type="button"
                     onClick={onToggleRail}
-                    disabled={!interactiveReady}
-                    className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-secondary)]"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
                     Map
                   </button>
-                  <Link
-                    href={picoHref(pathname, '/support')}
-                    aria-label="Open Pico support"
-                    className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-secondary)]"
+                  <button
+                    type="button"
+                    onClick={onToggleHelpLane}
+                    className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]"
                   >
                     Help
-                  </Link>
+                  </button>
                 </>
               )}
             </div>
           </div>
-        </div>
+        </nav>
 
         <PicoWelcomeTour
           open={tourOpen}
@@ -408,23 +341,23 @@ export function PicoShell({
     <div className="relative min-h-screen overflow-hidden bg-[color:var(--pico-bg)] text-[color:var(--pico-text)]">
       <ShellBackground academyMode={false} />
 
-      <div className="relative mx-auto max-w-[104rem] px-3 py-4 pb-28 sm:px-5 lg:px-6 lg:pb-4">
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[16rem,minmax(0,1fr)]">
+      <div className="relative mx-auto max-w-[106rem] px-4 py-5 pb-28 sm:px-6 lg:px-8 lg:pb-4">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[18rem,minmax(0,1fr)]">
           <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start">
             <div className={picoPanel('overflow-hidden')}>
-              <div className="border-b border-[color:var(--pico-border)] p-4">
+              <div className="border-b border-[color:var(--pico-border)] p-5">
                 <PicoWordmark pathname={pathname} />
               </div>
 
-              <div className="border-b border-[color:var(--pico-border)] px-4 py-3">
+              <div className="border-b border-[color:var(--pico-border)] px-5 py-4">
                 <p className={picoClasses.label}>Current chapter</p>
-                <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.035em] text-[color:var(--pico-text)]">
+                <p className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                   {currentItem.label}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[color:var(--pico-text-secondary)]">{currentItem.note}</p>
+                <p className="mt-2 text-sm text-[color:var(--pico-text-secondary)]">{currentItem.note}</p>
               </div>
 
-              <nav className="grid gap-1.5 p-3">
+              <nav className="grid gap-2 p-4">
                 {navItems.map((item) => {
                   const active = routeIsActive(pathname, item.href)
                   return (
@@ -432,13 +365,13 @@ export function PicoShell({
                       key={item.href}
                       href={picoHref(pathname, item.href)}
                       className={cn(
-                        'grid gap-1 rounded-[12px] border px-3 py-2.5 transition duration-200',
+                        'grid gap-1 rounded-[22px] border px-4 py-3 transition duration-200',
                         active
-                          ? 'border-[color:var(--pico-border-hover)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.13),rgba(10,16,12,0.32))] text-[color:var(--pico-text)] shadow-[0_12px_32px_rgba(var(--pico-accent-rgb),0.07)]'
+                          ? 'border-[color:var(--pico-border-hover)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.16),rgba(10,19,11,0.38))] text-[color:var(--pico-text)] shadow-[0_18px_42px_rgba(var(--pico-accent-rgb),0.08)]'
                           : 'border-[color:rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.015)] text-[color:var(--pico-text-secondary)] hover:border-[color:var(--pico-border)] hover:bg-[rgba(255,255,255,0.03)] hover:text-[color:var(--pico-text)]',
                       )}
                     >
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-text-muted)]">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
                         {item.chapter}
                       </span>
                       <span className="font-medium">{item.label}</span>
@@ -450,27 +383,15 @@ export function PicoShell({
             </div>
           </aside>
 
-          <div className="min-w-0 space-y-5">
-            <div className="lg:hidden" data-testid="pico-mobile-product-masthead">
-              <div className={picoPanel('px-4 py-4')}>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <PicoWordmark pathname={pathname} />
-                  <span className={picoCodex.stamp}>Chapter {currentItem.chapter}</span>
-                </div>
-                <p className="mt-3 text-xs leading-5 text-[color:var(--pico-text-secondary)]">
-                  {currentItem.note}
-                </p>
-              </div>
-            </div>
-
+          <div className="min-w-0 space-y-6">
             <header className={picoPanel('overflow-hidden')}>
-              <div className="hidden border-b border-[color:var(--pico-border)] px-4 py-3 sm:block sm:px-5">
+              <div className="border-b border-[color:var(--pico-border)] px-6 py-4 sm:px-7">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="inline-flex rounded-[9px] border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.13em] text-[color:var(--pico-accent-bright)]">
+                    <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.02)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--pico-accent-bright)]">
                       Chapter {currentItem.chapter}
                     </span>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--pico-text-muted)]">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
                       {currentItem.note}
                     </span>
                   </div>
@@ -479,7 +400,6 @@ export function PicoShell({
                     <button
                       type="button"
                       onClick={() => setTourOpen(true)}
-                      disabled={!interactiveReady}
                       className={picoClasses.tertiaryButton}
                       data-testid="pico-open-tour"
                     >
@@ -504,12 +424,7 @@ export function PicoShell({
                       </Link>
                     ) : null}
                     {onToggleHelpLane ? (
-                      <button
-                        type="button"
-                        onClick={onToggleHelpLane}
-                        disabled={!interactiveReady}
-                        className={picoClasses.tertiaryButton}
-                      >
+                      <button type="button" onClick={onToggleHelpLane} className={picoClasses.tertiaryButton}>
                         {helpLaneOpen ? 'Hide recovery' : 'Show recovery'}
                       </button>
                     ) : null}
@@ -517,58 +432,41 @@ export function PicoShell({
                 </div>
               </div>
 
-              <div className="grid grid-cols-[minmax(0,1fr)] gap-5 px-4 py-5 sm:px-5 lg:grid-cols-[minmax(0,1fr),18rem] lg:items-start">
-                <div className="grid min-w-0 gap-3">
-                  <div className="grid gap-2 sm:hidden">
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-5 px-6 py-6 sm:px-7 lg:grid-cols-[minmax(0,1fr),20rem] lg:items-start">
+                <div className="grid min-w-0 gap-4">
+                  <div className="sm:hidden">
                     <button
                       type="button"
                       onClick={() => setTourOpen(true)}
-                      disabled={!interactiveReady}
                       className={picoClasses.tertiaryButton}
                       data-testid="pico-open-tour-mobile"
                     >
                       Quick help
                     </button>
-                    {nextItem ? (
-                      <Link
-                        href={picoHref(pathname, nextItem.href)}
-                        aria-label={`Go to next chapter: ${nextItem.label}`}
-                        className={picoClasses.tertiaryButton}
-                      >
-                        Next chapter
-                      </Link>
-                    ) : null}
                   </div>
                   {eyebrow ? (
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--pico-text-muted)]">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[color:var(--pico-text-muted)]">
                       {eyebrow}
                     </span>
                   ) : null}
-                  <h1 className="max-w-4xl font-[family:var(--font-site-display)] text-4xl leading-[1.02] tracking-[-0.04em] text-[color:var(--pico-text)] sm:text-5xl">
+                  <h1 className="max-w-[11ch] font-[family:var(--font-site-display)] text-[clamp(2.6rem,10vw,4rem)] leading-[0.92] tracking-[-0.06em] text-[color:var(--pico-text)] sm:max-w-4xl sm:text-6xl">
                     {title}
                   </h1>
-                  <p className="max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)] sm:text-base">
+                  <p className="max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
                     {description}
                   </p>
                   {heroContent ? <div className="pt-1">{heroContent}</div> : null}
                 </div>
 
-                <div className="grid min-w-0 gap-3">
-                  <div className="hidden lg:block">
-                    <ShellRobotCard
-                      title={routeRobot.title}
-                      caption={routeRobot.caption}
-                      src={routeRobot.src}
-                      alt={routeRobot.alt}
-                    />
-                  </div>
-                  <div className={picoCodexInset('p-4')}>
+                <div className="grid min-w-0 gap-4">
+                  <PicoSignalDiagram {...routeSignal} compact />
+                  <div className={picoCodexInset('p-5')}>
                     <p className={picoClasses.label}>Chapter note</p>
-                    <p className="mt-2 font-[family:var(--font-site-display)] text-xl tracking-[-0.035em] text-[color:var(--pico-text)]">
+                    <p className="mt-3 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
                       {currentItem.note}
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                      Use this chapter to keep setup moving and choose the next practical action.
+                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      Use this chapter to cut uncertainty quickly and identify the next irreversible action.
                     </p>
                   </div>
                   {actions ? (
@@ -586,67 +484,53 @@ export function PicoShell({
               ) : null}
             </header>
 
-            <main className="space-y-6">{children}</main>
+            <main id="main-content" className="space-y-6">{children}</main>
           </div>
         </div>
       </div>
 
       <PicoFooter />
 
-      <div className="fixed inset-x-3 bottom-3 z-40 lg:hidden" data-testid="pico-mobile-product-nav">
-        <div className="grid grid-cols-[auto,1fr,auto,auto] items-center gap-1.5 rounded-[16px] border border-[color:var(--pico-border)] bg-[rgba(6,12,8,0.9)] p-1.5 shadow-[0_18px_44px_rgba(0,0,0,0.36)] backdrop-blur">
-          {previousItem ? (
-            <Link
-              href={picoHref(pathname, previousItem.href)}
-              aria-label={`Go to previous chapter: ${previousItem.label}`}
-              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-secondary)]"
-            >
-              Prev
-            </Link>
-          ) : (
-            <span
-              aria-disabled="true"
-              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:rgba(255,255,255,0.035)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-muted)]"
-            >
-              Start
-            </span>
-          )}
+      <nav
+        aria-label="Pico mobile navigation"
+        className="fixed inset-x-4 bottom-4 z-40 lg:hidden"
+        data-testid="pico-mobile-product-nav"
+      >
+        <div className="grid grid-cols-[auto,1fr,auto,auto] items-center gap-2 rounded-[24px] border border-[color:var(--pico-border)] bg-[rgba(6,12,8,0.94)] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.4)] backdrop-blur">
+          <Link
+            href={picoHref(pathname, previousItem?.href ?? '/onboarding')}
+            aria-label={previousItem ? `Go to previous chapter: ${previousItem.label}` : 'Go to onboarding'}
+            className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--pico-text-secondary)]"
+          >
+            Prev
+          </Link>
 
-          <div className="min-w-0 px-1">
-            <p className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--pico-text-muted)]">
+          <div className="min-w-0 px-2">
+            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--pico-text-muted)]">
               Chapter {currentItem.chapter}
             </p>
-            <p className="truncate font-[family:var(--font-site-display)] text-base tracking-[-0.035em] text-[color:var(--pico-text)]">
+            <p className="truncate font-[family:var(--font-site-display)] text-xl tracking-[-0.05em] text-[color:var(--pico-text)]">
               {currentItem.label}
             </p>
           </div>
 
-          {nextItem ? (
-            <Link
-              href={picoHref(pathname, nextItem.href)}
-              aria-label={`Go to next chapter: ${nextItem.label}`}
-              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:var(--pico-border)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-secondary)]"
-            >
-              Next
-            </Link>
-          ) : (
-            <span
-              aria-disabled="true"
-              className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:rgba(255,255,255,0.035)] px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-[color:var(--pico-text-muted)]"
-            >
-              End
-            </span>
-          )}
+          <Link
+            href={picoHref(pathname, nextItem?.href ?? '/support')}
+            aria-label={nextItem ? `Go to next chapter: ${nextItem.label}` : 'Go to support'}
+            className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:var(--pico-border)] px-3 text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--pico-text-secondary)]"
+          >
+            Next
+          </Link>
 
           <Link
             href={picoHref(pathname, currentItem.href === '/support' ? '/academy' : '/support')}
-            aria-label={currentItem.href === '/support' ? 'Open academy map' : 'Open help'}
-            className="inline-flex min-h-9 items-center justify-center rounded-[11px] border border-[color:rgba(var(--pico-accent-rgb),0.28)] bg-[linear-gradient(135deg,var(--pico-accent-bright)_0%,var(--pico-accent)_48%,var(--pico-accent-deep)_100%)] px-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[color:var(--pico-accent-contrast)]"
+            aria-label={currentItem.href === '/support' ? 'Open academy map' : 'Open help lane'}
+            className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-[color:rgba(var(--pico-accent-rgb),0.28)] bg-[linear-gradient(135deg,var(--pico-accent-bright)_0%,var(--pico-accent)_48%,var(--pico-accent-deep)_100%)] px-3 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-accent-contrast)]"
           >
             {currentItem.href === '/support' ? 'Map' : 'Help'}
           </Link>
         </div>
-      </div>
+      </nav>
 
       <PicoWelcomeTour
         open={tourOpen}
