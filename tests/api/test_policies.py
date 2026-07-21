@@ -5,6 +5,7 @@ Tests for /policies endpoints.
 import asyncio
 import uuid
 from datetime import datetime, timezone
+from types import SimpleNamespace
 
 import pytest
 from httpx import AsyncClient
@@ -14,11 +15,18 @@ from sqlalchemy.orm import sessionmaker
 from src.api.models import User, UserSetting
 from src.api.routes.approvals import APPROVAL_KEY_PREFIX, _list_approval_settings
 from src.api.routes.policies import (
+    _policy_approval_dedupe_key,
     _redact_secret_text,
     evaluate_policies_and_request_approval,
 )
 from src.api.services.approval import ApprovalRequest
-from src.api.services.policy_store import Policy, PolicyEvaluationContext, PolicyStore, Rule
+from src.api.services.policy_store import (
+    Policy,
+    PolicyEvaluationContext,
+    PolicyEvaluationResult,
+    PolicyStore,
+    Rule,
+)
 
 
 @pytest.mark.parametrize(
@@ -58,6 +66,43 @@ def test_policy_approval_secret_text_redaction_preserves_safe_text():
 
     assert safe_value == value
     assert redacted is False
+
+
+def test_policy_approval_dedupe_key_is_keyed_against_offline_secret_guessing(monkeypatch):
+    context = PolicyEvaluationContext(
+        input="Deploy with password=hunter2",
+        tool="deploy_database",
+        tool_args={"password": "hunter2"},
+        run_id="run-keyed-dedupe",
+    )
+    result = PolicyEvaluationResult(
+        decision="require_approval",
+        reason="Approval required",
+        evaluated_policy_count=1,
+    )
+    user = User(id=uuid.uuid4(), email="reviewer@example.com")
+
+    monkeypatch.setattr(
+        "src.api.routes.policies.get_settings",
+        lambda: SimpleNamespace(
+            secret_encryption_key="first-dedicated-encryption-key-material",
+            jwt_secret="unused-jwt-secret-material",
+        ),
+    )
+    first_key = _policy_approval_dedupe_key(context, result, user)
+
+    monkeypatch.setattr(
+        "src.api.routes.policies.get_settings",
+        lambda: SimpleNamespace(
+            secret_encryption_key="second-dedicated-encryption-key-material",
+            jwt_secret="unused-jwt-secret-material",
+        ),
+    )
+    second_key = _policy_approval_dedupe_key(context, result, user)
+
+    assert first_key.startswith("policy-approval:v2:")
+    assert first_key != second_key
+    assert "hunter2" not in first_key
 
 
 class TestPolicyStore:

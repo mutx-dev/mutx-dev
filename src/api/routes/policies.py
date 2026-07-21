@@ -4,6 +4,7 @@ Policy management routes — CRUD + SSE hot-reload endpoint.
 
 import asyncio
 import hashlib
+import hmac
 import json
 import logging
 import re
@@ -18,6 +19,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.dependencies import get_current_user
+from src.api.config import get_settings
 from src.api.database import get_db
 from src.api.models import User
 from src.api.routes.approvals import (
@@ -39,6 +41,7 @@ logger = logging.getLogger(__name__)
 
 APPROVAL_CONTEXT_REDACTION_MARKER = "[REDACTED]"
 APPROVAL_CONTEXT_REDACTION_POLICY = "secret-values-v1"
+_POLICY_APPROVAL_DEDUPE_KEY_CONTEXT = b"mutx.policy-approval-dedupe.v2"
 _SENSITIVE_CONTEXT_KEYS = frozenset(
     {
         "access_key",
@@ -235,7 +238,19 @@ def _policy_approval_dedupe_key(
         separators=(",", ":"),
         default=str,
     )
-    return f"policy-approval:{hashlib.sha256(serialized.encode()).hexdigest()}"
+    settings = get_settings()
+    key_material = settings.secret_encryption_key or settings.jwt_secret
+    purpose_key = hmac.new(
+        key_material.encode("utf-8"),
+        _POLICY_APPROVAL_DEDUPE_KEY_CONTEXT,
+        hashlib.sha256,
+    ).digest()
+    digest = hmac.new(
+        purpose_key,
+        serialized.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return f"policy-approval:v2:{digest}"
 
 
 async def _find_existing_policy_approval(
@@ -256,7 +271,6 @@ async def _find_existing_policy_approval(
         offset += limit
         if offset >= total:
             return None
-    return None
 
 
 @asynccontextmanager
