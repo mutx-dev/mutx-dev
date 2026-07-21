@@ -22,6 +22,10 @@ jest.mock('@/components/site/docs/DocsLayout', () => ({
   DocsLayout: ({ children }: { children: unknown }) => children,
 }))
 
+jest.mock('@/components/site/docs/DocsRenderer', () => ({
+  DocsRenderer: () => null,
+}))
+
 jest.mock('remark', () => ({
   remark: () => ({
     use() {

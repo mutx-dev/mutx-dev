@@ -13,13 +13,13 @@
       "skipToMain": "Skip to main content"
     },
   "hero": {
-    "badge": "Waitlist Open · Founding Access",
-    "title": "Stop babysitting ",
-    "titleAccent": "your AI.",
-    "subtitle": "Start from zero, recover a stuck setup, or prepare a live agent for real work. Pico keeps the next setup step clear.",
+      "badge": "Private beta",
+      "title": "Get your agent ",
+      "titleAccent": "unstuck.",
+      "subtitle": "Connect it. Fix it. Ship it.",
     "cta": "Request access",
     "ctaSecondary": "See How It Works",
-    "meta": "Waitlist open. Guided setup access is rolling out."
+      "meta": "Private beta access is rolling out."
   },
   "agentSlider": {
     "ariaLabel": "Autonomous agent types",
@@ -87,21 +87,21 @@
       "close": "Pico turns that uncertainty into one practical next step."
     },
     "platform": {
-      "eyebrow": "How Pico Works",
-      "title": "Find the blocker. Finish the setup.",
-      "body": "Pico helps you identify what is blocking the agent, then points you to the next install, repair, review, or support step.",
+      "eyebrow": "Three moves",
+      "title": "From stuck to shipped.",
+      "body": "Pico finds the blocker and gives you the next move.",
       "howItWorks": {
         "0": {
-          "title": "Describe the goal or connect the agent",
-          "body": "Start with the job, the blocker, or the live system you need to understand. Pico uses that context to choose the right setup step."
+          "title": "Connect",
+          "body": "Show Pico the goal, the agent, or the failure."
         },
         "1": {
-          "title": "Choose install, repair, review, or support",
-          "body": "New builds get a practical path to one useful agent. Stuck setups get repair steps. Live systems get run history, thresholds, and approvals."
+          "title": "Fix",
+          "body": "Get the exact next step—install, repair, or review."
         },
         "2": {
-          "title": "Make the next change without losing context",
-          "body": "Check the run, isolate what is off, make the next change, and keep moving."
+          "title": "Ship",
+          "body": "Make the change and keep the context."
         },
         "3": {
           "title": "Escalate when the edge case is real",
@@ -236,16 +236,16 @@
     },
     "pricingPage": {
       "eyebrow": "Pricing",
-      "title": "Start free. Get help when setup needs it.",
-      "subtitle": "PicoMUTX helps you install, prepare an agent packet, and get human help for keys, hosting, integrations, or custom implementation.",
+      "title": "Choose a plan.",
+      "subtitle": "Start free. Upgrade when Pico is doing enough work to earn it.",
       "primaryCta": "Get Started",
       "secondaryCta": "Talk to support",
       "returnToLanding": "Return to landing",
       "routeState": {
-        "label": "Access state",
-        "title": "Start with setup. Choose a plan when you need support.",
-        "body": "Most users start with onboarding and then decide whether they need 1-on-1 guidance, managed setup, or a custom rollout.",
-        "signalLabel": "Access status",
+        "label": "Route state",
+        "title": "Start free. Sign in when you want Pico to remember your work.",
+        "body": "You can explore without paying. A hosted account adds progress sync, checkout, and a workspace that follows you between sessions.",
+        "signalLabel": "Access signal",
         "sessionAttached": "Hosted session attached",
         "sessionLoading": "Checking hosted session",
         "sessionMissing": "No hosted session yet",
@@ -255,17 +255,17 @@
         "stacksLabel": "Tracked stacks"
       },
       "accessPlans": {
-        "label": "Plans",
-        "title": "Use Pico yourself or get guided setup",
-        "body": "Free is enough to inspect the setup flow. Paid plans add more product access and support when setup gets practical.",
-        "recommended": "Recommended",
-        "meta": "Start with onboarding. Upgrade when API keys, hosting, integrations, or support time matter.",
-        "noteLabel": "What you get",
-        "note": "Pico is designed to move from install to agent packet to a running agent, with human help available when self-serve setup is too much.",
+        "label": "Our Plans",
+        "title": "Start with free. Upgrade when you need more power.",
+        "body": "All plans include full academy access. Choose what's right for your journey.",
+        "recommended": "Popular",
+        "meta": "Free needs no credit card. Paid plans are monthly and can be cancelled anytime.",
+        "noteLabel": "Why choose Pico?",
+        "note": "Start building and controlling AI agents today with our straightforward pricing. No hidden fees, cancel anytime.",
         "truths": [
-          "Onboarding prepares the agent packet",
-          "Support helps with keys, hosting, and rollout",
-          "Custom work is available when self-serve setup is not enough"
+          "Free includes onboarding and Academy",
+          "Starter adds credits and Autopilot",
+          "Pro adds API access and priority support"
         ],
         "tiers": {
           "trial": {
@@ -331,18 +331,18 @@
         }
       },
       "livePlans": {
-        "label": "Live product plans",
-        "title": "Live product plans after setup starts",
-        "body": "Use these once you know whether you are self-serving, bringing a team, or asking Pico to help implement the setup.",
-        "badge": "Inside Pico",
-        "badgePopular": "Recommended",
+        "label": "Plans",
+        "title": "Start free. Upgrade when the work earns it.",
+        "body": "Pick the smallest plan that covers the work in front of you. You can change it later.",
+        "badge": "Monthly",
+        "badgePopular": "Operator default",
         "currentPlan": "Current",
         "loading": "Starting checkout...",
         "checkoutError": "Checkout failed. Please try again.",
         "truths": [
-          "Checkout is for the live app",
-          "Hosted session unlocks progress sync and runtime state",
-          "Custom work starts with planning"
+          "Free needs no credit card",
+          "Paid plans include hosted progress sync",
+          "Enterprise starts with a rollout plan"
         ],
         "tiers": {
           "free": {
@@ -402,34 +402,34 @@
           }
         }
       },
-      "stackLabel": "Stack notes",
-      "stackTitle": "What Pico uses during setup",
-      "stackBody": "Pico uses tracked pack docs, sequenced lessons, and live stack briefings so the setup path and agent packet stay practical.",
+      "stackLabel": "Included",
+      "stackTitle": "What every plan is built on",
+      "stackBody": "Academy lessons, stack guides, and product documentation stay available as Pico grows with your work.",
       "stackFooterPrefix": "Last builder-pack refresh",
       "stackFooterMiddle": "across",
       "stackFooterDocs": "visible docs and",
       "stackFooterStacks": "tracked stack briefings.",
       "finalLabel": "Next move",
-      "finalTitle": "Need help choosing the right setup?",
-      "finalBody": "Start free if you want to inspect Pico. Talk to support if you need help with API keys, hosting, integrations, or a custom implementation.",
-      "finalPrimary": "Talk to support",
+      "finalTitle": "Need help choosing?",
+      "finalBody": "If the question is urgency, plan fit, or rollout shape, support should answer it directly and send you back into the right Pico route.",
+      "finalPrimary": "Open support lane",
       "finalSecondary": "Return to landing"
     },
     "faq": {
       "eyebrow": "Questions",
-      "title": "Questions worth clearing up before you commit",
+      "title": "Before you ask.",
       "items": {
         "0": {
           "q": "Do I need to know how to code?",
-          "a": "No. PicoMUTX is for people who need outcomes without turning themselves into full-time agent engineers."
+          "a": "No. Pico is built to make the next step clear without requiring an agent-engineering background."
         },
         "1": {
           "q": "What if I already tried and failed?",
-          "a": "That is one of the main entry points. PicoMUTX is built to recover momentum after the first confusing, expensive, or credibility-killing blocker."
+          "a": "That is the point. Connect the stuck setup and start from the blocker."
         },
         "2": {
           "q": "What kind of agent work is this for?",
-          "a": "Practical agent systems: support flows, internal copilots, lead capture, sales follow-up, and workflows that need to get built, fixed, or reviewed in the real world."
+          "a": "Support flows, copilots, lead capture, follow-up, and other practical agent workflows."
         },
         "3": {
           "q": "Is the waitlist open?",
@@ -442,15 +442,15 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Founding Access",
-      "title": "Request Pico access.",
-      "body": "Pico helps you get something useful working, recover it when it breaks, and keep it reviewable in real work.",
+      "eyebrow": "Private beta",
+      "title": "Bring the blocker.",
+      "body": "Pico will find the next move.",
       "faqLabel": "Still deciding? Clear the last few blockers.",
-      "formHeadline": "Start with the actual blocker.",
-      "formSubline": "Tell us whether you need to install, repair, review, or customize an agent setup.",
+      "formHeadline": "What is stuck?",
+      "formSubline": "Tell us what you are trying to ship.",
       "ctaButton": "Request access",
       "secondaryButton": "Book a Planning Call",
-      "formCtaMeta": "Free trial · Founding rates at 90% off · €29 / €79 · Pico Pilot from €1,000+"
+      "formCtaMeta": "Private beta · Limited access"
     },
     "contactForm": {
       "dialogLabel": "Contact form",

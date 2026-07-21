@@ -5,7 +5,8 @@
  * and a smoke test that SUMMARY.md is well-formed.
  */
 
-import { parseSummary, flatNav, getDocSitemapRoutes, type DocNavItem } from '../../lib/docs'
+import { parseSummary, flatNav, getDocSitemapRoutes, getPublishedDocRoutes, type DocNavItem } from '../../lib/docs'
+import { resolveDocHref } from '../../lib/docsLinks'
 
 // -----------------------------------------------------------------------------
 // Helper constants (replicate lib/docs.ts internals for isolation)
@@ -177,5 +178,29 @@ describe('parseSummary integration', () => {
     const routes = getDocSitemapRoutes()
     const unique = new Set(routes)
     expect(routes.length).toBe(unique.size)
+  })
+
+  it('keeps safe pages linked from published docs reachable', () => {
+    const routes = getPublishedDocRoutes()
+    expect(routes.has('/docs/deployment/local-developer-bootstrap')).toBe(true)
+    expect(routes.has('/docs/reference/leads')).toBe(true)
+    expect(routes.has('/docs/reference/analytics')).toBe(true)
+  })
+
+  it('does not publish internal release runbooks linked from old section markup', () => {
+    const routes = getPublishedDocRoutes()
+    expect(routes.has('/docs/deployment/cli-release')).toBe(false)
+    expect(routes.has('/docs/deployment/release-v0.1')).toBe(false)
+  })
+})
+
+describe('resolveDocHref', () => {
+  it('resolves links from a README-backed section directory', () => {
+    expect(resolveDocHref('quickstart.md', ['deployment', 'README'])).toBe('/docs/deployment/quickstart')
+    expect(resolveDocHref('docker.md', ['deployment', 'README'])).toBe('/docs/deployment/docker')
+  })
+
+  it('preserves API reference routing for source files under docs/api', () => {
+    expect(resolveDocHref('./leads.md', ['api', 'reference'])).toBe('/docs/reference/leads')
   })
 })

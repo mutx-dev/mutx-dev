@@ -69,6 +69,22 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
   },
 ];
 
+const DASHBOARD_NAV_PANELS: Partial<Record<DashboardNavItem["key"], string>> = {
+  home: "overview",
+  sessions: "chat",
+  apiKeys: "api-keys",
+  budgets: "cost-tracker",
+  orchestration: "tasks",
+  analytics: "tokens",
+  history: "activity",
+  control: "settings",
+  autonomy: "cron",
+};
+
+export function getDashboardNavPanel(key: DashboardNavItem["key"]): string {
+  return DASHBOARD_NAV_PANELS[key] ?? key;
+}
+
 function normalizePathname(pathname: string): string {
   if (pathname !== "/" && pathname.endsWith("/")) {
     return pathname.slice(0, -1);

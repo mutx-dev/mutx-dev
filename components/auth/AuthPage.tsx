@@ -28,21 +28,17 @@ const authContent = {
   default: {
     login: {
       eyebrow: "Sign in",
-      title: "Sign in to MUTX.",
+      title: "Pick up where you left off.",
       description:
-        "Use your MUTX account to open the dashboard, review agents, and continue your setup.",
-      asideEyebrow: "What unlocks next",
-      asideTitle: "Your dashboard opens after sign-in.",
+        "Open the workspace, runs, and controls tied to your MUTX account.",
+      asideEyebrow: "After sign-in",
+      asideTitle: "Your workspace, ready when you are.",
       asideBody:
-        "Once your session is active, MUTX loads your agents, deployments, traces, and settings from the same workspace.",
-      mediaSrc: "/landing/webp/wiring-bay.webp",
-      mediaAlt: "MUTX robot operating inside a wiring bay",
-      mediaWidth: 1024,
-      mediaHeight: 1536,
+        "Your team, permissions, deployment state, and run history load from the same account.",
       highlights: [
-        "Use a provider or password to reach the same MUTX workspace.",
-        "Sessions stay scoped to the current host.",
-        "If sign-in fails, the form shows the returned error.",
+        "One account for hosted work and desktop control.",
+        "Your permissions load with the workspace.",
+        "Failed sign-ins explain what went wrong.",
       ],
       heading: "Welcome back",
       subheading:
@@ -52,21 +48,17 @@ const authContent = {
     },
     register: {
       eyebrow: "Create account",
-      title: "Create your MUTX account.",
+      title: "Set up your MUTX workspace.",
       description:
-        "Sign up with a password or provider, confirm your identity, and open the dashboard.",
-      asideEyebrow: "Account rules",
-      asideTitle: "Account setup should be clear and easy to verify.",
+        "Create one account for the dashboard, desktop app, and the work your agents run.",
+      asideEyebrow: "What you get",
+      asideTitle: "A workspace that belongs to your team.",
       asideBody:
-        "MUTX sends verification email when needed and links provider identities to the same account.",
-      mediaSrc: "/landing/webp/victory-core.webp",
-      mediaAlt: "MUTX robot holding the MUTX mark after access is granted",
-      mediaWidth: 1536,
-      mediaHeight: 1024,
+        "Your identity, permissions, run history, and deployment records stay together from the first session.",
       highlights: [
-        "Google, GitHub, Discord, and Apple can all create MUTX sessions.",
-        "Password registration sends verification email to the current host.",
-        "If email confirmation is required, the UI moves into a verification state.",
+        "Sign up with email or a provider.",
+        "Verification returns you to the right workspace.",
+        "Account errors stay visible and actionable.",
       ],
       heading: "Create your account",
       subheading:
@@ -77,22 +69,18 @@ const authContent = {
   },
   pico: {
     login: {
-      eyebrow: "Pico preview access",
-      title: "Sign in to the Pico preview while the product is still taking shape.",
+      eyebrow: "Pico sign-in",
+      title: "Come back to your work.",
       description:
-        "Pico is usable now, but it is still being built in public. Sign in to keep your progress attached to this preview and continue from where the current build leaves off.",
-      asideEyebrow: "What to expect",
-      asideTitle: "This is an early version, not the finished product.",
+        "Sign in to restore your lessons, setup, and progress across Pico.",
+      asideEyebrow: "Your workspace",
+      asideTitle: "Pico remembers where you stopped.",
       asideBody:
-        "Some parts already work well, some parts are still moving, and the sign-in wall is mainly here so your lessons, settings, and progress stay tied to one preview account.",
-      mediaSrc: "/landing/webp/wiring-bay.webp",
-      mediaAlt: "MUTX robot operating inside a wiring bay",
-      mediaWidth: 1024,
-      mediaHeight: 1536,
+        "Your current lesson, saved proof, setup state, and support context return with your account.",
       highlights: [
-        "You can already explore onboarding, academy, tutor, and support flows.",
-        "Copy, layout, and product behavior will keep changing as Pico develops.",
-        "Signing in keeps this preview personal instead of dropping you into a disposable demo.",
+        "Resume lessons and saved proof.",
+        "Keep setup progress across devices.",
+        "Return to the same support context.",
       ],
       heading: "Enter the current Pico build",
       subheading:
@@ -101,22 +89,18 @@ const authContent = {
       loadingLabel: "Opening Pico",
     },
     register: {
-      eyebrow: "Pico preview access",
-      title: "Create a Pico preview account for the version that exists today.",
+      eyebrow: "Create Pico account",
+      title: "Give your work somewhere to live.",
       description:
-        "This is the early-access lane for Pico. Create an account if you want your setup, progress, and feedback tied to the hosted preview while we keep building the rest.",
-      asideEyebrow: "Why sign in now",
-      asideTitle: "Because this preview already remembers your work.",
+        "Save your setup, lessons, and progress to one Pico account.",
+      asideEyebrow: "Why an account",
+      asideTitle: "So you never restart from zero.",
       asideBody:
-        "Registration gives the current build a stable way to remember you while onboarding, lessons, and agent tools keep evolving.",
-      mediaSrc: "/landing/webp/victory-core.webp",
-      mediaAlt: "MUTX robot holding the MUTX mark after access is granted",
-      mediaWidth: 1536,
-      mediaHeight: 1024,
+        "Your current route, saved proof, and support history stay attached as you move through the product.",
       highlights: [
-        "Accounts created here stay scoped to the Pico preview host.",
-        "Verification email and provider auth return you to the Pico flow, not the main dashboard.",
-        "You get a real preview account, not a throwaway demo identity.",
+        "One account for onboarding and Academy.",
+        "Verification returns you to Pico.",
+        "Your progress persists between sessions.",
       ],
       heading: "Create your Pico preview account",
       subheading:

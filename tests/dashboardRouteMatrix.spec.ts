@@ -1111,6 +1111,19 @@ test.describe('Dashboard route matrix', () => {
       await expect(page.getByRole('link', { name: /^logs$/i })).toHaveCount(0);
       await expect(page.getByRole('link', { name: /^spawn$/i })).toHaveCount(0);
     });
+
+    test('command palette is keyboard accessible', async ({ page }) => {
+      await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+
+      await expect(page.getByRole('button', { name: /open command palette/i })).toBeEnabled();
+      await page.keyboard.press('Control+K');
+      const palette = page.getByRole('dialog', { name: /go anywhere/i });
+      await expect(palette).toBeVisible();
+      await expect(page.getByRole('combobox', { name: /search dashboard surfaces/i })).toBeFocused();
+
+      await page.keyboard.press('Escape');
+      await expect(palette).toHaveCount(0);
+    });
   });
 
   test.describe('mobile', () => {

@@ -53,7 +53,7 @@ export function FilterBar({
 
   return (
     <section
-      className={cn("dashboard-entry rounded-[20px] border p-3.5", className)}
+      className={cn("dashboard-entry rounded-xl border p-3.5", className)}
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradient,
@@ -64,7 +64,7 @@ export function FilterBar({
     >
       <div className="flex flex-wrap items-center gap-2.5">
         <div
-          className="flex min-h-11 min-w-[240px] flex-1 items-center gap-2 rounded-[14px] border px-3.5"
+          className="flex min-h-11 min-w-[240px] flex-1 items-center gap-2 rounded-md border px-3.5"
           style={{
             borderColor: dashboardTokens.borderStrong,
             backgroundColor: dashboardTokens.bgInset,
@@ -99,7 +99,7 @@ export function FilterBar({
             {filters.map((filter) => (
               <label
                 key={filter.id}
-                className="flex items-center gap-2 rounded-[14px] border px-3 py-2 text-sm"
+                className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
                 style={{
                   borderColor: dashboardTokens.borderSubtle,
                   backgroundColor: dashboardTokens.bgInset,
@@ -131,7 +131,7 @@ export function FilterBar({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex h-11 items-center gap-1 rounded-[14px] border px-3 text-sm"
+            className="inline-flex h-11 items-center gap-1 rounded-md border px-3 text-sm"
             style={{
               borderColor: dashboardTokens.borderSubtle,
               backgroundColor: dashboardTokens.bgInset,

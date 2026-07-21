@@ -23,7 +23,6 @@ import {
   Workflow,
 } from 'lucide-react'
 
-import { DemoRoutePage } from '@/components/dashboard/DemoRoutePage'
 import { LoadingState } from '@/components/dashboard/LoadingState'
 import { RouteHeader } from '@/components/dashboard/RouteHeader'
 import { DashboardSectionPage } from '@/components/dashboard/DashboardSectionPage'
@@ -57,6 +56,10 @@ const BudgetsPageClient = dynamic(
   () => import('@/components/dashboard/BudgetsPageClient').then((mod) => mod.BudgetsPageClient),
   { loading: () => <LoadingState variant='cards' count={3} /> },
 )
+const ChannelsPageClient = dynamic(
+  () => import('@/components/dashboard/ChannelsPageClient').then((mod) => mod.ChannelsPageClient),
+  { loading: () => <LoadingState variant='cards' count={3} /> },
+)
 const DocumentsPageClient = dynamic(
   () => import('@/components/dashboard/DocumentsPageClient').then((mod) => mod.DocumentsPageClient),
   { loading: () => <LoadingState variant='cards' count={3} /> },
@@ -72,6 +75,10 @@ const LogsPageClient = dynamic(
   () => import('@/components/dashboard/LogsPageClient').then((mod) => mod.LogsPageClient),
   { loading: () => <LoadingState variant='rows' count={5} /> },
 )
+const MemoryPageClient = dynamic(
+  () => import('@/components/dashboard/MemoryPageClient').then((mod) => mod.MemoryPageClient),
+  { loading: () => <LoadingState variant='cards' count={3} /> },
+)
 const MonitoringPageClient = dynamic(
   () => import('@/components/dashboard/MonitoringPageClient').then((mod) => mod.MonitoringPageClient),
   { loading: () => <LoadingState variant='cards' count={3} /> },
@@ -81,6 +88,14 @@ const ObservabilityPageClient = dynamic(
     import('@/components/dashboard/ObservabilityPageClient').then(
       (mod) => mod.ObservabilityPageClient,
     ),
+  { loading: () => <LoadingState variant='cards' count={3} /> },
+)
+const NotificationsPageClient = dynamic(
+  () => import('@/components/dashboard/NotificationsPageClient').then((mod) => mod.NotificationsPageClient),
+  { loading: () => <LoadingState variant='rows' count={4} /> },
+)
+const OrchestrationPageClient = dynamic(
+  () => import('@/components/dashboard/OrchestrationPageClient').then((mod) => mod.OrchestrationPageClient),
   { loading: () => <LoadingState variant='cards' count={3} /> },
 )
 const OpenclawSetupSurface = dynamic(
@@ -113,6 +128,10 @@ const SkillsPageClient = dynamic(
 const SwarmsPageClient = dynamic(
   () => import('@/components/dashboard/SwarmsPageClient').then((mod) => mod.SwarmsPageClient),
   { loading: () => <LoadingState variant='cards' count={3} /> },
+)
+const StandupPageClient = dynamic(
+  () => import('@/components/dashboard/StandupPageClient').then((mod) => mod.StandupPageClient),
+  { loading: () => <LoadingState variant='detail' count={2} /> },
 )
 const TemplateCatalogPageClient = dynamic(
   () =>
@@ -179,27 +198,6 @@ function UpgradeNudge({
         'Switch the interface mode to full once you need the broader dashboard surface.',
         `Current subscription: ${subscription || 'free'}.`,
         'Essential mode keeps overview, agents, tasks, chat, activity, logs, and settings available.',
-      ]}
-    />
-  )
-}
-
-function MissingPanel({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) {
-  return (
-    <DashboardSectionPage
-      title={title}
-      description={description}
-      badge='route scaffold'
-      checks={[
-        'Keep the shell truthful: no fake notification or standup theater until the contracts exist.',
-        'When this route ships, wire it through the same content router instead of creating a separate app shell.',
-        'Treat this panel as reserved space, not a design playground.',
       ]}
     />
   )
@@ -449,29 +447,29 @@ function renderPanel(panel: DashboardPanelId) {
       )
     case 'tasks':
       return (
-        <DemoRoutePage
+        <ShellRoute
           title='Orchestration'
-          description='Workflow and handoff control will land here once the backend owns orchestration entities end to end.'
-          badge='demo orchestration'
-          notes={[
-            'Show truthful workflow topology once orchestration endpoints ship.',
-            'Keep pause, resume, and concurrency controls hidden until they map to auditable backend actions.',
-            'Use the same shell and density rules as the live routes so this page is ready for backend wiring, not another redesign.',
-          ]}
-        />
+          description='Approvals, recovery lanes, blueprints, and autonomy queue posture from live orchestration data.'
+          icon={Network}
+          iconTone='text-sky-300 bg-sky-400/10'
+          badge='orchestration surface'
+          stats={[{ label: 'Scope', value: 'Workflow + recovery' }, { label: 'Data', value: 'Live API', tone: 'success' }]}
+        >
+          <OrchestrationPageClient />
+        </ShellRoute>
       )
     case 'memory':
       return (
-        <DemoRoutePage
+        <ShellRoute
           title='Memory'
-          description='Memory and context management need real retention and retrieval contracts before controls belong here.'
-          badge='demo memory'
-          notes={[
-            'Do not ship pretend vector-store or retention controls before the product semantics exist.',
-            'This page should become the place to inspect memory pressure, retention windows, and context ownership.',
-            'Until then, keep the route compact, honest, and visually aligned with the rest of the control plane.',
-          ]}
-        />
+          description='Retained session context, source activity, and workspace memory artifacts from the live contract.'
+          icon={Brain}
+          iconTone='text-violet-300 bg-violet-400/10'
+          badge='memory surface'
+          stats={[{ label: 'Scope', value: 'Context + artifacts' }, { label: 'Data', value: 'Live API', tone: 'success' }]}
+        >
+          <MemoryPageClient />
+        </ShellRoute>
       )
     case 'tokens':
       return (
@@ -491,16 +489,16 @@ function renderPanel(panel: DashboardPanelId) {
       )
     case 'channels':
       return (
-        <DashboardSectionPage
+        <ShellRoute
           title='Channels'
-          description='Assistant channel shell for bindings, policy mode, and safe communication defaults.'
+          description='Assistant channel bindings, policy mode, sessions, and communication readiness from the live contract.'
+          icon={Users}
+          iconTone='text-cyan-300 bg-cyan-400/10'
           badge='assistant channels'
-          checks={[
-            'Bind this route to mounted assistant channel state once browser panels consume the control-plane contract.',
-            'Keep channel enablement and policy views grounded in real backend data.',
-            'Use this surface for truthful channel inspection before introducing richer write flows.',
-          ]}
-        />
+          stats={[{ label: 'Scope', value: 'Bindings + sessions' }, { label: 'Data', value: 'Live API', tone: 'success' }]}
+        >
+          <ChannelsPageClient />
+        </ShellRoute>
       )
     case 'skills':
       return (
@@ -600,17 +598,29 @@ function renderPanel(panel: DashboardPanelId) {
       )
     case 'notifications':
       return (
-        <MissingPanel
+        <ShellRoute
           title='Notifications'
-          description='The shell reserves this panel, but MUTX does not ship a truthful notification center yet.'
-        />
+          description='Live alerts, pending approvals, webhook failures, and runtime incident summaries.'
+          icon={BellRing}
+          iconTone='text-amber-300 bg-amber-400/10'
+          badge='signal inbox'
+          stats={[{ label: 'Scope', value: 'Signals only' }, { label: 'Data', value: 'Live API', tone: 'success' }]}
+        >
+          <NotificationsPageClient />
+        </ShellRoute>
       )
     case 'standup':
       return (
-        <MissingPanel
+        <ShellRoute
           title='Standup'
-          description='MUTX does not have a real standup workflow in this checkout yet, so this panel stays reserved.'
-        />
+          description='A read-only brief synthesized from current alerts, approvals, runs, failures, and autonomy backlog.'
+          icon={Activity}
+          iconTone='text-cyan-300 bg-cyan-400/10'
+          badge='derived brief'
+          stats={[{ label: 'Scope', value: 'Read-only synthesis' }, { label: 'Data', value: 'Live API', tone: 'success' }]}
+        >
+          <StandupPageClient />
+        </ShellRoute>
       )
   }
 }

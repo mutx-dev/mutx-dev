@@ -1,13 +1,28 @@
 'use client'
 
 import { useLocale, useTranslations } from 'next-intl'
-import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react'
+import { useState, useCallback, useEffect, useId, useRef, type FormEvent } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import * as Select from '@radix-ui/react-select'
 import { X, ArrowRight, Check, ChevronDown } from 'lucide-react'
 
 import s from './PicoContactForm.module.css'
 import { buildPicoContactPayload } from './picoContactPayload'
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"]):not([tabindex="-1"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
+function getFocusableElements(container: HTMLElement) {
+  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (element) => element.getClientRects().length > 0 && !element.closest('[aria-hidden="true"]'),
+  )
+}
 
 type PicoContactFormOption = {
   value: string
@@ -55,7 +70,14 @@ export function PicoContactForm({
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const successTitleRef = useRef<HTMLHeadingElement>(null)
   const honeypotRef = useRef<HTMLInputElement>(null)
+  const submissionIdRef = useRef(0)
+  const titleId = useId()
+  const interestLabelId = useId()
   const usesStructuredIntake =
     t.has('interestOptions.build') &&
     t.has('interestOptions.fix') &&
@@ -110,6 +132,8 @@ export function PicoContactForm({
 
       if (honeypotRef.current?.value) return
 
+      const submissionId = submissionIdRef.current + 1
+      submissionIdRef.current = submissionId
       setState('submitting')
       setErrorMsg('')
 
@@ -133,6 +157,7 @@ export function PicoContactForm({
         })
 
         const data = await res.json()
+        if (submissionId !== submissionIdRef.current) return
 
         if (!res.ok || data.status === 'error') {
           const msg = data.error?.message || t('errorFallback')
@@ -144,6 +169,7 @@ export function PicoContactForm({
         setState('success')
         onSuccess?.()
       } catch {
+        if (submissionId !== submissionIdRef.current) return
         setErrorMsg(t('networkError'))
         setState('error')
       }
@@ -152,16 +178,109 @@ export function PicoContactForm({
   )
 
   const handleClose = useCallback(() => {
-    if (state === 'submitting') return
+    submissionIdRef.current += 1
     setState('idle')
     setErrorMsg('')
     onClose()
-  }, [onClose, state])
+  }, [onClose])
+
+  useEffect(() => {
+    if (!open) return
+
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const overlay = overlayRef.current
+    const inertedElements = new Map<HTMLElement, boolean>()
+    const previousOverflow = document.body.style.overflow
+
+    // Keep the mounted modal branch interactive while making every sibling
+    // background branch unavailable to pointer, keyboard, and assistive tech.
+    let activeBranch: HTMLElement | null = overlay
+    while (activeBranch && activeBranch !== document.body) {
+      const parent = activeBranch.parentElement
+      if (!parent) break
+
+      for (const sibling of Array.from(parent.children)) {
+        if (sibling !== activeBranch && sibling instanceof HTMLElement) {
+          inertedElements.set(sibling, sibling.hasAttribute('inert'))
+          sibling.setAttribute('inert', '')
+        }
+      }
+
+      activeBranch = parent
+    }
+
+    document.body.style.overflow = 'hidden'
+    const focusFrame = window.requestAnimationFrame(() => emailRef.current?.focus({ preventScroll: true }))
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame)
+      document.body.style.overflow = previousOverflow
+      for (const [element, wasInert] of inertedElements) {
+        if (!wasInert) element.removeAttribute('inert')
+      }
+      previouslyFocused?.focus({ preventScroll: true })
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return
+
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        handleClose()
+        return
+      }
+
+      if (event.key !== 'Tab' || !modalRef.current) return
+
+      const activeElement = document.activeElement
+      if (
+        activeElement instanceof HTMLElement &&
+        activeElement.closest('[data-pico-contact-select-content]')
+      ) {
+        return
+      }
+
+      const focusableElements = getFocusableElements(modalRef.current)
+      const first = focusableElements[0]
+      const last = focusableElements.at(-1)
+      if (!first || !last) {
+        event.preventDefault()
+        modalRef.current.focus({ preventScroll: true })
+        return
+      }
+
+      if (!modalRef.current.contains(activeElement)) {
+        event.preventDefault()
+        const focusTarget = event.shiftKey ? last : first
+        focusTarget.focus()
+      } else if (event.shiftKey && activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleClose, open])
+
+  useEffect(() => {
+    if (!open || state !== 'success') return
+    successTitleRef.current?.focus({ preventScroll: true })
+  }, [open, state])
 
   return (
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={overlayRef}
           className={s.overlay}
           initial={prefersReducedMotion ? undefined : { opacity: 0 }}
           animate={prefersReducedMotion ? undefined : { opacity: 1 }}
@@ -172,6 +291,7 @@ export function PicoContactForm({
           }}
         >
           <motion.div
+            ref={modalRef}
             className={s.modal}
             initial={prefersReducedMotion ? undefined : { opacity: 0, y: 24, scale: 0.97 }}
             animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
@@ -180,6 +300,7 @@ export function PicoContactForm({
             role='dialog'
             aria-modal='true'
             aria-label={t('dialogLabel')}
+            tabIndex={-1}
           >
             <button
               className={s.closeBtn}
@@ -195,7 +316,14 @@ export function PicoContactForm({
                 <span className={s.successIcon}>
                   <Check className='h-6 w-6' aria-hidden='true' />
                 </span>
-                <h2 className={s.successTitle}>{resolvedCopy.successTitle}</h2>
+                <h2
+                  ref={successTitleRef}
+                  id={titleId}
+                  className={s.successTitle}
+                  tabIndex={-1}
+                >
+                  {resolvedCopy.successTitle}
+                </h2>
                 <p className={s.successBody}>{resolvedCopy.successBody}</p>
                 <button className={s.successBtn} onClick={handleClose} type='button'>
                   {resolvedCopy.successBack}
@@ -204,7 +332,9 @@ export function PicoContactForm({
             ) : (
               <>
                 <div className={s.header}>
-                  <h2 className={s.title}>{resolvedCopy.title}</h2>
+                  <h2 id={titleId} className={s.title}>
+                    {resolvedCopy.title}
+                  </h2>
                   <p className={s.subtitle}>{resolvedCopy.subtitle}</p>
                 </div>
 
@@ -223,6 +353,7 @@ export function PicoContactForm({
                     <label className={s.label} htmlFor='pico-email'>
                       <span className={s.labelText}>{t('emailLabel')}</span>
                       <input
+                        ref={emailRef}
                         id='pico-email'
                         name='email'
                         type='email'
@@ -264,9 +395,14 @@ export function PicoContactForm({
                   </div>
 
                   <div className={s.label}>
-                    <span className={s.labelText}>{resolvedCopy.interestLabel}</span>
+                    <span id={interestLabelId} className={s.labelText}>
+                      {resolvedCopy.interestLabel}
+                    </span>
                     <Select.Root value={interest} onValueChange={setInterest}>
-                      <Select.Trigger className={s.selectTrigger}>
+                      <Select.Trigger
+                        className={s.selectTrigger}
+                        aria-labelledby={interestLabelId}
+                      >
                         <Select.Value />
                         <Select.Icon className={s.selectIcon}>
                           <ChevronDown className='h-3.5 w-3.5' aria-hidden='true' />
@@ -274,6 +410,7 @@ export function PicoContactForm({
                       </Select.Trigger>
                       <Select.Portal>
                         <Select.Content
+                          data-pico-contact-select-content
                           className={s.selectContent}
                           position='popper'
                           sideOffset={4}

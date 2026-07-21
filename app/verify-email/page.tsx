@@ -28,10 +28,6 @@ const authSurfaceProps = {
   asideTitle: "Keep confirmation explicit.",
   asideBody:
     "Provider auth can skip this because the upstream identity is already verified. Password registration stays accountable through the email confirmation lane.",
-  mediaSrc: "/landing/webp/reading-bench.webp",
-  mediaAlt: "MUTX robot reviewing a verification packet on a bench",
-  mediaWidth: 1024,
-  mediaHeight: 1536,
   highlights: [
     "Verification links terminate on the active frontend host instead of a hardcoded marketing route.",
     "Expired or invalid tokens fail honestly and leave a clear resend path.",
@@ -173,7 +169,7 @@ function VerifyEmailContent() {
     <AuthSurface {...authSurfaceProps} variant="recovery">
       <div className={styles.formWrap}>
         {status === "loading" ? (
-          <div className={styles.success}>
+          <div className={styles.success} role="status" aria-live="polite">
             <Loader2 className="h-4 w-4 animate-spin" />
             {message}
           </div>
@@ -181,7 +177,7 @@ function VerifyEmailContent() {
 
         {status === "success" ? (
           <>
-            <div className={styles.success}>
+            <div className={styles.success} role="status" aria-live="polite">
               <CheckCircle2 className="h-4 w-4" />
               {message}
             </div>
@@ -205,7 +201,7 @@ function VerifyEmailContent() {
 
         {status === "pending" ? (
           <>
-            <div className={styles.success}>
+            <div className={styles.success} role="status" aria-live="polite">
               <Mail className="h-4 w-4" />
               {message}
             </div>
@@ -247,7 +243,7 @@ function VerifyEmailContent() {
 
         {status === "error" ? (
           <>
-            <div className={styles.error}>
+            <div className={styles.error} role="alert">
               <AlertCircle className="h-4 w-4" />
               {message}
             </div>

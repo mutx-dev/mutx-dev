@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { ArrowRight, PhoneCall } from "lucide-react";
 
 import { ContactLeadForm } from "@/components/ContactLeadForm";
@@ -7,6 +6,7 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
+import { OperationalVisual } from "@/components/site/marketing/OperationalVisual";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
 import { buildPageMetadata, getCanonicalUrl, getSiteUrl } from "@/lib/seo";
 
@@ -54,7 +54,7 @@ export default function ContactPage() {
       />
       <PublicNav />
 
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
           <div className={`${styles.shell} ${styles.routeHeroNarrow}`}>
             <div className={styles.contactHeroStage}>
@@ -65,7 +65,7 @@ export default function ContactPage() {
                     Talk to MUTX.
                   </h1>
                   <p className={`${styles.bodyText} ${styles.bodyTextOnDark} ${styles.contactHeroBody}`}>
-                    Use this for evaluation, rollout review, or a concrete operator issue.
+                    Evaluation. Rollout. Operator issues.
                   </p>
                 </div>
 
@@ -82,13 +82,7 @@ export default function ContactPage() {
               </div>
 
               <div className={styles.contactHeroImageWrap}>
-                <Image
-                  src="/marketing/call-me.png"
-                  alt="Contact MUTX"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className={styles.contactHeroImage}
-                />
+                <OperationalVisual variant="contact" />
               </div>
             </div>
           </div>

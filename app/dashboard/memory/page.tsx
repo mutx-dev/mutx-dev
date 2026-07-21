@@ -1,6 +1,9 @@
 "use client";
 
-import { DemoRoutePage } from "@/components/dashboard/DemoRoutePage";
+import { MemoryStick } from "lucide-react";
+
+import { MemoryPageClient } from "@/components/dashboard/MemoryPageClient";
+import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { DesktopRouteBoundary } from "@/components/desktop/DesktopRouteBoundary";
 
 export default function DashboardMemoryPage() {
@@ -8,16 +11,20 @@ export default function DashboardMemoryPage() {
     <DesktopRouteBoundary
       routeKey="memory"
       browserView={
-        <DemoRoutePage
-          title="Memory"
-          description="Memory and context management need real retention and retrieval contracts before controls belong here."
-          badge="demo memory"
-          notes={[
-            "Do not ship pretend vector-store or retention controls before the product semantics exist.",
-            "This page should become the place to inspect memory pressure, retention windows, and context ownership.",
-            "Until then, keep the route compact, honest, and visually aligned with the rest of the control plane.",
-          ]}
-        />
+        <div className="space-y-4">
+          <RouteHeader
+            title="Memory"
+            description="Inspect retained session context, source activity, and workspace memory artifacts from the live contract."
+            icon={MemoryStick}
+            iconTone="text-violet-300 bg-violet-400/10"
+            badge="memory surface"
+            stats={[
+              { label: "Scope", value: "Context + artifacts" },
+              { label: "Data", value: "Live API", tone: "success" },
+            ]}
+          />
+          <MemoryPageClient />
+        </div>
       }
     />
   );

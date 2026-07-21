@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -664,13 +663,12 @@ export function PicoTutorPageClient() {
             <form onSubmit={submit} className="p-6 sm:p-7">
               <p className={picoClasses.label}>Tutor desk</p>
               <div className="mt-3 flex items-center gap-4">
-                <Image
-                  src="/pico/mascot/pico-atom.svg"
-                  alt="PicoMUTX tutor mascot"
-                  width={48}
-                  height={48}
-                  className="flex-shrink-0 drop-shadow-[0_4px_12px_rgba(164,255,92,0.18)]"
-                />
+                <span
+                  aria-hidden="true"
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center border border-[color:var(--pico-accent)] font-[family:var(--font-mono)] text-xs font-semibold tracking-[0.14em] text-[color:var(--pico-accent)]"
+                >
+                  03
+                </span>
                 <h2 className="font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
                   Bring one blocker to the desk
                 </h2>

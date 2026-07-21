@@ -22,6 +22,7 @@ export default tseslint.config(
       "dist/**",
       "gbrain-src/**",
       "out/**",
+      "output/**",
       "tmp/**",
       "playwright-report/**",
       "test-results/**",

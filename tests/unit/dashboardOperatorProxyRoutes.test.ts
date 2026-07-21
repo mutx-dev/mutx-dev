@@ -274,11 +274,53 @@ describe('dashboard operator panel routes', () => {
     expect(payload.summary).toMatchObject({
       sessions: 1,
       activeSessions: 1,
+      sources: 1,
       documentJobs: 1,
       documentArtifacts: 1,
       reasoningJobs: 1,
       reasoningArtifacts: 2,
     })
+    expect(payload.assistant).toEqual({
+      name: 'Ops Assistant',
+      workspace: 'ops',
+      status: 'active',
+    })
+    expect(payload.sessions).toEqual([
+      {
+        id: 'session_1',
+        label: 'Ops Assistant',
+        source: 'gateway',
+        channel: 'slack',
+        active: true,
+        kind: 'session',
+        model: 'gpt-5',
+        lastActivity: '2026-04-19T09:15:00.000Z',
+        flags: [],
+      },
+    ])
+    expect(payload.sources).toEqual([{ source: 'gateway', count: 1 }])
+    expect(payload.documents).toEqual([
+      expect.objectContaining({
+        id: 'doc_1',
+        templateId: 'runbook',
+        executionMode: 'managed',
+        artifacts: 1,
+        resultSummary: 'Rendered PDF',
+        updatedAt: '2026-04-19T08:00:00.000Z',
+      }),
+    ])
+    expect(payload.reasoning).toEqual([
+      expect.objectContaining({
+        id: 'reason_1',
+        templateId: 'postmortem',
+        executionMode: 'managed',
+        artifacts: 2,
+        resultSummary: 'Compared outputs',
+        updatedAt: '2026-04-19T08:10:00.000Z',
+      }),
+    ])
+    expect(payload).not.toHaveProperty('documentJobs')
+    expect(payload).not.toHaveProperty('reasoningJobs')
     expect(payload.partials[0]).toMatch(/read-only/i)
   })
 
