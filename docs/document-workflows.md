@@ -46,7 +46,7 @@ Required prerequisites:
 - `MUTX_DOCUMENTS_ENABLED=true`
 - Python `>= 3.11`
 - `deno` on `PATH`
-- `predict-rlm>=0.2.2,<1` in the backend environment
+- `predict-rlm>=0.7.3,<1` in the backend environment
 - model credentials for the configured providers
 
 Default model wiring:
@@ -136,7 +136,14 @@ MUTX does not claim authorship over `predict-rlm` or its upstream example design
 
 - Upstream project: [Trampoline-AI/predict-rlm](https://github.com/Trampoline-AI/predict-rlm)
 - License: MIT
-- Current upstream ref used for attribution: `5c7387afa1980b62b21a34ad0261256a95d8caa1`
+- Validated upstream release: `v0.7.3`
+  (`e7f1e5df7d0188861b39142094b4b738f456972f`)
+- Historical adaptation ref: `5c7387afa1980b62b21a34ad0261256a95d8caa1`
+
+The v0.7.3 core document API remains compatible with MUTX's use of `File`,
+`Skill`, and `PredictRLM`. The upstream release adds GPT-5.6 support to the
+optional `codex-lm` extra; MUTX's document engine uses the core package, so its
+template and artifact contracts do not require a migration.
 
 The integration, template alignment, and legal provenance are tracked in:
 

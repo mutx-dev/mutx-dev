@@ -1,6 +1,6 @@
 # MUTX upstream dependency report
 
-Last verified: 2026-07-15
+Baseline last verified: 2026-07-15. predict-rlm reverified: 2026-07-22.
 
 This report separates three facts that older revisions conflated:
 
@@ -21,7 +21,7 @@ Immutable license and source evidence is maintained in
 | FPL | Main `b7aa0b7ad56f60428d692278a435c5e6640cec2b` | Apache-2.0 | MUTX ships FPL policy files and CLI integration | Validate parser/daemon compatibility; retain Apache-2.0 text and any future `NOTICE` |
 | Mission Control | `v2.1.0` / `b4ebc5418bea4fa9288a5c17fbddb9ba99740964` | MIT, Copyright (c) 2026 Builderz Labs | Direct dashboard pattern provenance predates the current release | Treat `v2.1.0` as the comparison baseline, not proof of compatibility |
 | Orchestra Research AI-Research-SKILLs | `v1.7.2` / `773a52944ba4747a18bd4ae9ade53fff041adcbc` | MIT, Copyright (c) 2025 Claude AI Research Skills Contributors | Catalog is pinned to `05f1958727bfc2bc22240f41d060504473c4f236` | Regenerate and validate the catalog against `v1.7.2` in a dedicated migration |
-| predict-rlm | `v0.7.2` / `4ff334dea79a2f27e96b7a50a358b0427050899e` | MIT, Copyright (c) 2026 Trampoline AI | Workflow provenance is pinned to `5c7387afa1980b62b21a34ad0261256a95d8caa1` | Validate templates, runtime prerequisites, and output contracts against `v0.7.2` |
+| predict-rlm | `v0.7.3` / `e7f1e5df7d0188861b39142094b4b738f456972f` | MIT, Copyright (c) 2026 Trampoline AI | Core runtime, templates, and artifact outputs are compatible; workflow provenance remains pinned to `5c7387afa1980b62b21a34ad0261256a95d8caa1` | Keep the `>=0.7.3,<1` floor and compatibility contract green |
 | Guild AI | Tag `0.9.0`; audited main `dfbefedb6ca5ce3a1341f9f00a4016420f6fc76d` | Apache-2.0 | Candidate only; no direct reuse recorded | Keep out of the distribution unless a scoped adoption decision records exact provenance |
 | LACP | Unresolved identity | Unknown | No direct reuse recorded | Do not port or make a license claim until owner, canonical repo, ref, and license are established |
 
@@ -99,10 +99,22 @@ MUTX conformance.
 2. Close the AARM naming and claim drift before adding new conformance features.
 3. Validate the pinned Faramesh Core `v0.2.0` release and current FPL in an isolated compatibility lane.
 4. Regenerate Orchestra metadata against `v1.7.2` and review the resulting content.
-5. Exercise predict-rlm `v0.7.2` through every managed/local workflow contract.
+5. Keep predict-rlm `v0.7.3` compatibility green across every managed/local workflow contract.
 6. Re-audit Mission Control `v2.1.0` only for roadmap-backed capabilities.
 
 ## Changelog
+
+### 2026-07-22 — predict-rlm only
+
+- Verified PyPI `0.7.3` and GitHub tag `v0.7.3` at immutable commit
+  `e7f1e5df7d0188861b39142094b4b738f456972f`.
+- Confirmed that the v0.7.2-to-v0.7.3 core API remains compatible with MUTX's
+  `File`, `Skill`, and `PredictRLM` integration and existing output contracts.
+- Recorded the release wheel and source-distribution SHA-256 digests and raised
+  MUTX's runtime floor to `predict-rlm>=0.7.3,<1`.
+- The release's functional change is isolated to the optional `codex-lm` extra,
+  which now supports the GPT-5.6 family; MUTX does not load that extra in its
+  document workflow engine.
 
 ### 2026-07-15
 
