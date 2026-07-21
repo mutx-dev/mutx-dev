@@ -118,9 +118,6 @@ def verify_changed_ts_syntax(repo_root: str, changed: list[str]) -> list[dict]:
             {"file": f, "exit_code": 0, "stdout": '{"ok": true}', "stderr": ""} for f in ts_files
         ]
 
-    import json
-    import subprocess
-
     node_check_script = (
         "const ts = require(String(process.argv[1]));"
         "const files = JSON.parse(String(process.argv[2]));"
