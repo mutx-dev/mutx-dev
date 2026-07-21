@@ -30,6 +30,7 @@
 * [Python SDK](docs/sdk.md)
 * [Support](support.md)
 * [Release notes](docs/releases/v1.4.md)
+  * [v1.3 release notes](docs/releases/v1.3.md)
   * [v1.5 release checklist](docs/releases/v1.5-checklist.md)
 * [Legal and attribution](docs/legal/index.md)
   * [OSS attribution ledger](docs/legal/oss-attribution-ledger.md)
