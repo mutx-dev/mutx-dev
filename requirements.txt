@@ -51,7 +51,7 @@ aiosqlite==0.20.0
 langchain-core>=0.3.86,<0.4.0
 bcrypt>=4.0.0
 pillow>=11.1.0
-predict-rlm>=0.6.1,<1
+predict-rlm>=0.7.3,<1
 litellm==1.87.0
 # Updated Mon Mar 16 10:24:07 CET 2026
 

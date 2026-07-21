@@ -40,6 +40,9 @@ langchain = [
     "langchain-community>=0.3.31,<0.4.0",
     "langchain-text-splitters>=0.3.11,<0.4.0",
 ]
+documents = [
+    "predict-rlm>=0.7.3,<1; python_version >= '3.11'",
+]
 dev = [
     "pytest>=9.0.3",
     "pytest-asyncio>=0.23.0",

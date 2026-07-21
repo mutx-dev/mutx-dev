@@ -114,15 +114,15 @@ is an explicit upgrade gap, not hidden drift.
 
 - **Repository:** https://github.com/Trampoline-AI/predict-rlm
 - **License:** MIT — Copyright (c) 2026 Trampoline AI
-- **Current upstream release:** `v0.7.2`
-  (`4ff334dea79a2f27e96b7a50a358b0427050899e`)
+- **Current validated upstream release:** `v0.7.3`
+  (`e7f1e5df7d0188861b39142094b4b738f456972f`)
 - **MUTX provenance pin:**
   `5c7387afa1980b62b21a34ad0261256a95d8caa1`
 
 MUTX uses predict-rlm as the document workflow engine and adapts its workflow
 families into MUTX job, artifact, worker, CLI, dashboard, and observability
-surfaces. The current upstream release and the historical adaptation pin are
-reported separately until compatibility with `v0.7.2` is validated.
+surfaces. Compatibility with `v0.7.3` is validated while the historical
+adaptation pin remains recorded separately.
 
 ## Candidate projects with no direct reuse recorded
 

@@ -53,9 +53,9 @@ def test_upstream_versions_licenses_and_refs_are_pinned() -> None:
             "773a52944ba4747a18bd4ae9ade53fff041adcbc",
         ),
         "predict-rlm": (
-            "v0.7.2",
+            "v0.7.3",
             "MIT",
-            "4ff334dea79a2f27e96b7a50a358b0427050899e",
+            "e7f1e5df7d0188861b39142094b4b738f456972f",
         ),
         "guild-ai": (
             "0.9.0",
@@ -71,6 +71,16 @@ def test_upstream_versions_licenses_and_refs_are_pinned() -> None:
         assert project["current_version"] == version
         assert project["license"] == license_id
         assert project["current_ref"] == ref
+
+    predict_rlm = projects["predict-rlm"]
+    assert predict_rlm["status"] == "adapted-compatible"
+    assert predict_rlm["verified_at"] == "2026-07-22"
+    assert predict_rlm["pypi_wheel_sha256"] == (
+        "7a3ee04c83e1716da98b5d44248eff5ddf992864e1b296960cb237b9ffac036b"
+    )
+    assert predict_rlm["pypi_sdist_sha256"] == (
+        "3284fde60e10678c3887560975f6a7ff44fef8a66d9f39df698b0c7cca52c987"
+    )
 
 
 def test_every_attributed_local_path_exists() -> None:
