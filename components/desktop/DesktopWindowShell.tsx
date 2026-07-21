@@ -940,7 +940,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
                 </div>
               )}
 
-              <main className="min-w-0 flex-1 overflow-y-auto p-4 xl:p-4 2xl:p-5">{children}</main>
+              <main id="main-content" className="min-w-0 flex-1 overflow-y-auto p-4 xl:p-4 2xl:p-5">{children}</main>
             </div>
           </div>
         </div>

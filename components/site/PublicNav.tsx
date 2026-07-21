@@ -1,61 +1,119 @@
-import Link from "next/link";
-import { marketingPublicRailLinks } from "@/lib/marketingContent";
+"use client";
 
-export function PublicNav() {
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
+import styles from "./PublicNav.module.css";
+
+const NAV_ITEMS = [
+  { label: "Product", href: "/ai-agent-control-plane", external: false },
+  { label: "Docs", href: "/docs", external: false },
+  { label: "GitHub", href: "https://github.com/mutx-dev/mutx-dev", external: true },
+  { label: "Dashboard", href: "/dashboard", external: false },
+] as const;
+
+export function PublicNav({ overlay = false }: { overlay?: boolean }) {
+  const pathname = usePathname() ?? "/";
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
+
   return (
-    <div className="sticky top-0 z-30 px-4 pt-4 sm:px-6">
-      <nav
-        data-testid="public-auth-nav"
-        aria-label="Public navigation"
-        className="mx-auto flex w-full max-w-[1360px] items-center justify-between gap-4 rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(10,9,12,0.78)] px-3 py-2.5 text-[#f7f0e4] shadow-[0_20px_60px_rgba(2,2,5,0.32)] backdrop-blur-xl"
-      >
-        <Link
-          href="/"
-          className="inline-flex min-w-0 items-center gap-3 rounded-full border border-[rgba(255,240,214,0.08)] bg-[rgba(255,248,236,0.04)] px-2.5 py-2 pr-4 transition hover:border-[rgba(212,171,115,0.28)] hover:bg-[rgba(255,248,236,0.06)]"
-        >
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(212,171,115,0.2)] bg-[radial-gradient(circle_at_top,rgba(212,171,115,0.2),transparent_58%),linear-gradient(180deg,rgba(255,248,236,0.08),rgba(255,248,236,0.02))]">
-            <img src="/logo.webp" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
-          </span>
-          <span className="grid min-w-0">
-            <span className="truncate font-[family:var(--font-site-display)] text-[1rem] leading-none tracking-[-0.06em]">
-              MUTX
-            </span>
-            <span className="font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.22em] text-[rgba(232,221,203,0.56)]">
-              deployed agents
-            </span>
+    <header data-testid="public-nav" className={`${styles.nav} ${overlay ? styles.overlay : ""}`}>
+      <div className={styles.navInner}>
+        <Link href="/" className={styles.brand} aria-label="MUTX home">
+          <span className={styles.brandMark} aria-hidden="true">MX</span>
+          <span className={styles.brandCopy}>
+            <strong>MUTX</strong>
+            <small>Agent operations</small>
           </span>
         </Link>
 
-        <div className="hidden items-center gap-2 xl:flex">
-          {marketingPublicRailLinks.map((link) =>
-            link.external ? (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full px-4 py-2 text-[13px] text-[rgba(232,221,203,0.76)] transition hover:bg-[rgba(255,248,236,0.06)] hover:text-[#f7f0e4]"
-              >
-                {link.label}
+        <nav className={styles.navLinks} aria-label="Primary navigation">
+          {NAV_ITEMS.map((item) => {
+            const productActive = item.label === "Product" && pathname.startsWith("/ai-agent-");
+            const active = !item.external && (productActive || pathname === item.href || pathname.startsWith(`${item.href}/`));
+
+            return item.external ? (
+              <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">
+                {item.label} <ArrowUpRight aria-hidden="true" />
+                <span className={styles.visuallyHidden}> (opens in a new tab)</span>
               </a>
             ) : (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full px-4 py-2 text-[13px] text-[rgba(232,221,203,0.76)] transition hover:bg-[rgba(255,248,236,0.06)] hover:text-[#f7f0e4]"
-              >
-                {link.label}
+              <Link key={item.href} href={item.href} className={active ? styles.active : undefined} aria-current={active ? "page" : undefined}>
+                {item.label}
               </Link>
-            ),
-          )}
-        </div>
+            );
+          })}
+        </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
-          <span className="rounded-full border border-[rgba(255,240,214,0.1)] bg-[rgba(255,248,236,0.03)] px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] text-[rgba(232,221,203,0.6)]">
-            platform / docs / pico
-          </span>
+        <div className={styles.actions}>
+          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className={styles.pico}>
+            Pico <ArrowUpRight aria-hidden="true" /><span className={styles.visuallyHidden}> (opens in a new tab)</span>
+          </a>
+          <Link href="/download" className={styles.download}>
+            Download <ArrowRight aria-hidden="true" />
+          </Link>
+          <button
+            ref={menuButtonRef}
+            type="button"
+            className={styles.menuButton}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+            aria-controls="public-mobile-navigation"
+            onClick={() => setMobileOpen((open) => !open)}
+          >
+            {mobileOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </button>
         </div>
-      </nav>
-    </div>
+      </div>
+
+      {mobileOpen ? (
+        <nav id="public-mobile-navigation" className={styles.mobileMenu} aria-label="Mobile navigation">
+          <p><span aria-hidden="true" /> Control plane navigation</p>
+          {NAV_ITEMS.map((item, index) => {
+            const productActive = item.label === "Product" && pathname.startsWith("/ai-agent-");
+            const active = !item.external && (productActive || pathname === item.href || pathname.startsWith(`${item.href}/`));
+
+            return item.external ? (
+              <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">
+                <span>{String(index + 1).padStart(2, "0")}</span>{item.label}<ArrowUpRight aria-hidden="true" />
+                <span className={styles.visuallyHidden}> (opens in a new tab)</span>
+              </a>
+            ) : (
+              <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} aria-current={active ? "page" : undefined}>
+                <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
+              </Link>
+            );
+          })}
+          <Link href="/download" onClick={() => setMobileOpen(false)} className={styles.mobileDownload}>
+            <span>05</span>Download<ArrowRight aria-hidden="true" />
+          </Link>
+          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer">
+            <span>06</span>Pico<ArrowUpRight aria-hidden="true" />
+            <span className={styles.visuallyHidden}> (opens in a new tab)</span>
+          </a>
+        </nav>
+      ) : null}
+    </header>
   );
 }

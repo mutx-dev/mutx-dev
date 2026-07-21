@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
-import { AlertTriangle, ArrowRight, Lock, Sparkles } from "lucide-react";
+import { AlertTriangle, Lock, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
@@ -108,7 +109,7 @@ export function LivePanel({
   return (
     <section
       className={cn(
-        "dashboard-entry overflow-hidden rounded-[28px] border shadow-[0_20px_56px_rgba(2,2,5,0.24)]",
+        "dashboard-entry relative overflow-hidden rounded-[6px] border",
         className,
       )}
       style={{
@@ -117,16 +118,25 @@ export function LivePanel({
         boxShadow: dashboardTokens.shadowSm,
       }}
     >
+      <span className="absolute left-0 top-0 z-10 h-px w-16" style={{ backgroundColor: dashboardTokens.brand }} aria-hidden="true" />
       <header
-        className="flex items-center justify-between gap-3 border-b px-4 py-3"
+        className="flex min-h-12 items-center justify-between gap-3 border-b px-4 py-3 sm:px-5"
         style={{
           borderColor: dashboardTokens.borderSubtle,
-          backgroundColor: "color-mix(in srgb, rgba(17, 16, 21, 0.94) 86%, transparent)",
+          backgroundColor: dashboardTokens.bgInset,
         }}
       >
-        <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-3">
+          <span
+            className="hidden font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.16em] sm:inline"
+            style={{ color: dashboardTokens.textLabel }}
+            aria-hidden="true"
+          >
+            REC
+          </span>
+          <span className="hidden h-4 w-px sm:block" style={{ backgroundColor: dashboardTokens.borderStrong }} aria-hidden="true" />
           <h2
-            className="truncate text-[13px] font-semibold uppercase tracking-[0.14em]"
+            className="truncate text-[13px] font-medium tracking-[-0.01em]"
             style={{ color: dashboardTokens.textPrimary }}
           >
             {title}
@@ -135,8 +145,8 @@ export function LivePanel({
         <div className="flex items-center gap-3">
           {meta ? (
             <span
-              className="hidden text-[10px] font-medium uppercase tracking-[0.18em] sm:inline"
-              style={{ color: dashboardTokens.textLabel }}
+              className="hidden border-l pl-3 font-[family:var(--font-mono)] text-[8px] font-medium uppercase tracking-[0.15em] sm:inline"
+              style={{ borderColor: dashboardTokens.borderStrong, color: dashboardTokens.textMuted }}
             >
               {meta}
             </span>
@@ -162,18 +172,22 @@ export function LiveStatCard({
 }) {
   return (
     <article
-      className="dashboard-entry rounded-[24px] border p-4"
+      className="dashboard-entry relative overflow-hidden rounded-[4px] border p-4 sm:p-5"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradientStrong,
         boxShadow: dashboardTokens.shadowSm,
       }}
     >
+      <span className="absolute left-0 top-0 h-full w-px" style={{ backgroundColor: dashboardTokens.borderInteractive }} aria-hidden="true" />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: dashboardTokens.textMuted }}>{label}</p>
+          <p className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: dashboardTokens.textMuted }}>
+            <span className="mr-2 text-[#ff7545]" aria-hidden="true">REC /</span>
+            {label}
+          </p>
           <p
-            className="mt-2 truncate font-[family:var(--font-site-display)] text-[1.28rem] font-semibold tracking-[-0.05em]"
+            className="mt-3 truncate font-[family:var(--font-mono)] text-[2rem] font-medium leading-none tracking-[-0.055em] tabular-nums sm:text-[2.2rem]"
             style={{ color: dashboardTokens.textPrimary }}
           >
             {value}
@@ -181,7 +195,7 @@ export function LiveStatCard({
         </div>
         {status ? <StatusBadge status={status} /> : null}
       </div>
-      <p className="mt-3 text-[12px] leading-5" style={{ color: dashboardTokens.textSubtle }}>
+      <p className="mt-4 border-t pt-3 text-[11px] leading-5" style={{ borderColor: dashboardTokens.borderSubtle, color: dashboardTokens.textSubtle }}>
         {detail}
       </p>
     </article>
@@ -189,7 +203,7 @@ export function LiveStatCard({
 }
 
 export function LiveKpiGrid({ children }: { children: ReactNode }) {
-  return <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">{children}</div>;
+  return <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-4">{children}</div>;
 }
 
 export function LiveMiniStatGrid({
@@ -199,7 +213,7 @@ export function LiveMiniStatGrid({
   children: ReactNode;
   columns?: 2 | 3;
 }) {
-  return <div className={cn("grid gap-3", columns === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>{children}</div>;
+  return <div className={cn("grid gap-2.5", columns === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>{children}</div>;
 }
 
 export function LiveMiniStat({
@@ -215,17 +229,18 @@ export function LiveMiniStat({
 }) {
   return (
     <div
-          className="rounded-[18px] border p-3"
+      className="rounded-[4px] border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         backgroundColor: dashboardTokens.bgInset,
       }}
     >
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em]" style={{ color: dashboardTokens.textMuted }}>
-        {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
+      <div className="flex items-center gap-2 font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: dashboardTokens.textMuted }}>
+        <span className="text-[#58aaff]" aria-hidden="true">CH /</span>
+        {Icon ? <Icon className="h-3.5 w-3.5" aria-hidden="true" /> : null}
         <span>{label}</span>
       </div>
-      <p className="mt-2 text-sm font-medium" style={{ color: dashboardTokens.textPrimary }}>
+      <p className="mt-2 font-[family:var(--font-mono)] text-[13px] font-medium tabular-nums" style={{ color: dashboardTokens.textPrimary }}>
         {value}
       </p>
       {detail ? (
@@ -255,66 +270,64 @@ export function LiveAuthRequired({
   const displayTitle = title.replace(/^Operator session/i, "Sign-in");
 
   return (
-    <LivePanel title={displayTitle} meta="auth required">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(260px,0.92fr)]">
-        <div
-          className="rounded-[24px] border p-5"
-          style={{
-            borderColor: dashboardTokens.borderStrong,
-            background: dashboardTokens.panelGradientStrong,
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border"
-              style={{
-                borderColor: dashboardTokens.borderStrong,
-                backgroundColor: dashboardTokens.bgSurfaceHigher,
-                color: dashboardTokens.brand,
-              }}
-            >
-              <Lock className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <p
-                className="text-[11px] font-semibold uppercase tracking-[0.2em]"
-                style={{ color: dashboardTokens.textLabel }}
+    <LivePanel title={title} meta="auth required">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)] lg:items-center">
+        <div className="flex items-start gap-4">
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[4px] border"
+            style={{
+              borderColor: dashboardTokens.borderStrong,
+              backgroundColor: dashboardTokens.brandSoft,
+              color: dashboardTokens.brand,
+            }}
+          >
+            <Lock className="h-4 w-4" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.2em]" style={{ color: dashboardTokens.textLabel }}>
+              Access ledger / private workspace
+            </p>
+            <p className="mt-2 font-[family:var(--font-site-display)] text-2xl font-medium tracking-[-0.045em]" style={{ color: dashboardTokens.textPrimary }}>
+              {displayTitle}
+            </p>
+            <p className="mt-2 max-w-xl text-[13px] leading-6" style={{ color: dashboardTokens.textSubtle }}>
+              {message}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link
+                href="/login?next=%2Fdashboard"
+                className="inline-flex min-h-10 items-center justify-center rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-4 text-xs font-semibold text-[#090a08] transition hover:bg-[#ff7545]"
               >
-                Sign-in gate
-              </p>
-              <p
-                className="mt-2 font-[family:var(--font-site-display)] text-lg font-semibold"
-                style={{ color: dashboardTokens.textPrimary }}
+                Sign in
+              </Link>
+              <Link
+                href="/register?next=%2Fdashboard"
+                className="inline-flex min-h-10 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-xs font-semibold text-[#d8d1c4] transition hover:border-[#777268] hover:text-white"
               >
-                {displayTitle}
-              </p>
-              <p className="mt-2 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
-                {message}
-              </p>
+                Create account
+              </Link>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-3">
+        <ul className="border-l pl-5" style={{ borderColor: dashboardTokens.borderStrong }}>
           {[
-            "Open setup or sign back in with the account for this workspace.",
-            "After sign-in, this page loads live data from the control plane.",
-          ].map((note) => (
-            <div
+            "Fleet health and current deployment state.",
+            "Recent runs, alerts, and budget pressure.",
+            "The permissions attached to your account.",
+          ].map((note, index) => (
+            <li
               key={note}
-              className="rounded-[18px] border px-4 py-3"
-              style={{
-                borderColor: dashboardTokens.borderSubtle,
-                backgroundColor: dashboardTokens.bgSurface,
-              }}
+              className="flex items-start gap-3 border-b py-3 first:pt-0 last:border-0 last:pb-0"
+              style={{ borderColor: dashboardTokens.borderSubtle }}
             >
-              <div className="flex items-start gap-3">
-                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-sky-200" />
-                <p className="text-sm leading-6 text-slate-300">{note}</p>
-              </div>
-            </div>
+              <span className="font-[family:var(--font-mono)] text-[9px] text-[#ff7545]">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <p className="text-[12px] leading-5" style={{ color: dashboardTokens.textSubtle }}>{note}</p>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </LivePanel>
   );
@@ -371,41 +384,50 @@ export function SignalPill({
   value: string;
   tone: "success" | "warning" | "info";
 }) {
-  const toneClasses = {
-    success: "bg-emerald-500/15 border-emerald-500/30 text-emerald-300",
-    warning: "bg-amber-500/15 border-amber-500/30 text-amber-300",
-    info: "bg-sky-500/15 border-sky-500/30 text-sky-300",
+  const toneStyles = {
+    success: {
+      backgroundColor: dashboardTokens.successSoft,
+      borderColor: "var(--mutx-dashboard-status-success-border)",
+      color: dashboardTokens.success,
+    },
+    warning: {
+      backgroundColor: dashboardTokens.warnSoft,
+      borderColor: "var(--mutx-dashboard-status-warning-border)",
+      color: dashboardTokens.warn,
+    },
+    info: {
+      backgroundColor: dashboardTokens.traceSoft,
+      borderColor: "var(--mutx-dashboard-status-running-border)",
+      color: dashboardTokens.trace,
+    },
   };
 
   return (
-    <div className={`rounded-lg border px-2.5 py-1.5 ${toneClasses[tone]}`}>
-      <div className="text-[10px] uppercase tracking-wide opacity-70">{label}</div>
-      <div className="text-xs font-semibold font-mono truncate">{value}</div>
+    <div className="rounded-[4px] border px-2.5 py-2" style={toneStyles[tone]}>
+      <div className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.16em] opacity-70">
+        SIG / {label}
+      </div>
+      <div className="mt-0.5 truncate font-[family:var(--font-mono)] text-[11px] font-semibold tabular-nums">
+        {value}
+      </div>
     </div>
   );
 }
 
 export function BriefingBar({ entries }: { entries: BriefingBarEntry[] }) {
-  const statusDotClasses: Record<BriefingBarStatus, string> = {
-    healthy: "bg-emerald-400",
-    degraded: "bg-amber-400",
-    critical: "bg-rose-400",
-    unknown: "bg-slate-500",
-  };
-
-  const statusTextClasses: Record<BriefingBarStatus, string> = {
-    healthy: "text-emerald-300",
-    degraded: "text-amber-300",
-    critical: "text-rose-300",
-    unknown: "text-slate-400",
+  const statusColors: Record<BriefingBarStatus, string> = {
+    healthy: dashboardTokens.success,
+    degraded: dashboardTokens.warn,
+    critical: dashboardTokens.danger,
+    unknown: dashboardTokens.textMuted,
   };
 
   return (
     <div
-      className="flex items-center gap-4 rounded-xl border px-4 py-2.5 overflow-x-auto"
+      className="flex items-center gap-4 overflow-x-auto border-y px-1 py-3"
       style={{
         borderColor: dashboardTokens.borderSubtle,
-        backgroundColor: dashboardTokens.bgInset,
+        backgroundColor: "transparent",
       }}
     >
       {entries.map((entry, index) => (
@@ -416,14 +438,24 @@ export function BriefingBar({ entries }: { entries: BriefingBarEntry[] }) {
               style={{ backgroundColor: dashboardTokens.borderSubtle }}
             />
           )}
-          <div className={`h-2 w-2 rounded-full ${statusDotClasses[entry.status]}`} />
+          <div
+            className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              entry.status === "healthy" && "dashboard-live-dot",
+            )}
+            style={{ backgroundColor: statusColors[entry.status] }}
+            aria-hidden="true"
+          />
           <span
-            className="text-[10px] uppercase tracking-widest"
+            className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.16em]"
             style={{ color: dashboardTokens.textMuted }}
           >
             {entry.label}
           </span>
-          <span className={`text-xs font-semibold ${statusTextClasses[entry.status]}`}>
+          <span
+            className="font-[family:var(--font-mono)] text-[10px] font-semibold tabular-nums"
+            style={{ color: statusColors[entry.status] }}
+          >
             {entry.value}
           </span>
         </div>
@@ -447,12 +479,12 @@ export interface FlowStage {
 }
 
 export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
-  const statusConfig: Record<RunFlowStatus, { bar: string; text: string; dot: string }> = {
-    pending: { bar: "bg-slate-500", text: "text-slate-400", dot: "bg-slate-400" },
-    running: { bar: "bg-cyan-500", text: "text-cyan-300", dot: "bg-cyan-400" },
-    completed: { bar: "bg-emerald-500", text: "text-emerald-300", dot: "bg-emerald-400" },
-    failed: { bar: "bg-rose-500", text: "text-rose-300", dot: "bg-rose-400" },
-    awaiting_owner: { bar: "bg-amber-500", text: "text-amber-300", dot: "bg-amber-400" },
+  const statusConfig: Record<RunFlowStatus, { color: string }> = {
+    pending: { color: dashboardTokens.textMuted },
+    running: { color: dashboardTokens.trace },
+    completed: { color: dashboardTokens.success },
+    failed: { color: dashboardTokens.danger },
+    awaiting_owner: { color: dashboardTokens.warn },
   };
 
   const total = entries.reduce((sum, e) => sum + e.count, 0);
@@ -460,18 +492,22 @@ export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs text-slate-400">Queue depth</span>
-        <span className="text-xs font-semibold text-white">{total} total</span>
+        <span className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: dashboardTokens.textMuted }}>
+          Queue depth
+        </span>
+        <span className="font-[family:var(--font-mono)] text-[10px] font-semibold tabular-nums" style={{ color: dashboardTokens.textPrimary }}>
+          {total} total
+        </span>
       </div>
-      <div className="flex h-2 overflow-hidden rounded-full bg-[#1a2943]">
+      <div className="flex h-1.5 overflow-hidden rounded-[2px]" style={{ backgroundColor: dashboardTokens.bgSurfaceHigher }}>
         {entries.map((entry) => {
           if (entry.count === 0) return null;
           const width = total > 0 ? (entry.count / total) * 100 : 0;
           return (
             <div
               key={entry.status}
-              className={cn("h-full transition-all", statusConfig[entry.status].bar)}
-              style={{ width: `${width}%` }}
+              className="h-full transition-[width]"
+              style={{ backgroundColor: statusConfig[entry.status].color, width: `${width}%` }}
             />
           );
         })}
@@ -479,8 +515,8 @@ export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
       <div className="flex flex-wrap gap-3">
         {entries.map((entry) => (
           <div key={entry.status} className="flex items-center gap-1.5">
-            <span className={cn("h-1.5 w-1.5 rounded-full", statusConfig[entry.status].dot)} />
-            <span className={cn("text-[10px]", statusConfig[entry.status].text)}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: statusConfig[entry.status].color }} aria-hidden="true" />
+            <span className="font-[family:var(--font-mono)] text-[9px] tabular-nums" style={{ color: statusConfig[entry.status].color }}>
               {entry.label}: {entry.count}
             </span>
           </div>
@@ -491,41 +527,36 @@ export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
 }
 
 export function FlowStatusBar({ stages }: { stages: FlowStage[] }) {
-  const stageConfig: Record<RunFlowStatus, { active: string; pending: string; label: string; dot: string }> = {
+  const stageConfig: Record<RunFlowStatus, { color: string; soft: string; label: string }> = {
     pending: {
-      active: "border-slate-500/30 bg-slate-500/10 text-slate-400",
-      pending: "border-slate-700/30 bg-[#0a1428] text-slate-600",
+      color: dashboardTokens.textMuted,
+      soft: dashboardTokens.bgSurfaceHigher,
       label: "Pending",
-      dot: "bg-slate-400",
     },
     running: {
-      active: "border-cyan-500/50 bg-cyan-500/15 text-cyan-300",
-      pending: "border-cyan-900/30 bg-[#0a1428] text-slate-600",
+      color: dashboardTokens.trace,
+      soft: dashboardTokens.traceSoft,
       label: "Running",
-      dot: "bg-cyan-400",
     },
     completed: {
-      active: "border-emerald-500/50 bg-emerald-500/15 text-emerald-300",
-      pending: "border-emerald-900/30 bg-[#0a1428] text-slate-600",
+      color: dashboardTokens.success,
+      soft: dashboardTokens.successSoft,
       label: "Completed",
-      dot: "bg-emerald-400",
     },
     failed: {
-      active: "border-rose-500/50 bg-rose-500/15 text-rose-300",
-      pending: "border-rose-900/30 bg-[#0a1428] text-slate-600",
+      color: dashboardTokens.danger,
+      soft: dashboardTokens.dangerSoft,
       label: "Failed",
-      dot: "bg-rose-400",
     },
     awaiting_owner: {
-      active: "border-amber-500/50 bg-amber-500/15 text-amber-300",
-      pending: "border-amber-900/30 bg-[#0a1428] text-slate-600",
+      color: dashboardTokens.warn,
+      soft: dashboardTokens.warnSoft,
       label: "Awaiting Owner",
-      dot: "bg-amber-400",
     },
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center overflow-x-auto pb-1">
       {stages.map((stage, index) => {
         const config = stageConfig[stage.status];
         const isActive = stage.count > 0;
@@ -533,28 +564,32 @@ export function FlowStatusBar({ stages }: { stages: FlowStage[] }) {
           <div key={stage.status} className="flex items-center">
             {index > 0 && (
               <div
-                className={cn(
-                  "h-px w-4 transition-all",
-                  stages[index - 1].count > 0 ? "bg-cyan-500/50" : "bg-slate-700",
-                )}
+                className="h-px w-4 transition-colors"
+                style={{
+                  backgroundColor:
+                    stages[index - 1].count > 0
+                      ? dashboardTokens.trace
+                      : dashboardTokens.borderStrong,
+                }}
               />
             )}
             <div
-              className={cn(
-                "flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 transition-all",
-                isActive ? config.active : config.pending,
-              )}
+              className="flex shrink-0 items-center gap-1.5 rounded-[4px] border px-2.5 py-1.5 transition-colors"
+              style={{
+                backgroundColor: isActive ? config.soft : dashboardTokens.bgInset,
+                borderColor: isActive ? config.color : dashboardTokens.borderSubtle,
+                color: isActive ? config.color : dashboardTokens.textMuted,
+              }}
             >
               <span
-                className={cn(
-                  "h-1.5 w-1.5 rounded-full",
-                  isActive ? config.dot || "bg-current" : "bg-slate-700",
-                )}
+                className={cn("h-1.5 w-1.5 rounded-full", isActive && stage.status === "running" && "dashboard-live-dot")}
+                style={{ backgroundColor: isActive ? config.color : dashboardTokens.borderStrong }}
+                aria-hidden="true"
               />
-              <span className="text-[10px] font-medium uppercase tracking-wide">
+              <span className="font-[family:var(--font-mono)] text-[8px] font-medium uppercase tracking-[0.12em]">
                 {config.label}
               </span>
-              <span className="text-[10px] font-semibold tabular-nums">
+              <span className="font-[family:var(--font-mono)] text-[9px] font-semibold tabular-nums">
                 {stage.count}
               </span>
             </div>
@@ -577,30 +612,30 @@ export function CapacityIndicator({ used, max, label }: CapacityIndicatorProps) 
   const isNearCapacity = percentage >= 80 && !isOverCapacity;
 
   const barColor = isOverCapacity
-    ? "bg-rose-500"
+    ? dashboardTokens.danger
     : isNearCapacity
-      ? "bg-amber-500"
-      : "bg-emerald-500";
+      ? dashboardTokens.warn
+      : dashboardTokens.success;
 
   return (
     <div className="space-y-1.5">
       {label && (
         <div className="flex items-center justify-between gap-3">
-          <span className="text-[10px] uppercase tracking-widest text-slate-500">{label}</span>
+          <span className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.16em]" style={{ color: dashboardTokens.textMuted }}>
+            {label}
+          </span>
           <span
-            className={cn(
-              "text-[10px] font-semibold tabular-nums",
-              isOverCapacity ? "text-rose-300" : isNearCapacity ? "text-amber-300" : "text-slate-300",
-            )}
+            className="font-[family:var(--font-mono)] text-[9px] font-semibold tabular-nums"
+            style={{ color: isOverCapacity ? dashboardTokens.danger : isNearCapacity ? dashboardTokens.warn : dashboardTokens.textSecondary }}
           >
             {used}/{max}
           </span>
         </div>
       )}
-      <div className="h-1.5 overflow-hidden rounded-full bg-[#1a2943]">
+      <div className="h-1.5 overflow-hidden rounded-[2px]" style={{ backgroundColor: dashboardTokens.bgSurfaceHigher }}>
         <div
-          className={cn("h-full rounded-full transition-all", barColor)}
-          style={{ width: `${percentage}%` }}
+          className="h-full rounded-[2px] transition-[width]"
+          style={{ backgroundColor: barColor, width: `${percentage}%` }}
         />
       </div>
     </div>

@@ -57,7 +57,7 @@ export function PicoLangSwitcher() {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="inline-flex min-h-[2.45rem] items-center justify-center gap-2 rounded-full border border-[color:var(--pico-border)] bg-[rgba(7,14,9,0.82)] px-3 py-2 text-sm font-semibold text-[color:var(--pico-text)] shadow-[0_12px_30px_rgba(0,0,0,0.24)] backdrop-blur transition duration-200 hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(var(--pico-accent-rgb),0.08)]"
+        className="inline-flex min-h-11 items-center justify-center gap-2 border border-[color:var(--pico-border)] bg-[#0a0a09] px-3 py-2 text-sm font-semibold text-[color:var(--pico-text)] transition duration-200 hover:border-[color:var(--pico-accent)] hover:text-[color:var(--pico-accent)]"
       >
         <span aria-hidden="true">{current.flag}</span>
         <span className="hidden text-[11px] uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)] sm:inline">
@@ -70,7 +70,7 @@ export function PicoLangSwitcher() {
       {open && (
         <div
           role="listbox"
-          className="absolute right-0 top-[calc(100%+0.45rem)] z-[100] flex max-h-80 min-w-[14rem] flex-col gap-1 overflow-y-auto rounded-[20px] border border-[color:var(--pico-border)] bg-[linear-gradient(180deg,rgba(8,15,10,0.96),rgba(4,9,6,0.98))] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.34)] backdrop-blur-xl"
+          className="absolute right-0 top-[calc(100%+0.45rem)] z-[100] flex max-h-80 min-w-[14rem] flex-col gap-1 overflow-y-auto border border-[color:var(--pico-border)] bg-[#0a0a09] p-2"
         >
           {LOCALES.map((l) => (
             <button
@@ -79,7 +79,7 @@ export function PicoLangSwitcher() {
               role="option"
               aria-selected={l.code === locale}
               onClick={() => handleSelect(l.code)}
-              className={`flex items-center gap-3 rounded-2xl border px-3 py-2 text-left text-sm transition duration-150 ${
+              className={`flex min-h-11 items-center gap-3 border px-3 py-2 text-left text-sm transition duration-150 ${
                 l.code === locale
                   ? 'border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-[color:var(--pico-text)]'
                   : 'border-transparent bg-transparent text-[color:var(--pico-text-secondary)] hover:border-[color:rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.03)] hover:text-[color:var(--pico-text)]'

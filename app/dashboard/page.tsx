@@ -16,11 +16,11 @@ export default function DashboardPage() {
             title="Overview"
             description="Fleet posture, recent execution, alerts, delivery health, and budget state in one surface."
             icon={Activity}
-            iconTone="text-cyan-300 bg-cyan-400/10"
+            iconTone="text-[#ffb199] bg-[rgba(255,77,0,0.12)]"
             badge="workspace overview"
             stats={[
-              { label: "Route", value: "/dashboard" },
-              { label: "Data", value: "Live API", tone: "success" },
+              { label: "Workspace", value: "Browser" },
+              { label: "Data", value: "Sign-in gated" },
             ]}
           />
 

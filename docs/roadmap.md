@@ -62,6 +62,7 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Shipped (Last 30 Days)
 
+- `2026-07-16` Unified site redesign now covers the public site, docs, dashboard, auth, desktop, and Pico surfaces
 - `2026-07-16` Node 24 and the safe JavaScript dependency baseline are enforced across local, CI, and container builds
 - `2026-07-16` LangChain integrations are on the latest compatible 0.3 line with the remaining 1.x security boundary documented
 - `2026-07-16` OSS attribution and AARM claims are backed by immutable upstream source and license evidence

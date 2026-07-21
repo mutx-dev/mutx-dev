@@ -56,6 +56,100 @@ function pickString(record: Record<string, unknown>, keys: string[]) {
   return null;
 }
 
+function pickBoolean(record: Record<string, unknown>, keys: string[], fallback = false) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "boolean") return value;
+    if (value === "true" || value === 1) return true;
+    if (value === "false" || value === 0) return false;
+  }
+
+  return fallback;
+}
+
+function normalizeStringList(value: unknown) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeTimestamp(value: unknown) {
+  if (value === null || value === undefined || value === "") return null;
+
+  let date: Date;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (value <= 0) return null;
+    date = new Date(value < 1_000_000_000_000 ? value * 1000 : value);
+  } else if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    const numeric = Number(trimmed);
+    date = Number.isFinite(numeric)
+      ? new Date(numeric < 1_000_000_000_000 ? numeric * 1000 : numeric)
+      : new Date(trimmed);
+  } else {
+    return null;
+  }
+
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function resultSummary(job: Record<string, unknown>) {
+  const value = job.result_summary ?? job.resultSummary;
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value;
+  }
+
+  if (!isRecord(value)) return null;
+  return pickString(value, ["summary", "message", "result", "detail"]);
+}
+
+function normalizeAssistant(value: unknown) {
+  if (!isRecord(value)) return null;
+
+  return {
+    name: pickString(value, ["name", "label", "assistant_id", "agent_id"]) ?? "Assistant",
+    workspace: pickString(value, ["workspace", "assistant_id", "agent_id"]) ?? "unpublished",
+    status: pickString(value, ["status", "onboarding_status"]) ?? "unknown",
+  };
+}
+
+function normalizeSession(session: Record<string, unknown>, index: number) {
+  const id = pickString(session, ["id", "key", "session_key"]) ?? `session-${index + 1}`;
+
+  return {
+    id,
+    label: pickString(session, ["label", "agent", "name", "key", "session_key"]) ?? id,
+    source: pickString(session, ["source"]) ?? "unknown",
+    channel: pickString(session, ["channel"]) ?? "direct",
+    active: pickBoolean(session, ["active"]),
+    kind: pickString(session, ["kind", "type"]) ?? "session",
+    model: pickString(session, ["model", "provider_model"]) ?? "unknown",
+    lastActivity: normalizeTimestamp(
+      session.last_activity ?? session.lastActivity ?? session.updated_at ?? session.updatedAt,
+    ),
+    flags: normalizeStringList(session.flags),
+  };
+}
+
+function normalizeJob(job: Record<string, unknown>, index: number, kind: "document" | "reasoning") {
+  return {
+    id: pickString(job, ["id"]) ?? `${kind}-${index + 1}`,
+    templateId: pickString(job, ["template_id", "templateId"]) ?? "unpublished",
+    status: pickString(job, ["status"]) ?? "unknown",
+    executionMode: pickString(job, ["execution_mode", "executionMode"]) ?? "unknown",
+    artifacts: artifactCount(job),
+    createdAt: normalizeTimestamp(job.created_at ?? job.createdAt),
+    updatedAt: normalizeTimestamp(job.updated_at ?? job.updatedAt),
+    resultSummary: resultSummary(job),
+    errorMessage: pickString(job, ["error_message", "errorMessage"]),
+  };
+}
+
 function extractErrorMessage(payload: unknown, fallback: string) {
   if (typeof payload === "string" && payload.trim().length > 0) {
     return payload;
@@ -108,7 +202,12 @@ async function fetchResource(
 }
 
 function artifactCount(job: Record<string, unknown>) {
-  return Array.isArray(job.artifacts) ? job.artifacts.length : 0;
+  if (Array.isArray(job.artifacts)) return job.artifacts.length;
+  if (typeof job.artifacts === "number" && Number.isFinite(job.artifacts)) {
+    return Math.max(0, Math.trunc(job.artifacts));
+  }
+
+  return 0;
 }
 
 function pickRefreshedTokens(results: Array<{ tokenRefreshed: boolean; refreshedTokens?: AuthTokens }>) {
@@ -170,11 +269,22 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       "Failed to fetch reasoning jobs",
     );
 
-    const sessionItems = normalizeCollection(sessions.data, ["sessions", "items", "data"]).filter(
-      isRecord,
-    );
-    const documentItems = normalizeCollection(documentJobs.data, ["items", "data"]).filter(isRecord);
-    const reasoningItems = normalizeCollection(reasoningJobs.data, ["items", "data"]).filter(isRecord);
+    const sessionItems = normalizeCollection(sessions.data, ["sessions", "items", "data"])
+      .filter(isRecord)
+      .map(normalizeSession);
+    const documentItems = normalizeCollection(documentJobs.data, ["items", "data"])
+      .filter(isRecord)
+      .map((job, index) => normalizeJob(job, index, "document"));
+    const reasoningItems = normalizeCollection(reasoningJobs.data, ["items", "data"])
+      .filter(isRecord)
+      .map((job, index) => normalizeJob(job, index, "reasoning"));
+    const sourceCounts = new Map<string, number>();
+    for (const session of sessionItems) {
+      sourceCounts.set(session.source, (sourceCounts.get(session.source) ?? 0) + 1);
+    }
+    const sources = [...sourceCounts.entries()]
+      .map(([source, count]) => ({ source, count }))
+      .sort((left, right) => right.count - left.count || left.source.localeCompare(right.source));
     const partials = [
       "Memory inventory is read-only and derived from live sessions plus artifact-producing jobs.",
     ];
@@ -186,18 +296,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const nextResponse = NextResponse.json({
       generatedAt: new Date().toISOString(),
-      assistant,
+      assistant: normalizeAssistant(assistant),
       summary: {
         sessions: sessionItems.length,
-        activeSessions: sessionItems.filter((session) => Boolean(session.active)).length,
+        activeSessions: sessionItems.filter((session) => session.active).length,
+        sources: sources.length,
         documentJobs: documentItems.length,
-        documentArtifacts: documentItems.reduce((sum, job) => sum + artifactCount(job), 0),
+        documentArtifacts: documentItems.reduce((sum, job) => sum + job.artifacts, 0),
         reasoningJobs: reasoningItems.length,
-        reasoningArtifacts: reasoningItems.reduce((sum, job) => sum + artifactCount(job), 0),
+        reasoningArtifacts: reasoningItems.reduce((sum, job) => sum + job.artifacts, 0),
       },
       sessions: sessionItems,
-      documentJobs: documentItems,
-      reasoningJobs: reasoningItems,
+      sources,
+      documents: documentItems,
+      reasoning: reasoningItems,
       partials,
     });
 

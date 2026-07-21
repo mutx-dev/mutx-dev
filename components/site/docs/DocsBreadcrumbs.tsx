@@ -10,14 +10,12 @@ function findAncestors(
   items: DocNavItem[]
 ): DocNavItem[] | null {
   for (const item of items) {
-    if (
-      pathname === item.route ||
-      pathname.startsWith(item.route + "/")
-    ) return [item];
+    if (pathname === item.route) return [item];
     if (item.children.length > 0) {
       const found = findAncestors(pathname, item.children);
       if (found) return [item, ...found];
     }
+    if (pathname.startsWith(item.route + "/")) return [item];
   }
   return null;
 }

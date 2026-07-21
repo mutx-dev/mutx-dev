@@ -9,7 +9,7 @@ Use the smallest channel that fits the problem.
 
 ## Bugs
 
-Open a GitHub issue with the bug template.
+[Open a bug report](https://github.com/mutx-dev/mutx-dev/issues/new?template=bug.yml).
 
 Please include:
 
@@ -20,26 +20,26 @@ Please include:
 
 ## Feature Requests
 
-Open a GitHub issue with the feature template.
+[Open a feature request](https://github.com/mutx-dev/mutx-dev/issues/new?template=feature.yml).
 
 Tie proposals to a real user or maintainer problem when possible.
 
 ## Docs Improvements
 
-Open a docs issue or send a PR directly.
+[Open a docs issue](https://github.com/mutx-dev/mutx-dev/issues/new?template=docs.yml) or send a PR directly.
 
 ## Local Setup And Troubleshooting
 
 Start with:
 
-- `docs/deployment/quickstart.md`
-- `docs/troubleshooting/common-issues.md`
-- `docs/troubleshooting/debugging.md`
+- [Deployment quickstart](/docs/deployment/quickstart)
+- [Common issues](/docs/troubleshooting/common-issues)
+- [Debugging](/docs/troubleshooting/debugging)
 
 ## Security Reports
 
-See [Security Policy](security.md).
+See the [Security Policy](/security).
 
 ## Product Or Commercial Questions
 
-Use the contact flow at `https://mutx.dev/contact`.
+[Contact MUTX](/contact).

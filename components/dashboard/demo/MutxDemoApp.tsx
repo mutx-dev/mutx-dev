@@ -213,7 +213,8 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                 </span>
                 <button
                   type="button"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-[linear-gradient(180deg,rgba(15,21,29,0.96)_0%,rgba(9,13,18,1)_100%)] text-white/46"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.08] bg-[linear-gradient(180deg,rgba(15,21,29,0.96)_0%,rgba(9,13,18,1)_100%)] text-white/46"
+                  aria-label="Open notifications"
                 >
                   <Bell className="h-4 w-4" />
                 </button>
@@ -260,7 +261,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                 <TopControl label="Last 24h" icon={Clock3} compact />
                 <button
                   type="button"
-                  className="inline-flex h-10 items-center gap-2 rounded-full border border-cyan-300/18 bg-cyan-400/10 px-4 text-sm font-semibold text-cyan-50 shadow-[0_18px_42px_rgba(8,145,178,0.16)]"
+                  className="inline-flex h-11 items-center gap-2 rounded-full border border-cyan-300/18 bg-cyan-400/10 px-4 text-sm font-semibold text-cyan-50 shadow-[0_18px_42px_rgba(8,145,178,0.16)]"
                 >
                   Live walkthrough
                 </button>
@@ -270,7 +271,8 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                   <button
                     key={index}
                     type="button"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-[linear-gradient(180deg,rgba(15,21,29,0.96)_0%,rgba(9,13,18,1)_100%)] text-white/44 transition hover:text-white/82"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.08] bg-[linear-gradient(180deg,rgba(15,21,29,0.96)_0%,rgba(9,13,18,1)_100%)] text-white/44 transition hover:text-white/82"
+                    aria-label={["Open notifications", "Open billing", "Open settings"][index]}
                   >
                     <Icon className="h-4 w-4" />
                   </button>
@@ -290,7 +292,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                   key={item.key}
                   href={item.href}
                   className={cn(
-                    "inline-flex h-10 shrink-0 items-center gap-2 rounded-full border px-3 text-[13px] transition",
+                    "inline-flex h-11 shrink-0 items-center gap-2 rounded-full border px-3 text-[13px] transition",
                     active
                       ? theme.navActive
                       : "border-white/[0.08] bg-white/[0.03] text-white/62",
@@ -381,7 +383,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
             </div>
           </aside>
 
-          <main className="min-h-0 overflow-y-auto overflow-x-hidden bg-transparent p-2.5 lg:overflow-hidden lg:p-3">
+          <main id="main-content" className="min-h-0 overflow-y-auto overflow-x-hidden bg-transparent p-2.5 lg:overflow-hidden lg:p-3">
             <div className="flex min-h-full flex-col gap-3 lg:h-full lg:min-h-0 lg:overflow-hidden">
               <DemoStageHeader section={section} tick={tick} />
               <motion.div

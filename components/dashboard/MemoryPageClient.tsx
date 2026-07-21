@@ -71,6 +71,130 @@ type MemoryPayload = {
   partials: string[];
 };
 
+type MemorySession = MemoryPayload["sessions"][number];
+type MemoryJob = MemoryPayload["documents"][number];
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function asString(value: unknown, fallback: string) {
+  return typeof value === "string" && value.trim().length > 0 ? value : fallback;
+}
+
+function asNullableString(value: unknown) {
+  return typeof value === "string" && value.trim().length > 0 ? value : null;
+}
+
+function asCount(value: unknown, fallback = 0) {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.trunc(value))
+    : fallback;
+}
+
+function asStringList(value: unknown) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeSession(value: unknown, index: number): MemorySession | null {
+  const session = asRecord(value);
+  if (!session) return null;
+
+  const id = asString(session.id, `session-${index + 1}`);
+  return {
+    id,
+    label: asString(session.label, id),
+    source: asString(session.source, "unknown"),
+    channel: asString(session.channel, "direct"),
+    active: session.active === true,
+    kind: asString(session.kind, "session"),
+    model: asString(session.model, "unknown"),
+    lastActivity: asNullableString(session.lastActivity),
+    flags: asStringList(session.flags),
+  };
+}
+
+function normalizeJob(value: unknown, index: number, prefix: string): MemoryJob | null {
+  const job = asRecord(value);
+  if (!job) return null;
+
+  return {
+    id: asString(job.id, `${prefix}-${index + 1}`),
+    templateId: asString(job.templateId, "unpublished"),
+    status: asString(job.status, "unknown"),
+    executionMode: asString(job.executionMode, "unknown"),
+    artifacts: asCount(job.artifacts),
+    createdAt: asNullableString(job.createdAt),
+    updatedAt: asNullableString(job.updatedAt),
+    resultSummary: asNullableString(job.resultSummary),
+    errorMessage: asNullableString(job.errorMessage),
+  };
+}
+
+export function normalizeMemoryPayload(value: unknown): MemoryPayload {
+  const root = asRecord(value) ?? {};
+  const summary = asRecord(root.summary) ?? {};
+  const assistantRecord = asRecord(root.assistant);
+  const sessions = Array.isArray(root.sessions)
+    ? root.sessions
+        .map(normalizeSession)
+        .filter((session): session is MemorySession => session !== null)
+    : [];
+  const sources = Array.isArray(root.sources)
+    ? root.sources.flatMap((value) => {
+        const source = asRecord(value);
+        if (!source) return [];
+        return [{ source: asString(source.source, "unknown"), count: asCount(source.count) }];
+      })
+    : [];
+  const documents = Array.isArray(root.documents)
+    ? root.documents
+        .map((job, index) => normalizeJob(job, index, "document"))
+        .filter((job): job is MemoryJob => job !== null)
+    : [];
+  const reasoning = Array.isArray(root.reasoning)
+    ? root.reasoning
+        .map((job, index) => normalizeJob(job, index, "reasoning"))
+        .filter((job): job is MemoryJob => job !== null)
+    : [];
+
+  const activeSessions = sessions.filter((session) => session.active).length;
+  const documentArtifacts = documents.reduce((total, job) => total + job.artifacts, 0);
+  const reasoningArtifacts = reasoning.reduce((total, job) => total + job.artifacts, 0);
+
+  return {
+    generatedAt: asString(root.generatedAt, ""),
+    assistant: assistantRecord
+      ? {
+          name: asString(assistantRecord.name, "Assistant"),
+          workspace: asString(assistantRecord.workspace, "unpublished"),
+          status: asString(assistantRecord.status, "unknown"),
+        }
+      : null,
+    summary: {
+      sessions: asCount(summary.sessions, sessions.length),
+      activeSessions: asCount(summary.activeSessions, activeSessions),
+      sources: asCount(summary.sources, sources.length),
+      documentJobs: asCount(summary.documentJobs, documents.length),
+      documentArtifacts: asCount(summary.documentArtifacts, documentArtifacts),
+      reasoningJobs: asCount(summary.reasoningJobs, reasoning.length),
+      reasoningArtifacts: asCount(summary.reasoningArtifacts, reasoningArtifacts),
+    },
+    sessions,
+    sources,
+    documents,
+    reasoning,
+    partials: asStringList(root.partials),
+  };
+}
+
 function isAuthError(error: unknown) {
   return error instanceof ApiRequestError && (error.status === 401 || error.status === 403);
 }
@@ -90,9 +214,9 @@ export function MemoryPageClient() {
       setError(null);
 
       try {
-        const response = await readJson<MemoryPayload>("/api/dashboard/memory");
+        const response = await readJson<unknown>("/api/dashboard/memory");
         if (!cancelled) {
-          setPayload(response);
+          setPayload(normalizeMemoryPayload(response));
           setLoading(false);
         }
       } catch (loadError) {

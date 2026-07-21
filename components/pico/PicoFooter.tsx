@@ -19,7 +19,7 @@ export function PicoFooter({ className }: { className?: string }) {
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <Link
             href="/pico"
-            className="inline-flex items-center gap-2 text-sm text-[color:var(--pico-text-secondary)] no-underline transition hover:text-[color:var(--pico-text)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 text-sm text-[color:var(--pico-text-secondary)] no-underline transition hover:text-[color:var(--pico-text)]"
           >
             <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-[rgba(var(--pico-accent-rgb),0.1)]">
               <Image src="/pico/logo.png" alt="PicoMUTX logo" width={14} height={14} />
@@ -29,7 +29,7 @@ export function PicoFooter({ className }: { className?: string }) {
 
           <a
             href={`${SITE}/releases`}
-            className="text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
           >
             Releases
           </a>
@@ -37,7 +37,7 @@ export function PicoFooter({ className }: { className?: string }) {
             href="https://docs.mutx.dev"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
           >
             Docs
           </a>
@@ -45,19 +45,19 @@ export function PicoFooter({ className }: { className?: string }) {
             href="https://github.com/mutx-dev/mutx-dev"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
           >
             GitHub
           </a>
           <a
             href={`${SITE}/download`}
-            className="text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
           >
             Download
           </a>
           <a
             href={`${SITE}/privacy-policy`}
-            className="text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
           >
             Privacy
           </a>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -14,13 +14,22 @@ import {
   getCanonicalUrl,
   getSiteUrl,
 } from "@/lib/seo";
-import { type DocNavItem, parseSummary } from "@/lib/docs";
+import { type DocNavItem, getPublishedDocRoutes, parseSummary } from "@/lib/docs";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
 
 function docsDir() {
   return path.join(process.cwd(), "docs");
+}
+
+function isPublishedDocSlug(slugSegments: string[]): boolean {
+  if (slugSegments.length === 0 || (slugSegments.length === 1 && slugSegments[0] === "README")) {
+    return true;
+  }
+
+  const route = `/docs/${slugSegments.join("/")}`;
+  return getPublishedDocRoutes().has(route);
 }
 
 // Root-level content directories (mirrored from repo root, not inside docs/)
@@ -98,10 +107,12 @@ function resolveSlug(slugSegments: string[]): string | null {
   // e.g. /docs/reference → docs/api/reference.md
   // e.g. /docs/reference/authentication → docs/api/authentication.md
   // e.g. /docs/reference/index → docs/api/index.md (API Overview)
+  const apiSegments = slugSegments[0] === "reference" ? slugSegments.slice(1) : slugSegments;
   const apiCandidates = [
-    path.join("api", ...slugSegments) + ".md",
-    path.join("api", ...slugSegments, "README.md"),
-    path.join("api", ...slugSegments, "index.md"),
+    ...(apiSegments.length === 0 ? [path.join("api", "reference.md"), path.join("api", "index.md")] : []),
+    path.join("api", ...apiSegments) + ".md",
+    path.join("api", ...apiSegments, "README.md"),
+    path.join("api", ...apiSegments, "index.md"),
     // Special case: /docs/X/index → serve docs/api/index.md
     path.join("api", slugSegments[0], "index.md"),
   ];
@@ -117,6 +128,12 @@ function resolveSlug(slugSegments: string[]): string | null {
   }
 
   return null;
+}
+
+function sourceSlugForDocsRenderer(filePath: string): string[] {
+  const relative = path.relative(docsDir(), filePath);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) return [];
+  return relative.replace(/\.md$/i, "").split(path.sep);
 }
 
 function hasUnsafeSlugSegment(slugSegments: string[]): boolean {
@@ -309,6 +326,7 @@ export async function generateMetadata({
   params: Promise<{ slug?: string[] }>;
 }): Promise<Metadata> {
   const { slug = [] } = await params;
+  if (!isPublishedDocSlug(slug)) return { title: "Not Found" };
   const filePath = resolveSlug(slug);
   if (!filePath) return { title: "Not Found" };
 
@@ -337,32 +355,32 @@ const FEATURED = [
   {
     title: "MUTX Quickstart",
     href: "/docs/quickstart",
-    desc: "Read the shortest setup guide before you choose the full hosted or local path.",
+    desc: "The shortest path to a working MUTX setup.",
   },
   {
     title: "Deployment Quickstart",
     href: "/docs/deployment/quickstart",
-    desc: "Get from clone to a working stack with the shortest validated path.",
+    desc: "Clone, configure, deploy.",
   },
   {
     title: "Architecture Overview",
     href: "/docs/architecture/overview",
-    desc: "See the code-accurate map behind the app, backend, CLI, SDK, and infrastructure.",
+    desc: "The system map.",
   },
   {
-    title: "Autonomous Agent Team",
-    href: "/docs/agents",
-    desc: "Understand the specialist agent roles, ownership boundaries, and review-safe shipping model.",
+    title: "API Reference",
+    href: "/docs/reference",
+    desc: "Public contracts and endpoints.",
   },
   {
-    title: "AI Agent Cost Management",
-    href: "/ai-agent-cost",
-    desc: "Learn how MUTX handles LLM spend tracking, attribution, and budget enforcement.",
+    title: "Python SDK",
+    href: "/sdk",
+    desc: "Build against MUTX in Python.",
   },
   {
-    title: "AI Agent Approvals",
-    href: "/ai-agent-approvals",
-    desc: "See how human-in-the-loop approval workflows and authorization gates work in the control plane.",
+    title: "Troubleshooting",
+    href: "/docs/troubleshooting",
+    desc: "Find and clear common failures.",
   },
 ];
 
@@ -373,7 +391,6 @@ const AREA_LABELS: Record<string, string> = {
   deployment: "Deployment",
   releases: "Releases",
   troubleshooting: "Troubleshooting",
-  agents: "Agents",
 };
 
 function DocsHomePage() {
@@ -387,15 +404,12 @@ function DocsHomePage() {
       <div className="docs-article-main docs-home">
         <section className="docs-home-billboard">
           <div className="docs-home-billboard-copy">
-            <p className="docs-home-kicker">Field manual</p>
-            <h1 className="docs-home-title">Read MUTX like a shipped system, not a static help center.</h1>
-            <p className="docs-home-sub">
-              This is the code-accurate route into setup, platform references, and operator
-              behavior. Start with one guided entry point, then move through the product by area.
-            </p>
+            <p className="docs-home-kicker">Operator manual</p>
+            <h1 className="docs-home-title">Know the system.</h1>
+            <p className="docs-home-sub">Set up MUTX. Run agents. Clear failures.</p>
             <div className="docs-home-actions">
-              <Link href="/docs/deployment/quickstart" className="docs-home-primary">
-                Open quickstart
+              <Link href="/docs/quickstart" className="docs-home-primary">
+                Open MUTX quickstart
               </Link>
               <Link href="/docs/reference" className="docs-home-secondary">
                 Read API reference
@@ -404,7 +418,7 @@ function DocsHomePage() {
           </div>
 
           <div className="docs-home-ledger">
-            <p className="docs-home-ledger-label">Manual index</p>
+            <p className="docs-home-ledger-label">Start here</p>
             {FEATURED.slice(0, 3).map((card, index) => (
               <Link key={card.href} href={card.href} className="docs-home-ledger-item">
                 <span className="docs-home-ledger-index">{String(index + 1).padStart(2, "0")}</span>
@@ -417,25 +431,10 @@ function DocsHomePage() {
           </div>
         </section>
 
-        <section className="docs-home-featured">
-          <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">High-signal routes</p>
-            <h2 className="docs-home-section-title">Start from the pages people actually need first.</h2>
-          </div>
-          <div className="docs-home-featured-list">
-            {FEATURED.map((card) => (
-              <Link key={card.href} href={card.href} className="docs-home-featured-item">
-                <span className="docs-home-featured-title">{card.title}</span>
-                <span className="docs-home-featured-desc">{card.desc}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
         <section className="docs-home-areas">
           <div className="docs-home-section-heading">
             <p className="docs-home-kicker">By area</p>
-            <h2 className="docs-home-section-title">Move through the platform one surface at a time.</h2>
+            <h2 className="docs-home-section-title">Go by surface.</h2>
           </div>
 
           <div className="docs-home-area-list">
@@ -448,25 +447,13 @@ function DocsHomePage() {
                     <span className="docs-home-area-index">{String(index + 1).padStart(2, "0")}</span>
                     <h3 className="docs-home-area-title">{label}</h3>
                   </div>
-                  <SectionLanding title={label} children={section.children} />
+                  <SectionLanding title="" children={section.children} />
                 </div>
               );
             })}
           </div>
         </section>
 
-        <section className="docs-home-appendix">
-          <div className="docs-home-section-heading">
-            <p className="docs-home-kicker">Truth rules</p>
-            <h2 className="docs-home-section-title">When docs drift, trust the executable system.</h2>
-          </div>
-          <p className="docs-home-truth">
-            Source of truth order: <code>src/api/routes/</code> for backend behavior,{" "}
-            <code>app/api/</code> for browser-facing proxy behavior, <code>app/</code> for site
-            and app surfaces, <code>cli/</code> for terminal workflows, and{" "}
-            <code>sdk/mutx/</code> for SDK behavior.
-          </p>
-        </section>
       </div>
     </div>
   );
@@ -483,6 +470,10 @@ export default async function DocPage({
   // Also handle /docs/README which Next.js serves for docs/README.md
   if (slug.length === 0 || (slug.length === 1 && slug[0] === "README")) {
     return <DocsHomePage />;
+  }
+
+  if (!isPublishedDocSlug(slug)) {
+    redirect("/docs");
   }
 
   const filePath = resolveSlug(slug);
@@ -514,24 +505,8 @@ export default async function DocPage({
       />
       <div className="docs-article-layout">
         <div className="docs-article-main">
-          <DocsRenderer source={content} currentSlug={slug} />
+          <DocsRenderer source={content} currentSlug={sourceSlugForDocsRenderer(filePath)} />
           <PrevNextNav currentRoute={currentRoute} />
-          {data.icon && (
-            <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
-              Last updated via GitBook sync — source at{" "}
-              <a
-                href={`https://github.com/mutx-dev/mutx-dev/blob/main/${path.relative(
-                  process.cwd(),
-                  filePath
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-gray-600"
-              >
-                GitHub
-              </a>
-            </p>
-          )}
         </div>
         <TableOfContents sourceHeadings={headings} />
       </div>
