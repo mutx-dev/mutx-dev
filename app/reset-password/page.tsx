@@ -17,10 +17,6 @@ const authSurfaceProps = {
   asideTitle: 'Keep the recovery path boring.',
   asideBody:
     'Password resets should be plain, fast, and easy to verify. Strong form states matter more than ornamental auth theater.',
-  mediaSrc: '/landing/webp/thumbs-up-portrait.webp',
-  mediaAlt: 'MUTX robot giving a thumbs-up once the reset path is complete',
-  mediaWidth: 900,
-  mediaHeight: 1350,
   highlights: [
     'Reset links are token-based, so an expired or missing token should fail honestly.',
     'Use a password that clears your own security bar, not just the minimum validator.',

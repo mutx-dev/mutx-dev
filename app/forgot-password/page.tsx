@@ -16,10 +16,6 @@ const authSurfaceProps = {
   asideTitle: 'Keep the auth lane practical.',
   asideBody:
     'Reset flows should be simple, honest, and easy to verify. If the account does not exist or the hosted lane is unavailable, the rest of the public surface still tells the truth.',
-  mediaSrc: '/landing/webp/reading-bench.webp',
-  mediaAlt: 'MUTX robot reading and reviewing system state on a bench',
-  mediaWidth: 1024,
-  mediaHeight: 1536,
   highlights: [
     'Use the work email tied to the hosted operator account.',
     'Reset links expire, so handle the email quickly once it lands.',

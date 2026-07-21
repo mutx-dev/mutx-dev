@@ -269,7 +269,11 @@ export function PicoShell({
 
         <PicoFooter />
 
-        <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
+        <nav
+          aria-label="Pico mobile navigation"
+          className="fixed inset-x-4 bottom-4 z-40 lg:hidden"
+          data-testid="pico-mobile-product-nav"
+        >
           <div className={picoCodexFrame('px-3 py-3')}>
             <div className="grid grid-cols-3 gap-2">
               {isAcademyLessonRoute ? (
@@ -319,7 +323,7 @@ export function PicoShell({
               )}
             </div>
           </div>
-        </div>
+        </nav>
 
         <PicoWelcomeTour
           open={tourOpen}
@@ -487,7 +491,11 @@ export function PicoShell({
 
       <PicoFooter />
 
-      <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
+      <nav
+        aria-label="Pico mobile navigation"
+        className="fixed inset-x-4 bottom-4 z-40 lg:hidden"
+        data-testid="pico-mobile-product-nav"
+      >
         <div className="grid grid-cols-[auto,1fr,auto,auto] items-center gap-2 rounded-[24px] border border-[color:var(--pico-border)] bg-[rgba(6,12,8,0.94)] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.4)] backdrop-blur">
           <Link
             href={picoHref(pathname, previousItem?.href ?? '/onboarding')}
@@ -522,7 +530,7 @@ export function PicoShell({
             {currentItem.href === '/support' ? 'Map' : 'Help'}
           </Link>
         </div>
-      </div>
+      </nav>
 
       <PicoWelcomeTour
         open={tourOpen}

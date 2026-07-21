@@ -28,10 +28,6 @@ const authSurfaceProps = {
   asideTitle: "Keep confirmation explicit.",
   asideBody:
     "Provider auth can skip this because the upstream identity is already verified. Password registration stays accountable through the email confirmation lane.",
-  mediaSrc: "/landing/webp/reading-bench.webp",
-  mediaAlt: "MUTX robot reviewing a verification packet on a bench",
-  mediaWidth: 1024,
-  mediaHeight: 1536,
   highlights: [
     "Verification links terminate on the active frontend host instead of a hardcoded marketing route.",
     "Expired or invalid tokens fail honestly and leave a clear resend path.",

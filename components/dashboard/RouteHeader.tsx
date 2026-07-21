@@ -21,10 +21,10 @@ interface RouteHeaderProps {
 }
 
 const STAT_TONES: Record<NonNullable<RouteHeaderStat["tone"]>, string> = {
-  neutral: "text-[#5f5b54]",
-  success: "text-[#146c49]",
-  warning: "text-[#805600]",
-  danger: "text-[#a83226]",
+  neutral: "text-[#c8c0b0]",
+  success: "text-[#78e3b4]",
+  warning: "text-[#f4cc82]",
+  danger: "text-[#ff9b96]",
 };
 
 export function RouteHeader({
@@ -39,38 +39,47 @@ export function RouteHeader({
   return (
     <header
       className={cn(
-        "dashboard-entry grid gap-8 border-b border-[#d8d3c7] pb-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end",
+        "dashboard-entry relative grid gap-8 border-b border-[#34342e] pb-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end lg:pb-8",
         className,
       )}
     >
+      <span className="absolute -bottom-px left-0 h-px w-20 bg-[#ff571c]" aria-hidden="true" />
       <div className="min-w-0">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-6 w-6 items-center justify-center rounded-sm bg-[#f04a00] text-[#fffaf3]">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span
+            className="flex h-7 w-7 items-center justify-center rounded-[4px] border border-[#663619] bg-[#21150f] text-[#ff8355]"
+          >
             <Icon className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
-          <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.22em] text-[#8b877e]">
-            {badge || "Operator workspace"}
+          <p className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.2em] text-[#8d867a]">
+            <span className="text-[#ff7545]">REC /</span> {badge || "Operator workspace"}
           </p>
           {hint ? <FeatureHint {...hint} align="left" /> : null}
+          <span className="hidden font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.18em] text-[#5e5b54] sm:inline" aria-hidden="true">
+            Frame 001
+          </span>
         </div>
-        <h1 className="mt-5 max-w-[18ch] font-[family:var(--font-site-display)] text-[clamp(2.7rem,5vw,5.25rem)] font-light leading-[0.88] tracking-[-0.075em] text-[#191916]">
+        <h1 className="mt-5 max-w-[20ch] font-[family:var(--font-site-display)] text-[clamp(2.4rem,4.5vw,4.65rem)] font-medium leading-[0.9] tracking-[-0.065em] text-[#eee9dc]">
           {title}
         </h1>
-        <p className="mt-5 max-w-2xl text-[14px] leading-6 text-[#6e6a62] sm:text-[15px]">
+        <p className="mt-5 max-w-2xl text-[13px] leading-6 text-[#999284] sm:text-[14px]">
           {description}
         </p>
       </div>
 
       {stats.length > 0 ? (
-        <dl className="grid min-w-[17rem] grid-cols-2 border-l border-[#d8d3c7] pl-5 sm:gap-x-8">
-          {stats.map((stat) => (
-            <div key={`${stat.label}-${stat.value}`}>
-              <dt className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.18em] text-[#9b978e]">
+        <dl className="grid min-w-[17rem] grid-cols-2 border-l border-[#34342e] pl-5 sm:gap-x-8">
+          {stats.map((stat, index) => (
+            <div key={`${stat.label}-${stat.value}`} className="relative py-1">
+              <dt className="font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.17em] text-[#716d64]">
+                <span className="mr-2 text-[#ff6a32]" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 {stat.label}
               </dt>
               <dd
                 className={cn(
-                  "mt-2 text-[13px] font-medium",
+                  "mt-2 font-[family:var(--font-mono)] text-[12px] font-medium tabular-nums",
                   STAT_TONES[stat.tone || "neutral"],
                 )}
               >

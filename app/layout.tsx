@@ -4,7 +4,6 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 
 import { appFontVariables } from "@/app/fonts/app";
-import { AppDomainDemoIntro } from "@/components/app/AppDomainDemoIntro";
 import {
   buildPageMetadata,
   getSiteUrl,
@@ -12,14 +11,14 @@ import {
 
 const siteUrl = getSiteUrl();
 const rootSocialMetadata = buildPageMetadata({
-  title: "MUTX | Open Control Plane for AI Agents",
+  title: "MUTX | Flight Recorder and Control Plane for AI Agents",
   description:
-    "Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.",
+    "See every move, stop actions outside policy, and keep a reviewable receipt of every AI agent run.",
   path: "/",
   socialDescription:
-    "MUTX is the open control plane for agents that have to survive real deployments, auth boundaries, webhooks, and runtime operations.",
+    "MUTX is the flight recorder and control layer for AI agents operating across real deployment and policy boundaries.",
   twitterDescription:
-    "Operate deployed agents across auth, deployments, traces, webhooks, and runtime posture.",
+    "Observe the run, hold risky actions, and keep the evidence.",
 });
 
 export const viewport = {
@@ -32,13 +31,15 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   ...rootSocialMetadata,
-  title: "MUTX | Open Control Plane for AI Agents",
+  title: "MUTX | Flight Recorder and Control Plane for AI Agents",
   description:
-    "Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.",
+    "See every move, stop actions outside policy, and keep a reviewable receipt of every AI agent run.",
   applicationName: "MUTX",
   category: "developer tools",
   keywords: [
+    "AI agent flight recorder",
     "agent control plane",
+    "agent audit trail",
     "agent deployments",
     "operator dashboard",
     "webhooks",
@@ -79,18 +80,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} className="h-full" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){try{if(window.sessionStorage.getItem('mutx-home-loader-played')==='1'){document.documentElement.setAttribute('data-home-loader-played','1');document.documentElement.setAttribute('data-loader-state','complete');}}catch(_error){}})();",
-          }}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){try{var host=window.location.hostname.toLowerCase();if(host==='app.mutx.dev'||host==='app.localhost'){if(window.sessionStorage.getItem('mutx-app-demo-intro-played')==='1'){document.documentElement.setAttribute('data-app-demo-intro-played','1');}else{document.documentElement.setAttribute('data-app-demo-intro-active','1');}}}catch(_error){}})();",
-          }}
-        />
         <link rel="preconnect" href="https://calendly.com" />
         <link rel="dns-prefetch" href="https://calendly.com" />
         <link rel="preconnect" href="https://challenges.cloudflare.com" />
@@ -100,7 +89,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
-          <AppDomainDemoIntro />
         </NextIntlClientProvider>
       </body>
     </html>

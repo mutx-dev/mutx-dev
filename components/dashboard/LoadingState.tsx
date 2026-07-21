@@ -12,7 +12,7 @@ export interface LoadingStateProps extends HTMLAttributes<HTMLDivElement> {
 function SkeletonBlock({ className }: { className?: string }) {
   return (
     <div
-      className={cn("animate-pulse rounded-md", className)}
+      className={cn("animate-pulse rounded-[3px]", className)}
       aria-hidden="true"
       style={{ backgroundColor: dashboardTokens.bgSubtle }}
     />
@@ -22,7 +22,7 @@ function SkeletonBlock({ className }: { className?: string }) {
 function CardSkeleton() {
   return (
     <div
-      className="rounded-lg border p-4"
+      className="rounded-[6px] border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradient,
@@ -31,7 +31,7 @@ function CardSkeleton() {
     >
       <div className="flex items-center justify-between gap-3">
         <SkeletonBlock className="h-4 w-36" />
-        <SkeletonBlock className="h-5 w-20 rounded-full" />
+        <SkeletonBlock className="h-5 w-20" />
       </div>
       <div className="mt-4 space-y-2">
         <SkeletonBlock className="h-3 w-full" />
@@ -44,7 +44,7 @@ function CardSkeleton() {
 function RowSkeleton() {
   return (
     <div
-      className="flex items-center gap-3 rounded-[16px] border px-3 py-3"
+      className="flex items-center gap-3 rounded-[4px] border px-3 py-3"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         backgroundColor: dashboardTokens.bgSurface,
@@ -55,7 +55,7 @@ function RowSkeleton() {
         <SkeletonBlock className="h-3.5 w-40" />
         <SkeletonBlock className="h-3 w-52" />
       </div>
-      <SkeletonBlock className="h-5 w-16 rounded-full" />
+      <SkeletonBlock className="h-5 w-16" />
     </div>
   );
 }
@@ -63,7 +63,7 @@ function RowSkeleton() {
 function DetailSkeleton() {
   return (
     <div
-      className="rounded-lg border p-4"
+      className="rounded-[6px] border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradient,
@@ -99,6 +99,14 @@ export function LoadingState({
       {...props}
     >
       <span className="sr-only">Loading dashboard content</span>
+      <div
+        className="mb-3 flex items-center gap-2 font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.18em]"
+        style={{ color: dashboardTokens.textMuted }}
+        aria-hidden="true"
+      >
+        <span className="h-px w-5" style={{ backgroundColor: dashboardTokens.brand }} />
+        REC / buffering
+      </div>
       {items.map((_, index) => {
         if (variant === "rows") {
           return <RowSkeleton key={`row-${index}`} />;

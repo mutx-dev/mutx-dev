@@ -70,7 +70,7 @@ export function PicoPricingPage() {
           <span>{t('subtitle')}</span>
         </section>
 
-        <section className={s.plans} aria-label="Pico plans">
+        <section className={s.plans} aria-label="Pico plans" data-testid="pico-pricing-live-plans">
           {plans.map((plan, index) => {
             const isCurrent = currentPlan === plan.id
             const isRequested = requestedPlan === plan.id

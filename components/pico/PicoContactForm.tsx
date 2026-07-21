@@ -299,7 +299,7 @@ export function PicoContactForm({
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             role='dialog'
             aria-modal='true'
-            aria-labelledby={titleId}
+            aria-label={t('dialogLabel')}
             tabIndex={-1}
           >
             <button

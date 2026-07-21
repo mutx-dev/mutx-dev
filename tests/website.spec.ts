@@ -1,47 +1,10 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { marketingHomepage } from '../lib/marketingContent';
 import { createDefaultPicoProgress } from '../lib/pico/academy';
 
 type PicoProductStubOptions = {
   authenticated?: boolean
   isEmailVerified?: boolean
   webhookCount?: number
-}
-
-async function expectLoaderStageCentered(page: Page, viewportLabel: string) {
-  await page.waitForFunction(() => {
-    const state = document.documentElement.dataset.loaderState;
-    return (
-      (state === 'active' || state === 'handoff') &&
-      Boolean(document.querySelector('[data-testid="marketing-loader-stage"]'))
-    );
-  }, { timeout: 5000 });
-
-  const alignmentSamples = await page.evaluate(async () => {
-    const samples: Array<{ deltaX: number; deltaY: number }> = [];
-
-    for (let index = 0; index < 6; index += 1) {
-      const stage = document.querySelector<HTMLElement>('[data-testid="marketing-loader-stage"]');
-
-      if (stage) {
-        const rect = stage.getBoundingClientRect();
-        samples.push({
-          deltaX: Math.abs(rect.left + rect.width / 2 - window.innerWidth / 2),
-          deltaY: Math.abs(rect.top + rect.height / 2 - window.innerHeight / 2),
-        });
-      }
-
-      await new Promise((resolve) => window.requestAnimationFrame(() => resolve(undefined)));
-    }
-
-    return samples;
-  });
-
-  expect(alignmentSamples.length, `${viewportLabel} loader stage never rendered`).toBeGreaterThan(0);
-  expect(
-    alignmentSamples.every((sample) => sample.deltaX <= 4 && sample.deltaY <= 4),
-    `${viewportLabel} loader stage drifted off center: ${JSON.stringify(alignmentSamples)}`
-  ).toBe(true);
 }
 
 async function expectRouteSurfaceSplit(page: Page) {
@@ -84,6 +47,12 @@ async function expectRouteSurfaceSplit(page: Page) {
   expect(metrics.lightTop).toBeGreaterThanOrEqual(metrics.darkBottom - 1);
   expect(metrics.headingInsideDark).toBe(true);
   expect(metrics.crossingPanel).toBe(false);
+}
+
+async function expectAuthLedger(page: Page, variant: 'access' | 'recovery') {
+  await expect(page.getByTestId('public-auth-nav')).toBeVisible();
+  await expect(page.locator(`main[data-auth-variant="${variant}"]`)).toBeVisible();
+  await expect(page.getByText(/identity ledger/i)).toBeVisible();
 }
 
 async function getAverageRgb(locator: Locator) {
@@ -507,262 +476,97 @@ test.describe('mutx.dev QA', () => {
     });
   });
 
-  test('homepage hides copy behind the loader, lands the mark cleanly, and skips the cinematic replay in-session', async ({ page }) => {
+  test('homepage opens directly into a concrete operational ledger', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('public-auth-nav')).toHaveCount(0);
+    await expect(page.getByTestId('marketing-loader')).toHaveCount(0);
     await expect(page.getByText(/^Loading\.\.\.$/i)).toHaveCount(0);
+    await expect(
+      page.getByRole('heading', { name: /see every move\. hold the line\./i })
+    ).toBeVisible();
+    await expect(
+      page.getByText(/stops actions outside policy, and keeps a reviewable receipt/i)
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /open dashboard/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /github/i }).first()).toBeVisible();
 
-    const html = page.locator('html');
-    const loader = page.getByTestId('marketing-loader');
-    await page.waitForFunction(() => {
-      const state = document.documentElement.dataset.loaderState;
-      return state === 'active' || state === 'handoff';
-    }, { timeout: 5000 });
-    await expect(loader).toBeVisible({ timeout: 5000 });
-    await expectLoaderStageCentered(page, 'desktop');
-    await expect(page.locator('[data-testid="marketing-loader"] video')).toHaveAttribute('poster', /mutx-logo-loader-poster\.webp/i);
+    const runRecord = page.getByLabel(/example mutx production deployment run/i);
+    await expect(runRecord).toBeVisible();
+    await expect(runRecord.getByText(/production boundary matched/i)).toBeVisible();
+    await expect(runRecord.getByText(/approved by a\. rivera/i)).toBeVisible();
+    await expect(runRecord.getByText(/rcpt_7f2a91/i)).toBeVisible();
+  });
 
-    await expect
-      .poll(async () => {
-        return page.getByTestId('homepage-lockup-copy').evaluate((node) => {
-          return Number.parseFloat(getComputedStyle(node).opacity);
-        });
-      })
-      .toBeLessThan(0.1);
-    await expect
-      .poll(async () => {
-        return page.getByTestId('homepage-hero-content').evaluate((node) => {
-          return Number.parseFloat(getComputedStyle(node).opacity);
-        });
-      })
-      .toBeLessThan(0.1);
+  test('homepage tells one complete story from intent to evidence', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect
-      .poll(async () => {
-        return page.evaluate(() => {
-          const stage = document.querySelector('[data-testid="marketing-loader-stage"]');
-          return stage ? Number.parseFloat(getComputedStyle(stage).opacity || '1') : 0;
-        });
-      })
-      .toBeGreaterThan(0.95);
-
-    const visibilitySamples = await page.evaluate(async () => {
-      const samples = [];
-
-      for (let index = 0; index < 16; index += 1) {
-        const stage = document.querySelector('[data-testid="marketing-loader-stage"]');
-        const video = document.querySelector('[data-testid="marketing-loader"] video');
-        const heroMark = document.querySelector('[data-testid="homepage-lockup-mark"]');
-        const heroContent = document.querySelector('[data-testid="homepage-hero-content"]');
-        const html = document.documentElement;
-        const stageOpacity = stage ? Number.parseFloat(getComputedStyle(stage).opacity || '1') : 0;
-        const videoOpacity = video ? Number.parseFloat(getComputedStyle(video).opacity || '1') : 0;
-        const heroMarkOpacity = heroMark ? Number.parseFloat(getComputedStyle(heroMark).opacity || '1') : 0;
-        const heroContentOpacity = heroContent
-          ? Number.parseFloat(getComputedStyle(heroContent).opacity || '1')
-          : 1;
-
-        samples.push({
-          state: html.dataset.loaderState || null,
-          stageVisible: stageOpacity > 0.15,
-          videoVisible: videoOpacity > 0.15,
-          heroMarkVisible: heroMarkOpacity > 0.08,
-          heroContentHidden: heroContentOpacity < 0.08,
-        });
-
-        await new Promise((resolve) => window.requestAnimationFrame(() => resolve(undefined)));
-      }
-
-      return samples;
-    });
-
-    const beforeCompleteSamples = visibilitySamples.filter((sample) => sample.state !== 'complete');
-
-    if (beforeCompleteSamples.length > 0) {
-      expect(beforeCompleteSamples.every((sample) => sample.stageVisible)).toBe(true);
-      expect(beforeCompleteSamples.every((sample) => sample.videoVisible)).toBe(true);
-      expect(beforeCompleteSamples.every((sample) => sample.heroContentHidden)).toBe(true);
-    } else {
-      expect(visibilitySamples.some((sample) => sample.state === 'complete')).toBe(true);
+    for (const heading of [
+      /one line from intent to evidence/i,
+      /signal first\. furniture last\./i,
+      /helpful is not the same as permitted\./i,
+      /from download to first record\./i,
+      /run the agent\. keep the evidence\./i,
+    ]) {
+      await expect(page.getByRole('heading', { name: heading })).toBeVisible();
     }
 
-    await expect(loader).toBeHidden({ timeout: 9000 });
-    await expect(html).toHaveAttribute('data-loader-state', 'complete');
+    for (const label of ['Observe', 'Bound', 'Approve', 'Execute', 'Prove']) {
+      await expect(page.getByRole('link', { name: new RegExp(label, 'i') }).first()).toBeVisible();
+    }
 
-    await expect(page.getByTestId('homepage-lockup')).toBeVisible();
-    await expect(page.getByTestId('homepage-lockup-mark')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /run agents with review built in\./i })).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(
-      page.getByText(/live runs, clear permissions, approvals, and readable history in one place\./i)
-    ).toBeVisible();
-    await expect(page.getByRole('link', { name: /go to picomutx/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /view github/i }).first()).toBeVisible();
-    await expect(page.getByTestId('homepage-hero-proof-line')).toHaveCount(0);
-    await expect(page.getByLabel(/hero proof points/i)).toHaveCount(0);
-    await expect(page.getByLabel(/platform feature slides/i)).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /read the platform model/i })).toHaveCount(0);
-
-    const wordOpacityAfter = await page.getByTestId('homepage-lockup-word').evaluate((node) => {
-      return Number.parseFloat(getComputedStyle(node).opacity);
-    });
-    const metaOpacityAfter = await page.getByTestId('homepage-lockup-meta').evaluate((node) => {
-      return Number.parseFloat(getComputedStyle(node).opacity);
-    });
-    const heroActions = await page
-      .locator('main section')
-      .first()
-      .getByRole('link')
-      .evaluateAll((links) =>
-        links.slice(0, 3).map((link) => link.textContent?.replace(/\s+/g, ' ').trim())
-      );
-    const strayLargeLogos = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll("img[src='/logo.png']")).filter((node) => {
-        const image = node as HTMLImageElement;
-        const rect = image.getBoundingClientRect();
-        const style = getComputedStyle(image);
-        return rect.width > 120 && Number.parseFloat(style.opacity || '1') > 0.1;
-      }).length;
-    });
-
-    expect(wordOpacityAfter).toBeGreaterThan(0.95);
-    expect(metaOpacityAfter).toBeGreaterThan(0.95);
-    await expect
-      .poll(async () => {
-        return page.getByTestId('homepage-hero-content').evaluate((node) => {
-          return Number.parseFloat(getComputedStyle(node).opacity);
-        });
-      })
-      .toBeGreaterThan(0.95);
-    expect(heroActions).toEqual(['Go to PicoMUTX', 'Download for Mac', 'View GitHub']);
-    expect(strayLargeLogos).toBe(0);
-    await expect(page.getByTestId('marketing-loader-stage')).toHaveCount(0);
-
-    const desktopFold = await page.evaluate(() => {
-      const hero = document.querySelector('main section');
-      const proof = document.querySelector('[data-testid="homepage-proof-section"]');
-      const heroRect = hero?.getBoundingClientRect();
-      const proofRect = proof?.getBoundingClientRect();
-
-      return {
-        heroHeight: heroRect?.height ?? 0,
-        viewportHeight: window.innerHeight,
-        proofTop: proofRect?.top ?? 0,
-      };
-    });
-
-    expect(desktopFold.heroHeight).toBeGreaterThanOrEqual(desktopFold.viewportHeight - 1);
-    expect(desktopFold.proofTop).toBeGreaterThan(0);
-
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(loader).toBeHidden({ timeout: 2000 });
-    await expect(html).toHaveAttribute('data-loader-state', 'complete', { timeout: 2000 });
+    await expect(page.getByText(/no file moved\. scope and destination preserved/i)).toBeVisible();
+    await expect(page.getByText(/source-available control plane/i).first()).toBeVisible();
   });
 
-  test('landing page exposes the current production sections and final CTA only', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('marketing-loader')).toBeHidden({ timeout: 9000 });
-
-    const visibleHeadings = await page.locator('h2').evaluateAll((nodes) =>
-      nodes.map((node) => node.textContent?.trim() ?? '').filter(Boolean)
-    );
-
-    expect(visibleHeadings.length).toBeGreaterThanOrEqual(3);
-    expect(visibleHeadings.some((heading) => /see it for yourself/i.test(heading))).toBe(true);
-    await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /close details/i })).toHaveCount(0);
-    await expect(page.getByText(/the operator surface already ships\./i)).toHaveCount(0);
-  });
-
-  test('homepage settles cleanly on mobile after the loader handoff', async ({ page }) => {
+  test('homepage stays inside the mobile viewport and preserves the operating record', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await page.waitForFunction(() => {
-      return Boolean(document.documentElement.dataset.loaderState);
-    }, { timeout: 5000 });
-    await expectLoaderStageCentered(page, 'mobile');
-    await expect(page.getByTestId('marketing-loader')).toBeHidden({ timeout: 9000 });
-    await expect(page.locator('html')).toHaveAttribute('data-loader-state', 'complete');
+    await expect(
+      page.getByRole('heading', { name: /see every move\. hold the line\./i })
+    ).toBeVisible();
+    await expect(page.getByLabel(/example mutx production deployment run/i)).toBeVisible();
 
-    const mobileMetrics = await page.evaluate(() => {
+    const metrics = await page.evaluate(() => {
       const heading = document.querySelector('h1');
       const headingRect = heading?.getBoundingClientRect();
-      const word = document.querySelector('[data-testid="homepage-lockup-word"]');
-      const proof = document.querySelector('[data-testid="homepage-proof-section"]');
-      const proofRect = proof?.getBoundingClientRect();
 
       return {
-        bodyWidth: document.body.scrollWidth,
+        documentWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth,
-        viewportHeight: window.innerHeight,
         headingLeft: headingRect?.left ?? 0,
         headingRight: headingRect?.right ?? 0,
-        wordOpacity: word ? Number.parseFloat(getComputedStyle(word).opacity) : 0,
-        proofTop: proofRect?.top ?? 0,
       };
     });
 
-    expect(mobileMetrics.bodyWidth).toBeLessThanOrEqual(mobileMetrics.viewportWidth);
-    expect(mobileMetrics.headingLeft).toBeGreaterThanOrEqual(-1);
-    expect(mobileMetrics.headingRight).toBeLessThanOrEqual(mobileMetrics.viewportWidth + 1);
-    expect(mobileMetrics.wordOpacity).toBeGreaterThan(0.95);
-    expect(mobileMetrics.proofTop).toBeGreaterThan(0);
-
-    await expect(page.getByRole('link', { name: /pico\.?mutx/i }).first()).toBeVisible();
+    expect(metrics.documentWidth).toBeLessThanOrEqual(metrics.viewportWidth);
+    expect(metrics.headingLeft).toBeGreaterThanOrEqual(-1);
+    expect(metrics.headingRight).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+    await expect(page.getByRole('link', { name: /download/i }).first()).toBeVisible();
   });
 
-  test('homepage scrolls after the loader settles', async ({ page }) => {
+  test('homepage remains scrollable with motion enabled or reduced', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => {
-      return (
-        document.documentElement.dataset.loaderState === 'complete' &&
-        document.documentElement.scrollHeight > window.innerHeight
-      );
-    }, { timeout: 9000 });
+    await page.waitForFunction(() => document.documentElement.scrollHeight > window.innerHeight);
 
     const before = await page.evaluate(() => window.scrollY);
     await page.mouse.move(320, 320);
     await page.mouse.wheel(0, 1800);
-    await page.waitForTimeout(350);
+    await page.waitForTimeout(250);
     const after = await page.evaluate(() => window.scrollY);
 
     expect(before).toBe(0);
     expect(after).toBeGreaterThan(0);
+    await expect(page.getByRole('heading', { name: /one line from intent to evidence/i })).toBeVisible();
   });
-
-  test('homepage demo section uses real dashboard story media and supporting assets', async () => {
-    const demoTabs = marketingHomepage.salesSections.demo.tabs;
-    const demoAssets = demoTabs.map((tab) => tab.mediaSrc);
-    const storyAsset = marketingHomepage.salesSections.demo.story.mediaSrc;
-
-    expect(demoAssets.length).toBeGreaterThan(0);
-    expect(new Set(demoAssets).size).toBe(demoAssets.length);
-    expect(demoAssets.every((src) => src.startsWith('/marketing/dashboard/'))).toBe(true);
-    for (const tab of demoTabs) {
-      if (tab.mediaType === 'image') {
-        expect(tab.mediaSrc.endsWith('.jpg')).toBe(true);
-        expect(tab.mediaPosterSrc).toBeUndefined();
-      } else {
-        expect(tab.mediaSrc.endsWith('.mp4')).toBe(true);
-        expect(tab.mediaPosterSrc?.startsWith('/marketing/dashboard/')).toBe(true);
-      }
-    }
-    expect(storyAsset.startsWith('/marketing/dashboard/')).toBe(true);
-    expect(storyAsset.endsWith('.mp4')).toBe(true);
-  });
-
   test('download page exposes the mac release notes and checksum path', async ({ page }) => {
     await page.goto('/download/macos', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('public-auth-nav')).toBeVisible();
-    await expect(page.getByTestId('public-auth-nav').getByRole('link')).toHaveCount(5);
+    await expect(page.getByTestId('public-nav')).toBeVisible();
+    await expect(page.getByRole('navigation', { name: /primary navigation/i })).toBeVisible();
     await expect(
       page.getByRole('heading', { name: /download mutx for macos\./i })
     ).toBeVisible();
@@ -784,7 +588,7 @@ test.describe('mutx.dev QA', () => {
   test('releases page exposes the current release summary and artifact links', async ({ page }) => {
     await page.goto('/releases', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('public-auth-nav')).toBeVisible();
+    await expect(page.getByTestId('public-nav')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: /signed desktop release\./i })
     ).toBeVisible();
@@ -804,19 +608,17 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/docs', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('link', { name: /mutx docs operator manual/i })).toBeVisible();
-    await expect(page.getByText(/canonical reference/i)).toBeVisible();
     await expect(
       page.getByRole('heading', {
-        name: /read mutx like a shipped system, not a static help center\./i,
+        name: /know the system\./i,
       }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /open quickstart/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /open mutx quickstart/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /read api reference/i })).toBeVisible();
-    await expect(page.getByText(/field manual/i).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /go by surface\./i })).toBeVisible();
 
     await page.goto('/docs/deployment/quickstart', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('link', { name: /mutx docs operator manual/i })).toBeVisible();
-    await expect(page.getByText(/canonical reference/i)).toBeVisible();
     await expect(page.getByRole('heading', { name: /quickstart/i }).first()).toBeVisible();
     await expect(page.locator('.docs-breadcrumbs')).toBeVisible();
   });
@@ -826,8 +628,8 @@ test.describe('mutx.dev QA', () => {
   }) => {
     await page.goto('/contact', { waitUntil: 'domcontentloaded' });
     await expectRouteSurfaceSplit(page);
-    await expect(page.getByTestId('public-auth-nav')).toBeVisible();
-    await expect(page.getByTestId('public-auth-nav').getByRole('link')).toHaveCount(5);
+    await expect(page.getByTestId('public-nav')).toBeVisible();
+    await expect(page.getByRole('navigation', { name: /primary navigation/i })).toBeVisible();
     await expect(
       page.getByRole('heading', { name: /talk to mutx\./i })
     ).toBeVisible();
@@ -860,7 +662,7 @@ test.describe('mutx.dev QA', () => {
     expect(await getAverageRgb(page.getByText(/^effective date$/i))).toBeLessThan(140);
 
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
-    await expectRouteSurfaceSplit(page);
+    await expectAuthLedger(page, 'access');
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByLabel(/^password$/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
@@ -869,7 +671,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: /continue with discord/i })).toBeVisible();
 
     await page.goto('/register', { waitUntil: 'domcontentloaded' });
-    await expectRouteSurfaceSplit(page);
+    await expectAuthLedger(page, 'access');
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByLabel(/^password$/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /sign up/i })).toBeVisible();
@@ -880,7 +682,7 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/verify-email?email=operator%40mutx.dev&next=%2Fdashboard%2Fwebhooks', {
       waitUntil: 'domcontentloaded',
     });
-    await expectRouteSurfaceSplit(page);
+    await expectAuthLedger(page, 'recovery');
     await expect(page.getByText(/we sent a verification link to operator@mutx\.dev\./i)).toBeVisible();
     await expect(page.getByRole('button', { name: /resend verification/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /back to sign in/i })).toHaveAttribute(
@@ -889,17 +691,17 @@ test.describe('mutx.dev QA', () => {
     );
 
     await page.goto('/forgot-password', { waitUntil: 'domcontentloaded' });
-    await expectRouteSurfaceSplit(page);
+    await expectAuthLedger(page, 'recovery');
     await expect(page.getByText(/send reset instructions/i)).toBeVisible();
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /send reset link/i })).toBeVisible();
 
     await page.goto('/reset-password', { waitUntil: 'domcontentloaded' });
-    await expectRouteSurfaceSplit(page);
+    await expectAuthLedger(page, 'recovery');
     await expect(page.getByText(/invalid reset link/i)).toBeVisible();
 
     await page.goto('/reset-password?token=test-token', { waitUntil: 'domcontentloaded' });
-    await expectRouteSurfaceSplit(page);
+    await expectAuthLedger(page, 'recovery');
     await expect(page.getByText(/choose a new password/i)).toBeVisible();
     await expect(page.getByLabel(/new password/i)).toBeVisible();
     await expect(page.getByLabel(/confirm password/i)).toBeVisible();
@@ -988,25 +790,22 @@ test.describe('mutx.dev QA', () => {
     expect(new URL(page.url()).pathname).toBe('/');
   });
 
-  test('pico pricing route keeps setup access and live billing together', async ({
+  test('pico pricing route keeps live plans and support together', async ({
     page,
   }) => {
     await page.goto('/pico/pricing', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('pico-pricing-route')).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /start free\. get help when setup needs it\./i }),
+      page.getByRole('heading', { name: /choose a plan\./i }),
     ).toBeVisible();
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/free trial/i);
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€29/i);
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€290/i);
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€79/i);
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/€790/i);
-    await expect(page.getByTestId('pico-pricing-access-lanes')).toContainText(/pico pilot/i);
-    await expect(page.getByTestId('pico-pricing-live-plans')).toContainText(
-      /live product plans after setup starts/i,
-    );
-    await expect(page.getByText(/need help choosing the right setup\?/i)).toBeVisible();
+    const livePlans = page.getByTestId('pico-pricing-live-plans');
+    await expect(livePlans).toContainText(/\$0\/mo/i);
+    await expect(livePlans).toContainText(/\$9\/mo/i);
+    await expect(livePlans).toContainText(/\$29\/mo/i);
+    await expect(livePlans.getByRole('heading', { name: /^enterprise$/i })).toBeVisible();
+    await expect(livePlans.getByRole('link', { name: /book planning call/i })).toBeVisible();
+    await expect(page.getByText(/start free\.\s*pay when it works\./i)).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/pricing');
   });
 
@@ -1116,6 +915,7 @@ test.describe('mutx.dev QA', () => {
     expect(new URL(page.url()).pathname).toBe('/pico/academy/run-your-first-agent');
 
     await page.goto('/pico/academy', { waitUntil: 'domcontentloaded' });
+    await page.locator('summary').filter({ hasText: /platform settings/i }).click();
     await expect(page.getByTestId('pico-platform-surface')).toBeVisible();
     await expect(page.getByTestId('pico-platform-active-surface')).toContainText(/academy/i);
     await expect(page.getByTestId('pico-platform-surface-memory')).toBeVisible();
@@ -1126,16 +926,13 @@ test.describe('mutx.dev QA', () => {
     await page.setViewportSize({ width: 390, height: 844 });
 
     await page.goto('/pico/onboarding', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('pico-mobile-product-masthead')).toBeVisible();
     await expect(page.getByTestId('pico-mobile-product-nav')).toBeVisible();
     await expect(page.getByRole('heading', { name: /get to your first working agent fast/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /go to next chapter: lessons/i }).first()).toBeVisible();
 
     await page.getByRole('link', { name: /go to next chapter: lessons/i }).first().click();
-    await expect(page.getByTestId('pico-mobile-academy-nav')).toBeVisible();
-    await expect(
-      page.getByTestId('pico-mobile-academy-nav').getByRole('link', { name: /open pico support/i }),
-    ).toBeVisible();
+    await expect(page.getByTestId('pico-mobile-product-nav')).toBeVisible();
+    await expect(page.getByTestId('pico-mobile-product-nav').getByRole('button', { name: /help/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /install hermes locally/i })).toBeVisible();
     await expect(page.getByTestId('pico-academy-mission-billboard')).toBeVisible();
     await expect(page.getByTestId('pico-academy-progress-strip')).toBeVisible();
@@ -1190,7 +987,7 @@ test.describe('mutx.dev QA', () => {
     await page.locator('header').getByRole('button', { name: 'Help', exact: true }).click();
     await expect(page.getByTestId('pico-help-lane-panel')).toBeVisible();
 
-    await page.getByTestId('pico-help-lane-panel').getByRole('link', { name: /get setup help/i }).click();
+    await page.getByTestId('pico-help-lane-panel').getByRole('link', { name: /open support lane/i }).click();
     await expect(page.getByRole('heading', { name: /get a human when setup needs guidance/i })).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/pico/support');
   });

@@ -71,17 +71,17 @@ async function stopAgent(agentId: string): Promise<{ status: string }> {
 
 function AgentCardSkeleton() {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5 animate-pulse">
+    <div className="animate-pulse rounded-[6px] border border-[#2b2b26] bg-[#11120f] p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <div className="h-5 w-32 rounded bg-white/10" />
-          <div className="mt-2 h-4 w-48 rounded bg-white/5" />
+          <div className="h-5 w-32 rounded-[3px] bg-[#24251f]" />
+          <div className="mt-2 h-4 w-48 rounded-[3px] bg-[#1b1c18]" />
         </div>
-        <div className="h-6 w-20 rounded-full bg-white/10" />
+        <div className="h-6 w-20 rounded-[4px] bg-[#24251f]" />
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="h-12 rounded-lg bg-white/5" />
-        <div className="h-12 rounded-lg bg-white/5" />
+        <div className="h-12 rounded-[4px] bg-[#1b1c18]" />
+        <div className="h-12 rounded-[4px] bg-[#1b1c18]" />
       </div>
     </div>
   );
@@ -100,26 +100,26 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
   };
 
   return (
-    <article className="dashboard-entry rounded-lg border border-[#d8d3c7] bg-[#fbfaf6] p-5 transition hover:border-[#b7b0a3]">
+    <article className="dashboard-entry rounded-[4px] border border-[#2b2b26] bg-[#11120f] p-5 transition hover:border-[#48463e]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md border border-[#f5b696] bg-[#fff0e8] text-[#a63808]">
-              <Bot className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-[4px] border border-[#663619] bg-[#21150f] text-[#ff8355]">
+              <Bot className="h-5 w-5" aria-hidden="true" />
             </div>
             <div className="min-w-0">
               <h3 className="truncate text-[0.98rem] font-semibold tracking-[-0.02em] text-white">
                 {agent.name}
               </h3>
               <div className="mt-1 flex flex-wrap items-center gap-2">
-                <p className="max-w-full truncate font-[family:var(--font-mono)] text-[10px] text-[#8b877e]">
+                <p className="max-w-full truncate font-[family:var(--font-mono)] text-[9px] text-[#8d867a]">
                   {agent.id}
                 </p>
                 <button
                   onClick={copyId}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-[#d8d3c7] bg-[#f5f2ea] px-2 py-1 text-[10px] text-[#625e57] transition hover:border-[#f04a00] hover:text-[#a63808]"
+                  className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#34342e] bg-[#151612] px-2 py-1 text-[9px] text-[#aaa397] transition hover:border-[#ff6a32] hover:text-[#ff9a72]"
                 >
-                  <Copy className="h-3 w-3" />
+                  <Copy className="h-3 w-3" aria-hidden="true" />
                   {copied ? "Copied" : "Copy ID"}
                 </button>
               </div>
@@ -154,11 +154,11 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
       </div>
 
       {agent.config && Object.keys(agent.config).length > 0 && (
-        <div className="mt-4 rounded-md border border-[#d8d3c7] bg-[#f5f2ea] p-3">
-          <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-widest text-slate-500">
-            Configuration
+        <div className="mt-4 rounded-[4px] border border-[#2b2b26] bg-[#0c0d0b] p-3">
+          <div className="mb-2 flex items-center gap-2 font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.16em] text-[#8d867a]">
+            <span className="text-[#58aaff]" aria-hidden="true">CFG /</span> Configuration
           </div>
-          <pre className="overflow-x-auto rounded-md border border-[#d8d3c7] bg-[#191916] px-3 py-2 text-xs text-[#ece7dc]">
+          <pre className="overflow-x-auto rounded-[4px] border border-[#34342e] bg-[#090a08] px-3 py-2 text-xs text-[#c8c0b0]">
             {JSON.stringify(agent.config, null, 2)}
           </pre>
         </div>
@@ -168,7 +168,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
         <button
           onClick={() => onStop(agent.id)}
           disabled={isStopping || !canStop}
-          className="inline-flex items-center gap-1.5 rounded-md border border-[#d8d3c7] bg-[#f5f2ea] px-3 py-2 text-xs text-[#625e57] transition hover:border-[#c58a00] hover:text-[#805600] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#34342e] bg-[#151612] px-3 py-2 text-xs text-[#aaa397] transition hover:border-[#8a6d38] hover:text-[#f4cc82] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isStopping ? (
             <Loader2 className="h-3 w-3 animate-spin" />
@@ -180,7 +180,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
         <button
           onClick={() => onDelete(agent.id)}
           disabled={isDeleting}
-          className="inline-flex items-center gap-1.5 rounded-md border border-[#d8d3c7] bg-[#f5f2ea] px-3 py-2 text-xs text-[#625e57] transition hover:border-[#c8493c] hover:text-[#a83226] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#34342e] bg-[#151612] px-3 py-2 text-xs text-[#aaa397] transition hover:border-[#7c3835] hover:text-[#ff9b96] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isDeleting ? (
             <Loader2 className="h-3 w-3 animate-spin" />
@@ -227,7 +227,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fieldClassName =
-    "w-full rounded-md border border-[#c9c3b6] bg-[#fbfaf6] px-4 py-3 text-sm text-[#191916] placeholder:text-[#9b978e] focus:border-[#f04a00] focus:outline-none";
+    "w-full rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-4 py-3 text-sm text-[#eee9dc] placeholder:text-[#8d867a] focus:border-[#ff6a32] focus:outline-none";
 
   if (!isOpen) return null;
 
@@ -267,7 +267,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md border border-[#c9c3b6] bg-[#fbfaf6] px-4 py-2 text-sm font-medium text-[#4f4b44] transition hover:border-[#191916]"
+            className="rounded-[4px] border border-[#3b3a33] bg-[#151612] px-4 py-2 text-sm font-medium text-[#c8c0b0] transition hover:border-[#777268] hover:text-white"
           >
             Cancel
           </button>
@@ -275,7 +275,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
             type="submit"
             form="create-agent-form"
             disabled={loading || !name}
-            className="rounded-md bg-[#f04a00] px-4 py-2 text-sm font-medium text-[#fffaf3] transition hover:bg-[#cf3f00] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-4 py-2 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -334,7 +334,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
           </div>
 
           {error && (
-            <div className="rounded-[14px] border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            <div className="rounded-[4px] border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
               {error}
             </div>
           )}
@@ -365,8 +365,8 @@ class AgentsErrorBoundary extends Component<{ children: ReactNode }, ErrorBounda
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-white/5 bg-white/[0.01] py-16 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/20 text-rose-400">
+        <div className="flex flex-col items-center justify-center rounded-[6px] border border-[#2b2b26] bg-[#11120f] py-16 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[4px] border border-rose-500/30 bg-rose-500/10 text-rose-400">
             <X className="h-8 w-8" />
           </div>
           <h3 className="mt-6 text-lg font-semibold text-white">Something went wrong</h3>
@@ -375,7 +375,7 @@ class AgentsErrorBoundary extends Component<{ children: ReactNode }, ErrorBounda
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] px-6 py-2.5 text-sm font-medium text-white transition hover:bg-white/[0.05]"
+            className="mt-6 rounded-[4px] border border-[#3b3a33] bg-[#151612] px-6 py-2.5 text-sm font-medium text-white transition hover:border-[#777268]"
           >
             Reload Page
           </button>
@@ -564,13 +564,13 @@ export function AgentsPageClient() {
         </LiveKpiGrid>
 
         {error && !authRequired && (
-          <div className="flex items-center justify-between rounded-[18px] border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          <div className="flex items-center justify-between rounded-[4px] border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
             <div className="flex items-center gap-2">
               <span className="font-medium">Error:</span> {error}
             </div>
             <button
               onClick={() => { setError(""); loadAgents(); }}
-              className="rounded-lg border border-rose-500/30 bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-200 transition hover:bg-rose-500/30"
+              className="rounded-[4px] border border-rose-500/30 bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-200 transition hover:bg-rose-500/30"
             >
               Retry
             </button>
@@ -592,14 +592,14 @@ export function AgentsPageClient() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="inline-flex items-center gap-2 rounded-md border border-[#c9c3b6] bg-[#fbfaf6] px-3.5 py-2 text-sm text-[#4f4b44] transition hover:border-[#191916] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#151612] px-3.5 py-2 text-sm text-[#c8c0b0] transition hover:border-[#777268] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RefreshCcw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
                 {refreshing ? "Refreshing" : "Refresh"}
               </button>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-md bg-[#f04a00] px-3.5 py-2 text-sm font-medium text-[#fffaf3] transition hover:bg-[#cf3f00]"
+                className="inline-flex items-center gap-2 rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-3.5 py-2 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545]"
               >
                 <Plus className="h-4 w-4" />
                 Create Agent
@@ -626,7 +626,7 @@ export function AgentsPageClient() {
             title="Fleet registry"
             meta={`${filteredAgents.length} visible`}
             action={
-              <span className="hidden rounded-full border border-[#2c3947] bg-[#10161d] px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-[#90a2b6] sm:inline-flex">
+              <span className="hidden rounded-[4px] border border-[#294d6c] bg-[#101c26] px-2.5 py-1 font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.14em] text-[#8ac7ff] sm:inline-flex">
                 {isMac ? "⌘K search" : "Ctrl+K search"}
               </span>
             }

@@ -42,61 +42,63 @@
     --site-radius-lg: 1.5rem;
     --site-radius-xl: 2rem;
     --site-shell-max: 86rem;
-    --mutx-dashboard-bg-canvas: #f2efe6;
-    --mutx-dashboard-bg-canvas-raised: #ebe6da;
-    --mutx-dashboard-bg-surface: #fbfaf6;
-    --mutx-dashboard-bg-surface-strong: #ffffff;
-    --mutx-dashboard-bg-surface-higher: #f0ece2;
-    --mutx-dashboard-bg-subtle: rgba(240, 74, 0, 0.08);
-    --mutx-dashboard-bg-inset: #ece7dc;
-    --mutx-dashboard-panel-gradient:
-      linear-gradient(180deg, #ffffff 0%, #faf8f2 100%);
-    --mutx-dashboard-panel-gradient-strong:
-      linear-gradient(180deg, #ffffff 0%, #f7f3ea 100%);
-    --mutx-dashboard-shell-gradient:
-      linear-gradient(180deg, #191916 0%, #11110f 100%);
-    --mutx-dashboard-text-primary: #191916;
-    --mutx-dashboard-text-secondary: #4f4b44;
-    --mutx-dashboard-text-subtle: #6e6a62;
-    --mutx-dashboard-text-muted: #8b877e;
-    --mutx-dashboard-text-label: #a63808;
-    --mutx-dashboard-border-subtle: #d8d3c7;
-    --mutx-dashboard-border-strong: rgba(240, 74, 0, 0.34);
-    --mutx-dashboard-border-interactive: rgba(240, 74, 0, 0.58);
-    --mutx-dashboard-focus-ring: rgba(240, 74, 0, 0.42);
-    --mutx-dashboard-brand: #f04a00;
-    --mutx-dashboard-brand-strong: #191916;
-    --mutx-dashboard-brand-soft: rgba(240, 74, 0, 0.1);
-    --mutx-dashboard-status-active: #146c49;
-    --mutx-dashboard-warn: #f59e0b;
-    --mutx-dashboard-warn-soft: rgba(245, 158, 11, 0.16);
-    --mutx-dashboard-danger: #f87171;
-    --mutx-dashboard-status-idle-bg: #eeebe2;
-    --mutx-dashboard-status-idle-border: #d6d1c5;
-    --mutx-dashboard-status-idle-text: #5f5b54;
-    --mutx-dashboard-status-idle-dot: #8b877e;
-    --mutx-dashboard-status-running-bg: #fff0e8;
-    --mutx-dashboard-status-running-border: #f6b493;
-    --mutx-dashboard-status-running-text: #8d2e05;
-    --mutx-dashboard-status-running-dot: #f04a00;
-    --mutx-dashboard-status-success-bg: #e8f5ee;
-    --mutx-dashboard-status-success-border: #a9d8c0;
-    --mutx-dashboard-status-success-text: #146c49;
-    --mutx-dashboard-status-success-dot: #20a36a;
-    --mutx-dashboard-status-error-bg: #fff0ee;
-    --mutx-dashboard-status-error-border: #efb5ae;
-    --mutx-dashboard-status-error-text: #a83226;
-    --mutx-dashboard-status-error-dot: #c8493c;
-    --mutx-dashboard-status-warning-bg: #fff5dc;
-    --mutx-dashboard-status-warning-border: #e8cb82;
-    --mutx-dashboard-status-warning-text: #805600;
-    --mutx-dashboard-status-warning-dot: #c58a00;
-    --mutx-dashboard-shadow-sm: 0 1px 2px rgba(25, 25, 22, 0.06);
-    --mutx-dashboard-shadow-lg: 0 18px 48px rgba(25, 25, 22, 0.1);
-    --swarm-radius-sm: 6px;
-    --swarm-radius-md: 8px;
-    --swarm-radius-lg: 12px;
-    --swarm-radius-xl: 16px;
+    --mutx-dashboard-bg-canvas: #090a08;
+    --mutx-dashboard-bg-canvas-raised: #0d0e0c;
+    --mutx-dashboard-bg-surface: #11120f;
+    --mutx-dashboard-bg-surface-strong: #151612;
+    --mutx-dashboard-bg-surface-higher: #1a1b17;
+    --mutx-dashboard-bg-subtle: rgba(255, 87, 28, 0.09);
+    --mutx-dashboard-bg-inset: #0c0d0b;
+    --mutx-dashboard-panel-gradient: #11120f;
+    --mutx-dashboard-panel-gradient-strong: #151612;
+    --mutx-dashboard-shell-gradient: #080907;
+    --mutx-dashboard-text-primary: #eee9dc;
+    --mutx-dashboard-text-secondary: #c8c0b0;
+    --mutx-dashboard-text-subtle: #999284;
+    --mutx-dashboard-text-muted: #8d867a;
+    --mutx-dashboard-text-label: #ff8355;
+    --mutx-dashboard-border-subtle: #2b2b26;
+    --mutx-dashboard-border-strong: #48463e;
+    --mutx-dashboard-border-interactive: rgba(255, 87, 28, 0.72);
+    --mutx-dashboard-focus-ring: rgba(255, 123, 76, 0.72);
+    --mutx-dashboard-brand: #ff571c;
+    --mutx-dashboard-brand-strong: #ff8355;
+    --mutx-dashboard-brand-soft: rgba(255, 87, 28, 0.11);
+    --mutx-dashboard-trace: #58aaff;
+    --mutx-dashboard-trace-soft: rgba(88, 170, 255, 0.11);
+    --mutx-dashboard-success: #4bd69b;
+    --mutx-dashboard-success-soft: rgba(75, 214, 155, 0.11);
+    --mutx-dashboard-status-active: #4bd69b;
+    --mutx-dashboard-warn: #efb654;
+    --mutx-dashboard-warn-soft: rgba(239, 182, 84, 0.12);
+    --mutx-dashboard-danger: #ff6d66;
+    --mutx-dashboard-danger-soft: rgba(255, 109, 102, 0.11);
+    --mutx-dashboard-status-idle-bg: #171813;
+    --mutx-dashboard-status-idle-border: #34342e;
+    --mutx-dashboard-status-idle-text: #aaa397;
+    --mutx-dashboard-status-idle-dot: #77766d;
+    --mutx-dashboard-status-running-bg: #101c26;
+    --mutx-dashboard-status-running-border: #294d6c;
+    --mutx-dashboard-status-running-text: #8ac7ff;
+    --mutx-dashboard-status-running-dot: #58aaff;
+    --mutx-dashboard-status-success-bg: #0f2018;
+    --mutx-dashboard-status-success-border: #285a43;
+    --mutx-dashboard-status-success-text: #78e3b4;
+    --mutx-dashboard-status-success-dot: #4bd69b;
+    --mutx-dashboard-status-error-bg: #241312;
+    --mutx-dashboard-status-error-border: #66302e;
+    --mutx-dashboard-status-error-text: #ff9b96;
+    --mutx-dashboard-status-error-dot: #ff6d66;
+    --mutx-dashboard-status-warning-bg: #211a0e;
+    --mutx-dashboard-status-warning-border: #65502b;
+    --mutx-dashboard-status-warning-text: #f4cc82;
+    --mutx-dashboard-status-warning-dot: #efb654;
+    --mutx-dashboard-shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.025);
+    --mutx-dashboard-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.48);
+    --swarm-radius-sm: 4px;
+    --swarm-radius-md: 6px;
+    --swarm-radius-lg: 8px;
+    --swarm-radius-xl: 8px;
     --swarm-font-family-sans: var(--font-site-body, var(--font-display));
     --swarm-font-family-mono: var(--font-mono);
   }
@@ -152,31 +154,6 @@
   body.mutx-demo-shell {
     height: 100%;
     overflow: hidden;
-  }
-
-  html[data-app-demo-intro-active='1'],
-  html[data-app-demo-intro-active='1'] body {
-    overflow: hidden;
-  }
-
-  html[data-app-demo-intro-active='1'] {
-    scroll-behavior: auto;
-  }
-
-  html[data-app-demo-intro-active='1'] body {
-    overscroll-behavior: none;
-  }
-
-  .mutx-app-demo-intro {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-  }
-
-  html[data-app-demo-intro-active='1'] .mutx-app-demo-intro {
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
   }
 
   html.mutx-demo-shell {
@@ -1637,61 +1614,49 @@
 .docs-sidebar::-webkit-scrollbar-thumb { background: rgba(255, 240, 214, 0.18); border-radius: 3px; }
 .docs-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255, 240, 214, 0.28); }
 
-/* MUTX operator editorial theme. Legacy dashboard routes still carry a small
-   set of dark utility classes; these scoped translations keep every route on
-   the shared light canvas while those screens converge on the core tokens. */
+/* MUTX flight-recorder dashboard. Existing dark utility classes now sit on a
+   native carbon canvas, so no light-theme translation layer is required. */
 .dashboard-app {
-  color-scheme: light;
-  --dashboard-card: #fbfaf6;
-  --dashboard-card-muted: #f5f2ea;
-  --dashboard-copy: #4f4b44;
+  color-scheme: dark;
+  accent-color: var(--mutx-dashboard-brand);
+  background: var(--mutx-dashboard-bg-canvas);
+  color: var(--mutx-dashboard-text-primary);
+  --dashboard-card: var(--mutx-dashboard-bg-surface);
+  --dashboard-card-muted: var(--mutx-dashboard-bg-inset);
+  --dashboard-copy: var(--mutx-dashboard-text-secondary);
 }
 
-.dashboard-app .dashboard-content [class~="text-white"],
-.dashboard-app .dashboard-content [class~="text-white/70"],
-.dashboard-app .dashboard-content [class~="text-white/80"],
-.dashboard-app .dashboard-content [class~="text-white/90"],
-.dashboard-app .dashboard-content [class~="text-slate-100"],
-.dashboard-app .dashboard-content [class~="text-slate-200"],
-.dashboard-app .dashboard-content [class~="text-slate-300"] {
-  color: #191916 !important;
+.dashboard-app ::selection {
+  background: var(--mutx-dashboard-brand);
+  color: #080907;
 }
 
-.dashboard-app .dashboard-content [class~="text-slate-400"] { color: #625e57 !important; }
-.dashboard-app .dashboard-content [class~="text-slate-500"],
-.dashboard-app .dashboard-content [class~="text-slate-600"] { color: #8b877e !important; }
-.dashboard-app .dashboard-content [class~="text-cyan-300"],
-.dashboard-app .dashboard-content [class~="text-sky-300"],
-.dashboard-app .dashboard-content [class~="text-sky-200"] { color: #0f6f80 !important; }
-.dashboard-app .dashboard-content [class~="text-emerald-300"],
-.dashboard-app .dashboard-content [class~="text-emerald-200"] { color: #146c49 !important; }
-.dashboard-app .dashboard-content [class~="text-amber-300"],
-.dashboard-app .dashboard-content [class~="text-amber-200"],
-.dashboard-app .dashboard-content [class~="text-amber-100"] { color: #805600 !important; }
-.dashboard-app .dashboard-content [class~="text-rose-300"],
-.dashboard-app .dashboard-content [class~="text-rose-200"] { color: #a83226 !important; }
-
-.dashboard-app .dashboard-content [class~="border-white/10"],
-.dashboard-app .dashboard-content [class~="border-white/20"] { border-color: #d8d3c7 !important; }
-
-.dashboard-app .dashboard-content [class~="bg-white/[0.02]"],
-.dashboard-app .dashboard-content [class~="bg-white/[0.03]"],
-.dashboard-app .dashboard-content [class~="bg-white/[0.04]"],
-.dashboard-app .dashboard-content [class~="bg-white/5"],
-.dashboard-app .dashboard-content [class~="bg-black/30"],
-.dashboard-app .dashboard-content [class~="bg-black/40"],
-.dashboard-app .dashboard-content [class~="bg-[#0a1428]"],
-.dashboard-app .dashboard-content [class~="bg-[#0b1730]/60"] {
-  background-color: var(--dashboard-card-muted) !important;
+.dashboard-app .dashboard-content {
+  color: var(--mutx-dashboard-text-primary);
 }
 
-.dashboard-app .dashboard-content input,
-.dashboard-app .dashboard-content textarea,
-.dashboard-app .dashboard-content select {
-  color: #191916;
+.dashboard-app .text-slate-500 {
+  color: var(--mutx-dashboard-text-subtle);
 }
 
-.dashboard-app .dashboard-content input::placeholder,
-.dashboard-app .dashboard-content textarea::placeholder {
-  color: #9b978e;
+.dashboard-app .text-slate-600 {
+  color: var(--mutx-dashboard-text-muted);
+}
+
+.dashboard-app :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--mutx-dashboard-focus-ring);
+  outline-offset: 2px;
+}
+
+.dashboard-app .dashboard-content :where(input, textarea, select) {
+  caret-color: var(--mutx-dashboard-brand);
+}
+
+.dashboard-app .dashboard-content :where(input, textarea)::placeholder {
+  color: var(--mutx-dashboard-text-muted);
+}
+
+.dashboard-app :where(aside, main, nav) {
+  scrollbar-color: var(--mutx-dashboard-border-strong) var(--mutx-dashboard-bg-inset);
+  scrollbar-width: thin;
 }

@@ -3,6 +3,11 @@
 Date: 2026-06-02
 Branch: `codex/repo-size-audit`
 
+> 2026-07-21 follow-up: the Operational Ledger redesign removed the unused
+> `public/marketing` media tree and four retired auth illustrations after a
+> repository-wide literal reference audit.
+> The sizes below remain the historical baseline that motivated that cleanup.
+
 ## Measurement Commands
 
 ```bash
@@ -186,7 +191,7 @@ Keep generated contract artifacts until repo policy changes. Mark generated arti
 
 - `app/control/[[...slug]]/page.tsx` and `components/dashboard/demo/*` are explicitly documented as browser demo/control preview surfaces.
 - Dashboard routes marked `preview` in `components/desktop/desktopRouteConfig.ts` include preview-backed or redirect-backed areas that must remain out of stable primary navigation until their contracts mature.
-- `public/demo.gif` is referenced by marketing content and should not be deleted without replacing the page behavior.
+- `public/demo.gif` is embedded in the README and should not be deleted without replacing that project preview.
 
 ### `DEAD`
 
@@ -215,7 +220,7 @@ Highest confidence for the next PR:
 
 Needs proof before deletion:
 
-- `public/demo.gif` (`PREVIEW`): referenced by `lib/marketingContent.ts`.
+- `public/demo.gif` (`PREVIEW`): embedded in `README.md` and guarded by the docs-drift suite.
 - Duplicate logo variants under `public/` and `public/pico/`.
 - Preview/control route code under `app/control` and `components/dashboard/demo`.
 - Large marketing media under `public/marketing` and `public/landing`.

@@ -59,8 +59,8 @@ export function DashboardCommandPalette({
       description="Search every operator surface without leaving the keyboard."
       className="max-w-2xl"
     >
-      <div className="flex min-h-12 items-center gap-3 rounded-md border border-[#c9c3b6] bg-[#fbfaf6] px-3.5 focus-within:border-[#f04a00]">
-        <Search className="h-4 w-4 shrink-0 text-[#8b877e]" aria-hidden="true" />
+      <div className="flex min-h-12 items-center gap-3 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-3.5 transition-colors focus-within:border-[#ff6a32]">
+        <Search className="h-4 w-4 shrink-0 text-[#ff7545]" aria-hidden="true" />
         <input
           data-autofocus
           type="search"
@@ -90,9 +90,9 @@ export function DashboardCommandPalette({
           aria-activedescendant={
             matches[activeIndex] ? `dashboard-command-${matches[activeIndex].key}` : undefined
           }
-          className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#191916] outline-none placeholder:text-[#9b978e]"
+          className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#eee9dc] outline-none placeholder:text-[#8d867a]"
         />
-        <kbd className="rounded border border-[#d8d3c7] bg-[#f2efe6] px-1.5 py-0.5 font-[family:var(--font-mono)] text-[9px] text-[#8b877e]">
+        <kbd className="rounded-[3px] border border-[#3b3a33] bg-[#151612] px-1.5 py-0.5 font-[family:var(--font-mono)] text-[8px] text-[#8d867a]">
           ESC
         </kbd>
       </div>
@@ -122,26 +122,33 @@ export function DashboardCommandPalette({
                 onFocus={() => setActiveIndex(index)}
                 onClick={() => selectItem(item)}
                 className={cn(
-                  "group flex min-h-14 w-full items-center gap-3 rounded-md px-3 text-left transition-colors",
-                  active ? "bg-[#191916] text-white" : "text-[#4f4b44] hover:bg-[#ece7dc]",
+                  "group flex min-h-14 w-full items-center gap-3 rounded-[4px] border px-3 text-left transition-colors",
+                  active
+                    ? "border-[#3b3a33] bg-[#171813] text-[#eee9dc] shadow-[inset_3px_0_0_#ff571c]"
+                    : "border-transparent text-[#b8b1a4] hover:border-[#2b2b26] hover:bg-[#11120f]",
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-md border",
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-[4px] border",
                     active
-                      ? "border-[#484741] bg-[#24231f] text-[#f04a00]"
-                      : "border-[#d8d3c7] bg-[#f5f2ea] text-[#6e6a62]",
+                      ? "border-[#56534b] bg-[#0c0d0b] text-[#ff7545]"
+                      : "border-[#34342e] bg-[#0c0d0b] text-[#8d867a]",
                   )}
                 >
                   <ItemIcon className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-medium">{item.title}</span>
+                  <span className="flex items-center gap-2 text-sm font-medium">
+                    <span className="font-[family:var(--font-mono)] text-[8px] text-[#ff6a32]" aria-hidden="true">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span>{item.title}</span>
+                  </span>
                   <span
                     className={cn(
                       "mt-0.5 block truncate text-xs",
-                      active ? "text-[#b7b3aa]" : "text-[#8b877e]",
+                      active ? "text-[#aaa397]" : "text-[#8d867a]",
                     )}
                   >
                     {item.description}
@@ -150,7 +157,7 @@ export function DashboardCommandPalette({
                 <ArrowRight
                   className={cn(
                     "h-4 w-4 shrink-0",
-                    active ? "text-[#f04a00]" : "text-[#b7b0a3]",
+                    active ? "text-[#58aaff]" : "text-[#5f5d55]",
                   )}
                   aria-hidden="true"
                 />
@@ -158,7 +165,7 @@ export function DashboardCommandPalette({
             );
           })
         ) : (
-          <div className="rounded-md border border-dashed border-[#c9c3b6] px-4 py-8 text-center text-sm text-[#6e6a62]">
+          <div className="rounded-[4px] border border-dashed border-[#3b3a33] bg-[#0c0d0b] px-4 py-8 text-center text-sm text-[#888278]">
             No surface matches “{query}”.
           </div>
         )}

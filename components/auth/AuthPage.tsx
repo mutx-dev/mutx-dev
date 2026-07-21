@@ -35,10 +35,6 @@ const authContent = {
       asideTitle: "Your workspace, ready when you are.",
       asideBody:
         "Your team, permissions, deployment state, and run history load from the same account.",
-      mediaSrc: "/landing/webp/wiring-bay.webp",
-      mediaAlt: "MUTX robot operating inside a wiring bay",
-      mediaWidth: 1024,
-      mediaHeight: 1536,
       highlights: [
         "One account for hosted work and desktop control.",
         "Your permissions load with the workspace.",
@@ -59,10 +55,6 @@ const authContent = {
       asideTitle: "A workspace that belongs to your team.",
       asideBody:
         "Your identity, permissions, run history, and deployment records stay together from the first session.",
-      mediaSrc: "/landing/webp/victory-core.webp",
-      mediaAlt: "MUTX robot holding the MUTX mark after access is granted",
-      mediaWidth: 1536,
-      mediaHeight: 1024,
       highlights: [
         "Sign up with email or a provider.",
         "Verification returns you to the right workspace.",
@@ -85,10 +77,6 @@ const authContent = {
       asideTitle: "Pico remembers where you stopped.",
       asideBody:
         "Your current lesson, saved proof, setup state, and support context return with your account.",
-      mediaSrc: "/landing/webp/wiring-bay.webp",
-      mediaAlt: "MUTX robot operating inside a wiring bay",
-      mediaWidth: 1024,
-      mediaHeight: 1536,
       highlights: [
         "Resume lessons and saved proof.",
         "Keep setup progress across devices.",
@@ -109,10 +97,6 @@ const authContent = {
       asideTitle: "So you never restart from zero.",
       asideBody:
         "Your current route, saved proof, and support history stay attached as you move through the product.",
-      mediaSrc: "/landing/webp/victory-core.webp",
-      mediaAlt: "MUTX robot holding the MUTX mark after access is granted",
-      mediaWidth: 1536,
-      mediaHeight: 1024,
       highlights: [
         "One account for onboarding and Academy.",
         "Verification returns you to Pico.",
