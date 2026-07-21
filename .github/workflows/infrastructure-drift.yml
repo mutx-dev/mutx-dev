@@ -9,8 +9,25 @@ permissions:
   contents: read
 
 jobs:
+  readiness:
+    name: Terraform drift readiness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report drift schedule state
+        env:
+          ENABLE_TERRAFORM_DRIFT: ${{ vars.ENABLE_TERRAFORM_DRIFT }}
+          TRIGGER: ${{ github.event_name }}
+        run: |
+          if [ "$TRIGGER" = "schedule" ] && [ "$ENABLE_TERRAFORM_DRIFT" != "true" ]; then
+            echo "::notice::Scheduled Terraform drift is disabled. Set ENABLE_TERRAFORM_DRIFT=true after configuring the required cloud and remote-state credentials."
+          else
+            echo "Terraform drift was explicitly requested or enabled."
+          fi
+
   terraform-drift:
     name: Terraform drift (${{ matrix.environment }})
+    needs: readiness
+    if: github.event_name == 'workflow_dispatch' || vars.ENABLE_TERRAFORM_DRIFT == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
