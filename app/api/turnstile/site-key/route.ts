@@ -7,11 +7,6 @@ export async function GET() {
 
   return NextResponse.json(
     { siteKey },
-    {
-      status: siteKey ? 200 : 503,
-      headers: {
-        'Cache-Control': 'no-store',
-      },
-    }
+    { headers: { 'Cache-Control': 'no-store' } },
   )
 }

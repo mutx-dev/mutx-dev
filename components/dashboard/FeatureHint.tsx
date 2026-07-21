@@ -52,7 +52,7 @@ export function FeatureHint({
     <details className={cn("group relative", className)}>
       <summary
         className={cn(
-          "inline-flex list-none cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors [&::-webkit-details-marker]:hidden",
+          "inline-flex min-h-11 list-none cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors [&::-webkit-details-marker]:hidden",
           copy.summaryClassName,
         )}
       >

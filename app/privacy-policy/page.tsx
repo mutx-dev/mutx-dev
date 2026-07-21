@@ -105,7 +105,7 @@ export default function PrivacyPolicyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
           <div className={`${styles.shell} ${styles.routeHeroCopy} ${styles.routeHeroNarrow} ${styles.routeHeroNarrowCopy}`}>
             <div className={styles.intro}>

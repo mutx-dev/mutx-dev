@@ -4,6 +4,15 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const SEARCH_ATTR = 'data-docs-search-open';
+const SEARCH_LISTBOX_ID = 'docs-search-results';
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
 
 interface SearchEntry {
   id: string;
@@ -20,17 +29,18 @@ interface SearchDocument {
   entries: SearchEntry[];
 }
 
-interface SearchIndex {
-  documents: SearchDocument[];
-}
+type SearchIndex = SearchDocument[] | { documents: SearchDocument[] };
 
 export function DocsSearch() {
   const [entries, setEntries] = useState<SearchEntry[]>([]);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const isOpenRef = useRef(false);
   const router = useRouter();
 
   // Load search index
@@ -38,7 +48,8 @@ export function DocsSearch() {
     fetch('/docs-search-index.json')
       .then((r) => r.json())
       .then((data: SearchIndex) => {
-        const flat = data.documents.flatMap((doc) =>
+        const documents = Array.isArray(data) ? data : data.documents;
+        const flat = documents.flatMap((doc) =>
           doc.entries.map((e) => ({ ...e, section: doc.section }))
         );
         setEntries(flat);
@@ -48,19 +59,43 @@ export function DocsSearch() {
 
   // Watch attribute for open/close
   useEffect(() => {
-    const obs = new MutationObserver(() => {
+    function syncOpenState() {
       const open = document.documentElement.hasAttribute(SEARCH_ATTR);
+
+      if (open === isOpenRef.current) return;
+      isOpenRef.current = open;
+
+      if (open && document.activeElement instanceof HTMLElement) {
+        returnFocusRef.current = document.activeElement;
+      }
+
       setIsOpen(open);
       if (open) {
         setQuery('');
         setSelected(0);
-        setTimeout(() => inputRef.current?.focus(), 20);
       }
-    });
+    }
+
+    const obs = new MutationObserver(syncOpenState);
     obs.observe(document.documentElement, { attributes: true, attributeFilter: [SEARCH_ATTR] });
-    if (document.documentElement.hasAttribute(SEARCH_ATTR)) setIsOpen(true);
+    syncOpenState();
     return () => obs.disconnect();
   }, []);
+
+  // Move focus into the dialog when it opens and return it when it closes.
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus();
+      return;
+    }
+
+    // The attribute observer may have queued an open state during this effect cycle.
+    if (isOpenRef.current) return;
+
+    const returnTarget = returnFocusRef.current;
+    returnFocusRef.current = null;
+    if (returnTarget?.isConnected) returnTarget.focus();
+  }, [isOpen]);
 
   // Cmd+K shortcut
   useEffect(() => {
@@ -87,36 +122,81 @@ export function DocsSearch() {
         .slice(0, 12)
         .map((s) => s.entry)
     : [];
+  const activeIndex = results.length > 0 ? Math.min(selected, results.length - 1) : -1;
+  const activeOptionId = activeIndex >= 0 ? getOptionId(activeIndex) : undefined;
+
+  function close() {
+    document.documentElement.removeAttribute(SEARCH_ATTR);
+  }
 
   function navigate(href: string) {
-    document.documentElement.removeAttribute(SEARCH_ATTR);
+    close();
     router.push(href);
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
+  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelected((s) => Math.min(s + 1, results.length - 1));
+      if (results.length > 0) setSelected((s) => Math.min(s + 1, results.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelected((s) => Math.max(s - 1, 0));
+      if (results.length > 0) setSelected((s) => Math.max(s - 1, 0));
     } else if (e.key === 'Enter') {
-      if (results[selected]) navigate(results[selected].href);
-    } else if (e.key === 'Escape') {
-      document.documentElement.removeAttribute(SEARCH_ATTR);
+      const result = results[activeIndex];
+      if (result) {
+        e.preventDefault();
+        navigate(result.href);
+      }
+    }
+  }
+
+  function handleDialogKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+      return;
+    }
+
+    if (e.key !== 'Tab') return;
+
+    const focusable = Array.from(
+      dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []
+    ).filter((element) => element.getAttribute('aria-hidden') !== 'true');
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (!first || !last) {
+      e.preventDefault();
+      dialogRef.current?.focus();
+    } else if (e.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
     }
   }
 
   useEffect(() => {
     const el = resultsRef.current?.querySelector('[data-selected="true"]');
     el?.scrollIntoView({ block: 'nearest' });
-  }, [selected]);
+  }, [activeIndex]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="docs-search-overlay" onClick={() => document.documentElement.removeAttribute(SEARCH_ATTR)}>
-      <div className="docs-search-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="docs-search-overlay" onClick={close}>
+      <div
+        ref={dialogRef}
+        className="docs-search-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search documentation"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleDialogKeyDown}
+      >
         <div className="docs-search-input-row">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="docs-search-icon">
             <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.5" />
@@ -126,25 +206,35 @@ export function DocsSearch() {
             ref={inputRef}
             className="docs-search-input"
             placeholder="Search docs..."
+            role="combobox"
+            aria-label="Search documentation"
+            aria-autocomplete="list"
+            aria-haspopup="listbox"
+            aria-expanded={Boolean(q && results.length > 0)}
+            aria-controls={q && results.length > 0 ? SEARCH_LISTBOX_ID : undefined}
+            aria-activedescendant={activeOptionId}
             autoComplete="off"
             spellCheck="false"
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelected(0); }}
-            onKeyDown={handleKeyDown}
+            onKeyDown={handleInputKeyDown}
           />
-          <kbd className="docs-search-kbd">Esc</kbd>
+          <button type="button" className="docs-search-close" aria-label="Close search" onClick={close}>
+            <kbd aria-hidden="true">Esc</kbd>
+          </button>
         </div>
         {q && (
           <div className="docs-search-body" ref={resultsRef}>
             {results.length > 0 ? (
-              <ul className="docs-search-results" role="listbox">
+              <ul id={SEARCH_LISTBOX_ID} className="docs-search-results" role="listbox" aria-label="Search results">
                 {results.map((r, i) => (
                   <li
                     key={r.href + r.title}
+                    id={getOptionId(i)}
                     role="option"
-                    aria-selected={i === selected}
-                    data-selected={i === selected}
-                    className={"docs-search-result" + (i === selected ? " selected" : "")}
+                    aria-selected={i === activeIndex}
+                    data-selected={i === activeIndex}
+                    className={"docs-search-result" + (i === activeIndex ? " selected" : "")}
                     onClick={() => navigate(r.href)}
                     onMouseEnter={() => setSelected(i)}
                   >
@@ -161,7 +251,7 @@ export function DocsSearch() {
                 ))}
               </ul>
             ) : (
-              <div className="docs-search-empty">No results for &ldquo;{query}&rdquo;</div>
+              <div className="docs-search-empty" role="status">No results for &ldquo;{query}&rdquo;</div>
             )}
           </div>
         )}
@@ -175,6 +265,10 @@ export function DocsSearch() {
       </div>
     </div>
   );
+}
+
+function getOptionId(index: number): string {
+  return `${SEARCH_LISTBOX_ID}-option-${index}`;
 }
 
 function scoreEntry(entry: SearchEntry, q: string): number {

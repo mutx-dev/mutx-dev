@@ -62,6 +62,124 @@ type OrchestrationPayload = {
   partials: string[];
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function stringValue(value: unknown, fallback: string) {
+  return typeof value === "string" && value.trim().length > 0 ? value : fallback;
+}
+
+function nullableString(value: unknown) {
+  return typeof value === "string" && value.trim().length > 0 ? value : null;
+}
+
+function countValue(value: unknown, fallback = 0) {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.round(value))
+    : fallback;
+}
+
+function nullableCount(value: unknown, fallback: number | null = null) {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.round(value))
+    : fallback;
+}
+
+function recordList(value: unknown) {
+  return Array.isArray(value) ? value.filter(isRecord) : [];
+}
+
+function normalizeOrchestrationPayload(value: unknown): OrchestrationPayload {
+  const payload = isRecord(value) ? value : {};
+
+  const approvals = recordList(payload.approvals).map((approval, index) => ({
+    id: stringValue(approval.id, `approval-${index + 1}`),
+    agentId: nullableString(approval.agentId),
+    actionType: stringValue(approval.actionType, "Approval request"),
+    requester: stringValue(approval.requester, "Unknown requester"),
+    status: stringValue(approval.status, "PENDING"),
+    createdAt: nullableString(approval.createdAt),
+  }));
+
+  const recoveries = recordList(payload.recoveries).map((recovery, index) => {
+    const kind = recovery.kind === "session" ? ("session" as const) : ("run" as const);
+
+    return {
+      id: stringValue(recovery.id, `recovery-${index + 1}`),
+      kind,
+      title: stringValue(recovery.title, "Recovery item"),
+      detail: stringValue(recovery.detail, "No recovery detail was returned."),
+      status: stringValue(recovery.status, "unknown"),
+      createdAt: nullableString(recovery.createdAt),
+      href: stringValue(
+        recovery.href,
+        kind === "session" ? "/dashboard/sessions" : "/dashboard/runs",
+      ),
+    };
+  });
+
+  const blueprints = recordList(payload.blueprints).map((blueprint, index) => ({
+    id: stringValue(blueprint.id, `blueprint-${index + 1}`),
+    name: stringValue(blueprint.name, "Blueprint"),
+    summary: stringValue(blueprint.summary, "No blueprint summary was returned."),
+    recommendedAgents: stringValue(blueprint.recommendedAgents, "not specified"),
+    roles: countValue(blueprint.roles),
+    tags: Array.isArray(blueprint.tags)
+      ? blueprint.tags.filter(
+          (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
+        )
+      : [],
+  }));
+
+  const autonomyRecord = isRecord(payload.autonomy) ? payload.autonomy : null;
+  const autonomy = autonomyRecord
+    ? {
+        queued: countValue(autonomyRecord.queued),
+        running: countValue(autonomyRecord.running),
+        parked: countValue(autonomyRecord.parked),
+        completed: countValue(autonomyRecord.completed),
+        activeRunners: countValue(autonomyRecord.activeRunners),
+      }
+    : null;
+
+  const summary = isRecord(payload.summary) ? payload.summary : {};
+  const partials = Array.isArray(payload.partials)
+    ? payload.partials.filter(
+        (note): note is string => typeof note === "string" && note.trim().length > 0,
+      )
+    : [];
+  const responseIsIncomplete =
+    !isRecord(value) ||
+    !isRecord(payload.summary) ||
+    !Array.isArray(payload.approvals) ||
+    !Array.isArray(payload.recoveries) ||
+    !Array.isArray(payload.blueprints) ||
+    !Array.isArray(payload.partials);
+
+  if (responseIsIncomplete) {
+    partials.push(
+      "The orchestration proxy returned an incomplete payload; unavailable collections are shown as empty.",
+    );
+  }
+
+  return {
+    generatedAt: stringValue(payload.generatedAt, new Date().toISOString()),
+    summary: {
+      pendingApprovals: countValue(summary.pendingApprovals, approvals.length),
+      recoveryWatch: countValue(summary.recoveryWatch, recoveries.length),
+      blueprints: countValue(summary.blueprints, blueprints.length),
+      queuedAutonomy: nullableCount(summary.queuedAutonomy, autonomy?.queued ?? null),
+      runningAutonomy: nullableCount(summary.runningAutonomy, autonomy?.running ?? null),
+    },
+    approvals,
+    recoveries,
+    blueprints,
+    autonomy,
+    partials: [...new Set(partials)],
+  };
+}
+
 function isAuthError(error: unknown) {
   return error instanceof ApiRequestError && (error.status === 401 || error.status === 403);
 }
@@ -89,9 +207,9 @@ export function OrchestrationPageClient() {
       setError(null);
 
       try {
-        const response = await readJson<OrchestrationPayload>("/api/dashboard/orchestration");
+        const response = await readJson<unknown>("/api/dashboard/orchestration");
         if (!cancelled) {
-          setPayload(response);
+          setPayload(normalizeOrchestrationPayload(response));
           setLoading(false);
         }
       } catch (loadError) {

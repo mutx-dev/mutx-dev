@@ -10,6 +10,7 @@ import {
   History,
   KeyRound,
   Layers,
+  LayoutGrid,
   ListTree,
   MemoryStick,
   MessagesSquare,
@@ -34,6 +35,7 @@ export type DesktopRouteKey =
   | "reasoning"
   | "runs"
   | "monitoring"
+  | "autonomy"
   | "traces"
   | "observability"
   | "sessions"
@@ -46,6 +48,9 @@ export type DesktopRouteKey =
   | "memory"
   | "analytics"
   | "channels"
+  | "templates"
+  | "notifications"
+  | "standup"
   | "history"
   | "skills"
   | "spawn"
@@ -151,6 +156,19 @@ export const DESKTOP_ROUTE_META: Record<DesktopRouteKey, DesktopRouteMeta> = {
     icon: BellRing,
     iconTone: "text-sky-300 bg-sky-400/10",
     requiresAuth: true,
+  },
+  autonomy: {
+    key: "autonomy",
+    title: "Autonomy",
+    path: "/dashboard/autonomy",
+    publicHref: "/dashboard/autonomy",
+    description: "Local autonomy daemon, queue, runner, and report posture from the live workspace contract.",
+    badge: "local autonomy",
+    section: "execution",
+    icon: Bot,
+    iconTone: "text-fuchsia-300 bg-fuchsia-400/10",
+    stage: "preview",
+    showInPrimaryNav: false,
   },
   traces: {
     key: "traces",
@@ -304,6 +322,48 @@ export const DESKTOP_ROUTE_META: Record<DesktopRouteKey, DesktopRouteMeta> = {
     requiresAuth: true,
     requiresAssistant: true,
   },
+  templates: {
+    key: "templates",
+    title: "Templates",
+    path: "/dashboard/templates",
+    publicHref: "/dashboard/templates",
+    description: "Starter and custom agent templates backed by the workspace catalog.",
+    badge: "workspace",
+    section: "support",
+    icon: LayoutGrid,
+    iconTone: "text-violet-300 bg-violet-400/10",
+    stage: "preview",
+    showInPrimaryNav: false,
+    requiresAuth: true,
+  },
+  notifications: {
+    key: "notifications",
+    title: "Notifications",
+    path: "/dashboard/notifications",
+    publicHref: "/dashboard/notifications",
+    description: "Live operator notifications and read state from the dashboard contract.",
+    badge: "support",
+    section: "support",
+    icon: BellRing,
+    iconTone: "text-sky-300 bg-sky-400/10",
+    stage: "preview",
+    showInPrimaryNav: false,
+    requiresAuth: true,
+  },
+  standup: {
+    key: "standup",
+    title: "Standup",
+    path: "/dashboard/standup",
+    publicHref: "/dashboard/standup",
+    description: "Current standup summary, blockers, and recent execution context.",
+    badge: "support",
+    section: "support",
+    icon: Users,
+    iconTone: "text-emerald-300 bg-emerald-400/10",
+    stage: "preview",
+    showInPrimaryNav: false,
+    requiresAuth: true,
+  },
   history: {
     key: "history",
     title: "History",
@@ -380,6 +440,7 @@ export const DESKTOP_ROUTE_ORDER: DesktopRouteKey[] = [
   "deployments",
   "runs",
   "monitoring",
+  "autonomy",
   "documents",
   "reasoning",
   "traces",
@@ -394,6 +455,9 @@ export const DESKTOP_ROUTE_ORDER: DesktopRouteKey[] = [
   "memory",
   "swarm",
   "channels",
+  "templates",
+  "notifications",
+  "standup",
   "history",
   "skills",
   "spawn",

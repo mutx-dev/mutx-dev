@@ -25,7 +25,7 @@ export function DashboardSectionPage({
 }: DashboardSectionPageProps) {
   return (
     <section
-      className="dashboard-entry overflow-hidden rounded-[36px] border"
+      className="dashboard-entry overflow-hidden rounded-xl border"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         background: dashboardTokens.panelGradientStrong,
@@ -48,7 +48,7 @@ export function DashboardSectionPage({
       <div className="grid gap-6 p-5 lg:p-7 xl:grid-cols-[minmax(0,1.8fr)_320px]">
         <div className="space-y-6">
           <div
-            className="rounded-[30px] border p-6"
+            className="rounded-lg border p-6"
             style={{
               borderColor: dashboardTokens.borderSubtle,
               background: dashboardTokens.panelGradient,
@@ -72,21 +72,20 @@ export function DashboardSectionPage({
                   className="mt-4 max-w-3xl text-sm leading-7"
                   style={{ color: dashboardTokens.textSubtle }}
                 >
-                  The shell is stable. The next additions should read like an operating ledger,
-                  not placeholder product chrome: one live surface, one source of truth, one
-                  useful next action.
+                  Each section centers one live capability, the state behind it, and the next
+                  useful action.
                 </p>
               </div>
 
               <div
-                className="space-y-3 rounded-[24px] border px-4 py-4"
+                className="space-y-3 rounded-lg border px-4 py-4"
                 style={{
                   borderColor: dashboardTokens.borderSubtle,
                   backgroundColor: dashboardTokens.bgInset,
                 }}
               >
                 <div
-                  className="inline-flex rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em]"
+                  className="inline-flex rounded-md border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em]"
                   style={{
                     borderColor: dashboardTokens.borderStrong,
                     backgroundColor: dashboardTokens.brandSoft,
@@ -104,7 +103,7 @@ export function DashboardSectionPage({
           </div>
 
           <section
-            className="rounded-[30px] border p-4 sm:p-5"
+            className="rounded-lg border p-4 sm:p-5"
             style={{
               borderColor: dashboardTokens.borderSubtle,
               background: dashboardTokens.panelGradient,
@@ -127,7 +126,7 @@ export function DashboardSectionPage({
                 </p>
               </div>
               <span
-                className="rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
+                className="rounded-md border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]"
                 style={{
                   borderColor: dashboardTokens.borderSubtle,
                   backgroundColor: dashboardTokens.bgInset,
@@ -142,14 +141,14 @@ export function DashboardSectionPage({
               {checks.map((item, index) => (
                 <li
                   key={item}
-                  className="grid gap-3 rounded-[24px] border px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-start"
+                  className="grid gap-3 rounded-lg border px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-start"
                   style={{
                     borderColor: dashboardTokens.borderSubtle,
                     backgroundColor: dashboardTokens.bgInset,
                   }}
                 >
                   <span
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border text-[11px] font-semibold uppercase tracking-[0.18em]"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border text-[10px] font-semibold uppercase tracking-[0.16em]"
                     style={{
                       borderColor: dashboardTokens.borderStrong,
                       backgroundColor: dashboardTokens.brandSoft,
@@ -187,7 +186,7 @@ export function DashboardSectionPage({
         <aside className="space-y-4">
           {aside ?? (
             <div
-              className="rounded-[28px] border p-5"
+              className="rounded-lg border p-5"
               style={{
                 borderColor: dashboardTokens.borderSubtle,
                 background: dashboardTokens.panelGradient,
@@ -216,7 +215,7 @@ export function DashboardSectionPage({
           )}
 
           <div
-            className="rounded-[28px] border p-5"
+            className="rounded-lg border p-5"
             style={{
               borderColor: dashboardTokens.borderSubtle,
               background: dashboardTokens.panelGradient,

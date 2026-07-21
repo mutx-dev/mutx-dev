@@ -31,30 +31,30 @@ export function hslRaw(color: HSL): string {
   return `${h} ${s}% ${l}%`;
 }
 
-/** Core void palette — dark theme foundation */
+/** Core flight-recorder palette — carbon surfaces with a warm signal accent. */
 export const voidPalette = {
-  background: { h: 215, s: 27, l: 4 },  // #07090C
-  card: { h: 220, s: 30, l: 8 },         // #0F141C
-  primary: { h: 217, s: 91, l: 60 },     // #3b82f6 (MUTX brand blue)
-  secondary: { h: 220, s: 25, l: 11 },
-  muted: { h: 220, s: 20, l: 14 },
-  border: { h: 220, s: 20, l: 14 },
-  ring: { h: 217, s: 91, l: 60 },        // #3b82f6 (brand blue)
+  background: { h: 80, s: 5, l: 4 },
+  card: { h: 75, s: 6, l: 7 },
+  primary: { h: 16, s: 100, l: 55 },
+  secondary: { h: 72, s: 6, l: 10 },
+  muted: { h: 65, s: 6, l: 15 },
+  border: { h: 58, s: 7, l: 17 },
+  ring: { h: 16, s: 100, l: 64 },
 } satisfies Record<string, HSL>;
 
 /** Accent palette for status, highlights, and semantic colors */
 export const voidAccents = {
-  cyan: { h: 187, s: 82, l: 53 },    // #22D3EE
-  mint: { h: 160, s: 60, l: 52 },    // #34D399
-  amber: { h: 38, s: 92, l: 50 },    // #F59E0B
-  violet: { h: 263, s: 90, l: 66 },  // #A78BFA
-  crimson: { h: 0, s: 72, l: 51 },   // #DC2626
+  cyan: { h: 210, s: 100, l: 66 },
+  mint: { h: 156, s: 63, l: 56 },
+  amber: { h: 39, s: 84, l: 62 },
+  violet: { h: 263, s: 72, l: 70 },
+  crimson: { h: 3, s: 100, l: 70 },
 } satisfies Record<string, HSL>;
 
 /** Status color mapping — maps status states to HSL accent values */
 export const statusColors = {
-  idle: voidAccents.cyan,
-  running: { h: 217, s: 91, l: 60 },    // brand blue
+  idle: { h: 60, s: 4, l: 46 },
+  running: voidAccents.cyan,
   success: voidAccents.mint,
   error: voidAccents.crimson,
   warning: voidAccents.amber,
@@ -62,10 +62,10 @@ export const statusColors = {
 
 /** Surface elevation scale — 4-level depth system */
 export const surfaces = {
-  0: { h: 215, s: 27, l: 4 },   // Deepest void
-  1: { h: 222, s: 35, l: 7 },   // Dark navy
-  2: { h: 220, s: 30, l: 10 },  // Mid surface
-  3: { h: 220, s: 25, l: 14 },  // Raised surface
+  0: { h: 80, s: 5, l: 4 },
+  1: { h: 75, s: 6, l: 7 },
+  2: { h: 72, s: 6, l: 10 },
+  3: { h: 65, s: 6, l: 14 },
 } as const;
 
 /** Spacing scale (px) */
@@ -81,87 +81,89 @@ export const spacing = {
 
 /** Border radius scale (px) */
 export const radius = {
-  xs: 6,
-  sm: 8,
-  md: 10,
-  lg: 12,
-  xl: 16,
+  xs: 3,
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 8,
   full: 9999,
 } as const;
 
 // ---------------------------------------------------------------------------
-// Legacy CSS-var token system (unchanged — backward compatible)
+// CSS-var token system. Names remain stable for existing dashboard surfaces.
 // ---------------------------------------------------------------------------
 
 export const dashboardTokens = {
-  bgCanvas: "var(--mutx-dashboard-bg-canvas, #070b13)",
-  bgCanvasRaised: "var(--mutx-dashboard-bg-canvas-raised, #0d1220)",
-  bgSurface: "var(--mutx-dashboard-bg-surface, #111827)",
-  bgSurfaceStrong: "var(--mutx-dashboard-bg-surface-strong, #162033)",
-  bgSurfaceHigher: "var(--mutx-dashboard-bg-surface-higher, #1d2a40)",
-  bgSubtle: "var(--mutx-dashboard-bg-subtle, rgba(59, 130, 246, 0.12))",
-  bgInset: "var(--mutx-dashboard-bg-inset, #0a0f18)",
-  panelGradient:
-    "var(--mutx-dashboard-panel-gradient, linear-gradient(180deg, rgba(17,24,39,0.98) 0%, rgba(8,12,20,0.98) 100%))",
-  panelGradientStrong:
-    "var(--mutx-dashboard-panel-gradient-strong, radial-gradient(circle at top right, rgba(96,165,250,0.14), transparent 28%), linear-gradient(180deg, rgba(20,29,45,0.98) 0%, rgba(8,12,20,0.98) 100%))",
-  shellGradient:
-    "var(--mutx-dashboard-shell-gradient, linear-gradient(180deg, rgba(13,19,31,0.98) 0%, rgba(7,10,16,0.98) 100%))",
-  textPrimary: "var(--mutx-dashboard-text-primary, #f4f8ff)",
-  textSecondary: "var(--mutx-dashboard-text-secondary, rgba(223, 233, 250, 0.88))",
-  textSubtle: "var(--mutx-dashboard-text-subtle, rgba(176, 196, 227, 0.8))",
-  textMuted: "var(--mutx-dashboard-text-muted, rgba(132, 156, 192, 0.84))",
-  textLabel: "var(--mutx-dashboard-text-label, #93c5fd)",
-  borderSubtle: "var(--mutx-dashboard-border-subtle, rgba(191, 219, 254, 0.12))",
-  borderStrong: "var(--mutx-dashboard-border-strong, rgba(96, 165, 250, 0.28))",
-  borderInteractive: "var(--mutx-dashboard-border-interactive, rgba(96, 165, 250, 0.46))",
-  focusRing: "var(--mutx-dashboard-focus-ring, rgba(96, 165, 250, 0.48))",
-  brand: "var(--mutx-dashboard-brand, #3b82f6)",
-  brandStrong: "var(--mutx-dashboard-brand-strong, #dbeafe)",
-  brandSoft: "var(--mutx-dashboard-brand-soft, rgba(59, 130, 246, 0.16))",
-  statusActive: "var(--mutx-dashboard-status-active, var(--mutx-dashboard-status-running-dot, #60a5fa))",
-  warn: "var(--mutx-dashboard-warn, #f59e0b)",
-  warnSoft: "var(--mutx-dashboard-warn-soft, rgba(245, 158, 11, 0.16))",
-  danger: "var(--mutx-dashboard-danger, #f87171)",
-  radiusSm: "var(--swarm-radius-sm, 10px)",
-  radiusMd: "var(--swarm-radius-md, 14px)",
-  radiusLg: "var(--swarm-radius-lg, 18px)",
-  radiusXl: "var(--swarm-radius-xl, 24px)",
+  bgCanvas: "var(--mutx-dashboard-bg-canvas, #090a08)",
+  bgCanvasRaised: "var(--mutx-dashboard-bg-canvas-raised, #0d0e0c)",
+  bgSurface: "var(--mutx-dashboard-bg-surface, #11120f)",
+  bgSurfaceStrong: "var(--mutx-dashboard-bg-surface-strong, #151612)",
+  bgSurfaceHigher: "var(--mutx-dashboard-bg-surface-higher, #1a1b17)",
+  bgSubtle: "var(--mutx-dashboard-bg-subtle, rgba(255, 87, 28, 0.09))",
+  bgInset: "var(--mutx-dashboard-bg-inset, #0c0d0b)",
+  panelGradient: "var(--mutx-dashboard-panel-gradient, #11120f)",
+  panelGradientStrong: "var(--mutx-dashboard-panel-gradient-strong, #151612)",
+  shellGradient: "var(--mutx-dashboard-shell-gradient, #080907)",
+  textPrimary: "var(--mutx-dashboard-text-primary, #eee9dc)",
+  textSecondary: "var(--mutx-dashboard-text-secondary, #c8c0b0)",
+  textSubtle: "var(--mutx-dashboard-text-subtle, #999284)",
+  textMuted: "var(--mutx-dashboard-text-muted, #8d867a)",
+  textLabel: "var(--mutx-dashboard-text-label, #ff8355)",
+  borderSubtle: "var(--mutx-dashboard-border-subtle, #2b2b26)",
+  borderStrong: "var(--mutx-dashboard-border-strong, #48463e)",
+  borderInteractive: "var(--mutx-dashboard-border-interactive, rgba(255, 87, 28, 0.72))",
+  focusRing: "var(--mutx-dashboard-focus-ring, rgba(255, 123, 76, 0.72))",
+  brand: "var(--mutx-dashboard-brand, #ff571c)",
+  brandStrong: "var(--mutx-dashboard-brand-strong, #ff8355)",
+  brandSoft: "var(--mutx-dashboard-brand-soft, rgba(255, 87, 28, 0.11))",
+  trace: "var(--mutx-dashboard-trace, #58aaff)",
+  traceSoft: "var(--mutx-dashboard-trace-soft, rgba(88, 170, 255, 0.11))",
+  success: "var(--mutx-dashboard-success, #4bd69b)",
+  successSoft: "var(--mutx-dashboard-success-soft, rgba(75, 214, 155, 0.11))",
+  statusActive: "var(--mutx-dashboard-status-active, #4bd69b)",
+  warn: "var(--mutx-dashboard-warn, #efb654)",
+  warnSoft: "var(--mutx-dashboard-warn-soft, rgba(239, 182, 84, 0.12))",
+  danger: "var(--mutx-dashboard-danger, #ff6d66)",
+  dangerSoft: "var(--mutx-dashboard-danger-soft, rgba(255, 109, 102, 0.11))",
+  radiusSm: "var(--swarm-radius-sm, 4px)",
+  radiusMd: "var(--swarm-radius-md, 6px)",
+  radiusLg: "var(--swarm-radius-lg, 8px)",
+  radiusXl: "var(--swarm-radius-xl, 8px)",
   fontSans: "var(--swarm-font-family-sans, var(--font-site-body, var(--font-display)))",
   fontMono: "var(--swarm-font-family-mono, var(--font-mono))",
-  shadowSm: "var(--mutx-dashboard-shadow-sm, 0 18px 38px rgba(2, 2, 5, 0.32))",
-  shadowLg: "var(--mutx-dashboard-shadow-lg, 0 38px 120px rgba(2, 2, 5, 0.56))",
+  shadowSm: "var(--mutx-dashboard-shadow-sm, 0 1px 0 rgba(255, 255, 255, 0.025))",
+  shadowLg: "var(--mutx-dashboard-shadow-lg, 0 24px 64px rgba(0, 0, 0, 0.48))",
 } as const;
 
 export const statusTokens = {
   idle: {
-    bg: "var(--mutx-dashboard-status-idle-bg, rgba(148, 163, 184, 0.14))",
-    border: "var(--mutx-dashboard-status-idle-border, rgba(148, 163, 184, 0.26))",
-    text: "var(--mutx-dashboard-status-idle-text, #d9e2f0)",
-    dot: "var(--mutx-dashboard-status-idle-dot, #94a3b8)",
+    bg: "var(--mutx-dashboard-status-idle-bg, #171813)",
+    border: "var(--mutx-dashboard-status-idle-border, #34342e)",
+    text: "var(--mutx-dashboard-status-idle-text, #aaa397)",
+    dot: "var(--mutx-dashboard-status-idle-dot, #77766d)",
   },
   running: {
-    bg: "var(--mutx-dashboard-status-running-bg, rgba(59, 130, 246, 0.16))",
-    border: "var(--mutx-dashboard-status-running-border, rgba(59, 130, 246, 0.32))",
-    text: "var(--mutx-dashboard-status-running-text, #dbeafe)",
-    dot: "var(--mutx-dashboard-status-running-dot, #60a5fa)",
+    bg: "var(--mutx-dashboard-status-running-bg, #101c26)",
+    border: "var(--mutx-dashboard-status-running-border, #294d6c)",
+    text: "var(--mutx-dashboard-status-running-text, #8ac7ff)",
+    dot: "var(--mutx-dashboard-status-running-dot, #58aaff)",
   },
   success: {
-    bg: "var(--mutx-dashboard-status-success-bg, rgba(14, 165, 233, 0.16))",
-    border: "var(--mutx-dashboard-status-success-border, rgba(14, 165, 233, 0.3))",
-    text: "var(--mutx-dashboard-status-success-text, #d9f5ff)",
-    dot: "var(--mutx-dashboard-status-success-dot, #38bdf8)",
+    bg: "var(--mutx-dashboard-status-success-bg, #0f2018)",
+    border: "var(--mutx-dashboard-status-success-border, #285a43)",
+    text: "var(--mutx-dashboard-status-success-text, #78e3b4)",
+    dot: "var(--mutx-dashboard-status-success-dot, #4bd69b)",
   },
   error: {
-    bg: "var(--mutx-dashboard-status-error-bg, rgba(248, 113, 113, 0.16))",
-    border: "var(--mutx-dashboard-status-error-border, rgba(248, 113, 113, 0.3))",
-    text: "var(--mutx-dashboard-status-error-text, #ffd7d7)",
-    dot: "var(--mutx-dashboard-status-error-dot, #f87171)",
+    bg: "var(--mutx-dashboard-status-error-bg, #241312)",
+    border: "var(--mutx-dashboard-status-error-border, #66302e)",
+    text: "var(--mutx-dashboard-status-error-text, #ff9b96)",
+    dot: "var(--mutx-dashboard-status-error-dot, #ff6d66)",
   },
   warning: {
-    bg: "var(--mutx-dashboard-status-warning-bg, rgba(245, 158, 11, 0.16))",
-    border: "var(--mutx-dashboard-status-warning-border, rgba(245, 158, 11, 0.3))",
-    text: "var(--mutx-dashboard-status-warning-text, #ffe6b6)",
-    dot: "var(--mutx-dashboard-status-warning-dot, #f59e0b)",
+    bg: "var(--mutx-dashboard-status-warning-bg, #211a0e)",
+    border: "var(--mutx-dashboard-status-warning-border, #65502b)",
+    text: "var(--mutx-dashboard-status-warning-text, #f4cc82)",
+    dot: "var(--mutx-dashboard-status-warning-dot, #efb654)",
   },
 } as const;

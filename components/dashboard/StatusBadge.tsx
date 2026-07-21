@@ -16,9 +16,10 @@ export function StatusBadge({ status, label, className, style, ...props }: Statu
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium uppercase tracking-[0.16em]",
+        "inline-flex min-h-6 items-center gap-1.5 rounded-[4px] border px-2 py-1 font-[family:var(--font-mono)] text-[8px] font-semibold uppercase tracking-[0.14em] tabular-nums",
         className,
       )}
+      data-status={status}
       style={{
         backgroundColor: tone.bg,
         borderColor: tone.border,
@@ -30,7 +31,10 @@ export function StatusBadge({ status, label, className, style, ...props }: Statu
     >
       <span
         aria-hidden
-        className="dashboard-live-dot h-1.5 w-1.5 rounded-full"
+        className={cn(
+          "h-1.5 w-1.5 rounded-full",
+          status === "running" && "dashboard-live-dot",
+        )}
         style={{ backgroundColor: tone.dot }}
       />
       {label ?? status}

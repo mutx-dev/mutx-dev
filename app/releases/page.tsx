@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   AppWindow,
@@ -11,6 +10,7 @@ import {
 import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
+import { OperationalVisual } from "@/components/site/marketing/OperationalVisual";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
 import {
   MUTX_GITHUB_RELEASES_URL,
@@ -51,15 +51,17 @@ const structuredData = buildWebPageStructuredData({
 
 export default async function ReleasesPage() {
   const release = await fetchLatestStableDesktopRelease();
-  const version = release?.version ?? "1.3.0";
-  const releaseLabel = `v${version}`;
-  const docsReleaseNotesHref = buildReleaseNotesUrl(version);
+  const version = release?.version;
+  const releaseLabel = version ? `v${version}` : "Latest stable";
+  const docsReleaseNotesHref = version ? buildReleaseNotesUrl(version) : "/download/macos/release-notes";
   const checksumsHref = release?.assets.checksums ?? release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL;
   const releaseHref = release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL;
   const cards: ReadonlyArray<ReleaseCard> = [
     {
       title: "Apple Silicon DMG",
-      body: `${buildDesktopArtifactName(version, "arm64-dmg")} for M-series Macs.`,
+      body: version
+        ? `${buildDesktopArtifactName(version, "arm64-dmg")} for M-series Macs.`
+        : "Latest stable Apple Silicon installer for M-series Macs.",
       href: release?.assets.arm64Dmg ?? "/download/macos/arm64",
       label: "Download arm64",
       icon: AppWindow,
@@ -67,7 +69,9 @@ export default async function ReleasesPage() {
     },
     {
       title: "Intel Mac DMG",
-      body: `${buildDesktopArtifactName(version, "x64-dmg")} for Intel hardware that still needs a supported MUTX lane.`,
+      body: version
+        ? `${buildDesktopArtifactName(version, "x64-dmg")} for supported Intel Macs.`
+        : "Latest stable installer for supported Intel Macs.",
       href: release?.assets.x64Dmg ?? "/download/macos/intel",
       label: "Download x64",
       icon: AppWindow,
@@ -75,7 +79,9 @@ export default async function ReleasesPage() {
     },
     {
       title: "Checksums",
-      body: `${buildDesktopArtifactName(version, "checksums")} for artifact verification and rollout checks.`,
+      body: version
+        ? `${buildDesktopArtifactName(version, "checksums")} for artifact verification.`
+        : "Checksums published with the latest stable release.",
       href: checksumsHref,
       label: "View checksums",
       icon: ShieldCheck,
@@ -94,23 +100,23 @@ export default async function ReleasesPage() {
   const artifactRows = [
     {
       label: "Apple Silicon DMG",
-      value: buildDesktopArtifactName(version, "arm64-dmg"),
+      value: version ? buildDesktopArtifactName(version, "arm64-dmg") : "Resolved from the stable release channel",
     },
     {
       label: "Intel Mac DMG",
-      value: buildDesktopArtifactName(version, "x64-dmg"),
+      value: version ? buildDesktopArtifactName(version, "x64-dmg") : "Resolved from the stable release channel",
     },
     {
       label: "Apple Silicon ZIP",
-      value: buildDesktopArtifactName(version, "arm64-zip"),
+      value: version ? buildDesktopArtifactName(version, "arm64-zip") : "Resolved from the stable release channel",
     },
     {
       label: "Intel Mac ZIP",
-      value: buildDesktopArtifactName(version, "x64-zip"),
+      value: version ? buildDesktopArtifactName(version, "x64-zip") : "Resolved from the stable release channel",
     },
     {
       label: "Checksums",
-      value: buildDesktopArtifactName(version, "checksums"),
+      value: version ? buildDesktopArtifactName(version, "checksums") : "Published with the stable release",
     },
   ] as const;
 
@@ -128,7 +134,7 @@ export default async function ReleasesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
           <div className={styles.shell}>
             <div className={styles.routeDownloadStage}>
@@ -136,7 +142,7 @@ export default async function ReleasesPage() {
                 <div className={styles.intro}>
                   <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Release lane</p>
                   <h1 className={`${styles.displayTitle} ${styles.darkText}`}>
-                    MUTX {releaseLabel}
+                    MUTX <span className={styles.releaseVersion}>{releaseLabel}</span>
                     <span className={styles.displayAccent}>Signed desktop release.</span>
                   </h1>
                   <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>
@@ -171,14 +177,7 @@ export default async function ReleasesPage() {
               </div>
 
               <div className={styles.routeVisualFrame}>
-                <div className={styles.routeVisualGlow} aria-hidden="true" />
-                <Image
-                  src="/landing/webp/running-agent.webp"
-                  alt="MUTX runtime scene showing the operator lane in motion"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 34rem"
-                  className={styles.routeVisualImage}
-                />
+                <OperationalVisual variant="release" />
               </div>
             </div>
 

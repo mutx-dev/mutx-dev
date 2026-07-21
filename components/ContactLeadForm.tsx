@@ -1,6 +1,6 @@
 'use client'
 
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useId, useMemo, useState } from 'react'
 import { AlertCircle, CheckCircle2, Loader2, Send } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -30,6 +30,9 @@ const MESSAGE_PLACEHOLDERS: Record<string, string> = {
 }
 
 export function ContactLeadForm({ source = 'contact-page', className }: ContactLeadFormProps) {
+  const emailErrorId = useId()
+  const messageErrorId = useId()
+  const submissionErrorId = useId()
   const [inquiryType, setInquiryType] = useState('general')
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -39,6 +42,8 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [emailInvalid, setEmailInvalid] = useState(false)
+  const [messageInvalid, setMessageInvalid] = useState(false)
 
   const inquiryLabel = useMemo(
     () => INQUIRY_TYPES.find((item) => item.value === inquiryType)?.label ?? 'General',
@@ -92,7 +97,7 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
   return (
     <div data-testid="contact-lead-form" className={cn(marketing.panel, marketing.panelPadded, className)}>
       {success ? (
-        <div className={marketing.success}>
+        <div className={marketing.success} role="status">
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
             <p className="font-medium">{success}</p>
@@ -112,7 +117,7 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
           />
 
           <label className={marketing.field}>
-            <span className={marketing.fieldLabel}>Inquiry type</span>
+            <span className={marketing.fieldLabel}>Inquiry type (required)</span>
             <select
               required
               value={inquiryType}
@@ -129,52 +134,77 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className={marketing.field}>
-              <span className={marketing.fieldLabel}>Name</span>
+              <span className={marketing.fieldLabel}>Name (optional)</span>
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
+                autoComplete="name"
                 placeholder="Your name"
                 className={marketing.input}
               />
             </label>
 
             <label className={marketing.field}>
-              <span className={marketing.fieldLabel}>Work email</span>
+              <span className={marketing.fieldLabel}>Work email (required)</span>
               <input
                 type="email"
                 required
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value)
+                  setEmailInvalid(false)
+                }}
+                onInvalid={() => setEmailInvalid(true)}
+                autoComplete="email"
+                aria-invalid={emailInvalid || undefined}
+                aria-describedby={emailInvalid ? emailErrorId : undefined}
                 placeholder="you@company.com"
                 className={marketing.input}
               />
+              {emailInvalid ? (
+                <span id={emailErrorId} className="sr-only">
+                  Enter a valid work email address.
+                </span>
+              ) : null}
             </label>
           </div>
 
           <label className={marketing.field}>
-            <span className={marketing.fieldLabel}>Organization</span>
+            <span className={marketing.fieldLabel}>Organization (optional)</span>
             <input
               value={organization}
               onChange={(event) => setOrganization(event.target.value)}
+              autoComplete="organization"
               placeholder="Firm, company, studio, or fund"
               className={marketing.input}
             />
           </label>
 
           <label className={marketing.field}>
-            <span className={marketing.fieldLabel}>Message</span>
+            <span className={marketing.fieldLabel}>Message (required)</span>
             <textarea
               required
               value={message}
-              onChange={(event) => setMessage(event.target.value)}
+              onChange={(event) => {
+                setMessage(event.target.value)
+                setMessageInvalid(false)
+              }}
+              onInvalid={() => setMessageInvalid(true)}
+              aria-invalid={messageInvalid || undefined}
+              aria-describedby={messageInvalid ? messageErrorId : undefined}
               placeholder={MESSAGE_PLACEHOLDERS[inquiryType]}
               rows={6}
               className={marketing.textarea}
             />
+            {messageInvalid ? (
+              <span id={messageErrorId} className="sr-only">
+                Enter a message.
+              </span>
+            ) : null}
           </label>
 
           {error ? (
-            <div className={marketing.error}>
+            <div id={submissionErrorId} className={marketing.error} role="alert">
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
               <p>{error}</p>
             </div>
@@ -183,6 +213,7 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
           <button
             type="submit"
             disabled={loading}
+            aria-describedby={error ? submissionErrorId : undefined}
             className={`${marketing.buttonPrimary} disabled:cursor-not-allowed disabled:opacity-50`}
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}

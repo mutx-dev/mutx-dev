@@ -1,0 +1,185 @@
+.page {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 4rem);
+  background: #f3f0e7;
+  color: #0b0c0b;
+}
+
+.frame {
+  width: min(100%, 76rem);
+  border: 1px solid #0b0c0b;
+  background: #fcfaf4;
+}
+
+.topline {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #0b0c0b;
+  padding: 0 1.25rem;
+  font-family: var(--font-mono), monospace;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.topline span:last-child { color: #c83b00; }
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, .42fr);
+  min-height: 34rem;
+}
+
+.copy {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: end;
+  padding: clamp(2rem, 6vw, 5rem);
+}
+
+.eyebrow,
+.receipt p {
+  margin: 0;
+  color: #c83b00;
+  font-family: var(--font-mono), monospace;
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.copy h1 {
+  max-width: 11ch;
+  margin: 1.25rem 0 0;
+  font-family: var(--font-site-display), var(--font-display), sans-serif;
+  font-size: clamp(3.6rem, 8vw, 7.5rem);
+  font-weight: 300;
+  letter-spacing: -.075em;
+  line-height: .88;
+  text-wrap: balance;
+}
+
+.description {
+  max-width: 36rem;
+  margin: 1.75rem 0 0;
+  color: #625e57;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 2rem;
+}
+
+.actions a,
+.actions button {
+  display: inline-flex;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  border: 1px solid #0b0c0b;
+  border-radius: 4px;
+  background: #0b0c0b;
+  padding: 0 1rem;
+  color: #f3f0e7;
+  font-family: var(--font-mono), monospace;
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.actions a:hover,
+.actions button:hover { background: #ff4d00; color: #0b0c0b; }
+
+.rail {
+  position: relative;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  height: 4rem;
+  border-top: 1px solid #0b0c0b;
+  border-bottom: 1px solid #0b0c0b;
+  padding-inline: clamp(2rem, 6vw, 5rem);
+}
+
+.rail::before {
+  position: absolute;
+  right: clamp(2rem, 6vw, 5rem);
+  left: clamp(2rem, 6vw, 5rem);
+  height: 1px;
+  background: #a9a49b;
+  content: '';
+}
+
+.rail span,
+.rail i {
+  position: relative;
+  z-index: 1;
+  width: .65rem;
+  height: .65rem;
+  border: 1px solid #0b0c0b;
+  border-radius: 50%;
+  background: #fcfaf4;
+}
+
+.rail span:nth-child(3),
+.rail span:nth-child(4) { justify-self: end; }
+.rail i { background: #ff4d00; }
+
+.rail i.live { animation: stateTravel 2.4s ease-in-out infinite; }
+
+.receipt {
+  display: grid;
+  grid-column: 2;
+  grid-row: 1;
+  align-content: end;
+  gap: .75rem;
+  border-left: 1px solid #0b0c0b;
+  padding: clamp(2rem, 4vw, 3.5rem);
+}
+
+.receipt strong {
+  font-family: var(--font-site-display), var(--font-display), sans-serif;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -.05em;
+}
+
+.receipt span { color: #716d65; font-size: .8rem; line-height: 1.55; }
+
+.compact { min-height: 26rem; padding: 2rem 0; }
+.compact .frame { max-width: 56rem; }
+.compact .body { min-height: 24rem; }
+.compact .copy h1 { font-size: clamp(3rem, 7vw, 5rem); }
+
+@keyframes stateTravel {
+  0%, 100% { transform: translateX(-2rem); }
+  50% { transform: translateX(2rem); }
+}
+
+@media (max-width: 700px) {
+  .page { padding: 0; }
+  .frame { border-inline: 0; }
+  .body { grid-template-columns: 1fr; min-height: calc(100svh - 3.5rem); }
+  .copy { align-self: center; padding: 3rem 1.25rem; }
+  .receipt { grid-column: 1; grid-row: 3; border-top: 1px solid #0b0c0b; border-left: 0; padding: 1.5rem 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail i.live { animation: none; }
+}

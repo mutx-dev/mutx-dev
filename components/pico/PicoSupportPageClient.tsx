@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
@@ -8,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { PicoContactForm } from '@/components/pico/PicoContactForm'
 import { PicoSessionBanner } from '@/components/pico/PicoSessionBanner'
 import { PicoShell } from '@/components/pico/PicoShell'
+import { PicoSignalDiagram } from '@/components/pico/PicoSignalDiagram'
 import { PicoSurfaceCompass } from '@/components/pico/PicoSurfaceCompass'
 import {
   picoClasses,
@@ -21,7 +21,6 @@ import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoSession } from '@/components/pico/usePicoSession'
 import { usePicoSetupState } from '@/components/pico/usePicoSetupState'
 import { usePicoHref } from '@/lib/pico/navigation'
-import { picoRobotArtById } from '@/lib/picoRobotArt'
 import { cn } from '@/lib/utils'
 
 const supportOptions = [
@@ -88,7 +87,6 @@ export function PicoSupportPageClient() {
   const [formOpen, setFormOpen] = useState(false)
   const [interest, setInterest] = useState<string | undefined>()
   const [copied, setCopied] = useState(false)
-  const supportRobot = picoRobotArtById.coffee
   const recoveryLesson = derived.nextLesson
   const recoveryWorkspace = usePicoLessonWorkspace(recoveryLesson?.slug ?? 'support', recoveryLesson?.steps.length ?? 0, {
     progress,
@@ -231,20 +229,20 @@ export function PicoSupportPageClient() {
         description="Use this for API keys, local or cloud hosting, integrations, team rollout, or custom implementation."
         heroContent={
           <div
-            className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.14),rgba(9,15,10,0.92)_36%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+            className="relative overflow-hidden border border-[color:var(--pico-border-hover)] bg-[color:var(--pico-bg-panel)] p-5 sm:p-6"
             data-testid="pico-support-hero-signal"
           >
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_30%,transparent_72%,rgba(255,255,255,0.02))]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[color:var(--pico-accent)]"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.14)] blur-3xl"
+              className="hidden"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[rgba(var(--pico-accent-rgb),0.1)] blur-3xl"
+              className="hidden"
             />
             <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
               <div className="grid gap-5">
@@ -312,16 +310,13 @@ export function PicoSupportPageClient() {
               </div>
 
               <div className={picoInset('grid gap-4 overflow-hidden border-[color:rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_20%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
-                <div className="overflow-hidden rounded-[24px] border border-[rgba(var(--pico-accent-rgb),0.2)] bg-[linear-gradient(180deg,rgba(6,12,6,0.98),rgba(2,4,2,1))]">
-                  <Image
-                    src={supportRobot.src}
-                    alt={supportRobot.alt}
-                    width={320}
-                    height={320}
-                    className="h-auto w-full p-4"
-                    sizes="(max-width: 1024px) 100vw, 18rem"
-                  />
-                </div>
+                <PicoSignalDiagram
+                  index="05"
+                  label="Packet route"
+                  title="Short context travels farther."
+                  caption="Carry the page, current step, error, and what you already tried."
+                  compact
+                />
 
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.label}>Packet preview</p>
@@ -435,24 +430,13 @@ export function PicoSupportPageClient() {
                   Good support starts with a short packet: page, setup step, error, and what you already tried.
                 </p>
               </div>
-              <div className={picoInset('overflow-hidden p-0')}>
-                <div className="border-b border-[color:var(--pico-border)] p-5">
-                  <p className={picoClasses.label}>Desk tone</p>
-                  <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
-                    Support should make setup easier without adding another process to manage.
-                  </p>
-                </div>
-                <div className="flex items-center justify-center p-6">
-                  <Image
-                    src={supportRobot.src}
-                    alt={supportRobot.alt}
-                    width={220}
-                    height={220}
-                    className="h-auto w-full max-w-[11rem] object-contain drop-shadow-[0_12px_28px_rgba(164,255,92,0.18)]"
-                    sizes="176px"
-                  />
-                </div>
-              </div>
+              <PicoSignalDiagram
+                index="05"
+                label="Desk tone"
+                title="Useful, direct, human."
+                caption="Support should make setup easier without adding another process to manage."
+                compact
+              />
               <div className={picoInset('p-5')}>
                 <p className={picoClasses.label}>Best first move</p>
                 <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
