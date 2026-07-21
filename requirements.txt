@@ -24,16 +24,16 @@ Authlib==1.6.12
 python-multipart==0.0.31
 email-validator==2.1.0
 # Agent & AI
-openai==2.45.0
-anthropic==0.116.0
+openai==2.46.0
+anthropic==0.117.1
 httpx==0.28.1
 # LangChain v1's agent runtime is backed by LangGraph. Keep the ecosystem on
 # compatible current majors and use provider packages instead of langchain-classic.
-langchain>=1.3.13,<2.0.0
-langchain-core>=1.4.9,<2.0.0
+langchain>=1.3.14,<2.0.0
+langchain-core>=1.5.0,<2.0.0
 langgraph>=1.2.9,<1.3.0
-langchain-openai>=1.3.5,<2.0.0
-langchain-anthropic>=1.4.8,<2.0.0
+langchain-openai>=1.4.0,<2.0.0
+langchain-anthropic>=1.5.0,<2.0.0
 langchain-text-splitters>=1.1.2,<2.0.0
 langchain-ollama>=1.1.0,<2.0.0
 langchain-huggingface>=1.2.2,<2.0.0

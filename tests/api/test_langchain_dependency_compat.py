@@ -15,11 +15,11 @@ from src.api.integrations.vector_store import (
 
 def test_langchain_v1_packages_resolve_to_the_tested_security_line() -> None:
     minimum_versions = {
-        "langchain": "1.3.13",
-        "langchain-core": "1.4.9",
+        "langchain": "1.3.14",
+        "langchain-core": "1.5.0",
         "langgraph": "1.2.9",
-        "langchain-openai": "1.3.5",
-        "langchain-anthropic": "1.4.8",
+        "langchain-openai": "1.4.0",
+        "langchain-anthropic": "1.5.0",
         "langchain-text-splitters": "1.1.2",
         "langchain-ollama": "1.1.0",
         "langchain-huggingface": "1.2.2",
