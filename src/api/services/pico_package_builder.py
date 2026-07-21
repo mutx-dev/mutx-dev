@@ -17,9 +17,9 @@ KNOWLEDGE_ROOT = Path(__file__).resolve().parents[1] / "knowledge" / "pico-build
 UPSTREAM_RELEASES = {
     "hermes": {
         "repository": "https://github.com/NousResearch/hermes-agent",
-        "ref": "v2026.7.7.2",
-        "commit": "9de9c25f620ff7f1ce0fd5457d596052d5159596",
-        "version": "0.18.2",
+        "ref": "v2026.7.20",
+        "commit": "3ef6bbd201263d354fd83ec55b3c306ded2eb72a",
+        "version": "0.19.0",
         "runtime": "Python >=3.11,<3.14 (3.12 recommended)",
     },
     "openclaw": {
@@ -117,7 +117,7 @@ def _build_upstream_lock(state: OnboardingState) -> str:
         "commit": release["commit"],
         "version": release["version"],
         "runtime": release["runtime"],
-        "verified_at": "2026-07-16",
+        "verified_at": "2026-07-22",
     }
     if stack == "picoclaw" and state.os == "android":
         document["android_distribution"] = PICOCLAW_ANDROID_RELEASE
@@ -160,8 +160,8 @@ def _build_install_sh(state: OnboardingState) -> str:
 
     if stack == "hermes":
         lines += [
-            "HERMES_REF='v2026.7.7.2'",
-            "HERMES_COMMIT='9de9c25f620ff7f1ce0fd5457d596052d5159596'",
+            "HERMES_REF='v2026.7.20'",
+            "HERMES_COMMIT='3ef6bbd201263d354fd83ec55b3c306ded2eb72a'",
             'HERMES_DIR="${HERMES_HOME:-$HOME/.hermes}/hermes-agent"',
             "command -v git >/dev/null || { echo 'git is required'; exit 1; }",
             "command -v uv >/dev/null || { echo 'uv is required: https://docs.astral.sh/uv/'; exit 1; }",

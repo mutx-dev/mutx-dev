@@ -29,6 +29,11 @@ function compactWhitespace(value) {
   return value.replace(/\s+/g, ' ').trim()
 }
 
+function displaySourcePath(sourcePath) {
+  const relativePath = path.relative(ROOT, sourcePath)
+  return relativePath && !relativePath.startsWith('..') ? relativePath : sourcePath
+}
+
 function formatDateLabel(value) {
   if (!value) return 'Unavailable'
   const parsed = new Date(value)
@@ -626,7 +631,7 @@ async function buildContent() {
     visibleDocCount: manifest.docs.filter((doc) => doc.visible).length,
     lessonCount: lessons.length,
     totalLessonMinutes,
-    sourcePaths: packDirectories,
+    sourcePaths: packDirectories.map(displaySourcePath),
     currentProductNotes: extractBullets(getMarkdownSection(readme, 'Current product notes worth knowing')),
   }
 

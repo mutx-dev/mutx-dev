@@ -1,6 +1,6 @@
 # Update Notes
 
-Refreshed on 2026-07-16.
+Refreshed on 2026-07-22.
 
 Every uploaded `.md` file was changed with at least one real improvement. The pack now reflects current official docs more closely and also tightens behavior where the old pack was weak or contradictory.
 
@@ -82,7 +82,7 @@ Every uploaded `.md` file was changed with at least one real improvement. The pa
 
 ### `EXAMPLES.md`
 - Replaced the retired NanoClaw v1 `/setup` path with the v2 `nanoclaw.sh` bootstrap.
-- Added audited release locks for Hermes v2026.7.7.2, OpenClaw v2026.7.1, NanoClaw v2.1.17, and PicoClaw v0.3.1.
+- Refreshed the audited release locks to Hermes v2026.7.20, OpenClaw v2026.7.1, NanoClaw v2.1.17, and PicoClaw v0.3.1.
 - Removed guessed runtime configs, a nonexistent mutable NanoClaw image, and unpinned installer paths from generated packages.
 - Added Tailscale remote-dashboard example.
 - Improved examples for fast-path vs diagnostic-path behavior.

@@ -466,7 +466,7 @@ class TestCrossStackValidation:
     @pytest.mark.parametrize(
         "stack,expected_ref,expected_commit",
         [
-            ("hermes", "v2026.7.7.2", "9de9c25f620ff7f1ce0fd5457d596052d5159596"),
+            ("hermes", "v2026.7.20", "3ef6bbd201263d354fd83ec55b3c306ded2eb72a"),
             ("openclaw", "v2026.7.1", "2d2ddc43d0dcf71f31283d780f9fe9ff4cc04fe4"),
             ("nanoclaw", "v2.1.17", "ee7f891698760f21b9e79a850d64c7f633cd95ef"),
             ("picoclaw", "v0.3.1", "2cf030d2fd3b871d7ec17e3be34c24688aac76da"),
@@ -486,7 +486,7 @@ class TestCrossStackValidation:
         assert lock["schema_version"] == 1
         assert lock["ref"] == expected_ref
         assert lock["commit"] == expected_commit
-        assert lock["verified_at"] == "2026-07-16"
+        assert lock["verified_at"] == "2026-07-22"
         assert "@latest" not in files["install.sh"]
         assert "install.sh | bash" not in files["install.sh"]
 
