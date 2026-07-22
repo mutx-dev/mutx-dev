@@ -66,6 +66,31 @@ class TestMutxLangChainCallbackHandler:
             assert call_args[1]["attributes"]["llm.model"] == "gpt-4"
             assert call_args[1]["attributes"]["llm.prompt_count"] == 1
 
+    def test_on_chat_model_start_emits_v1_span(self):
+        """LangChain v1 chat callbacks should emit the same LLM span."""
+        from mutx.adapters.langchain import MutxLangChainCallbackHandler
+
+        handler = MutxLangChainCallbackHandler(
+            api_url="https://api.mutx.dev",
+            api_key="test-key",
+            agent_name="test-agent",
+        )
+
+        with patch.object(handler._tracer, "start_span") as mock_start_span:
+            handler.on_chat_model_start(
+                {"id": ["langchain", "chat_models", "ChatOpenAI"]},
+                [[MagicMock()]],
+            )
+
+        mock_start_span.assert_called_once_with(
+            "mutx.llm.call",
+            attributes={
+                "llm.model": "ChatOpenAI",
+                "llm.prompt_count": 1,
+                "agent.name": "test-agent",
+            },
+        )
+
     def test_on_llm_end_records_token_usage(self):
         """Test that on_llm_end records token usage attributes."""
         from mutx.adapters.langchain import MutxLangChainCallbackHandler
@@ -348,7 +373,9 @@ class TestMutxAgentKit:
         )
 
         mock_executor = MagicMock()
-        mock_executor.invoke.return_value = {"output": "test response"}
+        response_message = MagicMock()
+        response_message.text = "test response"
+        mock_executor.invoke.return_value = {"messages": [response_message]}
         kit.set_agent_executor(mock_executor)
 
         result = kit.arun("test input")
@@ -357,6 +384,7 @@ class TestMutxAgentKit:
         mock_executor.invoke.assert_called_once()
         # The invoke is called with two positional args: (input_dict, config_dict)
         call_args = mock_executor.invoke.call_args
+        assert call_args[0][0] == {"messages": [{"role": "user", "content": "test input"}]}
         # Second positional argument should be the config dict with callbacks
         config_arg = call_args[0][1]
         assert "callbacks" in config_arg

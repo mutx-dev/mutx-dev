@@ -64,7 +64,7 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 - `2026-07-16` Unified site redesign now covers the public site, docs, dashboard, auth, desktop, and Pico surfaces
 - `2026-07-16` Node 24 and the safe JavaScript dependency baseline are enforced across local, CI, and container builds
-- `2026-07-16` LangChain integrations are on the latest compatible 0.3 line with the remaining 1.x security boundary documented
+- `2026-07-16` LangChain is migrated to the v1 graph-backed agent runtime with current provider packages and no legacy compatibility layer
 - `2026-07-16` OSS attribution and AARM claims are backed by immutable upstream source and license evidence
 - `2026-04-14` Deployment lifecycle history and rollback posture now ship consistently across the dashboard and CLI
 - `2026-04-14` Pico now uses the premium studio surface across onboarding, academy, tutor, autopilot, and support

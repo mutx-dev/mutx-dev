@@ -1,5 +1,6 @@
 import logging
 import uuid
+from collections.abc import Mapping
 from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
@@ -8,19 +9,13 @@ import ast
 import operator
 from datetime import datetime, timezone
 
-from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent
 from langchain_anthropic import ChatAnthropic
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_community.chat_models import ChatOllama
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
+from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.tools import BaseTool
-from langchain.agents import (
-    AgentExecutor,
-    create_openai_functions_agent,
-    create_structured_chat_agent,
-)
-from langchain.memory import ConversationBufferMemory
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 
 from .tool_names import RUNTIME_BUILTIN_TOOL_NAMES
 from .vector_store import VectorStoreRegistry
@@ -52,6 +47,49 @@ _MAX_CALCULATE_COLLECTION_ITEMS = 32
 _MAX_CALCULATE_POWER_EXPONENT = 1000
 _MAX_CALCULATE_MAGNITUDE = 10**12
 _MAX_CALCULATE_RESULT_MAGNITUDE = 10**18
+
+
+def _content_text(content: Any) -> str:
+    """Normalize LangChain string or structured message content to text."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        blocks: list[str] = []
+        for block in content:
+            if isinstance(block, str):
+                blocks.append(block)
+            elif (
+                isinstance(block, Mapping)
+                and block.get("type") == "text"
+                and isinstance(block.get("text"), str)
+            ):
+                blocks.append(block["text"])
+        return "".join(blocks)
+    return str(content or "")
+
+
+def _extract_message_text(message: Any) -> str:
+    """Extract text across LangChain v0 method and v1 property message APIs."""
+    if isinstance(message, Mapping):
+        text = message.get("text")
+        content = message.get("content")
+    else:
+        text = getattr(message, "text", None)
+        content = getattr(message, "content", None)
+
+    # LangChain v1's TextAccessor is both a string and callable. Prefer its
+    # property value so we do not trigger the deprecated method-style access.
+    if isinstance(text, str):
+        if text:
+            return text
+    elif callable(text):
+        text = text()
+        if text:
+            return str(text)
+    elif text:
+        return str(text)
+
+    return _content_text(content)
 
 
 def _validate_safe_number(value: int | float) -> int | float:
@@ -149,7 +187,7 @@ class AgentConfig:
     vector_store_name: Optional[str] = None
     memory_type: str = "buffer"
     max_iterations: int = 10
-    verbose: bool = True
+    verbose: bool = False
     tool_executor: Optional[Callable[[str, str, Dict[str, Any], Callable], Any]] = None
 
 
@@ -247,10 +285,12 @@ class ToolFactory:
     def _create_tool_from_definition(tool_def: ToolDefinition) -> BaseTool:
         from langchain_core.tools import tool
 
+        args_schema = tool_def.parameters or {"type": "object", "properties": {}}
+
         @tool(
             tool_def.name,
-            args_schema=tool_def.parameters,
             description=tool_def.description,
+            args_schema=args_schema,
         )
         def wrapper_func(**kwargs):
             return tool_def.function(kwargs)
@@ -297,13 +337,7 @@ class BuiltInTools:
 class ConversationMemoryManager:
     def __init__(self, memory_type: str = "buffer"):
         self.memory_type = memory_type
-        self.chat_history = ChatMessageHistory()
-        self.memory = ConversationBufferMemory(
-            chat_memory=self.chat_history,
-            return_messages=True,
-            output_key="output",
-            input_key="input",
-        )
+        self.chat_history = InMemoryChatMessageHistory()
 
     def add_user_message(self, content: str):
         self.chat_history.add_user_message(content)
@@ -316,7 +350,6 @@ class ConversationMemoryManager:
 
     def clear(self):
         self.chat_history.clear()
-        self.memory.clear()
 
     def get_context(self) -> str:
         messages = self.get_messages()
@@ -365,6 +398,14 @@ class LangChainAgent:
                             vector_store_name, kwargs.get("query", ""), kwargs.get("k", 4)
                         )
                     ),
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "query": {"type": "string"},
+                            "k": {"type": "integer", "minimum": 1, "default": 4},
+                        },
+                        "required": ["query"],
+                    },
                 )
             )
 
@@ -374,11 +415,17 @@ class LangChainAgent:
                     name="get_time",
                     description="Get the current timestamp",
                     function=lambda _: BuiltInTools.get_timestamp(),
+                    parameters={"type": "object", "properties": {}},
                 ),
                 ToolDefinition(
                     name="calculator",
                     description="Perform mathematical calculations",
                     function=lambda kwargs: BuiltInTools.calculate(kwargs.get("expression", "0")),
+                    parameters={
+                        "type": "object",
+                        "properties": {"expression": {"type": "string"}},
+                        "required": ["expression"],
+                    },
                 ),
             ]
         )
@@ -406,77 +453,40 @@ class LangChainAgent:
 
         return ToolFactory.create_tools(tool_definitions)
 
-    def _build_prompt(self) -> ChatPromptTemplate:
-        system_message = self.config.system_prompt or (
+    def _system_prompt(self) -> str:
+        return self.config.system_prompt or (
             "You are a helpful AI assistant. Use the available tools to answer questions. "
             "If you need to search for information, use the search_documents tool."
         )
 
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", system_message),
-                MessagesPlaceholder(variable_name="chat_history", optional=True),
-                ("human", "{input}"),
-                MessagesPlaceholder(variable_name="agent_scratchpad"),
-            ]
-        )
-        return prompt
-
     def initialize(self):
-        if not self.tools:
-            self.state.status = "ready"
-            return
-
-        prompt = self._build_prompt()
-
-        if self.config.provider == LLMProvider.OPENAI:
-            agent = create_openai_functions_agent(
-                llm=self._get_llm_adapter(),
-                tools=self.tools,
-                prompt=prompt,
-            )
-        else:
-            agent = create_structured_chat_agent(
-                llm=self._get_llm_adapter(),
-                tools=self.tools,
-                prompt=prompt,
-            )
-
-        self.agent_executor = AgentExecutor(
-            agent=agent,
+        self.agent_executor = create_agent(
+            model=self._get_llm_adapter(),
             tools=self.tools,
-            memory=self.memory_manager.memory,
-            max_iterations=self.config.max_iterations,
-            verbose=self.config.verbose,
-            handle_parsing_errors=True,
+            system_prompt=self._system_prompt(),
+            debug=self.config.verbose,
         )
         self.state.status = "initialized"
         logger.info(f"Agent {self.agent_id} initialized with {len(self.tools)} tools")
 
     def _get_llm_adapter(self):
-        if isinstance(self.llm, OpenAILLM):
-            from langchain_openai import ChatOpenAI
+        return self.llm.client
 
-            return ChatOpenAI(
-                model=self.config.model,
-                temperature=self.config.temperature,
-                max_tokens=self.config.max_tokens,
-            )
-        elif isinstance(self.llm, AnthropicLLM):
-            from langchain_anthropic import ChatAnthropic
+    def _agent_config(self) -> Dict[str, Any]:
+        # Each tool iteration consumes a model node and a tool node. Preserve the
+        # former max_iterations contract using LangGraph's recursion limit.
+        return {"recursion_limit": max(2, (self.config.max_iterations * 2) + 1)}
 
-            return ChatAnthropic(
-                model=self.config.model,
-                temperature=self.config.temperature,
-                max_tokens=self.config.max_tokens,
-            )
-        else:
-            from langchain_community.chat_models import ChatOllama
+    @staticmethod
+    def _message_text(message: BaseMessage) -> str:
+        return _extract_message_text(message)
 
-            return ChatOllama(
-                model=self.config.model,
-                temperature=self.config.temperature,
-            )
+    @classmethod
+    def _extract_agent_output(cls, result: Dict[str, Any]) -> str:
+        messages = result.get("messages") or []
+        if not messages:
+            return ""
+        return cls._message_text(messages[-1])
 
     def run(self, input_text: str) -> Dict[str, Any]:
         self.state.status = "running"
@@ -484,8 +494,11 @@ class LangChainAgent:
 
         try:
             if self.agent_executor:
-                result = self.agent_executor.invoke({"input": input_text})
-                output = result.get("output", "")
+                result = self.agent_executor.invoke(
+                    {"messages": self.memory_manager.get_messages()},
+                    config=self._agent_config(),
+                )
+                output = self._extract_agent_output(result)
             else:
                 messages = [
                     SystemMessage(
@@ -494,7 +507,7 @@ class LangChainAgent:
                     HumanMessage(content=input_text),
                 ]
                 response = self.llm.invoke(messages)
-                output = response.content
+                output = self._message_text(response)
 
             self.memory_manager.add_ai_message(output)
             self.state.last_run = datetime.now(timezone.utc)
@@ -528,8 +541,11 @@ class LangChainAgent:
 
         try:
             if self.agent_executor:
-                result = await self.agent_executor.ainvoke({"input": input_text})
-                output = result.get("output", "")
+                result = await self.agent_executor.ainvoke(
+                    {"messages": self.memory_manager.get_messages()},
+                    config=self._agent_config(),
+                )
+                output = self._extract_agent_output(result)
             else:
                 messages = [
                     SystemMessage(
@@ -538,7 +554,7 @@ class LangChainAgent:
                     HumanMessage(content=input_text),
                 ]
                 response = await self.llm.ainvoke(messages)
-                output = response.content
+                output = self._message_text(response)
 
             self.memory_manager.add_ai_message(output)
             self.state.last_run = datetime.now(timezone.utc)
@@ -572,13 +588,23 @@ class LangChainAgent:
 
         try:
             if self.agent_executor:
-                for chunk in self.agent_executor.stream({"input": input_text}):
-                    if "output" in chunk:
-                        yield chunk["output"]
-                    elif "messages" in chunk:
-                        for msg in chunk["messages"]:
-                            if hasattr(msg, "content"):
-                                yield msg.content
+                message_count = len(self.memory_manager.get_messages())
+                final_output = ""
+                for chunk in self.agent_executor.stream(
+                    {"messages": self.memory_manager.get_messages()},
+                    config=self._agent_config(),
+                    stream_mode="values",
+                ):
+                    messages = chunk.get("messages") or []
+                    for message in messages[message_count:]:
+                        if isinstance(message, AIMessage):
+                            output = self._message_text(message)
+                            if output:
+                                final_output = output
+                                yield output
+                    message_count = len(messages)
+                if final_output:
+                    self.memory_manager.add_ai_message(final_output)
             else:
                 messages = [
                     SystemMessage(
@@ -587,7 +613,7 @@ class LangChainAgent:
                     HumanMessage(content=input_text),
                 ]
                 response = self.llm.invoke(messages)
-                yield response.content
+                yield self._message_text(response)
 
             self.state.last_run = datetime.now(timezone.utc)
             self.state.status = "ready"

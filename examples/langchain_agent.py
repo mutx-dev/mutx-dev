@@ -1,7 +1,7 @@
 """Example LangChain agent with MUTX observability integration.
 
 This example demonstrates:
-1. Creating a ReAct agent with MutxLangChainCallbackHandler for tracing
+1. Creating a LangChain v1 agent with MutxLangChainCallbackHandler for tracing
 2. Running the agent with and without guardrails using MutxAgentKit
 
 Run with:
@@ -13,7 +13,7 @@ import ast
 import operator
 
 # LangChain imports
-from langchain.agents import AgentExecutor, create_react_agent
+from langchain.agents import create_agent
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 
@@ -121,9 +121,8 @@ def main():
     # Define the tools list
     tools = [get_weather, calculator]
 
-    # Create the ReAct agent
-    # Note: In production, you would use a proper prompt template
-    prompt = """You are a helpful assistant that can use tools to answer questions.
+    # LangChain v1 agents use LangGraph for the tool execution loop.
+    system_prompt = """You are a helpful assistant that can use tools to answer questions.
 
 You have access to the following tools:
 - get_weather: Get the weather for a city
@@ -132,8 +131,7 @@ You have access to the following tools:
 Answer the user's question using these tools when appropriate.
 """
 
-    agent = create_react_agent(llm, tools, prompt)
-    executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    agent = create_agent(llm, tools, system_prompt=system_prompt)
 
     # ============================================================
     # Example 1: Using MutxLangChainCallbackHandler directly
@@ -149,11 +147,11 @@ Answer the user's question using these tools when appropriate.
     )
 
     # Run a query with the callback handler
-    result = executor.invoke(
-        {"input": "What is the weather in New York?"},
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": "What is the weather in New York?"}]},
         {"callbacks": [callback_handler]},
     )
-    print(f"\nResult: {result['output']}\n")
+    print(f"\nResult: {result['messages'][-1].text}\n")
 
     # ============================================================
     # Example 2: Using MutxAgentKit without guardrails
@@ -168,7 +166,7 @@ Answer the user's question using these tools when appropriate.
         api_key=MUTX_API_KEY,
         guardrails_enabled=False,
     )
-    kit_no_guardrails.set_agent_executor(executor)
+    kit_no_guardrails.set_agent_executor(agent)
 
     try:
         result = kit_no_guardrails.arun("What is 2 + 2?")
@@ -189,7 +187,7 @@ Answer the user's question using these tools when appropriate.
         api_key=MUTX_API_KEY,
         guardrails_enabled=True,
     )
-    kit_with_guardrails.set_agent_executor(executor)
+    kit_with_guardrails.set_agent_executor(agent)
 
     # This should pass through
     try:

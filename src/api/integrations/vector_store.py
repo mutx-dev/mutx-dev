@@ -74,14 +74,14 @@ class VectorStoreManager:
                 dimensions=self.config.embedding_dimensions,
             )
         elif self.config.embedding_provider == EmbeddingProvider.HUGGINGFACE:
-            from langchain_community.embeddings import HuggingFaceEmbeddings
+            from langchain_huggingface import HuggingFaceEmbeddings
 
             return HuggingFaceEmbeddings(
                 model_name=self.config.embedding_model,
                 model_kwargs={"device": "cpu"},
             )
         elif self.config.embedding_provider == EmbeddingProvider.OLLAMA:
-            from langchain_community.embeddings import OllamaEmbeddings
+            from langchain_ollama import OllamaEmbeddings
 
             return OllamaEmbeddings(model=self.config.embedding_model)
         else:

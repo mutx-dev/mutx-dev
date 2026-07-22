@@ -1,11 +1,11 @@
-"""Compatibility coverage for the supported LangChain 0.3 dependency island."""
+"""Compatibility coverage for the supported LangChain v1 dependency family."""
 
 from importlib.metadata import version
 
 from langchain_core.documents import Document
 from packaging.version import Version
 
-from src.api.integrations.langchain_agent import ChatMessageHistory, LLMProvider
+from src.api.integrations.langchain_agent import InMemoryChatMessageHistory, LLMProvider
 from src.api.integrations.vector_store import (
     EmbeddingProvider,
     VectorStoreConfig,
@@ -13,24 +13,29 @@ from src.api.integrations.vector_store import (
 )
 
 
-def test_langchain_03_packages_resolve_to_the_tested_security_line() -> None:
+def test_langchain_v1_packages_resolve_to_the_tested_security_line() -> None:
     minimum_versions = {
-        "langchain": "0.3.30",
-        "langchain-core": "0.3.86",
-        "langchain-openai": "0.3.35",
-        "langchain-anthropic": "0.3.22",
-        "langchain-community": "0.3.31",
-        "langchain-text-splitters": "0.3.11",
+        "langchain": "1.3.14",
+        "langchain-core": "1.5.0",
+        "langgraph": "1.2.9",
+        "langchain-openai": "1.4.0",
+        "langchain-anthropic": "1.5.0",
+        "langchain-text-splitters": "1.1.2",
+        "langchain-ollama": "1.1.0",
+        "langchain-huggingface": "1.2.2",
     }
 
     for package, minimum in minimum_versions.items():
         installed = Version(version(package))
         assert installed >= Version(minimum)
-        assert installed < Version("0.4.0")
+        if package == "langgraph":
+            assert installed < Version("1.3.0")
+        else:
+            assert installed < Version("2.0.0")
 
 
-def test_langchain_agent_uses_the_current_03_history_provider() -> None:
-    assert ChatMessageHistory.__module__.startswith("langchain_core.chat_history")
+def test_langchain_agent_uses_the_v1_history_provider() -> None:
+    assert InMemoryChatMessageHistory.__module__.startswith("langchain_core.chat_history")
     assert LLMProvider.OPENAI.value == "openai"
 
 
