@@ -45,3 +45,5 @@ def test_infrastructure_docs_describe_current_and_alternate_deployments() -> Non
         assert "Railway is the current production deployment path" in docs
         assert "ENABLE_TERRAFORM_DRIFT" in docs
         assert "dispatch remains fail-closed" in docs
+        assert "repository or organization Actions secrets" in docs
+        assert "environment-scoped secrets are not" in docs

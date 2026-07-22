@@ -100,7 +100,10 @@ Required GitHub secrets before enabling the schedule:
 - `TF_STATE_ACCESS_KEY_ID`
 - `TF_STATE_SECRET_ACCESS_KEY`
 
-Prefer environment-scoped secrets and approvals for `staging` and `production` when this deployment path is activated.
+Store these as repository or organization Actions secrets. The workflow does not
+currently declare GitHub environments, so environment-scoped secrets are not
+available to its matrix jobs. If environments and approval gates are added later,
+update the workflow and this guidance together.
 
 ## Extra Validation Targets
 
