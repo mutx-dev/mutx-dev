@@ -88,17 +88,24 @@ The monitoring compose file binds UI and exporter ports to localhost by default.
 
 ## CI Drift Detection
 
-A scheduled GitHub Actions workflow now checks Terraform drift daily for both `staging` and `production` using `terraform plan -detailed-exitcode`:
+Railway is the current production deployment path. The Terraform DigitalOcean configuration remains an alternate deployment path and its drift workflow is intentionally dormant until real cloud and remote-state credentials are configured.
 
 * Workflow: `.github/workflows/infrastructure-drift.yml`
-* Trigger: daily cron + manual dispatch
-* Behavior: uploads plan artifacts and fails when drift is detected
+* Trigger: manual dispatch at any time; daily cron only when the repository variable `ENABLE_TERRAFORM_DRIFT` is set to `true`
+* Disabled schedule: reports readiness and skips the Terraform matrix instead of producing a false drift failure
+* Enabled behavior: uploads plan artifacts and fails when drift is detected
+* Manual safety: dispatch remains fail-closed when any required secret is missing
 
-Required GitHub secrets:
+Required GitHub secrets before enabling the schedule:
 
 * `DO_TOKEN`
 * `TF_STATE_ACCESS_KEY_ID`
 * `TF_STATE_SECRET_ACCESS_KEY`
+
+Store these as repository or organization Actions secrets. The workflow does not
+currently declare GitHub environments, so environment-scoped secrets are not
+available to its matrix jobs. If environments and approval gates are added later,
+update the workflow and this guidance together.
 
 ## Extra Validation Targets
 
