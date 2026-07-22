@@ -164,6 +164,9 @@ jobs:
           pip install -r requirements.txt
           pip install -e ".[dev]"
 
+      - name: Validate JavaScript dependency compatibility
+        run: npm run test:dependency-compat
+
       - name: Run frontend unit tests
         run: npm run test:app
 
