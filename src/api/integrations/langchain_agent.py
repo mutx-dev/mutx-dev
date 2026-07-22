@@ -1,5 +1,6 @@
 import logging
 import uuid
+from collections.abc import Mapping
 from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
@@ -46,6 +47,49 @@ _MAX_CALCULATE_COLLECTION_ITEMS = 32
 _MAX_CALCULATE_POWER_EXPONENT = 1000
 _MAX_CALCULATE_MAGNITUDE = 10**12
 _MAX_CALCULATE_RESULT_MAGNITUDE = 10**18
+
+
+def _content_text(content: Any) -> str:
+    """Normalize LangChain string or structured message content to text."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        blocks: list[str] = []
+        for block in content:
+            if isinstance(block, str):
+                blocks.append(block)
+            elif (
+                isinstance(block, Mapping)
+                and block.get("type") == "text"
+                and isinstance(block.get("text"), str)
+            ):
+                blocks.append(block["text"])
+        return "".join(blocks)
+    return str(content or "")
+
+
+def _extract_message_text(message: Any) -> str:
+    """Extract text across LangChain v0 method and v1 property message APIs."""
+    if isinstance(message, Mapping):
+        text = message.get("text")
+        content = message.get("content")
+    else:
+        text = getattr(message, "text", None)
+        content = getattr(message, "content", None)
+
+    # LangChain v1's TextAccessor is both a string and callable. Prefer its
+    # property value so we do not trigger the deprecated method-style access.
+    if isinstance(text, str):
+        if text:
+            return text
+    elif callable(text):
+        text = text()
+        if text:
+            return str(text)
+    elif text:
+        return str(text)
+
+    return _content_text(content)
 
 
 def _validate_safe_number(value: int | float) -> int | float:
@@ -435,8 +479,7 @@ class LangChainAgent:
 
     @staticmethod
     def _message_text(message: BaseMessage) -> str:
-        text = getattr(message, "text", "")
-        return str(text) if text else ""
+        return _extract_message_text(message)
 
     @classmethod
     def _extract_agent_output(cls, result: Dict[str, Any]) -> str:

@@ -39,6 +39,49 @@ except ImportError as e:
 from mutx.telemetry import get_tracer
 
 
+def _content_text(content: Any) -> str:
+    """Normalize LangChain string or structured message content to text."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        blocks: list[str] = []
+        for block in content:
+            if isinstance(block, str):
+                blocks.append(block)
+            elif (
+                isinstance(block, Mapping)
+                and block.get("type") == "text"
+                and isinstance(block.get("text"), str)
+            ):
+                blocks.append(block["text"])
+        return "".join(blocks)
+    return str(content or "")
+
+
+def _extract_message_text(message: Any) -> str:
+    """Extract text across LangChain v0 method and v1 property message APIs."""
+    if isinstance(message, Mapping):
+        text = message.get("text")
+        content = message.get("content")
+    else:
+        text = getattr(message, "text", None)
+        content = getattr(message, "content", None)
+
+    # LangChain v1's TextAccessor is both a string and callable. Prefer its
+    # property value so we do not trigger the deprecated method-style access.
+    if isinstance(text, str):
+        if text:
+            return text
+    elif callable(text):
+        text = text()
+        if text:
+            return str(text)
+    elif text:
+        return str(text)
+
+    return _content_text(content)
+
+
 class MutxLangChainCallbackHandler(BaseCallbackHandler):
     """Callback handler for tracing LangChain agent executions via OTel.
 
@@ -450,13 +493,7 @@ class MutxAgentKit:
         if not messages:
             return ""
 
-        message = messages[-1]
-        text = getattr(message, "text", "")
-        if text:
-            return str(text)
-        if isinstance(message, dict):
-            return str(message.get("content") or "")
-        return str(getattr(message, "content", "") or "")
+        return _extract_message_text(messages[-1])
 
     def arun(self, input: str) -> str:
         """Run the agent synchronously.

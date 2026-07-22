@@ -33,6 +33,58 @@ class ToolCallingFakeModel(FakeMessagesListChatModel):
         return self
 
 
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        (
+            SimpleNamespace(text=lambda: "legacy callable response", content="fallback"),
+            "legacy callable response",
+        ),
+        (
+            SimpleNamespace(
+                content=[
+                    {"type": "text", "text": "structured "},
+                    "response",
+                    {"type": "image", "url": "https://example.com/image.png"},
+                ]
+            ),
+            "structured response",
+        ),
+    ],
+)
+def test_langchain_agent_extracts_callable_text_and_content_fallback(
+    message: Any,
+    expected: str,
+) -> None:
+    assert LangChainAgent._message_text(message) == expected
+
+
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        (
+            SimpleNamespace(text=lambda: "legacy SDK response", content="fallback"),
+            "legacy SDK response",
+        ),
+        (
+            {
+                "content": [
+                    {"type": "text", "text": "structured "},
+                    "SDK response",
+                    {"type": "image", "url": "https://example.com/image.png"},
+                ]
+            },
+            "structured SDK response",
+        ),
+    ],
+)
+def test_sdk_agent_kit_extracts_callable_text_and_content_fallback(
+    message: Any,
+    expected: str,
+) -> None:
+    assert MutxAgentKit._extract_output({"messages": [message]}) == expected
+
+
 @pytest.mark.asyncio
 async def test_langchain_v1_agent_runs_sync_and_async_with_message_state(monkeypatch) -> None:
     model = ToolCallingFakeModel(
