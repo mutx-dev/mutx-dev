@@ -10,7 +10,10 @@ https://github.com/builderz-labs/mission-control/blob/0552b00b3b743ed12949e6deb1
 
 from __future__ import annotations
 
+import hashlib
+import os
 import re
+import stat
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
@@ -20,7 +23,27 @@ from typing import Any, Iterable
 DEFAULT_MAX_CHANGED_FILES = 6
 MAX_CHANGED_FILES_CEILING = 25
 SANDBOX_BLOCKER_CLASS = "sandbox_violation"
+MAX_GIT_METADATA_ENTRIES = 512
+MAX_GIT_METADATA_FILE_BYTES = 2 * 1024 * 1024
 _MAX_CHANGED_FILES = re.compile(r"^max_changed_files\s*=\s*(.+)$", re.IGNORECASE)
+_SENSITIVE_GIT_PATHS = (
+    "HEAD",
+    "index",
+    "config",
+    "config.worktree",
+    "hooks",
+    "info/exclude",
+    "info/attributes",
+    "objects/info/alternates",
+    "objects/info/http-alternates",
+    "MERGE_HEAD",
+    "MERGE_MSG",
+    "CHERRY_PICK_HEAD",
+    "REVERT_HEAD",
+    "rebase-apply",
+    "rebase-merge",
+    "sequencer",
+)
 
 
 class WorkOrderSandboxError(ValueError):
@@ -47,6 +70,7 @@ class WorkOrderSandbox:
 
     worktree: str
     base_commit: str
+    git_metadata_digest: str
     allowed_paths: tuple[str, ...]
     max_changed_files: int
 
@@ -55,6 +79,7 @@ class WorkOrderSandbox:
             "ok": True,
             "worktree": self.worktree,
             "base_commit": self.base_commit,
+            "git_metadata_digest": self.git_metadata_digest,
             "allowed_paths": list(self.allowed_paths),
             "max_changed_files": self.max_changed_files,
         }
@@ -66,6 +91,7 @@ def _run_git(worktree: str | Path, args: list[str]) -> subprocess.CompletedProce
         cwd=str(worktree),
         capture_output=True,
         check=False,
+        env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"},
     )
 
 
@@ -220,6 +246,203 @@ def current_commit(worktree: str | Path) -> str:
         ) from exc
 
 
+def _git_path(worktree: str | Path, relative_path: str) -> Path:
+    result = _run_git(
+        worktree,
+        ["rev-parse", "--path-format=absolute", "--git-path", relative_path],
+    )
+    if result.returncode != 0:
+        raise WorkOrderSandboxError(
+            "git_metadata_unavailable",
+            "Unable to resolve repository metadata paths",
+            git_path=relative_path,
+        )
+    try:
+        return Path(result.stdout.decode().strip())
+    except UnicodeDecodeError as exc:
+        raise WorkOrderSandboxError(
+            "git_metadata_unavailable",
+            "Repository metadata path cannot be decoded",
+            git_path=relative_path,
+        ) from exc
+
+
+def _configured_hooks_path(worktree: str | Path) -> Path | None:
+    result = _run_git(worktree, ["config", "--path", "--get", "core.hooksPath"])
+    if result.returncode == 1:
+        return None
+    if result.returncode != 0:
+        raise WorkOrderSandboxError(
+            "git_metadata_unavailable", "Unable to resolve the configured Git hooks path"
+        )
+    try:
+        raw_path = result.stdout.decode().strip()
+    except UnicodeDecodeError as exc:
+        raise WorkOrderSandboxError(
+            "git_metadata_unavailable", "Configured Git hooks path cannot be decoded"
+        ) from exc
+    if not raw_path:
+        return None
+    path = Path(raw_path).expanduser()
+    return path if path.is_absolute() else Path(worktree) / path
+
+
+def _hash_metadata_path(
+    digest: Any,
+    path: Path,
+    label: str,
+    budget: dict[str, int],
+    visited: set[tuple[int, int]],
+    *,
+    follow_symlinks: bool = True,
+    recurse_directories: bool = True,
+) -> None:
+    digest.update(f"path:{label}\0".encode())
+    try:
+        metadata = path.lstat()
+    except FileNotFoundError:
+        digest.update(b"missing\0")
+        return
+    except OSError as exc:
+        raise WorkOrderSandboxError(
+            "git_metadata_unavailable",
+            "Repository metadata cannot be inspected",
+            git_path=label,
+        ) from exc
+
+    budget["entries"] += 1
+    if budget["entries"] > MAX_GIT_METADATA_ENTRIES:
+        raise WorkOrderSandboxError(
+            "git_metadata_unbounded",
+            "Repository metadata boundary contains too many entries",
+            git_path=label,
+        )
+
+    mode = metadata.st_mode
+    digest.update(f"mode:{stat.S_IFMT(mode)}:{stat.S_IMODE(mode)}\0".encode())
+    if stat.S_ISLNK(mode):
+        try:
+            target = os.readlink(path)
+        except OSError as exc:
+            raise WorkOrderSandboxError(
+                "git_metadata_unavailable",
+                "Repository metadata symlink cannot be read",
+                git_path=label,
+            ) from exc
+        digest.update(f"link:{target}\0".encode())
+        if not follow_symlinks:
+            return
+        try:
+            resolved = path.resolve(strict=True)
+        except OSError as exc:
+            raise WorkOrderSandboxError(
+                "git_metadata_unavailable",
+                "Repository metadata symlink target cannot be resolved",
+                git_path=label,
+            ) from exc
+        _hash_metadata_path(
+            digest,
+            resolved,
+            f"{label}->target",
+            budget,
+            visited,
+            follow_symlinks=True,
+            recurse_directories=True,
+        )
+        return
+
+    inode = (metadata.st_dev, metadata.st_ino)
+    if inode in visited:
+        digest.update(b"visited\0")
+        return
+    visited.add(inode)
+
+    if stat.S_ISDIR(mode):
+        if not recurse_directories:
+            return
+        try:
+            children = sorted(path.iterdir(), key=lambda child: child.name)
+        except OSError as exc:
+            raise WorkOrderSandboxError(
+                "git_metadata_unavailable",
+                "Repository metadata directory cannot be read",
+                git_path=label,
+            ) from exc
+        for child in children:
+            _hash_metadata_path(
+                digest,
+                child,
+                f"{label}/{child.name}",
+                budget,
+                visited,
+                follow_symlinks=True,
+                recurse_directories=True,
+            )
+        return
+
+    if stat.S_ISREG(mode):
+        if metadata.st_size > MAX_GIT_METADATA_FILE_BYTES:
+            raise WorkOrderSandboxError(
+                "git_metadata_unbounded",
+                "Repository metadata file exceeds the snapshot limit",
+                git_path=label,
+                size=metadata.st_size,
+            )
+        try:
+            with path.open("rb") as source:
+                for chunk in iter(lambda: source.read(64 * 1024), b""):
+                    digest.update(chunk)
+        except OSError as exc:
+            raise WorkOrderSandboxError(
+                "git_metadata_unavailable",
+                "Repository metadata file cannot be read",
+                git_path=label,
+            ) from exc
+
+
+def repository_metadata_digest(worktree: str | Path) -> str:
+    """Fingerprint Git state that can alter status, staging, commit, or hook behavior."""
+
+    digest = hashlib.sha256()
+    budget = {"entries": 0}
+    visited: set[tuple[int, int]] = set()
+    _hash_metadata_path(
+        digest,
+        Path(worktree) / ".git",
+        "worktree/.git",
+        budget,
+        visited,
+        follow_symlinks=False,
+        recurse_directories=False,
+    )
+    for relative_path in _SENSITIVE_GIT_PATHS:
+        _hash_metadata_path(
+            digest,
+            _git_path(worktree, relative_path),
+            relative_path,
+            budget,
+            visited,
+        )
+    hooks_path = _configured_hooks_path(worktree)
+    if hooks_path is not None:
+        _hash_metadata_path(
+            digest,
+            hooks_path,
+            "core.hooksPath",
+            budget,
+            visited,
+        )
+
+    config = _run_git(worktree, ["config", "--null", "--show-origin", "--list"])
+    if config.returncode != 0:
+        raise WorkOrderSandboxError(
+            "git_metadata_unavailable", "Unable to inspect effective Git configuration"
+        )
+    digest.update(b"effective-config\0")
+    digest.update(config.stdout)
+    return digest.hexdigest()
+
+
 def list_changed_files(worktree: str | Path, base_commit: str | None = None) -> list[str]:
     """Return committed, staged, unstaged, deleted, renamed, and untracked paths."""
 
@@ -250,6 +473,23 @@ def _path_is_allowed(path: str, allowed_paths: tuple[str, ...]) -> bool:
     return any(path == allowed or path.startswith(f"{allowed}/") for allowed in allowed_paths)
 
 
+def _changed_symlink_paths(worktree: str | Path, changed_files: list[str]) -> list[str]:
+    root = Path(worktree)
+    symlink_paths: list[str] = []
+    for relative_path in changed_files:
+        candidate = root
+        for part in PurePosixPath(relative_path).parts:
+            candidate /= part
+            try:
+                if candidate.is_symlink():
+                    symlink_paths.append(relative_path)
+                    break
+            except OSError:
+                symlink_paths.append(relative_path)
+                break
+    return symlink_paths
+
+
 def prepare_work_order_sandbox(work_order: dict[str, Any]) -> WorkOrderSandbox:
     """Validate a clean, realpath-confined execution boundary before dispatch."""
 
@@ -265,9 +505,11 @@ def prepare_work_order_sandbox(work_order: dict[str, Any]) -> WorkOrderSandbox:
             changed_files=dirty_paths,
         )
     base_commit = current_commit(worktree)
+    git_metadata_digest = repository_metadata_digest(worktree)
     return WorkOrderSandbox(
         worktree=str(worktree),
         base_commit=base_commit,
+        git_metadata_digest=git_metadata_digest,
         allowed_paths=allowed_paths,
         max_changed_files=max_changed_files,
     )
@@ -276,8 +518,38 @@ def prepare_work_order_sandbox(work_order: dict[str, Any]) -> WorkOrderSandbox:
 def assess_worktree_changes(sandbox: WorkOrderSandbox) -> dict[str, Any]:
     """Fail closed when a worker crosses its path or change-count boundary."""
 
-    changed_files = list_changed_files(sandbox.worktree, sandbox.base_commit)
     head_commit = current_commit(sandbox.worktree)
+    if head_commit != sandbox.base_commit:
+        return {
+            **sandbox.to_dict(),
+            "ok": False,
+            "reason": "worker_mutated_git_history",
+            "changed_files": [],
+            "head_commit": head_commit,
+        }
+
+    git_metadata_digest = repository_metadata_digest(sandbox.worktree)
+    if git_metadata_digest != sandbox.git_metadata_digest:
+        return {
+            **sandbox.to_dict(),
+            "ok": False,
+            "reason": "repository_metadata_changed",
+            "changed_files": [],
+            "head_commit": head_commit,
+            "current_git_metadata_digest": git_metadata_digest,
+        }
+
+    changed_files = list_changed_files(sandbox.worktree, sandbox.base_commit)
+    changed_symlinks = _changed_symlink_paths(sandbox.worktree, changed_files)
+    if changed_symlinks:
+        return {
+            **sandbox.to_dict(),
+            "ok": False,
+            "reason": "changed_symlink_path",
+            "changed_files": changed_files,
+            "changed_symlinks": changed_symlinks,
+            "head_commit": head_commit,
+        }
     out_of_scope = [
         path for path in changed_files if not _path_is_allowed(path, sandbox.allowed_paths)
     ]
@@ -288,14 +560,6 @@ def assess_worktree_changes(sandbox: WorkOrderSandbox) -> dict[str, Any]:
             "reason": "changed_path_outside_allowlist",
             "changed_files": changed_files,
             "out_of_scope": out_of_scope,
-            "head_commit": head_commit,
-        }
-    if head_commit != sandbox.base_commit:
-        return {
-            **sandbox.to_dict(),
-            "ok": False,
-            "reason": "worker_mutated_git_history",
-            "changed_files": changed_files,
             "head_commit": head_commit,
         }
     if len(changed_files) > sandbox.max_changed_files:

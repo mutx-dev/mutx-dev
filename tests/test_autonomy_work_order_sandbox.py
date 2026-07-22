@@ -136,7 +136,7 @@ def test_assessment_fails_closed_for_out_of_scope_changes(clean_repo: Path) -> N
 def test_assessment_checks_both_sides_of_cross_boundary_rename(clean_repo: Path) -> None:
     sandbox = SANDBOX.prepare_work_order_sandbox(_work_order(clean_repo))
     (clean_repo / "app").mkdir()
-    _git(clean_repo, "mv", "docs/tracked.md", "app/tracked.md")
+    (clean_repo / "docs" / "tracked.md").rename(clean_repo / "app" / "tracked.md")
 
     result = SANDBOX.assess_worktree_changes(sandbox)
 
@@ -156,8 +156,8 @@ def test_assessment_catches_out_of_scope_changes_committed_by_worker(clean_repo:
     result = SANDBOX.assess_worktree_changes(sandbox)
 
     assert result["ok"] is False
-    assert result["reason"] == "changed_path_outside_allowlist"
-    assert result["out_of_scope"] == ["app/committed.ts"]
+    assert result["reason"] == "worker_mutated_git_history"
+    assert result["changed_files"] == []
 
 
 def test_assessment_reserves_git_history_mutation_for_orchestrator(clean_repo: Path) -> None:
@@ -170,8 +170,48 @@ def test_assessment_reserves_git_history_mutation_for_orchestrator(clean_repo: P
 
     assert result["ok"] is False
     assert result["reason"] == "worker_mutated_git_history"
-    assert result["changed_files"] == ["docs/tracked.md"]
+    assert result["changed_files"] == []
     assert result["head_commit"] != result["base_commit"]
+
+
+def test_assessment_rejects_git_hook_tampering(clean_repo: Path) -> None:
+    sandbox = SANDBOX.prepare_work_order_sandbox(_work_order(clean_repo))
+    hook = clean_repo / ".git" / "hooks" / "pre-commit"
+    hook.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+    hook.chmod(0o755)
+
+    result = SANDBOX.assess_worktree_changes(sandbox)
+
+    assert result["ok"] is False
+    assert result["reason"] == "repository_metadata_changed"
+    assert result["changed_files"] == []
+
+
+def test_assessment_rejects_git_config_tampering(clean_repo: Path) -> None:
+    sandbox = SANDBOX.prepare_work_order_sandbox(_work_order(clean_repo))
+    _git(clean_repo, "config", "core.hooksPath", "../hooks")
+
+    result = SANDBOX.assess_worktree_changes(sandbox)
+
+    assert result["ok"] is False
+    assert result["reason"] == "repository_metadata_changed"
+    assert result["changed_files"] == []
+
+
+def test_assessment_rejects_changed_symlink_paths(clean_repo: Path, tmp_path: Path) -> None:
+    sandbox = SANDBOX.prepare_work_order_sandbox(_work_order(clean_repo))
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    escape = clean_repo / "docs" / "escape"
+    escape.symlink_to(outside, target_is_directory=True)
+    (escape / "pwned.txt").write_text("outside\n", encoding="utf-8")
+
+    result = SANDBOX.assess_worktree_changes(sandbox)
+
+    assert result["ok"] is False
+    assert result["reason"] == "changed_symlink_path"
+    assert result["changed_files"] == ["docs/escape"]
+    assert result["changed_symlinks"] == ["docs/escape"]
 
 
 def test_assessment_enforces_clamped_changed_file_limit(clean_repo: Path) -> None:
