@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------
 # Stage 1: Builder - Install dependencies
 # -----------------------------------------------------------------------------
-FROM python:3.11-slim-bookworm@sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba AS builder
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS builder
 
 WORKDIR /build
 
@@ -33,7 +33,7 @@ RUN python -m pip install --no-cache-dir \
 # -----------------------------------------------------------------------------
 # Stage 2: Production - Runtime image
 # -----------------------------------------------------------------------------
-FROM python:3.11-slim-bookworm@sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba AS production
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS production
 
 # Install the PostgreSQL runtime library used by the API and migrations.
 # hadolint ignore=DL3008

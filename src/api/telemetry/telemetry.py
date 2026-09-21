@@ -31,7 +31,7 @@ def get_exporter_from_env():
     """Get the appropriate span exporter based on environment variables.
 
     Environment Variables:
-        OTEL_TRACES_EXPORTER: otlp, jaeger, zipkin, console (default: console)
+        OTEL_TRACES_EXPORTER: otlp, zipkin, console (default: console)
         OTEL_EXPORTER_OTLP_ENDPOINT: OTLP gRPC/HTTP endpoint
     """
     exporter_type = os.getenv("OTEL_TRACES_EXPORTER", "console")
@@ -47,7 +47,7 @@ def get_exporter_from_env():
 
     elif exporter_type == "zipkin":
         try:
-            from opentelemetry.exporter.zipkin.proto.http import ZipkinExporter
+            from opentelemetry.exporter.zipkin.json import ZipkinExporter
 
             endpoint = os.getenv(
                 "OTEL_EXPORTER_ZIPKIN_ENDPOINT", "http://localhost:9411/api/v2/spans"

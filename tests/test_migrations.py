@@ -42,7 +42,7 @@ def _load_migration_module(module_name: str, file_name: str):
     return module
 
 
-def _run_alembic_upgrade(database_url: str) -> None:
+def _run_alembic_upgrade(database_url: str, revision: str = "head") -> None:
     env = os.environ.copy()
     env.update(
         {
@@ -56,7 +56,7 @@ def _run_alembic_upgrade(database_url: str) -> None:
         }
     )
     result = subprocess.run(
-        [sys.executable, "-m", "alembic", "-c", "alembic.ini", "upgrade", "head"],
+        [sys.executable, "-m", "alembic", "-c", "alembic.ini", "upgrade", revision],
         cwd=ROOT,
         env=env,
         capture_output=True,
@@ -445,7 +445,7 @@ def test_durable_scheduler_migration_follows_tenant_storage_head():
     assert module.down_revision == "b6d8f0a2c4e6"
 
 
-def test_mutx_observability_migration_is_the_single_follow_up_head():
+def test_mutx_observability_and_approval_migrations_form_a_single_chain():
     module = _load_migration_module(
         "add_durable_mutx_observability",
         "f0b4d6e8a2c5_add_durable_mutx_observability.py",
@@ -453,7 +453,11 @@ def test_mutx_observability_migration_is_the_single_follow_up_head():
 
     assert module.revision == "f0b4d6e8a2c5"
     assert module.down_revision == "e9a2c4d6f8b0"
-    assert _current_head() == module.revision
+    approval = _load_migration_module(
+        "approval_enforcement", "a1c3e5f7b9d2_add_approval_enforcement.py"
+    )
+    assert approval.down_revision == module.revision
+    assert _current_head() == approval.revision
 
 
 def test_live_mode_schema_hardening_upgrade_is_idempotent_for_existing_live_schema(monkeypatch):
@@ -1417,7 +1421,8 @@ def test_tenant_storage_migration_repairs_partial_schema_and_preserves_data(tmp_
     finally:
         engine.dispose()
 
-    _run_alembic_upgrade(database_url)
+    # This fixture intentionally includes only the tenant-storage predecessor tables.
+    _run_alembic_upgrade(database_url, "b6d8f0a2c4e6")
 
     engine = sa.create_engine(database_url)
     try:
@@ -1496,7 +1501,7 @@ def test_tenant_storage_migration_repairs_partial_schema_and_preserves_data(tmp_
         assert policy.name == "legacy-policy"
         assert policy.version == 7
         assert policy.updated_at is not None
-        assert revision == _current_head()
+        assert revision == "b6d8f0a2c4e6"
     finally:
         engine.dispose()
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import stat
 import subprocess
 from pathlib import Path
@@ -17,6 +18,11 @@ def _write_executable(path: Path, content: str) -> None:
 
 
 def test_demo_validate_uses_project_scoped_compose_commands(tmp_path: Path) -> None:
+    fixture_root = tmp_path / "repo"
+    for relative in ("scripts/demo-validate.sh", "scripts/validate-demo.js", "infrastructure/docker/docker-compose.yml", ".env.example"):
+        target = fixture_root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, target)
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir(parents=True, exist_ok=True)
     docker_log = tmp_path / "docker.log"
@@ -50,8 +56,8 @@ exit 0
     env["DEMO_HOST"] = "127.0.0.1"
 
     result = subprocess.run(
-        ["bash", str(DEMO_VALIDATE_SCRIPT)],
-        cwd=ROOT,
+        ["bash", str(fixture_root / "scripts/demo-validate.sh")],
+        cwd=fixture_root,
         env=env,
         capture_output=True,
         text=True,
@@ -62,13 +68,13 @@ exit 0
     docker_calls = docker_log.read_text(encoding="utf-8").splitlines()
     assert any(
         call.startswith(
-            f"compose -p mutx-proof -f {ROOT / 'infrastructure' / 'docker' / 'docker-compose.yml'} down --remove-orphans"
+            f"compose -p mutx-proof -f {fixture_root / 'infrastructure' / 'docker' / 'docker-compose.yml'} down --remove-orphans"
         )
         for call in docker_calls
     )
     assert any(
         call.startswith(
-            f"compose -p mutx-proof -f {ROOT / 'infrastructure' / 'docker' / 'docker-compose.yml'} up --build -d postgres redis migrate api frontend"
+            f"compose -p mutx-proof -f {fixture_root / 'infrastructure' / 'docker' / 'docker-compose.yml'} up --build -d postgres redis migrate api frontend"
         )
         for call in docker_calls
     )

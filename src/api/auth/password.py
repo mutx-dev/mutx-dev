@@ -1,27 +1,62 @@
+import base64
+import hashlib
+import hmac
 import re
 from typing import Optional
 
 import bcrypt
-from passlib.hash import pbkdf2_sha256
+from argon2 import PasswordHasher
+from argon2.exceptions import InvalidHashError, VerificationError
 
-# Fallback to pbkdf2_sha256 if bcrypt is acting up with newer python/library versions
-# Using bcrypt directly for password hashing
+_password_hasher = PasswordHasher()
 
 MIN_PASSWORD_LENGTH = 8
 MAX_PASSWORD_BYTES = 72
 
 
 def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    return _password_hasher.hash(password)
+
+
+def password_needs_rehash(hashed_password: str) -> bool:
+    if not hashed_password.startswith("$argon2id$"):
+        return True
+    try:
+        return _password_hasher.check_needs_rehash(hashed_password)
+    except (InvalidHashError, ValueError):
+        return True
+
+
+def _verify_legacy_pbkdf2(password: str, encoded: str) -> bool:
+    """Verify Passlib's historical adapted-base64 format without the retired package."""
+    try:
+        _, scheme, rounds, salt, expected = encoded.split("$")
+        iterations = int(rounds)
+        if scheme != "pbkdf2-sha256" or not 1 <= iterations <= 10_000_000:
+            return False
+
+        def decode(value: str) -> bytes:
+            return base64.b64decode(
+                value.replace(".", "+") + "=" * (-len(value) % 4), validate=True
+            )
+
+        expected_digest = decode(expected)
+        if len(expected_digest) != 32:
+            return False
+        actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), decode(salt), iterations)
+        return hmac.compare_digest(actual, expected_digest)
+    except (ValueError, TypeError, UnicodeError):
+        return False
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     if hashed_password.startswith("$pbkdf2-sha256$"):
+        return _verify_legacy_pbkdf2(plain_password, hashed_password)
+    if hashed_password.startswith("$argon2"):
         try:
-            return pbkdf2_sha256.verify(plain_password, hashed_password)
-        except (ValueError, TypeError):
+            return _password_hasher.verify(hashed_password, plain_password)
+        except (VerificationError, InvalidHashError, ValueError, TypeError):
             return False
-
     try:
         return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
     except (ValueError, TypeError):

@@ -2,19 +2,17 @@
 # FastAPI 0.137 introduced included-router wrappers that are not yet compatible
 # with our route inventory and OpenTelemetry FastAPI instrumentation.
 fastapi==0.135.3
-uvicorn[standard]==0.27.0
+uvicorn[standard]==0.53.0
 starlette>=0.49.1
-pydantic==2.10.6
-pydantic-settings==2.10.1
+pydantic==2.13.5
+pydantic-settings==2.15.0
 
 # Database
-sqlalchemy==2.0.25
-asyncpg==0.29.0
-# Keep universal hashed locks complete for asyncpg 0.29 on Python 3.10/3.11.
-async-timeout==5.0.1
+sqlalchemy==2.0.54
+asyncpg==0.31.0
 psycopg[binary]>=3.2.13
-greenlet==3.0.3
-alembic==1.13.1
+greenlet==3.5.6
+alembic==1.20.0
 # Infrastructure
 python-digitalocean==1.17.0
 boto3>=1.43.20,<2
@@ -22,7 +20,8 @@ botocore>=1.43.20,<2
 redis==7.4.1
 # Security
 python-jose[cryptography]==3.5.0
-passlib==1.7.4
+cryptography>=50.0.0
+argon2-cffi==25.1.0
 Authlib==1.6.12
 python-multipart==0.0.31
 email-validator==2.3.0
@@ -52,7 +51,7 @@ python-dateutil==2.8.2
 croniter>=2.0.0
 aiofiles==23.2.1
 tenacity==8.2.3
-psutil==5.9.8
+psutil==7.2.2
 aiosqlite==0.20.0
 bcrypt>=4.0.0
 pillow>=11.1.0
@@ -68,8 +67,7 @@ opentelemetry-api>=1.25.0
 opentelemetry-sdk>=1.25.0
 opentelemetry-exporter-otlp-proto-grpc>=1.25.0
 opentelemetry-exporter-otlp-proto-http>=1.25.0
-opentelemetry-exporter-jaeger-thrift
-opentelemetry-exporter-zipkin-proto-http
+opentelemetry-exporter-zipkin-json>=1.44.0
 opentelemetry-exporter-prometheus
 opentelemetry-instrumentation-fastapi
 opentelemetry-instrumentation-httpx
