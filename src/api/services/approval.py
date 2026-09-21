@@ -39,6 +39,10 @@ class ApprovalRequest(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     resolved_at: datetime | None = None
     comment: str | None = None
+    expires_at: datetime | None = None
+    escalates_at: datetime | None = None
+    escalated_at: datetime | None = None
+    consumed_at: datetime | None = None
 
     model_config = {"use_enum_values": True}
 

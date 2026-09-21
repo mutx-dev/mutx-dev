@@ -34,6 +34,7 @@ authorization boundary.
 | `GET` | `/v1/approvals/{request_id}` | Read one visible approval |
 | `POST` | `/v1/approvals/{request_id}/approve` | Approve by request ID |
 | `POST` | `/v1/approvals/{request_id}/reject` | Reject by request ID |
+| `GET` | `/v1/approvals/{request_id}/events` | Read transactional lifecycle evidence |
 
 ## Legacy security compatibility
 
@@ -51,11 +52,39 @@ No approval secret or one-time bearer token is returned or accepted. The
 ordinary authenticated principal plus persisted assignment/role checks govern
 resolution.
 
-## Governed runtime DEFER
+## Deadlines, escalation, and audit
 
-The in-process governed tool runtime does not yet have a durable serialized
-continuation that can safely resume an arbitrary handler. A `DEFER` decision
-therefore fails closed before the handler runs and returns `resumable: false`;
-it does not create a ghost approval. Applications that need a resumable flow
-must create a canonical approval and bind its resolution to their own durable,
-idempotent job continuation.
+Requests expire after one hour by default. The migration derives deadlines for
+existing rows from their original creation time. Creation accepts `timeout_seconds`
+(60–86400) and optional `escalation_seconds` (default 900). An escalation deadline
+at or beyond expiry is disabled. Once due, pending requests move from the assigned
+reviewer to the administrator queue; owners still cannot approve their own requests.
+Deadline transitions are persisted on reads, decisions, and execution attempts.
+They require no scheduled GitHub workflow. Expired approvals cannot authorize work.
+
+`GET /v1/approvals/{request_id}/events` returns creation, escalation, resolution,
+expiry, and consumption evidence under the approval's existing visibility rules.
+Each event commits in the same database transaction as the state change.
+
+## Governed runtime approval enforcement
+
+`POST /v1/policies/evaluate-and-request-approval` evaluates the caller's policies
+and creates an action-bound canonical approval when needed. Plain `/evaluate`
+remains side-effect-free. Policy context secrets are redacted before persistence.
+
+Managed `ToolExecutionHandler.execute_tool` calls with a trusted `user_id` evaluate
+that owner's durable policies before invoking the handler. A tenant `block` always
+halts; tenant `require_approval` or runtime `DEFER` creates a canonical approval and
+returns its ID without executing. Callers must pass the same owner, agent, run,
+session, tool, and arguments plus `approval_id` to resume after reviewer approval.
+Policy versions are re-evaluated, and approval consumption uses a conditional
+UPDATE so only one worker can execute. Changed arguments, expired/rejected requests,
+and reused approvals fail closed. Runtime receipts and audit events carry the
+approval ID through authorization and execution.
+
+Consumption provides **at-most-once authorization**, not guaranteed execution: if a
+worker crashes or authorization-evidence persistence fails after claiming approval,
+that approval stays consumed. An operator must investigate and explicitly request
+a new action rather than retry a potentially executed side effect. Arbitrary handlers
+are not serialized; the caller owns continuation storage. Ownerless `DEFER` calls
+remain blocked with `resumable: false`.

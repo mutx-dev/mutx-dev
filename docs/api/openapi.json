@@ -12668,7 +12668,7 @@
           "policies"
         ],
         "summary": "Evaluate Policies And Request Approval",
-        "description": "Evaluate tenant policies and persist an idempotent, linked approval.\n\nRepeated evaluations of the same action return its existing approval,\nincluding a terminal decision; use a new run/session identity for a new action.",
+        "description": "Evaluate tenant policies and create a durable action-bound approval.",
         "operationId": "evaluate_policies_and_request_approval_v1_policies_evaluate_and_request_approval_post",
         "requestBody": {
           "required": true,
@@ -13269,6 +13269,61 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApprovalRequest"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/approvals/{request_id}/events": {
+      "get": {
+        "tags": [
+          "approvals"
+        ],
+        "summary": "Approval Events",
+        "description": "Read canonical audit evidence under the same ownership boundary as the approval.",
+        "operationId": "approval_events_v1_approvals__request_id__events_get",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApprovalAuditResponse"
+                  },
+                  "title": "Response Approval Events V1 Approvals  Request Id  Events Get"
                 }
               }
             }
@@ -15466,6 +15521,49 @@
         "title": "ApprovalActionResponse",
         "description": "Response for approve/deny actions."
       },
+      "ApprovalAuditResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Id"
+          },
+          "details": {
+            "type": "object",
+            "title": "Details"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "event_type",
+          "actor_id",
+          "details",
+          "created_at"
+        ],
+        "title": "ApprovalAuditResponse"
+      },
       "ApprovalCreate": {
         "properties": {
           "agent_id": {
@@ -15495,6 +15593,27 @@
               }
             ],
             "title": "Reviewer Id"
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "maximum": 86400.0,
+            "minimum": 60.0,
+            "title": "Timeout Seconds",
+            "default": 3600
+          },
+          "escalation_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 86399.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalation Seconds",
+            "default": 900
           }
         },
         "type": "object",
@@ -15649,6 +15768,54 @@
               }
             ],
             "title": "Comment"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "escalates_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalates At"
+          },
+          "escalated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Escalated At"
+          },
+          "consumed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consumed At"
           }
         },
         "type": "object",

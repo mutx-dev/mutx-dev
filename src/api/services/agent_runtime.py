@@ -72,9 +72,10 @@ class RuntimeState:
 
 
 class ToolExecutionHandler:
-    def __init__(self, governance: GovernanceRuntime):
+    def __init__(self, governance: GovernanceRuntime, session_factory=None):
         self._handlers: Dict[str, Callable] = {}
         self._governance = governance
+        self._session_factory = session_factory
 
     def register_handler(self, tool_name: str, handler: Callable):
         if tool_name in self._governance.SAFE_BUILTIN_TOOLS:
@@ -106,6 +107,7 @@ class ToolExecutionHandler:
         actor_id: str | None = None,
         actor_display: str | None = None,
         handler_override: Callable | None = None,
+        approval_id: str | None = None,
     ) -> Any:
         resolved_run_id = run_id or str(uuid.uuid4())
         resolved_session_id = session_id or resolved_run_id
@@ -134,6 +136,99 @@ class ToolExecutionHandler:
                 "receipt_id": receipt.receipt_id,
                 "integrity_hash": audit_event.integrity_hash,
             }
+
+        modification_envelope = evaluation.decision.modifications or {}
+        effective_parameters = modification_envelope.get("modified_args", parameters)
+
+        if user_id:
+            # user_id is the trusted execution owner, never model-supplied tool arguments.
+            from sqlalchemy import select
+            from src.api import database
+            from src.api.models import Agent, User
+            from src.api.services.policy_store import PolicyEvaluationContext
+            from src.api.services.policy_approval import evaluate_with_approval, consume_approval
+            from src.security import PolicyDecision
+
+            try:
+                factory = self._session_factory or database.async_session_maker
+                async with factory() as db:
+                    owner = await db.get(User, uuid.UUID(user_id))
+                    if owner is None or not owner.is_active:
+                        return {"error": "Tool owner is unavailable", "resumable": False}
+                    try:
+                        persisted_agent_id = uuid.UUID(agent_id)
+                    except ValueError:
+                        persisted_agent_id = None
+                    if persisted_agent_id is not None:
+                        registered_owner = (
+                            await db.execute(
+                                select(Agent.user_id).where(Agent.id == persisted_agent_id)
+                            )
+                        ).scalar_one_or_none()
+                        if registered_owner is not None and registered_owner != owner.id:
+                            return {
+                                "error": "Tool agent does not belong to execution owner",
+                                "resumable": False,
+                            }
+                    policy_context = PolicyEvaluationContext(
+                        tool=tool_name,
+                        tool_args=effective_parameters,
+                        agent_id=agent_id,
+                        session_id=resolved_session_id,
+                        run_id=resolved_run_id,
+                    )
+                    runtime_policy = None
+                    if evaluation.decision.is_deferred:
+                        runtime_policy = {
+                            "refs": evaluation.policy_refs,
+                            "rule_id": evaluation.decision.rule_id,
+                            "reason": evaluation.decision.reason,
+                        }
+                    linked = await evaluate_with_approval(
+                        db, owner, policy_context, runtime_policy=runtime_policy
+                    )
+                    if linked.decision == "block":
+                        evaluation.decision.decision = PolicyDecision.DENY
+                        evaluation.decision.reason = linked.reason
+                        await self._governance.record_outcome(evaluation, outcome="blocked")
+                        return {
+                            "error": "Tool execution denied by tenant policy",
+                            "decision": "block",
+                        }
+                    if linked.approval_request is not None:
+                        evaluation.approval_id = str(linked.approval_request.id)
+                        evaluation.policy_refs += [match.policy_id for match in linked.matches]
+                        claimed = approval_id is not None and await consume_approval(
+                            db,
+                            user=owner,
+                            approval_id=uuid.UUID(approval_id),
+                            dedupe_key=linked.approval_dedupe_key,
+                        )
+                        if not claimed:
+                            evaluation.decision.decision = PolicyDecision.DEFER
+                            await self._governance.record_outcome(
+                                evaluation, outcome="awaiting_approval"
+                            )
+                            return {
+                                "error": "Tool execution requires an unconsumed approved action",
+                                "decision": "require_approval",
+                                "approval_id": evaluation.approval_id,
+                                "approval_status": linked.approval_request.status,
+                                "resumable": (
+                                    linked.approval_request.status in {"PENDING", "APPROVED"}
+                                    and linked.approval_request.consumed_at is None
+                                ),
+                            }
+                        evaluation.decision.decision = PolicyDecision.ALLOW
+                        evaluation.decision.reason = "Approved exact action consumed for execution"
+                    elif approval_id is not None:
+                        return {
+                            "error": "Approval no longer matches current policy",
+                            "resumable": False,
+                        }
+            except Exception:
+                logger.exception("Tool approval authorization failed closed: %s", tool_name)
+                return {"error": "Durable approval authorization unavailable", "resumable": False}
 
         if evaluation.decision.is_deferred:
             receipt, audit_event = await self._governance.record_outcome(
@@ -185,8 +280,6 @@ class ToolExecutionHandler:
                 "reason": evaluation.decision.reason,
             }
 
-        modification_envelope = evaluation.decision.modifications or {}
-        effective_parameters = modification_envelope.get("modified_args", parameters)
         try:
             if asyncio.iscoroutinefunction(handler):
                 result = await handler(effective_parameters)
@@ -240,7 +333,7 @@ class AgentRuntime:
         self.tool_handler = ToolExecutionHandler(self.governance)
         self._execution_callbacks: Dict[str, Callable] = {}
         self._running_tasks: Dict[str, asyncio.Task] = {}
-        self._execution_scope: ContextVar[tuple[str, str] | None] = ContextVar(
+        self._execution_scope: ContextVar[tuple[str, str, str] | None] = ContextVar(
             f"mutx_runtime_execution_{self.runtime_id}", default=None
         )
         self._event_loop: asyncio.AbstractEventLoop | None = None
@@ -368,7 +461,7 @@ class AgentRuntime:
     ) -> Any:
         """Bridge synchronous LangChain tools through async governance enforcement."""
         scope = self._execution_scope.get()
-        run_id, session_id = scope or (str(uuid.uuid4()), str(uuid.uuid4()))
+        run_id, session_id, user_id = scope or (str(uuid.uuid4()), str(uuid.uuid4()), "")
 
         async def execute() -> Any:
             return await self.tool_handler.execute_tool(
@@ -377,6 +470,7 @@ class AgentRuntime:
                 agent_id=agent_id,
                 session_id=session_id,
                 run_id=run_id,
+                user_id=user_id,
                 handler_override=handler,
             )
 
@@ -402,6 +496,8 @@ class AgentRuntime:
         agent_id: str,
         input_text: str,
         timeout: Optional[int] = None,
+        *,
+        user_id: str = "",
     ) -> ExecutionContext:
         self._bind_event_loop()
         execution_id = str(uuid.uuid4())
@@ -420,7 +516,7 @@ class AgentRuntime:
             return context
 
         timeout = timeout or self.config.default_timeout
-        scope_token = self._execution_scope.set((execution_id, execution_id))
+        scope_token = self._execution_scope.set((execution_id, execution_id, user_id))
 
         try:
             result = await asyncio.wait_for(
@@ -463,6 +559,8 @@ class AgentRuntime:
         self,
         agent_id: str,
         input_text: str,
+        *,
+        user_id: str = "",
     ) -> AsyncIterator[str]:
         self._bind_event_loop()
         agent = AgentRegistry.get_agent(agent_id)
@@ -471,7 +569,7 @@ class AgentRuntime:
             return
 
         execution_id = str(uuid.uuid4())
-        scope_token = self._execution_scope.set((execution_id, execution_id))
+        scope_token = self._execution_scope.set((execution_id, execution_id, user_id))
         try:
             stream = iter(agent.stream_run(input_text))
 
@@ -495,13 +593,15 @@ class AgentRuntime:
         finally:
             self._execution_scope.reset(scope_token)
 
-    def execute_agent_sync(self, agent_id: str, input_text: str) -> Dict[str, Any]:
+    def execute_agent_sync(
+        self, agent_id: str, input_text: str, *, user_id: str = ""
+    ) -> Dict[str, Any]:
         agent = AgentRegistry.get_agent(agent_id)
         if not agent:
             return {"success": False, "error": f"Agent {agent_id} not found"}
 
         execution_id = str(uuid.uuid4())
-        scope_token = self._execution_scope.set((execution_id, execution_id))
+        scope_token = self._execution_scope.set((execution_id, execution_id, user_id))
         try:
             return agent.run(input_text)
         finally:

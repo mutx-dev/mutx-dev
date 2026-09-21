@@ -2,6 +2,9 @@
 
 import logging
 import uuid
+from datetime import datetime
+from sqlalchemy import select
+from src.api.models.approval import ApprovalAuditEvent
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
@@ -56,6 +59,8 @@ class ApprovalCreate(BaseModel):
     action_type: str
     payload: dict = Field(default_factory=dict)
     reviewer_id: uuid.UUID | None = None
+    timeout_seconds: int = Field(default=3600, ge=60, le=86400)
+    escalation_seconds: int | None = Field(default=900, ge=1, le=86399)
 
 
 class ApprovalResolve(BaseModel):
@@ -125,6 +130,8 @@ async def create_approval(
             reviewer_id=body.reviewer_id,
             idempotency_key=idempotency_key,
             webhook_url=webhook_url,
+            timeout_seconds=body.timeout_seconds,
+            escalation_seconds=body.escalation_seconds,
         )
     except ApprovalIdempotencyConflictError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
@@ -289,4 +296,38 @@ async def reject_request(
         db=db,
         user=user,
         target_status=ApprovalStatus.REJECTED,
+    )
+
+
+class ApprovalAuditResponse(BaseModel):
+    id: uuid.UUID
+    event_type: str
+    actor_id: uuid.UUID | None
+    details: dict
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+@router.get("/{request_id}/events", response_model=list[ApprovalAuditResponse])
+async def approval_events(
+    request_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_roles("VIEWER", "DEVELOPER")),
+):
+    """Read canonical audit evidence under the same ownership boundary as the approval."""
+    try:
+        record = await get_visible_approval(db, request_id=_request_uuid(request_id), user=user)
+    except ApprovalNotFoundError as exc:
+        raise _not_found() from exc
+    return list(
+        (
+            await db.execute(
+                select(ApprovalAuditEvent)
+                .where(ApprovalAuditEvent.approval_id == record.id)
+                .order_by(ApprovalAuditEvent.created_at, ApprovalAuditEvent.id)
+            )
+        )
+        .scalars()
+        .all()
     )

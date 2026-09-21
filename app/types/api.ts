@@ -3747,10 +3747,7 @@ export interface paths {
         put?: never;
         /**
          * Evaluate Policies And Request Approval
-         * @description Evaluate tenant policies and persist an idempotent, linked approval.
-         *
-         *     Repeated evaluations of the same action return its existing approval,
-         *     including a terminal decision; use a new run/session identity for a new action.
+         * @description Evaluate tenant policies and create a durable action-bound approval.
          */
         post: operations["evaluate_policies_and_request_approval_v1_policies_evaluate_and_request_approval_post"];
         delete?: never;
@@ -3909,6 +3906,26 @@ export interface paths {
          * @description Reject a pending request as a non-owner ADMIN or assigned DEVELOPER.
          */
         post: operations["reject_request_v1_approvals__request_id__reject_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{request_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Approval Events
+         * @description Read canonical audit evidence under the same ownership boundary as the approval.
+         */
+        get: operations["approval_events_v1_approvals__request_id__events_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4872,6 +4889,25 @@ export interface components {
             /** Request Id */
             request_id: string;
         };
+        /** ApprovalAuditResponse */
+        ApprovalAuditResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Event Type */
+            event_type: string;
+            /** Actor Id */
+            actor_id: string | null;
+            /** Details */
+            details: Record<string, never>;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /**
          * ApprovalCreate
          * @description Payload for creating a new approval request.
@@ -4887,6 +4923,16 @@ export interface components {
             payload?: Record<string, never>;
             /** Reviewer Id */
             reviewer_id?: string | null;
+            /**
+             * Timeout Seconds
+             * @default 3600
+             */
+            timeout_seconds: number;
+            /**
+             * Escalation Seconds
+             * @default 900
+             */
+            escalation_seconds: number | null;
         };
         /**
          * ApprovalListResponse
@@ -4948,6 +4994,14 @@ export interface components {
             resolved_at?: string | null;
             /** Comment */
             comment?: string | null;
+            /** Expires At */
+            expires_at?: string | null;
+            /** Escalates At */
+            escalates_at?: string | null;
+            /** Escalated At */
+            escalated_at?: string | null;
+            /** Consumed At */
+            consumed_at?: string | null;
         };
         /**
          * ApprovalRequestCreate
@@ -18357,6 +18411,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approval_events_v1_approvals__request_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalAuditResponse"][];
                 };
             };
             /** @description Validation Error */

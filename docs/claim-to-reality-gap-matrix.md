@@ -73,8 +73,8 @@
 
 **Audit Date:** 2026-07-28
 **Total top-level `/v1` families:** 33
-**Total OpenAPI paths:** 201
-**Total endpoint-method pairs:** 249
+**Total OpenAPI paths:** 202
+**Total endpoint-method pairs:** 250
 
 Security counts below are generated operation contracts. They do not replace the
 persisted-role, ownership, plan, or internal-user checks declared in route source.
@@ -84,7 +84,7 @@ persisted-role, ownership, plan, or internal-user checks declared in route sourc
 | `/v1/agents` | DELETE, GET, PATCH, POST | 21 required |
 | `/v1/analytics` | GET | 8 required |
 | `/v1/api-keys` | DELETE, GET, POST | 5 required |
-| `/v1/approvals` | GET, POST | 5 required |
+| `/v1/approvals` | GET, POST | 7 required |
 | `/v1/assistant` | DELETE, GET, POST | 8 required |
 | `/v1/audit` | GET | 3 required |
 | `/v1/auth` | GET, POST | 1 required / 1 optional / 12 public |
@@ -251,7 +251,7 @@ workstation layout:
 | Top-level `/v1` families | 33 |
 | OpenAPI paths | 198 |
 | OpenAPI operations | 246 |
-| Required-auth operations | 226 |
+| Required-auth operations | 227 |
 | Optional-auth operations | 2 |
 | Public operations | 21 |
 
