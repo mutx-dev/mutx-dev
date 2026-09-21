@@ -2,6 +2,8 @@
 
 Last verified: 2026-07-22
 
+Faramesh Core and FPL were independently reverified on 2026-07-22.
+
 This report separates three facts that older revisions conflated:
 
 1. the current upstream release or head;
@@ -17,8 +19,8 @@ Immutable license and source evidence is maintained in
 | --- | --- | --- | --- | --- |
 | agent-run | No release tags; main `9c7c3fa68413de878fae2d605c90fb334a0201f6` | MIT, Copyright (c) 2026 Builderz Labs | Local schemas are adapted; upstream package is not a runtime dependency | **QUARANTINE** current upstream package; do not import, vendor, execute, or update pending maintainer review |
 | AARM docs | Main `8eff208b98786b2c9a578b26cb7eaca440ec4020` | MIT, Copyright (c) 2023 Mintlify | MUTX’s old R1–R9 numbering drifted from the current model | Use the current mapping; close technical and organizational gaps before any conformance claim |
-| Faramesh Core | Main `e230a9ac2d12d80ed6f632db42b6e1983ccbce82`; pinned published release `v0.2.0` / `ae3ebc9066d65e4e930164881c2f2ce2be554c7f`; historical semver tag `v1.2.9` / `c85237e4e6b13745169291f60b9c6b985285dbaa` | Main: Apache-2.0; `v0.2.0` and `v1.2.9`: MPL-2.0 | CLI and gateway fetch an immutable installer and request `v0.2.0` explicitly | Run the pinned compatibility lane before changing either installer ref or release |
-| FPL | Main `b7aa0b7ad56f60428d692278a435c5e6640cec2b` | Apache-2.0 | MUTX ships FPL policy files and CLI integration | Validate parser/daemon compatibility; retain Apache-2.0 text and any future `NOTICE` |
+| Faramesh Core | Main `01476cfb8bcbce83c199df3497af746a46318f8f`; latest published release and installer `v0.2.0` / `ae3ebc9066d65e4e930164881c2f2ce2be554c7f`; latest semver tag `v1.2.9` / `c85237e4e6b13745169291f60b9c6b985285dbaa` | Main: Apache-2.0; `v0.2.0` and `v1.2.9`: MPL-2.0 | Pinned binary, installer, socket protocol, CLI, and generated-launcher contracts are regression-tested | Keep `v0.2.0` pinned until a newer published release exists; migrate legacy `serve --policy` startup to `governance.fms` / `apply` separately |
+| FPL | Main `c78b5a44215aa810cb86c46fbefa032a8aa10364`; no releases or tags | Apache-2.0 | All four shipped policies load with Core `v0.2.0`; grammar hash is unchanged from the prior audit | Retain Apache-2.0 text and carry any future `NOTICE` |
 | Mission Control | `v2.2.0` / `0552b00b3b743ed12949e6deb19597655b02bbcc` | MIT, Copyright (c) 2026 Builderz Labs | Historical dashboard provenance remains pinned; v2.2.0's dispatch-boundary contract is adapted and tested locally | Keep `v2.1.0` as the behavioral comparison baseline and review future releases against the enforced runner boundary |
 | Orchestra Research AI-Research-SKILLs | `v1.7.2` / `773a52944ba4747a18bd4ae9ade53fff041adcbc` | MIT, Copyright (c) 2025 Claude AI Research Skills Contributors | Catalog and runtime sync are pinned to v1.7.2; all 98 skills and curated references validate | Regenerate with the deterministic builder whenever the release pin moves |
 | predict-rlm | `v0.7.3` / `e7f1e5df7d0188861b39142094b4b738f456972f` | MIT, Copyright (c) 2026 Trampoline AI | Core runtime, templates, and artifact outputs are compatible; workflow provenance remains pinned to `5c7387afa1980b62b21a34ad0261256a95d8caa1` | Keep the `>=0.7.3,<1` floor and compatibility contract green |
@@ -121,6 +123,22 @@ on main does not retroactively relicense an earlier tag. If a future upstream re
 `NOTICE`, that material must be carried into the distribution when applicable.
 “AARM-aligned” is the accurate upstream status for Faramesh and does not prove
 MUTX conformance.
+
+The 2026-07-22 audit found that both upstream repositories changed only their
+root `LICENSE` formatting after MUTX's prior refs. Core's CLI/socket/runtime
+code and FPL's EBNF, specification, AST schema, and examples did not change.
+Neither current tree contains a root `NOTICE` file.
+
+Compatibility was tested against the published `v0.2.0` Darwin ARM64 asset
+(`sha256:6b89acce83e1b7dcbd3079f50c4762dc2657886413e3e3262d23f8d144a9ea24`).
+The published contract uses `faramesh --version`, `status`, `govern`,
+`poll_defer`, `approve_defer`, `agent {op: pending}`, and an apply-generated
+`.faramesh/bin/agent` launcher. It does not expose the former MUTX assumptions
+`faramesh version`, `faramesh run`, `faramesh policy validate`, or the
+`evaluate`, `gate_decide`, `action_submit`, and `policy_reload` socket aliases.
+MUTX now uses the published operations and validates standalone FPL by loading
+it in an isolated daemon. The four bundled policies compile and reach socket
+readiness through the pinned release.
 
 ## Integration migration order
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -7,6 +8,7 @@ import socket
 import subprocess
 import tempfile
 import time
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
@@ -17,13 +19,14 @@ FAREMESH_PROVIDER_ID = "faramesh"
 FAREMESH_DEFAULT_DAEMON_PORT = 7777
 FAREMESH_INSTALL_REF = "ae3ebc9066d65e4e930164881c2f2ce2be554c7f"
 FAREMESH_INSTALL_VERSION = "0.2.0"
+FAREMESH_INSTALL_SCRIPT_SHA256 = "9cce09b37079c6d0e391e9744577f151fc0fa4f71792659d81683a2f92e59f20"
 FAREMESH_INSTALL_URL = (
     f"https://raw.githubusercontent.com/faramesh/faramesh-core/{FAREMESH_INSTALL_REF}/install.sh"
 )
 
 
 def _default_faramesh_socket_path() -> str:
-    configured_path = os.environ.get("FAREMESH_SOCKET_PATH")
+    configured_path = os.environ.get("FAREMESH_SOCKET") or os.environ.get("FAREMESH_SOCKET_PATH")
     if configured_path:
         return configured_path
 
@@ -132,18 +135,37 @@ class FarameshSnapshot:
     observed_at: str | None = None
     payload: dict | None = None
 
+    def to_payload(self) -> dict:
+        """Return the stable JSON shape consumed by CLI and desktop surfaces."""
+        return {
+            "provider": self.provider,
+            "status": self.status,
+            "version": self.version,
+            "decisions_total": self.decisions_total,
+            "permits_today": self.permits_today,
+            "denies_today": self.denies_today,
+            "defers_today": self.defers_today,
+            "pending_approvals": self.pending_approvals,
+            "last_decision_at": self.last_decision_at,
+            "observed_at": self.observed_at,
+            "payload": self.payload or {},
+        }
+
 
 def is_socket_reachable(socket_path: str = FAREMESH_SOCKET_PATH, timeout: float = 0.5) -> bool:
+    sock: socket.socket | None = None
     try:
         if not os.path.exists(socket_path):
             return False
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.settimeout(timeout)
         sock.connect(socket_path)
-        sock.close()
         return True
     except (OSError, socket.error, socket.timeout):
         return False
+    finally:
+        if sock is not None:
+            sock.close()
 
 
 def _send_socket_request(
@@ -242,21 +264,25 @@ def _send_socket_request(
 
 
 def get_daemon_status(socket_path: str = FAREMESH_SOCKET_PATH, timeout: float = 1.0) -> dict:
-    result = _send_socket_request(socket_path, {"type": "audit_subscribe"}, timeout=timeout)
-    subscribed = len(result) > 0 and any(r.get("subscribed") for r in result)
-    return {"reachable": bool(result), "subscribed": subscribed}
+    result = _send_socket_request(socket_path, {"type": "status"}, timeout=timeout)
+    for response in result:
+        if not isinstance(response, dict) or response.get("error"):
+            continue
+        if "running" in response:
+            return {"reachable": True, **response}
+    return {"reachable": False}
 
 
 def get_recent_decisions(
     socket_path: str = FAREMESH_SOCKET_PATH, limit: int = 50, timeout: float = 1.0
 ) -> list[FarameshDecision]:
-    result = _send_socket_request(
-        socket_path,
-        {"type": "decisions_recent", "limit": limit},
-        timeout=timeout,
-    )
+    # v0.2.0 has no historical ``decisions_recent`` socket operation. Its
+    # supported contract is a bounded read from the live audit subscription.
+    result = _send_socket_request(socket_path, {"type": "audit_subscribe"}, timeout=timeout)
     decisions = []
     for item in result:
+        if not isinstance(item, dict) or not item.get("effect"):
+            continue
         decisions.append(
             FarameshDecision(
                 effect=item.get("effect"),
@@ -269,18 +295,36 @@ def get_recent_decisions(
                 timestamp=item.get("timestamp"),
             )
         )
+        if limit > 0 and len(decisions) >= limit:
+            break
     return decisions
 
 
 def get_pending_defers(
     socket_path: str = FAREMESH_SOCKET_PATH, timeout: float = 1.0
 ) -> list[FarameshDeferItem]:
-    result = _send_socket_request(socket_path, {"type": "defers_pending"}, timeout=timeout)
+    result = _send_socket_request(
+        socket_path,
+        {"type": "agent", "op": "pending"},
+        timeout=timeout,
+    )
+    items: list[dict] = []
+    for response in result:
+        if not isinstance(response, dict):
+            continue
+        response_items = response.get("items")
+        if isinstance(response_items, list):
+            items.extend(item for item in response_items if isinstance(item, dict))
+        elif response.get("defer_token"):
+            items.append(response)
+
     defers = []
-    for item in result:
+    for item in items:
         defers.append(
             FarameshDeferItem(
-                defer_token=item.get("defer_token"),
+                defer_token=(
+                    item.get("defer_token") or item.get("approval_id") or item.get("token")
+                ),
                 agent_id=item.get("agent_id"),
                 tool_id=item.get("tool_id"),
                 status=item.get("status"),
@@ -306,7 +350,7 @@ def detect_faramesh_version() -> str | None:
         return None
     try:
         result = subprocess.run(
-            [bin_path, "version"],
+            [bin_path, "--version"],
             capture_output=True,
             text=True,
             timeout=5,
@@ -349,6 +393,13 @@ def ensure_faramesh_installed(
                 check=True,
                 timeout=30,
             )
+            installer_digest = hashlib.sha256(install_script_path.read_bytes()).hexdigest()
+            if installer_digest != FAREMESH_INSTALL_SCRIPT_SHA256:
+                return (
+                    False,
+                    "Faramesh installer integrity check failed: "
+                    f"expected {FAREMESH_INSTALL_SCRIPT_SHA256}, got {installer_digest}",
+                )
             subprocess.run(
                 ["chmod", "+x", str(install_script_path)],
                 check=True,
@@ -470,6 +521,9 @@ def get_faramesh_health() -> FarameshDaemonHealth:
     if health.socket_reachable:
         status = get_daemon_status()
         health.daemon_reachable = status.get("reachable", False)
+        health.policy_loaded = bool(status.get("policy_loaded", False))
+        health.policy_name = status.get("policy_version")
+        health.uptime_seconds = float(status.get("uptime_seconds", 0.0) or 0.0)
 
         if health.daemon_reachable:
             health.doctor_summary = "Faramesh governance daemon is running and reachable."
@@ -560,73 +614,143 @@ def get_default_policy_path() -> str | None:
 def approve_defer(socket_path: str, token: str) -> bool:
     """Approve a deferred governance decision."""
     result = _send_socket_request(
-        socket_path, {"type": "agent_approve", "token": token}, timeout=5.0
+        socket_path,
+        {
+            "type": "approve_defer",
+            "defer_token": token,
+            "approved": True,
+            "reason": "approved via MUTX",
+        },
+        timeout=5.0,
     )
     if not result:
         return False
     for r in result:
-        if isinstance(r, dict) and r.get("approved"):
+        if isinstance(r, dict) and r.get("ok") is True:
             return True
     return False
 
 
 def deny_defer(socket_path: str, token: str) -> bool:
     """Deny a deferred governance decision."""
-    result = _send_socket_request(socket_path, {"type": "agent_deny", "token": token}, timeout=5.0)
-    if not result:
-        return False
-    for r in result:
-        if isinstance(r, dict) and r.get("denied"):
-            return True
-    return False
-
-
-def kill_agent(socket_path: str, agent_id: str) -> bool:
-    """Emergency kill an agent."""
     result = _send_socket_request(
-        socket_path, {"type": "agent_kill", "agent_id": agent_id}, timeout=5.0
+        socket_path,
+        {
+            "type": "approve_defer",
+            "defer_token": token,
+            "approved": False,
+            "reason": "denied via MUTX",
+        },
+        timeout=5.0,
     )
     if not result:
         return False
     for r in result:
-        if isinstance(r, dict) and r.get("killed"):
+        if isinstance(r, dict) and r.get("ok") is True:
+            return True
+    return False
+
+
+def kill_agent(socket_path: str, agent_id: str, admin_token: str | None = None) -> bool:
+    """Emergency kill an agent."""
+    resolved_token = (
+        admin_token
+        or os.environ.get("FAREMESH_STANDING_ADMIN_TOKEN")
+        or os.environ.get("FAREMESH_POLICY_ADMIN_TOKEN")
+        or os.environ.get("FARAMESH_STANDING_ADMIN_TOKEN")
+        or os.environ.get("FARAMESH_POLICY_ADMIN_TOKEN")
+        or ""
+    )
+    result = _send_socket_request(
+        socket_path,
+        {"type": "kill", "agent_id": agent_id, "admin_token": resolved_token},
+        timeout=5.0,
+    )
+    if not result:
+        return False
+    for r in result:
+        if isinstance(r, dict) and r.get("ok") is True:
             return True
     return False
 
 
 def validate_policy(socket_path: str, policy_path: str) -> dict:
-    """Validate an FPL policy file."""
+    """Validate FPL by loading it with the pinned release's supported daemon CLI."""
+    del socket_path  # Validation uses an isolated socket and data directory.
     bin_path = find_faramesh_bin()
     if not bin_path:
         return {"valid": False, "error": "faramesh not installed"}
 
     try:
-        proc = subprocess.run(
-            [bin_path, "policy", "validate", policy_path],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        if proc.returncode == 0:
-            return {"valid": True, "output": proc.stdout.strip()}
-        else:
-            return {"valid": False, "error": proc.stderr.strip() or proc.stdout.strip()}
-    except subprocess.TimeoutExpired:
-        return {"valid": False, "error": "validation timed out"}
-    except Exception as e:
-        return {"valid": False, "error": str(e)}
+        # Darwin limits Unix-domain socket paths to roughly 104 bytes. Keep the
+        # isolated validation socket rooted at the short, portable /tmp path.
+        with tempfile.TemporaryDirectory(prefix="mfx-val-", dir="/tmp") as temp_dir:
+            validation_socket = Path(temp_dir) / "faramesh.sock"
+            validation_data = Path(temp_dir) / "data"
+            process = subprocess.Popen(
+                [
+                    bin_path,
+                    "serve",
+                    "--policy",
+                    str(Path(policy_path).expanduser().resolve()),
+                    "--socket",
+                    str(validation_socket),
+                    "--data-dir",
+                    str(validation_data),
+                    "--log-level",
+                    "error",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                deadline = time.monotonic() + 5.0
+                while time.monotonic() < deadline:
+                    if validation_socket.exists():
+                        return {"valid": True, "output": "policy loaded by Faramesh v0.2.0"}
+                    if process.poll() is not None:
+                        stdout, stderr = process.communicate()
+                        return {
+                            "valid": False,
+                            "error": (stderr.strip() or stdout.strip() or "policy load failed"),
+                        }
+                    time.sleep(0.05)
+                return {"valid": False, "error": "validation timed out before socket readiness"}
+            finally:
+                if process.poll() is None:
+                    process.terminate()
+                    try:
+                        process.wait(timeout=2)
+                    except subprocess.TimeoutExpired:
+                        process.kill()
+                        process.wait(timeout=2)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {"valid": False, "error": str(exc)}
 
 
 def reload_policy(socket_path: str, policy_path: str | None = None) -> bool:
-    """Hot-reload the running policy."""
-    request = {"type": "policy_reload"}
-    if policy_path:
-        request["policy_path"] = policy_path
-    result = _send_socket_request(socket_path, request, timeout=5.0)
-    for r in result:
-        if isinstance(r, dict) and r.get("reloaded"):
-            return True
-    return False
+    """Reload an applied governance stack through the supported ``apply`` CLI."""
+    del socket_path  # v0.2.0 exposes no policy_reload socket operation.
+    bin_path = find_faramesh_bin()
+    if not bin_path:
+        return False
+
+    candidate = Path(policy_path).expanduser().resolve() if policy_path else Path.cwd()
+    stack_dir = candidate if candidate.is_dir() else candidate.parent
+    if not (stack_dir / "governance.fms").is_file():
+        return False
+
+    try:
+        result = subprocess.run(
+            [bin_path, "apply", "--dir", str(stack_dir)],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        return result.returncode == 0
+    except (OSError, subprocess.SubprocessError, subprocess.TimeoutExpired):
+        return False
 
 
 def list_policy_packs() -> list[dict]:
@@ -753,7 +877,7 @@ def _response_context(
     if not isinstance(audit_context, dict):
         audit_context = None
 
-    action_id = response.get("action_id")
+    action_id = response.get("action_id") or response.get("call_id")
     return (
         str(action_id) if action_id is not None else None,
         str(receipt_id) if receipt_id is not None else None,
@@ -948,6 +1072,42 @@ def _action_result_from_decision(
     )
 
 
+def _govern_request(
+    agent_id: str,
+    tool_id: str,
+    params: dict,
+    context: dict | None = None,
+) -> dict:
+    """Build the newline-delimited JSON request supported by Faramesh v0.2.0."""
+    governance_context = context or {}
+    request = {
+        "type": "govern",
+        "call_id": str(governance_context.get("call_id") or uuid.uuid4()),
+        "agent_id": agent_id,
+        "session_id": str(
+            governance_context.get("session_id") or governance_context.get("run_id") or ""
+        ),
+        "tool_id": tool_id,
+        "args": params,
+    }
+    for field in (
+        "action_type",
+        "reasoning_summary",
+        "principal_token",
+        "delegation_token",
+        "execution_timeout_ms",
+        "model",
+        "model_name",
+        "model_fingerprint",
+        "model_provider",
+        "model_version",
+    ):
+        value = governance_context.get(field)
+        if value is not None:
+            request[field] = value
+    return request
+
+
 def gate_decide(
     agent_id: str,
     tool_id: str,
@@ -957,13 +1117,7 @@ def gate_decide(
 ) -> GateDecision:
     """Ask Faramesh for an authoritative decision, failing closed on indeterminate states."""
     try:
-        request = {
-            "type": "gate_decide",
-            "agent_id": agent_id,
-            "tool_id": tool_id,
-            "params": params,
-            "context": context or {},
-        }
+        request = _govern_request(agent_id, tool_id, params, context)
         responses = _send_socket_request(socket_path, request, timeout=2.0, strict=True)
         if not responses:
             return _failure_decision(
@@ -1008,13 +1162,7 @@ def submit_action(
 ) -> ActionResult:
     """Submit an action for governance review without inferring permission from failures."""
     try:
-        request = {
-            "type": "action_submit",
-            "agent_id": agent_id,
-            "tool_id": tool_id,
-            "params": params,
-            "context": context or {},
-        }
+        request = _govern_request(agent_id, tool_id, params, context)
         responses = _send_socket_request(socket_path, request, timeout=5.0, strict=True)
         if not responses:
             return _action_result_from_decision(
@@ -1061,6 +1209,7 @@ def wait_for_decision(
     defer_token: str,
     timeout: float = 300.0,
     socket_path: str = FAREMESH_SOCKET_PATH,
+    agent_id: str = "",
 ) -> ActionResult:
     """Wait for a deferred action without treating disappearance as approval."""
     start = time.time()
@@ -1068,6 +1217,47 @@ def wait_for_decision(
 
     try:
         while time.time() - start < timeout:
+            if agent_id:
+                responses = _send_socket_request(
+                    socket_path,
+                    {"type": "poll_defer", "agent_id": agent_id, "defer_token": defer_token},
+                    timeout=2.0,
+                    strict=True,
+                )
+                if not responses or not isinstance(responses[0], dict):
+                    return _action_result_from_decision(
+                        _failure_decision(
+                            GovernanceDecisionStatus.NO_DECISION,
+                            "deferred decision returned no authoritative result",
+                            "governance_no_decision",
+                        )
+                    )
+                response = responses[0]
+                defer_status = str(response.get("status") or "unknown").lower()
+                if response.get("error"):
+                    return _action_result_from_decision(_parse_gate_response(response))
+                if defer_status in {"approved", "denied", "expired"}:
+                    result = _action_result_from_decision(
+                        _parse_gate_response(
+                            {
+                                **response,
+                                "effect": "PERMIT" if defer_status == "approved" else "DENY",
+                                "defer_token": defer_token,
+                            }
+                        )
+                    )
+                    result.status = defer_status
+                    return result
+                if defer_status not in {"pending", "deferred"}:
+                    return _action_result_from_decision(
+                        _failure_decision(
+                            GovernanceDecisionStatus.MALFORMED,
+                            "unknown deferred decision status",
+                            "governance_unknown_defer_status",
+                        )
+                    )
+                time.sleep(poll_interval)
+                continue
             matching = next(
                 (
                     item
