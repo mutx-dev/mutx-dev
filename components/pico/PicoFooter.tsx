@@ -19,18 +19,18 @@ export function PicoFooter({ className }: { className?: string }) {
     <footer
       data-testid="pico-footer"
       className={cn(
-        'border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg)] px-4 py-8 sm:px-6 lg:px-8',
+        'border-t border-(--pico-border) bg-(--pico-bg) px-4 py-8 sm:px-6 lg:px-8',
         className,
       )}
       style={{ fontFamily: 'var(--font-site-body), sans-serif' }}
     >
-      <div className="mx-auto max-w-[var(--pico-shell,72rem)]">
+      <div className="mx-auto max-w-(--pico-shell,72rem)">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <Link
             href={picoHref(pathname, '/')}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 text-sm text-[color:var(--pico-text-secondary)] no-underline transition hover:text-[color:var(--pico-text)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 text-sm text-(--pico-text-secondary) no-underline transition hover:text-(--pico-text)"
           >
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-[rgba(var(--pico-accent-rgb),0.1)]">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-sm bg-[rgba(var(--pico-accent-rgb),0.1)]">
               <Image src="/pico/logo.png" alt={t('logoAlt')} width={14} height={14} />
             </span>
             PicoMUTX
@@ -38,31 +38,31 @@ export function PicoFooter({ className }: { className?: string }) {
 
           <a
             href={`${SITE}/releases`}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-(--pico-text-muted) no-underline transition hover:text-(--pico-text-secondary)"
           >
             {t('links.releases')}
           </a>
           <a
             href={`${SITE}/docs`}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-(--pico-text-muted) no-underline transition hover:text-(--pico-text-secondary)"
           >
             {t('links.docs')}
           </a>
           <a
             href="https://github.com/mutx-dev/mutx-dev"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-(--pico-text-muted) no-underline transition hover:text-(--pico-text-secondary)"
           >
             {t('links.github')}
           </a>
           <a
             href={`${SITE}/download`}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-(--pico-text-muted) no-underline transition hover:text-(--pico-text-secondary)"
           >
             {t('links.download')}
           </a>
           <a
             href={`${SITE}/privacy-policy`}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-[color:var(--pico-text-muted)] no-underline transition hover:text-[color:var(--pico-text-secondary)]"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm text-(--pico-text-muted) no-underline transition hover:text-(--pico-text-secondary)"
           >
             {t('links.privacy')}
           </a>
@@ -71,7 +71,7 @@ export function PicoFooter({ className }: { className?: string }) {
           </span>
         </div>
 
-        <p className="mt-5 text-xs leading-5 text-[color:var(--pico-text-muted)]">
+        <p className="mt-5 text-xs leading-5 text-(--pico-text-muted)">
           {t('copyright', { year: new Date().getFullYear() })}
         </p>
       </div>

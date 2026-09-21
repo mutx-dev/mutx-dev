@@ -122,7 +122,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
                 {agent.name}
               </h3>
               <div className="mt-1 flex flex-wrap items-center gap-2">
-                <p className="max-w-full truncate font-[family:var(--font-mono)] text-[9px] text-[#8d867a]">
+                <p className="max-w-full truncate font-(--font-mono) text-[9px] text-[#8d867a]">
                   {agent.id}
                 </p>
                 <button
@@ -165,7 +165,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
 
       {agent.config && Object.keys(agent.config).length > 0 && (
         <div className="mt-4 rounded-[4px] border border-[#2b2b26] bg-[#0c0d0b] p-3">
-          <div className="mb-2 flex items-center gap-2 font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.16em] text-[#8d867a]">
+          <div className="mb-2 flex items-center gap-2 font-(--font-mono) text-[8px] uppercase tracking-[0.16em] text-[#8d867a]">
             <span className="text-[#58aaff]" aria-hidden="true">CFG /</span> Configuration
           </div>
           <pre className="overflow-x-auto rounded-[4px] border border-[#34342e] bg-[#090a08] px-3 py-2 text-xs text-[#c8c0b0]">
@@ -178,7 +178,7 @@ function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent:
         <Link
           href={`/dashboard/agents/${encodeURIComponent(agent.id)}`}
           aria-label={`Inspect ${agent.name}`}
-          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#294d6c] bg-[#101c26] px-3 py-2 text-xs text-[#8ac7ff] transition hover:border-[#58aaff] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#58aaff]"
+          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[#294d6c] bg-[#101c26] px-3 py-2 text-xs text-[#8ac7ff] transition hover:border-[#58aaff] hover:text-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#58aaff]"
         >
           <ArrowRight className="h-3 w-3" aria-hidden="true" />
           Inspect
@@ -245,7 +245,7 @@ function CreateAgentModal({ isOpen, onClose, onSuccess }: CreateAgentModalProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const fieldClassName =
-    "w-full rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-4 py-3 text-sm text-[#eee9dc] placeholder:text-[#8d867a] focus:border-[#ff6a32] focus:outline-none";
+    "w-full rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-4 py-3 text-sm text-[#eee9dc] placeholder:text-[#8d867a] focus:border-[#ff6a32] focus:outline-hidden";
 
   if (!isOpen) return null;
 
@@ -686,7 +686,7 @@ export function AgentsPageClient() {
           <div aria-busy={Boolean(deletingId || stoppingId)} className="space-y-4 text-start">
             <div className="rounded-[4px] border border-[#2b2b26] bg-[#0c0d0b] p-3">
               <p className="text-sm font-semibold text-white">{pendingAction?.agent.name}</p>
-              <p dir="ltr" className="mt-1 break-all text-start font-[family:var(--font-mono)] text-xs text-[#8d867a]">
+              <p dir="ltr" className="mt-1 break-all text-start font-(--font-mono) text-xs text-[#8d867a]">
                 {pendingAction?.agent.id}
               </p>
             </div>
@@ -789,7 +789,7 @@ export function AgentsPageClient() {
             title="Fleet registry"
             meta={`${filteredAgents.length} visible · ${agents.length} of ${totalAgents} loaded`}
             action={
-              <span className="hidden rounded-[4px] border border-[#294d6c] bg-[#101c26] px-2.5 py-1 font-[family:var(--font-mono)] text-[8px] uppercase tracking-[0.14em] text-[#8ac7ff] sm:inline-flex">
+              <span className="hidden rounded-[4px] border border-[#294d6c] bg-[#101c26] px-2.5 py-1 font-(--font-mono) text-[8px] uppercase tracking-[0.14em] text-[#8ac7ff] sm:inline-flex">
                 / search
               </span>
             }

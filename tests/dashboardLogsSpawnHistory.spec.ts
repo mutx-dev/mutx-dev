@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { expect, test, type Page } from '@playwright/test'
 
 const runSummary = {
@@ -32,6 +33,10 @@ async function mockWorkflowTraffic(page: Page) {
   await page.route('**/api/**', async (route) => {
     const request = route.request()
     const url = new URL(request.url())
+    if (url.pathname === '/api/dashboard/access') {
+      await route.fallback();
+      return;
+    }
 
     if (url.pathname === '/api/auth/me') {
       await route.fulfill({
@@ -107,7 +112,7 @@ test.describe('Logs, Spawn, and History contracts', () => {
     await page.goto('/dashboard/history', { waitUntil: 'domcontentloaded' })
 
     await expect(page).toHaveURL(/\/dashboard\/history$/)
-    await expect(page.getByRole('heading', { name: 'History' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'History', level: 1 })).toBeVisible()
     await expect(page.getByText('Execution history')).toBeVisible()
     await expect(page.getByText('Unassigned')).toBeVisible()
     await expect(page.getByText('workflow.completed')).toBeVisible()
@@ -117,9 +122,14 @@ test.describe('Logs, Spawn, and History contracts', () => {
   test('logs renders embedded run traces instead of a synthetic step sequence', async ({ page }) => {
     await page.goto('/dashboard/logs', { waitUntil: 'domcontentloaded' })
 
-    await expect(page.getByRole('heading', { name: 'Logs' })).toBeVisible()
-    await expect(page.getByText('Run traces')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Logs', level: 1 })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Run traces', exact: true })).toBeVisible()
     await expect(page.getByText('workflow.completed')).toBeVisible()
     await expect(page.getByText('No step data')).toHaveCount(0)
   })
 })
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
+});

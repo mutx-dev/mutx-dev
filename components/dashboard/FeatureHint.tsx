@@ -63,12 +63,12 @@ export function FeatureHint({
       <div
         className={cn(
           "z-30 mt-2 hidden w-full rounded-[18px] border p-4 shadow-[0_20px_50px_rgba(2,2,5,0.34)] group-open:block sm:absolute sm:top-[calc(100%+0.5rem)] sm:mt-0 sm:w-[min(20rem,calc(100vw-2rem))]",
-          align === "start" ? "start-0" : "end-0",
+          align === "start" ? "inset-s-0" : "inset-e-0",
           copy.detailClassName,
         )}
       >
         <div className="flex items-start gap-2.5">
-          <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.06]">
+          <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/6">
             <Icon className="h-4 w-4" />
           </span>
           <div className="min-w-0">

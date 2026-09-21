@@ -47,7 +47,7 @@ function DashboardAccessLoading({ platformReady }: { platformReady: boolean }) {
             aria-hidden='true'
           />
           <div>
-            <h1 className='font-[family:var(--font-site-display)] text-2xl font-medium tracking-[-0.045em] text-[#eee9dc]'>
+            <h1 className='font-(--font-site-display) text-2xl font-medium tracking-[-0.045em] text-[#eee9dc]'>
               {platformReady ? 'Verifying your operator session' : 'Resolving dashboard runtime'}
             </h1>
             <p className='mt-2 max-w-2xl text-sm leading-6 text-[#aaa397]'>
@@ -68,14 +68,14 @@ function DashboardAccessFailure({ message, retry }: { message: string; retry: ()
         <div role='alert' className='flex items-start gap-4 py-4'>
           <AlertTriangle className='mt-0.5 h-5 w-5 shrink-0 text-[#ff9b96]' aria-hidden='true' />
           <div>
-            <h1 className='font-[family:var(--font-site-display)] text-2xl font-medium tracking-[-0.045em] text-[#eee9dc]'>
+            <h1 className='font-(--font-site-display) text-2xl font-medium tracking-[-0.045em] text-[#eee9dc]'>
               Dashboard access could not be verified
             </h1>
             <p className='mt-2 max-w-2xl text-sm leading-6 text-[#aaa397]'>{message}</p>
             <button
               type='button'
               onClick={retry}
-              className='mt-5 inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none'
+              className='mt-5 inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none'
             >
               <RefreshCw className='h-4 w-4' aria-hidden='true' />
               Retry access check

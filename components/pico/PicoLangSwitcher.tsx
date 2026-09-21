@@ -62,7 +62,7 @@ export function PicoLangSwitcher() {
         onChange={handleSelect}
         disabled={!ready}
         aria-label={`${t('listLabel')}. ${t('currentLanguage')}: ${PICO_LANGUAGE_OPTIONS.find((item) => item.code === selectedLocale)?.label ?? selectedLocale}`}
-        className="min-h-11 w-[8.75rem] max-w-full cursor-pointer appearance-none truncate border border-[color:var(--pico-border)] bg-[#0a0a09] py-2 pe-9 ps-3 text-sm font-semibold text-[color:var(--pico-text)] outline-none transition duration-200 hover:border-[color:var(--pico-accent)] focus-visible:border-[color:var(--pico-accent)] focus-visible:ring-2 focus-visible:ring-[color:var(--pico-accent)] disabled:cursor-wait disabled:opacity-70 sm:w-[11rem]"
+        className="min-h-11 w-35 max-w-full cursor-pointer appearance-none truncate border border-(--pico-border) bg-[#0a0a09] py-2 pe-9 ps-3 text-sm font-semibold text-(--pico-text) outline-hidden transition duration-200 hover:border-(--pico-accent) focus-visible:border-(--pico-accent) focus-visible:ring-2 focus-visible:ring-(--pico-accent) disabled:cursor-wait disabled:opacity-70 sm:w-44"
       >
         {PICO_LANGUAGE_OPTIONS.map((item) => (
           <option key={item.code} value={item.code}>
@@ -72,7 +72,7 @@ export function PicoLangSwitcher() {
       </select>
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 end-3 inline-flex items-center text-[0.68rem] text-[color:var(--pico-text-muted)]"
+        className="pointer-events-none absolute inset-y-0 inset-e-3 inline-flex items-center text-[0.68rem] text-(--pico-text-muted)"
       >
         ▾
       </span>

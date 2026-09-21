@@ -64,8 +64,8 @@ function AgentListSkeleton() {
         <div className="flex items-start gap-3">
           <div className="h-9 w-9 rounded-lg bg-white/10" />
           <div className="flex-1">
-            <div className="h-5 w-32 rounded bg-white/10" />
-            <div className="mt-2 h-4 w-48 rounded bg-white/5" />
+            <div className="h-5 w-32 rounded-sm bg-white/10" />
+            <div className="mt-2 h-4 w-48 rounded-sm bg-white/5" />
           </div>
         </div>
       </div>
@@ -73,8 +73,8 @@ function AgentListSkeleton() {
         <div className="flex items-start gap-3">
           <div className="h-9 w-9 rounded-lg bg-white/10" />
           <div className="flex-1">
-            <div className="h-5 w-32 rounded bg-white/10" />
-            <div className="mt-2 h-4 w-48 rounded bg-white/5" />
+            <div className="h-5 w-32 rounded-sm bg-white/10" />
+            <div className="mt-2 h-4 w-48 rounded-sm bg-white/5" />
           </div>
         </div>
       </div>
@@ -151,8 +151,8 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
               <div>
-                <div className="h-6 w-8 rounded bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
-                <div className="mt-1 h-3 w-16 rounded bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
+                <div className="h-6 w-8 rounded-sm bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
+                <div className="mt-1 h-3 w-16 rounded-sm bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
               </div>
             </div>
           </div>
@@ -160,8 +160,8 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
               <div>
-                <div className="h-6 w-8 rounded bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
-                <div className="mt-1 h-3 w-16 rounded bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
+                <div className="h-6 w-8 rounded-sm bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
+                <div className="mt-1 h-3 w-16 rounded-sm bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
               </div>
             </div>
           </div>
@@ -169,8 +169,8 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
               <div>
-                <div className="h-6 w-8 rounded bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
-                <div className="mt-1 h-3 w-16 rounded bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
+                <div className="h-6 w-8 rounded-sm bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
+                <div className="mt-1 h-3 w-16 rounded-sm bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
               </div>
             </div>
           </div>
@@ -274,13 +274,13 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search agents..."
             aria-label="Search agents"
-            className="w-full rounded-xl border border-white/10 bg-black/40 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+            className="w-full rounded-xl border border-white/10 bg-black/40 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-hidden focus:ring-1 focus:ring-cyan-400/20"
           />
         </div>
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 transition hover:border-cyan-300/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/3 px-4 py-2.5 text-sm text-slate-300 transition hover:border-cyan-300/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RefreshCw className={`h-4 w-4 ${refreshing ? "motion-safe:animate-spin motion-reduce:animate-none" : ""}`} />
           {refreshing ? "Refreshing" : "Refresh"}

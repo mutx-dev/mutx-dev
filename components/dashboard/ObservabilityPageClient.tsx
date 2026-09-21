@@ -346,7 +346,7 @@ export function ObservabilityPageClient() {
                 <Link
                   key={destination.href}
                   href={destination.href}
-                  className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:text-white"
+                  className="flex items-center justify-between rounded-xl border border-white/10 bg-white/2 px-4 py-3 text-sm text-slate-300 transition hover:border-white/20 hover:text-white"
                 >
                   <div>
                     <div className="font-medium text-white">{destination.label}</div>
@@ -377,7 +377,7 @@ export function ObservabilityPageClient() {
                     className={`w-full rounded-lg border p-3 text-left transition-colors ${
                       selectedRunId === run.id
                         ? "border-cyan-500/50 bg-cyan-500/10"
-                        : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                        : "border-white/10 bg-white/2 hover:bg-white/5"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -450,7 +450,7 @@ export function ObservabilityPageClient() {
                 {selectedRun.cost && (
                   <div>
                     <div className="mb-2 text-xs text-slate-500">Cost Breakdown</div>
-                    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                    <div className="rounded-lg border border-white/10 bg-white/2 p-3">
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
                           <div className="text-lg text-white">{selectedRun.cost.input_tokens.toLocaleString()}</div>
@@ -480,7 +480,7 @@ export function ObservabilityPageClient() {
                       {selectedRun.steps.map((step, i) => (
                         <div
                           key={step.id}
-                          className="flex items-center gap-2 rounded border border-white/5 bg-white/[0.02] p-2 text-xs"
+                          className="flex items-center gap-2 rounded-sm border border-white/5 bg-white/2 p-2 text-xs"
                         >
                           <span className="w-6 text-slate-500">{i + 1}</span>
                           <span

@@ -151,7 +151,7 @@ export function MetricsDashboard({
   );
 
   return (
-    <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+    <Card className="border border-white/5 bg-white/1 p-0 overflow-hidden">
       <div className="flex items-center justify-between border-b border-white/5 p-4">
         <div className="flex items-center gap-3 text-emerald-400">
           <Activity className="h-5 w-5" />
@@ -172,7 +172,7 @@ export function MetricsDashboard({
           <button
             onClick={loadMetrics}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:text-white disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-white/3 px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:text-white disabled:opacity-50"
           >
             <RefreshCcw
               className={`h-3.5 w-3.5 ${loading ? "motion-safe:animate-spin motion-reduce:animate-none" : ""}`}
@@ -266,7 +266,7 @@ export function MetricsDashboard({
 
           <div className="max-h-[200px] overflow-y-auto custom-scrollbar">
             <table className="w-full text-left text-xs">
-              <thead className="bg-white/[0.02] text-slate-500 uppercase tracking-wider sticky top-0">
+              <thead className="bg-white/2 text-slate-500 uppercase tracking-wider sticky top-0">
                 <tr>
                   <th className="px-4 py-3 font-medium">Timestamp</th>
                   <th className="px-4 py-3 font-medium">CPU</th>
@@ -277,9 +277,9 @@ export function MetricsDashboard({
                 {metrics.map((metric, index) => (
                   <tr
                     key={metric.id ?? `${metric.timestamp}-${index}`}
-                    className="transition-colors hover:bg-white/[0.02]"
+                    className="transition-colors hover:bg-white/2"
                   >
-                    <td className="px-4 py-3 font-[family:var(--font-mono)] text-slate-400">
+                    <td className="px-4 py-3 font-(--font-mono) text-slate-400">
                       {formatTimestamp(metric.timestamp)}
                     </td>
                     <td className={`px-4 py-3 font-medium ${getUsageColor(metric.cpu_usage)}`}>

@@ -9,7 +9,7 @@ FROM base AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci
 
 # Builder stage
 FROM base AS builder

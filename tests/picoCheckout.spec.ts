@@ -124,7 +124,7 @@ test.describe('Pico paid checkout', () => {
 
     await page.goto('/pico/pricing');
     await page.getByRole('button', { name: /choose pro/i }).click();
-    await expect(page.getByRole('alert')).toContainText(/temporarily unavailable/i);
+    await expect(page.getByTestId('pico-checkout-notice')).toContainText(/temporarily unavailable/i);
 
     await page.getByRole('button', { name: /retry checkout/i }).click();
 
@@ -178,8 +178,8 @@ test.describe('Pico paid checkout', () => {
     await page.goto('/pico/pricing');
     await page.getByRole('button', { name: /choose starter/i }).click();
 
-    await expect(page.getByRole('alert')).toContainText(/does not have access to checkout/i);
-    await expect(page.getByRole('alert')).not.toContainText(/internal-rbac-policy-name/i);
+    await expect(page.getByTestId('pico-checkout-notice')).toContainText(/does not have access to checkout/i);
+    await expect(page.getByTestId('pico-checkout-notice')).not.toContainText(/internal-rbac-policy-name/i);
     expect(new URL(page.url()).pathname).toBe('/pico/pricing');
   });
 });

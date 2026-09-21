@@ -74,9 +74,9 @@ fi
 
 echo "Installing Node.js dependencies..."
 if [ -f package-lock.json ]; then
-    npm ci --legacy-peer-deps
+    npm ci
 else
-    npm install --legacy-peer-deps
+    npm install
 fi
 
 echo "Building Docker services..."

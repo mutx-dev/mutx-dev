@@ -108,12 +108,12 @@ export function SecurityPageClient() {
         <LivePanel title="Credential inventory" meta={`${keys.length} keys`}>
           <div className="space-y-3">
             {keys.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-6 text-sm text-slate-400">
+              <div className="rounded-xl border border-dashed border-white/10 bg-white/2 p-6 text-sm text-slate-400">
                 No API keys returned yet. Once operator credentials exist, rotation posture will show up here.
               </div>
             ) : (
               keys.map((key) => (
-                <div key={key.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div key={key.id} className="rounded-xl border border-white/10 bg-white/2 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-white">{key.name}</p>
@@ -138,7 +138,7 @@ export function SecurityPageClient() {
 
         <LivePanel title="Security posture" meta="workspace trust">
           <div className="space-y-3">
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-white/10 bg-white/2 p-4">
               <div className="flex items-center gap-2 text-slate-300">
                 <ShieldCheck className="h-4 w-4 text-cyan-300" />
                 <span className="text-sm font-medium">Owned credentials</span>
@@ -147,7 +147,7 @@ export function SecurityPageClient() {
                 MUTX keeps API keys and deployment actions in the same governance surface so rotation, ownership, and actionability stay connected.
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-white/10 bg-white/2 p-4">
               <div className="flex items-center gap-2 text-slate-300">
                 <Lock className="h-4 w-4 text-cyan-300" />
                 <span className="text-sm font-medium">Auth boundary</span>
@@ -156,7 +156,7 @@ export function SecurityPageClient() {
                 Dashboard surfaces now fail honestly into auth-required state instead of rendering dead-end product shells.
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-white/10 bg-white/2 p-4">
               <div className="flex items-center gap-2 text-slate-300">
                 <KeyRound className="h-4 w-4 text-cyan-300" />
                 <span className="text-sm font-medium">Rotation posture</span>

@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { expect, test } from '@playwright/test'
 
 async function mockOverviewTraffic(page: import('@playwright/test').Page) {
@@ -16,6 +17,10 @@ async function mockOverviewTraffic(page: import('@playwright/test').Page) {
   await page.route('**/api/**', async (route) => {
     const request = route.request()
     const url = new URL(request.url())
+    if (url.pathname === '/api/dashboard/access') {
+      await route.fallback();
+      return;
+    }
     const { pathname } = url
 
     if (pathname === '/api/dashboard/overview') {
@@ -253,3 +258,8 @@ test.describe('Dashboard OpenClaw overview', () => {
     await expect(page.getByText('Personal Assistant')).toBeVisible()
   })
 })
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
+});

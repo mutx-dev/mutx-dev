@@ -106,16 +106,14 @@ test('standalone docs publish a working client search index', async ({ page }) =
   await expect(page.getByRole('dialog', { name: /search documentation/i })).toHaveCount(0)
 })
 
-test('standalone dashboard preserves its route boundary without a live session', async ({ page }) => {
+test('standalone dashboard requires a session before exposing private routes', async ({ page }) => {
   const response = await page.goto('/dashboard/release-smoke-unknown', {
     waitUntil: 'domcontentloaded',
   })
-
-  expect(response?.status()).toBe(404)
-  const boundary = page.locator(
-    '[data-boundary-surface="dashboard"][data-boundary-kind="not-found"]'
+  expect(response?.status()).toBe(200)
+  await expect(page.getByRole('heading', { name: 'Sign in to open the dashboard' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toHaveAttribute(
+    'href', '/login?next=%2Fdashboard%2Frelease-smoke-unknown'
   )
-  await expect(boundary).toBeVisible()
-  await expect(boundary.getByRole('heading', { name: /no dashboard record matches/i })).toBeVisible()
-  await expect(boundary.getByRole('link', { name: /dashboard home/i })).toBeVisible()
+  await expect(page.locator('[data-boundary-kind="not-found"]')).toHaveCount(0)
 })

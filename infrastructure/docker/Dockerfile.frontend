@@ -5,7 +5,7 @@ RUN npm install -g npm@11.18.0
 
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci
 
 FROM base AS development
 ENV NODE_ENV=development
@@ -47,6 +47,8 @@ COPY --from=builder --chown=nextjs:nextjs /app/.next/static /app/.next/standalon
 COPY --from=builder --chown=nextjs:nextjs /app/docs /app/docs
 COPY --from=builder --chown=nextjs:nextjs /app/SUMMARY.md /app/security.md /app/support.md /app/
 COPY --from=builder --chown=nextjs:nextjs /app/app/fonts /app/app/fonts
+# Compose invokes this probe inside the final image.
+COPY --from=builder --chown=nextjs:nextjs /app/scripts/verify-release-http.mjs /app/scripts/verify-release-http.mjs
 
 USER nextjs
 

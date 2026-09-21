@@ -313,7 +313,7 @@ async function main() {
     },
   });
 
-  await waitForServer(`${nextServerUrl}/dashboard`, nextServerProcess);
+  await waitForServer(`${nextServerUrl}/api/desktop/health`, nextServerProcess);
 
   proxyServer = http.createServer(async (request, response) => {
     if (tryServeStaticAsset(request, response)) {

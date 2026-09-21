@@ -70,7 +70,7 @@ export function AgentRow({ agent, onClick, className }: AgentRowProps) {
         <div className="flex items-center gap-2">
           <span className="font-medium text-sm text-white truncate">{agent.name}</span>
           {agent.type && (
-            <span className="text-2xs text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">
+            <span className="text-2xs text-slate-400 bg-white/5 px-1.5 py-0.5 rounded-sm">
               {agent.type}
             </span>
           )}

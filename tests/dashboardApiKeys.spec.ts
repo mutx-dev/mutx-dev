@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { expect, test } from '@playwright/test';
 
 const mockKey = {
@@ -12,7 +13,7 @@ const mockKey = {
 
 async function openApiKeysPage(page: import('@playwright/test').Page) {
   await page.goto('/dashboard/api-keys', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { name: 'API Keys' })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('heading', { name: 'API Keys', level: 1 })).toBeVisible({ timeout: 10000 });
   await expect(page.getByText('Production operator')).toBeVisible({ timeout: 10000 });
 }
 
@@ -62,7 +63,9 @@ test.describe('Dashboard API key confirmations', () => {
     });
 
     await openApiKeysPage(page);
-    await page.getByRole('button', { name: 'Rotate', exact: true }).click();
+    const rotateTrigger = page.getByRole('button', { name: 'Rotate', exact: true });
+    await rotateTrigger.focus();
+    await rotateTrigger.press('Enter');
 
     const dialog = page.getByRole('dialog', { name: 'Rotate API key?' });
     await expect(dialog).toBeVisible();
@@ -170,7 +173,7 @@ test.describe('Dashboard API key confirmations', () => {
 
 test.describe('Dashboard API key authorization states', () => {
   for (const status of [401, 403]) {
-    test(`renders the operator-session state for ${status}`, async ({ page }) => {
+    test(`renders the authorization state for ${status}`, async ({ page }) => {
       await page.route('**/api/api-keys', async (route) => {
         await route.fulfill({
           status,
@@ -181,7 +184,12 @@ test.describe('Dashboard API key authorization states', () => {
 
       await page.goto('/dashboard/api-keys', { waitUntil: 'domcontentloaded' });
 
-      await expect(page.getByText('Operator session required')).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(status === 401 ? 'Operator session required' : 'API key permission required')).toBeVisible({ timeout: 10000 });
     });
   }
+});
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
 });

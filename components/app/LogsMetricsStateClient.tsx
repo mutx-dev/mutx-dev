@@ -110,7 +110,7 @@ function LogLevelBadge({ level }: { level: LogEntry["level"] }) {
     debug: "bg-slate-400/10 text-slate-300 border-slate-400/20",
   };
   return (
-    <span className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase ${colors[level]}`}>
+    <span className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 text-[10px] font-medium uppercase ${colors[level]}`}>
       {level}
     </span>
   );
@@ -174,7 +174,7 @@ function StateMachineVisualization({ transitions }: { transitions: StateTransiti
                   ? stateColors[state]
                   : hasBeenIn
                     ? "border-white/20 bg-white/5 text-slate-400"
-                    : "border-white/5 bg-white/[0.02] text-slate-600"
+                    : "border-white/5 bg-white/2 text-slate-600"
               }`}
             >
               {state}
@@ -193,7 +193,7 @@ function StateMachineVisualization({ transitions }: { transitions: StateTransiti
           {transitions.slice(-5).reverse().map((transition) => (
             <div key={transition.id} className="flex items-center gap-3 text-xs">
               <span className="font-medium text-slate-300">{transition.from}</span>
-              <ChevronDown className="h-3 w-3 rotate-[-90deg] text-cyan-400" />
+              <ChevronDown className="h-3 w-3 -rotate-90 text-cyan-400" />
               <span className="font-medium text-emerald-300">{transition.to}</span>
               <span className="ml-auto text-slate-500">{transition.trigger}</span>
               <span className="text-slate-600">{formatRelativeTime(transition.timestamp)}</span>
@@ -232,7 +232,7 @@ export function LogsMetricsStateClient() {
 
   return (
     <div className="space-y-6">
-      <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+      <Card className="border border-white/5 bg-white/1 p-0 overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 p-6">
           <div className="flex items-center gap-3 text-violet-400">
             <Activity className="h-5 w-5" />
@@ -251,7 +251,7 @@ export function LogsMetricsStateClient() {
             <select
               value={selectedAgent}
               onChange={(e) => setSelectedAgent(e.target.value)}
-              className="bg-transparent text-sm text-white focus:outline-none"
+              className="bg-transparent text-sm text-white focus:outline-hidden"
             >
               <option value="worker-001">worker-001</option>
               <option value="worker-002">worker-002</option>
@@ -292,7 +292,7 @@ export function LogsMetricsStateClient() {
                     value={logFilter}
                     onChange={(e) => setLogFilter(e.target.value)}
                     placeholder="Search logs..."
-                    className="w-full rounded-lg border border-white/10 bg-black/40 pl-10 pr-4 py-2 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none"
+                    className="w-full rounded-lg border border-white/10 bg-black/40 pl-10 pr-4 py-2 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-hidden"
                   />
                 </div>
                 <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 p-1">
@@ -322,12 +322,12 @@ export function LogsMetricsStateClient() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/5 bg-black/20 font-[family:var(--font-mono)] text-xs">
+              <div className="rounded-xl border border-white/5 bg-black/20 font-(--font-mono) text-xs">
                 <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
                   {filteredLogs.map((log) => (
                     <div
                       key={log.id}
-                      className="flex items-start gap-3 border-b border-white/5 px-4 py-2.5 hover:bg-white/[0.02]"
+                      className="flex items-start gap-3 border-b border-white/5 px-4 py-2.5 hover:bg-white/2"
                     >
                       <span className="shrink-0 text-slate-500">{formatTime(log.timestamp)}</span>
                       <LogLevelBadge level={log.level} />
@@ -348,7 +348,7 @@ export function LogsMetricsStateClient() {
           {activeTab === "metrics" && (
             <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">CPU Usage</span>
                     <Gauge className="h-4 w-4 text-cyan-400" />
@@ -361,7 +361,7 @@ export function LogsMetricsStateClient() {
                     />
                   </div>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">Memory</span>
                     <Activity className="h-4 w-4 text-emerald-400" />
@@ -374,7 +374,7 @@ export function LogsMetricsStateClient() {
                     />
                   </div>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">Requests/min</span>
                     <Zap className="h-4 w-4 text-amber-400" />
@@ -382,7 +382,7 @@ export function LogsMetricsStateClient() {
                   <p className="mt-3 text-2xl font-semibold text-white">{latestMetrics.requests}</p>
                   <p className="mt-2 text-xs text-slate-500">Last 20 minutes</p>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">Avg Latency</span>
                     <Clock className="h-4 w-4 text-violet-400" />
@@ -393,7 +393,7 @@ export function LogsMetricsStateClient() {
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">CPU & Memory</span>
                     <BarChart3 className="h-4 w-4 text-slate-400" />
@@ -403,7 +403,7 @@ export function LogsMetricsStateClient() {
                     <MetricChart data={mockMetrics.memory} color="bg-emerald-400" label="Memory %" />
                   </div>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">Requests & Latency</span>
                     <Activity className="h-4 w-4 text-slate-400" />
@@ -419,7 +419,7 @@ export function LogsMetricsStateClient() {
 
           {activeTab === "state" && (
             <div className="space-y-4">
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Layers className="h-4 w-4 text-violet-400" />
@@ -436,7 +436,7 @@ export function LogsMetricsStateClient() {
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Play className="h-4 w-4 text-emerald-400" />
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">Active Handlers</span>
@@ -449,24 +449,24 @@ export function LogsMetricsStateClient() {
                       { name: "scaler", status: "idle", tasks: 0 },
                     ].map((handler) => (
                       <div key={handler.name} className="flex items-center justify-between rounded-lg border border-white/5 bg-black/20 px-3 py-2">
-                        <span className="text-xs font-[family:var(--font-mono)] text-slate-300">{handler.name}</span>
+                        <span className="text-xs font-(--font-mono) text-slate-300">{handler.name}</span>
                         <div className="flex items-center gap-2">
                           <span className={`h-2 w-2 rounded-full ${handler.status === "active" ? "bg-emerald-400" : "bg-slate-500"}`} />
                           <span className="text-xs text-slate-500">{handler.status}</span>
                           {handler.tasks > 0 && (
-                            <span className="rounded bg-cyan-400/10 px-1.5 py-0.5 text-[10px] text-cyan-300">{handler.tasks}</span>
+                            <span className="rounded-sm bg-cyan-400/10 px-1.5 py-0.5 text-[10px] text-cyan-300">{handler.tasks}</span>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Settings className="h-4 w-4 text-amber-400" />
                     <span className="text-[10px] uppercase tracking-widest text-slate-500">Configuration</span>
                   </div>
-                  <div className="space-y-2 font-[family:var(--font-mono)] text-xs">
+                  <div className="space-y-2 font-(--font-mono) text-xs">
                     <div className="flex justify-between rounded-lg border border-white/5 bg-black/20 px-3 py-2">
                       <span className="text-slate-500">worker_pool_size</span>
                       <span className="text-cyan-300">5</span>

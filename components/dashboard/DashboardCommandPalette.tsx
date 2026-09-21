@@ -105,9 +105,9 @@ export function DashboardCommandPalette({
           aria-activedescendant={
             matches[activeIndex] ? `dashboard-command-${matches[activeIndex].key}` : undefined
           }
-          className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#eee9dc] outline-none placeholder:text-[#8d867a]"
+          className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#eee9dc] outline-hidden placeholder:text-[#8d867a]"
         />
-        <kbd className="rounded-[3px] border border-[#3b3a33] bg-[#151612] px-1.5 py-0.5 font-[family:var(--font-mono)] text-[8px] text-[#8d867a]">
+        <kbd className="rounded-[3px] border border-[#3b3a33] bg-[#151612] px-1.5 py-0.5 font-(--font-mono) text-[8px] text-[#8d867a]">
           ESC
         </kbd>
       </div>
@@ -156,7 +156,7 @@ export function DashboardCommandPalette({
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2 text-sm font-medium">
-                    <span className="font-[family:var(--font-mono)] text-[8px] text-[#ff6a32]" aria-hidden="true">
+                    <span className="font-(--font-mono) text-[8px] text-[#ff6a32]" aria-hidden="true">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span>{item.title}</span>

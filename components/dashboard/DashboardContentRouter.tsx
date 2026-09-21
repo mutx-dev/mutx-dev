@@ -219,7 +219,7 @@ export function UpgradeNudge({
     >
       <div className='grid gap-8 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.42fr)] lg:items-end'>
         <div className='max-w-3xl'>
-          <div className='flex flex-wrap items-center gap-2 font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.16em] text-[#aaa397]'>
+          <div className='flex flex-wrap items-center gap-2 font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.16em] text-[#aaa397]'>
             <span className='inline-flex items-center gap-1.5 rounded-[3px] border border-[#4d3a2d] bg-[#1c100a] px-2.5 py-1 text-[#ff9b73]'>
               <LockKeyhole className='h-3.5 w-3.5' aria-hidden='true' />
               Essential view
@@ -229,7 +229,7 @@ export function UpgradeNudge({
 
           <h1
             id='full-mode-title'
-            className='mt-5 max-w-2xl font-[family:var(--font-site-display)] text-[clamp(2rem,5vw,4rem)] leading-[0.94] tracking-[-0.065em] text-[#eee9dc]'
+            className='mt-5 max-w-2xl font-(--font-site-display) text-[clamp(2rem,5vw,4rem)] leading-[0.94] tracking-[-0.065em] text-[#eee9dc]'
           >
             {canUseFullMode
               ? 'Open the full workspace.'
@@ -251,7 +251,7 @@ export function UpgradeNudge({
                 type='button'
                 aria-label={`Switch ${panelLabel} panel to full mode`}
                 onClick={() => setInterfaceMode('full')}
-                className='inline-flex min-h-11 items-center gap-2 rounded-[4px] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7445] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8d66] motion-reduce:transition-none'
+                className='inline-flex min-h-11 items-center gap-2 rounded-[4px] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7445] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8d66] motion-reduce:transition-none'
               >
                 Switch to full mode
                 <ArrowUpRight className='h-4 w-4' aria-hidden='true' />
@@ -260,7 +260,7 @@ export function UpgradeNudge({
               <a
                 href='/pico/pricing?plan=pro'
                 aria-label={`Compare plans for ${panelLabel} panel`}
-                className='inline-flex min-h-11 items-center gap-2 rounded-[4px] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7445] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8d66] motion-reduce:transition-none'
+                className='inline-flex min-h-11 items-center gap-2 rounded-[4px] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7445] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8d66] motion-reduce:transition-none'
               >
                 Compare plans
                 <ArrowUpRight className='h-4 w-4' aria-hidden='true' />
@@ -270,7 +270,7 @@ export function UpgradeNudge({
                 type='button'
                 aria-label={`Retry plan check for ${panelLabel} panel`}
                 onClick={() => window.location.reload()}
-                className='inline-flex min-h-11 items-center gap-2 rounded-[4px] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7445] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8d66] motion-reduce:transition-none'
+                className='inline-flex min-h-11 items-center gap-2 rounded-[4px] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7445] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8d66] motion-reduce:transition-none'
               >
                 Retry plan check
                 <ArrowUpRight className='h-4 w-4' aria-hidden='true' />
@@ -279,7 +279,7 @@ export function UpgradeNudge({
             <a
               href='/dashboard'
               aria-label='Return to dashboard overview'
-              className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#45443c] bg-[#0c0d0b] px-4 text-sm font-medium text-[#d6d0c3] transition-colors hover:border-[#656258] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
+              className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#45443c] bg-[#0c0d0b] px-4 text-sm font-medium text-[#d6d0c3] transition-colors hover:border-[#656258] hover:text-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
             >
               Return to overview
             </a>
@@ -294,7 +294,7 @@ export function UpgradeNudge({
             ['Required plan', 'Pro or Enterprise'],
           ].map(([label, value]) => (
             <div key={label} className='flex items-center justify-between gap-5 bg-[#0c0d0b] px-4 py-3.5'>
-              <dt className='font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.14em] text-[#918b80]'>
+              <dt className='font-(--font-mono) text-[10px] uppercase tracking-[0.14em] text-[#918b80]'>
                 {label}
               </dt>
               <dd className='text-end text-sm font-medium capitalize text-[#eee9dc]'>{value}</dd>

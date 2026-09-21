@@ -39,6 +39,7 @@ test.describe('simulated control demo', () => {
     await page.goto('/control', { waitUntil: 'domcontentloaded' });
 
     const presenter = page.getByRole('button', { name: 'Presenter' });
+    await expect(page.getByTestId('control-demo-root')).not.toHaveAttribute('data-demo-tick', '0');
     await presenter.focus();
     await page.keyboard.press('Enter');
 
@@ -56,10 +57,11 @@ test.describe('simulated control demo', () => {
     await expect(page.getByRole('status')).toHaveText(/presenter mode off/i);
   });
 
-  test('supports keyboard-only local interventions and route search', async ({ page }) => {
+  test('supports keyboard-only local interventions and route search', async ({ page, browserName }) => {
     await page.goto('/control', { waitUntil: 'domcontentloaded' });
 
     const quickAction = page.locator('button:visible', { hasText: 'Deploy new version' }).first();
+    await expect(page.getByTestId('control-demo-root')).not.toHaveAttribute('data-demo-tick', '0');
     await quickAction.focus();
     await expect(quickAction).toBeFocused();
     await page.keyboard.press('Enter');
@@ -73,7 +75,7 @@ test.describe('simulated control demo', () => {
     const results = page.locator('[data-testid="control-demo-search-results"]:visible');
     await expect(results).toContainText(/sample routes · no live data/i);
     const settingsResult = results.getByRole('link', { name: /settings/i });
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
     await expect(settingsResult).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/control\/settings$/);
@@ -91,6 +93,9 @@ test.describe('simulated control demo', () => {
     const initialTick = await root.getAttribute('data-demo-tick');
     await page.waitForTimeout(2500);
     await expect(root).toHaveAttribute('data-demo-tick', initialTick ?? '0');
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect(root).toHaveAttribute('data-motion', 'full');
+    await expect(root).not.toHaveAttribute('data-demo-tick', initialTick ?? '0');
   });
 
   for (const width of [320, 768, 1280, 1600]) {
@@ -135,6 +140,8 @@ test.describe('simulated control demo', () => {
       await page.goto(route, { waitUntil: 'domcontentloaded' });
       await expect(page.getByTestId('control-demo-root')).toBeVisible();
       await expect(page.getByTestId('control-demo-label')).toBeVisible();
+      // Let route prefetches settle before replacing the document, especially in WebKit.
+      await page.waitForLoadState('networkidle');
     }
 
     expect(errors).toEqual([]);

@@ -128,7 +128,7 @@ function WindowSwitcher({
           onClick={() => onSelect(item.role)}
           aria-pressed={item.role === activeRole}
           className={cn(
-            `min-h-9 rounded-[4px] border px-3 py-1.5 font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors ${DESKTOP_FOCUS_CLASS}`,
+            `min-h-9 rounded-[4px] border px-3 py-1.5 font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors ${DESKTOP_FOCUS_CLASS}`,
             item.role === activeRole
               ? "border-[#663619] bg-[#21150f] text-[#ff8355] shadow-[inset_0_-2px_0_#ff571c]"
               : "border-transparent text-[#999284] hover:border-[#34342e] hover:bg-[#151612] hover:text-[#eee9dc]",
@@ -162,7 +162,7 @@ function CommandPalette({
   }
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-start justify-center bg-[#090a08]/90 px-4 py-16 motion-reduce:backdrop-blur-none sm:py-20">
+    <div className="fixed inset-0 z-120 flex items-start justify-center bg-[#090a08]/90 px-4 py-16 motion-reduce:backdrop-blur-none sm:py-20">
       <div
         ref={dialogRef}
         role="dialog"
@@ -182,13 +182,13 @@ function CommandPalette({
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Search windows, panes, and desktop actions"
-            className="w-full bg-transparent text-sm text-[#eee9dc] outline-none placeholder:text-[#777268]"
+            className="w-full bg-transparent text-sm text-[#eee9dc] outline-hidden placeholder:text-[#777268]"
           />
           <button
             type="button"
             onClick={onClose}
             aria-label="Close command palette"
-            className={cn("rounded-[4px] border border-[#3b3a33] bg-[#151612] px-2.5 py-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.12em] text-[#aaa397]", DESKTOP_FOCUS_CLASS)}
+            className={cn("rounded-[4px] border border-[#3b3a33] bg-[#151612] px-2.5 py-1.5 font-(--font-mono) text-[10px] uppercase tracking-[0.12em] text-[#aaa397]", DESKTOP_FOCUS_CLASS)}
           >
             Esc
           </button>
@@ -490,7 +490,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
   return (
     <div
       data-mutx-desktop="operator-shell"
-      className="min-h-screen bg-[#090a08] font-[family:var(--font-site-body)] text-[#eee9dc]"
+      className="min-h-screen bg-[#090a08] font-(--font-site-body) text-[#eee9dc]"
     >
       <CommandPalette
         open={paletteOpen}
@@ -505,7 +505,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
 
       <a
         href="#main-content"
-        className={cn("sr-only z-[140] rounded-[4px] bg-[#ff571c] px-3 py-2 text-xs font-semibold text-[#090a08] focus:not-sr-only focus:fixed focus:left-3 focus:top-3", DESKTOP_FOCUS_CLASS)}
+        className={cn("sr-only z-140 rounded-[4px] bg-[#ff571c] px-3 py-2 text-xs font-semibold text-[#090a08] focus:not-sr-only focus:fixed focus:left-3 focus:top-3", DESKTOP_FOCUS_CLASS)}
       >
         Skip to desktop workspace
       </a>
@@ -540,7 +540,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
                   <span className="hidden xl:inline">Search panes and actions</span>
                   <span className="xl:hidden">Search</span>
                 </span>
-                <span className="rounded-[4px] border border-[#3b3a33] bg-[#090a08] px-1.5 py-0.5 font-[family:var(--font-mono)] text-[9px] uppercase tracking-[0.12em] text-[#7f7a70]">
+                <span className="rounded-[4px] border border-[#3b3a33] bg-[#090a08] px-1.5 py-0.5 font-(--font-mono) text-[9px] uppercase tracking-[0.12em] text-[#7f7a70]">
                   {isMac ? "⌘K" : "Ctrl+K"}
                 </span>
               </button>
@@ -568,7 +568,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="border-l-2 border-[#ff571c] pl-2 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">
+                  <span className="border-l-2 border-[#ff571c] pl-2 font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">
                     {role === "workspace"
                       ? "workspace"
                       : role === "sessions"
@@ -577,7 +577,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
                           ? "traces"
                           : "settings"}
                   </span>
-                  <p className="font-[family:var(--font-site-display)] text-[1.02rem] font-medium tracking-[-0.035em] text-[#eee9dc]">
+                  <p className="font-(--font-site-display) text-[1.02rem] font-medium tracking-[-0.035em] text-[#eee9dc]">
                     {shellTitle}
                   </p>
                 </div>
@@ -585,16 +585,16 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <span className="max-w-[220px] truncate rounded-[4px] border border-[#34342e] bg-[#151612] px-2.5 py-1.5 font-[family:var(--font-mono)] text-[9px] uppercase tracking-[0.1em] text-[#c8c0b0]">
+                <span className="max-w-[220px] truncate rounded-[4px] border border-[#34342e] bg-[#151612] px-2.5 py-1.5 font-(--font-mono) text-[9px] uppercase tracking-widest text-[#c8c0b0]">
                   {status.user?.email || "desktop session"}
                 </span>
-                <span className="rounded-[4px] border border-[#663619] bg-[#21150f] px-2.5 py-1.5 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.1em] text-[#ff8355]">
+                <span className="rounded-[4px] border border-[#663619] bg-[#21150f] px-2.5 py-1.5 font-(--font-mono) text-[9px] font-semibold uppercase tracking-widest text-[#ff8355]">
                   {status.mode === "local" ? "local runtime" : status.mode || "runtime unknown"}
                 </span>
                 {lifecycleChips.map((chip) => (
                   <span
                     key={chip.label}
-                    className={`rounded-full border px-2.5 py-1.5 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.1em] ${chip.tone}`}
+                    className={`rounded-full border px-2.5 py-1.5 font-(--font-mono) text-[9px] font-semibold uppercase tracking-widest ${chip.tone}`}
                   >
                     {chip.label}
                   </span>
@@ -624,7 +624,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
                   <div className="space-y-4">
                     {primaryWorkspaceGroups.map((group) => (
                       <div key={group.title} className="space-y-1.5">
-                        <p className="border-b border-[#292a25] px-2 pb-2 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+                        <p className="border-b border-[#292a25] px-2 pb-2 font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
                           {group.title}
                         </p>
                         {group.items.map((item) => {
@@ -662,13 +662,13 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
                     ))}
                   </div>
                   <div className="mt-auto rounded-[6px] border border-[#2b2b26] bg-[#0c0d0b] p-3">
-                    <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+                    <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
                       Keyboard
                     </p>
                       <div className="mt-2 space-y-2 text-[11px] text-[#aaa397]">
                         <div className="flex items-center justify-between gap-3">
                           <span>Command palette</span>
-                        <span className="rounded-[4px] border border-[#3b3a33] bg-[#090a08] px-2 py-0.5 font-[family:var(--font-mono)] text-[9px] uppercase tracking-[0.14em] text-[#7f7a70]">
+                        <span className="rounded-[4px] border border-[#3b3a33] bg-[#090a08] px-2 py-0.5 font-(--font-mono) text-[9px] uppercase tracking-[0.14em] text-[#7f7a70]">
                             {isMac ? "⌘K" : "Ctrl+K"}
                           </span>
                         </div>
@@ -779,7 +779,7 @@ export function DesktopWindowShell({ children }: { children: ReactNode }) {
                 </div>
               )}
 
-              <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto bg-[#090a08] p-3 outline-none sm:p-4 2xl:p-5">{children}</main>
+              <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto bg-[#090a08] p-3 outline-hidden sm:p-4 2xl:p-5">{children}</main>
             </div>
           </div>
         </div>

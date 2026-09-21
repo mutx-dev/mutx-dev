@@ -221,7 +221,7 @@ export function StateTransitions({
   );
 
   return (
-    <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+    <Card className="border border-white/5 bg-white/1 p-0 overflow-hidden">
       <div className="flex items-center justify-between border-b border-white/5 p-4">
         <div className="flex items-center gap-3 text-violet-400">
           <GitBranch className="h-5 w-5" />
@@ -242,7 +242,7 @@ export function StateTransitions({
           <button
             onClick={loadEvents}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:text-white disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-white/3 px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:text-white disabled:opacity-50"
           >
             <RefreshCcw
               className={`h-3.5 w-3.5 ${loading ? "motion-safe:animate-spin motion-reduce:animate-none" : ""}`}
@@ -282,7 +282,7 @@ export function StateTransitions({
       ) : (
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
           <div className="relative p-4">
-            <div className="absolute left-[27px] top-8 bottom-4 w-px bg-gradient-to-b from-violet-400/30 via-violet-400/10 to-transparent" />
+            <div className="absolute left-[27px] top-8 bottom-4 w-px bg-linear-to-b from-violet-400/30 via-violet-400/10 to-transparent" />
 
             <div className="space-y-4">
               {sortedEvents.map((event, index) => {
@@ -308,7 +308,7 @@ export function StateTransitions({
                           {formatRelativeTime(event.created_at)}
                         </span>
                         {event.node_id && (
-                          <span className="font-[family:var(--font-mono)]">
+                          <span className="font-(--font-mono)">
                             Node: {event.node_id.slice(0, 8)}...
                           </span>
                         )}

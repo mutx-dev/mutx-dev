@@ -29,7 +29,7 @@ function AccessibleBrowserFallback({
       aria-labelledby={titleId}
       className="rounded-[6px] border border-[#34342e] bg-[#11120f] px-5 py-6"
     >
-      <h2 id={titleId} className="font-[family:var(--font-site-display)] text-lg font-medium text-[#eee9dc]">
+      <h2 id={titleId} className="font-(--font-site-display) text-lg font-medium text-[#eee9dc]">
         {meta.title} is available in the browser dashboard
       </h2>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-[#999284]">
@@ -44,14 +44,14 @@ function AccessibleBrowserFallback({
             onClick={() =>
               void window.mutxDesktop?.openExternal(`https://app.mutx.dev${meta.publicHref}`)
             }
-            className="mt-4 inline-flex min-h-10 items-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-3 py-2 text-xs font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
+            className="mt-4 inline-flex min-h-10 items-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-3 py-2 text-xs font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
           >
             Open {meta.title} in browser
           </button>
         ) : (
           <a
             href={meta.publicHref}
-            className="mt-4 inline-flex min-h-10 items-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-3 py-2 text-xs font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
+            className="mt-4 inline-flex min-h-10 items-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-3 py-2 text-xs font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
           >
             Open {meta.title}
           </a>

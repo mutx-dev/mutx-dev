@@ -99,6 +99,9 @@ function installLockedPackages(packages, arch) {
       [
         "ci",
         "--ignore-scripts",
+        // npm ci still checks process.arch for direct native packages, even with --cpu.
+        // This isolated install contains only integrity-locked prebuilt binaries, no scripts.
+        ...(arch !== process.arch ? ["--force"] : []),
         "--include=optional",
         "--no-audit",
         "--no-fund",

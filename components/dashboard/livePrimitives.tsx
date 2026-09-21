@@ -73,7 +73,7 @@ export function Panel({
       data-dashboard-ui="panel"
     >
       <span
-        className="absolute start-0 top-0 z-10 h-px w-16"
+        className="absolute inset-s-0 top-0 z-10 h-px w-16"
         style={{ backgroundColor: dashboardTokens.brand }}
         aria-hidden="true"
       />
@@ -86,7 +86,7 @@ export function Panel({
       >
         <div className="flex min-w-0 items-center gap-3">
           <span
-            className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em]"
+            className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em]"
             style={{ color: dashboardTokens.textLabel }}
             aria-hidden="true"
           >
@@ -98,7 +98,7 @@ export function Panel({
             aria-hidden="true"
           />
           <h2
-            className="min-w-0 break-words text-[13px] font-medium tracking-[-0.01em]"
+            className="min-w-0 wrap-break-word text-[13px] font-medium tracking-[-0.01em]"
             style={{ color: dashboardTokens.textPrimary }}
           >
             {title}
@@ -107,7 +107,7 @@ export function Panel({
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-3">
           {meta ? (
             <span
-              className="break-words border-s ps-3 font-[family:var(--font-mono)] text-[11px] font-medium uppercase tracking-[0.12em]"
+              className="wrap-break-word border-s ps-3 font-(--font-mono) text-[11px] font-medium uppercase tracking-[0.12em]"
               style={{ borderColor: dashboardTokens.borderStrong, color: dashboardTokens.textMuted }}
             >
               {meta}
@@ -160,7 +160,7 @@ export function Action({ tone = "secondary", className, type = "button", ...prop
       type={type}
       data-dashboard-ui="action"
       className={cn(
-        "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[4px] border px-3 text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#58aaff] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none",
+        "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[4px] border px-3 text-[12px] font-semibold transition-colors focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#58aaff] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none",
         ACTION_TONES[tone],
         className,
       )}
@@ -183,7 +183,7 @@ export function Field({ id, label, hint, error, className, style, ...props }: Fi
   return (
     <label htmlFor={fieldId} className="block min-w-0" data-dashboard-ui="field">
       <span
-        className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em]"
+        className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em]"
         style={{ color: dashboardTokens.textSecondary }}
       >
         {label}
@@ -194,7 +194,7 @@ export function Field({ id, label, hint, error, className, style, ...props }: Fi
         aria-invalid={error ? true : props["aria-invalid"]}
         aria-describedby={descriptionId}
         className={cn(
-          "mt-2 min-h-11 w-full min-w-0 rounded-[4px] border bg-[#0c0d0b] px-3 text-[13px] text-[#eee9dc] outline-none placeholder:text-[#8d867a] focus:border-[#58aaff]",
+          "mt-2 min-h-11 w-full min-w-0 rounded-[4px] border bg-[#0c0d0b] px-3 text-[13px] text-[#eee9dc] outline-hidden placeholder:text-[#8d867a] focus:border-[#58aaff]",
           className,
         )}
         style={{ borderColor: error ? dashboardTokens.danger : dashboardTokens.borderStrong, ...style }}
@@ -252,11 +252,11 @@ export function Notice({
       className={cn("min-w-0 rounded-[4px] border px-4 py-3", className)}
       style={{ backgroundColor, borderColor }}
     >
-      <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color }}>
+      <p className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color }}>
         {title}
       </p>
       {children ? (
-        <div className="mt-1.5 break-words text-[12px] leading-5" style={{ color: dashboardTokens.textSecondary }}>
+        <div className="mt-1.5 wrap-break-word text-[12px] leading-5" style={{ color: dashboardTokens.textSecondary }}>
           {children}
         </div>
       ) : null}
@@ -382,15 +382,15 @@ export function LiveStatCard({
         boxShadow: dashboardTokens.shadowSm,
       }}
     >
-      <span className="absolute start-0 top-0 h-full w-px" style={{ backgroundColor: dashboardTokens.borderInteractive }} aria-hidden="true" />
+      <span className="absolute inset-s-0 top-0 h-full w-px" style={{ backgroundColor: dashboardTokens.borderInteractive }} aria-hidden="true" />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: dashboardTokens.textMuted }}>
+          <p className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: dashboardTokens.textMuted }}>
             <span className="me-2 text-[#ff7545]" aria-hidden="true">SIG /</span>
             {label}
           </p>
           <p
-            className="mt-3 truncate font-[family:var(--font-mono)] text-[2rem] font-medium leading-none tracking-[-0.055em] tabular-nums sm:text-[2.2rem]"
+            className="mt-3 truncate font-(--font-mono) text-[2rem] font-medium leading-none tracking-[-0.055em] tabular-nums sm:text-[2.2rem]"
             style={{ color: dashboardTokens.textPrimary }}
           >
             {value}
@@ -438,12 +438,12 @@ export function LiveMiniStat({
         backgroundColor: dashboardTokens.bgInset,
       }}
     >
-      <div className="flex items-center gap-2 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: dashboardTokens.textMuted }}>
+      <div className="flex items-center gap-2 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: dashboardTokens.textMuted }}>
         <span className="text-[#58aaff]" aria-hidden="true">CH /</span>
         {Icon ? <Icon className="h-3.5 w-3.5" aria-hidden="true" /> : null}
         <span>{label}</span>
       </div>
-      <p className="mt-2 font-[family:var(--font-mono)] text-[13px] font-medium tabular-nums" style={{ color: dashboardTokens.textPrimary }}>
+      <p className="mt-2 font-(--font-mono) text-[13px] font-medium tabular-nums" style={{ color: dashboardTokens.textPrimary }}>
         {value}
       </p>
       {detail ? (
@@ -490,10 +490,10 @@ export function LiveAuthRequired({
             <Lock className="h-4 w-4" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: dashboardTokens.textLabel }}>
+            <p className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: dashboardTokens.textLabel }}>
               Access ledger / private workspace
             </p>
-            <p className="mt-2 font-[family:var(--font-site-display)] text-2xl font-medium tracking-[-0.045em]" style={{ color: dashboardTokens.textPrimary }}>
+            <p className="mt-2 font-(--font-site-display) text-2xl font-medium tracking-[-0.045em]" style={{ color: dashboardTokens.textPrimary }}>
               {displayTitle}
             </p>
             <p className="mt-2 max-w-xl text-[13px] leading-6" style={{ color: dashboardTokens.textSubtle }}>
@@ -533,7 +533,7 @@ export function LiveAuthRequired({
               className="flex items-start gap-3 border-b py-3 first:pt-0 last:border-0 last:pb-0"
               style={{ borderColor: dashboardTokens.borderSubtle }}
             >
-              <span className="font-[family:var(--font-mono)] text-[9px] text-[#ff7545]">
+              <span className="font-(--font-mono) text-[9px] text-[#ff7545]">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <p className="text-[12px] leading-5" style={{ color: dashboardTokens.textSubtle }}>{note}</p>
@@ -638,10 +638,10 @@ export function SignalPill({
 
   return (
     <div className="rounded-[4px] border px-2.5 py-2" style={toneStyles[tone]}>
-      <div className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em] opacity-80">
+      <div className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em] opacity-80">
         SIG / {label}
       </div>
-      <div className="mt-0.5 truncate font-[family:var(--font-mono)] text-[11px] font-semibold tabular-nums">
+      <div className="mt-0.5 truncate font-(--font-mono) text-[11px] font-semibold tabular-nums">
         {value}
       </div>
     </div>
@@ -681,13 +681,13 @@ export function BriefingBar({ entries }: { entries: BriefingBarEntry[] }) {
             aria-hidden="true"
           />
           <span
-            className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em]"
+            className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em]"
             style={{ color: dashboardTokens.textMuted }}
           >
             {entry.label}
           </span>
           <span
-            className="font-[family:var(--font-mono)] text-[10px] font-semibold tabular-nums"
+            className="font-(--font-mono) text-[10px] font-semibold tabular-nums"
             style={{ color: statusColors[entry.status] }}
           >
             {entry.value}
@@ -726,10 +726,10 @@ export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: dashboardTokens.textMuted }}>
+        <span className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: dashboardTokens.textMuted }}>
           Queue depth
         </span>
-        <span className="font-[family:var(--font-mono)] text-[10px] font-semibold tabular-nums" style={{ color: dashboardTokens.textPrimary }}>
+        <span className="font-(--font-mono) text-[10px] font-semibold tabular-nums" style={{ color: dashboardTokens.textPrimary }}>
           {total} total
         </span>
       </div>
@@ -750,7 +750,7 @@ export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
         {entries.map((entry) => (
           <div key={entry.status} className="flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: statusConfig[entry.status].color }} aria-hidden="true" />
-            <span className="font-[family:var(--font-mono)] text-[9px] tabular-nums" style={{ color: statusConfig[entry.status].color }}>
+            <span className="font-(--font-mono) text-[9px] tabular-nums" style={{ color: statusConfig[entry.status].color }}>
               {entry.label}: {entry.count}
             </span>
           </div>
@@ -820,10 +820,10 @@ export function FlowStatusBar({ stages }: { stages: FlowStage[] }) {
                 style={{ backgroundColor: isActive ? config.color : dashboardTokens.borderStrong }}
                 aria-hidden="true"
               />
-              <span className="font-[family:var(--font-mono)] text-[11px] font-medium uppercase tracking-[0.1em]">
+              <span className="font-(--font-mono) text-[11px] font-medium uppercase tracking-widest">
                 {config.label}
               </span>
-              <span className="font-[family:var(--font-mono)] text-[9px] font-semibold tabular-nums">
+              <span className="font-(--font-mono) text-[9px] font-semibold tabular-nums">
                 {stage.count}
               </span>
             </div>
@@ -855,11 +855,11 @@ export function CapacityIndicator({ used, max, label }: CapacityIndicatorProps) 
     <div className="space-y-1.5">
       {label && (
         <div className="flex items-center justify-between gap-3">
-          <span className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: dashboardTokens.textMuted }}>
+          <span className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: dashboardTokens.textMuted }}>
             {label}
           </span>
           <span
-            className="font-[family:var(--font-mono)] text-[9px] font-semibold tabular-nums"
+            className="font-(--font-mono) text-[9px] font-semibold tabular-nums"
             style={{ color: isOverCapacity ? dashboardTokens.danger : isNearCapacity ? dashboardTokens.warn : dashboardTokens.textSecondary }}
           >
             {used}/{max}

@@ -423,7 +423,7 @@ export default function DeploymentDetailPage() {
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-[#24303d] bg-[#0a1017] px-4 py-3">
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Identifier</p>
-                <p className="mt-2 truncate font-[family:var(--font-mono)] text-sm text-slate-100">{deployment.id}</p>
+                <p className="mt-2 truncate font-(--font-mono) text-sm text-slate-100">{deployment.id}</p>
               </div>
               <button
                 type="button"
@@ -577,7 +577,7 @@ export default function DeploymentDetailPage() {
             const nextReplicas = Number.parseInt(event.target.value, 10);
             setScaleReplicas(Number.isFinite(nextReplicas) ? Math.min(10, Math.max(1, nextReplicas)) : 1);
           }}
-          className="mt-2 w-full rounded-[14px] border border-[#2e3946] bg-[#0b1017] px-4 py-3 text-sm text-white focus:border-sky-300/30 focus:outline-none"
+          className="mt-2 w-full rounded-[14px] border border-[#2e3946] bg-[#0b1017] px-4 py-3 text-sm text-white focus:border-sky-300/30 focus:outline-hidden"
         />
         <p className="mt-2 text-xs leading-5 text-slate-500">Active deployments support between 1 and 10 replicas.</p>
       </DashboardDialog>

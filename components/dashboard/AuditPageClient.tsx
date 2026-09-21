@@ -103,7 +103,7 @@ const EMPTY_FILTERS: AuditFilters = {
 };
 
 const inputClassName =
-  "min-h-11 w-full rounded-[4px] border border-[#3a3933] bg-[#0d0e0b] px-3 text-sm text-[#eee9dc] outline-none transition placeholder:text-[#6f6a61] focus:border-[#ff7545] focus:ring-1 focus:ring-[#ff7545]";
+  "min-h-11 w-full rounded-[4px] border border-[#3a3933] bg-[#0d0e0b] px-3 text-sm text-[#eee9dc] outline-hidden transition placeholder:text-[#6f6a61] focus:border-[#ff7545] focus:ring-1 focus:ring-[#ff7545]";
 
 function toIsoTimestamp(value: string) {
   if (!value) return null;
@@ -300,7 +300,7 @@ export function AuditPageClient() {
         <button
           type="button"
           onClick={() => setReloadToken((value) => value + 1)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+          className="inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
         >
           <RotateCw className="h-4 w-4" aria-hidden="true" />
           Retry audit query
@@ -402,14 +402,14 @@ export function AuditPageClient() {
           <div className="flex flex-wrap gap-2 lg:col-span-3">
             <button
               type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffb091]"
+              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffb091]"
             >
               Apply query
             </button>
             <button
               type="button"
               onClick={clearFilters}
-              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
             >
               Clear filters
             </button>
@@ -426,7 +426,7 @@ export function AuditPageClient() {
             onClick={exportEvidence}
             disabled={!exportContext || exporting}
             aria-describedby="audit-export-requirement"
-            className="inline-flex min-h-10 items-center gap-2 rounded-[4px] border border-[#3d654f] bg-[#102019] px-3 text-xs font-semibold text-[#78e3b4] transition hover:border-[#78e3b4] disabled:cursor-not-allowed disabled:border-[#34342e] disabled:bg-[#151612] disabled:text-[#777268] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78e3b4]"
+            className="inline-flex min-h-10 items-center gap-2 rounded-[4px] border border-[#3d654f] bg-[#102019] px-3 text-xs font-semibold text-[#78e3b4] transition hover:border-[#78e3b4] disabled:cursor-not-allowed disabled:border-[#34342e] disabled:bg-[#151612] disabled:text-[#777268] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78e3b4]"
           >
             <Download className="h-4 w-4" aria-hidden="true" />
             {exporting ? "Exporting…" : "Export evidence"}
@@ -457,7 +457,7 @@ export function AuditPageClient() {
                     <StatusBadge status={eventStatus(event.event_type)} label={event.event_type} />
                     <span className="font-mono text-[11px] text-[#8d867a]">{formatRelativeTime(event.timestamp)}</span>
                   </div>
-                  <p className="mt-2 break-words text-sm font-medium text-[#eee9dc]">
+                  <p className="mt-2 wrap-break-word text-sm font-medium text-[#eee9dc]">
                     {actorLabel(event)}
                     <span className="font-normal text-[#777268]"> · {event.actor_type}</span>
                   </p>
@@ -465,7 +465,7 @@ export function AuditPageClient() {
                     agent {event.agent_id} · session {event.session_id}
                     {event.run_id ? ` · run ${event.run_id}` : ""}
                   </p>
-                  <p className="mt-2 break-words text-xs leading-5 text-[#999284]">
+                  <p className="mt-2 wrap-break-word text-xs leading-5 text-[#999284]">
                     {summarizeOperatorContext(event.payload)}
                   </p>
                 </div>
@@ -473,7 +473,7 @@ export function AuditPageClient() {
                   type="button"
                   onClick={() => setSelectedEvent(event)}
                   aria-label={`Inspect ${event.event_type} event ${event.event_id}`}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs font-semibold text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545] md:justify-self-end"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs font-semibold text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545] md:justify-self-end"
                 >
                   <Eye className="h-4 w-4" aria-hidden="true" />
                   Inspect event
@@ -490,7 +490,7 @@ export function AuditPageClient() {
               type="button"
               onClick={() => setSkip((value) => Math.max(0, value - PAGE_SIZE))}
               disabled={skip === 0}
-              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" /> Previous
             </button>
@@ -498,7 +498,7 @@ export function AuditPageClient() {
               type="button"
               onClick={() => setSkip((value) => value + PAGE_SIZE)}
               disabled={!hasNextPage}
-              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
             >
               Next <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -537,7 +537,7 @@ export function AuditPageClient() {
 
             <div>
               <h3 className="font-mono text-xs uppercase tracking-[0.12em] text-[#8d867a]">Redacted event context</h3>
-              <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap break-words rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-mono text-[11px] leading-5 text-[#c8c0b0]">
+              <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap wrap-break-word rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-mono text-[11px] leading-5 text-[#c8c0b0]">
                 {formatOperatorContext(selectedEvent.payload)}
               </pre>
             </div>
@@ -545,7 +545,7 @@ export function AuditPageClient() {
             {selectedEvent.cost_record ? (
               <div>
                 <h3 className="font-mono text-xs uppercase tracking-[0.12em] text-[#8d867a]">Redacted cost record</h3>
-                <pre className="mt-2 overflow-auto whitespace-pre-wrap break-words rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-mono text-[11px] leading-5 text-[#c8c0b0]">
+                <pre className="mt-2 overflow-auto whitespace-pre-wrap wrap-break-word rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-mono text-[11px] leading-5 text-[#c8c0b0]">
                   {formatOperatorContext(selectedEvent.cost_record)}
                 </pre>
               </div>

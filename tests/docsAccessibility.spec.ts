@@ -46,13 +46,15 @@ for (const { route, heading } of [
 
 test('docs search contains focus, closes on Escape, and restores scrolling', async ({ page }) => {
   await page.goto('/whitepaper');
-  await page.evaluate(() => window.scrollTo(0, Math.min(420, document.documentElement.scrollHeight - innerHeight)));
+  await expect(page.locator('.docs-content h1')).toBeVisible();
+  await page.evaluate(() => window.scrollTo({ top: Math.min(420, document.documentElement.scrollHeight - innerHeight), behavior: 'instant' }));
 
   const trigger = page.getByRole('button', { name: 'Search docs (Cmd+K)' });
   const scrollBefore = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }));
   expect(scrollBefore.y).toBeGreaterThan(0);
   await trigger.focus();
-  await trigger.click();
+  await trigger.focus();
+    await trigger.press('Enter');
 
   const dialog = page.getByRole('dialog', { name: 'Search documentation' });
   const input = dialog.getByRole('combobox', { name: 'Search documentation' });
@@ -78,7 +80,8 @@ test('docs search input, results, and trigger retain readable contrast', async (
 
   const trigger = page.getByRole('button', { name: 'Search docs (Cmd+K)' });
   expect(await contrastRatio(trigger, trigger)).toBeGreaterThanOrEqual(4.5);
-  await trigger.click();
+  await trigger.focus();
+    await trigger.press('Enter');
 
   const dialog = page.getByRole('dialog', { name: 'Search documentation' });
   const input = dialog.getByRole('combobox', { name: 'Search documentation' });

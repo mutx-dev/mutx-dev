@@ -29,7 +29,7 @@ describe('control demo interaction contracts', () => {
   })
 
   it('keeps the demo explicitly simulated and reduced-motion aware', () => {
-    expect(appSource).toContain('useReducedMotion() ?? false')
+    expect(appSource).toContain('useReducedMotionPreference()')
     expect(appSource).toContain('if (prefersReducedMotion)')
     expect(appSource).toContain('data-motion={prefersReducedMotion ? "reduced" : "full"}')
     expect(appSource).toContain('data-no-live-writes="true"')

@@ -121,7 +121,7 @@ export function TopBar({
               ))}
             </nav>
           ) : null}
-          <h1 className="truncate font-[family:var(--font-site-display)] text-[1.5rem] font-semibold tracking-[-0.06em] sm:text-[1.6rem]">
+          <h1 className="truncate font-(--font-site-display) text-[1.5rem] font-semibold tracking-[-0.06em] sm:text-[1.6rem]">
             {title}
           </h1>
           {hint ? <FeatureHint {...hint} align="start" className="pt-0.5" /> : null}
@@ -202,7 +202,7 @@ export function TopBar({
                     event.preventDefault();
                     items[nextIndex]?.focus();
                   }}
-                  className="absolute end-0 mt-2 min-w-[220px] overflow-hidden rounded-[22px] border py-1 shadow-2xl"
+                  className="absolute inset-e-0 mt-2 min-w-[220px] overflow-hidden rounded-[22px] border py-1 shadow-2xl"
                   style={{
                     borderColor: dashboardTokens.borderSubtle,
                     backgroundColor: dashboardTokens.bgSurfaceStrong,

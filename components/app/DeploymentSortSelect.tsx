@@ -11,7 +11,7 @@ export function DeploymentSortSelect({ value, onChange }: DeploymentSortSelectPr
       aria-label="Sort deployments by"
       value={value}
       onChange={(e) => onChange(e.target.value as "date" | "status" | "agent")}
-      className="min-h-11 rounded-[14px] border border-[#2f3c49] bg-[#10161d] px-3 py-2 text-sm text-white/80 focus:border-emerald-300/30 focus:outline-none"
+      className="min-h-11 rounded-[14px] border border-[#2f3c49] bg-[#10161d] px-3 py-2 text-sm text-white/80 focus:border-emerald-300/30 focus:outline-hidden"
     >
       <option value="date">Date (newest)</option>
       <option value="status">Status</option>

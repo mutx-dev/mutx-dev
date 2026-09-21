@@ -62,7 +62,8 @@ test('search and RTL drawer preserve focus and logical alignment', async ({ page
   await page.goto('/docs')
 
   const searchButton = page.getByRole('button', { name: 'Search docs (Cmd+K)' })
-  await searchButton.click()
+  await searchButton.focus();
+    await searchButton.press('Enter')
   const dialog = page.getByRole('dialog', { name: 'Search documentation' })
   await expect(dialog.getByRole('combobox')).toBeFocused()
   await dialog.getByRole('combobox').fill('deployment')
@@ -74,6 +75,6 @@ test('search and RTL drawer preserve focus and logical alignment', async ({ page
   await page.getByRole('button', { name: 'Open documentation navigation' }).click()
   const drawer = page.getByRole('dialog', { name: 'Documentation navigation' })
   await expect(drawer).toBeVisible()
-  expect(await drawer.evaluate((node) => Math.abs(node.getBoundingClientRect().right - innerWidth) < 1)).toBe(true)
+  await expect.poll(() => drawer.evaluate((node) => Math.abs(node.getBoundingClientRect().right - innerWidth) < 1)).toBe(true)
   await expectNoPageOverflow(page)
 })

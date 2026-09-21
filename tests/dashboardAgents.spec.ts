@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { test, expect } from '@playwright/test';
 
 const mockAgents = [
@@ -161,7 +162,7 @@ test.describe('Dashboard Agents List', () => {
     await page.getByRole('button', { name: 'Create Agent' }).click();
 
     await expect(page.getByLabel('Name *')).toBeVisible();
-    await expect(page.getByLabel('Description')).toBeVisible();
+    await expect(page.getByLabel('Description', { exact: true })).toBeVisible();
     await expect(page.getByLabel('Type')).toBeVisible();
     await page.getByLabel('Name *').fill('unavailable-agent');
     await page.getByRole('button', { name: 'Create Agent' }).last().click();
@@ -292,4 +293,9 @@ test.describe('Dashboard Agents List', () => {
     await expect(page.getByRole('heading', { name: 'test-agent-1' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'test-agent-2' })).toHaveCount(0);
   });
+});
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
 });

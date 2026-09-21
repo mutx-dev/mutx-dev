@@ -861,12 +861,12 @@ test.describe('mutx.dev QA', () => {
       agentGalleryBox!.x + agentGalleryBox!.width / 2,
       agentGalleryBox!.y + agentGalleryBox!.height / 2,
     );
-    await expect(page.getByRole('dialog', { name: /contact form/i })).toHaveCount(0);
+    await expect(page.getByRole('dialog', { name: /talk to the pico team|request accepted/i })).toHaveCount(0);
 
     await page.getByRole('button', { name: /talk to support/i }).click();
-    const dialog = page.getByRole('dialog', { name: /contact form/i });
+    const dialog = page.getByRole('dialog', { name: /talk to the pico team|request accepted/i });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole('heading', { name: /talk to the pico team/i })).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: /talk to the pico team|request accepted/i })).toBeVisible();
     await dialog.getByLabel(/work email/i).fill('operator@example.com');
     await dialog.getByLabel(/^name$/i).fill('Pico Operator');
     await dialog.getByLabel(/company/i).fill('MUTX Lab');
@@ -903,7 +903,7 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/pico', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: /talk to support/i }).click();
 
-    const dialog = page.getByRole('dialog', { name: /contact form/i });
+    const dialog = page.getByRole('dialog', { name: /talk to the pico team|request accepted/i });
     await dialog.getByLabel(/work email/i).fill('operator@example.com');
     await dialog.getByRole('checkbox', {
       name: /email me occasional Pico product and release updates/i,

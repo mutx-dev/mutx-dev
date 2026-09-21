@@ -244,15 +244,15 @@ export function PicoWelcomeTour({
         aria-labelledby={titleId}
         aria-describedby={stepDescriptionId}
         tabIndex={-1}
-        className={picoCodexFrame('flex max-h-full w-full max-w-[26rem] flex-col overflow-hidden p-0')}
+        className={picoCodexFrame('flex max-h-full w-full max-w-104 flex-col overflow-hidden p-0')}
       >
-        <div className="border-b border-[color:var(--pico-border)] px-5 py-4 sm:px-6">
+        <div className="border-b border-(--pico-border) px-5 py-4 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className={picoClasses.label}>{t('dialog.label')}</p>
               <h2
                 id={titleId}
-                className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.06em] text-[color:var(--pico-text)]"
+                className="mt-2 font-(--font-site-display) text-3xl tracking-[-0.06em] text-(--pico-text)"
               >
                 {t('dialog.title')}
               </h2>
@@ -279,12 +279,12 @@ export function PicoWelcomeTour({
             >
               {t('dialog.step', { current: stepIndex + 1, total: steps.length, eyebrow: step.eyebrow })}
             </p>
-            <h3 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+            <h3 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
               {step.title}
             </h3>
             <p
               id={stepDescriptionId}
-              className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]"
+              className="mt-3 text-sm leading-6 text-(--pico-text-secondary)"
             >
               {step.body}
             </p>
@@ -292,9 +292,9 @@ export function PicoWelcomeTour({
 
           <div className="grid gap-3">
             {step.bullets.map((bullet) => (
-              <div key={bullet} className={picoCodexInset('grid grid-cols-[0.8rem,1fr] items-start gap-3 px-4 py-4')}>
-                <span className="mt-1.5 h-2.5 w-2.5 rounded-full bg-[color:var(--pico-accent)]" />
-                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{bullet}</p>
+              <div key={bullet} className={picoCodexInset('grid grid-cols-[0.8rem_1fr] items-start gap-3 px-4 py-4')}>
+                <span className="mt-1.5 h-2.5 w-2.5 rounded-full bg-(--pico-accent)" />
+                <p className="text-sm leading-6 text-(--pico-text-secondary)">{bullet}</p>
               </div>
             ))}
           </div>
@@ -308,8 +308,8 @@ export function PicoWelcomeTour({
                   className={cn(
                     'h-2.5 rounded-full transition',
                     stepIndex === index
-                      ? 'w-7 bg-[color:var(--pico-accent)]'
-                      : 'w-2.5 bg-[color:var(--pico-border)]',
+                      ? 'w-7 bg-(--pico-accent)'
+                      : 'w-2.5 bg-(--pico-border)',
                   )}
                 />
               ))}

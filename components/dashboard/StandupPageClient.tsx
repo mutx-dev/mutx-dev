@@ -85,7 +85,7 @@ function BriefList({
           {items.map((item) => (
             <div
               key={item.id}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+              className="rounded-2xl border border-white/10 bg-white/3 p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -246,11 +246,11 @@ export function StandupPageClient() {
         title="Derived operator brief"
         meta={`updated ${formatRelativeTime(payload.generatedAt)}`}
       >
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+        <div className="rounded-3xl border border-white/10 bg-white/3 p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
             Focus
           </p>
-          <p className="mt-3 font-[family:var(--font-site-display)] text-[1.5rem] tracking-[-0.05em] text-white">
+          <p className="mt-3 font-(--font-site-display) text-[1.5rem] tracking-tighter text-white">
             {payload.focus}
           </p>
           <p className="mt-3 text-sm leading-6 text-slate-300">
@@ -298,7 +298,7 @@ export function StandupPageClient() {
             {payload.partials.map((note) => (
               <div
                 key={note}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                className="rounded-2xl border border-white/10 bg-white/3 px-4 py-3"
               >
                 <p className="text-sm leading-6 text-slate-300">{note}</p>
               </div>

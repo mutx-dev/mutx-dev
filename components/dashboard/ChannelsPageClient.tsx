@@ -241,7 +241,7 @@ export function ChannelsPageClient() {
               {payload.channels.map((channel) => (
                 <div
                   key={channel.id}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                  className="rounded-2xl border border-white/10 bg-white/3 p-4"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -343,7 +343,7 @@ export function ChannelsPageClient() {
                 {payload.partials.map((note) => (
                   <div
                     key={note}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                    className="rounded-2xl border border-white/10 bg-white/3 px-4 py-3"
                   >
                     <p className="text-sm leading-6 text-slate-300">{note}</p>
                   </div>

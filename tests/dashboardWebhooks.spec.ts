@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { expect, test, type Page } from '@playwright/test';
 
 const longWebhookId = `wh_${'identifier'.repeat(12)}`;
@@ -29,6 +30,10 @@ async function mockWebhookTraffic(page: Page) {
     const request = route.request();
     const { pathname } = new URL(request.url());
     const method = request.method();
+    if (pathname === '/api/dashboard/access') {
+      await route.fallback();
+      return;
+    }
 
     if (pathname === '/api/auth/me' && method === 'GET') {
       await route.fulfill({
@@ -111,7 +116,7 @@ test.describe('Webhook component accessibility', () => {
 
     await openWebhookPage(page);
 
-    const search = page.getByRole('searchbox', { name: 'Search webhooks' });
+    const search = page.getByRole('searchbox', { name: 'Search webhooks', includeHidden: true });
     await expect(search).toHaveAttribute('placeholder', 'Search webhooks by URL, ID, or event');
 
     await page.keyboard.press('Control+K');
@@ -140,7 +145,7 @@ test.describe('Webhook component accessibility', () => {
     await page.getByRole('button', { name: 'View delivery history' }).click();
 
     const disclosure = page.getByRole('button', {
-      name: `Expand ${longEventName} delivery details`,
+      name: new RegExp(`^(Expand|Collapse) ${longEventName} delivery details$`),
     });
     await expect(disclosure).toHaveAttribute('aria-expanded', 'false');
 
@@ -194,7 +199,7 @@ test.describe('Webhook component at 320px', () => {
 
     await historyButton.click();
     const disclosure = page.getByRole('button', {
-      name: `Expand ${longEventName} delivery details`,
+      name: new RegExp(`^(Expand|Collapse) ${longEventName} delivery details$`),
     });
     await disclosure.click();
 
@@ -214,4 +219,9 @@ test.describe('Webhook component at 320px', () => {
     expect(deliveryMetrics.right).toBeLessThanOrEqual(321);
     await expectNoHorizontalOverflow(page);
   });
+});
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
 });

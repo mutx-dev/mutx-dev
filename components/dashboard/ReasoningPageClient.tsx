@@ -268,7 +268,7 @@ export function ReasoningPageClient() {
               <select
                 value={selectedTemplateId}
                 onChange={(event) => setSelectedTemplateId(event.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
+                className="w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-white"
               >
                 {templates.map((template) => (
                   <option key={template.id} value={template.id}>
@@ -279,7 +279,7 @@ export function ReasoningPageClient() {
             </label>
 
             {selectedTemplate ? (
-              <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-sm text-slate-300">
+              <div className="rounded-2xl border border-white/10 bg-white/2 p-4 text-sm text-slate-300">
                 <p className="font-medium text-white">{selectedTemplate.summary}</p>
                 <p className="mt-2 text-slate-400">{selectedTemplate.description}</p>
               </div>
@@ -292,7 +292,7 @@ export function ReasoningPageClient() {
               <textarea
                 value={taskPrompt}
                 onChange={(event) => setTaskPrompt(event.target.value)}
-                className="min-h-32 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
+                className="min-h-32 w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-white"
                 placeholder="What should Autoreason improve, decide, or rewrite?"
               />
             </label>
@@ -304,7 +304,7 @@ export function ReasoningPageClient() {
               <textarea
                 value={incumbent}
                 onChange={(event) => setIncumbent(event.target.value)}
-                className="min-h-28 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
+                className="min-h-28 w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-white"
                 placeholder="Optional starting answer. Leave empty to draft from scratch."
               />
             </label>
@@ -316,7 +316,7 @@ export function ReasoningPageClient() {
               <textarea
                 value={rubric}
                 onChange={(event) => setRubric(event.target.value)}
-                className="min-h-24 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
+                className="min-h-24 w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-white"
                 placeholder="Optional evaluation rubric for the judge panel."
               />
             </label>
@@ -330,7 +330,7 @@ export function ReasoningPageClient() {
                 multiple
                 accept=".txt,.md,.pdf,.json,.yaml,.yml,.xml,.csv,.py,.js,.ts,.tsx,.html,.css,.log,.sh,.bash"
                 onChange={(event) => setContextFiles(Array.from(event.target.files ?? []))}
-                className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-300"
+                className="block w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-slate-300"
               />
               {contextFiles.length > 0 ? (
                 <ul className="space-y-1 text-xs text-slate-400">
@@ -371,7 +371,7 @@ export function ReasoningPageClient() {
                       type="button"
                       onClick={() => setSelectedJobId(job.id)}
                       className={`w-full rounded-2xl border p-4 text-left transition ${
-                        isSelected ? "border-sky-400/40 bg-sky-500/10" : "border-white/10 bg-white/[0.02]"
+                        isSelected ? "border-sky-400/40 bg-sky-500/10" : "border-white/10 bg-white/2"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -407,7 +407,7 @@ export function ReasoningPageClient() {
                   <span className="text-slate-500">run {selectedJob.run_id}</span>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/2 p-4">
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Winner</p>
                     <p className="mt-2 text-lg font-medium text-white">
                       {typeof selectedJob.result_summary?.winner === "string"
@@ -415,7 +415,7 @@ export function ReasoningPageClient() {
                         : "Pending"}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/2 p-4">
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Passes</p>
                     <p className="mt-2 text-lg font-medium text-white">
                       {typeof selectedJob.result_summary?.pass_count === "number"
@@ -424,7 +424,7 @@ export function ReasoningPageClient() {
                     </p>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="rounded-2xl border border-white/10 bg-white/2 p-4">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Input task</p>
                   <p className="mt-2 whitespace-pre-wrap text-slate-300">
                     {typeof selectedJob.parameters?.task_prompt === "string"
@@ -432,7 +432,7 @@ export function ReasoningPageClient() {
                       : "No task prompt recorded."}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="rounded-2xl border border-white/10 bg-white/2 p-4">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Artifacts</p>
                   {selectedJob.artifacts.length === 0 ? (
                     <p className="mt-2 text-slate-500">No artifacts synced yet.</p>

@@ -8,7 +8,7 @@ const UI_PORT_RANGE = { min: 18900, max: 18999 };
 const UI_SERVER_START_TIMEOUT_MS = 15000;
 const UI_SERVER_START_ATTEMPTS = 3;
 const UI_SERVER_BACKOFF_MS = [750, 1500, 3000];
-const UI_SERVER_HEALTH_PATH = "/api/dashboard/health";
+const UI_SERVER_HEALTH_PATH = "/api/desktop/health";
 const UI_SERVER_PROBE_TIMEOUT_MS = 2000;
 const UI_SERVER_PROBE_INTERVAL_MS = 250;
 const UI_SERVER_MAX_PROBE_BYTES = 64 * 1024;
@@ -279,7 +279,7 @@ function probeServerReadiness(url, timeoutMs = UI_SERVER_PROBE_TIMEOUT_MS) {
         }
 
         const health = contractValue(payload?.status, UI_HEALTH_VALUES);
-        const readiness = contractValue(payload?.database, UI_READINESS_VALUES);
+        const readiness = contractValue(payload?.readiness, UI_READINESS_VALUES);
         if (health !== "healthy" || readiness !== "ready") {
           settle(
             reject,

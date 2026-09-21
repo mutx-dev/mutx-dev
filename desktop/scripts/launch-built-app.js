@@ -57,12 +57,11 @@ async function main() {
 
   console.log(`Launching built app smoke from ${appPath}`);
 
+  const smokeEnv = { ...process.env, MUTX_DESKTOP_SMOKE: "1" };
+  delete smokeEnv.MUTX_DESKTOP_URL; // A release smoke must exercise the bundled UI.
   await new Promise((resolve, reject) => {
     const child = spawn(executablePath, ["--smoke-exit-after-ready"], {
-      env: {
-        ...process.env,
-        MUTX_DESKTOP_SMOKE: "1",
-      },
+      env: smokeEnv,
       stdio: "pipe",
     });
 
@@ -92,7 +91,12 @@ async function main() {
 
     child.on("exit", (code) => {
       clearTimeout(timer);
-      if (code === 0) {
+      const verified = [
+        "[Main] UI server started",
+        "[Main] Bridge started",
+        "[Main] Smoke launch verified",
+      ].every((marker) => stdout.includes(marker));
+      if (code === 0 && verified) {
         resolve();
         return;
       }

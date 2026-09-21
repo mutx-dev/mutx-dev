@@ -190,7 +190,7 @@ export function DashboardDialog({
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
         className={cn(
-          "relative z-10 flex max-h-[100dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[8px] border sm:max-h-[calc(100dvh-3rem)] sm:rounded-[8px]",
+          "relative z-10 flex max-h-dvh w-full max-w-lg flex-col overflow-hidden rounded-t-[8px] border sm:max-h-[calc(100dvh-3rem)] sm:rounded-[8px]",
           className,
         )}
         style={{
@@ -232,7 +232,7 @@ export function DashboardDialog({
             ref={closeButtonRef}
             type="button"
             onClick={() => onOpenChangeRef.current(false)}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border transition hover:opacity-90 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{
               borderColor: dashboardTokens.borderSubtle,
               backgroundColor: dashboardTokens.bgInset,

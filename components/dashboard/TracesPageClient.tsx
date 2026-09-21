@@ -168,7 +168,7 @@ export function TracesPageClient() {
                 className={`w-full rounded-xl border p-4 text-left transition ${
                   active
                     ? "border-cyan-400/35 bg-cyan-400/10"
-                    : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                    : "border-white/10 bg-white/2 hover:border-white/20"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -200,7 +200,7 @@ export function TracesPageClient() {
       >
         {selectedRun ? (
           <div className="space-y-4">
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-white/10 bg-white/2 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate font-mono text-sm text-white">{selectedRun.id}</p>
@@ -229,7 +229,7 @@ export function TracesPageClient() {
             ) : (
               <div className="space-y-3">
                 {traces.map((trace) => (
-                  <div key={trace.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div key={trace.id} className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-medium text-white">{trace.event_type}</p>

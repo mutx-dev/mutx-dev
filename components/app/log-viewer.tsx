@@ -229,7 +229,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
             <button
               onClick={() => setIsAutoScroll(!isAutoScroll)}
               className={cn(
-                'px-2.5 py-1 rounded text-xs font-medium border transition-colors',
+                'px-2.5 py-1 rounded-sm text-xs font-medium border transition-colors',
                 isAutoScroll
                   ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                   : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
@@ -239,13 +239,13 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
             </button>
             <button
               onClick={handleScrollToBottom}
-              className="px-2.5 py-1 rounded text-xs font-medium border border-white/10 bg-white/[0.02] text-slate-400 hover:text-white hover:border-white/20 transition-colors"
+              className="px-2.5 py-1 rounded-sm text-xs font-medium border border-white/10 bg-white/2 text-slate-400 hover:text-white hover:border-white/20 transition-colors"
             >
               Bottom
             </button>
             <button
               onClick={fetchLogs}
-              className="px-2.5 py-1 rounded text-xs font-medium border border-white/10 bg-white/[0.02] text-slate-400 hover:text-white hover:border-white/20 transition-colors"
+              className="px-2.5 py-1 rounded-sm text-xs font-medium border border-white/10 bg-white/2 text-slate-400 hover:text-white hover:border-white/20 transition-colors"
             >
               Refresh
             </button>
@@ -258,7 +258,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
             <select
               value={filters.deploymentId || ''}
               onChange={e => handleFilterChange('deploymentId', e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-black/30 text-slate-300 text-xs rounded border border-white/10 focus:outline-none focus:border-cyan-400/50"
+              className="w-full px-2.5 py-1.5 bg-black/30 text-slate-300 text-xs rounded-sm border border-white/10 focus:outline-hidden focus:border-cyan-400/50"
             >
               <option value="">Latest deployment</option>
               {deploymentId && !deployments.some(dep => dep.id === deploymentId) ? (
@@ -276,7 +276,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
             <select
               value={filters.level || ''}
               onChange={e => handleFilterChange('level', e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-black/30 text-slate-300 text-xs rounded border border-white/10 focus:outline-none focus:border-cyan-400/50"
+              className="w-full px-2.5 py-1.5 bg-black/30 text-slate-300 text-xs rounded-sm border border-white/10 focus:outline-hidden focus:border-cyan-400/50"
             >
               <option value="">All levels</option>
               <option value="error">Error</option>
@@ -292,7 +292,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
               value={filters.search || ''}
               onChange={e => handleFilterChange('search', e.target.value)}
               placeholder="Search logs..."
-              className="w-full px-2.5 py-1.5 bg-black/30 text-slate-300 text-xs rounded border border-white/10 focus:outline-none focus:border-cyan-400/50 placeholder:text-slate-600"
+              className="w-full px-2.5 py-1.5 bg-black/30 text-slate-300 text-xs rounded-sm border border-white/10 focus:outline-hidden focus:border-cyan-400/50 placeholder:text-slate-600"
             />
           </div>
         </div>
@@ -301,21 +301,21 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
           <button
             onClick={handleExportText}
             disabled={filteredLogs.length === 0}
-            className="px-2.5 py-1 rounded text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-2.5 py-1 rounded-sm text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Export .log
           </button>
           <button
             onClick={handleExportJson}
             disabled={filteredLogs.length === 0}
-            className="px-2.5 py-1 rounded text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-2.5 py-1 rounded-sm text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Export .json
           </button>
           <button
             onClick={handleClear}
             disabled={logs.length === 0}
-            className="px-2.5 py-1 rounded text-xs font-medium bg-red-500/15 text-red-300 border border-red-500/30 hover:bg-red-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-2.5 py-1 rounded-sm text-xs font-medium bg-red-500/15 text-red-300 border border-red-500/30 hover:bg-red-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Clear
           </button>
@@ -340,7 +340,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
         <span>
           Showing {filteredLogs.length} of {logs.length} logs
           {logs.length >= MAX_LOG_BUFFER && (
-            <span className="ml-2 px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/25">
+            <span className="ml-2 px-1.5 py-0.5 rounded-sm bg-amber-500/15 text-amber-400 border border-amber-500/25">
               Buffer full ({MAX_LOG_BUFFER})
             </span>
           )}
@@ -365,13 +365,13 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
           <EmptyState
             title="Logs unavailable"
             message={logsError}
-            className="h-40 border-red-500/20 bg-red-500/[0.03]"
+            className="h-40 border-red-500/20 bg-red-500/3"
           />
         ) : !selectedDeploymentId ? (
           <EmptyState
             title="No deployment selected"
             message="Create or select a deployment to load its log records."
-            className="h-40 border-white/5 bg-white/[0.02]"
+            className="h-40 border-white/5 bg-white/2"
           />
         ) : filteredLogs.length === 0 ? (
           <EmptyState
@@ -379,7 +379,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
             message={filters.level || filters.search
               ? 'Try changing the level or search filters.'
               : 'The backend returned no log records for this deployment.'}
-            className="h-40 border-white/5 bg-white/[0.02]"
+            className="h-40 border-white/5 bg-white/2"
           />
         ) : (
           filteredLogs.map(entry => (
@@ -401,7 +401,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
                     </span>
                     <span className="text-slate-500">[agent:{entry.agent_id.slice(0, 8)}]</span>
                   </div>
-                  <div className="mt-1 text-slate-300 break-words whitespace-pre-wrap">
+                  <div className="mt-1 text-slate-300 wrap-break-word whitespace-pre-wrap">
                     {entry.message}
                   </div>
                   {entry.extra_data && (
@@ -409,7 +409,7 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
                       <summary className="cursor-pointer text-xs text-slate-600 hover:text-slate-400">
                         Data
                       </summary>
-                      <pre className="mt-1 text-xs text-slate-600 overflow-auto max-h-24 bg-black/30 p-2 rounded">
+                      <pre className="mt-1 text-xs text-slate-600 overflow-auto max-h-24 bg-black/30 p-2 rounded-sm">
                         {entry.extra_data}
                       </pre>
                     </details>

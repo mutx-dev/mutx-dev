@@ -84,7 +84,7 @@ describe("desktop UI readiness probing", () => {
     const requests = installHttpPlans({
       kind: "response",
       statusCode: 200,
-      payload: { status: "healthy", database: "ready" },
+      payload: { status: "healthy", readiness: "ready" },
     });
 
     await expect(probeServerReadiness("http://127.0.0.1:18900", 200)).resolves.toEqual({
@@ -92,13 +92,13 @@ describe("desktop UI readiness probing", () => {
       readiness: "ready",
     });
     expect(requests.requestedUrls).toEqual([
-      "http://127.0.0.1:18900/api/dashboard/health",
+      "http://127.0.0.1:18900/api/desktop/health",
     ]);
   });
 
   it.each([
-    [{ status: "degraded", database: "ready" }, "health: degraded; readiness: ready"],
-    [{ status: "healthy", database: "initializing" }, "health: healthy; readiness: initializing"],
+    [{ status: "degraded", readiness: "ready" }, "health: degraded; readiness: ready"],
+    [{ status: "healthy", readiness: "initializing" }, "health: healthy; readiness: initializing"],
   ])("rejects a 200 response with unhealthy or not-ready truth", async (payload, reason) => {
     installHttpPlans({ kind: "response", statusCode: 200, payload });
 
@@ -109,7 +109,7 @@ describe("desktop UI readiness probing", () => {
     installHttpPlans({
       kind: "response",
       statusCode,
-      payload: { status: "healthy", database: "ready" },
+      payload: { status: "healthy", readiness: "ready" },
     });
 
     await expect(probeServerReadiness("http://127.0.0.1:18900", 200)).rejects.toThrow(
@@ -130,12 +130,12 @@ describe("desktop UI readiness probing", () => {
       {
         kind: "response",
         statusCode: 200,
-        payload: { status: "healthy", database: "initializing" },
+        payload: { status: "healthy", readiness: "initializing" },
       },
       {
         kind: "response",
         statusCode: 200,
-        payload: { status: "healthy", database: "ready" },
+        payload: { status: "healthy", readiness: "ready" },
       },
     );
 
@@ -149,7 +149,7 @@ describe("desktop UI readiness probing", () => {
     installHttpPlans({
       kind: "response",
       statusCode: 200,
-      payload: { status: "degraded", database: "initializing" },
+      payload: { status: "degraded", readiness: "initializing" },
     });
 
     let failure: Error | null = null;

@@ -133,7 +133,7 @@ function QueueList({
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
-            <div key={item.id ?? item.title} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div key={item.id ?? item.title} className="rounded-xl border border-white/10 bg-white/2 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-white">{item.title ?? item.id ?? "Unnamed task"}</p>
@@ -301,7 +301,7 @@ export function AutonomyPageClient() {
               />
             ) : (
               data.activeRunners.map((runner) => (
-                <div key={`${runner.taskId}-${runner.startedAt}`} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div key={`${runner.taskId}-${runner.startedAt}`} className="rounded-xl border border-white/10 bg-white/2 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium text-white">{runner.taskId ?? "unnamed task"}</p>
@@ -324,7 +324,7 @@ export function AutonomyPageClient() {
         <LivePanel title="Lane state" meta={`${data.lanes.length} reported lanes`}>
           <div className="space-y-3">
             {data.lanes.map((lane) => (
-              <div key={lane.name} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div key={lane.name} className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-white">{lane.name}</p>
@@ -355,7 +355,7 @@ export function AutonomyPageClient() {
           ) : (
             <div className="space-y-3">
               {data.reports.map((report, index) => (
-                <div key={`${report.taskId ?? "report"}-${index}`} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div key={`${report.taskId ?? "report"}-${index}`} className="rounded-xl border border-white/10 bg-white/2 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium text-white">{report.taskId ?? "unknown task"}</p>
@@ -378,7 +378,7 @@ export function AutonomyPageClient() {
         {data.fleet.roles.length ? (
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {data.fleet.roles.map((role) => (
-              <div key={role.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div key={role.id} className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium text-white">{role.id}</p>
                   <StatusBadge status={asDashboardStatus(role.lane)} label={role.lane} />

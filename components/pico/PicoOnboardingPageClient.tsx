@@ -329,7 +329,7 @@ export function PicoOnboardingPageClient() {
       description={t('hero.shellDescription')}
       heroContent={
         <div
-          className="relative overflow-hidden rounded-[28px] border border-[color:var(--pico-border-hover)] bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.16),rgba(9,16,11,0.88)_38%,rgba(255,255,255,0.03)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+          className="relative overflow-hidden rounded-[28px] border border-(--pico-border-hover) bg-[linear-gradient(135deg,rgba(var(--pico-accent-rgb),0.16),rgba(9,16,11,0.88)_38%,rgba(255,255,255,0.03)_100%)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
           data-testid="pico-onboarding-hero-signal"
         >
           <div
@@ -342,93 +342,93 @@ export function PicoOnboardingPageClient() {
           />
           <motion.div
             aria-hidden="true"
-            className="pointer-events-none absolute -start-8 top-10 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.16)] blur-3xl"
+            className="pointer-events-none absolute -inset-s-8 top-10 h-40 w-40 rounded-full bg-[rgba(var(--pico-accent-rgb),0.16)] blur-3xl"
             animate={prefersReducedMotion ? undefined : { x: [-10, 18, -6], y: [0, 14, -4], scale: [1, 1.08, 0.96] }}
             transition={ambientDriftTransition}
           />
           <motion.div
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 end-0 h-52 w-52 rounded-full bg-[rgba(var(--pico-accent-rgb),0.12)] blur-3xl"
+            className="pointer-events-none absolute bottom-0 inset-e-0 h-52 w-52 rounded-full bg-[rgba(var(--pico-accent-rgb),0.12)] blur-3xl"
             animate={prefersReducedMotion ? undefined : { x: [12, -10, 8], y: [8, -12, 0], scale: [0.94, 1.06, 1] }}
             transition={slowFloatTransition}
           />
-          <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr),18rem]">
+          <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
             <div className="grid gap-5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className={picoClasses.chip}>{t('hero.chip')}</span>
-                <span className="inline-flex rounded-full border border-[color:var(--pico-border)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-text-secondary)]">
+                <span className="inline-flex rounded-full border border-(--pico-border) bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-(--pico-text-secondary)">
                   {activeTrack.title}
                 </span>
               </div>
-              <p className="font-[family:var(--font-site-display)] text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-[color:var(--pico-text)]">
+              <p className="font-(--font-site-display) text-[clamp(1.9rem,4vw,2.9rem)] leading-[0.94] tracking-[-0.06em] text-(--pico-text)">
                 {heroEyebrow}
               </p>
-              <p className="max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+              <p className="max-w-2xl text-sm leading-6 text-(--pico-text-secondary)">
                 {t('hero.subtitle')}
               </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.label}>{t('hero.chapterPulse')}</p>
-                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  <p className="mt-2 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                     {chapterPulsePercent}%
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  <p className="mt-2 text-sm leading-6 text-(--pico-text-secondary)">
                     {t('hero.stepsClear', { completed: completedLessonStepCount, total: totalLessonStepCount })}
                   </p>
                 </div>
 
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.label}>{t('hero.proofState')}</p>
-                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  <p className="mt-2 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                     {proofSignalLabel}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  <p className="mt-2 text-sm leading-6 text-(--pico-text-secondary)">
                     {proofCaptured ? t('hero.proofArtifactLogged') : t('hero.proofArtifactMissing')}
                   </p>
                 </div>
 
                 <div className={picoSoft('p-4')}>
                   <p className={picoClasses.label}>{t('hero.runtimeTruth')}</p>
-                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  <p className="mt-2 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                     {runtimeSignal}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  <p className="mt-2 text-sm leading-6 text-(--pico-text-secondary)">
                     {runtimeSignalDetail}
                   </p>
                 </div>
               </div>
 
-              <div className={picoInset('grid gap-3 p-4 sm:grid-cols-[auto,minmax(0,1fr)] sm:items-center')}>
+              <div className={picoInset('grid gap-3 p-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center')}>
                 <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-[rgba(var(--pico-accent-rgb),0.24)] bg-[linear-gradient(180deg,rgba(var(--pico-accent-rgb),0.18),rgba(7,13,8,0.5))] shadow-[0_18px_40px_rgba(var(--pico-accent-rgb),0.12)]">
-                  <span className="h-3 w-3 rounded-full bg-[color:var(--pico-accent-bright)] shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
+                  <span className="h-3 w-3 rounded-full bg-(--pico-accent-bright) shadow-[0_0_18px_rgba(var(--pico-accent-rgb),0.5)]" />
                 </div>
                 <div className="min-w-0">
                   <p className={picoClasses.label}>{t('hero.nextIrreversibleMove')}</p>
-                  <p className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  <p className="mt-2 font-(--font-site-display) text-2xl tracking-tighter text-(--pico-text)">
                     {nextMoveTitle}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  <p className="mt-2 text-sm leading-6 text-(--pico-text-secondary)">
                     {activeFocusStep} · {activeWorkspaceLabel}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className={picoInset('relative min-h-[20rem] overflow-hidden border-[color:rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_22%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
+            <div className={picoInset('relative min-h-80 overflow-hidden border-[rgba(var(--pico-accent-rgb),0.24)] bg-[radial-gradient(circle_at_50%_22%,rgba(var(--pico-accent-rgb),0.16),rgba(6,11,7,0.94)_54%,rgba(3,5,3,0.98)_100%)] p-4')}>
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:28px_28px]"
+                className="pointer-events-none absolute inset-0 opacity-[0.18] bg-[linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[28px_28px]"
               />
               <motion.div
                 aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[16rem] w-[16rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(var(--pico-accent-rgb),0.16)]"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-[16rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(var(--pico-accent-rgb),0.16)]"
                 animate={prefersReducedMotion ? undefined : { rotate: 360 }}
                 transition={orbitTransition}
               />
               <motion.div
                 aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[11rem] w-[11rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(var(--pico-accent-rgb),0.24)]"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(var(--pico-accent-rgb),0.24)]"
                 animate={prefersReducedMotion ? undefined : { rotate: -360, scale: [0.98, 1.03, 0.98] }}
                 transition={prefersReducedMotion ? undefined : { duration: 16, repeat: Infinity, ease: 'linear' }}
               />
@@ -440,45 +440,45 @@ export function PicoOnboardingPageClient() {
               />
 
               <motion.div
-                className="absolute start-4 top-4 max-w-[8.5rem] rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                className="absolute inset-s-4 top-4 max-w-34 rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
                 animate={prefersReducedMotion ? undefined : { y: [-2, 10, -2], x: [0, 6, 0] }}
                 transition={ambientDriftTransition}
               >
                 <p className={picoClasses.label}>{t('hero.proof')}</p>
-                <p className="mt-1 font-medium text-[color:var(--pico-text)]">{proofSignalLabel}</p>
+                <p className="mt-1 font-medium text-(--pico-text)">{proofSignalLabel}</p>
               </motion.div>
 
               <motion.div
-                className="absolute end-4 top-7 max-w-[8.5rem] rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                className="absolute inset-e-4 top-7 max-w-34 rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
                 animate={prefersReducedMotion ? undefined : { y: [8, -6, 8], x: [0, -4, 0] }}
                 transition={slowFloatTransition}
               >
                 <p className={picoClasses.label}>{t('hero.runtime')}</p>
-                <p className="mt-1 font-medium text-[color:var(--pico-text)]">{runtimeSignal}</p>
+                <p className="mt-1 font-medium text-(--pico-text)">{runtimeSignal}</p>
               </motion.div>
 
               <motion.div
-                className="absolute bottom-4 start-5 max-w-[9rem] rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                className="absolute bottom-4 inset-s-5 max-w-36 rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
                 animate={prefersReducedMotion ? undefined : { y: [0, -10, 0], x: [-2, 6, -2] }}
                 transition={ambientDriftTransition}
               >
                 <p className={picoClasses.label}>{t('hero.focus')}</p>
-                <p className="mt-1 text-sm font-medium text-[color:var(--pico-text)]">{activeFocusStep}</p>
+                <p className="mt-1 text-sm font-medium text-(--pico-text)">{activeFocusStep}</p>
               </motion.div>
 
               <motion.div
-                className="absolute bottom-5 end-5 rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
+                className="absolute bottom-5 inset-e-5 rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[rgba(4,8,5,0.62)] px-3 py-2 backdrop-blur-md"
                 animate={prefersReducedMotion ? undefined : { y: [6, -4, 6], x: [0, -6, 0] }}
                 transition={slowFloatTransition}
               >
                 <p className={picoClasses.label}>{t('hero.sync')}</p>
-                <p className="mt-1 font-medium text-[color:var(--pico-text)]">{hostedSyncLabel}</p>
+                <p className="mt-1 font-medium text-(--pico-text)">{hostedSyncLabel}</p>
               </motion.div>
 
               <div className="relative flex h-full items-center justify-center">
-                <div className="w-full max-w-[11rem] rounded-[30px] border border-[rgba(var(--pico-accent-rgb),0.22)] bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-4 text-center shadow-[0_22px_60px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+                <div className="w-full max-w-44 rounded-[30px] border border-[rgba(var(--pico-accent-rgb),0.22)] bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-4 text-center shadow-[0_22px_60px_rgba(0,0,0,0.32)] backdrop-blur-xl">
                   <p className={picoClasses.label}>{t('hero.signalCore')}</p>
-                  <p className="mt-3 font-[family:var(--font-site-display)] text-5xl tracking-[-0.08em] text-[color:var(--pico-text)]">
+                  <p className="mt-3 font-(--font-site-display) text-5xl tracking-[-0.08em] text-(--pico-text)">
                     {chapterPulsePercent}%
                   </p>
                   <div className="mt-4 overflow-hidden rounded-full bg-[rgba(255,255,255,0.07)]">
@@ -487,7 +487,7 @@ export function PicoOnboardingPageClient() {
                       style={{ width: `${chapterPulsePercent}%` }}
                     />
                   </div>
-                  <p className="mt-3 text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
+                  <p className="mt-3 text-xs uppercase tracking-[0.18em] text-(--pico-text-muted)">
                     {t('hero.stepsClear', { completed: completedLessonStepCount, total: totalLessonStepCount })}
                   </p>
                 </div>
@@ -579,12 +579,12 @@ export function PicoOnboardingPageClient() {
       />
 
       <section className={picoPanel('p-6 sm:p-7')} data-testid="pico-onboarding-kickoff-doctrine">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr),20rem]">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_20rem]">
           <div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className={picoClasses.label}>{t('doctrine.label')}</p>
-                <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)]">
+                <h2 className="mt-3 font-(--font-site-display) text-4xl tracking-[-0.06em] text-(--pico-text)">
                   {t('doctrine.title')}
                 </h2>
               </div>
@@ -595,10 +595,10 @@ export function PicoOnboardingPageClient() {
               {kickoffDoctrine.map((item) => (
                 <article key={item.label} className={picoInset('snap-start flex h-full flex-col p-5')}>
                   <p className={picoClasses.label}>{item.label}</p>
-                  <h3 className="mt-5 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  <h3 className="mt-5 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                     {item.title}
                   </h3>
-                  <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+                  <p className="mt-4 text-sm leading-7 text-(--pico-text-secondary)">
                     {item.body}
                   </p>
                 </article>
@@ -609,7 +609,7 @@ export function PicoOnboardingPageClient() {
           <div className="grid gap-4">
             <div className={picoEmber('p-5')}>
               <p className={picoClasses.label}>{t('doctrine.postTitle')}</p>
-              <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+              <p className="mt-3 text-sm leading-6 text-(--pico-text-secondary)">
                 {t('doctrine.postBody')}
               </p>
             </div>
@@ -627,10 +627,10 @@ export function PicoOnboardingPageClient() {
               <div className="mt-4 grid gap-3">
                 {activeTrack.checklist.map((item) => (
                   <div key={item} className="flex items-start gap-3">
-                    <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--pico-accent)]">
+                    <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-(--pico-border) bg-[rgba(var(--pico-accent-rgb),0.12)] text-[10px] font-semibold uppercase tracking-[0.16em] text-(--pico-accent)">
                       {t('runtime.done')}
                     </span>
-                    <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item}</p>
+                    <p className="text-sm leading-6 text-(--pico-text-secondary)">{item}</p>
                   </div>
                 ))}
               </div>
@@ -639,20 +639,20 @@ export function PicoOnboardingPageClient() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.08fr)_22rem]">
         <div className={picoPanel('overflow-hidden p-0')}>
-          <div className="grid gap-0 border-b border-[color:var(--pico-border)] lg:grid-cols-[minmax(0,1fr),18rem]">
+          <div className="grid gap-0 border-b border-(--pico-border) lg:grid-cols-[minmax(0,1fr)_18rem]">
             <div className="p-6 sm:p-7">
               <p className={picoClasses.label}>{t('labels.chapterBrief')}</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-4xl tracking-[-0.06em] text-[color:var(--pico-text)] sm:text-5xl">
+              <h2 className="mt-3 font-(--font-site-display) text-4xl tracking-[-0.06em] text-(--pico-text) sm:text-5xl">
                 {t('doctrine.brief')}
               </h2>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-[color:var(--pico-text-secondary)] sm:text-base">
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-(--pico-text-secondary) sm:text-base">
                 {t('doctrine.items.install.body')}
               </p>
 
               <div className={joinClasses(picoEmber('mt-6 p-5 text-sm leading-7'), 'sm:p-6')}>
-                <p className="font-medium text-[color:var(--pico-text)]">{t('labels.fastestPath')}</p>
+                <p className="font-medium text-(--pico-text)">{t('labels.fastestPath')}</p>
                 <p className="mt-2">
                   {firstRunDone
                     ? t('doctrine.fastestPath.cleared')
@@ -665,19 +665,19 @@ export function PicoOnboardingPageClient() {
               <div className={picoInset('mt-6 grid gap-4 p-5 lg:grid-cols-3')}>
                 <div>
                   <p className={picoClasses.label}>{t('labels.trackLocked')}</p>
-                  <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  <p className="mt-2 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                     {activeTrack.title}
                   </p>
                 </div>
                 <div>
                   <p className={picoClasses.label}>{t('hero.nextMove')}</p>
-                  <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
+                  <p className="mt-2 text-lg font-medium text-(--pico-text)">
                     {nextLesson?.title ?? t('runtime.notRecorded')}
                   </p>
                 </div>
                 <div>
                   <p className={picoClasses.label}>{t('labels.visibleSuccess')}</p>
-                  <p className="mt-2 text-lg font-medium text-[color:var(--pico-text)]">
+                  <p className="mt-2 text-lg font-medium text-(--pico-text)">
                     {firstRunWorkspace.workspace.evidence.trim() || firstRunDone
                       ? t('mission.captured')
                       : installDone
@@ -688,30 +688,30 @@ export function PicoOnboardingPageClient() {
               </div>
             </div>
 
-            <div className="border-t border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] p-6 lg:border-s lg:border-t-0">
+            <div className="border-t border-(--pico-border) bg-(--pico-bg-surface) p-6 lg:border-s lg:border-t-0">
               <p className={picoClasses.label}>{t('labels.studioLedger')}</p>
               <div className="mt-4 grid gap-3">
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.completedLessons')}</p>
-                  <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">
+                  <p className="text-sm text-(--pico-text-muted)">{t('labels.completedLessons')}</p>
+                  <p className="mt-1 text-2xl font-semibold text-(--pico-text)">
                     {derived.completedLessonCount}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.hostedSync')}</p>
-                  <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">
+                  <p className="text-sm text-(--pico-text-muted)">{t('labels.hostedSync')}</p>
+                  <p className="mt-1 text-2xl font-semibold text-(--pico-text)">
                     {session.status === 'authenticated' ? `${hostedCompletionRatio}%` : t('runtime.signInShort')}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.runtimeStatus')}</p>
-                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                  <p className="text-sm text-(--pico-text-muted)">{t('labels.runtimeStatus')}</p>
+                  <p className="mt-1 text-lg font-medium text-(--pico-text)">
                     {setup.runtime?.status ?? t('hero.runtimeNotAttached')}
                   </p>
                 </div>
                 <div className={picoSoft('p-4')}>
-                  <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.workspace')}</p>
-                  <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                  <p className="text-sm text-(--pico-text-muted)">{t('labels.workspace')}</p>
+                  <p className="mt-1 text-lg font-medium text-(--pico-text)">
                     {setup.onboarding?.workspace ?? currentBinding?.workspace ?? t('runtime.notRecorded')}
                   </p>
                 </div>
@@ -734,7 +734,7 @@ export function PicoOnboardingPageClient() {
 
               <div className={picoInset('mt-4 p-4')}>
                 <p className={picoClasses.label}>{t('labels.operatingRule')}</p>
-                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                <p className="mt-3 text-sm leading-6 text-(--pico-text-secondary)">
                   {t('doctrine.reviewLine')}
                 </p>
               </div>
@@ -747,12 +747,12 @@ export function PicoOnboardingPageClient() {
             <p className={picoClasses.label}>{t('labels.currentPressure')}</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.install')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{installDone ? t('runtime.done') : t('runtime.pending')}</p>
+                <p className="text-sm text-(--pico-text-muted)">{t('labels.install')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">{installDone ? t('runtime.done') : t('runtime.pending')}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.firstPrompt')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                <p className="text-sm text-(--pico-text-muted)">{t('labels.firstPrompt')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">
                   {firstRunWorkspace.workspace.evidence.trim() || firstRunDone ? t('hero.proofArtifactLogged') : t('runtime.pending')}
                 </p>
               </div>
@@ -765,10 +765,10 @@ export function PicoOnboardingPageClient() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
               <p className={picoClasses.label}>{t('labels.proofProtocol')}</p>
-            <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+            <h2 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text) sm:text-4xl">
               {t('protocol.title')}
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-(--pico-text-secondary)">
               {t('protocol.body')}
             </p>
           </div>
@@ -779,15 +779,15 @@ export function PicoOnboardingPageClient() {
           {activationChecklist.map((item, index) => (
             <article key={item.title} className={picoInset('snap-start flex h-full flex-col p-5 sm:p-6')}>
               <div className="flex items-center justify-between gap-3">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--pico-border)] bg-[rgba(var(--pico-accent-rgb),0.12)] text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--pico-accent)]">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-(--pico-border) bg-[rgba(var(--pico-accent-rgb),0.12)] text-xs font-semibold uppercase tracking-[0.18em] text-(--pico-accent)">
                   {item.chapter}
                 </span>
                 <span className={picoClasses.label}>{index === 0 ? t('labels.doThisNow') : t('labels.visibleMove')}</span>
               </div>
-              <h3 className="mt-6 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+              <h3 className="mt-6 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                 {t(`protocol.items.${index}.title`)}
               </h3>
-              <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">{t(`protocol.items.${index}.body`)}</p>
+              <p className="mt-4 text-sm leading-7 text-(--pico-text-secondary)">{t(`protocol.items.${index}.body`)}</p>
             </article>
           ))}
         </div>
@@ -797,10 +797,10 @@ export function PicoOnboardingPageClient() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className={picoClasses.label}>{t('stack.label')}</p>
-            <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+            <h2 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text) sm:text-4xl">
               {t('stack.title')}
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-(--pico-text-secondary)">
               {t('stack.body')}
             </p>
           </div>
@@ -816,10 +816,10 @@ export function PicoOnboardingPageClient() {
                 <span className={picoClasses.label}>{stack.name}</span>
                 <span className={picoClasses.chip}>{t(`stack.items.${stack.id}.latestSignal`)}</span>
               </div>
-              <p className="mt-6 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+              <p className="mt-6 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                 {t(`stack.items.${stack.id}.whyNow`)}
               </p>
-              <p className="mt-4 text-sm leading-7 text-[color:var(--pico-text-secondary)]">
+              <p className="mt-4 text-sm leading-7 text-(--pico-text-secondary)">
                 {t('stack.itemBody')}
               </p>
             </article>
@@ -831,10 +831,10 @@ export function PicoOnboardingPageClient() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
               <p className={picoClasses.label}>{t('labels.missionBoard')}</p>
-              <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+              <h2 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text) sm:text-4xl">
               {t('mission.title')}
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-(--pico-text-secondary)">
               {t('mission.body')}
             </p>
           </div>
@@ -846,7 +846,7 @@ export function PicoOnboardingPageClient() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className={picoClasses.label}>{t('labels.mission01')}</p>
-                <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                <h3 className="mt-2 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                   {t('mission.installHermes')}
                 </h3>
               </div>
@@ -854,7 +854,7 @@ export function PicoOnboardingPageClient() {
                 {t('hero.stepsClear', { completed: installWorkspace.completedStepCount, total: installLesson?.steps.length ?? 0 })}
               </span>
             </div>
-            <div className="overflow-hidden rounded-full bg-[color:var(--pico-bg-input)]">
+            <div className="overflow-hidden rounded-full bg-(--pico-bg-input)">
               <div
                 className="h-2 rounded-full bg-[linear-gradient(90deg,var(--pico-accent),var(--pico-accent-bright))]"
                 style={{ width: `${installWorkspace.progressPercent}%` }}
@@ -862,12 +862,12 @@ export function PicoOnboardingPageClient() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('mission.focusedStep')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{installFocusedStep}</p>
+                <p className="text-sm text-(--pico-text-muted)">{t('mission.focusedStep')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">{installFocusedStep}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('mission.proofState')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                <p className="text-sm text-(--pico-text-muted)">{t('mission.proofState')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">
                   {installWorkspace.workspace.evidence.trim() ? t('mission.captured') : installDone ? t('mission.completed') : t('mission.missing')}
                 </p>
               </div>
@@ -886,7 +886,7 @@ export function PicoOnboardingPageClient() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className={picoClasses.label}>{t('labels.mission02')}</p>
-                <h3 className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                <h3 className="mt-2 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                   {t('mission.runBoundedPrompt')}
                 </h3>
               </div>
@@ -894,7 +894,7 @@ export function PicoOnboardingPageClient() {
                 {t('hero.stepsClear', { completed: firstRunWorkspace.completedStepCount, total: firstRunLesson?.steps.length ?? 0 })}
               </span>
             </div>
-            <div className="overflow-hidden rounded-full bg-[color:var(--pico-bg-input)]">
+            <div className="overflow-hidden rounded-full bg-(--pico-bg-input)">
               <div
                 className="h-2 rounded-full bg-[linear-gradient(90deg,var(--pico-accent),var(--pico-accent-bright))]"
                 style={{ width: `${firstRunWorkspace.progressPercent}%` }}
@@ -902,12 +902,12 @@ export function PicoOnboardingPageClient() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('mission.focusedStep')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">{firstRunFocusedStep}</p>
+                <p className="text-sm text-(--pico-text-muted)">{t('mission.focusedStep')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">{firstRunFocusedStep}</p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('mission.proofState')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                <p className="text-sm text-(--pico-text-muted)">{t('mission.proofState')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">
                   {firstRunWorkspace.workspace.evidence.trim() ? t('mission.captured') : firstRunDone ? t('mission.completed') : t('mission.missing')}
                 </p>
               </div>
@@ -928,10 +928,10 @@ export function PicoOnboardingPageClient() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className={picoClasses.label}>{t('coach.label')}</p>
-            <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+            <h2 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text) sm:text-4xl">
               {t('coach.title')}
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-(--pico-text-secondary)">
               {t('coach.body')}
             </p>
           </div>
@@ -960,7 +960,7 @@ export function PicoOnboardingPageClient() {
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr),22rem]">
+          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
             <div className="grid gap-4">
               {setup.coachLoading && !setup.coachSession ? (
                 <div className={picoSoft('p-5')} data-testid="pico-coach-loading">
@@ -998,7 +998,7 @@ export function PicoOnboardingPageClient() {
               ) : null}
 
               <div
-                className={picoInset('grid max-h-[28rem] min-h-[12rem] gap-3 overflow-y-auto p-4')}
+                className={picoInset('grid max-h-112 min-h-48 gap-3 overflow-y-auto p-4')}
                 aria-live="polite"
                 data-testid="pico-coach-history"
               >
@@ -1009,7 +1009,7 @@ export function PicoOnboardingPageClient() {
                       className={message.role === 'assistant' ? picoSoft('p-4') : picoEmber('p-4')}
                     >
                       <p className={picoClasses.label}>{message.role === 'assistant' ? t('coach.picoCoach') : t('coach.you')}</p>
-                      <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-(--pico-text-secondary)">
                         {message.content}
                       </p>
                     </article>
@@ -1024,14 +1024,14 @@ export function PicoOnboardingPageClient() {
               </div>
 
               <form className={picoInset('grid gap-3 p-4')} onSubmit={submitCoachMessage}>
-                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                   <span className={picoClasses.label}>{t('coach.continueSetup')}</span>
                   <textarea
                     value={coachDraft}
                     onChange={(event) => setCoachDraft(event.target.value)}
                     maxLength={6000}
                     rows={4}
-                    className="resize-y rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                    className="resize-y rounded-[20px] border border-(--pico-border) bg-(--pico-bg-input) px-4 py-3 text-(--pico-text) outline-hidden placeholder:text-(--pico-text-muted)"
                     placeholder={t('coach.placeholder')}
                   />
                 </label>
@@ -1060,25 +1060,25 @@ export function PicoOnboardingPageClient() {
             <aside className={picoInset('grid content-start gap-4 p-5')} data-testid="pico-package-readiness">
               <div>
                 <p className={picoClasses.label}>{t('coach.readiness')}</p>
-                <p className="mt-2 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                <p className="mt-2 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                   {coachReady ? t('runtime.ready') : t('coach.needsDetails')}
                 </p>
               </div>
               {(['stack', 'os', 'provider', 'goal'] as const).map((field) => (
                 <div key={field} className={picoSoft('flex items-center justify-between gap-3 p-3')}>
-                  <span className="text-sm text-[color:var(--pico-text-muted)]">{t(`coach.fields.${field}`)}</span>
-                  <span className="text-sm font-medium text-[color:var(--pico-text)]">
+                  <span className="text-sm text-(--pico-text-muted)">{t(`coach.fields.${field}`)}</span>
+                  <span className="text-sm font-medium text-(--pico-text)">
                     {setup.coachSession?.onboarding_state[field] ?? t('coach.notConfirmed')}
                   </span>
                 </div>
               ))}
               {!emailReady ? (
-                <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                <p className="text-sm leading-6 text-(--pico-text-secondary)">
                   {t('coach.verifyEmail')}
                 </p>
               ) : !packagePlanReady ? (
                 <div className="grid gap-2">
-                  <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                  <p className="text-sm leading-6 text-(--pico-text-secondary)">
                     {t('coach.planRequired')}
                   </p>
                   <Link href={toHref('/pricing')} className={picoClasses.secondaryButton}>
@@ -1096,7 +1096,7 @@ export function PicoOnboardingPageClient() {
               </button>
               {setup.packageError ? (
                 <div className={picoEmber('grid gap-3 p-4')} role="alert">
-                  <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{t('coach.errorDetail', { detail: setup.packageError })}</p>
+                  <p className="text-sm leading-6 text-(--pico-text-secondary)">{t('coach.errorDetail', { detail: setup.packageError })}</p>
                   {setup.coachAuthRequired ? (
                     <button type="button" onClick={session.retry} className={picoClasses.secondaryButton}>
                       {t('coach.refreshSignIn')}
@@ -1134,10 +1134,10 @@ export function PicoOnboardingPageClient() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className={picoClasses.label}>{t('labels.operatorRecord')}</p>
-            <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+            <h2 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text) sm:text-4xl">
               {t('operatorRecord.title')}
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-(--pico-text-secondary)">
               {t('operatorRecord.body')}
             </p>
           </div>
@@ -1152,7 +1152,7 @@ export function PicoOnboardingPageClient() {
           ) : null}
         </div>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.08fr),22rem]">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.08fr)_22rem]">
           <div className="grid gap-4">
             {session.status !== 'authenticated' ? (
               <div className={picoSoft('p-5')}>
@@ -1179,7 +1179,7 @@ export function PicoOnboardingPageClient() {
                           key={provider.id}
                           className={joinClasses(
                             picoInset('snap-start grid gap-2 p-4'),
-                            active && 'border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.09)]',
+                            active && 'border-(--pico-border-hover) bg-[rgba(var(--pico-accent-rgb),0.09)]',
                             !provider.enabled && 'opacity-70',
                           )}
                         >
@@ -1187,15 +1187,15 @@ export function PicoOnboardingPageClient() {
                             <div className="flex items-center gap-3">
                               <span className="text-xl">{provider.cue ?? '•'}</span>
                               <div>
-                                <p className="font-medium text-[color:var(--pico-text)]">{provider.label}</p>
-                                <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--pico-text-muted)]">
+                                <p className="font-medium text-(--pico-text)">{provider.label}</p>
+                                <p className="text-xs uppercase tracking-[0.18em] text-(--pico-text-muted)">
                                   {active ? t('runtime.currentProvider') : provider.enabled ? t('runtime.availableSoon') : t('runtime.locked')}
                                 </p>
                               </div>
                             </div>
                             <span className={picoClasses.chip}>{provider.enabled ? t('runtime.ready') : t('runtime.later')}</span>
                           </div>
-                          <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{provider.summary}</p>
+                          <p className="text-sm leading-6 text-(--pico-text-secondary)">{provider.summary}</p>
                         </article>
                       )
                     })}
@@ -1204,26 +1204,26 @@ export function PicoOnboardingPageClient() {
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">{t('runtime.wizardProgress')}</p>
-                    <p className="mt-1 text-2xl font-semibold text-[color:var(--pico-text)]">
+                    <p className="text-sm text-(--pico-text-muted)">{t('runtime.wizardProgress')}</p>
+                    <p className="mt-1 text-2xl font-semibold text-(--pico-text)">
                       {setup.onboarding ? `${hostedCompletionRatio}%` : t('runtime.notStarted')}
                     </p>
                   </div>
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">{t('runtime.currentStep')}</p>
-                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                    <p className="text-sm text-(--pico-text-muted)">{t('runtime.currentStep')}</p>
+                    <p className="mt-1 text-lg font-medium text-(--pico-text)">
                       {setup.onboarding?.current_step ?? t('runtime.notRecorded')}
                     </p>
                   </div>
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.runtimeStatus')}</p>
-                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                    <p className="text-sm text-(--pico-text-muted)">{t('labels.runtimeStatus')}</p>
+                    <p className="mt-1 text-lg font-medium text-(--pico-text)">
                       {setup.runtime?.status ?? t('hero.runtimeNotAttached')}
                     </p>
                   </div>
                   <div className={picoInset('p-4')}>
-                    <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.currentBinding')}</p>
-                    <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                    <p className="text-sm text-(--pico-text-muted)">{t('labels.currentBinding')}</p>
+                    <p className="mt-1 text-lg font-medium text-(--pico-text)">
                       {currentBinding?.assistant_name ?? currentBinding?.assistant_id ?? t('runtime.currentBindingNotRecorded')}
                     </p>
                   </div>
@@ -1234,7 +1234,7 @@ export function PicoOnboardingPageClient() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className={picoClasses.label}>{t('runtime.hostedKickoffReview')}</p>
-                        <h3 className="mt-2 font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                        <h3 className="mt-2 font-(--font-site-display) text-2xl tracking-tighter text-(--pico-text)">
                           {setup.onboarding.status}
                         </h3>
                       </div>
@@ -1244,7 +1244,7 @@ export function PicoOnboardingPageClient() {
                     </div>
 
                     {setup.onboarding.last_error ? (
-                      <p className="text-sm leading-6 text-[color:var(--pico-accent)]">{t('operatorRecord.errorDetail', { detail: setup.onboarding.last_error })}</p>
+                      <p className="text-sm leading-6 text-(--pico-accent)">{t('operatorRecord.errorDetail', { detail: setup.onboarding.last_error })}</p>
                     ) : null}
 
                     <div className={timelineRailClass}>
@@ -1256,12 +1256,12 @@ export function PicoOnboardingPageClient() {
                             key={step.id}
                             className={joinClasses(
                               picoInset('snap-start flex items-center justify-between gap-4 px-4 py-3'),
-                              active && 'border-[color:var(--pico-border-hover)] bg-[rgba(var(--pico-accent-rgb),0.08)]',
+                              active && 'border-(--pico-border-hover) bg-[rgba(var(--pico-accent-rgb),0.08)]',
                             )}
                           >
                             <div>
-                              <p className="text-sm font-medium text-[color:var(--pico-text)]">{step.title}</p>
-                              <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[color:var(--pico-text-muted)]">
+                              <p className="text-sm font-medium text-(--pico-text)">{step.title}</p>
+                              <p className="mt-1 text-xs uppercase tracking-[0.2em] text-(--pico-text-muted)">
                                 {step.id}
                               </p>
                             </div>
@@ -1279,38 +1279,38 @@ export function PicoOnboardingPageClient() {
                   </div>
                 )}
 
-                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr),18rem]">
+                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
                   <div className={picoInset('p-5')}>
                     <p className={picoClasses.label}>{t('runtime.operatorHostSnapshot')}</p>
                     {setup.runtime ? (
                       <div className="mt-4 grid gap-3 sm:grid-cols-2">
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">{t('runtime.gateway')}</p>
-                          <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                          <p className="text-sm text-(--pico-text-muted)">{t('runtime.gateway')}</p>
+                          <p className="mt-1 text-lg font-medium text-(--pico-text)">
                             {setup.runtime.gateway_url ?? t('runtime.notRecorded')}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">{t('runtime.installMethod')}</p>
-                          <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                          <p className="text-sm text-(--pico-text-muted)">{t('runtime.installMethod')}</p>
+                          <p className="mt-1 text-lg font-medium text-(--pico-text)">
                             {setup.runtime.install_method ?? t('runtime.notRecorded')}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">{t('runtime.lastSeen')}</p>
-                          <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                          <p className="text-sm text-(--pico-text-muted)">{t('runtime.lastSeen')}</p>
+                          <p className="mt-1 text-lg font-medium text-(--pico-text)">
                             {formatTimestamp(setup.runtime.last_seen_at, locale, t('runtime.notRecorded'))}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-[color:var(--pico-text-muted)]">{t('runtime.bindings')}</p>
-                          <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                          <p className="text-sm text-(--pico-text-muted)">{t('runtime.bindings')}</p>
+                          <p className="mt-1 text-lg font-medium text-(--pico-text)">
                             {setup.runtime.binding_count}
                           </p>
                         </div>
                       </div>
                     ) : (
-                      <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                      <p className="mt-3 text-sm leading-6 text-(--pico-text-secondary)">
                         {t('runtime.noRuntimeSnapshot')}
                       </p>
                     )}
@@ -1318,10 +1318,10 @@ export function PicoOnboardingPageClient() {
 
                   <div className={picoEmber('p-5')}>
                     <p className={picoClasses.label}>{t('runtime.gatewayHealth')}</p>
-                    <p className="mt-2 text-lg text-[color:var(--pico-text)]">
+                    <p className="mt-2 text-lg text-(--pico-text)">
                       {setup.runtime?.gateway?.status ?? t('runtime.unknown')}
                     </p>
-                    <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                    <p className="mt-3 text-sm leading-6 text-(--pico-text-secondary)">
                       {typeof setup.runtime?.gateway?.doctor_summary === 'string'
                         ? setup.runtime.gateway.doctor_summary
                         : t('runtime.noDoctorSummary')}
@@ -1341,15 +1341,15 @@ export function PicoOnboardingPageClient() {
                     <span className={picoClasses.chip}>{t('labels.doThisFirst')}</span>
                     <span className={picoClasses.chip}>{t('labels.outcomeDriven')}</span>
                   </div>
-                  <h2 className="font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                  <h2 className="font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text)">
                     {firstTrack.title}
                   </h2>
                   <p className={picoClasses.body}>{firstTrack.intro}</p>
-                  <p className="text-sm text-[color:var(--pico-accent)]">{t('labels.outcome')} {firstTrack.outcome}</p>
+                  <p className="text-sm text-(--pico-accent)">{t('labels.outcome')} {firstTrack.outcome}</p>
                 </div>
                 <div className="grid gap-3">
                   {firstTrack.checklist.map((item) => (
-                    <div key={item} className={picoInset('px-4 py-3 text-sm text-[color:var(--pico-text-secondary)]')}>
+                    <div key={item} className={picoInset('px-4 py-3 text-sm text-(--pico-text-secondary)')}>
                       {item}
                     </div>
                   ))}
@@ -1368,7 +1368,7 @@ export function PicoOnboardingPageClient() {
 
             <section className={picoPanel('p-5')}>
               <p className={picoClasses.label}>{t('labels.operatingRule')}</p>
-              <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+              <p className="mt-3 text-sm leading-6 text-(--pico-text-secondary)">
                 {t('doctrine.postBody')}
               </p>
               {firstRunDone ? (
@@ -1381,10 +1381,10 @@ export function PicoOnboardingPageClient() {
                       <article key={track.slug} className={picoInset('grid gap-3 p-4')}>
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <h3 className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+                            <h3 className="font-(--font-site-display) text-2xl tracking-tighter text-(--pico-text)">
                               {localizedTrack.title}
                             </h3>
-                            <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{localizedTrack.intro}</p>
+                            <p className="mt-2 text-sm leading-6 text-(--pico-text-secondary)">{localizedTrack.intro}</p>
                           </div>
                           <button
                             type="button"
@@ -1405,13 +1405,13 @@ export function PicoOnboardingPageClient() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.04fr),22rem]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.04fr)_22rem]">
         <section className={picoPanel('p-6 sm:p-7')}>
           <p className={picoClasses.label}>{t('labels.hostedRuntimeEditor')}</p>
-          <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+          <h2 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text) sm:text-4xl">
             {t('runtimeEditor.title')}
           </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-(--pico-text-secondary)">
             {t('runtimeEditor.body')}
           </p>
 
@@ -1422,26 +1422,26 @@ export function PicoOnboardingPageClient() {
           ) : (
             <div className="mt-5 grid gap-4">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                   <span className={picoClasses.label}>{t('labels.runtimeLabel')}</span>
                   <input
                     value={runtimeDraft.label}
                     onChange={(event) =>
                       setRuntimeDraft((current) => ({ ...current, label: event.target.value }))
                     }
-                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                    className="rounded-[20px] border border-(--pico-border) bg-(--pico-bg-surface) px-4 py-3 text-(--pico-text) outline-hidden placeholder:text-(--pico-text-muted)"
                     placeholder="OpenClaw"
                   />
                 </label>
 
-                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                   <span className={picoClasses.label}>{t('labels.runtimeStatusField')}</span>
                   <select
                     value={runtimeDraft.status}
                     onChange={(event) =>
                       setRuntimeDraft((current) => ({ ...current, status: event.target.value }))
                     }
-                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-[color:var(--pico-text)] outline-none"
+                    className="rounded-[20px] border border-(--pico-border) bg-(--pico-bg-input) px-4 py-3 text-(--pico-text) outline-hidden"
                   >
                     {runtimeStatusOptions.map((status) => (
                       <option key={status} value={status}>
@@ -1451,14 +1451,14 @@ export function PicoOnboardingPageClient() {
                   </select>
                 </label>
 
-                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                   <span className={picoClasses.label}>{t('labels.installMethod')}</span>
                   <select
                     value={runtimeDraft.installMethod}
                     onChange={(event) =>
                       setRuntimeDraft((current) => ({ ...current, installMethod: event.target.value }))
                     }
-                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-input)] px-4 py-3 text-[color:var(--pico-text)] outline-none"
+                    className="rounded-[20px] border border-(--pico-border) bg-(--pico-bg-input) px-4 py-3 text-(--pico-text) outline-hidden"
                   >
                     {installMethodOptions.map((method) => (
                       <option key={method} value={method}>
@@ -1468,51 +1468,51 @@ export function PicoOnboardingPageClient() {
                   </select>
                 </label>
 
-                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                   <span className={picoClasses.label}>{t('labels.gatewayUrl')}</span>
                   <input
                     value={runtimeDraft.gatewayUrl}
                     onChange={(event) =>
                       setRuntimeDraft((current) => ({ ...current, gatewayUrl: event.target.value }))
                     }
-                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                    className="rounded-[20px] border border-(--pico-border) bg-(--pico-bg-surface) px-4 py-3 text-(--pico-text) outline-hidden placeholder:text-(--pico-text-muted)"
                     placeholder="http://127.0.0.1:4111"
                   />
                 </label>
 
-                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                   <span className={picoClasses.label}>{t('labels.assistantName')}</span>
                   <input
                     value={runtimeDraft.assistantName}
                     onChange={(event) =>
                       setRuntimeDraft((current) => ({ ...current, assistantName: event.target.value }))
                     }
-                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                    className="rounded-[20px] border border-(--pico-border) bg-(--pico-bg-surface) px-4 py-3 text-(--pico-text) outline-hidden placeholder:text-(--pico-text-muted)"
                     placeholder="Pico Starter"
                   />
                 </label>
 
-                <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+                <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                   <span className={picoClasses.label}>{t('labels.workspaceField')}</span>
                   <input
                     value={runtimeDraft.workspace}
                     onChange={(event) =>
                       setRuntimeDraft((current) => ({ ...current, workspace: event.target.value }))
                     }
-                    className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                    className="rounded-[20px] border border-(--pico-border) bg-(--pico-bg-surface) px-4 py-3 text-(--pico-text) outline-hidden placeholder:text-(--pico-text-muted)"
                     placeholder="founder-lab"
                   />
                 </label>
               </div>
 
-              <label className="grid gap-2 text-sm text-[color:var(--pico-text-secondary)]">
+              <label className="grid gap-2 text-sm text-(--pico-text-secondary)">
                 <span className={picoClasses.label}>{t('labels.modelField')}</span>
                 <input
                   value={runtimeDraft.model}
                   onChange={(event) =>
                     setRuntimeDraft((current) => ({ ...current, model: event.target.value }))
                   }
-                  className="rounded-[20px] border border-[color:var(--pico-border)] bg-[color:var(--pico-bg-surface)] px-4 py-3 text-[color:var(--pico-text)] outline-none placeholder:text-[color:var(--pico-text-muted)]"
+                  className="rounded-[20px] border border-(--pico-border) bg-(--pico-bg-surface) px-4 py-3 text-(--pico-text) outline-hidden placeholder:text-(--pico-text-muted)"
                   placeholder="gpt-5.4-mini"
                 />
               </label>
@@ -1531,7 +1531,7 @@ export function PicoOnboardingPageClient() {
                     {t('labels.openInstallLesson')}
                   </Link>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+                <p className="mt-3 text-sm leading-6 text-(--pico-text-secondary)">
                   {t('labels.saveOnlyTruth')}
                 </p>
               </div>
@@ -1544,20 +1544,20 @@ export function PicoOnboardingPageClient() {
             <p className={picoClasses.label}>{t('labels.currentBindingTitle')}</p>
             <div className="mt-4 grid gap-3">
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.assistant')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                <p className="text-sm text-(--pico-text-muted)">{t('labels.assistant')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">
                   {currentBinding?.assistant_name ?? currentBinding?.assistant_id ?? t('runtime.notRecorded')}
                 </p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.workspace')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                <p className="text-sm text-(--pico-text-muted)">{t('labels.workspace')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">
                   {currentBinding?.workspace ?? setup.onboarding?.workspace ?? t('runtime.notRecorded')}
                 </p>
               </div>
               <div className={picoSoft('p-4')}>
-                <p className="text-sm text-[color:var(--pico-text-muted)]">{t('labels.model')}</p>
-                <p className="mt-1 text-lg font-medium text-[color:var(--pico-text)]">
+                <p className="text-sm text-(--pico-text-muted)">{t('labels.model')}</p>
+                <p className="mt-1 text-lg font-medium text-(--pico-text)">
                   {currentBinding?.model ?? t('runtime.notRecorded')}
                 </p>
               </div>

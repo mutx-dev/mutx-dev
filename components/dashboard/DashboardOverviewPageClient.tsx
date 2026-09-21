@@ -490,7 +490,7 @@ export function DashboardOverviewPageClient() {
         <div className="grid gap-4">
           <LivePanel title="Operator posture" meta="first viewport">
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/3 p-4">
                 <div className="flex items-center gap-2 text-slate-300">
                   <Activity className="h-4 w-4 text-cyan-300" />
                   <span className="text-sm font-medium">Control plane health</span>
@@ -509,7 +509,7 @@ export function DashboardOverviewPageClient() {
                   One surface for deployments, execution, alerts, keys, and delivery posture. No route shells pretending to be live data.
                 </p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/3 p-4">
                 <div className="flex items-center gap-2 text-slate-300">
                   <AlertTriangle className="h-4 w-4 text-amber-300" />
                   <span className="text-sm font-medium">Alert pressure</span>
@@ -555,7 +555,7 @@ export function DashboardOverviewPageClient() {
                     <Link
                       key={run.id}
                       href="/dashboard/runs"
-                      className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-colors hover:border-white/20 hover:bg-white/[0.04] md:grid-cols-[minmax(0,1fr)_auto]"
+                      className="grid gap-3 rounded-xl border border-white/10 bg-white/2 p-4 transition-colors hover:border-white/20 hover:bg-white/4 md:grid-cols-[minmax(0,1fr)_auto]"
                     >
                       <div className="min-w-0">
                         <p className="truncate font-mono text-sm text-white">{run.id}</p>
@@ -586,7 +586,7 @@ export function DashboardOverviewPageClient() {
               />
             ) : hasOpenClawRuntime ? (
               <div className="grid gap-3">
-                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 text-slate-300">
@@ -608,7 +608,7 @@ export function DashboardOverviewPageClient() {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                       Assistant
                     </p>
@@ -620,7 +620,7 @@ export function DashboardOverviewPageClient() {
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                       Workspace
                     </p>
@@ -632,7 +632,7 @@ export function DashboardOverviewPageClient() {
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                       Gateway
                     </p>
@@ -646,7 +646,7 @@ export function DashboardOverviewPageClient() {
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                       Sync state
                     </p>
@@ -692,7 +692,7 @@ export function DashboardOverviewPageClient() {
             ) : (
               <div className="space-y-3">
                 {alerts.slice(0, 4).map((alert) => (
-                  <div key={alert.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div key={alert.id} className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-white">{alert.type.replaceAll("_", " ")}</p>
@@ -715,7 +715,7 @@ export function DashboardOverviewPageClient() {
             meta={webhooksKnown ? `${activeWebhooks.length} active` : "coverage unknown"}
           >
             <div className="grid gap-3">
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <div className="flex items-center gap-2 text-slate-300">
                   <Webhook className="h-4 w-4 text-cyan-300" />
                   <span className="text-sm font-medium">Active endpoints</span>
@@ -729,7 +729,7 @@ export function DashboardOverviewPageClient() {
                     : "Webhook inventory is unavailable for this overview snapshot."}
                 </p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div>
                     <div className="flex items-center gap-2 text-slate-300">
