@@ -12612,6 +12612,56 @@
         ]
       }
     },
+    "/v1/policies/evaluate-and-request-approval": {
+      "post": {
+        "tags": [
+          "policies"
+        ],
+        "summary": "Evaluate Policies And Request Approval",
+        "description": "Evaluate tenant policies and persist an idempotent, linked approval.\n\nRepeated evaluations of the same action return its existing approval,\nincluding a terminal decision; use a new run/session identity for a new action.",
+        "operationId": "evaluate_policies_and_request_approval_v1_policies_evaluate_and_request_approval_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyEvaluationContext"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyApprovalEvaluationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
     "/v1/policies/{name}": {
       "get": {
         "tags": [
@@ -24562,6 +24612,102 @@
         ],
         "title": "Policy",
         "description": "A named collection of rules with versioning and enablement."
+      },
+      "PolicyApprovalEvaluationResult": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "allow",
+              "warn",
+              "block",
+              "require_approval"
+            ],
+            "title": "Decision"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "matches": {
+            "items": {
+              "$ref": "#/components/schemas/PolicyRuleMatch"
+            },
+            "type": "array",
+            "title": "Matches"
+          },
+          "evaluated_policy_count": {
+            "type": "integer",
+            "title": "Evaluated Policy Count"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "approval_request": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "approval_created": {
+            "type": "boolean",
+            "title": "Approval Created",
+            "default": false
+          },
+          "approval_dedupe_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approval Dedupe Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "reason",
+          "evaluated_policy_count"
+        ],
+        "title": "PolicyApprovalEvaluationResult",
+        "description": "Policy evaluation result plus optional linked approval request."
       },
       "PolicyEvaluationContext": {
         "properties": {
