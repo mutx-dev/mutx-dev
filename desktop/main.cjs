@@ -7,6 +7,7 @@ const trayManager = require("./main/trayManager.cjs");
 const statusStore = require("./main/statusStore.cjs");
 const statusPoll = require("./main/statusPoll.cjs");
 const windowManager = require("./main/windowManager.cjs");
+const { getSmokeFailure } = require("./main/smokeStatus.cjs");
 
 const hasExternalDesktopUrl = Boolean(process.env.MUTX_DESKTOP_URL);
 const smokeExitAfterReady =
@@ -609,6 +610,14 @@ if (gotSingleInstanceLock) {
   });
 }
 
+function finishSmoke(code) {
+  isQuitting = true;
+  if (statusPollInterval) clearInterval(statusPollInterval);
+  serverManager.stopUIServer();
+  bridgeManager.stopBridge();
+  app.exit(code);
+}
+
 app.whenReady().then(async () => {
   console.log("[Main] App ready");
 
@@ -622,6 +631,14 @@ app.whenReady().then(async () => {
 
   createAppMenu();
   await initializeDesktop();
+  if (smokeExitAfterReady) {
+    const failure = getSmokeFailure(statusStore.getState());
+    if (failure) {
+      console.error(`[Main] Smoke launch failed: ${failure}`);
+      finishSmoke(1);
+      return;
+    }
+  }
   if (!smokeExitAfterReady) {
     createTray();
   }
@@ -638,9 +655,10 @@ app.whenReady().then(async () => {
 
   if (smokeExitAfterReady) {
     setTimeout(() => {
-      console.log("[Main] Smoke launch verified");
-      isQuitting = true;
-      app.exit(0);
+      const failure = getSmokeFailure(statusStore.getState());
+      if (failure) console.error(`[Main] Smoke launch failed: ${failure}`);
+      else console.log("[Main] Smoke launch verified");
+      finishSmoke(failure ? 1 : 0);
     }, 2500);
   }
 });
