@@ -14,7 +14,8 @@ AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
 
 from datetime import datetime, timedelta, timezone
 from time import perf_counter
-from typing import Annotated
+from typing import Annotated, Any, Literal, Optional
+from pydantic import BaseModel, ConfigDict, Field, WithJsonSchema, model_validator
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -22,6 +23,12 @@ from fastapi.responses import PlainTextResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.dependencies import require_plan, require_roles
+from src.api.services.mcp_scanner import (
+    MAX_DEFINITION_BYTES,
+    MCPFindingSeverity,
+    MCPRegistrationDecision,
+    evaluate_mcp_registration,
+)
 from src.api.config import get_settings
 from src.api.database import get_db
 from src.api.models import ApprovalRecord, User
@@ -103,6 +110,115 @@ def _not_found(resource: str) -> HTTPException:
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"{resource} not found",
     )
+
+
+MCPJSONMap = Annotated[
+    dict[str, Any],
+    WithJsonSchema({"type": "object", "additionalProperties": True}),
+]
+
+
+class MCPToolDefinition(BaseModel):
+    """MCP 2025-11-25 tool fields relevant to static scanning."""
+
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
+
+    name: str = Field(..., min_length=1, max_length=256)
+    title: Optional[str] = Field(default=None, max_length=1_024)
+    description: Optional[str] = Field(default=None, max_length=8_192)
+    input_schema: MCPJSONMap = Field(alias="inputSchema")
+    output_schema: Optional[MCPJSONMap] = Field(default=None, alias="outputSchema")
+    annotations: Optional[MCPJSONMap] = None
+    execution: Optional[MCPJSONMap] = None
+    icons: list[MCPJSONMap] = Field(default_factory=list, max_length=32)
+
+
+class MCPServerDefinition(BaseModel):
+    """Static MCP server configuration and advertised tools."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    name: str = Field(..., min_length=1, max_length=256)
+    description: Optional[str] = Field(default=None, max_length=8_192)
+    transport: Optional[Literal["stdio", "streamable_http", "sse"]] = None
+    command: Optional[str] = Field(default=None, max_length=4_096)
+    args: list[str] = Field(default_factory=list, max_length=128)
+    url: Optional[str] = Field(default=None, max_length=4_096)
+    env: dict[str, str] = Field(default_factory=dict)
+    requested_permissions: list[str] = Field(
+        default_factory=list,
+        alias="requestedPermissions",
+        max_length=128,
+    )
+    tools: list[MCPToolDefinition] = Field(..., min_length=1, max_length=128)
+
+
+class MCPScanRequest(BaseModel):
+    """Request to statically inspect an MCP definition."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    server: MCPServerDefinition
+    trusted_tool_names: list[str] = Field(
+        default_factory=list,
+        alias="trustedToolNames",
+        max_length=256,
+    )
+
+    @model_validator(mode="after")
+    def enforce_definition_size(self) -> "MCPScanRequest":
+        encoded_size = len(self.model_dump_json(by_alias=True).encode("utf-8"))
+        if encoded_size > MAX_DEFINITION_BYTES:
+            raise ValueError(f"MCP definition exceeds the {MAX_DEFINITION_BYTES}-byte scan limit")
+        return self
+
+
+class MCPFindingResponse(BaseModel):
+    """One structured MCP scanner finding."""
+
+    code: str
+    severity: MCPFindingSeverity
+    category: str
+    path: str
+    title: str
+    explanation: str
+    evidence: str
+    recommendation: str
+
+
+class MCPScanResponse(BaseModel):
+    """Static scan result and pre-registration policy disposition."""
+
+    scanner_version: str
+    protocol_revision: str
+    decision: MCPRegistrationDecision
+    registration_allowed: bool
+    highest_severity: Optional[MCPFindingSeverity]
+    scanned_tools: int
+    finding_count: int
+    findings: list[MCPFindingResponse]
+
+
+@router.post("/mcp/scan", response_model=MCPScanResponse)
+async def scan_mcp_server_definition(
+    request: MCPScanRequest,
+    _current_user: User = Depends(require_roles(*SAFE_READ_ROLES)),
+):
+    """Statically scan untrusted MCP metadata without contacting or launching it.
+
+    This authenticated read-only analysis endpoint is available to authorized MUTX
+    viewer and developer roles.  ``registration_allowed`` is the reusable policy hook: medium
+    findings require review and high/critical findings deny registration.
+    """
+    definition = request.server.model_dump(by_alias=True, exclude_none=True)
+    # Environment values can contain credentials and are not needed for static
+    # capability analysis. Keep only variable names before the scanner sees it.
+    definition["env"] = sorted(request.server.env)
+    result = evaluate_mcp_registration(
+        definition,
+        trusted_tool_names=request.trusted_tool_names,
+    )
+    return MCPScanResponse(**result.to_dict())
 
 
 @router.post("/actions/evaluate", response_model=ActionEvaluateResponse)
