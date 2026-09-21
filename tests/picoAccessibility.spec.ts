@@ -70,7 +70,7 @@ test.describe('Pico locale and mobile accessibility', () => {
 
       await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
       await expect(page.locator('.pico-root')).toHaveAttribute('dir', 'rtl')
-      await expect(page.locator('main#main-content')).toHaveCSS('direction', 'rtl')
+      await expect(page.locator('main#main-content:visible')).toHaveCSS('direction', 'rtl')
       await expectNoRawKeysOrPageOverflow(page)
     }
   })

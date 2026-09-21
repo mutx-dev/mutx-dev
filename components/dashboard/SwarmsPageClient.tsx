@@ -56,9 +56,9 @@ const emptyCreateDraft: CreateDraft = {
   maxReplicas: '10',
 }
 const inputClass =
-  'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/40'
+  'w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-hidden transition placeholder:text-slate-600 focus:border-cyan-400/40'
 const secondaryButtonClass =
-  'min-h-11 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50'
+  'min-h-11 rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50'
 const primaryButtonClass =
   'min-h-11 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:border-cyan-300/50 disabled:cursor-not-allowed disabled:opacity-50'
 const dangerButtonClass =
@@ -501,7 +501,7 @@ export function SwarmsPageClient() {
         ) : (
           <div className='grid gap-4 xl:grid-cols-2'>
             {blueprints.map((blueprint) => (
-              <div key={blueprint.id} className='rounded-2xl border border-white/10 bg-white/[0.03] p-4'>
+              <div key={blueprint.id} className='rounded-2xl border border-white/10 bg-white/3 p-4'>
                 <div className='flex flex-wrap items-start justify-between gap-3'>
                   <div className='min-w-0'>
                     <p className='text-base font-semibold text-white'>{blueprint.name}</p>
@@ -515,7 +515,7 @@ export function SwarmsPageClient() {
                     <div key={`${blueprint.id}-${role.id}`} className='rounded-xl border border-white/10 bg-black/20 px-3 py-2.5'>
                       <div className='flex flex-wrap items-center justify-between gap-2'>
                         <p className='text-sm font-medium text-white'>{role.title}</p>
-                        <span className='rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-400'>{role.bundle_id}</span>
+                        <span className='rounded-full border border-white/10 bg-white/4 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-400'>{role.bundle_id}</span>
                       </div>
                       <p className='mt-1 text-xs text-slate-500'>{role.goal}</p>
                     </div>
@@ -560,7 +560,7 @@ export function SwarmsPageClient() {
               const acting = actingId === swarm.id
               const fallbackReplicas = swarm.agents[0]?.replicas || swarm.min_replicas
               return (
-                <div key={swarm.id} className='rounded-2xl border border-white/10 bg-white/[0.02] p-4'>
+                <div key={swarm.id} className='rounded-2xl border border-white/10 bg-white/2 p-4'>
                   {editingId === swarm.id && editDraft ? (
                     <form onSubmit={(event) => void updateSwarm(event, swarm)} className='space-y-3'>
                       <input className={inputClass} value={editDraft.name} onChange={(event) => setEditDraft((current) => current ? ({ ...current, name: event.target.value }) : current)} required maxLength={255} />

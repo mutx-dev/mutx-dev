@@ -43,9 +43,9 @@ export function EmptyState({
       }}
       {...props}
     >
-      <span className="absolute start-0 top-0 h-px w-20" style={{ backgroundColor: dashboardTokens.brand }} aria-hidden="true" />
+      <span className="absolute inset-s-0 top-0 h-px w-20" style={{ backgroundColor: dashboardTokens.brand }} aria-hidden="true" />
       <p
-        className="mb-4 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em]"
+        className="mb-4 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em]"
         style={{ color: dashboardTokens.textLabel }}
         aria-hidden="true"
       >
@@ -61,7 +61,7 @@ export function EmptyState({
       >
         {icon ?? <Inbox className="h-7 w-7" />}
       </div>
-      <h3 className="mt-4 font-[family:var(--font-site-display)] text-xl font-medium tracking-[-0.035em]">{title}</h3>
+      <h3 className="mt-4 font-(--font-site-display) text-xl font-medium tracking-[-0.035em]">{title}</h3>
       <p className="mt-2 max-w-md text-[13px] leading-6" style={{ color: dashboardTokens.textSubtle }}>
         {message}
       </p>

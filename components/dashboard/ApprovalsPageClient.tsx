@@ -64,7 +64,7 @@ type Decision = "approve" | "reject";
 type Notice = { tone: "success" | "error"; message: string };
 
 const inputClassName =
-  "min-h-11 w-full rounded-[4px] border border-[#3a3933] bg-[#0d0e0b] px-3 text-sm text-[#eee9dc] outline-none transition placeholder:text-[#6f6a61] focus:border-[#ff7545] focus:ring-1 focus:ring-[#ff7545]";
+  "min-h-11 w-full rounded-[4px] border border-[#3a3933] bg-[#0d0e0b] px-3 text-sm text-[#eee9dc] outline-hidden transition placeholder:text-[#6f6a61] focus:border-[#ff7545] focus:ring-1 focus:ring-[#ff7545]";
 
 function buildApprovalsUrl(statusFilter: string, agentId: string, skip: number) {
   const query = new URLSearchParams({
@@ -268,7 +268,7 @@ export function ApprovalsPageClient() {
         <button
           type="button"
           onClick={() => setReloadToken((value) => value + 1)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+          className="inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
         >
           <RotateCw className="h-4 w-4" aria-hidden="true" />
           Retry approval query
@@ -336,14 +336,14 @@ export function ApprovalsPageClient() {
           <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-1">
             <button
               type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffb091]"
+              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#ff7545] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffb091]"
             >
               Apply agent
             </button>
             <button
               type="button"
               onClick={clearFilters}
-              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#151612] px-4 text-sm text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
             >
               Clear
             </button>
@@ -382,16 +382,16 @@ export function ApprovalsPageClient() {
                     <StatusBadge status={asDashboardStatus(approval.status)} label={approval.status} />
                     <span className="font-mono text-[11px] text-[#8d867a]">{formatRelativeTime(approval.created_at)}</span>
                   </div>
-                  <p className="mt-2 break-words text-sm font-medium text-[#eee9dc]">
+                  <p className="mt-2 wrap-break-word text-sm font-medium text-[#eee9dc]">
                     {approval.action_type}
                   </p>
-                  <p className="mt-1 break-words text-xs leading-5 text-[#999284]">
+                  <p className="mt-1 wrap-break-word text-xs leading-5 text-[#999284]">
                     Requested by <span className="text-[#d8d1c4]">{approval.requester}</span>
                   </p>
                   <p className="mt-1 break-all font-mono text-[11px] leading-5 text-[#8d867a]">
                     agent {approval.agent_id} · session {approval.session_id}
                   </p>
-                  <p className="mt-2 break-words text-xs leading-5 text-[#999284]">
+                  <p className="mt-2 wrap-break-word text-xs leading-5 text-[#999284]">
                     {summarizeOperatorContext(approval.payload)}
                   </p>
                 </div>
@@ -399,7 +399,7 @@ export function ApprovalsPageClient() {
                   type="button"
                   onClick={() => inspectApproval(approval)}
                   aria-label={`Review ${approval.action_type} request ${approval.id}`}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs font-semibold text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545] md:justify-self-end"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs font-semibold text-[#d8d1c4] transition hover:border-[#777268] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545] md:justify-self-end"
                 >
                   <Eye className="h-4 w-4" aria-hidden="true" />
                   {approval.status === "PENDING" && approval.can_resolve
@@ -418,7 +418,7 @@ export function ApprovalsPageClient() {
               type="button"
               onClick={() => setSkip((value) => Math.max(0, value - PAGE_SIZE))}
               disabled={skip === 0}
-              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" /> Previous
             </button>
@@ -426,7 +426,7 @@ export function ApprovalsPageClient() {
               type="button"
               onClick={() => setSkip((value) => value + PAGE_SIZE)}
               disabled={!hasNextPage}
-              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
+              className="inline-flex min-h-11 items-center gap-1 rounded-[4px] border border-[#48463e] bg-[#151612] px-3 text-xs text-[#d8d1c4] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7545]"
             >
               Next <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -453,7 +453,7 @@ export function ApprovalsPageClient() {
                 onClick={() => resolveApproval("reject")}
                 disabled={Boolean(decisionPending)}
                 aria-busy={decisionPending === "reject"}
-                className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#66302e] bg-[#241312] px-4 text-sm font-semibold text-[#ff9b96] transition hover:border-[#ff6d66] disabled:cursor-wait disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9b96]"
+                className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#66302e] bg-[#241312] px-4 text-sm font-semibold text-[#ff9b96] transition hover:border-[#ff6d66] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9b96]"
               >
                 {decisionPending === "reject" ? "Rejecting…" : "Reject request"}
               </button>
@@ -462,7 +462,7 @@ export function ApprovalsPageClient() {
                 onClick={() => resolveApproval("approve")}
                 disabled={Boolean(decisionPending)}
                 aria-busy={decisionPending === "approve"}
-                className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#3d654f] bg-[#0f2018] px-4 text-sm font-semibold text-[#78e3b4] transition hover:border-[#4bd69b] disabled:cursor-wait disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78e3b4]"
+                className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#3d654f] bg-[#0f2018] px-4 text-sm font-semibold text-[#78e3b4] transition hover:border-[#4bd69b] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#78e3b4]"
               >
                 {decisionPending === "approve" ? "Approving…" : "Approve request"}
               </button>
@@ -497,7 +497,7 @@ export function ApprovalsPageClient() {
 
             <div>
               <h3 className="font-mono text-xs uppercase tracking-[0.12em] text-[#8d867a]">Redacted action context</h3>
-              <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-mono text-[11px] leading-5 text-[#c8c0b0]">
+              <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap wrap-break-word rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-mono text-[11px] leading-5 text-[#c8c0b0]">
                 {formatOperatorContext(selectedApproval.payload)}
               </pre>
             </div>
@@ -505,7 +505,7 @@ export function ApprovalsPageClient() {
             {selectedApproval.comment ? (
               <div className="rounded-[4px] border border-[#34342e] bg-[#10110e] p-3 text-sm leading-6 text-[#c8c0b0]">
                 <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#777268]">Resolution comment</span>
-                <p className="mt-1 break-words">{selectedApproval.comment}</p>
+                <p className="mt-1 wrap-break-word">{selectedApproval.comment}</p>
               </div>
             ) : null}
 

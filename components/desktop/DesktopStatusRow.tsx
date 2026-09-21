@@ -66,7 +66,7 @@ function DesktopCard({
     <article className={`rounded-[6px] border bg-[#11120f] p-4 ${borderColors[tone]}`}>
       <div className="flex items-center gap-2">
         <Icon className={`h-4 w-4 ${iconColors[tone]}`} aria-hidden="true" />
-        <span className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+        <span className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
           {title}
         </span>
       </div>
@@ -122,7 +122,7 @@ function SourceNote({ source }: { source: DesktopStatusSource }) {
   return (
     <p
       role="status"
-      className={`mt-3 inline-flex rounded-full border px-2 py-1 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.12em] ${DESKTOP_SOURCE_TONE_CLASS[presentation.tone]}`}
+      className={`mt-3 inline-flex rounded-full border px-2 py-1 font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.12em] ${DESKTOP_SOURCE_TONE_CLASS[presentation.tone]}`}
     >
       {label}
     </p>
@@ -223,12 +223,12 @@ export function DesktopStatusRow() {
   return (
     <section aria-labelledby="desktop-status-heading" className="space-y-3">
       <div className="flex items-center justify-between border-b border-[#34342e] pb-2">
-        <h2 id="desktop-status-heading" className="font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.16em] text-[#c8c0b0]">
+        <h2 id="desktop-status-heading" className="font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.16em] text-[#c8c0b0]">
           <span className="mr-2 text-[#ff7545]" aria-hidden="true">REC /</span>
           Desktop status
         </h2>
         {status.mutxVersion && (
-          <span className="font-[family:var(--font-mono)] text-[10px] text-[#8d867a]">v{status.mutxVersion}</span>
+          <span className="font-(--font-mono) text-[10px] text-[#8d867a]">v{status.mutxVersion}</span>
         )}
       </div>
 
@@ -248,7 +248,7 @@ export function DesktopStatusRow() {
             <StatusDot status={modeSource.freshness === "fresh" ? status.mode : modeSource.freshness} />
             <span className="text-sm font-medium capitalize text-[#eee9dc]">{status.mode}</span>
           </div>
-          {apiEndpoint && <p className="mt-1 truncate font-[family:var(--font-mono)] text-[10px] text-[#999284]">{apiEndpoint}</p>}
+          {apiEndpoint && <p className="mt-1 truncate font-(--font-mono) text-[10px] text-[#999284]">{apiEndpoint}</p>}
           <SourceNote source={modeSource} />
         </DesktopCard>
 
@@ -260,7 +260,7 @@ export function DesktopStatusRow() {
             <span className="text-sm font-medium text-[#eee9dc]">{status.openclaw.health}</span>
           </div>
           {gatewayEndpoint && (
-            <p className="mt-1 truncate font-[family:var(--font-mono)] text-[10px] text-[#999284]">{gatewayEndpoint}</p>
+            <p className="mt-1 truncate font-(--font-mono) text-[10px] text-[#999284]">{gatewayEndpoint}</p>
           )}
           <SourceNote source={gatewaySource} />
         </DesktopCard>
@@ -276,7 +276,7 @@ export function DesktopStatusRow() {
         <DesktopCard icon={Bot} title="Assistant" tone={assistantTone}>
           {status.assistant.found ? (
             <>
-              <p className="font-[family:var(--font-site-display)] text-lg font-medium text-[#eee9dc]">
+              <p className="font-(--font-site-display) text-lg font-medium text-[#eee9dc]">
                 {status.assistant.name || "Unnamed assistant"}
               </p>
               <p className="text-xs text-[#8d867a]">Name</p>

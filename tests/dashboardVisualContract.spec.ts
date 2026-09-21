@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { expect, test } from '@playwright/test';
 
 const mockKey = {
@@ -38,7 +39,7 @@ test.describe('Dashboard visual contract', () => {
       await page.setViewportSize({ width, height: 800 });
       await page.goto('/dashboard/api-keys', { waitUntil: 'domcontentloaded' });
 
-      await expect(page.getByRole('heading', { name: 'API Keys' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'API Keys', level: 1 })).toBeVisible();
       await expect(page.getByText('Visual contract operator')).toBeVisible();
 
       const contract = await page.evaluate(() => ({
@@ -80,4 +81,9 @@ test.describe('Dashboard visual contract', () => {
     await expect(dialog).toHaveCount(0);
     await expect(rotate).toBeFocused();
   });
+});
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
 });

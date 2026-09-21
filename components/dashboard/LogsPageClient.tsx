@@ -83,7 +83,7 @@ function TraceEntry({ trace }: { trace: RunTrace }) {
   const hasPayload = Object.keys(trace.payload).length > 0;
 
   return (
-    <article className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs">
+    <article className="rounded-lg border border-white/5 bg-white/2 px-3 py-2 text-xs">
       <div className="flex items-start gap-3">
         <div className="mt-0.5 shrink-0">
           <TraceIcon eventType={trace.event_type} />
@@ -110,7 +110,7 @@ function TraceEntry({ trace }: { trace: RunTrace }) {
           <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-slate-500">
             Event payload
           </summary>
-          <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded bg-black/20 p-2 text-[10px] text-slate-400">
+          <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap wrap-break-word rounded-sm bg-black/20 p-2 text-[10px] text-slate-400">
             {JSON.stringify(trace.payload, null, 2)}
           </pre>
         </details>
@@ -289,7 +289,7 @@ export function LogsPageClient({ mode = "logs" }: LogsPageClientProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/2 px-4 py-3">
         <div>
           <p className="text-sm font-medium text-white">{surfaceTitle} activity snapshot</p>
           <p className="mt-1 text-xs text-slate-500" role="status" aria-live="polite">
@@ -302,7 +302,7 @@ export function LogsPageClient({ mode = "logs" }: LogsPageClientProps) {
           type="button"
           onClick={() => void loadRuns()}
           disabled={refreshing || !pollingState.isOnline}
-          className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
+          className="rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
         >
           {refreshing ? "Refreshing…" : pollingState.isOnline ? "Refresh now" : "Offline"}
         </button>
@@ -361,7 +361,7 @@ export function LogsPageClient({ mode = "logs" }: LogsPageClientProps) {
                   className={`w-full rounded-lg border p-2.5 text-left transition-colors ${
                     selectedRun?.id === run.id
                       ? "border-cyan-500/40 bg-cyan-500/10"
-                      : "border-white/8 bg-white/[0.02] hover:bg-white/[0.05]"
+                      : "border-white/8 bg-white/2 hover:bg-white/5"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -424,7 +424,7 @@ export function LogsPageClient({ mode = "logs" }: LogsPageClientProps) {
             </div>
           ) : selectedRun ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 rounded-lg border border-white/8 bg-white/[0.02] p-3">
+              <div className="grid grid-cols-2 gap-3 rounded-lg border border-white/8 bg-white/2 p-3">
                 <div>
                   <div className="text-[10px] uppercase tracking-widest text-slate-500">Agent</div>
                   <div className="mt-0.5 truncate font-mono text-xs text-white/80">
@@ -452,7 +452,7 @@ export function LogsPageClient({ mode = "logs" }: LogsPageClientProps) {
               {selectedRun.input_text || selectedRun.output_text ? (
                 <div className="grid gap-2 md:grid-cols-2">
                   {selectedRun.input_text ? (
-                    <div className="rounded-lg border border-white/8 bg-white/[0.02] p-3">
+                    <div className="rounded-lg border border-white/8 bg-white/2 p-3">
                       <div className="text-[10px] uppercase tracking-widest text-slate-500">Input</div>
                       <p className="mt-1 whitespace-pre-wrap text-xs leading-5 text-slate-300">
                         {selectedRun.input_text}
@@ -460,7 +460,7 @@ export function LogsPageClient({ mode = "logs" }: LogsPageClientProps) {
                     </div>
                   ) : null}
                   {selectedRun.output_text ? (
-                    <div className="rounded-lg border border-white/8 bg-white/[0.02] p-3">
+                    <div className="rounded-lg border border-white/8 bg-white/2 p-3">
                       <div className="text-[10px] uppercase tracking-widest text-slate-500">Output</div>
                       <p className="mt-1 whitespace-pre-wrap text-xs leading-5 text-slate-300">
                         {selectedRun.output_text}
@@ -475,7 +475,7 @@ export function LogsPageClient({ mode = "logs" }: LogsPageClientProps) {
                   <div className="mb-2 text-[10px] uppercase tracking-widest text-slate-500">
                     Traces ({selectedRun.traces.length})
                   </div>
-                  <div className="max-h-[32rem] space-y-1 overflow-y-auto">
+                  <div className="max-h-128 space-y-1 overflow-y-auto">
                     {selectedRun.traces.map((trace) => (
                       <TraceEntry key={trace.id} trace={trace} />
                     ))}

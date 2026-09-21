@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { expect, test, type Page } from '@playwright/test';
 
 const ONE_BY_ONE_PNG = Buffer.from(
@@ -672,6 +673,10 @@ async function mockMatrixTraffic(page: Page) {
   await page.route('**/api/**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
+    if (url.pathname === '/api/dashboard/access') {
+      await route.fallback();
+      return;
+    }
     const { pathname, searchParams } = url;
     const method = request.method();
 
@@ -1429,7 +1434,7 @@ test.describe('Dashboard route matrix', () => {
       await expect(page.getByRole('link', { name: /^channels$/i })).toBeVisible();
       await expect(page.getByRole('link', { name: /^skills$/i })).toBeVisible();
       await expect(page.getByRole('link', { name: /^logs$/i })).toBeVisible();
-      await expect(page.getByRole('link', { name: /^history$/i })).toHaveCount(0);
+      await expect(page.getByRole('link', { name: /^history$/i })).toHaveAttribute('href', '/dashboard/history');
       await expect(page.getByRole('link', { name: /^spawn$/i })).toHaveCount(0);
     });
 
@@ -1486,4 +1491,9 @@ test.describe('Dashboard route matrix', () => {
       });
     }
   });
+});
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
 });

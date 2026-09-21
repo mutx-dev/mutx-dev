@@ -48,7 +48,7 @@ export default async function AppDemoLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ErrorBoundary>
         <DemoViewportLock>
-          <div className={`${appFontVariables} h-full overflow-hidden font-[family:var(--font-site-body)]`}>
+          <div className={`${appFontVariables} h-full overflow-hidden font-(--font-site-body)`}>
             {children}
           </div>
         </DemoViewportLock>

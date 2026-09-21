@@ -97,7 +97,7 @@ dump_failure_context() {
   fi
 
   echo ""
-  echo "Production compose smoke test failed. Current service status:"
+  echo "Production compose smoke test failed (exit ${exit_code}, command: ${BASH_COMMAND}). Current service status:"
   docker compose -f "$COMPOSE_FILE" ps || true
 
   echo ""
@@ -249,9 +249,10 @@ verify_monitor_container_health() {
 }
 
 verify_nginx_tls_contract() {
+  echo "Checking nginx configuration and TLS protocols..."
   docker compose -f "$COMPOSE_FILE" exec -T nginx nginx -t >/dev/null
   docker compose -f "$COMPOSE_FILE" exec -T nginx nginx -T 2>&1 |
-    grep -Eq 'ssl_protocols[[:space:]]+TLSv1\.2 TLSv1\.3;'
+    grep -E 'ssl_protocols[[:space:]]+TLSv1\.2 TLSv1\.3;' >/dev/null
 
   docker compose -f "$COMPOSE_FILE" exec -T \
     -e NODE_TLS_REJECT_UNAUTHORIZED=0 frontend \
@@ -267,7 +268,7 @@ const socket = tls.connect(
   }
 )
 socket.setTimeout(5000, () => socket.destroy(new Error("TLS handshake timed out")))
-socket.on("error", () => { process.exitCode = 1 })
+socket.on("error", (error) => { console.error(error.message); process.exitCode = 1 })
 ' >/dev/null
 
   docker compose -f "$COMPOSE_FILE" exec -T frontend \
@@ -422,7 +423,7 @@ verify_frontend_api_proxy
 ensure_ssl_material
 docker compose -f "$COMPOSE_FILE" up -d nginx
 
-verify_nginx_tls_contract
+wait_for_check "nginx generated configuration and TLS handshake" verify_nginx_tls_contract
 
 wait_for_check \
   "nginx HTTPS frontend and static asset" \

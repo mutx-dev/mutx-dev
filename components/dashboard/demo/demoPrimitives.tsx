@@ -36,13 +36,13 @@ import {
 const PANEL_CHROME =
   "relative overflow-hidden rounded-[6px] border border-[#2b2b26] bg-[#11120f] shadow-[0_1px_0_rgba(255,255,255,0.025)]";
 const FOCUS_RING =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]";
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]";
 
 export function SectionPill({ label, tone = "neutral" }: { label: string; tone?: Tone }) {
   return (
     <span
       className={cn(
-        "inline-flex min-h-7 items-center rounded-[3px] border px-2 py-1 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em]",
+        "inline-flex min-h-7 items-center rounded-[3px] border px-2 py-1 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em]",
         toneBadgeClasses(tone),
       )}
     >
@@ -55,7 +55,7 @@ export function StatusBadge({ label, tone }: { label: string; tone: Tone }) {
   return (
     <span
       className={cn(
-        "inline-flex min-h-6 items-center gap-1.5 rounded-[3px] border px-2 py-0.5 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.1em]",
+        "inline-flex min-h-6 items-center gap-1.5 rounded-[3px] border px-2 py-0.5 font-(--font-mono) text-[11px] font-semibold uppercase tracking-widest",
         toneBadgeClasses(tone),
       )}
     >
@@ -82,10 +82,10 @@ export function SurfacePanel({
 }) {
   return (
     <section className={cn(PANEL_CHROME, "flex h-auto min-h-0 flex-col", className)}>
-      <span className="absolute start-0 top-0 h-px w-16 bg-[#ff571c]" aria-hidden="true" />
+      <span className="absolute inset-s-0 top-0 h-px w-16 bg-[#ff571c]" aria-hidden="true" />
       <div className="flex min-h-12 shrink-0 items-center justify-between gap-3 border-b border-[#2b2b26] bg-[#0c0d0b] px-3.5 py-2.5">
         <div className="flex min-w-0 items-center gap-2.5">
-          <span className="hidden font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#ff6a32] sm:inline" aria-hidden="true">
+          <span className="hidden font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em] text-[#ff6a32] sm:inline" aria-hidden="true">
             REC
           </span>
           <h2 className="truncate text-[13px] font-semibold tracking-[-0.01em] text-[#eee9dc]">
@@ -94,7 +94,7 @@ export function SurfacePanel({
         </div>
         <div className="flex items-center gap-2">
           {meta ? (
-            <span className="hidden border-s border-[#3b3a33] ps-2.5 font-[family:var(--font-mono)] text-[11px] font-medium uppercase tracking-[0.1em] text-[#8d867a] sm:inline">
+            <span className="hidden border-s border-[#3b3a33] ps-2.5 font-(--font-mono) text-[11px] font-medium uppercase tracking-widest text-[#8d867a] sm:inline">
               {meta}
             </span>
           ) : null}
@@ -111,11 +111,11 @@ export function SurfacePanel({
 export function MetricCard({ metric }: { metric: Metric }) {
   return (
     <div className="relative flex min-h-[92px] min-w-0 flex-col justify-between overflow-hidden rounded-[4px] border border-[#34342e] bg-[#11120f] px-3 py-3">
-      <span className="absolute start-0 top-0 h-full w-px bg-[#ff571c]" aria-hidden="true" />
-      <div className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d867a]">
+      <span className="absolute inset-s-0 top-0 h-full w-px bg-[#ff571c]" aria-hidden="true" />
+      <div className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d867a]">
         {metric.label}
       </div>
-      <div className="mt-3 font-[family:var(--font-mono)] text-[1.75rem] font-medium leading-none tracking-[-0.055em] text-[#eee9dc]">
+      <div className="mt-3 font-(--font-mono) text-[1.75rem] font-medium leading-none tracking-[-0.055em] text-[#eee9dc]">
         {metric.value}
       </div>
       <div className={cn("mt-2 text-[11px] font-medium", toneTextClasses(metric.tone ?? "neutral"))}>
@@ -128,10 +128,10 @@ export function MetricCard({ metric }: { metric: Metric }) {
 export function OverviewCounter({ metric }: { metric: Metric }) {
   return (
     <div className="flex h-full min-w-0 flex-col justify-between rounded-[4px] border border-[#34342e] bg-[#0c0d0b] px-3 py-3">
-      <div className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d867a]">
+      <div className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d867a]">
         {metric.label}
       </div>
-      <div className="font-[family:var(--font-mono)] text-[1.45rem] font-medium leading-none tracking-[-0.04em] text-[#eee9dc]">
+      <div className="font-(--font-mono) text-[1.45rem] font-medium leading-none tracking-[-0.04em] text-[#eee9dc]">
         {metric.value}
       </div>
       <div className={cn("text-[11px] font-medium", toneTextClasses(metric.tone ?? "neutral"))}>
@@ -161,7 +161,7 @@ export function TopControl({
     >
       {Icon ? <Icon className="h-3.5 w-3.5 text-[#8d867a]" aria-hidden="true" /> : null}
       <span className="whitespace-nowrap">{label}</span>
-      <span className="font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#737067]">
+      <span className="font-(--font-mono) text-[11px] uppercase tracking-widest text-[#737067]">
         fixed
       </span>
     </div>
@@ -189,7 +189,7 @@ export function SearchBar() {
   }, [normalizedQuery]);
 
   return (
-    <div className="relative flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-3 focus-within:border-[#ff6a32] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#ff9a72]">
+    <div className="relative flex h-11 min-w-0 flex-1 items-center gap-2.5 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-3 focus-within:border-[#ff6a32] focus-within:outline-solid focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#ff9a72]">
       <Search className="h-4 w-4 shrink-0 text-[#8d867a]" aria-hidden="true" />
       <input
         type="search"
@@ -206,12 +206,12 @@ export function SearchBar() {
         aria-describedby={hintId}
         aria-controls={normalizedQuery ? resultsId : undefined}
         role="searchbox"
-        className="min-w-0 flex-1 bg-transparent text-sm text-[#eee9dc] outline-none placeholder:text-[#737067]"
+        className="min-w-0 flex-1 bg-transparent text-sm text-[#eee9dc] outline-hidden placeholder:text-[#737067]"
       />
       <span id={hintId} className="sr-only">
         Search sample routes only. Results stay inside the simulated control demo. Press Escape to clear.
       </span>
-      <kbd className="hidden rounded-[3px] border border-[#3b3a33] bg-[#090a08] px-1.5 py-0.5 font-[family:var(--font-mono)] text-[11px] text-[#8d867a] sm:inline">
+      <kbd className="hidden rounded-[3px] border border-[#3b3a33] bg-[#090a08] px-1.5 py-0.5 font-(--font-mono) text-[11px] text-[#8d867a] sm:inline">
         /
       </kbd>
       {normalizedQuery ? (
@@ -222,7 +222,7 @@ export function SearchBar() {
           aria-labelledby={resultsLabelId}
           className="absolute inset-x-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-[4px] border border-[#48463e] bg-[#0c0d0b] p-1.5 shadow-[0_20px_48px_rgba(0,0,0,0.52)]"
         >
-          <div id={resultsLabelId} className="px-2 py-1.5 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#ff8355]">
+          <div id={resultsLabelId} className="px-2 py-1.5 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em] text-[#ff8355]">
             Sample routes · no live data
           </div>
           <p className="sr-only" role="status" aria-live="polite">
@@ -241,7 +241,7 @@ export function SearchBar() {
                   )}
                 >
                   <span className="text-sm font-semibold">{item.label}</span>
-                  <span className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8d867a]">
+                  <span className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-widest text-[#8d867a]">
                     {SECTION_META[item.key].eyebrow}
                   </span>
                 </Link>
@@ -302,7 +302,7 @@ export function QuickActionButton({
       >
         <div className="min-w-0">
           <div className="truncate text-[13px] font-semibold">{action.label}</div>
-          <div className="truncate font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#999284]">
+          <div className="truncate font-(--font-mono) text-[11px] uppercase tracking-widest text-[#999284]">
             {simulated ? "Simulated locally" : `${action.detail} · demo only`}
           </div>
         </div>
@@ -333,9 +333,9 @@ export function Sparkline({
     <svg viewBox="0 0 420 132" className="h-full w-full" aria-hidden="true">
       <path d={areaPath} className={fillClassName} />
       {[24, 66, 108].map((y) => (
-        <path key={y} d={`M 0 ${y} L 420 ${y}`} className="stroke-[#2b2b26] stroke-[1]" />
+        <path key={y} d={`M 0 ${y} L 420 ${y}`} className="stroke-[#2b2b26] stroke-1" />
       ))}
-      <path d={linePath} className={cn("fill-none stroke-[2]", strokeClassName)} />
+      <path d={linePath} className={cn("fill-none stroke-2", strokeClassName)} />
     </svg>
   );
 }
@@ -353,7 +353,7 @@ export function ProgressRow({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3 text-[13px]">
         <span className="text-[#aaa397]">{label}</span>
-        <span className={cn("font-[family:var(--font-mono)] font-semibold", toneTextClasses(tone))}>
+        <span className={cn("font-(--font-mono) font-semibold", toneTextClasses(tone))}>
           {value}%
         </span>
       </div>
@@ -391,7 +391,7 @@ export function EnvironmentMatrix({
           {["Production", "Staging", "Development"].map((column) => (
             <div
               key={column}
-              className="flex h-10 items-center border-e border-[#34342e] px-3 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.11em] text-[#c8c0b0] last:border-e-0"
+              className="flex h-10 items-center border-e border-[#34342e] px-3 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.11em] text-[#c8c0b0] last:border-e-0"
             >
               {column}
             </div>
@@ -404,7 +404,7 @@ export function EnvironmentMatrix({
               className="grid min-h-[56px] grid-cols-[140px_repeat(3,minmax(0,1fr))] border-b border-[#292a25] bg-[#0c0d0b] last:border-b-0"
             >
               <div className="flex flex-col justify-center border-e border-[#34342e] px-3 py-2">
-                <div className="truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-[#eee9dc]">{row.label}</div>
+                <div className="truncate text-[11px] font-semibold uppercase tracking-widest text-[#eee9dc]">{row.label}</div>
                 {showMeta ? (
                   <div className="truncate text-[11px] text-[#8d867a]">{row.meta}</div>
                 ) : null}
@@ -420,7 +420,7 @@ export function EnvironmentMatrix({
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <StatusBadge label={cell.badge} tone={cell.tone} />
-                    <div className="font-[family:var(--font-mono)] text-[11px] text-[#737067]">{cell.stamp}</div>
+                    <div className="font-(--font-mono) text-[11px] text-[#737067]">{cell.stamp}</div>
                   </div>
                 </div>
               ))}
@@ -440,10 +440,10 @@ export function EnvironmentCardsMobile({ rows }: { rows: MatrixRow[] }) {
       {environments.map((environment, envIndex) => (
         <div key={environment} className={cn(PANEL_CHROME, "overflow-hidden")}>
           <div className="flex min-h-11 items-center justify-between border-b border-[#34342e] bg-[#0c0d0b] px-3 py-2">
-            <div className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.11em] text-[#eee9dc]">
+            <div className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.11em] text-[#eee9dc]">
               {environment}
             </div>
-            <span className="rounded-[3px] border border-[#34342e] px-2 py-1 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#8d867a]">
+            <span className="rounded-[3px] border border-[#34342e] px-2 py-1 font-(--font-mono) text-[11px] uppercase tracking-widest text-[#8d867a]">
               snapshot
             </span>
           </div>
@@ -457,7 +457,7 @@ export function EnvironmentCardsMobile({ rows }: { rows: MatrixRow[] }) {
                   className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-3 border-b border-[#292a25] px-3 py-3 last:border-b-0"
                 >
                   <div className="min-w-0">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#999284]">{row.label}</div>
+                    <div className="text-[11px] font-semibold uppercase tracking-widest text-[#999284]">{row.label}</div>
                     <div className="mt-1 text-[11px] leading-4 text-[#8d867a]">{row.meta}</div>
                   </div>
                   <div className="min-w-0">
@@ -465,7 +465,7 @@ export function EnvironmentCardsMobile({ rows }: { rows: MatrixRow[] }) {
                     <div className="mt-1 text-[11px] leading-4 text-[#999284]">{cell.detail}</div>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <StatusBadge label={cell.badge} tone={cell.tone} />
-                      <span className="font-[family:var(--font-mono)] text-[11px] text-[#737067]">{cell.stamp}</span>
+                      <span className="font-(--font-mono) text-[11px] text-[#737067]">{cell.stamp}</span>
                     </div>
                   </div>
                 </div>
@@ -482,7 +482,7 @@ export function DeploymentsTable({ rows }: { rows: DeploymentRow[] }) {
   return (
     <div className="flex h-full min-h-0 flex-col overflow-x-auto overflow-y-hidden">
       <div className="min-w-[780px]">
-        <div className="grid min-h-11 shrink-0 grid-cols-[1.45fr_0.88fr_0.88fr_0.72fr_0.72fr_0.86fr_0.72fr] items-center border-b border-[#34342e] bg-[#0c0d0b] px-4 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8d867a]">
+        <div className="grid min-h-11 shrink-0 grid-cols-[1.45fr_0.88fr_0.88fr_0.72fr_0.72fr_0.86fr_0.72fr] items-center border-b border-[#34342e] bg-[#0c0d0b] px-4 font-(--font-mono) text-[11px] font-semibold uppercase tracking-widest text-[#8d867a]">
           {["Agent", "Runtime", "Environment", "Version", "Region", "Health", "Rollout"].map((heading) => (
             <div key={heading}>{heading}</div>
           ))}
@@ -501,7 +501,7 @@ export function DeploymentsTable({ rows }: { rows: DeploymentRow[] }) {
               <div className="truncate">
                 <StatusBadge label={row.health} tone={row.tone} />
               </div>
-              <div className="truncate font-[family:var(--font-mono)] text-[11px] text-[#8d867a]">{row.rollout}</div>
+              <div className="truncate font-(--font-mono) text-[11px] text-[#8d867a]">{row.rollout}</div>
             </div>
           ))}
         </div>
@@ -524,7 +524,7 @@ export function RecordStack({
         >
           <div
             className={cn(
-              "absolute inset-y-0 start-0 w-[2px]",
+              "absolute inset-y-0 inset-s-0 w-[2px]",
               item.tone === "healthy"
                 ? "bg-[#4bd69b]"
                 : item.tone === "warning"
@@ -542,7 +542,7 @@ export function RecordStack({
             <div className="min-w-0">
               <div className="text-[14px] font-semibold text-[#eee9dc]">{item.title}</div>
               <div className="mt-1 text-[12px] leading-5 text-[#aaa397]">{item.detail}</div>
-              <div className={cn("mt-2 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.1em]", toneTextClasses(item.tone))}>
+              <div className={cn("mt-2 font-(--font-mono) text-[11px] font-semibold uppercase tracking-widest", toneTextClasses(item.tone))}>
                 {item.meta}
               </div>
             </div>
@@ -561,12 +561,12 @@ export function ConnectorGrid({ connectors }: { connectors: ConnectorCard[] }) {
           key={connector.name}
           className="relative flex min-h-0 flex-col justify-between overflow-hidden rounded-[4px] border border-[#34342e] bg-[#0c0d0b] p-3"
         >
-          <span className="absolute start-0 top-0 h-px w-12 bg-[#ff571c]" aria-hidden="true" />
+          <span className="absolute inset-s-0 top-0 h-px w-12 bg-[#ff571c]" aria-hidden="true" />
           <div>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-[15px] font-semibold text-[#eee9dc]">{connector.name}</div>
-                <div className="mt-1 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#8d867a]">
+                <div className="mt-1 font-(--font-mono) text-[11px] uppercase tracking-widest text-[#8d867a]">
                   integration contract
                 </div>
               </div>
@@ -574,7 +574,7 @@ export function ConnectorGrid({ connectors }: { connectors: ConnectorCard[] }) {
             </div>
             <div className="mt-3 text-[12px] leading-5 text-[#aaa397]">{connector.detail}</div>
           </div>
-          <div className="mt-4 w-fit border-s border-[#48463e] ps-2 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#8d867a]">
+          <div className="mt-4 w-fit border-s border-[#48463e] ps-2 font-(--font-mono) text-[11px] uppercase tracking-widest text-[#8d867a]">
             {connector.stamp}
           </div>
         </div>
@@ -586,27 +586,27 @@ export function ConnectorGrid({ connectors }: { connectors: ConnectorCard[] }) {
 export function AgentRegistryCard({ card }: { card: AgentCard }) {
   return (
     <div className="relative flex min-h-[132px] flex-col overflow-hidden rounded-[4px] border border-[#34342e] bg-[#0c0d0b] p-3">
-      <span className="absolute start-0 top-0 h-px w-12 bg-[#ff571c]" aria-hidden="true" />
+      <span className="absolute inset-s-0 top-0 h-px w-12 bg-[#ff571c]" aria-hidden="true" />
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[15px] font-semibold tracking-[-0.02em] text-[#eee9dc]">{card.name}</div>
-          <div className="mt-1 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8d867a]">
+          <div className="mt-1 font-(--font-mono) text-[11px] font-semibold uppercase tracking-widest text-[#8d867a]">
             {card.role}
           </div>
         </div>
         <StatusBadge label={card.status} tone={card.tone} />
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-2 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#8d867a]">
+      <div className="mt-3 grid grid-cols-2 gap-2 font-(--font-mono) text-[11px] uppercase tracking-widest text-[#8d867a]">
         <div className="rounded-[3px] border border-[#2b2b26] bg-[#11120f] px-2.5 py-2">
           <div>model</div>
-          <div className="mt-1 truncate font-[family:var(--font-site-body)] text-[12px] normal-case tracking-normal text-[#c8c0b0]">{card.model}</div>
+          <div className="mt-1 truncate font-(--font-site-body) text-[12px] normal-case tracking-normal text-[#c8c0b0]">{card.model}</div>
         </div>
         <div className="rounded-[3px] border border-[#2b2b26] bg-[#11120f] px-2.5 py-2">
           <div>load</div>
-          <div className="mt-1 font-[family:var(--font-site-body)] text-[12px] normal-case tracking-normal text-[#c8c0b0]">{card.load}</div>
+          <div className="mt-1 font-(--font-site-body) text-[12px] normal-case tracking-normal text-[#c8c0b0]">{card.load}</div>
         </div>
       </div>
-      <div className="mt-auto flex items-center justify-between pt-3 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#8d867a]">
+      <div className="mt-auto flex items-center justify-between pt-3 font-(--font-mono) text-[11px] uppercase tracking-widest text-[#8d867a]">
         <span>{card.env}</span>
         <span>{card.lastSeen}</span>
       </div>
@@ -628,7 +628,7 @@ export function RailSection({
       <div className="flex min-h-11 shrink-0 items-center justify-between gap-3 border-b border-[#2b2b26] bg-[#0c0d0b] px-3 py-2">
         <h2 className="text-[13px] font-semibold text-[#eee9dc]">{title}</h2>
         {meta ? (
-          <span className="hidden font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.1em] text-[#8d867a] sm:inline">
+          <span className="hidden font-(--font-mono) text-[11px] uppercase tracking-widest text-[#8d867a] sm:inline">
             {meta}
           </span>
         ) : null}
@@ -649,10 +649,10 @@ export function SectionIntroBar({
 }) {
   return (
     <section className="relative overflow-hidden rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-4 py-4">
-      <span className="absolute start-0 top-0 h-px w-20 bg-[#ff571c]" aria-hidden="true" />
+      <span className="absolute inset-s-0 top-0 h-px w-20 bg-[#ff571c]" aria-hidden="true" />
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.11em]">
+          <div className="flex flex-wrap items-center gap-2 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.11em]">
             <span className="rounded-[3px] border border-[#ff6a32] bg-[#28140d] px-2 py-1 text-[#ff9a72]">
               REC / {label}
             </span>

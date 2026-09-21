@@ -42,7 +42,7 @@ type SettledResource<T> = {
 const ANALYTICS_WINDOW = "30d";
 const ANALYTICS_INTERVAL = "day";
 const secondaryButtonClass =
-  "rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50";
+  "rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50";
 
 function emptyResource<T>(): ResourceState<T> {
   return { data: null, error: null, stale: false };
@@ -198,7 +198,7 @@ function TrendStrip({
 }) {
   if (data.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-4">
+      <div className="rounded-xl border border-dashed border-white/10 bg-white/2 p-4">
         <p className="text-sm font-medium text-white">{title}</p>
         <p className="mt-2 text-sm text-slate-400">{description}</p>
         <p
@@ -219,7 +219,7 @@ function TrendStrip({
   );
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+    <div className="rounded-xl border border-white/10 bg-white/2 p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-white">{title}</p>
         {stale ? <span className="text-[10px] uppercase tracking-[0.16em] text-amber-200">stale</span> : null}
@@ -239,7 +239,7 @@ function TrendStrip({
                 <span>{formatShortDate(point.timestamp)}</span>
                 <span>{point.value === null ? "Unavailable" : formatValue(point.value, kind)}</span>
               </div>
-              <div className="h-2 rounded-full bg-white/[0.05]">
+              <div className="h-2 rounded-full bg-white/5">
                 <div className="h-2 rounded-full bg-cyan-400/80" style={{ width: `${width}%` }} />
               </div>
             </div>
@@ -350,7 +350,7 @@ export function AnalyticsPageClient() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/2 px-4 py-3">
         <div>
           <p className="text-sm font-medium text-white">Analytics data snapshot</p>
           <p className="mt-1 text-xs text-slate-500">
@@ -446,7 +446,7 @@ export function AnalyticsPageClient() {
                   { label: "Total deployments", value: summary.total_deployments.toLocaleString() },
                   { label: "Failed runs", value: summary.failed_runs.toLocaleString() },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div key={item.label} className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">{item.label}</p>
                     <p className="mt-2 text-lg font-semibold text-white">{item.value}</p>
                   </div>
@@ -462,7 +462,7 @@ export function AnalyticsPageClient() {
           ) : (
             <div className="space-y-4">
               {costState.error ? <p className="text-xs text-amber-200">Refresh failed: {costState.error}</p> : null}
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Credit envelope</p>
                 <p className="mt-2 text-lg font-semibold text-white">{Math.round(costs.total_credits_used).toLocaleString()} used</p>
                 <p className="mt-1 text-sm text-slate-400">

@@ -5,17 +5,17 @@ export default function DashboardNotFound() {
     <section
       data-boundary-surface="dashboard"
       data-boundary-kind="not-found"
-      className="relative isolate flex min-h-[28rem] flex-col overflow-hidden rounded-[6px] border border-[#48463e] bg-[#0d0e0c] text-[#eee9dc] shadow-[0_24px_64px_rgba(0,0,0,0.32)]"
+      className="relative isolate flex min-h-112 flex-col overflow-hidden rounded-[6px] border border-[#48463e] bg-[#0d0e0c] text-[#eee9dc] shadow-[0_24px_64px_rgba(0,0,0,0.32)]"
       aria-labelledby="dashboard-not-found-title"
     >
-      <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-[#2b2b26] px-5 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8d867a] sm:px-7">
+      <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-[#2b2b26] px-5 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8d867a] sm:px-7">
         <span>Workspace / route lookup</span>
         <span className="text-[#efb654]">REC / 404</span>
       </header>
 
       <div className="grid flex-1 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="flex flex-col justify-end px-5 py-10 sm:px-8 sm:py-12 lg:px-10">
-          <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.18em] text-[#efb654]">
+          <p className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.18em] text-[#efb654]">
             Dashboard lookup complete
           </p>
           <h1
@@ -31,13 +31,13 @@ export default function DashboardNotFound() {
           <nav className="mt-7 flex flex-wrap gap-3" aria-label="Dashboard recovery">
             <Link
               href="/dashboard"
-              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
+              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
             >
               Dashboard home
             </Link>
             <Link
               href="/dashboard/runs"
-              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#11120f] px-4 text-sm font-medium text-[#eee9dc] transition-colors hover:border-[#777268] hover:bg-[#1a1b17] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
+              className="inline-flex min-h-11 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#11120f] px-4 text-sm font-medium text-[#eee9dc] transition-colors hover:border-[#777268] hover:bg-[#1a1b17] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
             >
               Open runs
             </Link>
@@ -45,7 +45,7 @@ export default function DashboardNotFound() {
         </div>
 
         <aside className="border-t border-[#2b2b26] bg-[#0a0b09] p-6 lg:border-l lg:border-t-0 lg:p-8">
-          <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+          <p className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
             Lookup result
           </p>
           <p className="mt-5 text-xl font-semibold tracking-[-0.03em] text-[#f4cc82]">

@@ -33,7 +33,10 @@ for (const surface of arabicSurfaces) {
 
 test('Arabic Pico-host auth inherits the root RTL contract', async ({ page }) => {
   await useArabic(page)
-  await page.context().setExtraHTTPHeaders({ host: 'pico.mutx.dev' })
+  await page.route('**/login', async (route) => {
+    const response = await route.fetch({ headers: { ...route.request().headers(), host: 'pico.mutx.dev' } })
+    await route.fulfill({ response })
+  })
   await page.goto('/login', { waitUntil: 'domcontentloaded' })
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar')

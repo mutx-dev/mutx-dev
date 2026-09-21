@@ -23,9 +23,9 @@ def test_setup_and_frontend_docker_use_the_same_npm_install_lane() -> None:
     setup_script = read_text("scripts/setup.sh")
     frontend_dockerfile = read_text("infrastructure/docker/Dockerfile.frontend")
 
-    assert "npm ci --legacy-peer-deps" in setup_script
+    assert "npm ci" in setup_script
     assert "RUN npm install -g npm@11.18.0" in frontend_dockerfile
-    assert "RUN npm ci --legacy-peer-deps" in frontend_dockerfile
+    assert "RUN npm ci" in frontend_dockerfile
     assert "RUN npm install --force" not in frontend_dockerfile
 
 

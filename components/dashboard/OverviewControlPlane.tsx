@@ -101,9 +101,9 @@ function incidentLevelClass(level: IncidentLevel) {
 
 const KPI_TONE_CLASS: Record<OverviewKpi["tone"], string> = {
   gateway: "border-emerald-500/25 bg-emerald-500/10",
-  blue: "border-sky-400/20 bg-sky-500/[0.08]",
-  green: "border-emerald-400/20 bg-emerald-500/[0.08]",
-  violet: "border-violet-400/20 bg-violet-500/[0.08]",
+  blue: "border-sky-400/20 bg-sky-500/8",
+  green: "border-emerald-400/20 bg-emerald-500/8",
+  violet: "border-violet-400/20 bg-violet-500/8",
   slate: "border-[#203252] bg-[#0d1a31]",
 };
 

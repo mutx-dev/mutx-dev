@@ -11,7 +11,13 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   output: 'standalone',
-  serverExternalPackages: ['@resvg/resvg-js', 'sharp'],
+  outputFileTracingExcludes: {
+    '/*': ['./dist/**/*'],
+  },
+  outputFileTracingIncludes: {
+    '/api/og-image': ['./node_modules/harfbuzzjs/hb.wasm'],
+  },
+  serverExternalPackages: ['@resvg/resvg-js', 'sharp', 'satori'],
   turbopack: {},
   webpack(config, { webpack, dev }) {
     if (dev) {

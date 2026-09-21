@@ -49,7 +49,7 @@ test.describe('Public and authentication product QA', () => {
       const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
       expect(response?.status(), `${route} should return a successful response`).toBeLessThan(400);
 
-      const main = page.locator('#main-content');
+      const main = page.locator('#main-content:visible');
       await expect(main, `${route} should expose the skip-link target`).toBeVisible();
       await expect(main.getByRole('heading', { level: 1 }).first(), `${route} should have an h1`).toBeVisible();
     }
@@ -115,7 +115,7 @@ test.describe('Public and authentication product QA', () => {
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
     await expect(skipLink).toBeFocused();
     await page.keyboard.press('Enter');
-    await expect(page.locator('#main-content')).toBeFocused();
+    await expect(page.locator('#main-content:visible')).toBeFocused();
   });
 
   test('product group styling does not misreport the current page', async ({ page }) => {
@@ -170,7 +170,7 @@ test.describe('Public and authentication product QA', () => {
 
     await message.fill('We need to validate a governed agent deployment.');
     await page.getByRole('button', { name: 'Send inquiry' }).click();
-    await expect(page.getByRole('alert')).toContainText('Contact intake is temporarily unavailable.');
+    await expect(page.getByTestId('contact-lead-form').getByRole('alert')).toContainText('Contact intake is temporarily unavailable.');
 
     shouldSucceed = true;
     await page.getByRole('button', { name: 'Send inquiry' }).click();

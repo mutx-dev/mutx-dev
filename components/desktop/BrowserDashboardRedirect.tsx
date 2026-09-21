@@ -20,7 +20,7 @@ export function BrowserDashboardRedirect({
       aria-live="polite"
       className="rounded-[6px] border border-[#34342e] bg-[#11120f] px-4 py-5 text-sm text-[#999284]"
     >
-      Redirecting to <a href={href} className="text-[#ff8355] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847]">{href}</a>…
+      Redirecting to <a href={href} className="text-[#ff8355] underline underline-offset-4 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847]">{href}</a>…
     </div>
   );
 }

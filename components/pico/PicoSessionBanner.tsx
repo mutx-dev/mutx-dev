@@ -78,20 +78,20 @@ export function PicoSessionBanner({
                 {runtimeSignal.label}
               </span>
             </div>
-            <p className="mt-2 truncate text-sm text-[color:var(--pico-text-secondary)]">
+            <p className="mt-2 truncate text-sm text-(--pico-text-secondary)">
               {session.user.email ?? session.user.name ?? t('authenticated.rails.operator')}
             </p>
           </div>
 
-          <div className={picoSoft('grid gap-2 p-3 sm:min-w-[22rem]')}>
-            <div className="grid grid-cols-3 gap-2 text-xs text-[color:var(--pico-text-secondary)]">
+          <div className={picoSoft('grid gap-2 p-3 sm:min-w-88')}>
+            <div className="grid grid-cols-3 gap-2 text-xs text-(--pico-text-secondary)">
               <div>
-                <p className="text-[color:var(--pico-text-muted)]">{t('authenticated.productTruth.progressSync')}</p>
-                <p className="mt-1 font-medium text-[color:var(--pico-text)]">{syncT(progressSyncState)}</p>
+                <p className="text-(--pico-text-muted)">{t('authenticated.productTruth.progressSync')}</p>
+                <p className="mt-1 font-medium text-(--pico-text)">{syncT(progressSyncState)}</p>
               </div>
               <div>
-                <p className="text-[color:var(--pico-text-muted)]">{t('authenticated.rails.emailState')}</p>
-                <p className="mt-1 font-medium text-[color:var(--pico-text)]">
+                <p className="text-(--pico-text-muted)">{t('authenticated.rails.emailState')}</p>
+                <p className="mt-1 font-medium text-(--pico-text)">
                   {session.user.isEmailVerified === false
                     ? t('authenticated.rails.pending')
                     : session.user.isEmailVerified === true
@@ -100,8 +100,8 @@ export function PicoSessionBanner({
                 </p>
               </div>
               <div>
-                <p className="text-[color:var(--pico-text-muted)]">{t('authenticated.productTruth.runtimeTruth')}</p>
-                <p className="mt-1 font-medium text-[color:var(--pico-text)]">
+                <p className="text-(--pico-text-muted)">{t('authenticated.productTruth.runtimeTruth')}</p>
+                <p className="mt-1 font-medium text-(--pico-text)">
                   {runtimeSignal.label}
                 </p>
               </div>
@@ -124,7 +124,7 @@ export function PicoSessionBanner({
     return (
       <div className={picoPanel('p-4 sm:p-5')}>
         <p className={picoClasses.label}>{t('loading.label')}</p>
-        <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+        <p className="mt-2 text-sm leading-6 text-(--pico-text-secondary)">
           {t('loading.body')}
         </p>
       </div>
@@ -135,7 +135,7 @@ export function PicoSessionBanner({
     return (
       <div className={picoEmber('p-4 sm:p-5')}>
         <p className={picoClasses.label}>{t('loading.label')}</p>
-        <p className="mt-2 text-sm leading-6 text-[color:var(--pico-text-secondary)]" role="alert">
+        <p className="mt-2 text-sm leading-6 text-(--pico-text-secondary)" role="alert">
           {t('errors.sessionUnavailable')}: {session.error}
         </p>
       </div>
@@ -150,24 +150,24 @@ export function PicoSessionBanner({
             <span className={picoClasses.chipWarning}>{t('anonymous.chips.sessionRequired')}</span>
             <span className={picoClasses.chipNeutral}>{t('anonymous.chips.picoHostAuth')}</span>
           </div>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)]">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-(--pico-text-secondary)">
             {t('anonymous.body')}
           </p>
         </div>
 
         <div className={picoSoft('grid gap-3 p-3 sm:min-w-[24rem]')}>
-          <div className="grid grid-cols-3 gap-2 text-xs text-[color:var(--pico-text-secondary)]">
+          <div className="grid grid-cols-3 gap-2 text-xs text-(--pico-text-secondary)">
             <div>
-              <p className="text-[color:var(--pico-text-muted)]">{t('anonymous.rails.progress')}</p>
-              <p className="mt-1 font-medium text-[color:var(--pico-text)]">{t('anonymous.withoutSession.localOnly')}</p>
+              <p className="text-(--pico-text-muted)">{t('anonymous.rails.progress')}</p>
+              <p className="mt-1 font-medium text-(--pico-text)">{t('anonymous.withoutSession.localOnly')}</p>
             </div>
             <div>
-              <p className="text-[color:var(--pico-text-muted)]">{t('anonymous.rails.runtimeTruth')}</p>
-              <p className="mt-1 font-medium text-[color:var(--pico-text)]">{t('anonymous.rails.limited')}</p>
+              <p className="text-(--pico-text-muted)">{t('anonymous.rails.runtimeTruth')}</p>
+              <p className="mt-1 font-medium text-(--pico-text)">{t('anonymous.rails.limited')}</p>
             </div>
             <div>
-              <p className="text-[color:var(--pico-text-muted)]">{t('anonymous.rails.approvals')}</p>
-              <p className="mt-1 font-medium text-[color:var(--pico-text)]">{t('anonymous.withoutSession.blocked')}</p>
+              <p className="text-(--pico-text-muted)">{t('anonymous.rails.approvals')}</p>
+              <p className="mt-1 font-medium text-(--pico-text)">{t('anonymous.withoutSession.blocked')}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">

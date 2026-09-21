@@ -46,7 +46,7 @@ function VersionItem({ version, onRollback }: { version: DeploymentVersion; onRo
   }
 
   return (
-    <div className={`flex items-center justify-between rounded-lg border p-3 ${isCurrent ? "border-emerald-400/30 bg-emerald-400/5" : "border-white/5 bg-white/[0.02]"}`}>
+    <div className={`flex items-center justify-between rounded-lg border p-3 ${isCurrent ? "border-emerald-400/30 bg-emerald-400/5" : "border-white/5 bg-white/2"}`}>
       <div className="flex items-center gap-3">
         <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium ${isCurrent ? "bg-emerald-400/20 text-emerald-300" : "bg-white/10 text-slate-400"}`}>
           v{version.version}
@@ -161,7 +161,7 @@ export function DeploymentHistory({
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <Card className="w-full max-w-md border border-white/10 bg-[#0a0a0a] p-5">
+          <Card className="w-full max-w-md border border-white/10 bg-surface p-5">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">Version History</h3>
               <button

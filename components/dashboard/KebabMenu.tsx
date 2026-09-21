@@ -118,7 +118,7 @@ export function KebabMenu({ actions, align = "end", className }: KebabMenuProps)
           }}
           className={cn(
             "absolute top-full z-50 mt-1.5 min-w-[180px] overflow-hidden rounded-lg border py-1 shadow-2xl",
-            align === "end" ? "end-0" : "start-0",
+            align === "end" ? "inset-e-0" : "inset-s-0",
           )}
           style={{
             borderColor: dashboardTokens.borderSubtle,

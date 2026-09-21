@@ -495,15 +495,15 @@ export default function WebhooksPageClient() {
           role="alert"
           className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-md"
         >
-          <AlertCircle aria-hidden="true" className="h-4 w-4 flex-shrink-0" />
-          <span className="min-w-0 flex-1 break-words">{error}</span>
+          <AlertCircle aria-hidden="true" className="h-4 w-4 shrink-0" />
+          <span className="min-w-0 flex-1 wrap-break-word">{error}</span>
           <button
             type="button"
             onClick={() => {
               setError(null);
               setFormError(null);
             }}
-            className="flex min-h-8 min-w-8 items-center justify-center rounded hover:bg-destructive/20"
+            className="flex min-h-8 min-w-8 items-center justify-center rounded-sm hover:bg-destructive/20"
             aria-label="Dismiss error"
           >
             <X aria-hidden="true" className="h-4 w-4" />
@@ -547,7 +547,7 @@ export default function WebhooksPageClient() {
                 setDeliveries([]);
                 setExpandedDelivery(null);
               }}
-              className="flex min-h-9 min-w-9 flex-shrink-0 items-center justify-center rounded-md hover:bg-accent"
+              className="flex min-h-9 min-w-9 shrink-0 items-center justify-center rounded-md hover:bg-accent"
               aria-label="Close delivery history"
             >
               <X aria-hidden="true" className="h-4 w-4" />
@@ -593,14 +593,14 @@ export default function WebhooksPageClient() {
                     >
                       <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
                         {delivery.success ? (
-                          <CheckCircle2 aria-hidden="true" className="h-4 w-4 flex-shrink-0 text-green-500" />
+                          <CheckCircle2 aria-hidden="true" className="h-4 w-4 shrink-0 text-green-500" />
                         ) : (
-                          <AlertCircle aria-hidden="true" className="h-4 w-4 flex-shrink-0 text-red-500" />
+                          <AlertCircle aria-hidden="true" className="h-4 w-4 shrink-0 text-red-500" />
                         )}
                         <span className="min-w-0 break-all font-mono text-sm">{delivery.event}</span>
                         {delivery.status_code && (
                           <span
-                            className={`flex-shrink-0 rounded px-2 py-0.5 text-xs ${
+                            className={`shrink-0 rounded px-2 py-0.5 text-xs ${
                               delivery.status_code >= 200 && delivery.status_code < 300
                                 ? "bg-green-500/20 text-green-400"
                                 : "bg-red-500/20 text-red-400"
@@ -610,15 +610,15 @@ export default function WebhooksPageClient() {
                           </span>
                         )}
                       </div>
-                      <div className="flex min-w-0 items-center justify-between gap-3 sm:flex-shrink-0 sm:justify-end">
-                        <span className="flex min-w-0 items-center gap-1 break-words text-xs text-muted-foreground">
-                          <Clock aria-hidden="true" className="h-3 w-3 flex-shrink-0" />
+                      <div className="flex min-w-0 items-center justify-between gap-3 sm:shrink-0 sm:justify-end">
+                        <span className="flex min-w-0 items-center gap-1 wrap-break-word text-xs text-muted-foreground">
+                          <Clock aria-hidden="true" className="h-3 w-3 shrink-0" />
                           {new Date(delivery.created_at).toLocaleString()}
                         </span>
                         {isExpanded ? (
-                          <ChevronUp aria-hidden="true" className="h-4 w-4 flex-shrink-0" />
+                          <ChevronUp aria-hidden="true" className="h-4 w-4 shrink-0" />
                         ) : (
-                          <ChevronDown aria-hidden="true" className="h-4 w-4 flex-shrink-0" />
+                          <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0" />
                         )}
                       </div>
                     </button>
@@ -630,11 +630,11 @@ export default function WebhooksPageClient() {
                       <p className="text-xs text-muted-foreground mb-2">
                         Payload:
                       </p>
-                      <pre className="max-h-64 min-w-0 overflow-x-hidden overflow-y-auto whitespace-pre-wrap break-all rounded bg-black/50 p-3 text-xs">
+                      <pre className="max-h-64 min-w-0 overflow-x-hidden overflow-y-auto whitespace-pre-wrap break-all rounded-sm bg-black/50 p-3 text-xs">
                         {formatJson(delivery.payload)}
                       </pre>
                       {delivery.error_message && (
-                        <p className="mt-2 break-words text-xs text-red-400">
+                        <p className="mt-2 wrap-break-word text-xs text-red-400">
                           Error: {delivery.error_message}
                         </p>
                       )}
@@ -662,7 +662,7 @@ export default function WebhooksPageClient() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search webhooks by URL, ID, or event"
-            className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none"
+            className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-hidden"
           />
         </div>
       )}
@@ -817,7 +817,7 @@ export default function WebhooksPageClient() {
                   <div className="flex min-w-0 flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1 space-y-2">
                       <div className="flex min-w-0 flex-wrap items-center gap-2">
-                        <code className="max-w-full min-w-0 whitespace-normal break-all rounded bg-muted px-2 py-1 text-sm">
+                        <code className="max-w-full min-w-0 whitespace-normal break-all rounded-sm bg-muted px-2 py-1 text-sm">
                           {webhook.url}
                         </code>
                         <StatusBadge status={lifecycle.status} label={lifecycle.label} />
@@ -825,7 +825,7 @@ export default function WebhooksPageClient() {
                         <button
                           type="button"
                           onClick={() => handleCopyId(webhook.id)}
-                          className="flex min-h-8 min-w-8 flex-shrink-0 items-center justify-center rounded text-slate-500 transition-colors hover:bg-accent hover:text-cyan-400"
+                          className="flex min-h-8 min-w-8 shrink-0 items-center justify-center rounded-sm text-slate-500 transition-colors hover:bg-accent hover:text-cyan-400"
                           aria-label={`Copy webhook ID ${webhook.id}`}
                           title={
                             currentCopyFeedback?.status === "error"
@@ -846,19 +846,19 @@ export default function WebhooksPageClient() {
                         {webhook.events.map((event) => (
                           <span
                             key={event}
-                            className="max-w-full break-all rounded bg-secondary px-2 py-0.5 text-xs"
+                            className="max-w-full break-all rounded-sm bg-secondary px-2 py-0.5 text-xs"
                           >
                             {event}
                           </span>
                         ))}
                       </div>
-                      <p className="break-words text-xs text-muted-foreground">
+                      <p className="wrap-break-word text-xs text-muted-foreground">
                         Created {new Date(webhook.created_at).toLocaleString()}
                         {deliverySignal.lastDeliveryAt
                           ? ` · last delivery ${formatRelativeTime(deliverySignal.lastDeliveryAt)}`
                           : ""}
                       </p>
-                      <p className="break-words text-xs text-muted-foreground">{deliverySignal.detail}</p>
+                      <p className="wrap-break-word text-xs text-muted-foreground">{deliverySignal.detail}</p>
                       {testFeedback?.webhookId === webhook.id ? (
                         <div
                           role="status"
@@ -867,7 +867,7 @@ export default function WebhooksPageClient() {
                           className="flex items-start gap-2 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-start text-xs text-emerald-200"
                         >
                           <CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
-                          <span className="min-w-0 break-words">{testFeedback.message}</span>
+                          <span className="min-w-0 wrap-break-word">{testFeedback.message}</span>
                         </div>
                       ) : null}
                       {deliverySignal.lastStatusCode ? (
@@ -877,7 +877,7 @@ export default function WebhooksPageClient() {
                         </p>
                       ) : null}
                     </div>
-                    <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-shrink-0">
+                    <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0">
                       <button
                         type="button"
                         onClick={() => setViewingDeliveries(webhook)}

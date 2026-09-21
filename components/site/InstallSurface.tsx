@@ -42,11 +42,11 @@ export function InstallSurface() {
         </div>
       </div>
 
-      <div className="border-b border-white/[0.08] px-3 py-3 sm:px-4">
+      <div className="border-b border-white/8 px-3 py-3 sm:px-4">
         <div
           role="tablist"
           aria-label="Choose an install lane"
-          className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-1"
+          className="inline-flex rounded-full border border-white/10 bg-white/4 p-1"
         >
           {installLanes.map((lane) => {
             const selected = lane.id === activeLane;
@@ -64,7 +64,7 @@ export function InstallSurface() {
                   "rounded-full px-4 py-2 text-sm font-semibold transition",
                   selected
                     ? "bg-white text-slate-950 shadow-[0_10px_24px_rgba(255,255,255,0.12)]"
-                    : "text-[color:var(--site-text-soft)] hover:text-white",
+                    : "text-(--site-text-soft) hover:text-white",
                 )}
               >
                 {lane.label}
@@ -83,13 +83,13 @@ export function InstallSurface() {
         >
           <div className="space-y-5">
             <div>
-              <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--site-text-muted)]">
+              <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.18em] site-muted-copy">
                 Desktop operator app
               </p>
-              <h3 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
+              <h3 className="mt-3 text-2xl font-semibold tracking-tighter text-white">
                 Check the current macOS release.
               </h3>
-              <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+              <p className="mt-3 text-sm leading-7 text-(--site-text-soft)">
                 The download lane opens only when MUTX resolves the complete expected
                 desktop asset set. Confirm publisher signing and notarization evidence
                 in the linked release before installation.
@@ -106,7 +106,7 @@ export function InstallSurface() {
               </Link>
             </div>
 
-            <div className="flex flex-wrap gap-3 text-sm text-[color:var(--site-text-muted)]">
+            <div className="flex flex-wrap gap-3 text-sm site-muted-copy">
               <Link href="/releases" className="site-inline-link">
                 Release page
               </Link>
@@ -122,8 +122,8 @@ export function InstallSurface() {
             </div>
           </div>
 
-          <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-4 sm:p-5">
-            <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[color:var(--site-text-muted)]">
+          <div className="rounded-[1.2rem] border border-white/10 bg-white/4 p-4 sm:p-5">
+            <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.18em] site-muted-copy">
               Release posture
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ export function InstallSurface() {
               <span className="site-route-pill">checksums when published</span>
               <span className="site-route-pill">manual download</span>
             </div>
-              <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
+              <p className="mt-4 text-sm leading-7 text-(--site-text-soft)">
               Apple Silicon is the primary lane. Intel stays available for
               compatibility, and the first-party download routes hand off to the
               current stable GitHub release assets while the public release page and

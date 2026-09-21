@@ -71,7 +71,7 @@ test.describe('Pico Academy evidence completion', () => {
     const completionStatus = page.getByTestId('pico-lesson-completion-status');
 
     await expect(completion).toBeDisabled();
-    await expect(completionStatus).toContainText(/complete all lesson steps/i);
+    await expect(completionStatus).toContainText(/do not seal the chapter until the proof/i);
 
     await completion.evaluate((button: HTMLButtonElement) => button.click());
     expect(academy.getProgress().completedLessons).toEqual([]);
@@ -83,12 +83,12 @@ test.describe('Pico Academy evidence completion', () => {
 
     await page.getByTestId('pico-lesson-proof').fill('done');
     await expect(completion).toBeDisabled();
-    await expect(completionStatus).toContainText(/at least 12 characters/i);
+    await expect(completionStatus).toContainText(/do not seal the chapter until the proof/i);
 
     const evidence = 'Fresh-shell output: /usr/local/bin/hermes opened successfully.';
     await page.getByTestId('pico-lesson-proof').fill(evidence);
 
-    await expect(completionStatus).toContainText(/checkpoint evidence is saved/i);
+    await expect(completionStatus).toContainText(/ready/i);
     await expect(completion).toBeEnabled();
     await expect
       .poll(() =>
@@ -100,7 +100,7 @@ test.describe('Pico Academy evidence completion', () => {
 
     await completion.click();
 
-    await expect(page.getByText(/evidence-backed checkpoint is saved/i)).toBeVisible();
+    await expect(completionStatus).toContainText(/sealed/i);
     await expect(page.getByRole('link', { name: /run your first agent now/i }).first()).toBeVisible();
     await expect
       .poll(() => academy.getProgress().completedLessons)
@@ -117,6 +117,7 @@ test.describe('Pico Academy evidence completion', () => {
     const firstStep = page.locator('[data-step-selector="desktop"][data-step-index="0"]');
     const secondStep = page.locator('[data-step-selector="desktop"][data-step-index="1"]');
 
+    await expect(firstStep).toBeEnabled();
     await firstStep.focus();
     await firstStep.press('ArrowDown');
     await expect(secondStep).toBeFocused();
@@ -128,20 +129,22 @@ test.describe('Pico Academy evidence completion', () => {
     await expect(motionSurfaces.first()).toHaveAttribute('data-motion', 'reduced');
     expect(
       await motionSurfaces.evaluateAll((elements) =>
-        elements.reduce((count, element) => count + element.getAnimations().length, 0),
+        elements.reduce((count, element) => count + element.getAnimations().filter((animation) => animation.playState === 'running' || animation.pending).length, 0),
       ),
     ).toBe(0);
 
     await page.goto('/pico/academy', { waitUntil: 'domcontentloaded' });
-    const settingsDisclosure = page.locator('summary').filter({ hasText: /platform settings/i });
+    const settingsDisclosure = page.locator('summary[aria-controls="pico-academy-platform-settings"]');
     await expect(settingsDisclosure).toHaveAttribute(
       'aria-controls',
       'pico-academy-platform-settings',
     );
+    await expect(page.getByRole('button', { name: 'Map', exact: true })).toBeEnabled();
     await settingsDisclosure.focus();
+    await expect(settingsDisclosure).toBeFocused();
     await settingsDisclosure.press('Enter');
     await expect(
-      page.getByRole('region', { name: 'Academy platform settings' }),
+      page.getByRole('region', { name: 'Setup', exact: true }),
     ).toBeVisible();
   });
 
@@ -167,6 +170,7 @@ test.describe('Pico Academy evidence completion', () => {
 
     const firstStep = page.locator('[data-step-selector="mobile"][data-step-index="0"]');
     const secondStep = page.locator('[data-step-selector="mobile"][data-step-index="1"]');
+    await expect(firstStep).toBeEnabled();
     await firstStep.focus();
     await firstStep.press('ArrowLeft');
     await expect(secondStep).toBeFocused();

@@ -100,7 +100,7 @@ export function LoadingState({
     >
       <span className="sr-only">Loading dashboard content</span>
       <div
-        className="mb-3 flex items-center gap-2 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.12em]"
+        className="mb-3 flex items-center gap-2 font-(--font-mono) text-[11px] uppercase tracking-[0.12em]"
         style={{ color: dashboardTokens.textMuted }}
         aria-hidden="true"
       >

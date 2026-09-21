@@ -60,7 +60,7 @@ interface PendingSessionAction {
 }
 
 const secondaryButtonClass =
-  "min-h-11 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50";
+  "min-h-11 rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50";
 const dangerButtonClass =
   "min-h-11 rounded-lg border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-xs font-medium text-rose-200 transition hover:border-rose-300/40 disabled:cursor-not-allowed disabled:opacity-50";
 const confirmButtonClass =
@@ -523,7 +523,7 @@ export function SessionsPageClient() {
               {sessions.map((session) => {
                 const acting = actingKey === session.key;
                 return (
-                  <div key={session.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div key={session.id} className="rounded-xl border border-white/10 bg-white/2 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-white">{session.agent}</p>
@@ -599,7 +599,7 @@ export function SessionsPageClient() {
             />
           ) : (
             <div className="space-y-3">
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-white">{assistant.name}</p>
@@ -663,7 +663,7 @@ export function SessionsPageClient() {
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">{role}</p>
                       {timestamp ? <time className="text-xs text-slate-500">{formatDateTime(timestamp)}</time> : null}
                     </div>
-                    <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-slate-300">
+                    <p className="mt-3 whitespace-pre-wrap wrap-break-word text-sm leading-6 text-slate-300">
                       {transcriptText(message)}
                     </p>
                   </article>

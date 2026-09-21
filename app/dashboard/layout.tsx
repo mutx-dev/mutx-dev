@@ -53,7 +53,7 @@ export default async function DashboardLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <div className={`${appFontVariables} h-full font-[family:var(--font-site-body)]`}>
+      <div className={`${appFontVariables} h-full font-(--font-site-body)`}>
         <ErrorBoundary>
           <DesktopStatusProvider>
             <DesktopWindowProvider>

@@ -67,11 +67,11 @@ export function deploymentErrorMessage(error: unknown, fallback: string) {
 
 function DeploymentCardSkeleton() {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5 motion-safe:animate-pulse motion-reduce:animate-none">
+    <div className="rounded-xl border border-white/5 bg-white/2 p-5 motion-safe:animate-pulse motion-reduce:animate-none">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <div className="h-5 w-48 rounded bg-white/10" />
-          <div className="mt-2 h-4 w-32 rounded bg-white/5" />
+          <div className="h-5 w-48 rounded-sm bg-white/10" />
+          <div className="mt-2 h-4 w-32 rounded-sm bg-white/5" />
         </div>
         <div className="h-6 w-20 rounded-full bg-white/10" />
       </div>
@@ -81,9 +81,9 @@ function DeploymentCardSkeleton() {
         <div className="h-12 rounded-lg bg-white/5" />
       </div>
       <div className="mt-4 flex gap-2">
-        <div className="h-8 w-20 rounded bg-white/5" />
-        <div className="h-8 w-20 rounded bg-white/5" />
-        <div className="h-8 w-20 rounded bg-white/5" />
+        <div className="h-8 w-20 rounded-sm bg-white/5" />
+        <div className="h-8 w-20 rounded-sm bg-white/5" />
+        <div className="h-8 w-20 rounded-sm bg-white/5" />
       </div>
     </div>
   );
@@ -122,7 +122,7 @@ function DeploymentCard({ deployment, onRestart, onStop, onStart, onTerminate, i
               {copied ? "Copied" : "Copy ID"}
             </button>
           </div>
-          <p className="mt-2 truncate text-xs text-slate-500 font-[family:var(--font-mono)]">
+          <p className="mt-2 truncate text-xs text-slate-500 font-(--font-mono)">
             Agent assignment: {deployment.agent_id}
           </p>
         </div>
@@ -216,7 +216,7 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const fieldClassName =
-    "w-full rounded-[14px] border border-[#2e3946] bg-[#0b1017] px-4 py-3 text-sm text-white focus:border-emerald-300/30 focus:outline-none";
+    "w-full rounded-[14px] border border-[#2e3946] bg-[#0b1017] px-4 py-3 text-sm text-white focus:border-emerald-300/30 focus:outline-hidden";
 
   const availableAgents = agents.filter(a => a.status !== "deployed");
 

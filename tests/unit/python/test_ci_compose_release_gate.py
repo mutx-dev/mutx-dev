@@ -491,3 +491,9 @@ def test_deployment_shell_and_workflow_syntax() -> None:
         ".github/workflows/release.yml",
     ):
         assert load_yaml(workflow)["jobs"]
+
+
+def test_frontend_image_ships_its_healthcheck_probe():
+    dockerfile = read_text("infrastructure/docker/Dockerfile.frontend")
+    production = dockerfile.split("FROM base AS production", 1)[1]
+    assert "COPY --from=builder --chown=nextjs:nextjs /app/scripts/verify-release-http.mjs /app/scripts/verify-release-http.mjs" in production

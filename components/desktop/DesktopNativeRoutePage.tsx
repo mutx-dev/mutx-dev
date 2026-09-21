@@ -331,7 +331,7 @@ function SnapshotDetails({
       className="rounded-[6px] border border-[#2b2b26] bg-[#0c0d0b] p-4"
     >
       <summary className={cn("cursor-pointer text-sm font-semibold text-[#eee9dc]", DESKTOP_FOCUS_CLASS)}>{title}</summary>
-      <pre className="mt-3 max-h-72 overflow-auto rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-[family:var(--font-mono)] text-xs text-[#999284]">
+      <pre className="mt-3 max-h-72 overflow-auto rounded-[4px] border border-[#34342e] bg-[#090a08] p-3 font-(--font-mono) text-xs text-[#999284]">
         {jsonPreview(value)}
       </pre>
     </details>
@@ -359,7 +359,7 @@ function InspectorFactGrid({
                   : "border-[#34342e] bg-[#151612]",
           )}
         >
-          <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">{item.label}</p>
+          <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">{item.label}</p>
           <p className="mt-2 text-sm font-semibold text-[#eee9dc]">{item.value}</p>
         </div>
       ))}
@@ -438,7 +438,7 @@ function ChipRow({
       {items.map((item) => (
         <span
           key={item}
-          className="rounded-full border border-[#34342e] bg-[#171813] px-2.5 py-1 font-[family:var(--font-mono)] text-[9px] uppercase tracking-[0.1em] text-[#aaa397]"
+          className="rounded-full border border-[#34342e] bg-[#171813] px-2.5 py-1 font-(--font-mono) text-[9px] uppercase tracking-widest text-[#aaa397]"
         >
           {item}
         </span>
@@ -461,18 +461,18 @@ function WorkbenchMetricStrip({
 }) {
   return (
     <div className="overflow-hidden rounded-[6px] border border-[#34342e] bg-[#0c0d0b]">
-      <div className="grid gap-px bg-[#2b2b26] [grid-template-columns:repeat(auto-fit,minmax(180px,1fr))]">
+      <div className="grid gap-px bg-[#2b2b26] grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
         {items.map((item) => (
           <div
             key={`${item.label}-${item.value}`}
             className="bg-[#11120f] px-4 py-4"
           >
-            <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+            <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
               {item.label}
             </p>
             <p
               className={cn(
-                "mt-2 font-[family:var(--font-mono)] text-lg font-medium tracking-[-0.03em]",
+                "mt-2 font-(--font-mono) text-lg font-medium tracking-[-0.03em]",
                 item.tone === "success"
                   ? "text-[#78e3b4]"
                   : item.tone === "warning"
@@ -516,7 +516,7 @@ function WorkbenchPane({
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2b2b26] bg-[#0c0d0b] px-4 py-3">
         <div className="min-w-0">
-          <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">REC / {title}</p>
+          <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">REC / {title}</p>
           {meta ? <p className="mt-1 text-xs text-[#999284]">{meta}</p> : null}
         </div>
         {toolbar ? <div className="flex flex-wrap items-center gap-2">{toolbar}</div> : null}
@@ -569,7 +569,7 @@ function InspectorDrawer({
   }
 
   return (
-    <div className="fixed inset-0 z-[110] flex justify-end bg-[#090a08]/84 motion-reduce:backdrop-blur-none">
+    <div className="fixed inset-0 z-110 flex justify-end bg-[#090a08]/84 motion-reduce:backdrop-blur-none">
       <button
         type="button"
         aria-label="Close inspector"
@@ -586,10 +586,10 @@ function InspectorDrawer({
       >
         <div className="flex items-center justify-between gap-3 border-b border-[#34342e] bg-[#0c0d0b] px-4 py-3.5">
           <div>
-            <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">
+            <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">
               Compact Inspector
             </p>
-            <h2 id="desktop-inspector-title" className="mt-1 font-[family:var(--font-site-display)] text-base font-medium text-[#eee9dc]">
+            <h2 id="desktop-inspector-title" className="mt-1 font-(--font-site-display) text-base font-medium text-[#eee9dc]">
               {title}
             </h2>
           </div>
@@ -1723,7 +1723,7 @@ export function DesktopNativeRoutePage({
     },
   ] as const;
   const inspectorRail = (
-    <div className="space-y-4 [&_button]:focus-visible:outline [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-offset-2 [&_button]:focus-visible:outline-[#ff7847] [&_input]:focus-visible:outline [&_input]:focus-visible:outline-2 [&_input]:focus-visible:outline-offset-2 [&_input]:focus-visible:outline-[#ff7847] [&_select]:focus-visible:outline [&_select]:focus-visible:outline-2 [&_select]:focus-visible:outline-offset-2 [&_select]:focus-visible:outline-[#ff7847]">
+    <div className="space-y-4 focus-visible:[&_button]:outline-solid focus-visible:[&_button]:outline-2 focus-visible:[&_button]:outline-offset-2 focus-visible:[&_button]:outline-[#ff7847] focus-visible:[&_input]:outline-solid focus-visible:[&_input]:outline-2 focus-visible:[&_input]:outline-offset-2 focus-visible:[&_input]:outline-[#ff7847] focus-visible:[&_select]:outline-solid focus-visible:[&_select]:outline-2 focus-visible:[&_select]:outline-offset-2 focus-visible:[&_select]:outline-[#ff7847]">
       <WorkbenchPane title="Route Inspector" meta="machine-aware">
         <div className="space-y-4">
           <div>
@@ -1931,13 +1931,13 @@ export function DesktopNativeRoutePage({
                           value={agentDraft.name}
                           onChange={(event) => setAgentDraft((current) => ({ ...current, name: event.target.value }))}
                           placeholder="Operator Prime"
-                          className="rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-none transition focus:border-[#5c6876]"
+                          className="rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden transition focus:border-[#5c6876]"
                         />
                         <select
                           aria-label="Agent provider"
                           value={agentDraft.type}
                           onChange={(event) => setAgentDraft((current) => ({ ...current, type: event.target.value }))}
-                          className="rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-none transition focus:border-[#5c6876]"
+                          className="rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden transition focus:border-[#5c6876]"
                         >
                           <option value="openai">openai</option>
                           <option value="anthropic">anthropic</option>
@@ -1952,7 +1952,7 @@ export function DesktopNativeRoutePage({
                         }
                         rows={4}
                         placeholder="Describe the operator or assistant role."
-                        className="w-full rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-none transition focus:border-[#5c6876]"
+                        className="w-full rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden transition focus:border-[#5c6876]"
                       />
                       <SectionButton
                         label="Create Agent"
@@ -2272,7 +2272,7 @@ export function DesktopNativeRoutePage({
                         onChange={(event) =>
                           setDeploymentDraft((current) => ({ ...current, agentId: event.target.value }))
                         }
-                        className="w-full rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-none transition focus:border-[#5c6876]"
+                        className="w-full rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden transition focus:border-[#5c6876]"
                       >
                         <option value="">Select an agent</option>
                         {cloudAgents.map((agent) => {
@@ -2292,7 +2292,7 @@ export function DesktopNativeRoutePage({
                         onChange={(event) =>
                           setDeploymentDraft((current) => ({ ...current, replicas: event.target.value }))
                         }
-                        className="w-full rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-none transition focus:border-[#5c6876]"
+                        className="w-full rounded-[6px] border border-[#2b3238] bg-[#0c1015] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden transition focus:border-[#5c6876]"
                       />
                       <SectionButton
                         label="Create Deployment"
@@ -3488,7 +3488,7 @@ export function DesktopNativeRoutePage({
                   value={apiKeyName}
                   onChange={(event) => setApiKeyName(event.target.value)}
                   placeholder="Operator key"
-                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-none"
+                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden"
                 />
                 <SectionButton
                   label="Create API Key"
@@ -3502,7 +3502,7 @@ export function DesktopNativeRoutePage({
 
               {revealedKey ? (
                 <div className="mt-4 rounded-[6px] border border-[#285a43] bg-[#0f2018] p-4">
-                  <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#78e3b4]">One-time secret</p>
+                  <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#78e3b4]">One-time secret</p>
                   <p className="mt-2 break-all font-mono text-sm text-[#eee9dc]">{revealedKey}</p>
                 </div>
               ) : null}
@@ -3607,7 +3607,7 @@ export function DesktopNativeRoutePage({
                   value={webhookDraft.url}
                   onChange={(event) => setWebhookDraft((current) => ({ ...current, url: event.target.value }))}
                   placeholder="https://example.com/webhooks/mutx"
-                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-none"
+                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden"
                 />
                 <input
                   aria-label="Webhook event names"
@@ -3616,7 +3616,7 @@ export function DesktopNativeRoutePage({
                     setWebhookDraft((current) => ({ ...current, events: event.target.value }))
                   }
                   placeholder="run.completed, deployment.failed"
-                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-none"
+                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden"
                 />
                 <label className="flex items-center gap-2 text-sm text-[#c8c0b0]">
                   <input
@@ -3919,7 +3919,7 @@ export function DesktopNativeRoutePage({
   );
 
   return (
-    <div className="space-y-4 [&_button]:focus-visible:outline [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-offset-2 [&_button]:focus-visible:outline-[#ff7847] [&_input]:focus-visible:outline [&_input]:focus-visible:outline-2 [&_input]:focus-visible:outline-offset-2 [&_input]:focus-visible:outline-[#ff7847] [&_select]:focus-visible:outline [&_select]:focus-visible:outline-2 [&_select]:focus-visible:outline-offset-2 [&_select]:focus-visible:outline-[#ff7847]">
+    <div className="space-y-4 focus-visible:[&_button]:outline-solid focus-visible:[&_button]:outline-2 focus-visible:[&_button]:outline-offset-2 focus-visible:[&_button]:outline-[#ff7847] focus-visible:[&_input]:outline-solid focus-visible:[&_input]:outline-2 focus-visible:[&_input]:outline-offset-2 focus-visible:[&_input]:outline-[#ff7847] focus-visible:[&_select]:outline-solid focus-visible:[&_select]:outline-2 focus-visible:[&_select]:outline-offset-2 focus-visible:[&_select]:outline-[#ff7847]">
       <RouteHeader
         title={meta.title}
         description={meta.description}
@@ -4082,7 +4082,7 @@ export function DesktopNativeRoutePage({
                   value={authName}
                   onChange={(event) => setAuthName(event.target.value)}
                   placeholder="Name"
-                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-none"
+                  className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden"
                 />
               ) : null}
               {authMode !== "local" ? (
@@ -4092,7 +4092,7 @@ export function DesktopNativeRoutePage({
                     value={authEmail}
                     onChange={(event) => setAuthEmail(event.target.value)}
                     placeholder="Email"
-                    className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-none"
+                    className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden"
                   />
                   <input
                     aria-label="Operator password"
@@ -4100,7 +4100,7 @@ export function DesktopNativeRoutePage({
                     value={authPassword}
                     onChange={(event) => setAuthPassword(event.target.value)}
                     placeholder="Password"
-                    className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-none"
+                    className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden"
                   />
                 </>
               ) : null}
@@ -4137,7 +4137,7 @@ export function DesktopNativeRoutePage({
                 aria-label="Assistant name"
                 value={assistantName}
                 onChange={(event) => setAssistantName(event.target.value)}
-                className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-none"
+                className="w-full rounded-[6px] border border-[#2b2b26] bg-[#11120f] px-3 py-2.5 text-sm text-[#eee9dc] outline-hidden"
               />
               <div className="flex flex-wrap gap-2">
                 <SectionButton label="Run Real Setup" icon={Play} tone="primary" onClick={() => void runAssistantSetup()} />

@@ -34,8 +34,8 @@ if (braceManifests.length === 0) {
 for (const manifestPath of braceManifests) {
   const { version } = readManifest(manifestPath);
   const major = Number(version.split(".")[0]);
-  // Patched release lines for GHSA-3jxr-9vmj-r5cp.
-  const minimum = major === 1 ? "1.1.16" : major === 2 ? "2.1.2" : "5.0.7";
+  // Patched release lines for GHSA-rgw5-rvv9-x895.
+  const minimum = major === 1 ? "1.1.18" : major === 2 ? "2.1.4" : "5.0.9";
 
   if (
     !Number.isInteger(major) ||
@@ -71,6 +71,17 @@ for (const manifestPath of minimatchManifests) {
     match("README.md", "src/**/*.ts")
   ) {
     throw new Error(`minimatch ${version} failed its compatibility probe`);
+  }
+}
+
+// Electron packaging parses Info.plist through every installed plist copy.
+// A security override of xmldom must preserve that parser contract.
+for (const manifestPath of packageManifests.filter((path) => readManifest(path).name === "plist")) {
+  const plist = require(dirname(manifestPath));
+  const expected = { CFBundleName: "MUTX", CFBundleVersion: "1.4.0" };
+  const parsed = plist.parse(plist.build(expected));
+  if (parsed.CFBundleName !== expected.CFBundleName || parsed.CFBundleVersion !== expected.CFBundleVersion) {
+    throw new Error(`plist failed its packaging compatibility probe at ${manifestPath}`);
   }
 }
 

@@ -26,14 +26,14 @@ type PicoSurfaceCompassProps = {
 
 function itemClasses(tone: PicoSurfaceCompassTone = 'secondary') {
   if (tone === 'primary') {
-    return picoEmber('group grid gap-3 p-5 transition hover:border-[color:var(--pico-accent)] hover:bg-[linear-gradient(180deg,rgba(117,64,33,0.28),rgba(45,27,16,0.32))]')
+    return picoEmber('group grid gap-3 p-5 transition hover:border-(--pico-accent) hover:bg-[linear-gradient(180deg,rgba(117,64,33,0.28),rgba(45,27,16,0.32))]')
   }
 
   if (tone === 'soft') {
-    return picoSoft('group grid gap-3 p-5 transition hover:border-[color:var(--pico-border-hover)] hover:bg-[rgba(22,16,12,0.86)]')
+    return picoSoft('group grid gap-3 p-5 transition hover:border-(--pico-border-hover) hover:bg-[rgba(22,16,12,0.86)]')
   }
 
-  return picoInset('group grid gap-3 p-5 transition hover:border-[color:var(--pico-border-hover)] hover:bg-[color:var(--pico-bg-surface-hover)]')
+  return picoInset('group grid gap-3 p-5 transition hover:border-(--pico-border-hover) hover:bg-(--pico-bg-surface-hover)')
 }
 
 export function PicoSurfaceCompass({
@@ -53,16 +53,16 @@ export function PicoSurfaceCompass({
 
   return (
     <section className={picoPanel('p-5 sm:p-6')} data-testid="pico-surface-compass">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr),22rem] lg:items-start">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className={picoClasses.label}>{t('label')}</span>
             {status ? <span className={picoClasses.chip}>{status}</span> : null}
           </div>
-          <h2 className="mt-3 font-[family:var(--font-site-display)] text-3xl tracking-[-0.05em] text-[color:var(--pico-text)] sm:text-4xl">
+          <h2 className="mt-3 font-(--font-site-display) text-3xl tracking-tighter text-(--pico-text) sm:text-4xl">
             {title}
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[color:var(--pico-text-secondary)] sm:text-base sm:leading-7">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-(--pico-text-secondary) sm:text-base sm:leading-7">
             {body}
           </p>
         </div>
@@ -70,7 +70,7 @@ export function PicoSurfaceCompass({
         {aside ? (
           <div className={picoSoft('p-4 sm:p-5')}>
             <p className={picoClasses.label}>{t('operatingRule')}</p>
-            <p className="mt-3 text-sm leading-6 text-[color:var(--pico-text-secondary)]">{aside}</p>
+            <p className="mt-3 text-sm leading-6 text-(--pico-text-secondary)">{aside}</p>
           </div>
         ) : null}
       </div>
@@ -83,17 +83,17 @@ export function PicoSurfaceCompass({
             className={cn(itemClasses(item.tone), 'snap-start')}
           >
             <div className="flex items-start justify-between gap-3">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--pico-text-muted)]">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-(--pico-text-muted)">
                 {item.note}
               </span>
-              <span className="text-sm text-[color:var(--pico-accent)]" aria-hidden="true">
+              <span className="text-sm text-(--pico-accent)" aria-hidden="true">
                 {t('forwardSymbol')}
               </span>
             </div>
-            <p className="font-[family:var(--font-site-display)] text-2xl tracking-[-0.05em] text-[color:var(--pico-text)]">
+            <p className="font-(--font-site-display) text-2xl tracking-tighter text-(--pico-text)">
               {item.label}
             </p>
-            <p className="text-sm leading-6 text-[color:var(--pico-text-secondary)]">{item.caption}</p>
+            <p className="text-sm leading-6 text-(--pico-text-secondary)">{item.caption}</p>
           </Link>
         ))}
       </div>

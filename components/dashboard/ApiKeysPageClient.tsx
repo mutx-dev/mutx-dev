@@ -388,7 +388,7 @@ export function ApiKeysPageClient() {
                   value={newKeyName}
                   onChange={(event) => setNewKeyName(event.target.value)}
                   aria-describedby={API_KEY_NAME_HELP_ID}
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white outline-none transition focus:border-cyan-400/40"
+                  className="mt-2 w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2.5 text-sm text-white outline-hidden transition focus:border-cyan-400/40"
                   placeholder="Operator key"
                 />
               </div>
@@ -458,7 +458,7 @@ export function ApiKeysPageClient() {
                   const active = lifecycle.label === "active";
 
                   return (
-                    <div key={key.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                    <div key={key.id} className="rounded-xl border border-white/10 bg-white/2 p-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
@@ -512,19 +512,19 @@ export function ApiKeysPageClient() {
 
         <LivePanel title="Lifecycle notes" meta="operator access">
           <div className="space-y-3">
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-white/10 bg-white/2 p-4">
               <p className="text-sm font-medium text-white">Creation and rotation are live</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 This route now owns create, rotate, and revoke actions directly instead of bouncing into the broader security page.
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-white/10 bg-white/2 p-4">
               <p className="text-sm font-medium text-white">Secrets are one-time reveal only</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 The secret value is shown exactly once after create or rotate. The ledger keeps metadata and audit posture, not reusable plaintext secrets.
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="rounded-xl border border-white/10 bg-white/2 p-4">
               <p className="text-sm font-medium text-white">Audit records stay visible</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 Revoked or expired keys remain in the registry so operators can verify lifecycle events without losing history.
@@ -589,7 +589,7 @@ export function ApiKeysPageClient() {
       >
         {confirmation ? (
           <div className="space-y-3">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-300">
+            <div className="rounded-xl border border-white/10 bg-white/3 p-4 text-sm text-slate-300">
               <span className="font-medium text-white">{confirmation.key.name}</span>
               <span className="mt-1 block font-mono text-xs text-slate-500">
                 {maskKeyId(confirmation.key.id)}

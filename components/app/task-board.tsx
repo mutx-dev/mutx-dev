@@ -81,8 +81,8 @@ function TaskCard({
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => setIsDragging(false)}
       className={cn(
-        'bg-white/[0.03] rounded-lg p-3 border border-white/5 border-l-4 cursor-grab active:cursor-grabbing',
-        'hover:border-white/10 hover:bg-white/[0.05] transition-all',
+        'bg-white/3 rounded-lg p-3 border border-white/5 border-l-4 cursor-grab active:cursor-grabbing',
+        'hover:border-white/10 hover:bg-white/5 transition-all',
         priorityColors[task.priority],
         isDragging ? 'opacity-50 scale-[0.97]' : ''
       )}
@@ -92,7 +92,7 @@ function TaskCard({
           {task.title}
         </h4>
         <span className={cn(
-          'text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0',
+          'text-[10px] px-1.5 py-0.5 rounded-sm font-medium shrink-0',
           priorityBadgeColors[task.priority]
         )}>
           {task.priority}
@@ -249,18 +249,18 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
     return (
       <div className={cn('flex flex-col h-full', className)}>
         <div className="p-4 border-b border-white/10">
-          <div className="h-7 w-32 rounded bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
+          <div className="h-7 w-32 rounded-sm bg-white/5 motion-safe:animate-pulse motion-reduce:animate-none" />
         </div>
         <div className="flex-1 flex gap-4 p-4 overflow-x-auto">
           {COLUMNS.map(col => (
             <div key={col.key} className="flex-1 min-w-72">
-              <div className="rounded-lg border border-white/5 bg-white/[0.02] flex flex-col min-h-64">
+              <div className="rounded-lg border border-white/5 bg-white/2 flex flex-col min-h-64">
                 <div className={cn('px-4 py-3 rounded-t-lg border-b border-white/5', col.color)}>
-                  <div className="h-4 w-20 rounded bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
+                  <div className="h-4 w-20 rounded-sm bg-white/10 motion-safe:animate-pulse motion-reduce:animate-none" />
                 </div>
                 <div className="flex-1 p-3 space-y-3">
                   {[1, 2].map(i => (
-                    <div key={i} className="h-20 rounded border border-l-2 border-white/5 border-l-slate-600 bg-white/[0.03] motion-safe:animate-pulse motion-reduce:animate-none" />
+                    <div key={i} className="h-20 rounded-sm border border-l-2 border-white/5 border-l-slate-600 bg-white/3 motion-safe:animate-pulse motion-reduce:animate-none" />
                   ))}
                 </div>
               </div>
@@ -282,7 +282,7 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
         </div>
         <button
           onClick={fetchData}
-          className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.02] text-xs text-slate-400 hover:text-white hover:border-white/20 transition-colors"
+          className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/2 text-xs text-slate-400 hover:text-white hover:border-white/20 transition-colors"
         >
           Refresh
         </button>
@@ -307,12 +307,12 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
                 'flex-1 min-w-72 rounded-lg border flex flex-col transition-colors',
                 dragOverColumn === col.key
                   ? 'border-cyan-400/40 bg-cyan-500/5'
-                  : 'border-white/5 bg-white/[0.02]'
+                  : 'border-white/5 bg-white/2'
               )}
             >
               <div className={cn('px-4 py-3 rounded-t-lg flex justify-between items-center border-b border-white/5', col.color)}>
                 <h3 className="text-sm font-semibold tracking-wide">{col.label}</h3>
-                <span className="text-xs font-mono bg-white/10 px-2 py-0.5 rounded min-w-[1.75rem] text-center">
+                <span className="text-xs font-mono bg-white/10 px-2 py-0.5 rounded-sm min-w-7 text-center">
                   {tasksByStatus[col.key]?.length || 0}
                 </span>
               </div>
@@ -354,12 +354,12 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
           <EmptyState
             title="No work items yet"
             message="Tasks will appear here once agents or deployments exist in this account."
-            className="h-full border-white/5 bg-white/[0.02]"
+            className="h-full border-white/5 bg-white/2"
           />
         </div>
       )}
 
-      <div className="border-t border-white/5 p-3 bg-white/[0.02] text-xs text-slate-500">
+      <div className="border-t border-white/5 p-3 bg-white/2 text-xs text-slate-500">
         <div className="flex justify-between">
           <span>{tasks.length} total tasks</span>
           <span>{tasks.filter(t => t.status === 'running').length} running</span>

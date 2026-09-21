@@ -136,7 +136,7 @@ export function LogsViewer({
   });
 
   return (
-    <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+    <Card className="border border-white/5 bg-white/1 p-0 overflow-hidden">
       <div className="flex items-center justify-between border-b border-white/5 p-4">
         <div className="flex items-center gap-3 text-cyan-400">
           <FileText className="h-5 w-5" />
@@ -155,7 +155,7 @@ export function LogsViewer({
             className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
               autoRefresh
                 ? "bg-cyan-400/10 text-cyan-400"
-                : "bg-white/[0.03] text-slate-400 hover:text-white"
+                : "bg-white/3 text-slate-400 hover:text-white"
             }`}
           >
             <RefreshCcw className={`h-3.5 w-3.5 ${autoRefresh ? "motion-safe:animate-spin motion-reduce:animate-none" : ""}`} />
@@ -164,7 +164,7 @@ export function LogsViewer({
           <button
             onClick={loadLogs}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:text-white disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-white/3 px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:text-white disabled:opacity-50"
           >
             <RefreshCcw
               className={`h-3.5 w-3.5 ${loading ? "motion-safe:animate-spin motion-reduce:animate-none" : ""}`}
@@ -173,14 +173,14 @@ export function LogsViewer({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 border-b border-white/5 bg-white/[0.02] p-3">
+      <div className="flex flex-wrap items-center gap-3 border-b border-white/5 bg-white/2 p-3">
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search logs..."
-            className="w-full rounded-lg border border-white/10 bg-black/40 pl-3 pr-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+            className="w-full rounded-lg border border-white/10 bg-black/40 pl-3 pr-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-hidden focus:ring-1 focus:ring-cyan-400/20"
           />
           {searchQuery && (
             <button
@@ -247,7 +247,7 @@ export function LogsViewer({
             {filteredLogs.map((log, index) => (
               <div
                 key={log.id ?? `${log.timestamp}-${index}`}
-                className="group px-4 py-3 transition hover:bg-white/[0.02]"
+                className="group px-4 py-3 transition hover:bg-white/2"
               >
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5">{getLogIcon(log.level)}</div>
@@ -285,7 +285,7 @@ export function LogsViewer({
                         </button>
                       )}
                     </div>
-                    <p className="mt-1.5 text-sm text-slate-300 font-[family:var(--font-mono)] break-all">
+                    <p className="mt-1.5 text-sm text-slate-300 font-(--font-mono) break-all">
                       {log.message}
                     </p>
                     {expandedLog === log.id && log.extra_data && (

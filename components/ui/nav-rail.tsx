@@ -142,7 +142,7 @@ function SidebarDesktop({ expanded, onToggle }: SidebarDesktopProps) {
       role="navigation"
       aria-label="Main navigation"
       className={cn(
-        'hidden md:flex flex-col bg-gradient-to-b from-card to-background border-r border-border shrink-0 transition-all duration-200 ease-in-out',
+        'hidden md:flex flex-col bg-linear-to-b from-card to-background border-r border-border shrink-0 transition-all duration-200 ease-in-out',
         expanded ? 'w-[220px]' : 'w-14'
       )}
     >
@@ -313,7 +313,7 @@ function MobileBottomSheet({
   }
 
   return (
-    <div className="md:hidden fixed inset-0 z-[60]">
+    <div className="md:hidden fixed inset-0 z-60">
       <div
         className={cn(
           'absolute inset-0 bg-black/40 transition-opacity duration-200',

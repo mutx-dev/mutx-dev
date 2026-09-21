@@ -95,7 +95,7 @@ export function PicoSignalDiagram({
         className,
       )}
     >
-      <div className="flex min-h-11 items-center justify-between gap-4 border-b border-[#0a0a09] px-4 font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.16em]">
+      <div className="flex min-h-11 items-center justify-between gap-4 border-b border-[#0a0a09] px-4 font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.16em]">
         <span>{localizedLabel}</span>
         <span className="text-[#c83b00]">{t('signal', { index })}</span>
       </div>
@@ -103,21 +103,21 @@ export function PicoSignalDiagram({
       <div
         aria-hidden="true"
         className={cn(
-          'relative grid overflow-hidden border-b border-[#0a0a09] [background-image:linear-gradient(rgba(10,10,9,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(10,10,9,0.12)_1px,transparent_1px)] [background-size:2rem_2rem]',
-          compact ? 'min-h-36' : 'aspect-[4/3] min-h-48',
+          'relative grid overflow-hidden border-b border-[#0a0a09] bg-[linear-gradient(rgba(10,10,9,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(10,10,9,0.12)_1px,transparent_1px)] bg-size-[2rem_2rem]',
+          compact ? 'min-h-36' : 'aspect-4/3 min-h-48',
         )}
       >
-        <span className="absolute start-4 top-3 font-[family:var(--font-site-body)] text-[clamp(4rem,10vw,7rem)] font-semibold leading-none tracking-[-0.1em]">
+        <span className="absolute inset-s-4 top-3 font-(--font-site-body) text-[clamp(4rem,10vw,7rem)] font-semibold leading-none -tracking-widest">
           {index}
         </span>
-        <span className="absolute bottom-4 start-4 h-3 w-3 bg-[#ff4d00]" />
-        <span className="absolute bottom-[1.35rem] start-7 end-4 h-px bg-[#0a0a09]" />
-        <span className="absolute bottom-4 end-4 h-3 w-3 border border-[#0a0a09] bg-[#f3f0e8]" />
-        <span className="absolute end-4 top-4 h-12 w-12 border border-[#0a0a09] before:absolute before:start-1/2 before:top-0 before:h-full before:w-px before:bg-[#0a0a09] after:absolute after:start-0 after:top-1/2 after:h-px after:w-full after:bg-[#0a0a09]" />
+        <span className="absolute bottom-4 inset-s-4 h-3 w-3 bg-[#ff4d00]" />
+        <span className="absolute bottom-[1.35rem] inset-s-7 inset-e-4 h-px bg-[#0a0a09]" />
+        <span className="absolute bottom-4 inset-e-4 h-3 w-3 border border-[#0a0a09] bg-[#f3f0e8]" />
+        <span className="absolute inset-e-4 top-4 h-12 w-12 border border-[#0a0a09] before:absolute before:inset-s-1/2 before:top-0 before:h-full before:w-px before:bg-[#0a0a09] after:absolute after:inset-s-0 after:top-1/2 after:h-px after:w-full after:bg-[#0a0a09]" />
       </div>
 
       <figcaption className={compact ? 'p-4' : 'p-5'}>
-        <p className="font-[family:var(--font-site-body)] text-2xl font-semibold leading-none tracking-[-0.055em]">
+        <p className="font-(--font-site-body) text-2xl font-semibold leading-none tracking-[-0.055em]">
           {localizedTitle}
         </p>
         <p className="mt-3 text-sm leading-6 text-[#4f4d48]">{localizedCaption}</p>

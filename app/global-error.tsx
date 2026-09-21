@@ -24,7 +24,7 @@ export default function GlobalError({
               <span className="text-[#ff8355]">System / interrupted</span>
             </header>
 
-            <div className="grid min-h-[28rem] lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="grid min-h-112 lg:grid-cols-[minmax(0,1fr)_18rem]">
               <div className="flex flex-col justify-end px-5 py-10 sm:px-8 sm:py-14 lg:px-12">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#ff8355]">
                   Safe recovery screen
@@ -43,13 +43,13 @@ export default function GlobalError({
                   <button
                     type="button"
                     onClick={reset}
-                    className="inline-flex min-h-11 items-center justify-center border border-[#ff6a32] bg-[#ff571c] px-5 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
+                    className="inline-flex min-h-11 items-center justify-center border border-[#ff6a32] bg-[#ff571c] px-5 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
                   >
                     Retry application
                   </button>
                   <a
                     href="/"
-                    className="inline-flex min-h-11 items-center justify-center border border-[#48463e] bg-transparent px-5 text-sm font-semibold text-[#eee9dc] transition-colors hover:border-[#777268] hover:bg-[#1a1b17] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
+                    className="inline-flex min-h-11 items-center justify-center border border-[#48463e] bg-transparent px-5 text-sm font-semibold text-[#eee9dc] transition-colors hover:border-[#777268] hover:bg-[#1a1b17] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff9a72] motion-reduce:transition-none"
                   >
                     Return to MUTX
                   </a>

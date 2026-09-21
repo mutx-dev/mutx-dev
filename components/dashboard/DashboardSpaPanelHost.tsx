@@ -57,7 +57,7 @@ function getBootTone(status: BootStatus) {
   if (status === 'running') {
     return 'border-sky-400/30 bg-sky-400/10 text-sky-100'
   }
-  return 'border-white/10 bg-white/[0.03] text-slate-300'
+  return 'border-white/10 bg-white/3 text-slate-300'
 }
 
 const BOOT_STATUS_LABELS: Record<BootStatus, string> = {
@@ -115,14 +115,14 @@ function BootLedger({
             <div className='flex items-center justify-between gap-3'>
               <div className='flex min-w-0 items-center gap-2'>
                 <span
-                  className='font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.18em] opacity-70'
+                  className='font-(--font-mono) text-[10px] uppercase tracking-[0.18em] opacity-70'
                   aria-hidden='true'
                 >
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <span className='truncate font-medium'>{step.label}</span>
               </div>
-              <span className='flex shrink-0 items-center gap-1.5 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.12em]'>
+              <span className='flex shrink-0 items-center gap-1.5 font-(--font-mono) text-[10px] uppercase tracking-[0.12em]'>
                 <BootStatusIcon status={step.status} />
                 {BOOT_STATUS_LABELS[step.status]}
               </span>
@@ -141,10 +141,10 @@ function PanelErrorFallback({ panelLabel }: { panelLabel: string }) {
       role='alert'
       className='rounded-[6px] border border-rose-400/30 bg-[rgba(69,29,24,0.44)] p-6 text-rose-100'
     >
-      <p className='font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-200'>
+      <p className='font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-200'>
         Surface unavailable
       </p>
-      <h2 className='mt-3 font-[family:var(--font-site-display)] text-[1.6rem] tracking-[-0.05em]'>
+      <h2 className='mt-3 font-(--font-site-display) text-[1.6rem] tracking-tighter'>
         {panelLabel} could not be displayed
       </h2>
       <p className='mt-3 max-w-2xl text-sm leading-6 text-rose-100/80'>
@@ -453,7 +453,7 @@ export function DashboardSpaPanelHost() {
         >
           <div className='flex flex-wrap items-center justify-between gap-3'>
             <div>
-              <p className='font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-100'>
+              <p className='font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-100'>
                 Update ready
               </p>
               <p className='mt-1 text-sm text-sky-50/85'>
@@ -463,7 +463,7 @@ export function DashboardSpaPanelHost() {
             <button
               type='button'
               onClick={dismissBanner}
-              className='min-h-11 rounded-[4px] border border-sky-200/20 bg-[#11120f] px-3 text-xs font-medium text-sky-100 transition-colors hover:border-sky-200/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 motion-reduce:transition-none'
+              className='min-h-11 rounded-[4px] border border-sky-200/20 bg-[#11120f] px-3 text-xs font-medium text-sky-100 transition-colors hover:border-sky-200/40 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 motion-reduce:transition-none'
               aria-label={`Dismiss MUTX ${updateAvailable} update notice`}
             >
               Dismiss
@@ -478,7 +478,7 @@ export function DashboardSpaPanelHost() {
       >
         <div className='flex flex-wrap items-start justify-between gap-5'>
           <div className='max-w-3xl space-y-3'>
-            <div className='flex flex-wrap items-center gap-2 font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.16em] text-[#aaa397]'>
+            <div className='flex flex-wrap items-center gap-2 font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.16em] text-[#aaa397]'>
               <span
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-[3px] border px-2.5 py-1',
@@ -503,7 +503,7 @@ export function DashboardSpaPanelHost() {
             <div>
               <h2
                 id='operator-workspace-title'
-                className='font-[family:var(--font-site-display)] text-[1.7rem] leading-[1.02] tracking-[-0.055em] text-[#eee9dc]'
+                className='font-(--font-site-display) text-[1.7rem] leading-[1.02] tracking-[-0.055em] text-[#eee9dc]'
               >
                 Operate the live system from one workspace
               </h2>
@@ -518,7 +518,7 @@ export function DashboardSpaPanelHost() {
             <button
               type='button'
               onClick={toggleLiveFeed}
-              className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-3 text-xs font-medium text-[#d6d0c3] transition-colors hover:border-[#59564d] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
+              className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-3 text-xs font-medium text-[#d6d0c3] transition-colors hover:border-[#59564d] hover:text-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
               aria-expanded={liveFeedOpen}
               aria-controls='dashboard-readiness-panel'
             >
@@ -528,7 +528,7 @@ export function DashboardSpaPanelHost() {
             <button
               type='button'
               onClick={() => setChatPanelOpen(!chatPanelOpen)}
-              className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-3 text-xs font-medium text-[#d6d0c3] transition-colors hover:border-[#59564d] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
+              className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-3 text-xs font-medium text-[#d6d0c3] transition-colors hover:border-[#59564d] hover:text-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
               aria-expanded={chatPanelOpen}
               aria-haspopup='dialog'
             >
@@ -545,7 +545,7 @@ export function DashboardSpaPanelHost() {
                 onClick={() => setInterfaceMode('essential')}
                 aria-pressed={interfaceMode === 'essential'}
                 className={cn(
-                  'min-h-9 rounded-[3px] px-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none',
+                  'min-h-9 rounded-[3px] px-3 transition-colors focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none',
                   interfaceMode === 'essential'
                     ? 'bg-[#eee9dc] text-[#090a08]'
                     : 'text-[#aaa397] hover:text-[#eee9dc]',
@@ -561,7 +561,7 @@ export function DashboardSpaPanelHost() {
                 disabled={!hasFullModeAccess(subscription)}
                 aria-pressed={interfaceMode === 'full'}
                 className={cn(
-                  'min-h-9 rounded-[3px] px-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none',
+                  'min-h-9 rounded-[3px] px-3 transition-colors focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none',
                   interfaceMode === 'full'
                     ? 'bg-[#ff571c] text-[#090a08]'
                     : 'text-[#aaa397] hover:text-[#eee9dc]',
@@ -573,7 +573,7 @@ export function DashboardSpaPanelHost() {
           </div>
         </div>
 
-        <div className='mt-4 flex flex-wrap items-center gap-2 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.12em] text-[#918b80]'>
+        <div className='mt-4 flex flex-wrap items-center gap-2 font-(--font-mono) text-[10px] uppercase tracking-[0.12em] text-[#918b80]'>
           <span className='rounded-[3px] border border-[#34342e] bg-[#0c0d0b] px-2.5 py-1'>
             {currentUser?.display_name || 'Operator unverified'}
           </span>
@@ -606,21 +606,21 @@ export function DashboardSpaPanelHost() {
           <section className='rounded-[6px] border border-[#34342e] bg-[linear-gradient(180deg,#151612_0%,#0d0e0c_100%)] p-4'>
             <div className='flex items-start justify-between gap-3'>
               <div>
-                <p className='font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ff8355]'>
+                <p className='font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ff8355]'>
                   Readiness
                 </p>
                 <p className='mt-2 text-sm leading-5 text-[#aaa397]'>
                   Evidence collected during this browser startup.
                 </p>
               </div>
-              <span className='rounded-[3px] border border-[#34342e] bg-[#0c0d0b] px-2.5 py-1 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.12em] text-[#d6d0c3]'>
+              <span className='rounded-[3px] border border-[#34342e] bg-[#0c0d0b] px-2.5 py-1 font-(--font-mono) text-[10px] uppercase tracking-[0.12em] text-[#d6d0c3]'>
                 {panelLabel}
               </span>
             </div>
 
             <div className='mt-4 grid gap-3'>
               <div className='rounded-[5px] border border-[#34342e] bg-[#0c0d0b] p-3'>
-                <div className='flex items-center gap-2 font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
+                <div className='flex items-center gap-2 font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
                   <Gauge className='h-3.5 w-3.5 text-[#58aaff]' aria-hidden='true' />
                   Connection evidence
                 </div>
@@ -649,7 +649,7 @@ export function DashboardSpaPanelHost() {
               </div>
 
               <div className='rounded-[5px] border border-[#34342e] bg-[#0c0d0b] p-3'>
-                <div className='flex items-center gap-2 font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
+                <div className='flex items-center gap-2 font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
                   <Activity className='h-3.5 w-3.5 text-[#58aaff]' aria-hidden='true' />
                   Current inventory
                 </div>
@@ -670,7 +670,7 @@ export function DashboardSpaPanelHost() {
               </div>
 
               <div className='rounded-[5px] border border-[#34342e] bg-[#0c0d0b] p-3'>
-                <div className='flex items-center gap-2 font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
+                <div className='flex items-center gap-2 font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
                   <ShieldCheck className='h-3.5 w-3.5 text-[#4bd69b]' aria-hidden='true' />
                   Startup ledger
                 </div>
@@ -697,7 +697,7 @@ export function DashboardSpaPanelHost() {
               setChatPanelOpen(false)
               navigateToPanel('chat')
             }}
-            className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72] motion-reduce:transition-none'
+            className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#ff6a32] bg-[#ff571c] px-4 text-sm font-semibold text-[#090a08] transition-colors hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72] motion-reduce:transition-none'
           >
             Open sessions
             <ArrowRight className='h-4 w-4' aria-hidden='true' />
@@ -707,13 +707,13 @@ export function DashboardSpaPanelHost() {
         <div className='space-y-4'>
           <div className='grid gap-3 sm:grid-cols-2'>
             <div className='rounded-[5px] border border-[#34342e] bg-[#0c0d0b] p-4'>
-              <p className='font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
+              <p className='font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
                 Sessions present
               </p>
               <p className='mt-3 text-2xl font-semibold text-[#eee9dc]'>{sessions.length}</p>
             </div>
             <div className='rounded-[5px] border border-[#34342e] bg-[#0c0d0b] p-4'>
-              <p className='font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
+              <p className='font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.14em] text-[#918b80]'>
                 Access
               </p>
               <p className='mt-3 text-sm leading-6 text-[#d6d0c3]'>
@@ -739,7 +739,7 @@ export function DashboardSpaPanelHost() {
             data-autofocus
             type='button'
             onClick={() => setBootVisible(false)}
-            className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-4 text-sm font-medium text-[#eee9dc] transition-colors hover:border-[#59564d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
+            className='inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#3b3a33] bg-[#0c0d0b] px-4 text-sm font-medium text-[#eee9dc] transition-colors hover:border-[#59564d] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847] motion-reduce:transition-none'
           >
             {bootOutcome.phase === 'running'
               ? 'Continue while checks run'
@@ -753,7 +753,7 @@ export function DashboardSpaPanelHost() {
         <div className='space-y-6'>
           <div className='flex flex-wrap items-center justify-between gap-3'>
             <div>
-              <p className='font-[family:var(--font-mono)] text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ff8355]'>
+              <p className='font-(--font-mono) text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ff8355]'>
                 Startup evidence
               </p>
               <p className='mt-2 text-sm text-[#aaa397]'>
@@ -764,7 +764,7 @@ export function DashboardSpaPanelHost() {
             </div>
             <span
               className={cn(
-                'rounded-[3px] border px-2.5 py-1 font-[family:var(--font-mono)] text-[10px] uppercase tracking-[0.14em]',
+                'rounded-[3px] border px-2.5 py-1 font-(--font-mono) text-[10px] uppercase tracking-[0.14em]',
                 bootOutcome.phase === 'ready'
                   ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
                   : bootOutcome.phase === 'degraded'

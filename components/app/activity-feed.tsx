@@ -90,14 +90,14 @@ function TimelineRow({ event }: { event: ActivityEvent }) {
   return (
     <div className="flex items-start gap-2.5 pl-3 py-1.5 hover:bg-white/5 rounded-r transition-colors relative">
       <span className={cn(
-        'absolute -left-[5px] top-3 w-2 h-2 rounded-full border-2',
+        'absolute left-[-5px] top-3 w-2 h-2 rounded-full border-2',
         event.type === 'deployment_failed' ? 'border-red-400' :
         event.type.startsWith('deployment') ? 'border-purple-400' :
         event.type.startsWith('agent') ? 'border-cyan-400' :
         'border-slate-500'
       )} />
       <span className={cn(
-        'w-5 h-5 rounded flex items-center justify-center text-2xs font-mono font-bold shrink-0',
+        'w-5 h-5 rounded-sm flex items-center justify-center text-2xs font-mono font-bold shrink-0',
         activityBgColors[event.type],
         activityColors[event.type]
       )}>
@@ -265,7 +265,7 @@ export function ActivityFeed({
   return (
     <div className={cn('flex flex-col', className)}>
       {showFilters && (
-        <div className="p-4 border-b border-white/10 bg-white/[0.02]">
+        <div className="p-4 border-b border-white/10 bg-white/2">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold text-white">Activity Feed</h3>
@@ -279,7 +279,7 @@ export function ActivityFeed({
             <button
               onClick={() => setAutoRefreshOn(!autoRefreshOn)}
               className={cn(
-                'px-2.5 py-1 rounded text-xs font-medium transition-colors border',
+                'px-2.5 py-1 rounded-sm text-xs font-medium transition-colors border',
                 autoRefreshOn
                   ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                   : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
@@ -292,7 +292,7 @@ export function ActivityFeed({
             <select
               value={selectedEntity}
               onChange={e => setSelectedEntity(e.target.value)}
-              className="bg-black/30 text-slate-300 text-xs rounded px-2.5 py-1.5 border border-white/10 focus:outline-none focus:border-cyan-400/50"
+              className="bg-black/30 text-slate-300 text-xs rounded-sm px-2.5 py-1.5 border border-white/10 focus:outline-hidden focus:border-cyan-400/50"
             >
               <option value="">All entities</option>
               {allEntities.map(entity => (
@@ -304,7 +304,7 @@ export function ActivityFeed({
             <select
               value={filterType}
               onChange={e => setFilterType(e.target.value)}
-              className="bg-black/30 text-slate-300 text-xs rounded px-2.5 py-1.5 border border-white/10 focus:outline-none focus:border-cyan-400/50"
+              className="bg-black/30 text-slate-300 text-xs rounded-sm px-2.5 py-1.5 border border-white/10 focus:outline-hidden focus:border-cyan-400/50"
             >
               <option value="">All types</option>
               {activityTypes.map(type => (
@@ -335,7 +335,7 @@ export function ActivityFeed({
               message={selectedEntity || filterType
                 ? 'Try clearing your filters to see agent and deployment activity.'
                 : 'Activity will appear here as agents and deployments are created, updated, and fail.'}
-              className="border-white/5 bg-white/[0.02]"
+              className="border-white/5 bg-white/2"
             />
           </div>
         ) : (
@@ -358,7 +358,7 @@ export function ActivityFeed({
         )}
       </div>
 
-      <div className="border-t border-white/5 p-3 bg-white/[0.02] text-xs text-slate-500">
+      <div className="border-t border-white/5 p-3 bg-white/2 text-xs text-slate-500">
         <div className="flex justify-between">
           <span>Showing {filteredEvents.length} events{filterType ? ` (filtered)` : ''}</span>
           <span>Last updated: {events.length > 0 ? formatRelativeTime(events[0]?.timestamp || Date.now()) : 'Never'}</span>

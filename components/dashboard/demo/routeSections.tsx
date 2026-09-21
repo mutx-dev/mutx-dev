@@ -381,7 +381,7 @@ function AgentsSection({ tick }: { tick: number }) {
                 <SectionPill label="Needs review" tone="warning" />
               </div>
               <div className="rounded-[4px] border border-[#3b3a33] bg-[#151612] px-3 py-2 text-right">
-                <div className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.1em] text-[#ff8355]">
+                <div className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-widest text-[#ff8355]">
                   Write controls unavailable
                 </div>
                 <div className="mt-1 text-[11px] text-[#8d867a]">Sample registry only</div>
@@ -399,7 +399,7 @@ function AgentsSection({ tick }: { tick: number }) {
 
         <div className="grid min-h-0 grid-cols-1 gap-3 overflow-visible lg:grid-rows-[minmax(0,0.72fr)_minmax(0,1fr)] lg:overflow-hidden">
           <SurfacePanel title="Fleet posture" meta="signal summary">
-            <div className="grid h-full min-h-0 grid-rows-[repeat(4,minmax(0,1fr))] gap-3">
+            <div className="grid h-full min-h-0 grid-rows-4 gap-3">
               <div className="rounded-[6px] border border-[#34342e] bg-[#11120f] p-3">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8d867a]">Agent capacity</div>
                 <div className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-[#eee9dc]">56</div>

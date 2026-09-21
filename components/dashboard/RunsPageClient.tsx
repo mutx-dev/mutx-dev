@@ -131,7 +131,7 @@ export function RunsPageClient() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/2 px-4 py-3">
         <div>
           <p className="text-sm font-medium text-white">Run activity snapshot</p>
           <p className="mt-1 text-xs text-slate-500" role="status" aria-live="polite">
@@ -144,7 +144,7 @@ export function RunsPageClient() {
           type="button"
           onClick={() => void loadRuns(false)}
           disabled={refreshing || !pollingState.isOnline}
-          className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
+          className="rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none"
         >
           {refreshing ? "Refreshing…" : pollingState.isOnline ? "Refresh now" : "Offline"}
         </button>
@@ -204,7 +204,7 @@ export function RunsPageClient() {
               {runs.map((run) => (
               <div
                 key={run.id}
-                className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 md:grid-cols-[minmax(0,1fr)_auto]"
+                className="grid gap-3 rounded-xl border border-white/10 bg-white/2 p-4 md:grid-cols-[minmax(0,1fr)_auto]"
               >
                 <div className="min-w-0">
                   <p className="truncate font-mono text-sm text-white">{run.id}</p>

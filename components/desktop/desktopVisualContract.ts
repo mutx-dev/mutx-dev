@@ -33,7 +33,7 @@ export const DESKTOP_VISUAL_CONTRACT = {
 } as const
 
 export const DESKTOP_FOCUS_CLASS =
-  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847]'
+  'focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7847]'
 
 export const DESKTOP_ACTION_CLASS =
   `min-h-10 rounded-[4px] border text-xs font-semibold transition-colors ${DESKTOP_FOCUS_CLASS} disabled:cursor-not-allowed disabled:opacity-50`

@@ -475,7 +475,7 @@ export function DocumentsPageClient() {
                   setSelectedTemplateId(event.target.value)
                   resetManagedSubmissionKey()
                 }}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
+                className="w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-white"
               >
                 {templates.map((item) => (
                   <option key={item.id} value={item.id}>
@@ -486,7 +486,7 @@ export function DocumentsPageClient() {
             </label>
 
             {selectedTemplate ? (
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <p className="text-sm text-white">{selectedTemplate.summary}</p>
                 <p className="mt-2 text-sm text-slate-400">{selectedTemplate.description}</p>
               </div>
@@ -500,7 +500,7 @@ export function DocumentsPageClient() {
                   setInstructions(event.target.value)
                   resetManagedSubmissionKey()
                 }}
-                className="min-h-24 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
+                className="min-h-24 w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-white"
                 placeholder="Optional analyst instructions for the workflow"
               />
             </label>
@@ -514,7 +514,7 @@ export function DocumentsPageClient() {
                     setRedactionPolicy(event.target.value)
                     resetManagedSubmissionKey()
                   }}
-                  className="min-h-24 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white"
+                  className="min-h-24 w-full rounded-xl border border-white/10 bg-white/3 px-3 py-2 text-sm text-white"
                   placeholder="Describe what must be redacted"
                 />
               </label>
@@ -583,7 +583,7 @@ export function DocumentsPageClient() {
             </div>
 
             {isDesktopRuntime() ? (
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-sm text-white">Desktop local lane</p>
@@ -650,7 +650,7 @@ export function DocumentsPageClient() {
                     className={`w-full rounded-xl border p-4 text-left transition ${
                       active
                         ? 'border-cyan-400/35 bg-cyan-400/10'
-                        : 'border-white/10 bg-white/[0.02] hover:border-white/20'
+                        : 'border-white/10 bg-white/2 hover:border-white/20'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -677,7 +677,7 @@ export function DocumentsPageClient() {
         {selectedJob ? (
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
             <div className="space-y-4">
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-mono text-sm text-white">{selectedJob.id}</p>
@@ -706,7 +706,7 @@ export function DocumentsPageClient() {
                   </Link>
                 </div>
                 {['created', 'uploading', 'failed'].includes(selectedJob.status) ? (
-                  <div className="mt-4 rounded-lg border border-amber-300/20 bg-amber-300/[0.06] p-3">
+                  <div className="mt-4 rounded-lg border border-amber-300/20 bg-amber-300/6 p-3">
                     <p className="text-sm text-amber-100">
                       {selectedJob.status === 'failed'
                         ? 'If the original files are still selected, submit again to retry safely; otherwise clean up this failed submission.'
@@ -726,7 +726,7 @@ export function DocumentsPageClient() {
                 ) : null}
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Artifacts</p>
                 <div className="mt-3 space-y-3">
                   {selectedJob.artifacts.length > 0 ? (
@@ -778,13 +778,13 @@ export function DocumentsPageClient() {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Parameters</p>
                 <pre className="mt-3 overflow-x-auto text-xs text-slate-300">
                   {JSON.stringify(selectedJob.parameters || {}, null, 2)}
                 </pre>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/10 bg-white/2 p-4">
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Result summary</p>
                 <pre className="mt-3 overflow-x-auto text-xs text-slate-300">
                   {JSON.stringify(selectedJob.result_summary || {}, null, 2)}

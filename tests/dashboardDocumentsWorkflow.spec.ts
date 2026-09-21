@@ -1,3 +1,4 @@
+import { mockDashboardSession } from './helpers/dashboardSession';
 import { expect, test } from '@playwright/test'
 
 const documentTemplate = {
@@ -81,7 +82,7 @@ test.describe('managed document workflow integrity', () => {
     })
 
     await page.goto('/dashboard/documents')
-    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Documents', level: 1 })).toBeVisible()
 
     await page.getByRole('button', { name: 'Submit managed job' }).click()
     await expect(page.getByText(/missing required inputs.*documents/i)).toBeVisible()
@@ -141,7 +142,7 @@ test.describe('managed document workflow integrity', () => {
     await page.getByRole('button', { name: 'Submit managed job' }).click()
 
     await expect(page.getByText(/document service error.*review canonical history/i)).toBeVisible()
-    await expect(page.getByText(/retry with the unchanged files/i)).toBeVisible()
+    await expect(page.getByText(/original files are still selected, submit again to retry safely/i)).toBeVisible()
     await expect(page.getByText('partial.txt')).toBeVisible()
 
     await page.getByRole('button', { name: 'Cancel and clean up' }).click()
@@ -150,3 +151,8 @@ test.describe('managed document workflow integrity', () => {
     await expect(page.getByText('partial.txt')).toHaveCount(0)
   })
 })
+
+
+test.beforeEach(async ({ page }) => {
+  await mockDashboardSession(page);
+});

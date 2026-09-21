@@ -565,7 +565,7 @@ export function AppDashboardClient() {
   if (!user) {
     return (
       <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-        <Card className="border border-white/5 bg-white/[0.01]">
+        <Card className="border border-white/5 bg-white/1">
           <div className="mb-6 flex items-center gap-3 text-cyan-400">
             <UserCircle2 className="h-6 w-6" />
             <h2 className="text-xl font-semibold text-white">
@@ -587,7 +587,7 @@ export function AppDashboardClient() {
             </div>
           </div>
 
-          <div className="mt-5 mb-6 inline-flex rounded-full border border-white/5 bg-white/[0.02] p-1 text-sm">
+          <div className="mt-5 mb-6 inline-flex rounded-full border border-white/5 bg-white/2 p-1 text-sm">
             {(["login", "register"] as const).map((value) => (
               <button
                 key={value}
@@ -610,7 +610,7 @@ export function AppDashboardClient() {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Operator name"
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-hidden focus:ring-1 focus:ring-cyan-400/20 transition-all"
               />
             ) : null}
             <input
@@ -619,7 +619,7 @@ export function AppDashboardClient() {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="operator@company.com"
               required
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-hidden focus:ring-1 focus:ring-cyan-400/20 transition-all"
             />
             <input
               type="password"
@@ -627,7 +627,7 @@ export function AppDashboardClient() {
               onChange={(event) => setPassword(event.target.value)}
               placeholder="••••••••"
               required
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-hidden focus:ring-1 focus:ring-cyan-400/20 transition-all"
             />
             <button
               type="submit"
@@ -651,7 +651,7 @@ export function AppDashboardClient() {
           ) : null}
         </Card>
 
-        <Card className="border border-white/5 bg-white/[0.01]">
+        <Card className="border border-white/5 bg-white/1">
           <div className="mb-6 flex items-center gap-3 text-cyan-400">
             <Activity className="h-6 w-6" />
             <h2 className="text-xl font-semibold text-white">System Status</h2>
@@ -686,11 +686,11 @@ export function AppDashboardClient() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-4 text-sm"
+                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/2 p-4 text-sm"
               >
                 <div>
                   <p className="font-medium text-white">{item.label}</p>
-                  <p className="mt-1 text-xs text-slate-500 font-[family:var(--font-mono)]">
+                  <p className="mt-1 text-xs text-slate-500 font-(--font-mono)">
                     {item.route}
                   </p>
                 </div>
@@ -709,7 +709,7 @@ export function AppDashboardClient() {
           </div>
         </Card>
 
-        <Card className="border border-white/5 bg-white/[0.01]">
+        <Card className="border border-white/5 bg-white/1">
           <div className="mb-4 flex items-center gap-3 text-cyan-300">
             <ShieldCheck className="h-6 w-6" />
             <h2 className="text-xl font-semibold text-white">Operator readiness</h2>
@@ -722,7 +722,7 @@ export function AppDashboardClient() {
           <p className="mt-3 text-sm leading-6 text-slate-300">{operatorReadiness.detail}</p>
         </Card>
 
-        <Card className="border border-white/5 bg-white/[0.01]">
+        <Card className="border border-white/5 bg-white/1">
           <div className="mb-4 flex items-center gap-3 text-cyan-300">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">Demo walkthrough</p>
           </div>
@@ -763,7 +763,7 @@ export function AppDashboardClient() {
             type="button"
             onClick={handleRefresh}
             disabled={refreshing || loading}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-cyan-300/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/3 px-4 py-3 text-sm transition hover:border-cyan-300/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             <RefreshCcw className={`h-4 w-4 ${refreshing ? "motion-safe:animate-spin motion-reduce:animate-none" : ""}`} />
             {refreshing ? "Refreshing" : "Refresh"}
@@ -771,7 +771,7 @@ export function AppDashboardClient() {
           <button
             type="button"
             onClick={handleLogout}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-rose-300/30 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/3 px-4 py-3 text-sm transition hover:border-rose-300/30 hover:text-white"
           >
             <LogOut className="h-4 w-4" />
             Logout
@@ -786,7 +786,7 @@ export function AppDashboardClient() {
         </div>
       ) : null}
 
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-cyan-400/[0.12] via-black/40 to-emerald-400/[0.08] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
+      <div className="rounded-3xl border border-white/10 bg-linear-to-br from-cyan-400/12 via-black/40 to-emerald-400/8 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">
@@ -824,10 +824,10 @@ export function AppDashboardClient() {
         {summary.map(({ label, value, detail, icon: Icon }) => (
           <Card
             key={label}
-            className="border border-white/5 bg-white/[0.01] p-5"
+            className="border border-white/5 bg-white/1 p-5"
           >
             <div className="mb-4 flex items-center justify-between">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-cyan-400">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/3 text-cyan-400">
                 <Icon className="h-5 w-5" />
               </div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -844,7 +844,7 @@ export function AppDashboardClient() {
             <p className="mt-2 text-xs text-slate-500">{detail}</p>
             {label === "Health" ? (
               <>
-                <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
+                <p className="mt-2 text-xs text-slate-500 font-(--font-mono)">
                   database: {health?.database || "unknown"}
                 </p>
                 {health?.error ? (
@@ -858,7 +858,7 @@ export function AppDashboardClient() {
 
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-6">
-          <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+          <Card className="border border-white/5 bg-white/1 p-0 overflow-hidden">
             <div className="flex items-center justify-between border-b border-white/5 p-6">
               <div className="flex items-center gap-3 text-cyan-400">
                 <Bot className="h-5 w-5" />
@@ -871,14 +871,14 @@ export function AppDashboardClient() {
                   </p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-white/[0.03] px-2 py-1 text-xs font-medium text-slate-400">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-white/3 px-2 py-1 text-xs font-medium text-slate-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
                 Live sync
               </span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-white/[0.02] text-xs uppercase tracking-widest text-slate-400">
+                <thead className="bg-white/2 text-xs uppercase tracking-widest text-slate-400">
                   <tr>
                     <th className="px-6 py-4 font-medium">Identifier</th>
                     <th className="px-6 py-4 font-medium">Status</th>
@@ -899,13 +899,13 @@ export function AppDashboardClient() {
                     agents.map((agent) => (
                       <tr
                         key={agent.id}
-                        className="transition-colors hover:bg-white/[0.02]"
+                        className="transition-colors hover:bg-white/2"
                       >
                         <td className="px-6 py-4 align-top">
                           <p className="font-medium text-slate-200">
                             {agent.name}
                           </p>
-                          <p className="mt-1 text-xs font-[family:var(--font-mono)] text-slate-500">
+                          <p className="mt-1 text-xs font-(--font-mono) text-slate-500">
                             {agent.id}
                           </p>
                         </td>
@@ -918,7 +918,7 @@ export function AppDashboardClient() {
                           </span>
                         </td>
                         <td className="px-6 py-4 align-top text-xs text-slate-400">
-                          <p className="font-[family:var(--font-mono)]">
+                          <p className="font-(--font-mono)">
                             {formatDate(agent.created_at)}
                           </p>
                           <p className="mt-1 text-slate-500">
@@ -942,7 +942,7 @@ export function AppDashboardClient() {
             </div>
           </Card>
 
-          <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+          <Card className="border border-white/5 bg-white/1 p-0 overflow-hidden">
             <div className="flex items-center justify-between border-b border-white/5 p-6">
               <div className="flex items-center gap-3 text-emerald-400">
                 <Rocket className="h-5 w-5" />
@@ -964,15 +964,15 @@ export function AppDashboardClient() {
 
             <div className="space-y-3 p-6">
               <div className="grid gap-3 lg:grid-cols-3">
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs text-slate-300">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4 text-xs text-slate-300">
                   <p className="text-[10px] uppercase tracking-widest text-slate-500">Runtime signal</p>
                   <p className="mt-2 text-white">{agentHealthDetail}</p>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs text-slate-300">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4 text-xs text-slate-300">
                   <p className="text-[10px] uppercase tracking-widest text-slate-500">Deployment posture</p>
                   <p className="mt-2 text-white">{deploymentHealthDetail}</p>
                 </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs text-slate-300">
+                <div className="rounded-xl border border-white/5 bg-white/2 p-4 text-xs text-slate-300">
                   <p className="text-[10px] uppercase tracking-widest text-slate-500">Replica footprint</p>
                   <p className="mt-2 text-white">{deployments.reduce((sum, deployment) => sum + deployment.replicas, 0)} total replicas across the visible fleet</p>
                 </div>
@@ -988,7 +988,7 @@ export function AppDashboardClient() {
                   return (
                     <div
                       key={deployment.id}
-                      className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition hover:border-emerald-400/20"
+                      className="rounded-xl border border-white/5 bg-white/2 p-4 transition hover:border-emerald-400/20"
                     >
                       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                         <div>
@@ -1018,7 +1018,7 @@ export function AppDashboardClient() {
                           <p className="text-[10px] uppercase tracking-widest text-slate-500">
                             Started
                           </p>
-                          <p className="mt-2 font-[family:var(--font-mono)] text-[11px] text-slate-300">
+                          <p className="mt-2 font-(--font-mono) text-[11px] text-slate-300">
                             {formatDate(deployment.started_at)}
                           </p>
                         </div>
@@ -1026,14 +1026,14 @@ export function AppDashboardClient() {
                           <p className="text-[10px] uppercase tracking-widest text-slate-500">
                             Ended
                           </p>
-                          <p className="mt-2 font-[family:var(--font-mono)] text-[11px] text-slate-300">
+                          <p className="mt-2 font-(--font-mono) text-[11px] text-slate-300">
                             {formatDate(deployment.ended_at)}
                           </p>
                         </div>
                       </div>
 
                       {latestEvent ? (
-                        <div className="mt-3 rounded-lg border border-emerald-400/10 bg-emerald-400/[0.04] p-3 text-xs">
+                        <div className="mt-3 rounded-lg border border-emerald-400/10 bg-emerald-400/4 p-3 text-xs">
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <p className="font-medium text-emerald-300">
                               Latest event: {latestEvent.event_type}
@@ -1070,7 +1070,7 @@ export function AppDashboardClient() {
           </Card>
 
           {deployments.length > 0 && (
-            <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+            <Card className="border border-white/5 bg-white/1 p-0 overflow-hidden">
               <div className="flex items-center justify-between border-b border-white/5 p-4">
                 <div className="flex items-center gap-3 text-cyan-400">
                   <Activity className="h-5 w-5" />
@@ -1085,14 +1085,14 @@ export function AppDashboardClient() {
                 </div>
               </div>
 
-              <div className="border-b border-white/5 bg-white/[0.02] p-3">
+              <div className="border-b border-white/5 bg-white/2 p-3">
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-500">Deployment:</span>
                     <select
                       value={selectedDeploymentId ?? ""}
                       onChange={(e) => setSelectedDeploymentId(e.target.value || null)}
-                      className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-sm text-white focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+                      className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-sm text-white focus:border-cyan-400 focus:outline-hidden focus:ring-1 focus:ring-cyan-400/20"
                     >
                       <option value="">Select a deployment</option>
                       {deployments.map((deployment) => (
@@ -1160,7 +1160,7 @@ export function AppDashboardClient() {
         </div>
 
         <div className="space-y-6">
-          <Card className="border border-white/5 bg-white/[0.01]">
+          <Card className="border border-white/5 bg-white/1">
             <div className="mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3 text-amber-400">
                 <KeyRound className="h-5 w-5" />
@@ -1168,7 +1168,7 @@ export function AppDashboardClient() {
                   API Keys
                 </h3>
               </div>
-              <span className="rounded-full border border-white/5 bg-white/[0.03] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              <span className="rounded-full border border-white/5 bg-white/3 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                 Operator-owned
               </span>
             </div>
@@ -1194,7 +1194,7 @@ export function AppDashboardClient() {
                 value={apiKeyName}
                 onChange={(event) => setApiKeyName(event.target.value)}
                 placeholder="Key name..."
-                className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400/20 transition-all"
+                className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-amber-400 focus:outline-hidden focus:ring-1 focus:ring-amber-400/20 transition-all"
               />
               <button
                 type="submit"
@@ -1230,7 +1230,7 @@ export function AppDashboardClient() {
                     {lastKeyAction === "rotated" ? "rotation complete" : "one-time reveal"}
                   </span>
                 </div>
-                <div className="mt-3 flex items-center gap-2 rounded bg-black/40 px-3 py-2">
+                <div className="mt-3 flex items-center gap-2 rounded-sm bg-black/40 px-3 py-2">
                   <code className="flex-1 truncate text-xs text-white">
                     {createdKey.key}
                   </code>
@@ -1258,14 +1258,14 @@ export function AppDashboardClient() {
             ) : null}
 
             <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-3 text-xs text-slate-300">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Newest active key
                 </p>
                 {newestActiveKey ? (
                   <>
                     <p className="mt-2 font-medium text-white">{newestActiveKey.name}</p>
-                    <p className="mt-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                    <p className="mt-1 font-(--font-mono) text-[11px] text-slate-500">
                       {maskApiKeyId(newestActiveKey.id)} · last used {formatRelativeDate(newestActiveKey.last_used)}
                     </p>
                   </>
@@ -1273,14 +1273,14 @@ export function AppDashboardClient() {
                   <p className="mt-2 text-slate-500">No active key issued yet.</p>
                 )}
               </div>
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-3 text-xs text-slate-300">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Audit trail
                 </p>
                 {newestRevokedKey ? (
                   <>
                     <p className="mt-2 font-medium text-white">Most recent revoked key kept for history</p>
-                    <p className="mt-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                    <p className="mt-1 font-(--font-mono) text-[11px] text-slate-500">
                       {maskApiKeyId(newestRevokedKey.id)} · revoked key still visible in the ledger
                     </p>
                   </>
@@ -1288,7 +1288,7 @@ export function AppDashboardClient() {
                   <p className="mt-2 text-slate-500">No revoked keys yet.</p>
                 )}
               </div>
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-3 text-xs text-slate-300">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Demo cue
                 </p>
@@ -1314,7 +1314,7 @@ export function AppDashboardClient() {
                   return (
                   <div
                     key={apiKey.id}
-                    className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-3 text-sm"
+                    className="rounded-lg border border-white/5 bg-white/2 px-3 py-3 text-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
@@ -1336,10 +1336,10 @@ export function AppDashboardClient() {
                             </span>
                           ) : null}
                         </div>
-                        <p className="mt-2 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                        <p className="mt-2 font-(--font-mono) text-[11px] text-slate-500">
                           {maskApiKeyId(apiKey.id)}
                         </p>
-                        <div className="mt-2 space-y-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                        <div className="mt-2 space-y-1 font-(--font-mono) text-[11px] text-slate-500">
                           <p>Created: {formatDate(apiKey.created_at)}</p>
                           <p>Last used: {formatDate(apiKey.last_used)} · {lastUsedRelative}</p>
                           <p>Expires: {formatDate(apiKey.expires_at)} · {expiresRelative}</p>
@@ -1365,7 +1365,7 @@ export function AppDashboardClient() {
                             type="button"
                             onClick={() => handleRotateKey(apiKey.id)}
                             disabled={loading}
-                            className="rounded border border-cyan-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="rounded-sm border border-cyan-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             Rotate
                           </button>
@@ -1373,7 +1373,7 @@ export function AppDashboardClient() {
                             type="button"
                             onClick={() => handleRevokeKey(apiKey.id)}
                             disabled={loading}
-                            className="rounded border border-rose-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="rounded-sm border border-rose-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             Revoke
                           </button>
@@ -1391,7 +1391,7 @@ export function AppDashboardClient() {
             </div>
           </Card>
 
-          <Card className="border border-white/5 bg-white/[0.01]">
+          <Card className="border border-white/5 bg-white/1">
             <div className="mb-4 flex items-center gap-3 text-cyan-300">
               {health?.status === "healthy" ? (
                 <CheckCircle2 className="h-5 w-5" />
@@ -1404,7 +1404,7 @@ export function AppDashboardClient() {
             </div>
 
             <div className="space-y-3 text-sm text-slate-300">
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Current health posture
                 </p>
@@ -1415,7 +1415,7 @@ export function AppDashboardClient() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Fleet signal
                 </p>
@@ -1426,7 +1426,7 @@ export function AppDashboardClient() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Key management
                 </p>
@@ -1443,14 +1443,14 @@ export function AppDashboardClient() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Plan quota truth
                 </p>
                 <p className="mt-2 text-white">{apiKeyPlanDetail}</p>
               </div>
 
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-white/5 bg-white/2 p-4">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Demo walkthrough
                 </p>

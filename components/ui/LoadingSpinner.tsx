@@ -38,7 +38,7 @@ export function LoadingOverlay({ isLoading, children, text }: LoadingOverlayProp
   return (
     <div className="relative">
       {children}
-      <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-xl">
+      <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-xs rounded-xl">
         <LoadingSpinner size="lg" text={text} />
       </div>
     </div>

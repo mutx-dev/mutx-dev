@@ -375,7 +375,7 @@ export function SkillsPageClient() {
             {bundles.map((bundle) => {
               const unavailable = bundle.unavailable_skill_ids?.length || 0
               return (
-                <div key={bundle.id} className='rounded-2xl border border-white/10 bg-white/[0.03] p-4'>
+                <div key={bundle.id} className='rounded-2xl border border-white/10 bg-white/3 p-4'>
                   <div className='flex flex-wrap items-start justify-between gap-3'>
                     <div className='min-w-0'>
                       <p className='text-base font-semibold text-white'>{bundle.name}</p>
@@ -391,7 +391,7 @@ export function SkillsPageClient() {
                     {(bundle.tags || []).map((tag) => (
                       <span
                         key={`${bundle.id}-${tag}`}
-                        className='rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] uppercase tracking-[0.18em] text-slate-400'
+                        className='rounded-full border border-white/10 bg-white/4 px-2.5 py-1 text-[11px] uppercase tracking-[0.18em] text-slate-400'
                       >
                         {tag}
                       </span>
@@ -450,7 +450,7 @@ export function SkillsPageClient() {
             placeholder='Search skills, tags, categories…'
             className='w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white placeholder:text-slate-600 md:max-w-md'
           />
-          <div className='rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-400'>
+          <div className='rounded-full border border-white/10 bg-white/3 px-3 py-1 text-xs text-slate-400'>
             {assistantId ? `Assistant bound: ${assistantName || assistantId}` : 'No assistant bound'}
           </div>
         </div>
@@ -467,12 +467,12 @@ export function SkillsPageClient() {
               const lifecycle = skillLifecyclePresentation(currentSkill)
               const available = currentSkill.available !== false
               return (
-                <div key={skill.id} className='rounded-2xl border border-white/10 bg-white/[0.02] p-4'>
+                <div key={skill.id} className='rounded-2xl border border-white/10 bg-white/2 p-4'>
                   <div className='flex flex-wrap items-start justify-between gap-3'>
                     <div className='min-w-0'>
                       <div className='flex flex-wrap items-center gap-2'>
                         <p className='text-base font-semibold text-white'>{skill.name}</p>
-                        <span className='rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-400'>
+                        <span className='rounded-full border border-white/10 bg-white/4 px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-400'>
                           {skill.category}
                         </span>
                       </div>
@@ -531,7 +531,7 @@ export function SkillsPageClient() {
                         (!available && !lifecycle.configured) ||
                         busySkillId === skill.id
                       }
-                      className='rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50'
+                      className='rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50'
                     >
                       {busySkillId === skill.id
                         ? 'Saving…'

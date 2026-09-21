@@ -39,6 +39,7 @@ test.describe('simulated control demo', () => {
     await page.goto('/control', { waitUntil: 'domcontentloaded' });
 
     const presenter = page.getByRole('button', { name: 'Presenter' });
+    await expect(page.getByTestId('control-demo-root')).not.toHaveAttribute('data-demo-tick', '0');
     await presenter.focus();
     await page.keyboard.press('Enter');
 
@@ -60,6 +61,7 @@ test.describe('simulated control demo', () => {
     await page.goto('/control', { waitUntil: 'domcontentloaded' });
 
     const quickAction = page.locator('button:visible', { hasText: 'Deploy new version' }).first();
+    await expect(page.getByTestId('control-demo-root')).not.toHaveAttribute('data-demo-tick', '0');
     await quickAction.focus();
     await expect(quickAction).toBeFocused();
     await page.keyboard.press('Enter');
@@ -91,6 +93,9 @@ test.describe('simulated control demo', () => {
     const initialTick = await root.getAttribute('data-demo-tick');
     await page.waitForTimeout(2500);
     await expect(root).toHaveAttribute('data-demo-tick', initialTick ?? '0');
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect(root).toHaveAttribute('data-motion', 'full');
+    await expect(root).not.toHaveAttribute('data-demo-tick', initialTick ?? '0');
   });
 
   for (const width of [320, 768, 1280, 1600]) {

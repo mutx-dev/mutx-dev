@@ -382,7 +382,7 @@ export default function AgentDetailPage() {
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-[#24303d] bg-[#0a1017] px-4 py-3">
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Identifier</p>
-                <p className="mt-2 truncate font-[family:var(--font-mono)] text-sm text-slate-100">{agent.id}</p>
+                <p className="mt-2 truncate font-(--font-mono) text-sm text-slate-100">{agent.id}</p>
               </div>
               <button
                 type="button"

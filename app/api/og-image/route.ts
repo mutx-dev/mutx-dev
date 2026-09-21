@@ -173,7 +173,7 @@ function buildCard({
                       type: "div",
                       props: {
                         style: {
-                          display: "inline-flex",
+                          display: "flex",
                           alignItems: "center",
                           gap: 8,
                           backgroundColor: "rgba(212, 171, 115, 0.1)",
@@ -186,7 +186,7 @@ function buildCard({
                           textTransform: "uppercase" as const,
                           width: "fit-content",
                         },
-                        children: [escapeXml(badge)],
+                        children: escapeXml(badge),
                       },
                     },
                   ]
@@ -202,7 +202,7 @@ function buildCard({
                     color: TEXT_WHITE,
                     letterSpacing: "-0.025em",
                   },
-                  children: [escapeXml(displayTitle)],
+                  children: escapeXml(displayTitle),
                 },
               },
               // Description
@@ -217,7 +217,7 @@ function buildCard({
                           color: TEXT_MUTED,
                           maxWidth: 760,
                         },
-                        children: [escapeXml(displayDesc)],
+                        children: escapeXml(displayDesc),
                       },
                     },
                   ]
@@ -263,7 +263,7 @@ function buildCard({
                           color: TEXT_WHITE,
                           letterSpacing: "0.08em",
                         },
-                        children: ["MUTX"],
+                        children: "MUTX",
                       },
                     },
                   ],
@@ -278,7 +278,7 @@ function buildCard({
                     color: TEXT_MUTED,
                     letterSpacing: "0.04em",
                   },
-                  children: ["Open Control Plane for AI Agents"],
+                  children: "Open Control Plane for AI Agents",
                 },
               },
             ],
@@ -400,20 +400,9 @@ export async function GET(request: NextRequest) {
         });
 
         // 2. SVG → PNG via sharp
-        const png = await sharp({
-          create: {
-            width: WIDTH,
-            height: HEIGHT,
-            channels: 4,
-            background: { r: 6, g: 8, b: 16, alpha: 1 },
-          },
-        })
-          .composite([
-            {
-              input: Buffer.from(svg),
-              density: 150,
-            },
-          ])
+        const png = await sharp(Buffer.from(svg), { density: 150 })
+          .resize(WIDTH, HEIGHT)
+          .flatten({ background: BG })
           .png({
             quality: 90,
             compressionLevel: 6,

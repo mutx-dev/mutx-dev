@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useReducedMotionPreference } from "@/lib/useReducedMotionPreference";
 import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "framer-motion";
 import {
   ChevronRight,
   Clock3,
@@ -70,10 +70,10 @@ function DemoStageHeader({ section, tick }: { section: DemoSection; tick: number
       data-testid="control-demo-stage"
       className="relative shrink-0 overflow-hidden rounded-[6px] border border-[#2b2b26] bg-[#11120f]"
     >
-      <span className="absolute start-0 top-0 h-px w-28 bg-[#ff571c]" aria-hidden="true" />
+      <span className="absolute inset-s-0 top-0 h-px w-28 bg-[#ff571c]" aria-hidden="true" />
       <div className="grid gap-4 px-4 py-4 sm:px-5 xl:grid-cols-[minmax(0,1fr)_minmax(390px,0.74fr)] xl:items-end">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em]">
+          <div className="flex flex-wrap items-center gap-2 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em]">
             <span className="rounded-[3px] border border-[#ff6a32] bg-[#28140d] px-2 py-1 text-[#ff9a72]">
               REC / {meta.eyebrow}
             </span>
@@ -89,7 +89,7 @@ function DemoStageHeader({ section, tick }: { section: DemoSection; tick: number
             {meta.chips.map((chip) => (
               <span
                 key={`${section}-${chip}`}
-                className="rounded-[3px] border border-[#34342e] bg-[#171813] px-2 py-1 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.12em] text-[#b6afa2]"
+                className="rounded-[3px] border border-[#34342e] bg-[#171813] px-2 py-1 font-(--font-mono) text-[11px] uppercase tracking-[0.12em] text-[#b6afa2]"
               >
                 {chip}
               </span>
@@ -101,12 +101,12 @@ function DemoStageHeader({ section, tick }: { section: DemoSection; tick: number
           {meta.heroStats.map((item) => (
             <div
               key={`${section}-${item.label}`}
-              className="min-w-[9rem] rounded-[4px] border border-[#34342e] bg-[#0c0d0b] px-3 py-2.5 sm:min-w-0"
+              className="min-w-36 rounded-[4px] border border-[#34342e] bg-[#0c0d0b] px-3 py-2.5 sm:min-w-0"
             >
-              <div className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d867a]">
+              <div className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d867a]">
                 {item.label}
               </div>
-              <div className="mt-2 font-[family:var(--font-mono)] text-[1.45rem] font-medium leading-none tracking-[-0.04em] text-[#eee9dc]">
+              <div className="mt-2 font-(--font-mono) text-[1.45rem] font-medium leading-none tracking-[-0.04em] text-[#eee9dc]">
                 {item.value}
               </div>
               <div className="mt-2 text-[11px] leading-4 text-[#999284]">{item.detail}</div>
@@ -114,7 +114,7 @@ function DemoStageHeader({ section, tick }: { section: DemoSection; tick: number
           ))}
         </div>
       </div>
-      <div className="flex min-h-9 items-center justify-between gap-3 border-t border-[#2b2b26] bg-[#0c0d0b] px-4 py-2 font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.12em] text-[#8d867a] sm:px-5">
+      <div className="flex min-h-9 items-center justify-between gap-3 border-t border-[#2b2b26] bg-[#0c0d0b] px-4 py-2 font-(--font-mono) text-[11px] uppercase tracking-[0.12em] text-[#8d867a] sm:px-5">
         <span>Recorded state · {pulseStamp}</span>
         <StatusBadge label="Simulated pulse" tone="focus" />
       </div>
@@ -128,7 +128,7 @@ function DemoBriefRail({ section }: { section: DemoSection }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-5">
       <div className="rounded-[4px] border border-[#5a3a2d] bg-[#21140f] px-3 py-3">
-        <div className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em] text-[#ff8355]">
+        <div className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em] text-[#ff8355]">
           Opening line
         </div>
         <div data-technical-value className="mt-2 text-sm leading-6 text-[#eee9dc]">{meta.command}</div>
@@ -139,7 +139,7 @@ function DemoBriefRail({ section }: { section: DemoSection }) {
             key={`${section}-narrative-${index}`}
             className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-[4px] border border-[#34342e] bg-[#11120f] px-3 py-3"
           >
-            <span className="font-[family:var(--font-mono)] text-[11px] font-semibold tabular-nums text-[#ff6a32]">
+            <span className="font-(--font-mono) text-[11px] font-semibold tabular-nums text-[#ff6a32]">
               {String(index + 1).padStart(2, "0")}
             </span>
             <span className="text-[13px] leading-5 text-[#c8c0b0]">{item}</span>
@@ -162,18 +162,18 @@ function PresenterDialog({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[80] flex justify-end bg-black/75 p-2 sm:p-4" data-testid="control-presenter-overlay">
+    <div className="fixed inset-0 z-80 flex justify-end bg-black/75 p-2 sm:p-4" data-testid="control-presenter-overlay">
       <aside
         id="control-presenter-panel"
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="control-presenter-title"
-        className="flex h-full w-full max-w-[25rem] flex-col overflow-hidden rounded-[6px] border border-[#48463e] bg-[#090a08] shadow-[0_24px_64px_rgba(0,0,0,0.58)]"
+        className="flex h-full w-full max-w-100 flex-col overflow-hidden rounded-[6px] border border-[#48463e] bg-[#090a08] shadow-[0_24px_64px_rgba(0,0,0,0.58)]"
       >
         <header className="flex min-h-16 items-center justify-between gap-3 border-b border-[#34342e] bg-[#0d0e0c] px-4 sm:px-5">
           <div className="min-w-0">
-            <p className="font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em] text-[#ff6a32]">
+            <p className="font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em] text-[#ff6a32]">
               Presenter mode / on
             </p>
             <h2 id="control-presenter-title" className="mt-1 truncate text-sm font-semibold text-[#eee9dc]">
@@ -184,14 +184,14 @@ function PresenterDialog({
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#151612] text-[#c8c0b0] hover:border-[#ff6a32] hover:text-[#eee9dc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[4px] border border-[#48463e] bg-[#151612] text-[#c8c0b0] hover:border-[#ff6a32] hover:text-[#eee9dc] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
             aria-label="Close presenter mode"
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </header>
         <DemoBriefRail section={section} />
-        <footer className="border-t border-[#34342e] px-4 py-3 font-[family:var(--font-mono)] text-[11px] leading-5 text-[#8d867a] sm:px-5">
+        <footer className="border-t border-[#34342e] px-4 py-3 font-(--font-mono) text-[11px] leading-5 text-[#8d867a] sm:px-5">
           Guidance is local to this demo. Escape closes this rail and returns focus to the presenter toggle.
         </footer>
       </aside>
@@ -203,7 +203,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
   const [tick, setTick] = useState(0);
   const [demoNotice, setDemoNotice] = useState("Sample data is active. No live system is connected.");
   const [presenterOpen, setPresenterOpen] = useState(false);
-  const prefersReducedMotion = useReducedMotion() ?? false;
+  const prefersReducedMotion = useReducedMotionPreference();
   const sectionMeta = SECTION_META[section];
   const appContentRef = useRef<HTMLDivElement>(null);
   const presenterTriggerRef = useRef<HTMLButtonElement>(null);
@@ -236,6 +236,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
     const handlePresenterKeys = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
+        setDemoNotice("Presenter mode off. Demo Script and talk track are hidden.");
         setPresenterOpen(false);
         return;
       }
@@ -301,7 +302,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
       data-motion={prefersReducedMotion ? "reduced" : "full"}
       data-control-visual-system="flight-recorder"
       data-no-live-writes="true"
-      className="relative h-[100dvh] w-full overflow-hidden bg-[#090a08] text-[#eee9dc]"
+      className="relative h-dvh w-full overflow-hidden bg-[#090a08] text-[#eee9dc]"
     >
       <p id="control-demo-boundary" className="sr-only">
         This is a simulated interactive demo with sample data. Controls cannot contact live systems.
@@ -315,13 +316,13 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
           <div className="flex min-h-16 items-center gap-3 px-3 sm:px-4 lg:px-5">
             <Link
               href="/control"
-              className="flex min-h-11 shrink-0 items-center gap-2.5 rounded-[4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
+              className="flex min-h-11 shrink-0 items-center gap-2.5 rounded-[4px] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
               aria-label="MUTX control demo overview"
             >
               <DemoMark />
               <span className="hidden sm:block">
                 <span className="block text-[15px] font-semibold leading-none tracking-[-0.035em]">MUTX</span>
-                <span className="mt-1 block font-[family:var(--font-mono)] text-[11px] uppercase leading-none tracking-[0.12em] text-[#8d867a]">
+                <span className="mt-1 block font-(--font-mono) text-[11px] uppercase leading-none tracking-[0.12em] text-[#8d867a]">
                   Control demo
                 </span>
               </span>
@@ -343,7 +344,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                 onClick={openPresenter}
                 aria-expanded={presenterOpen}
                 aria-controls="control-presenter-panel"
-                className="inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-2.5 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#c8c0b0] hover:border-[#ff6a32] hover:text-[#eee9dc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72] sm:px-3"
+                className="inline-flex min-h-11 items-center gap-2 rounded-[4px] border border-[#48463e] bg-[#151612] px-2.5 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.08em] text-[#c8c0b0] hover:border-[#ff6a32] hover:text-[#eee9dc] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72] sm:px-3"
               >
                 <Presentation className="h-4 w-4 text-[#ff6a32]" aria-hidden="true" />
                 <span>Presenter</span>
@@ -351,7 +352,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
               <Link
                 href="/control/settings"
                 aria-label="Open simulated settings"
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] text-[#090a08] hover:bg-[#ff7545] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[4px] border border-[#ff6a32] bg-[#ff571c] text-[#090a08] hover:bg-[#ff7545] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]"
               >
                 <Settings2 className="h-4 w-4" aria-hidden="true" />
               </Link>
@@ -364,7 +365,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
 
         <div
           data-testid="control-demo-label"
-          className="flex min-h-9 shrink-0 items-center justify-center border-b border-[#5a3a2d] bg-[#21140f] px-3 py-2 text-center font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.11em] text-[#ff9a72]"
+          className="flex min-h-9 shrink-0 items-center justify-center border-b border-[#5a3a2d] bg-[#21140f] px-3 py-2 text-center font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.11em] text-[#ff9a72]"
         >
           Simulated interactive demo · sample data · actions stay local
         </div>
@@ -379,13 +380,13 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[4px] border px-3 text-[12px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]",
+                    "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-[4px] border px-3 text-[12px] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]",
                     active
                       ? "dashboard-active-rail border-[#48463e] bg-[#171813] text-[#eee9dc]"
                       : "border-[#2b2b26] bg-[#11120f] text-[#aaa397] hover:border-[#48463e] hover:text-[#eee9dc]",
                   )}
                 >
-                  <span className="font-[family:var(--font-mono)] text-[11px] tabular-nums text-[#ff8355]">
+                  <span className="font-(--font-mono) text-[11px] tabular-nums text-[#ff8355]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <item.icon className="h-3.5 w-3.5 text-[#8d867a]" aria-hidden="true" />
@@ -399,7 +400,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
         <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[248px_minmax(0,1fr)] 2xl:grid-cols-[256px_minmax(0,1fr)_292px]">
           <aside className="hidden min-h-0 flex-col border-e border-[#2b2b26] bg-[#080907] lg:flex">
             <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
-              <p className="mb-2 flex items-center gap-2 border-b border-[#292a25] px-2 pb-2 font-[family:var(--font-mono)] text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8d867a]">
+              <p className="mb-2 flex items-center gap-2 border-b border-[#292a25] px-2 pb-2 font-(--font-mono) text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8d867a]">
                 <span className="text-[#ff6a32]">REC</span>
                 Flight recorder
               </p>
@@ -412,13 +413,13 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                       href={item.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "group flex min-h-11 items-center gap-2.5 rounded-[4px] border px-2.5 py-2 text-[12px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]",
+                        "group flex min-h-11 items-center gap-2.5 rounded-[4px] border px-2.5 py-2 text-[12px] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9a72]",
                         active
                           ? "dashboard-active-rail border-[#34342e] bg-[#171813] font-medium text-[#eee9dc]"
                           : "border-transparent text-[#aaa397] hover:border-[#2b2b26] hover:bg-[#12130f] hover:text-[#eee9dc]",
                       )}
                     >
-                      <span className="w-5 shrink-0 font-[family:var(--font-mono)] text-[11px] tabular-nums text-[#8d867a]">
+                      <span className="w-5 shrink-0 font-(--font-mono) text-[11px] tabular-nums text-[#8d867a]">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <item.icon className={cn("h-3.5 w-3.5 shrink-0", active ? "text-[#ff6a32]" : "text-[#737067]")} aria-hidden="true" />
@@ -430,7 +431,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
               </nav>
             </div>
             <div className="border-t border-[#2b2b26] px-4 py-3">
-              <div className="flex items-center justify-between font-[family:var(--font-mono)] text-[11px] uppercase tracking-[0.12em] text-[#8d867a]">
+              <div className="flex items-center justify-between font-(--font-mono) text-[11px] uppercase tracking-[0.12em] text-[#8d867a]">
                 <span>Channel / demo</span>
                 <StatusBadge label="Sample" tone="neutral" />
               </div>
@@ -474,7 +475,7 @@ export function MutxDemoApp({ section }: { section: DemoSection }) {
                         <div className="min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="text-[13px] font-semibold text-[#eee9dc]">{signal.title}</div>
-                            <div className="shrink-0 font-[family:var(--font-mono)] text-[11px] text-[#8d867a]">
+                            <div className="shrink-0 font-(--font-mono) text-[11px] text-[#8d867a]">
                               {signal.stamp}
                             </div>
                           </div>

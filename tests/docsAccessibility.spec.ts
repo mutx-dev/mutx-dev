@@ -46,7 +46,8 @@ for (const { route, heading } of [
 
 test('docs search contains focus, closes on Escape, and restores scrolling', async ({ page }) => {
   await page.goto('/whitepaper');
-  await page.evaluate(() => window.scrollTo(0, Math.min(420, document.documentElement.scrollHeight - innerHeight)));
+  await expect(page.locator('.docs-content h1')).toBeVisible();
+  await page.evaluate(() => window.scrollTo({ top: Math.min(420, document.documentElement.scrollHeight - innerHeight), behavior: 'instant' }));
 
   const trigger = page.getByRole('button', { name: 'Search docs (Cmd+K)' });
   const scrollBefore = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }));

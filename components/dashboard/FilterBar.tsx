@@ -82,7 +82,7 @@ export function FilterBar({
             onChange={(event) => onSearchChange(event.currentTarget.value)}
             onKeyDown={handleKeyDown}
             placeholder={searchPlaceholder}
-            className="w-full border-0 bg-transparent text-sm outline-none"
+            className="w-full border-0 bg-transparent text-sm outline-hidden"
             style={{ color: dashboardTokens.textPrimary }}
           />
         </div>
@@ -112,7 +112,7 @@ export function FilterBar({
                 <select
                   value={filter.value}
                   onChange={(event) => filter.onChange(event.currentTarget.value)}
-                  className="rounded border-0 bg-transparent text-sm outline-none"
+                  className="rounded-sm border-0 bg-transparent text-sm outline-hidden"
                   style={{ color: dashboardTokens.textPrimary }}
                   aria-label={filter.label}
                 >

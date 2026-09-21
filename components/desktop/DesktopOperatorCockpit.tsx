@@ -264,11 +264,11 @@ function SurfaceCard({
       className={`rounded-[6px] border bg-[#11120f] p-4 sm:p-5 ${toneClass}`}
     >
       {eyebrow ? (
-        <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">
+        <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]">
           <span aria-hidden="true">REC / </span>{eyebrow}
         </p>
       ) : null}
-      <h2 className="mt-2 font-[family:var(--font-site-display)] text-lg font-medium tracking-[-0.03em] text-[#eee9dc]">{title}</h2>
+      <h2 className="mt-2 font-(--font-site-display) text-lg font-medium tracking-[-0.03em] text-[#eee9dc]">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -292,7 +292,7 @@ function StatusPill({
 
   return (
     <span
-      className={`rounded-full border px-2.5 py-1 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.12em] ${className}`}
+      className={`rounded-full border px-2.5 py-1 font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.12em] ${className}`}
     >
       {label}
     </span>
@@ -360,10 +360,10 @@ function SignalTile({
 
   return (
     <div className={`rounded-[4px] border p-4 ${toneClass}`}>
-      <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+      <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
         {label}
       </p>
-      <p className="mt-2 font-[family:var(--font-mono)] text-lg font-medium text-[#eee9dc]">{value}</p>
+      <p className="mt-2 font-(--font-mono) text-lg font-medium text-[#eee9dc]">{value}</p>
       {detail ? (
         <p className="mt-2 text-sm leading-5 text-[#999284]">{detail}</p>
       ) : null}
@@ -384,10 +384,10 @@ function MetricChip({
     <div
       className={`rounded-[4px] border px-4 py-3 ${tone || "border-[#34342e] bg-[#151612]"}`}
     >
-      <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+      <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
         {label}
       </p>
-      <p className="mt-2 font-[family:var(--font-mono)] text-lg font-medium text-[#eee9dc]">{value}</p>
+      <p className="mt-2 font-(--font-mono) text-lg font-medium text-[#eee9dc]">{value}</p>
     </div>
   );
 }
@@ -430,7 +430,7 @@ function DeskPanel({
           {meta ? (
             <p
               className={cn(
-                "font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]",
+                "font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#ff8355]",
               )}
             >
               {meta}
@@ -438,7 +438,7 @@ function DeskPanel({
           ) : null}
           <h2
             className={cn(
-              "mt-1 font-[family:var(--font-site-display)] text-[0.97rem] font-medium tracking-[-0.03em] text-[#eee9dc]",
+              "mt-1 font-(--font-site-display) text-[0.97rem] font-medium tracking-[-0.03em] text-[#eee9dc]",
             )}
           >
             {title}
@@ -474,10 +474,10 @@ function DeskMetric({
               : "border-[#34342e] bg-[#151612]",
       )}
     >
-      <p className="font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
+      <p className="font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.16em] text-[#8d867a]">
         {label}
       </p>
-      <p className="mt-2 font-[family:var(--font-mono)] text-[0.98rem] font-medium tracking-[-0.03em] text-[#eee9dc]">
+      <p className="mt-2 font-(--font-mono) text-[0.98rem] font-medium tracking-[-0.03em] text-[#eee9dc]">
         {value}
       </p>
       {detail ? (
@@ -536,7 +536,7 @@ function DeskKeyValue({
   return (
     <div className="flex items-start justify-between gap-4 border-b border-[#2b2b26] py-3 text-[12.5px] last:border-b-0 last:pb-0">
       <span className="text-[#8d867a]">{label}</span>
-      <span className="max-w-[68%] break-all text-right font-[family:var(--font-mono)] text-[11px] text-[#c8c0b0]">
+      <span className="max-w-[68%] break-all text-right font-(--font-mono) text-[11px] text-[#c8c0b0]">
         {value || "n/a"}
       </span>
     </div>
@@ -2151,7 +2151,7 @@ export function DesktopOperatorCockpit({
 
   if (!isDesktop) {
     return standalone ? (
-      <div className="min-h-screen bg-[#090a08] font-[family:var(--font-site-body)] text-[#eee9dc]">
+      <div className="min-h-screen bg-[#090a08] font-(--font-site-body) text-[#eee9dc]">
         <DesktopRouteListener />
         <main className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-6 py-10">
           <SurfaceCard
@@ -2241,7 +2241,7 @@ export function DesktopOperatorCockpit({
             className="min-h-[320px]"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-[#34342e] bg-[#171813] px-3 py-1.5 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.12em] text-[#aaa397]">
+              <span className="rounded-full border border-[#34342e] bg-[#171813] px-3 py-1.5 font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.12em] text-[#aaa397]">
                 {advancedView ? "Advanced Control" : "Native Workspace"}
               </span>
               <span
@@ -2354,7 +2354,7 @@ export function DesktopOperatorCockpit({
                 </div>
               </div>
 
-              <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(145px,1fr))] self-start">
+              <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(145px,1fr))] self-start">
                 <DeskMetric
                   label="Environment"
                   value={
@@ -2467,7 +2467,7 @@ export function DesktopOperatorCockpit({
 
           <div className="grid gap-4 min-[1680px]:grid-cols-2">
             <DeskPanel title="Runtime Topology" meta="Local runtime">
-              <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(160px,1fr))]">
+              <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
                 <DeskMetric
                   label="Assistant"
                   value={status.assistant?.name || "Not bound"}
@@ -2631,7 +2631,7 @@ export function DesktopOperatorCockpit({
                           {session.age || "age unknown"}
                         </p>
                       </div>
-                      <span className="rounded-full border border-[#34342e] bg-[#171813] px-2.5 py-1 font-[family:var(--font-mono)] text-[9px] font-semibold uppercase tracking-[0.12em] text-[#aaa397]">
+                      <span className="rounded-full border border-[#34342e] bg-[#171813] px-2.5 py-1 font-(--font-mono) text-[9px] font-semibold uppercase tracking-[0.12em] text-[#aaa397]">
                         {session.active ? "active" : "idle"}
                       </span>
                     </div>
@@ -2694,8 +2694,8 @@ export function DesktopOperatorCockpit({
     <main
       className={
         standalone
-          ? "flex min-h-screen w-full flex-col gap-6 px-4 py-5 [&_button]:focus-visible:outline [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-offset-2 [&_button]:focus-visible:outline-[#ff7847] [&_input]:focus-visible:outline [&_input]:focus-visible:outline-2 [&_input]:focus-visible:outline-offset-2 [&_input]:focus-visible:outline-[#ff7847] lg:px-6 xl:px-8 2xl:px-10"
-          : "flex flex-col gap-6 [&_button]:focus-visible:outline [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-offset-2 [&_button]:focus-visible:outline-[#ff7847] [&_input]:focus-visible:outline [&_input]:focus-visible:outline-2 [&_input]:focus-visible:outline-offset-2 [&_input]:focus-visible:outline-[#ff7847]"
+          ? "flex min-h-screen w-full flex-col gap-6 px-4 py-5 focus-visible:[&_button]:outline-solid focus-visible:[&_button]:outline-2 focus-visible:[&_button]:outline-offset-2 focus-visible:[&_button]:outline-[#ff7847] focus-visible:[&_input]:outline-solid focus-visible:[&_input]:outline-2 focus-visible:[&_input]:outline-offset-2 focus-visible:[&_input]:outline-[#ff7847] lg:px-6 xl:px-8 2xl:px-10"
+          : "flex flex-col gap-6 focus-visible:[&_button]:outline-solid focus-visible:[&_button]:outline-2 focus-visible:[&_button]:outline-offset-2 focus-visible:[&_button]:outline-[#ff7847] focus-visible:[&_input]:outline-solid focus-visible:[&_input]:outline-2 focus-visible:[&_input]:outline-offset-2 focus-visible:[&_input]:outline-[#ff7847]"
       }
     >
       <section className="grid gap-6 min-[1500px]:grid-cols-[minmax(0,1.42fr)_minmax(360px,0.78fr)]">
@@ -2709,7 +2709,7 @@ export function DesktopOperatorCockpit({
                   ? "Advanced Operator Cockpit"
                   : "Native Operator Cockpit"}
               </div>
-              <h1 className="mt-5 max-w-[22ch] font-[family:var(--font-site-display)] text-4xl font-medium leading-[0.95] tracking-[-0.055em] text-[#eee9dc] sm:text-5xl">
+              <h1 className="mt-5 max-w-[22ch] font-(--font-site-display) text-4xl font-medium leading-[0.95] tracking-[-0.055em] text-[#eee9dc] sm:text-5xl">
                 {advancedView
                   ? "Operate the local runtime without falling back to the web mirror."
                   : "Make this machine a serious operator seat."}
@@ -2741,7 +2741,7 @@ export function DesktopOperatorCockpit({
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]">
+          <div className="mt-8 grid gap-4 grid-cols-[repeat(auto-fit,minmax(210px,1fr))]">
             <SignalTile
               label="Environment"
               value={
@@ -3296,7 +3296,7 @@ export function DesktopOperatorCockpit({
 
   if (standalone) {
     return (
-      <div data-mutx-desktop="standalone-cockpit" className="min-h-screen bg-[#090a08] font-[family:var(--font-site-body)] text-[#eee9dc]">
+      <div data-mutx-desktop="standalone-cockpit" className="min-h-screen bg-[#090a08] font-(--font-site-body) text-[#eee9dc]">
         <DesktopRouteListener />
         {content}
       </div>
