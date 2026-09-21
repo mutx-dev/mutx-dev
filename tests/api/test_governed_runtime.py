@@ -239,7 +239,7 @@ async def test_agent_runtime_langchain_bridge_preserves_execution_identity(tmp_p
     governance = _governance_for(PolicyDecision.ALLOW, audit_log)
     runtime = AgentRuntime(RuntimeConfig(vector_store_enabled=False), governance=governance)
     runtime._bind_event_loop()
-    scope_token = runtime._execution_scope.set(("run-bridge", "session-bridge"))
+    scope_token = runtime._execution_scope.set(("run-bridge", "session-bridge", ""))
     span = NonRecordingSpan(
         SpanContext(
             trace_id=0x0123456789ABCDEF0123456789ABCDEF,

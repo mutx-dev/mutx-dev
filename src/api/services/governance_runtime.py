@@ -43,6 +43,7 @@ class GovernanceEvaluation:
     actor_id: str
     actor_display: str | None
     policy_refs: list[str]
+    approval_id: str | None = None
 
 
 class GovernanceRuntime:
@@ -218,7 +219,7 @@ class GovernanceRuntime:
             metadata={
                 "run_id": evaluation.run_id,
                 "policy_decision_id": evaluation.decision_id,
-                "approval_id": None,
+                "approval_id": evaluation.approval_id,
             },
         )
         self.receipt_generator.sign_for_persistence(receipt)
@@ -337,7 +338,7 @@ class GovernanceRuntime:
             actor_display=evaluation.actor_display,
             policy_decision_id=evaluation.decision_id,
             policy_refs=evaluation.policy_refs,
-            approval_id=None,
+            approval_id=evaluation.approval_id,
             cost_record=cost_record,
             redaction_status=redaction_status,
         )

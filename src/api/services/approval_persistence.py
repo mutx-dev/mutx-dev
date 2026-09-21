@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import set_committed_value
 
-from src.api.models.approval import ApprovalNotificationOutbox, ApprovalRecord
+from src.api.models.approval import ApprovalAuditEvent, ApprovalNotificationOutbox, ApprovalRecord
 from src.api.models.models import User
 from src.api.services.approval import (
     ApprovalRequest,
@@ -129,6 +129,25 @@ def _legacy_security_expired(
     return now >= _as_utc(created_at) + timedelta(minutes=timeout_minutes)
 
 
+def record_approval_event(
+    db: AsyncSession, record: ApprovalRecord, event_type: str, actor_id: uuid.UUID | None = None
+) -> None:
+    db.add(
+        ApprovalAuditEvent(
+            approval_id=record.id,
+            event_type=event_type,
+            actor_id=actor_id,
+            details={
+                "status": record.status,
+                "agent_id": record.agent_id,
+                "session_id": record.session_id,
+                "policy_decision_id": record.payload.get("policy_approval_dedupe_key"),
+                "reviewer_id": str(record.reviewer_id) if record.reviewer_id else None,
+            },
+        )
+    )
+
+
 async def _expire_visible_legacy_security_approvals(
     db: AsyncSession,
     *,
@@ -136,42 +155,61 @@ async def _expire_visible_legacy_security_approvals(
     roles: set[str],
     request_id: uuid.UUID | None = None,
 ) -> None:
-    """Persist timeout state before reads or decisions expose legacy records."""
-    filters = [ApprovalRecord.status == ApprovalStatus.PENDING.value]
+    """Enforce expiry and escalation before reads, decisions, and execution claims."""
+    filters = [ApprovalRecord.status.in_(["PENDING", "APPROVED"])]
     scope = _visible_scope(user_id, roles)
     if scope is not None:
         filters.append(scope)
     if request_id is not None:
         filters.append(ApprovalRecord.id == request_id)
-
-    rows = (
-        await db.execute(
-            select(
-                ApprovalRecord.id,
-                ApprovalRecord.payload,
-                ApprovalRecord.created_at,
-            ).where(*filters)
+    records = (
+        (
+            await db.execute(
+                select(ApprovalRecord).where(*filters).execution_options(populate_existing=True)
+            )
         )
-    ).all()
-    now = datetime.now(timezone.utc)
-    expired_ids = [
-        approval_id
-        for approval_id, payload, created_at in rows
-        if _legacy_security_expired(payload, created_at, now=now)
-    ]
-    if not expired_ids:
-        return
-
-    await db.execute(
-        update(ApprovalRecord)
-        .where(
-            ApprovalRecord.id.in_(expired_ids),
-            ApprovalRecord.status == ApprovalStatus.PENDING.value,
-        )
-        .values(status=ApprovalStatus.EXPIRED.value, updated_at=now)
-        .execution_options(synchronize_session=False)
+        .scalars()
+        .all()
     )
-    await db.commit()
+    now = datetime.now(timezone.utc)
+    changed = False
+    for record in records:
+        expired = record.expires_at is not None and _as_utc(record.expires_at) <= now
+        expired = expired or _legacy_security_expired(record.payload, record.created_at, now=now)
+        escalated = (
+            record.status == "PENDING"
+            and record.escalated_at is None
+            and record.escalates_at is not None
+            and _as_utc(record.escalates_at) <= now
+        )
+        if not expired and not escalated:
+            continue
+        conditions = [
+            ApprovalRecord.id == record.id,
+            ApprovalRecord.status == record.status,
+            ApprovalRecord.consumed_at.is_(None),
+        ]
+        values = {"updated_at": now}
+        if expired:
+            values.update(status="EXPIRED", resolved_at=now)
+        else:
+            conditions.append(ApprovalRecord.escalated_at.is_(None))
+            values.update(reviewer_id=None, escalated_at=now)
+        updated = (
+            await db.execute(
+                update(ApprovalRecord)
+                .where(*conditions)
+                .values(**values)
+                .returning(ApprovalRecord)
+                .execution_options(synchronize_session=False, populate_existing=True)
+            )
+        ).scalar_one_or_none()
+        if updated is not None:
+            await db.refresh(updated)
+            record_approval_event(db, updated, "expired" if expired else "escalated")
+            changed = True
+    if changed:
+        await db.commit()
 
 
 def approval_can_resolve(
@@ -213,6 +251,10 @@ def approval_request_from_record(
         created_at=_as_utc(record.created_at),
         resolved_at=_as_utc(record.resolved_at),
         comment=record.comment,
+        expires_at=_as_utc(record.expires_at),
+        escalates_at=_as_utc(record.escalates_at),
+        escalated_at=_as_utc(record.escalated_at),
+        consumed_at=_as_utc(record.consumed_at),
     )
 
 
@@ -318,8 +360,14 @@ async def create_approval_record(
     reviewer_id: uuid.UUID | None,
     idempotency_key: str | None,
     webhook_url: str | None,
+    timeout_seconds: int = 3600,
+    escalation_seconds: int | None = 900,
 ) -> ApprovalCreateResult:
     """Create an approval and its notification event in one transaction."""
+    if not 60 <= timeout_seconds <= 86400:
+        raise ApprovalReviewerError("Approval timeout must be between 60 and 86400 seconds")
+    if escalation_seconds is not None and not 1 <= escalation_seconds < timeout_seconds:
+        escalation_seconds = None
     owner_id = owner.id
     owner_email = owner.email
     normalized_key = idempotency_key.strip() if idempotency_key is not None else None
@@ -361,8 +409,11 @@ async def create_approval_record(
         request_hash=request_hash,
         created_at=now,
         updated_at=now,
+        expires_at=now + timedelta(seconds=timeout_seconds),
+        escalates_at=now + timedelta(seconds=escalation_seconds) if escalation_seconds else None,
     )
     db.add(record)
+    record_approval_event(db, record, "created", owner_id)
 
     normalized_webhook_url = webhook_url.strip() if webhook_url else None
     if normalized_webhook_url:
@@ -486,6 +537,9 @@ async def resolve_approval(
         request_id=request_id,
     )
 
+    # Deadline transitions may commit, so reacquire the role lock before deciding.
+    roles = await get_persisted_roles(db, user, for_update=True)
+    now = datetime.now(timezone.utc)
     authorization_filter = None
     if ADMIN_ROLE in roles:
         authorization_filter = ApprovalRecord.owner_id != user_id
@@ -502,6 +556,7 @@ async def resolve_approval(
                 ApprovalRecord.id == request_id,
                 ApprovalRecord.status == ApprovalStatus.PENDING.value,
                 authorization_filter,
+                or_(ApprovalRecord.expires_at.is_(None), ApprovalRecord.expires_at > now),
             )
             .values(
                 status=target_status.value,
@@ -515,6 +570,8 @@ async def resolve_approval(
         )
         resolved = result.scalar_one_or_none()
         if resolved is not None:
+            await db.refresh(resolved)
+            record_approval_event(db, resolved, target_status.value.lower(), user_id)
             await db.commit()
             return resolved
         # The conditional UPDATE made no changes. Commit the diagnostic-free
