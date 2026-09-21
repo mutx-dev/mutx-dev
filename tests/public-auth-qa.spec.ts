@@ -108,9 +108,9 @@ test.describe('Public and authentication product QA', () => {
     }
   });
 
-  test('skip link moves keyboard focus to main content', async ({ page }) => {
+  test('skip link moves keyboard focus to main content', async ({ page, browserName }) => {
     await page.goto('/login');
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
 
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
     await expect(skipLink).toBeFocused();

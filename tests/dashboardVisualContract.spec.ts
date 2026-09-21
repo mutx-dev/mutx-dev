@@ -66,7 +66,8 @@ test.describe('Dashboard visual contract', () => {
     await expect(page.getByText('Visual contract operator')).toBeVisible();
 
     const rotate = page.getByRole('button', { name: 'Rotate', exact: true });
-    await rotate.click();
+    await rotate.focus();
+    await rotate.press('Enter');
 
     const dialog = page.getByRole('dialog', { name: 'Rotate API key?' });
     await expect(dialog).toBeVisible();

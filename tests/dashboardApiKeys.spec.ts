@@ -63,7 +63,9 @@ test.describe('Dashboard API key confirmations', () => {
     });
 
     await openApiKeysPage(page);
-    await page.getByRole('button', { name: 'Rotate', exact: true }).click();
+    const rotateTrigger = page.getByRole('button', { name: 'Rotate', exact: true });
+    await rotateTrigger.focus();
+    await rotateTrigger.press('Enter');
 
     const dialog = page.getByRole('dialog', { name: 'Rotate API key?' });
     await expect(dialog).toBeVisible();

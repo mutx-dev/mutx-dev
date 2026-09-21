@@ -98,7 +98,10 @@ test.describe('Pico locale and mobile accessibility', () => {
     await page.goto('/pico/onboarding', { waitUntil: 'domcontentloaded' })
 
     const trigger = page.getByTestId('pico-open-tour-mobile')
-    await trigger.click()
+    await expect(trigger).toBeEnabled()
+    await trigger.focus();
+    await expect(trigger).toBeFocused()
+    await trigger.press('Enter')
 
     const dialog = page.getByRole('dialog')
     const buttons = dialog.getByRole('button')

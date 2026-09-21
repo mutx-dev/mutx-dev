@@ -134,6 +134,7 @@ test.describe('managed document workflow integrity', () => {
     })
 
     await page.goto('/dashboard/documents')
+    await expect(page.getByText('Create a report from managed document inputs.', { exact: true })).toBeVisible()
     await page.locator('input[type="file"]').setInputFiles({
       name: 'brief.txt',
       mimeType: 'text/plain',
