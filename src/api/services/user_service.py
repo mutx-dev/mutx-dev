@@ -9,7 +9,8 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.api.auth.password import hash_password, verify_password
+from src.api.auth.password import hash_password
+from src.api.services.auth import authenticate_password_user
 from src.api.config import get_settings
 from src.api.models.models import (
     User,
@@ -203,12 +204,7 @@ class UserService:
         return result.scalar_one_or_none()
 
     async def authenticate_user(self, email: str, password: str) -> Optional[User]:
-        user = await self.get_user_by_email(email)
-        if not user or not user.password_hash:
-            return None
-        if not verify_password(password, user.password_hash):
-            return None
-        return user
+        return await authenticate_password_user(self.session, email=email, password=password)
 
     async def get_or_create_user_for_oauth(self, profile: OAuthUserProfile) -> User:
         identity = await self.get_external_auth_identity(

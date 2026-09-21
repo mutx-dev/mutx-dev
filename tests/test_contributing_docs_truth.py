@@ -19,5 +19,5 @@ def test_contributing_playwright_docs_match_local_standalone_reality() -> None:
 def test_clone_policy_uses_current_mutx_ci_node_version() -> None:
     clone_policy = read_text("docs/clone-policy.md")
 
-    assert "Node 24 (CI standard)" in clone_policy
+    assert "Node 24.15+ (CI standard)" in clone_policy
     assert "Node 20 (CI standard)" not in clone_policy

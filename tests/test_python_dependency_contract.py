@@ -3,8 +3,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_BASE = (
-    "python:3.11-slim-bookworm@sha256:"
-    "b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba"
+    "python:3.12-slim-bookworm@sha256:"
+    "392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e"
 )
 
 
@@ -18,12 +18,12 @@ def test_test_requirements_do_not_drift_from_runtime_core_pins() -> None:
 
     assert "fastapi==0.135.3" in runtime_requirements
     assert "fastapi>=" not in runtime_requirements
-    assert "pydantic-settings==2.10.1" in runtime_requirements
+    assert "pydantic-settings==2.15.0" in runtime_requirements
     assert "-r requirements.txt" in test_requirements
     assert "passlib[bcrypt]" not in test_requirements
     assert "httpx==0.28.1" in test_requirements
     assert "aiosqlite==0.20.0" in test_requirements
-    assert "sqlalchemy==2.0.25" in test_requirements
+    assert "sqlalchemy==2.0.54" in test_requirements
 
 
 def test_requirements_compat_script_checks_test_requirements_too() -> None:

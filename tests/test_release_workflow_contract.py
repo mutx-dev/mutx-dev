@@ -54,10 +54,12 @@ def test_railway_cli_and_same_version_guard_are_commit_bound() -> None:
     assert "commit-bound and forward-only" in guard
 
 
-def test_production_promotion_calls_inherit_repository_secrets() -> None:
+def test_production_promotion_calls_pass_only_required_repository_secrets() -> None:
     workflow = read_text(".github/workflows/release.yml")
 
-    assert workflow.count("secrets: inherit") == 2
+    assert "secrets: inherit" not in workflow
+    for name in ("RAILWAY_TOKEN", "RAILWAY_PROJECT_ID", "RAILWAY_FRONTEND_SERVICE_ID", "RAILWAY_API_SERVICE_ID", "RAILWAY_ENVIRONMENT_ID"):
+        assert workflow.count(f"{name}: ${{{{ secrets.{name} }}}}") == 2
 
 
 def test_container_scan_uses_the_real_frontend_dockerfile() -> None:

@@ -175,8 +175,9 @@ async def test_pico_generate_package_not_ready(client: AsyncClient, monkeypatch)
 
 
 @pytest.mark.asyncio
-async def test_pico_tutor_openai_connect(client: AsyncClient):
-    """Test PUT /v1/pico/tutor/openai connects OpenAI."""
+async def test_pico_tutor_openai_connect(client: AsyncClient, monkeypatch):
+    """Test a successfully provider-validated key is persisted."""
+    monkeypatch.setattr("src.api.services.pico_tutor_openai.validate_openai_api_key", AsyncMock())
     response = await client.put(
         "/v1/pico/tutor/openai",
         json={"apiKey": "sk-test-key-123"},
@@ -188,8 +189,9 @@ async def test_pico_tutor_openai_connect(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_pico_tutor_openai_disconnect(client: AsyncClient):
+async def test_pico_tutor_openai_disconnect(client: AsyncClient, monkeypatch):
     """Test DELETE /v1/pico/tutor/openai disconnects OpenAI."""
+    monkeypatch.setattr("src.api.services.pico_tutor_openai.validate_openai_api_key", AsyncMock())
     # First connect
     await client.put(
         "/v1/pico/tutor/openai",

@@ -67,7 +67,9 @@ class TestRuntimeSnapshots:
         assert payload["stale"] is True
 
     @pytest.mark.asyncio
-    async def test_runtime_snapshot_round_trip(self, client: AsyncClient):
+    async def test_runtime_snapshot_round_trip(self, client: AsyncClient, test_user, db_session):
+        test_user.roles = ["DEVELOPER"]
+        await db_session.commit()
         response = await client.put(
             "/v1/runtime/providers/openclaw",
             json={

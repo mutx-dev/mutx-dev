@@ -884,11 +884,18 @@ class TestPasswordCompatibility:
 
     def test_verify_password_accepts_legacy_pbkdf2_sha256_hash(self):
         """Test that verify_password can verify legacy pbkdf2_sha256 hashed passwords."""
-        from passlib.hash import pbkdf2_sha256
+        import hashlib
+        import base64
         from src.api.auth.password import verify_password
 
         plain_password = "StrongPassword123!"
-        legacy_hash = pbkdf2_sha256.hash(plain_password)
+        salt = b"fixed-legacy-salt"
+        digest = hashlib.pbkdf2_hmac("sha256", plain_password.encode(), salt, 29000)
+
+        def encode(value):
+            return base64.b64encode(value).decode().rstrip("=").replace("+", ".")
+
+        legacy_hash = f"$pbkdf2-sha256$29000${encode(salt)}${encode(digest)}"
 
         # Verify that the legacy hash can be checked with verify_password
         assert verify_password(plain_password, legacy_hash) is True

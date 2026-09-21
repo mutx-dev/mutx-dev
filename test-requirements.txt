@@ -9,4 +9,9 @@ pytest-cov>=4.0.0
 # Explicitly pin overlap-prone runtime deps used heavily in tests.
 httpx==0.28.1
 aiosqlite==0.20.0
-sqlalchemy==2.0.25
+sqlalchemy==2.0.54
+
+# Isolated wheel-distribution tests build without network build isolation.
+pip>=26.0
+setuptools>=80
+wheel>=0.45

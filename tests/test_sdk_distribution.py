@@ -42,7 +42,7 @@ def test_sdk_installs_as_mutx_distribution_and_exports_mutx_client(tmp_path: Pat
     )
 
     subprocess.run(
-        [str(pip_bin), "install", "--no-deps", "--no-build-isolation", str(SDK_ROOT)],
+        [str(pip_bin), "install", "--no-build-isolation", str(SDK_ROOT)],
         check=True,
         cwd=ROOT,
         capture_output=True,

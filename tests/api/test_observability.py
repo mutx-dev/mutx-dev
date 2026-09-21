@@ -168,14 +168,14 @@ async def test_update_run_status_rejects_negative_tokens(client):
 
 
 @pytest.mark.asyncio
-async def test_security_evaluate_endpoint(client):
+async def test_security_evaluate_endpoint(client, test_agent):
     """Test the security action evaluation endpoint."""
     response = await client.post(
         "/v1/security/actions/evaluate",
         json={
             "tool_name": "bash",
             "tool_args": {"command": "ls"},
-            "agent_id": "test-agent",
+            "agent_id": str(test_agent.id),
             "session_id": "test-session",
         },
     )

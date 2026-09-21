@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth import oidc
-from src.api.auth.password import hash_password, verify_password
+from src.api.auth.password import hash_password, password_needs_rehash, verify_password
 from src.api.models.models import ExternalAuthIdentity, RefreshTokenSession, User
 from src.api.security import hash_token_value
 from src.api.services.social_auth import OAuthUserProfile
@@ -48,6 +48,22 @@ async def authenticate_password_user(
     user = await get_auth_user_by_email(session, email)
     if not user or not user.password_hash or not verify_password(password, user.password_hash):
         return None
+    if password_needs_rehash(user.password_hash):
+        old_hash = user.password_hash
+        updated = await session.execute(
+            update(User)
+            .where(
+                User.id == user.id,
+                User.password_hash == old_hash,
+            )
+            .values(password_hash=hash_password(password))
+            .execution_options(synchronize_session=False)
+        )
+        if updated.rowcount != 1:
+            await session.rollback()
+            return None
+        await session.commit()
+        await session.refresh(user)
     return user
 
 
