@@ -56,7 +56,7 @@
 | "Governance — Policy enforcement (PERMIT/DENY/DEFER) via FPL" | surfaces.md | Code exists in `src/security/` and policies routes `/v1/policies/*` in OpenAPI | SHIPPED |
 | "Governance — Credential broker (Vault, AWS, GCP, Azure, 1Password, Infisical)" | surfaces.md | `/v1/governance/credentials/*` routes and all six provider adapters exist. External provisioning, credentials, and live end-to-end proof remain configuration-dependent; the Terraform Vault module is still a placeholder. | PARTIAL |
 | "Governance — Supervised agents" | surfaces.md | `/v1/runtime/governance/supervised/*` routes in OpenAPI with start/stop/restart/profiles | SHIPPED |
-| "Security — Actions, approvals, compliance, metrics, receipts, sessions" | surfaces.md | All confirmed: `/v1/security/actions/evaluate`, `/v1/security/approvals/*`, `/v1/security/compliance`, `/v1/security/metrics`, `/v1/security/receipts/*`, `/v1/security/sessions/*` | SHIPPED |
+| "Security — Actions, approvals, compliance, MCP definition scanning, metrics, receipts, sessions" | surfaces.md | Confirmed routes include `/v1/security/actions/evaluate`, `/v1/security/approvals/*`, `/v1/security/compliance`, `/v1/security/mcp/scan`, `/v1/security/metrics`, `/v1/security/receipts/*`, and `/v1/security/sessions/*`; MCP registration/runtime sandboxing is not claimed | SHIPPED |
 | "Dashboard — RAG search and scheduler return 503 with feature flags" | surfaces.md | RAG now has real endpoints (gated by config flag). Scheduler has real implementation. **No longer 503 stubs.** | **CHANGED → SHIPPED** |
 
 ### 1.5 roadmap.md Claims
@@ -73,8 +73,8 @@
 
 **Audit Date:** 2026-07-28
 **Total top-level `/v1` families:** 33
-**Total OpenAPI paths:** 198
-**Total endpoint-method pairs:** 246
+**Total OpenAPI paths:** 201
+**Total endpoint-method pairs:** 249
 
 Security counts below are generated operation contracts. They do not replace the
 persisted-role, ownership, plan, or internal-user checks declared in route source.
@@ -101,13 +101,13 @@ persisted-role, ownership, plan, or internal-user checks declared in route sourc
 | `/v1/onboarding` | GET, POST | 2 required |
 | `/v1/payments` | GET, POST | 4 required / 1 public |
 | `/v1/pico` | DELETE, GET, POST, PUT | 10 required / 1 optional |
-| `/v1/policies` | DELETE, GET, POST, PUT | 7 required |
+| `/v1/policies` | DELETE, GET, POST, PUT | 8 required |
 | `/v1/rag` | GET, POST | 5 required |
 | `/v1/reasoning` | GET, POST | 9 required |
 | `/v1/runs` | GET, POST | 5 required |
 | `/v1/runtime` | GET, POST, PUT | 10 required |
 | `/v1/scheduler` | DELETE, GET, PATCH, POST | 6 required |
-| `/v1/security` | DELETE, GET, POST | 14 required |
+| `/v1/security` | DELETE, GET, POST | 15 required |
 | `/v1/sessions` | DELETE, GET, POST | 5 required |
 | `/v1/swarms` | DELETE, GET, PATCH, POST | 7 required |
 | `/v1/telemetry` | GET, POST | 3 required |
@@ -251,7 +251,7 @@ workstation layout:
 | Top-level `/v1` families | 33 |
 | OpenAPI paths | 198 |
 | OpenAPI operations | 246 |
-| Required-auth operations | 223 |
+| Required-auth operations | 226 |
 | Optional-auth operations | 2 |
 | Public operations | 21 |
 

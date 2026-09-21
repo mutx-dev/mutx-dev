@@ -77,7 +77,7 @@ registered `audit` router mounts at `/v1/audit` and requires persisted `ADMIN` o
 | `documents` | `/v1/documents` | — |
 | `reasoning` | `/v1/reasoning` | — |
 | `observability` | `/v1/observability` | — |
-| `security` | `/v1/security` | — |
+| `security` | `/v1/security` | [mcp-security.md](./mcp-security.md) |
 | `rag` | `/v1/rag` | — |
 | `usage` | `/v1/usage` | — |
 | `analytics` | `/v1/analytics` | [analytics.md](./analytics.md) |
@@ -102,6 +102,7 @@ registered `audit` router mounts at `/v1/audit` and requires persisted `ADMIN` o
 - OpenAPI JSON: [`openapi.json`](https://github.com/mutx-dev/mutx-dev/blob/main/docs/api/openapi.json)
 - Authentication: [authentication.md](./authentication.md)
 - API keys: [api-keys.md](./api-keys.md)
+- MCP definition scanning: [mcp-security.md](./mcp-security.md)
 - Agents: [agents.md](./agents.md)
 - Analytics: [analytics.md](./analytics.md)
 - Approvals: [approvals.md](./approvals.md)

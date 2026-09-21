@@ -55,7 +55,7 @@ See [authentication.md](./authentication.md) and [api-keys.md](./api-keys.md) fo
 | Observability | `/v1/observability/*` — runs, eval, provenance, status, steps |
 | Policies | `/v1/policies/*` — CRUD and reload |
 | Scheduler | `/v1/scheduler/*` — durable tenant-owned tasks with multi-worker-safe execution claims |
-| Security | `/v1/security/*` — actions, approvals, compliance, metrics, receipts, sessions |
+| Security | `/v1/security/*` — actions, approvals, compliance, MCP definition scanning, metrics, receipts, sessions |
 | Telemetry | `/v1/telemetry/*` — config and health |
 | Other mounted families | `/v1/analytics`, `/v1/budgets`, `/v1/clawhub`, `/v1/documents/*`, `/v1/events`, `/v1/governance/*`, `/v1/monitoring/*`, `/v1/onboarding/*`, `/v1/payments/*`, `/v1/pico/*`, `/v1/rag/*`, `/v1/reasoning/*`, `/v1/runtime/*`, `/v1/sessions`, `/v1/swarms`, `/v1/templates`, `/v1/usage` |
 
@@ -77,5 +77,6 @@ Use the FastAPI routes directly for server-to-server integrations. Use `app/api/
 - [API Keys](./api-keys.md)
 - [Agents](./agents.md)
 - [Deployments](./deployments.md)
+- [MCP Definition Scanning](./mcp-security.md)
 - [Webhooks And Ingestion](./webhooks.md)
 - [Leads](./leads.md)
