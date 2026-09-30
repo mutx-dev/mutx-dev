@@ -34,8 +34,8 @@ if (braceManifests.length === 0) {
 for (const manifestPath of braceManifests) {
   const { version } = readManifest(manifestPath);
   const major = Number(version.split(".")[0]);
-  // Patched release lines for GHSA-rgw5-rvv9-x895.
-  const minimum = major === 1 ? "1.1.18" : major === 2 ? "2.1.4" : "5.0.9";
+  // Patched release lines for the active brace-expansion advisories.
+  const minimum = major === 1 ? "1.1.21" : major === 2 ? "2.1.7" : "5.0.12";
 
   if (
     !Number.isInteger(major) ||
