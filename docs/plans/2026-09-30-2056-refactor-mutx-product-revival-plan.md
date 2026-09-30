@@ -13,9 +13,9 @@ execution: code
 ## Goal Capsule
 
 - **Objective:** People can reach MUTX, install or connect a supported runtime, create and operate an agent, inspect real execution evidence, and keep their access and data intact.
-- **Means:** Restore the delivery path, rebuild the three product experiences, then close execution, onboarding, collaboration, and reliability gaps in behavior-led slices (KTD1, KTD2).
+- **Means:** Rebuild a small core behind preserved public contracts, delete the implementations it supersedes, then finish the product experiences and qualify delivery (KTD7).
 - **Authority:** User scope and visual direction govern the product contract. Current source, tests, manifests, and live checks govern existing behavior. Preserve current authentication, user data, route contracts, package identities, and Pico progress. Production, DNS, billing, credential, or irreversible data actions stop at a reviewable owner gate.
-- **Execution profile:** Code work in the isolated revival checkout. Each U-ID is an independently reviewable change. Do not copy changes from the dirty legacy checkout without reconciling them against current source and tests.
+- **Execution profile:** Code work in a clean rebuild worktree based on the integrated revival branch. Each U-ID is an independently reviewable replacement with named retirements. Do not copy changes from the dirty legacy checkout without reconciling them against current source and tests.
 - **Stop conditions:** Do not call a run active or successful without evidence from the connected runtime or worker. Do not declare a release from a local build alone. Hold a deployment if the configured host, release artifact, data migration, or approval boundary cannot be verified.
 - **Completion:** Keep the long-running goal open until every U-ID and the Definition of Done pass. The product owner reviews the redesigned screens and the production release candidate before publication.
 
@@ -25,13 +25,13 @@ execution: code
 
 ### Summary
 
-Restore MUTX availability and rebuild its public site, dashboard, and Pico experience. Make the core install-to-run-to-intervention journey real, observable, and supportable for individual developers, teams, and Pico users.
+Rebuild MUTX around connecting an agent, inspecting its state and runs, requesting a supported action, and verifying its outcome. Replace competing implementations as each core behavior moves to one owner. Keep individual, team, and Pico entry points, then finish their redesign and delivery against that core.
 
 ### Problem Frame
 
 The public domain currently returns a maintenance page with HTTP 503. The app and API domains return Railway fallback 404s, so users cannot reach the advertised product even though the source builds locally. The latest public desktop release has no downloadable assets.
 
-The repository contains working product flows, several competing route and command maps, separate run records, and status handlers that can report `RUNNING` after writing a database row. A dashboard redesign alone would leave users unable to tell whether a runtime actually acted. Existing install documentation also names different paths and does not consistently match the published CLI package boundary.
+The repository has accumulated overlapping execution paths, route catalogs, command handlers, page orchestration, and maintenance automation. Working product flows coexist with separate run records and status handlers that report `RUNNING` after writing a database row. A dashboard redesign alone would leave users unable to tell whether a runtime actually acted. Existing install documentation also names different paths and does not consistently match the published CLI package boundary.
 
 The current site, dashboard, and Pico visual design do not meet the requested quality bar. Their replacement must make MUTX's real product legible while keeping authentication, API contracts, routes, user data, and Pico learning state intact.
 
@@ -54,13 +54,15 @@ The current site, dashboard, and Pico visual design do not meet the requested qu
 **Delivery and maintainability**
 
 - R9. Restore working public, app, and API entry points and make published availability claims match verified deployed behavior.
-- R10. Audit every top-level product and infrastructure area. For each duplication or stale path, name its canonical owner and disposition. Remove code only after caller, data, license, URL, package, and migration compatibility are proven.
+- R10. Rebuild the core with one owner for each behavior and audit every tracked top-level area. Each replacement must retire its competing implementation after caller, data, license, URL, package, and migration checks; optional features must have a retained user workflow or an explicit retirement decision.
 - R11. Keep dependency locks, container builds, documentation, generated API types, CI, release artifacts, and deployed services aligned with the supported product path.
 - R12. Review each maintained direct dependency against its supported upstream line. Upgrade compatible releases, and document compatibility holds with evidence; keep major migrations separate from visual redesign work.
 
 ### Key Decisions
 
 - Audience scope: individual developers, teams, and PicoMUTX are first-class (session-settled: user-directed — chosen over selecting one primary audience: the user replied “EVERYTHING” after the audience choices were surfaced). Governs R1, R4, R5, R7, R8.
+
+- Core rebuild and pruning (session-settled: user-approved — chosen over continuing layered patches: the user approved a smaller rebuild that strips accumulated bloat). Governs R5–R7, R10, R11.
 
 ### Success Criteria
 
@@ -70,6 +72,7 @@ The current site, dashboard, and Pico visual design do not meet the requested qu
 - A team member cannot read or control a resource outside their membership. Existing accounts and their data remain accessible in personal scope after migration.
 - The public site, dashboard, and Pico have distinct, redesigned desktop and mobile compositions. Direct navigation, authentication, checkout, lesson completion, and browser console checks still pass.
 - Required local and hosted CI gates pass. Fixable critical/high dependency advisories are resolved; advisories without a fix remain explicitly assessed and disclosed. Every maintained direct dependency is current on a compatible release line or has a documented evidence-backed hold.
+- The agent/deployment lifecycle, dashboard route identity, supported CLI actions, and schema upgrade path each have one canonical owner. Retired paths have no active production callers. Source reduction is reported against the tracked baseline by area, without treating generated files or tests as product-code savings.
 - The release has working public links and verified download artifacts. A rendered or locally built screen does not count as a published result.
 
 ### Actors
@@ -108,7 +111,7 @@ The current site, dashboard, and Pico visual design do not meet the requested qu
 
 - A new agent orchestration engine, an independent run store, or a third party-specific control plane when current command and run contracts can be extended.
 - A general visual workflow canvas or a copy of any competitor's full platform. Competitor capabilities are evidence for run durability, inspection, human control, and install quality, not a feature checklist.
-- Unreviewed paid services, new commercial dependencies, credential entry, billing changes, DNS changes, production publishing, or destructive data changes.
+- Unreviewed paid services, new commercial dependencies, credential entry, billing changes, DNS changes, production publishing before U13’s owner-reviewed cutover, or destructive data changes.
 
 **Deferred to follow-up work**
 
@@ -128,12 +131,43 @@ The current site, dashboard, and Pico visual design do not meet the requested qu
 
 ### Key Technical Decisions
 
-- KTD1. **Extend the connected-agent command contract.** The repository already has agent-key-authenticated poll and acknowledgement routes. No production command producer was found. Use that boundary for the first real execution path instead of adding an execution engine. Give each operation one stable execution identity and correlate it with the existing `AgentRun`/trace contract; keep `MutxRun` as its distinct observability, cost, provenance, and evaluation record. Preserve both API families until their current callers and stored histories have tested projections or migrations.
+- KTD1. **Keep the connected-agent command boundary as an adapter to the rebuilt core.** The repository already has agent-key-authenticated poll and acknowledgement routes. No production command producer was found. Use that boundary for the first real execution path instead of adding an execution engine. Give each operation one stable execution identity and correlate it with the existing `AgentRun`/trace contract; keep `MutxRun` as its distinct observability, cost, provenance, and evaluation record. Preserve both API families until their current callers and stored histories have tested projections or migrations.
 - KTD2. **Use runtime evidence for lifecycle state.** Agent registration, deployment creation, and monitor/auto-heal paths can set database status without provisioning or executing work. A database write means requested or recorded state. A verified runtime heartbeat, command receipt, provider acknowledgement, or worker result means observed state. Keep this distinction in each API response and UI status treatment.
 - KTD3. **Replace the visual language while preserving behavior.** Build and review the public site, dashboard, and Pico locally or on a preview before any production cutover. The public site gets the Civico Due quality reference: a continuous, scroll-linked reveal with pinned chapters and a tangible MUTX console/device object, using actual MUTX pages as the content. Dashboard and Pico get purpose-built layouts under shared semantic tokens. Their route, auth, API, state, and mobile behavior remain product contracts. The Civico reference supplies choreography and craft only, not copy or business claims.
-- KTD4. **Refactor by ownership and compatibility, not file size alone.** Consolidate route metadata, duplicate command implementations, SDK sync/async bodies, and repeated workers only after listing callers and preserving aliases, flags, output, stored data, and external URLs. Large files are extraction candidates when their responsibilities and tests are identified.
+- KTD4. **Delete competing implementations when moving ownership.** Use the disposition table below to consolidate route identity, request parsing, CLI handlers, and lifecycle writers. Compatibility entry points delegate to the canonical owner; they do not carry a second implementation. Extract a large component only when the extracted module owns a coherent action or data lifecycle. (R4, R10.)
 - KTD5. **Make the maintained full-stack deployment path authoritative.** `infrastructure/docker/` and the scripts that use it are the current local stack; the root `Dockerfile` and `docker-compose.yml` are legacy copies. Fix the Python ABI copy path and gate the exact Railway and local images before retiring legacy files. Do not equate syntax validation with a built image.
 - KTD6. **Fence durable jobs before sharing their code or scaling workers.** Document and reasoning workers have similar lifecycle code but different job tables and drivers. First prove one worker owns a job, stale claimants cannot write results, and external effects are idempotent. Share only mechanics that survive that proof.
+
+- KTD7. **Rebuild the core in place behind existing adapters.** Create framework-independent lifecycle policy and one database-backed transition owner. HTTP routes handle authorization and wire translation; executors report evidence; clients consume the public contract. Start in a clean worktree, reuse characterized auth and persistence, and remove superseded branches within each replacement. This creates no second server, database, run store, dependency-injection framework, or universal renderer. (R4–R7, R10, R11; session-settled: user-approved — chosen over adding repairs to competing implementations: a smaller core is the approved direction.)
+- KTD8. **Separate operation records by authority.** `AgentRun`/trace owns user-visible operation evidence, `Command` owns delivery, document/reasoning jobs own specialized execution and claims, and `MutxRun` owns runtime-emitted observability. Domain services map their transitions to the run envelope transactionally. Preserve reported-run ingestion and both histories; correlation does not turn a caller-supplied status into execution proof. (KTD1, R6, R7.)
+- KTD9. **Enforce boundaries with small architecture checks.** Pure lifecycle policy imports neither HTTP, ORM, CLI, nor UI modules. API routes do not implement lifecycle transitions. Published CLI/SDK packages do not import backend `src` for a claimed installed capability. `mutx-cli` remains BUSL-1.1; SDK `mutx` remains Apache-2.0. Tests enumerate the transitional exceptions and remove each when its owner moves. (R4, R10, R11.)
+- KTD10. **Make local CLI execution honest before packaging an engine.** Installed CLI local document/reasoning modes fail before creating work if the optional engine is absent. Source-tree execution remains explicit until a separately reviewed installable engine earns inclusion. Do not bundle backend dependencies into the CLI to preserve an inaccurate installation claim. (R4–R7, R10.)
+
+### Ownership and retirement map
+
+The tracked-text audit at `a047b7fe` counted 795 product source files / 183,221 lines, separately from 91,601 test lines, 75,986 generated/lock lines, and 10,648 repository-automation lines. These are an audit baseline, not a promise that 70% can be deleted. Each completed unit records removed owners, remaining callers, and net source change outside this decision document.
+
+| Area / current paths | Keep / canonical owner | Replace or delete | Retirement evidence / unit |
+|---|---|---|---|
+| `src/api/routes/agents.py`, `deployments.py`, `agent_runtime.py`, `ingest.py`, `services/monitor*.py` | Existing auth, IDs and endpoints; one lifecycle policy and transition service | Route-local status writers, timer-based provisioning, synthetic heartbeats and fake restart/rollback recovery | Real heartbeat/provider evidence, stop/restart characterization, no competing status writers; U14 |
+| `services/agent_runtime.py`, `integrations/langchain_agent.py` | Governed tool execution and documented embedding contracts where actually used | Unwired process-local runtime/registry paths after transferring retained governance behavior | Production, tests, examples and docs caller audit; U17 |
+| `AgentRun`, `Command`, `DocumentJob`, `ReasoningJob`, `MutxRun` | Authority split in KTD8 | Duplicate transition mechanics only after fenced domain contracts pass | Same operation IDs, independent histories, stale-worker safety; U7, U10 |
+| `src/api/database.py`, migration versions | Alembic as schema-upgrade authority; configured sessions as persistence boundary | Competing startup schema repair/creation in production after legacy DB fixtures migrate | Empty/current/legacy upgrade and repeatability, restore/backfill proof; U17 |
+| `lib/dashboardPanels.ts`, desktop route config, dashboard navigation | One route identity catalog; desktop owns its presentation metadata | Handwritten reverse path/panel/nav maps | Every alias, nested route, SPA exclusion and desktop stage preserved; U15 |
+| `lib/store.ts`, dashboard SPA boot, `components/app/http.ts` | Workspace UI preferences and existing JSON transport | Uncalled store fetch/boot actions; duplicate parsers and redundant shell inventory requests | Caller search and request/auth/error contracts; U15 |
+| `app/api/dashboard/`, `app/api/pico/` | Existing authenticated transport; domain-specific aggregates; shared approval contract | Duplicate approval validation and proxy bodies | Both URL namespaces, refresh cookies and Pico conflict semantics; U15 |
+| `components/desktop/`, `desktop/` | Bridge/main/preload capabilities; feature-owned remote request logic | Giant native route switch cases as their feature owner takes over | Native-vs-browser behavior, bridge and route tests; U5, U15 |
+| `app/pico/`, `components/pico/`, `lib/pico/`, `i18n/`, `messages/` | Learner progress, localization, checkout and package proof | Duplicated content sources and mixed orchestration as canonical content/workflow owners move | Persisted progress, locale, package and entitlement parity; U6, U17 |
+| `cli/` | Canonical `auth`, `agent`, `deployment` handlers; documented local adapters | Duplicate flat/plural command bodies; backend imports from installed-only paths | Flags/defaults/output and clean-wheel smoke; aliases become thin dispatchers; U16 |
+| `sdk/` | Licensed SDK distributions and resource contracts | Repeated sync/async payload and response shaping; unused required instrumentation | Both execution modes, clean install and optional-extra contracts; U16 |
+| `agents/`, `autonomy_stubs/`, `scripts/autonomy/`, repository-agent CI | No default claim to be product runtime | Retire uncalled abandoned maintenance jobs, stubs and agent scaffolding | Workflow/cron/import/external use inventory, retained capability justification; U17 |
+| `infrastructure/`, root Docker/Compose, `nginx.conf`, Railway/Vercel config | One qualified local stack and current hosted deployment path | Duplicate build definitions and unsupported templates after state/use checks | Exact image builds, supported matrix, infrastructure-state checks; U2, U12, U17 |
+| `android/`, `ios/`, Capacitor, Electron packaging | Existing native identities and one shared UI/domain contract | Native copies of remote business behavior | Bridge/build/install evidence and platform caller audit; U5, U11, U13 |
+| `app/`, `components/site/`, `public/`, `lib/docs.ts` | Public URLs, truthful examples and one maintained visual system | Obsolete redesign variants, stale assets, competing copy/data definitions | Link/render and asset-use evidence; U4, U17 |
+| `docs/`, `examples/`, `contributing/`, `homebrew-tap/`, root docs | Supported install/API/license/release contracts | Stale unsupported instructions and examples after their replacements verify | Clean install, mounted routes, release bytes; U8, U12, U17 |
+| `tests/`, `scripts/`, `.github/`, root manifests/config | Behavior, distribution, security and release gates | Tests enshrining retired fake behavior and obsolete automation, after replacement tests exist | No weakened auth/concurrency contracts; audit every remaining tracked top-level area; U17 |
+
+Unlisted tracked top-level paths are inventoried in U17 before release. A large file, an old date, or a failed text search alone is insufficient deletion evidence.
 
 ### Assumptions
 
@@ -145,20 +179,18 @@ The current site, dashboard, and Pico visual design do not meet the requested qu
 
 ### High-Level Technical Design
 
-The target preserves current API and client boundaries while adding the missing producer and evidence path to the connected-agent protocol.
+The target rebuilds core ownership while preserving external contracts. This sketch describes boundaries; implementations may use existing modules where they satisfy KTD7–KTD9.
 
 ```mermaid
 flowchart LR
-  Site[Public site and docs] --> API[Authenticated FastAPI control plane]
-  UI[Dashboard and Pico] --> API
-  CLI[CLI and SDK] --> API
-  API --> Records[Existing agents deployments runs jobs approvals]
-  API --> Commands[Existing command queue]
-  Commands --> Runtime[Connected agent runtime]
-  Runtime -->|heartbeat command acknowledgement result| API
-  API --> Records
-  Records -->|same authorized operation identity| UI
-  Records -->|same authorized operation identity| CLI
+  Clients[Dashboard Pico CLI SDK] --> Adapters[HTTP and client adapters]
+  Adapters --> Services[Authorized lifecycle and operation services]
+  Services --> Policy[Pure lifecycle policy]
+  Services --> Store[Existing records through persistence boundary]
+  Services --> Delivery[Command and specialized job delivery]
+  Delivery --> Executors[Connected runtime or domain worker]
+  Executors -->|authenticated evidence| Services
+  Services -->|stable IDs and observed state| Adapters
 ```
 
 The connected-agent protocol must distinguish delivery from execution and return evidence before the control plane changes its user-visible state.
@@ -206,34 +238,35 @@ A stop request or approval decision is not complete when the API accepts it. The
 
 ```mermaid
 flowchart TB
-  U1[Dependency safety] --> U2[Container qualification]
-  U1 --> U3[Local and preview routing]
-  U3 --> U4[Public visual reset]
-  U4 --> U5[Dashboard reset]
-  U4 --> U6[Pico reset]
-  U1 --> U7[Runtime execution proof]
-  U7 --> U8[CLI and SDK first run]
-  U8 --> U9[Team membership]
-  U7 --> U10[Worker fencing]
-  U1 --> U11[Dependency modernization]
-  U2 --> U12[Support matrix and CI]
-  U3 --> U12
-  U4 --> U12
+  U1[Safety foundations] --> U14[One lifecycle owner]
+  U14 --> U7[Real execution proof]
+  U14 --> U15[Thin browser and desktop adapters]
+  U7 --> U16[Thin installable CLI and SDK]
+  U7 --> U10[Fenced domain workers]
+  U14 --> U17[Schema and repository retirement]
+  U15 --> U5[Operator redesign]
+  U15 --> U6[Pico redesign]
+  U16 --> U8[Fresh-install proof]
+  U8 --> U9[Explicit team scope]
+  U10 --> U17
+  U16 --> U17
+  U17 --> U12[Supported paths and CI]
   U5 --> U12
   U6 --> U12
-  U7 --> U12
-  U8 --> U12
   U9 --> U12
-  U10 --> U12
-  U11 --> U12
-  U12 --> U13[Live release]
+  U2[Exact images] --> U12
+  U3[Routing] --> U4[Public redesign]
+  U4 --> U12
+  U11[Dependency disposition] --> U12
+  U12 --> U13[Qualified live release]
 ```
 
 Local and preview work can continue while billing or production-project access is being resolved. U13 owns the live cutover.
 
 ### Alternatives Considered
 
-- **Replace the repository in one rewrite:** rejected because web, desktop, CLI, SDK, Pico, API, and deployments share external routes, data, and package contracts. The evidence supports staged replacements behind those contracts.
+- **Keep layering repairs onto competing implementations:** rejected by the approved core-rebuild decision (KTD7). It retains the ownership problem that caused abandonment.
+- **Discard all data, auth, clients, and history in a big-bang rewrite:** rejected under R4. Rebuild core behavior from scratch in staged replacements while retaining proven contracts and migration paths.
 - **Build a separate execution engine or visual workflow platform:** deferred. The current repository has a connected-agent command protocol, worker-backed document/reasoning jobs, and distinct run records. A new engine would duplicate those ownership boundaries before the existing path has a real producer.
 - **Copy a competitor feature matrix:** rejected. Current competitors separate runtime from control plane and emphasize durable traces, resumable execution, and human review. Dify's visual platform requires a 15-service Docker Compose stack and has a modified source license; that is not a suitable Pico installation baseline. Focus on MUTX's complete install-to-control path instead.
 
@@ -245,24 +278,27 @@ Local and preview work can continue while billing or production-project access i
 | U2 | Build the exact supported container images | Dockerfiles, Compose, CI | U1 |
 | U3 | Prepare safe public routing in local/preview builds | `next.config.mjs`, `proxy.ts`, tests | U1 |
 | U4 | Rebuild the public product story | `components/site/marketing/`, `tests/website.spec.ts` | U1, U3 |
-| U5 | Rebuild the dashboard experience | `components/dashboard/`, `components/desktop/` | U4 |
-| U6 | Rebuild the Pico experience | `app/pico/`, `components/pico/`, Pico tests | U4 |
-| U7 | Make connected-agent execution real and visible | agent, command, run, deployment routes | U1 |
-| U8 | Make fresh install and client contracts reliable | CLI, SDK, installer, docs | U7 |
+| U5 | Rebuild the dashboard experience | `components/dashboard/`, `components/desktop/` | U7, U15 |
+| U6 | Rebuild the Pico experience | `app/pico/`, `components/pico/`, Pico tests | U7, U15 |
+| U7 | Make connected-agent execution real and visible | agent, command, run, deployment routes | U14 |
+| U8 | Make fresh install and client contracts reliable | CLI, SDK, installer, docs | U7, U16 |
 | U9 | Add team membership without exposing personal data | models, authorization, migrations | U7, U8 |
 | U10 | Fix worker ownership and extract shared mechanics | job services, workers, concurrency tests | U7 |
 | U11 | Modernize and disposition dependency families | npm, Python, desktop, Capacitor manifests | U1 |
-| U12 | Declare supported paths and restore required CI | AGENTS, deployment docs, manifests, CI | U2–U11 |
-| U13 | Publish the verified site and release artifacts | release workflows, artifact verification, live domains | U2–U12 |
+| U12 | Declare supported paths and restore required CI | AGENTS, deployment docs, manifests, CI | U2–U11, U14–U17 |
+| U13 | Publish the verified site and release artifacts | release workflows, artifact verification, live domains | U12 |
+| U14 | Rebuild agent/deployment lifecycle ownership | lifecycle policy/service, monitor and routes | U1 |
+| U15 | Consolidate browser/desktop route and transport owners | route registry, store, approvals BFF | U14 |
+| U16 | Consolidate installable client implementations | CLI handlers, SDK resources | U7 |
+| U17 | Retire competing schema and repository systems | migrations, database bootstrap, caller inventory | U14, U10, U16 |
 
 ### Phased Delivery
 
-1. **Local foundations:** U1–U3. Close the fixable package advisories, correct build contracts, and make routing safe in local and preview builds. Container verification can proceed in parallel with the visual work.
-2. **Visible product reset:** U4–U6. Redesign the marketing site, dashboard, and Pico for desktop and mobile. Review real renders while the existing public domains remain on their current routes.
-3. **Working control plane:** U7–U10. Connect a real runtime, make first-run clients truthful, add explicit team membership, and fence background workers. These units can progress in parallel after their listed dependencies.
-4. **Dependency modernization:** U11. Review supported direct dependency lines after the immediate security fixes; run each compatible upgrade against its package contracts and isolate major migrations.
-5. **Support matrix and CI:** U12. Reconcile contributor, user, and deployment instructions with the built paths; restore required hosted checks after billing access returns.
-6. **Live release:** U13. Reassign production routing only after the rebuilt surfaces, supported images, real run, client setup, migrations, dependency disposition, and release artifacts pass their gates.
+1. **Architecture replacements first:** Verify U1’s safety prerequisite, then U14, then U7, U15 and U16. Freeze new feature work while each behavior gains one owner and its old implementation is removed. Previously completed safety/routing/visual work remains available, but it does not satisfy these structural gates.
+2. **Durable execution and retirement:** U10 and U17. Fence specialized workers, make one schema-upgrade path authoritative, and remove abandoned product/automation systems with recorded compatibility evidence.
+3. **Finish the product on that core:** Verify U3 routing before completing public U4 work; execute U5, U6, U8 and U9 in dependency order. Preserve all audiences while minimizing duplicated implementation. Complete U4's remaining public surfaces against verified behavior.
+4. **Qualify delivery:** U2, U11 and U12. These safety and packaging tasks may continue independently; release waits for their actual image/client/CI evidence.
+5. **Live release:** U13, after every prerequisite and the owner-reviewed cutover candidate pass.
 
 ### System-Wide Impact
 
@@ -383,9 +419,9 @@ Local and preview work can continue while billing or production-project access i
 
 - **Goal:** Give operators a coherent console for agents, deployments, runs, sessions, and approvals.
 - **Requirements:** R1, R2, R4–R7.
-- **Dependencies:** U4.
+- **Dependencies:** U7, U15.
 - **Files:** `app/dashboard/`, `components/app/AgentsPageClient.tsx`, `components/app/DeploymentsPageClient.tsx`, `components/dashboard/`, `components/desktop/desktopRouteConfig.ts`, `components/desktop/DesktopNativeRoutePage.tsx`, `lib/dashboardPanels.ts`, `tests/dashboardRouteMatrix.spec.ts`, `tests/dashboardAgents.spec.ts`, `tests/unit/dashboardAggregateTruth.test.ts`, `tests/unit/dashboardContinuity.test.ts`, `tests/unit/dashboardPanels.test.ts`, `tests/unit/dashboardSpaPanelHost.test.ts`, `tests/unit/desktopRouteMatrix.test.ts`.
-- **Approach:** Replace the navigation, typography, layout, and page composition while retaining direct URLs, aliases, authentication boundaries, browser routes, feature-flagged SPA routing, and Electron local-runtime controls. Consolidate route metadata only after mapping every current page and alias. Break the large desktop route switch into modules by existing responsibility; do not delete pages because they appear unused in one search. Build and review from local or preview services while production remains on its current domains.
+- **Approach:** Replace the navigation, typography, layout, and page composition while retaining direct URLs, aliases, authentication boundaries, browser routes, feature-flagged SPA routing, and Electron local-runtime controls. Use U15’s canonical route identity and transport owners. Break the large desktop route switch into modules by existing responsibility; do not delete pages because they appear unused in one search. Build and review from local or preview services while production remains on its current domains.
 - **Patterns to follow:** `DashboardRouteBoundary`, current route-matrix behavior, typed API clients, and the Electron preload bridge for privileged operations.
 - **Test scenarios:**
   - A signed-out user is redirected correctly, and a forbidden or failed lookup shows the correct state.
@@ -399,7 +435,7 @@ Local and preview work can continue while billing or production-project access i
 
 - **Goal:** Give Pico a clear, compact local setup and learning experience under the new visual system.
 - **Requirements:** R1–R4, R6.
-- **Dependencies:** U4.
+- **Dependencies:** U7, U15.
 - **Files:** `app/pico/`, `components/pico/`, `lib/pico/`, `app/api/pico/`, `tests/picoAcademyCompletion.spec.ts`, `tests/picoCheckout.spec.ts`, `tests/website.spec.ts`, `tests/unit/picoOnboardingContinuity.test.ts`, `tests/unit/picoLessonWorkspace.test.ts`, `tests/unit/picoFrontendRecoveryContracts.test.ts`.
 - **Approach:** Build a distinct Pico composition that shares semantic tokens with the main site but keeps its guided setup and learning feel. Redesign mobile as a local-first flow. Preserve locale selection, auth return paths, package generation, checkout branches, persisted proof, tutor/support handoff, and safe retry behavior.
 - **Patterns to follow:** Current Pico persistence and request-identity contracts; current UI is a behavior reference, not a visual reference.
@@ -415,14 +451,15 @@ Local and preview work can continue while billing or production-project access i
 
 - **Goal:** Create one working end-to-end operation whose command, runtime result, audit record, and user-visible run identity agree.
 - **Requirements:** R5–R7, R11.
-- **Dependencies:** U1.
+- **Dependencies:** U14.
 - **Files:** `src/api/models/models.py`, `src/api/routes/agent_runtime.py`, `src/api/routes/agents.py`, `src/api/routes/deployments.py`, `src/api/routes/runs.py`, `src/api/services/deployment_lifecycle.py`, `src/api/models/observability_models.py`, `src/api/routes/observability.py`, `app/api/dashboard/`, `components/dashboard/RunsPageClient.tsx`, `cli/commands/`, `sdk/mutx/`, `app/api/pico/`, `components/pico/`, `tests/api/test_agent_runtime_contract.py`, `tests/api/test_deployments.py`, `tests/api/test_runs.py`, `tests/api/test_observability.py`, `tests/api/test_approvals.py`, `tests/api/test_approval_enforcement.py`, `tests/api/test_audit_authorization.py`, `tests/api/test_agent_command_run_lifecycle.py` (new), `tests/test_sdk_agent_runtime_contract.py`, `tests/test_cli_runtime_commands.py`, `tests/unit/picoAutopilotDataContracts.test.ts`, `tests/picoAcademyCompletion.spec.ts`, `tests/dashboardAgents.spec.ts`.
-- **Approach:** Add the missing producer to the existing authenticated command poll/ack protocol. Correlate a new execution to the existing run identity, keep reported observability records distinguishable, and add only the smallest migration needed for correlation or delivery fencing. Mark registration, deployment request, delivery, active execution, approval wait, and terminal result distinctly. Require runtime evidence before reporting active or successful. Send stop and approved actions through the same authorized runtime boundary.
+- **Approach:** Apply KTD1, KTD8 and U14’s lifecycle owner to the authenticated command poll/ack protocol. Implement the producer and lease-backed listener against the canonical lifecycle owner. Correlate a new execution to the existing run identity, keep reported observability records distinguishable, and add only the smallest migration needed for correlation or delivery fencing. Mark registration, deployment request, delivery, active execution, approval wait, and terminal result distinctly. Require runtime evidence before reporting active or successful. Send stop and approved actions through the same authorized runtime boundary. Qualify the callback runner in `sdk/mutx/agent_runtime.py` and the planned CLI listener in `cli/services/agent_runtime.py` separately. The CLI’s first allow-listed action is `openclaw.health`; it proves a read-only action, not stop/approval. Before expanding that allowlist, bind each additional action to an executor capability and explicit target; unsupported actions remain unavailable. Leased operations require `leased-v1` capability, stable operation identity and fenced acknowledgement. At-least-once delivery requires replay-safe handlers and is not a promise of exactly-once effects.
 - **Patterns to follow:** Agent-key ownership and agent ID checks in `agent_runtime.py`, existing `AgentRun`/trace and audit records, and persisted approval enforcement. Do not use the simulated OpenClaw deployment provider as execution proof.
 - **Test scenarios:**
   - A user creates or registers a supported connected agent, starts a run, and its agent-key-authenticated poll receives exactly one operation with a stable run ID.
   - A runtime acknowledgement updates the same run and trace visible through the API, SDK, CLI, and dashboard; a rejected command produces a failed result.
-  - A repeated poll or acknowledgement does not create a second operation or let a stale result overwrite a newer attempt.
+  - A repeated poll or acknowledgement does not create a second operation or let a stale result overwrite a newer attempt. A legacy worker receives its existing protocol; a leased operation directed to an incompatible worker has an explicit unavailable/upgrade outcome.
+  - If execution succeeds and acknowledgement is lost, replay keeps the same operation identity and the handler’s documented idempotency boundary.
   - A stop request changes the connected runtime state, and an approval-required operation pauses until a separate authorized human decision.
   - A provider or runtime that is absent or disconnected leaves the operation pending, failed, or timed out with a truthful message rather than `RUNNING`.
   - Pico can link to the shared run identity when a connected runtime supplies evidence; when none is connected, its guide does not claim that the learner's machine executed the command.
@@ -433,9 +470,9 @@ Local and preview work can continue while billing or production-project access i
 
 - **Goal:** Make each documented install path reach a real, inspectable first result and clarify CLI, SDK, and backend boundaries.
 - **Requirements:** R1, R4–R7, R11.
-- **Dependencies:** U7.
+- **Dependencies:** U7, U16.
 - **Files:** `README.md`, `docs/quickstart.md`, `docs/cli.md`, `docs/sdk.md`, `docs/document-workflows.md`, `docs/deployment/quickstart.md`, `docs/deployment/cli-release.md`, `public/install.sh`, `cli/commands/doctor.py`, `cli/commands/onboard.py`, `cli/commands/setup.py`, `cli/services/documents.py`, `cli/commands/agent.py`, `cli/commands/agents.py`, `sdk/mutx/`, `examples/langchain_agent.py`, `tests/test_install_script.py`, `tests/test_cli_distribution.py`, `tests/test_sdk_distribution.py`, `tests/test_cli_current_api_contract.py`, `tests/test_cli_agents_contract.py`, `tests/test_sdk_agents_contract.py`, `tests/test_sdk_async_resources_contract.py`, `sdk/tests/test_route_inventory.py`, `tests/test_sdk_examples.py` (new).
-- **Approach:** Document the current Homebrew, PyPI CLI, SDK, repository, and hosted setup routes without calling them the same package. Pin the installer fallback to a tagged release. Resolve the CLI wheel's missing backend `src/` import for `doctor` and local document execution. Make `doctor` report the installed runtime's actual capabilities. Correct the batch-iterator description and fix examples that cannot run. Preserve old command families until every command, flag, output, and API route has a tested successor.
+- **Approach:** Document the current Homebrew, PyPI CLI, SDK, repository, and hosted setup routes without calling them the same package. Pin the installer fallback to a tagged release. Apply KTD10 to local engine capability and use U16’s canonical command handlers. Make `doctor` report the installed runtime's actual capabilities. Correct the batch-iterator description and fix examples that cannot run. Preserve old command families until every command, flag, output, and API route has a tested successor.
 - **Patterns to follow:** `tests/test_cli_current_api_contract.py`, the independent `mutx-cli` and SDK release lanes, and the sync/async SDK contract tests.
 - **Test scenarios:**
   - A clean supported install runs `mutx onboard`, reports readiness from an installed capability, connects an agent, and reaches the U7 first result.
@@ -450,12 +487,13 @@ Local and preview work can continue while billing or production-project access i
 - **Goal:** Let teams share selected MUTX resources with explicit membership while preserving private personal scope for existing accounts.
 - **Requirements:** R1, R4, R8, R11.
 - **Dependencies:** U7, U8.
-- **Files:** `src/api/models/models.py`, `src/api/models/approval.py`, `src/api/models/observability_models.py`, `src/api/auth/dependencies.py`, `src/api/security.py`, `src/api/routes/agents.py`, `src/api/routes/sessions.py`, `src/api/routes/approvals.py`, `src/api/routes/api_keys.py`, `src/api/models/migrations/versions/`, `app/api/dashboard/`, `sdk/mutx/`, `cli/`, `tests/api/test_session_tenant_isolation.py`, `tests/api/test_approval_enforcement.py`, `tests/api/test_workspace_tenant_isolation.py` (new), `tests/test_migrations.py`, `tests/test_database_runtime_repair.py`.
-- **Approach:** Add the smallest workspace and membership model that the in-product team flow needs. Give every current account a private personal scope first. Backfill existing agents, deployments, runs, sessions, approvals, keys, and linked jobs while retaining IDs, owner bindings, and session verification. Require explicit membership or sharing for team access. Apply current roles and approval entitlements at workspace scope; do not treat an optional observability `workspace_id` as authorization.
+- **Files:** `src/api/models/models.py`, `src/api/models/approval.py`, `src/api/models/observability_models.py`, `src/api/auth/dependencies.py`, `src/api/security.py`, `src/api/routes/agents.py`, `src/api/routes/sessions.py`, `src/api/routes/approvals.py`, `src/api/routes/api_keys.py`, `src/api/models/migrations/versions/`, `app/api/dashboard/`, `sdk/mutx/`, `cli/`, `tests/api/test_session_tenant_isolation.py`, `tests/api/test_approval_enforcement.py`, `tests/api/test_workspace_tenant_isolation.py` (new), `components/dashboard/` workspace-access client, `tests/workspaceMembership.spec.ts` (new), `tests/test_migrations.py`, `tests/test_database_runtime_repair.py`.
+- **Approach:** Add the smallest workspace and membership model that the in-product team flow needs. Give every current account a private personal scope first. Backfill existing agents, deployments, runs, sessions, approvals, keys, and linked jobs while retaining IDs, owner bindings, and session verification. Provide a compact dashboard flow for workspace creation, invitations, acceptance, role visibility, shared-resource access, and leaving/removal. Keep pending, denied and failed changes explicit. Require explicit membership or sharing for team access. Apply current roles and approval entitlements at workspace scope; do not treat an optional observability `workspace_id` as authorization.
 - **Patterns to follow:** Current `require_roles` principal resolution, user ownership helpers, `tests/api/test_session_tenant_isolation.py`, and the session HMAC ownership contract.
 - **Test scenarios:**
   - An existing user migrates to personal scope with the same agent/run/session IDs, history, keys, and accessible data.
   - A member can perform only the actions allowed by their workspace role and existing plan entitlement.
+  - Through the dashboard, an authorized operator creates shared scope and an invitation; the invited member accepts and sees their role. Empty membership, pending/denied invitations and failed mutations have explicit outcomes; leaving/removal revokes access.
   - A removed member loses access to shared records and keys without changing another member's personal data.
   - A caller-supplied foreign workspace ID cannot reveal or reassign a resource.
   - An interrupted or repeated migration produces no duplicate membership and preserves row counts.
@@ -468,13 +506,13 @@ Local and preview work can continue while billing or production-project access i
 - **Requirements:** R5, R6, R10, R11.
 - **Dependencies:** U7.
 - **Files:** `src/api/services/document_jobs.py`, `src/api/services/reasoning_jobs.py`, `src/api/document_worker.py`, `src/api/reasoning_worker.py`, `src/api/models/`, `tests/api/test_queue_worker_supervision.py`, `tests/api/test_documents.py`, `tests/api/test_reasoning.py`, `tests/api/test_queue_worker_concurrency.py` (new).
-- **Approach:** Add an atomic claim and owner token to queued jobs. Fence heartbeat, event, artifact, and terminal writes with the current token. Preserve document and reasoning schemas and drivers. Extract a shared lifecycle helper only after both services pass the same concurrency contract.
+- **Approach:** Add an atomic claim and owner token to queued jobs. Fence heartbeat, event, artifact, and terminal writes with the current token. Preserve document and reasoning schemas and drivers. Extract a shared lifecycle helper only after both services pass the same concurrency contract. Claim fencing protects database writes; it does not guarantee provider-side idempotency. Before redispatching an ambiguous external request, require an idempotent provider operation or reconcile its outcome. Otherwise retain an explicit unknown outcome and do not automatically repeat the request.
 - **Patterns to follow:** Existing claim-token and stale-running recovery fields, adapted so claim ownership reaches finalization.
 - **Test scenarios:**
   - Two workers racing for the same queued job yield one active claimant.
   - A stale claimant cannot write an event, artifact, or terminal result after a new claim takes ownership.
   - A long-running job renews ownership; an abandoned job becomes reclaimable only after its lease expires.
-  - A retried external operation uses a stable attempt identity and does not duplicate the side effect.
+  - A retried external operation uses a stable attempt identity and does not duplicate the side effect. If the first provider request may have succeeded before persistence failed, an unsupported-idempotency provider is not automatically called a second time.
 - **Verification:** Concurrent worker tests show one owner at a time and no stale writes. Existing supervision, document, and reasoning tests retain their domain behavior.
 - **Execution note:** Add characterization coverage before extracting shared worker code.
 
@@ -498,7 +536,7 @@ Local and preview work can continue while billing or production-project access i
 
 - **Goal:** Leave current source, contributor instructions, user docs, and hosted checks aligned with the install and deployment paths that passed qualification.
 - **Requirements:** R9–R11.
-- **Dependencies:** U2–U11.
+- **Dependencies:** U2–U11, U14–U17.
 - **Files:** `AGENTS.md`, `docs/ui-port-progress.md`, `docs/deployment/`, `docs/api/openapi.json`, `app/types/api.ts`, `.github/workflows/ci.yml`, `infrastructure/kubernetes/`, `infrastructure/helm/`, `infrastructure/terraform/`, `tests/test_deploy_manifest_truth.py`, `tests/test_frontend_container_contract.py`, `tests/test_python_dependency_contract.py`.
 - **Approach:** Publish a support matrix from images and clients actually verified. Remove or relabel stale manifests only after checking repository consumers, external links, and Terraform state. Update agent instructions, API types, and user docs from current manifests and mounted routes. Re-enable required CI only after billing eligibility returns.
 - **Patterns to follow:** Current package manifests, scripts/dev.sh, validated deployment configurations, and generated OpenAPI contracts.
@@ -513,7 +551,7 @@ Local and preview work can continue while billing or production-project access i
 
 - **Goal:** Publish a truthful MUTX release with working product domains and downloadable, verified artifacts.
 - **Requirements:** R9, R11.
-- **Dependencies:** U2–U12.
+- **Dependencies:** U12.
 - **Files:** `.github/workflows/release.yml`, `desktop/scripts/release-artifact-utils.js`, `tests/test_release_workflow_contract.py`, `tests/releaseFrontend.spec.ts`, `scripts/verify-production-release.sh`, `scripts/verify-release-http.mjs`.
 - **Approach:** Derive desktop artifact names from one manifest. Keep signing, notarization, launch, remote-byte, publication, and live-host checks as separate gates. Confirm provider ownership and preview the replacement before changing domain assignments. Preserve a rollback target.
 - **Patterns to follow:** Existing immutable release identity, checksum, signature, notarization, and HTTP verification scripts.
@@ -524,19 +562,95 @@ Local and preview work can continue while billing or production-project access i
   - The rollback target restores the previous truthful service if a host or artifact check fails.
 - **Verification:** Signed artifacts, verified remote bytes, active domains, and download paths all work. The owner reviews the concrete preview and rollback path before the production cutover.
 
+### U14. Rebuild agent and deployment lifecycle ownership
+
+- **Goal:** Make requested actions and authenticated runtime evidence converge on one transition owner.
+- **Requirements:** R4–R7, R10, R11; KTD2, KTD7–KTD9.
+- **Dependencies:** U1.
+- **Files:** `src/api/domain/lifecycle.py` (new), `src/api/services/deployment_lifecycle.py`, `src/api/services/monitoring.py`, `src/api/services/monitor.py`, `src/api/routes/agents.py`, `src/api/routes/deployments.py`, `src/api/routes/agent_runtime.py`, `src/api/routes/ingest.py`, `tests/api/test_ingest.py`, models/migrations and generated contracts when additive intent fields are required, `docs/adr/006-agent-runtime-architecture.md`, `tests/api/test_lifecycle_authority.py` (new), `tests/api/test_agents.py`, `tests/api/test_deployments.py`, `tests/api/test_agent_runtime_contract.py`, monitor tests, `tests/test_architecture_boundaries.py` (new).
+- **Approach:**
+  1. Characterize each current writer, principal, record, executor and completion signal. Start by deleting monitor-based fake provisioning and recovery; keep genuine stale-heartbeat detection and monitor supervision.
+  2. Implement pure evidence/transition policy and move persistent state changes into the existing lifecycle service. Route, ingest and monitor adapters call that owner; remove their inline transition branches. Ingest submissions retain their wire contracts as reported data and cannot overwrite observed state without authenticated executor evidence.
+  3. Preserve wire IDs and supported request shapes. Represent desired action separately from observed state through additive fields; use a monotonic target revision on intent, commands and qualified runtime observations. Bind deployment evidence to an explicit deployment ID, and preserve old rows without inventing historical evidence. Agent-wide stop targets all active deployments; deployment actions target one. Derive the agent observation from current target-bound deployments rather than whichever row was created last.
+  4. Preserve authenticated runtime heartbeats and real provider acknowledgements. A command-listener heartbeat proves connectivity, not running agent work or deployment readiness. Legacy unbound heartbeats remain liveness reports and cannot override a newer intent or promote an unrelated deployment. Unsupported provider operations return a truthful pending/unavailable result; no simulator substitutes for an executor.
+  5. Enforce the moved boundary and supersede the historical runtime ADR with current authority.
+- **Execution note:** Begin with failing behavioral tests that an old creating/failed agent cannot become running merely because time passed. Commit bounded replacements with their retired paths rather than accumulating a second implementation.
+- **Test scenarios:**
+  - Covers AE2. Deployment creation without an executor records intent and cannot claim running or synthesize a heartbeat/node ID.
+  - An authenticated runtime heartbeat changes the owned agent and eligible deployment; a listener heartbeat cannot mark provisioning complete.
+  - A stale real heartbeat marks the observation unavailable/failed, emits one attributable event, and never auto-restores running after a delay.
+  - Covers AE3. A stop/restart intent or late/unbound heartbeat cannot overwrite a newer target revision; explicit stop remains pending until executor confirmation.
+  - With multiple deployments, stopping or restarting one cannot revive an agent-wide stop or overwrite another deployment’s observation.
+  - Existing stored IDs, owner authorization, version history and foreign-user denial survive the replacement.
+- **Verification:** One transition service owns active agent/deployment state writes. No production monitor can synthesize execution or recovery. Boundary checks and affected API/monitor/migration contracts pass; qualified executor outcomes are distinguished from recorded intent.
+
+### U15. Consolidate browser and desktop adapters
+
+- **Goal:** Remove competing route identity, dead store network paths and duplicated approval transport.
+- **Requirements:** R4, R7, R10, R11; KTD4, KTD7, KTD9.
+- **Dependencies:** U14.
+- **Files:** `lib/dashboardPanels.ts`, `components/desktop/desktopRouteConfig.ts`, `components/dashboard/dashboardNav.ts`, `lib/navigation.ts`, `lib/store.ts`, `components/dashboard/dashboardSpaBoot.ts`, `components/dashboard/DashboardSpaPanelHost.tsx`, `components/app/http.ts`, `app/api/dashboard/approvals/`, `app/api/pico/approvals/`, shared approval contract, `tests/unit/dashboardPanels.test.ts`, `tests/unit/desktopRouteMatrix.test.ts`, `tests/unit/navigation.test.ts`, `tests/unit/dashboardSpaPanelHost.test.ts`, `tests/unit/store.test.ts`, approval route tests.
+- **Approach:**
+  1. Write route path, panel ID, aliases and SPA eligibility once; derive reverse/nav maps. Keep desktop icon/order/stage/surface metadata in its current owner.
+  2. Remove store fetch/boot actions after the caller audit, keeping active workspace preferences. Move compatible startup reads to the existing JSON helper and stop shell refetches of feature-owned inventories.
+  3. Move approval validation out of Pico’s route namespace and share existing backend transport. Preserve both public namespaces and Pico-specific conflict normalization.
+- **Test scenarios:**
+  - Every current panel and alias resolves to its previous path; unknown/deep routes remain excluded from SPA substitution.
+  - Safe `next` redirects retain allowed query strings and reject external/unsafe destinations; desktop stage and surface behavior remain unchanged.
+  - Store preference persistence works after dead fetching actions are removed; startup no longer duplicates feature inventory requests.
+  - Dashboard and Pico approvals preserve auth, refresh cookies, roles, pagination and their established conflict responses.
+- **Verification:** One handwritten route identity catalog, one approval schema/transport and no production caller of retired fetch paths. Existing route/request contracts and browser matrix pass.
+
+### U16. Make CLI and SDK thin installable clients
+
+- **Goal:** Keep supported command/resource contracts with one implementation per action.
+- **Requirements:** R4, R5, R7, R10, R11; KTD4, KTD9, KTD10.
+- **Dependencies:** U7.
+- **Files:** `cli/main.py`, `cli/commands/auth.py`, `cli/commands/agent.py`, `cli/commands/agents.py`, `cli/commands/deployment.py`, `cli/commands/deploy.py`, CLI local-capability services, `sdk/mutx/`, `pyproject.toml`, `sdk/pyproject.toml`, `docs/cli.md`, `docs/sdk.md`, distribution and CLI/SDK resource contract tests.
+- **Approach:**
+  1. Move retained verbs into documented canonical groups. Legacy names dispatch to the same handlers, preserving material differences in provisioning, flags, prompts and output.
+  2. Share sync/async SDK payload and response shaping without replacing their execution model. Remove unused required instrumentation or make it an explicit integration extra after a caller check.
+  3. Eliminate backend imports from advertised installed-only capabilities under KTD10; retain the distribution/license boundary in KTD9.
+- **Test scenarios:**
+  - Canonical and compatibility spellings make equivalent authorized API calls with their existing flags and exit statuses.
+  - OpenClaw creation still follows its provisioning flow rather than becoming an alias for a materially different operation.
+  - Clean CLI/SDK wheels import and execute their supported APIs without backend source; unavailable local mode fails before creating a job.
+  - Sync and async resources retain equal payloads, error handling and returned IDs.
+- **Verification:** No duplicate action bodies, installed clients have no undeclared backend dependency, and package identity/license and resource-contract tests pass.
+
+### U17. Retire competing persistence and abandoned systems
+
+- **Goal:** Leave a supportable repository whose remaining systems each serve a retained workflow.
+- **Requirements:** R4, R10, R11; KTD4, KTD7–KTD9.
+- **Dependencies:** U14, U10, U16.
+- **Files:** `src/api/database.py`, Alembic migrations, process-local runtime/registry modules and governance callers, `scripts/autonomy/`, `agents/`, `autonomy_stubs/`, `.github/workflows/`, deployment templates, duplicated Pico content, `docs/development/architecture.md` (new), `tests/test_architecture_boundaries.py`, migration/runtime/governance/content-generation contracts.
+- **Approach:**
+  1. Inventory every tracked top-level path with production callers, retained user capability, data/state ownership and removal evidence. Separate generated/lock/test counts from product-source savings.
+  2. Migrate empty/current/legacy schemas through Alembic fixtures, then remove competing production bootstrap repairs. Keep restoration and existing data IDs verified.
+  3. Transfer retained governed tool behavior before retiring unwired process-local runtime/registry modules. Resolve documented embedding callers explicitly.
+  4. Delete abandoned maintenance scaffolding and unused prototypes; retire unsupported deployment copies only after external/state checks. Consolidate duplicated content through its existing generator.
+  5. Record final owners, retired paths, compatibility adapters and remaining justified exceptions in one architecture document; require boundary checks in CI.
+- **Test scenarios:**
+  - Empty/current/legacy databases reach the same target through repeatable upgrades without losing rows or IDs.
+  - Retained governed tool execution still blocks an unapproved action after its owner moves.
+  - No active import, workflow, documented entry point or generated content build refers to a retired path.
+  - Boundary checks reject a reintroduced backend import in an installed client or a second lifecycle/schema owner.
+- **Verification:** Every tracked top-level area has a disposition, each deletion has caller/data/license/state evidence, and the final source-change report identifies removed implementations. Existing auth, migration, governance and package contracts pass.
+
 ---
 
 ## Verification Contract
 
 | Gate | Evidence required | Scope |
 |---|---|---|
-| Frontend unit and type gates | `npm test`, `npm run typecheck`, `npm run lint` | U3–U6, U8, U11, U12 |
-| Frontend production build | `npm run build` completes with standalone docs and fonts | U2–U6, U11, U12 |
-| Website and dashboard flows | `npx playwright test tests/website.spec.ts` and `npm run test:e2e:dashboard` | U3–U6, U8 |
+| Architecture and retirement | `tests/test_architecture_boundaries.py`; caller inventory, canonical-writer audit, generated-contract parity and per-area source delta | U14–U17 |
+| Frontend unit and type gates | `npm test`, `npm run typecheck`, `npm run lint` | U3–U6, U8, U11, U12, U15 |
+| Frontend production build | `npm run build` completes with standalone docs and fonts | U2–U6, U11, U12, U15 |
+| Website and dashboard flows | `npx playwright test tests/website.spec.ts` and `npm run test:e2e:dashboard` | U3–U6, U8, U15 |
 | Release browser smoke | `npm run test:e2e:release` and a real-domain HTTP/browser check | U3, U4, U13 |
-| Python tests and style | `python -m pytest`, `ruff check src/api cli sdk`, `ruff format --check src/api cli sdk src/security` | U1, U2, U7–U12 |
-| API/client contract | `tests/test_cli_current_api_contract.py`, SDK route/resource tests, OpenAPI generation and type diff | U7–U9, U12 |
-| Data and worker safety | Migration, tenant-isolation, approval, job-concurrency, stale-claim tests | U7, U9, U10 |
+| Python tests and style | `python -m pytest`, `ruff check src/api cli sdk`, `ruff format --check src/api cli sdk src/security` | U1, U2, U7–U12, U14, U16, U17 |
+| API/client contract | `tests/test_cli_current_api_contract.py`, SDK route/resource tests, OpenAPI generation and type diff | U7–U9, U12, U14, U16 |
+| Data and worker safety | Migration, tenant-isolation, approval, job-concurrency, stale-claim tests | U7, U9, U10, U14, U17 |
 | Container qualification | Actual builds for the Railway-selected backend, local full stack, frontend, and production service images | U2, U12 |
 | Native release qualification | Arm64 and x64 packaging, signing/notarization, launch smoke, checksum and remote-byte verification | U11, U13 |
 | CI and security | Required GitHub workflows execute after billing access is restored; fixed advisories are clear and no-fix items are risk-reviewed | U1, U2, U11, U12, U13 |
@@ -556,7 +670,9 @@ A GitHub job blocked by billing does not pass or fail the code. A stopped local 
 
 ## Definition of Done
 
-- Every U-ID has landed as a reviewable change with the tests and verification listed for it.
+- Every U-ID has landed as a reviewable change with the tests and verification listed for it. Architecture units U14–U17 are required; visual changes do not substitute for them.
+- Each rebuilt behavior has one canonical owner. Replaced implementations are deleted, compatibility adapters contain no independent business logic, and CI enforces the moved module boundaries.
+- Every tracked top-level area has a keep/replace/delete disposition with retained capability and deletion evidence. Source savings are measured against the baseline, with generated files, locks and tests reported separately.
 - All three audience paths remain supported. Personal data, auth, package identities, public URLs, Pico progress, lesson evidence, and checkout behavior survive the changes.
 - A connected runtime performs a real operation; start, approval, stop, result, and audit evidence agree across the supported UI and API.
 - The public site, dashboard, and Pico are visibly redesigned. Desktop and mobile are reviewed separately, with the cinematic site story mapped to actual product behavior.
