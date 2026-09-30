@@ -7,12 +7,16 @@ test('production frontend renders the release route and serves a hashed asset', 
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' })
 
   expect(response?.status()).toBe(200)
+  const hero = page.locator('section[aria-labelledby="home-title"]')
   await expect(
-    page.getByRole('heading', { name: /read the governed path\. hold the line\./i })
+    hero.getByRole('heading', { name: /inspect runs\. control tool calls\./i })
   ).toBeVisible()
-  await expect(
-    page.getByLabel(/example mutx governed deployment record/i)
-  ).toBeVisible()
+  const demoLink = hero.getByRole('link', { name: /explore the demo/i })
+  await expect(demoLink).toBeVisible()
+  await expect(demoLink).toHaveAttribute('href', '/control')
+  const quickstartLink = hero.getByRole('link', { name: /read the quickstart/i })
+  await expect(quickstartLink).toBeVisible()
+  await expect(quickstartLink).toHaveAttribute('href', '/docs/deployment/quickstart')
 
   const assetPath = await page
     .locator('script[src*="/_next/static/"], link[href*="/_next/static/"]')

@@ -86,7 +86,7 @@ describe('public and authentication QA contracts', () => {
 
     expect(navigation).toContain('const productActive = item.label === "Product"')
     expect(navigation).toContain('const current = !item.external')
-    expect(navigation).toContain('aria-current={current ? "page" : undefined}')
-    expect(navigation).not.toContain('aria-current={active ? "page" : undefined}')
+    expect(navigation).toContain('aria-current={item.current ? "page" : undefined}')
+    expect(navigation).not.toContain('aria-current={item.active ? "page" : undefined}')
   })
 })

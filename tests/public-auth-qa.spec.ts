@@ -124,7 +124,8 @@ test.describe('Public and authentication product QA', () => {
     await expect(productLink).not.toHaveAttribute('aria-current');
 
     await page.goto('/ai-agent-control-plane');
-    await expect(productLink).toHaveAttribute('aria-current', 'page');
+    await expect(productLink).toHaveAttribute('href', '/control');
+    await expect(productLink).not.toHaveAttribute('aria-current');
   });
 
   test('reduced-motion preference collapses public page animation durations', async ({ page }) => {

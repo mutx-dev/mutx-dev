@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { getPicoUrl } from "@/lib/seo";
 
 import styles from "./PublicFooter.module.css";
 
@@ -11,28 +12,23 @@ const FOOTER_GROUPS = [
   {
     title: "Product",
     links: [
-      { label: "Control plane", href: "/ai-agent-control-plane", external: false },
-      { label: "Monitoring", href: "/ai-agent-monitoring", external: false },
-      { label: "Guardrails", href: "/ai-agent-guardrails", external: false },
-      { label: "Approvals", href: "/ai-agent-approvals", external: false },
+      { label: "Browser preview", href: "/control", external: false },
+      { label: "Dashboard", href: "/dashboard", external: false },
     ],
   },
   {
-    title: "Operate",
+    title: "Get started",
     links: [
-      { label: "Dashboard", href: "/dashboard", external: false },
+      { label: "Deployment quickstart", href: "/docs/deployment/quickstart", external: false },
       { label: "Documentation", href: "/docs", external: false },
-      { label: "Download", href: "/download", external: false },
-      { label: "Releases", href: "/releases", external: false },
     ],
   },
   {
     title: "Ecosystem",
     links: [
+      { label: "PicoMUTX", href: getPicoUrl(), external: true },
       { label: "GitHub", href: "https://github.com/mutx-dev/mutx-dev", external: true },
-      { label: "Pico", href: "https://pico.mutx.dev", external: true },
-      { label: "Contact", href: "/contact", external: false },
-      { label: "Security", href: "/security", external: false },
+      { label: "Releases", href: "/releases", external: false },
     ],
   },
 ] as const;
@@ -43,13 +39,13 @@ export function PublicFooter({ className, showCallout = true }: PublicFooterProp
       {showCallout ? (
         <div className={styles.callout}>
           <div>
-            <p>Next run / 001</p>
-            <h2>See the move before the aftermath.</h2>
+            <p>Explore MUTX</p>
+            <h2>Start with a product preview.</h2>
           </div>
           <div className={styles.calloutAction}>
-            <p>Start on your Mac, then bring the control plane to your own runtime.</p>
-            <Link href="/download">
-              Download MUTX <ArrowRight className={styles.directionalIcon} aria-hidden="true" />
+            <p>See the browser demonstration or follow the local setup guide.</p>
+            <Link href="/control">
+              Explore the product <ArrowRight className="rtl-directional-icon" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -58,15 +54,11 @@ export function PublicFooter({ className, showCallout = true }: PublicFooterProp
       <div className={styles.footerMain}>
         <div className={styles.identity}>
           <Link href="/" className={styles.brand} aria-label="MUTX home">
-            <span aria-hidden="true">MX</span>
+            <span aria-hidden="true">M</span>
             <strong>MUTX</strong>
           </Link>
-          <p>
-            The source-available control plane for observable, governed agent work.
-          </p>
-          <span className={styles.availability}>
-            <i aria-hidden="true" /> macOS · API · CLI
-          </span>
+          <p>Run records, tool calls, and approval workflows for AI agents.</p>
+          <span className={styles.availability}>Source available · CLI · SDK</span>
         </div>
 
         <div className={styles.linkGrid}>
@@ -87,12 +79,12 @@ export function PublicFooter({ className, showCallout = true }: PublicFooterProp
       </div>
 
       <div className={styles.footerBottom}>
-        <p>© MUTX 2026 / Source available</p>
+        <p>© MUTX 2026 · Source available</p>
         <nav aria-label="Legal navigation">
           <Link href="/privacy-policy">Privacy</Link>
           <Link href="/security">Security</Link>
+          <Link href="/contact">Contact</Link>
         </nav>
-        <p>Observe → Bound → Approve → Execute → Prove</p>
       </div>
     </footer>
   );

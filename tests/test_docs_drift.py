@@ -141,7 +141,8 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
     readme = read_text("README.md")
     quickstart = read_text("docs/deployment/quickstart.md")
     install_surface = read_text("components/site/InstallSurface.tsx")
-    landing_content = read_text("components/site/marketing/RebrandHomePage.tsx")
+    landing_content = read_text("components/site/marketing/ProductHomePage.tsx")
+    landing_content += read_text("components/site/marketing/ProductRevealStage.tsx")
     landing_content += read_text("components/site/PublicFooter.tsx")
     install_script = read_text("public/install.sh")
 
@@ -162,10 +163,13 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
         "'personal_assistant' or 'Personal Assistant'."
     )
 
-    assert "/download" in landing_content
-    assert "/releases" in landing_content
-    assert "Check Mac availability" in landing_content
-    assert "Releases" in landing_content
+    assert "/control" in landing_content
+    assert "/dashboard" in landing_content
+    assert "/docs/deployment/quickstart" in landing_content
+    assert "/pico" in landing_content
+    assert "Explore the demo" in landing_content
+    assert "Read the quickstart" in landing_content
+    assert "Deployment quickstart" in landing_content
     assert "run_setup_handoff" in install_script
     assert "MUTX_OPEN_TUI" in install_script
     assert "mutx login" not in install_script
