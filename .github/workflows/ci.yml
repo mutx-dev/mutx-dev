@@ -457,8 +457,16 @@ jobs:
         include:
           - image: frontend
             dockerfile: infrastructure/docker/Dockerfile.frontend
+            target: runner
           - image: api
             dockerfile: infrastructure/docker/Dockerfile.api.production
+            target: production
+          - image: railway-backend
+            dockerfile: infrastructure/docker/Dockerfile.backend
+            target: production
+          - image: local-api
+            dockerfile: infrastructure/docker/Dockerfile.api
+            target: development
 
     steps:
       - name: Check out repository
@@ -466,8 +474,16 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build production image
-        run: docker build --file '${{ matrix.dockerfile }}' --tag 'mutx-ci-${{ matrix.image }}:${{ github.sha }}' .
+      - name: Build exact image
+        run: docker build --file '${{ matrix.dockerfile }}' --target '${{ matrix.target }}' --tag 'mutx-ci-${{ matrix.image }}:${{ github.sha }}' .
+
+      - name: Smoke API image imports
+        if: matrix.image == 'railway-backend' || matrix.image == 'local-api'
+        run: >-
+          docker run --rm --env ENVIRONMENT=development
+          --entrypoint /opt/venv/bin/python
+          'mutx-ci-${{ matrix.image }}:${{ github.sha }}'
+          -c 'import src.api.main'
 
       - name: Smoke standalone frontend image
         if: matrix.image == 'frontend'

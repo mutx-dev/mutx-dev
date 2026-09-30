@@ -173,7 +173,15 @@ def test_ci_versions_and_monorepo_gates_match_supported_runtimes() -> None:
         assert command in infrastructure_commands
 
     images = jobs["container-scan"]["strategy"]["matrix"]["include"]
-    assert {image["image"] for image in images} == {"api", "frontend"}
+    assert {
+        image["image"]: (image["dockerfile"], image["target"])
+        for image in images
+    } == {
+        "api": ("infrastructure/docker/Dockerfile.api.production", "production"),
+        "frontend": ("infrastructure/docker/Dockerfile.frontend", "runner"),
+        "railway-backend": ("infrastructure/docker/Dockerfile.backend", "production"),
+        "local-api": ("infrastructure/docker/Dockerfile.api", "development"),
+    }
     trivy_scan = next(
         step
         for step in jobs["container-scan"]["steps"]
