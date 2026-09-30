@@ -62,11 +62,11 @@ describe('public and authentication QA contracts', () => {
     const authCss = source('components/site/AuthSurface.module.css')
     const marketingCss = source('components/site/marketing/MarketingCore.module.css')
 
-    expect(authCss).toContain('color: #858178')
-    expect(authCss).toContain('color: #6b675f')
+    expect(authCss).toContain('color: #969f99')
+    expect(authCss).toContain('color: #5b625e')
     expect(marketingCss).toMatch(/::placeholder\s*\{\s*color:\s*#6b675f;/)
-    expect(contrastRatio('#858178', '#0b0b0b')).toBeGreaterThanOrEqual(4.5)
-    expect(contrastRatio('#6b675f', '#f3f0e8')).toBeGreaterThanOrEqual(4.5)
+    expect(contrastRatio('#969f99', '#0b0e0f')).toBeGreaterThanOrEqual(4.5)
+    expect(contrastRatio('#5b625e', '#f0efe9')).toBeGreaterThanOrEqual(4.5)
   })
 
   it('keeps the contact form bounded and gives success a next action', () => {

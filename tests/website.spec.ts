@@ -52,10 +52,11 @@ async function expectRouteSurfaceSplit(page: Page) {
   expect(metrics.crossingPanel).toBe(false);
 }
 
-async function expectAuthLedger(page: Page, variant: 'access' | 'recovery') {
+async function expectAuthSurface(page: Page, variant: 'access' | 'recovery') {
   await expect(page.getByTestId('public-auth-nav')).toBeVisible();
   await expect(page.locator(`main[data-auth-variant="${variant}"]`)).toBeVisible();
-  await expect(page.getByText(/identity ledger/i)).toBeVisible();
+  await expect(page.locator('main h1')).toBeVisible();
+  await expect(page.getByText(/identity ledger|secure channel/i)).toHaveCount(0);
 }
 
 async function getAverageRgb(locator: Locator) {
@@ -819,7 +820,7 @@ test.describe('mutx.dev QA', () => {
     expect(await getAverageRgb(page.getByText(/^effective date$/i))).toBeLessThan(140);
 
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'access');
+    await expectAuthSurface(page, 'access');
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByLabel(/^password$/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
@@ -828,7 +829,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: /continue with discord/i })).toBeVisible();
 
     await page.goto('/register', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'access');
+    await expectAuthSurface(page, 'access');
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByLabel(/^password$/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /sign up/i })).toBeVisible();
@@ -839,8 +840,8 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/verify-email?email=operator%40mutx.dev&next=%2Fdashboard%2Fwebhooks', {
       waitUntil: 'domcontentloaded',
     });
-    await expectAuthLedger(page, 'recovery');
-    await expect(page.getByText(/we sent a verification link to operator@mutx\.dev\./i)).toBeVisible();
+    await expectAuthSurface(page, 'recovery');
+    await expect(page.getByText(/check operator@mutx\.dev for your verification link\./i)).toBeVisible();
     await expect(page.getByRole('button', { name: /resend verification/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /^sign in$/i })).toHaveAttribute(
       'href',
@@ -848,21 +849,34 @@ test.describe('mutx.dev QA', () => {
     );
 
     await page.goto('/forgot-password', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'recovery');
+    await expectAuthSurface(page, 'recovery');
     await expect(page.getByText(/send reset instructions/i)).toBeVisible();
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /send reset link/i })).toBeVisible();
 
     await page.goto('/reset-password', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'recovery');
+    await expectAuthSurface(page, 'recovery');
     await expect(page.getByText(/invalid reset link/i)).toBeVisible();
 
     await page.goto('/reset-password?token=test-token', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'recovery');
-    await expect(page.getByText(/choose a new password/i)).toBeVisible();
+    await expectAuthSurface(page, 'recovery');
+    await expect(page.getByRole('heading', { name: 'Choose a new password', exact: true })).toBeVisible();
     await expect(page.getByLabel(/new password/i)).toBeVisible();
     await expect(page.getByLabel(/confirm password/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /reset password/i })).toBeVisible();
+  });
+
+  test('token-only expired verification points back to sign-in', async ({ page }) => {
+    await page.route('**/api/auth/verify-email', route => route.fulfill({
+      status: 400,
+      contentType: 'application/json',
+      body: JSON.stringify({ detail: 'Verification link expired' }),
+    }));
+    await page.goto('/verify-email?token=expired-example', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Verification failed', exact: true })).toBeVisible();
+    await expect(page.getByText('Return to sign in. If your email still needs verification, you can request a new link there.')).toBeVisible();
+    await expect(page.getByRole('button', { name: /resend verification/i })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toHaveAttribute('href', '/login?next=%2Fdashboard');
   });
 
   test('pico root exposes the live product path, plans, and durable support intake', async ({ page }) => {

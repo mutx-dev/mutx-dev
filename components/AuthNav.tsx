@@ -34,10 +34,10 @@ export function AuthNav({ hostVariant = 'default' }: AuthNavProps) {
     <header className={styles.header} data-testid="public-auth-nav">
       <nav className={styles.nav} aria-label={isPico ? picoAuthT('eyebrow') : 'Account navigation'}>
         <Link href="/" className={styles.brand} aria-label="MUTX home">
-          <span className={styles.mark} aria-hidden="true">{isPico ? 'PX' : 'MX'}</span>
+          <span className={styles.mark} aria-hidden="true">{isPico ? 'PX' : 'M'}</span>
           <span className={styles.brandCopy}>
             <strong>{isPico ? 'Pico / MUTX' : 'MUTX'}</strong>
-            <small>{isPico ? picoAuthT('eyebrow') : 'Identity checkpoint'}</small>
+            <small>{isPico ? picoAuthT('eyebrow') : 'Account'}</small>
           </span>
         </Link>
 
@@ -47,8 +47,8 @@ export function AuthNav({ hostVariant = 'default' }: AuthNavProps) {
           ))}
         </div>
 
-        <Link href={isPico ? '/onboarding' : '/download'} className={styles.action}>
-          {isPico ? picoNavT('cta') : 'Download'}
+        <Link href={isPico ? '/onboarding' : '/control'} className={styles.action}>
+          {isPico ? picoNavT('cta') : 'Explore the demo'}
           <ArrowRight className={styles.directionalIcon} aria-hidden="true" />
         </Link>
       </nav>
