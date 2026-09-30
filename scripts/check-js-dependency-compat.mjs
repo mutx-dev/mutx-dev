@@ -85,11 +85,32 @@ for (const manifestPath of packageManifests.filter((path) => readManifest(path).
   }
 }
 
+// Capacitor's Xcode writer uses uuid.v4 through CommonJS. Keep that concrete
+// contract when replacing its vulnerable uuid dependency with the patched line.
+const xcodeManifests = packageManifests.filter((path) => readManifest(path).name === "xcode");
+if (xcodeManifests.length === 0) {
+  throw new Error("No installed xcode writer found for the maintained Capacitor contract");
+}
+for (const manifestPath of xcodeManifests) {
+  const xcodeRequire = createRequire(manifestPath);
+  const { version } = readManifest(xcodeRequire.resolve("uuid/package.json"));
+  if (!/^\d+\.\d+\.\d+$/.test(version) || compareVersions(version, "11.1.1") < 0) {
+    throw new Error(`Unpatched xcode UUID ${version} at ${manifestPath}`);
+  }
+  const xcode = require(dirname(manifestPath));
+  const project = xcode.project("compatibility-probe.pbxproj");
+  project.hash = { project: { objects: {} } };
+  const ids = Array.from({ length: 8 }, () => project.generateUuid());
+  if (ids.some((id) => !/^[A-F0-9]{24}$/.test(id)) || new Set(ids).size !== ids.length) {
+    throw new Error(`xcode failed its UUID compatibility probe at ${manifestPath}`);
+  }
+}
+
 const braceVersions = [
   ...new Set(braceManifests.map((path) => readManifest(path).version)),
 ]
   .sort(compareVersions)
   .join(", ");
 console.log(
-  `Dependency compatibility passed: brace-expansion ${braceVersions}; ${minimatchManifests.length} minimatch installation(s) probed.`,
+  `Dependency compatibility passed: brace-expansion ${braceVersions}; ${minimatchManifests.length} minimatch and ${xcodeManifests.length} xcode installation(s) probed.`,
 );
