@@ -326,6 +326,8 @@ export function getPageTwitterImageUrl(
 }
 
 export function getDefaultSocialBadge(path = '/', host?: string | null) {
+  if (path === '/infrastructure' || path === '/infrastructure/') return 'INFRASTRUCTURE GUIDE'
+
   const section = resolveSocialSection(path, host)
 
   switch (section) {
@@ -352,25 +354,25 @@ export function getDefaultSocialBadge(path = '/', host?: string | null) {
     case 'sdk':
       return 'SDK'
     case 'governance':
-      return 'GOVERNANCE'
+      return 'ROUTE POLICY'
     case 'approvals':
-      return 'APPROVALS'
+      return 'HUMAN DECISIONS'
     case 'audit':
-      return 'AUDIT'
+      return 'GOVERNED EVIDENCE'
     case 'control':
       return 'CONTROL PLANE'
     case 'cost':
-      return 'COST'
+      return 'REPORTED USAGE'
     case 'deployment':
-      return 'DEPLOYMENT'
+      return 'LIFECYCLE RECORDS'
     case 'guardrails':
-      return 'GUARDRAILS'
+      return 'TOOL BOUNDARIES'
     case 'infrastructure':
-      return 'INFRASTRUCTURE'
+      return 'REPORTED SIGNALS'
     case 'monitoring':
-      return 'OBSERVABILITY'
+      return 'SUBMITTED EVENTS'
     case 'reliability':
-      return 'RELIABILITY'
+      return 'HEALTH SIGNALS'
     case 'academy':
       return 'ACADEMY'
     case 'tutor':

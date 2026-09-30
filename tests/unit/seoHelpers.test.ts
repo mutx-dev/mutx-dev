@@ -301,6 +301,19 @@ describe('surface resolution helpers', () => {
     expect(getDefaultSocialBadge('/control', 'app.mutx.dev')).toBe('CONTROL PLANE')
     expect(getDefaultSocialBadge('/whitepaper')).toBe('WHITEPAPER')
     expect(getDefaultSocialBadge('/sdk')).toBe('SDK')
+    expect(getDefaultSocialBadge('/infrastructure')).toBe('INFRASTRUCTURE GUIDE')
+    expect(getDefaultSocialBadge('/ai-agent-infrastructure')).toBe('REPORTED SIGNALS')
+  })
+})
+
+describe('infrastructure social previews', () => {
+  it('distinguishes the deployment guide from the agent infrastructure product story', () => {
+    for (const [path, badge] of [['/infrastructure', 'INFRASTRUCTURE GUIDE'], ['/ai-agent-infrastructure', 'REPORTED SIGNALS']]) {
+      const metadata = buildPageMetadata({ title: 'Infrastructure', description: 'Infrastructure details', path })
+      for (const images of [metadata.openGraph?.images, metadata.twitter?.images]) {
+        expect(images).toEqual([expect.objectContaining({ url: expect.stringContaining(`badge=${encodeURIComponent(badge).replace(/%20/g, '+')}`) })])
+      }
+    }
   })
 })
 

@@ -48,7 +48,7 @@ describe('surface-specific metadata families', () => {
     ])
   })
 
-  it('keeps control-plane metadata on the app host with the control badge', () => {
+  it('keeps demo metadata on the app host with an explicit demo badge', () => {
     expect(controlMetadata.alternates?.canonical).toBe('https://app.mutx.dev/control')
     expect(controlMetadata.openGraph?.images).toEqual([
       expect.objectContaining({
@@ -57,7 +57,7 @@ describe('surface-specific metadata families', () => {
     ])
     expect(controlMetadata.twitter?.images).toEqual([
       expect.objectContaining({
-        url: expect.stringContaining('badge=CONTROL+PLANE'),
+        url: expect.stringContaining('badge=PRODUCT+DEMO'),
       }),
     ])
   })

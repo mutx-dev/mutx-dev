@@ -711,12 +711,12 @@ test.describe('mutx.dev QA', () => {
   test('product artifacts clearly identify illustrative operational data', async ({ page }) => {
     await page.goto('/ai-agent-control-plane', { waitUntil: 'domcontentloaded' });
 
-    const recorder = page.getByLabel(/illustrative flight recorder/i);
-    await expect(recorder).toBeVisible();
-    await expect(recorder.getByText(/product example/i)).toBeVisible();
-    await expect(recorder.getByText(/sample \/ plane \/ healthy/i)).toBeVisible();
-    await expect(recorder.getByText(/sha-256 \/ sample/i)).toBeVisible();
-    await expect(recorder.getByText(/live record/i)).toHaveCount(0);
+    const example = page.getByRole('figure', { name: 'Example agent record' });
+    await expect(example).toBeVisible();
+    await expect(example.getByText('Example', { exact: true })).toBeVisible();
+    await expect(example.getByText('Submitted traces', { exact: true })).toBeVisible();
+    await expect(example.getByText('Reported by integration', { exact: true })).toBeVisible();
+    await expect(example.getByText(/live record/i)).toHaveCount(0);
   });
 
   test('download page exposes the mac release notes and checksum path', async ({ page }) => {

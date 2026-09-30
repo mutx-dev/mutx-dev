@@ -1,41 +1,45 @@
+'use client'
+
 import Link from 'next/link'
 
 import { ControlBoundary } from '@/components/dashboard/demo/ControlBoundary'
 import styles from '@/components/dashboard/demo/controlDemo.module.css'
 
-export default function ControlNotFound() {
+export function ControlErrorFallback({ reset }: { reset: () => void }) {
   return (
     <main
       id="main-content"
       tabIndex={-1}
       data-boundary-surface="control"
-      data-boundary-kind="not-found"
+      data-boundary-kind="error"
       className={styles.boundaryRoot}
-      aria-labelledby="control-not-found-title"
+      aria-labelledby="control-error-title"
     >
       <ControlBoundary
-        kind="not-found"
+        kind="error"
         eyebrow="Product demo"
-        title="This demo page isn’t available."
-        description="Choose Overview or Agents to continue."
-        stateLabel="Page unavailable"
-        stateTone="neutral"
+        title="We couldn’t open the demo."
+        description="Try again, or return to the overview."
+        stateLabel="Unavailable"
+        stateTone="critical"
+        role="alert"
       >
-        <nav className={styles.boundaryActions} aria-label="Demo navigation">
+        <div className={styles.boundaryActions}>
+          <button
+            type="button"
+            onClick={reset}
+            className={`${styles.boundaryPrimaryAction} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#71834a]`}
+          >
+            Retry
+          </button>
           <Link
             href="/control"
-            className={`${styles.boundaryPrimaryAction} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#71834a]`}
+            className={`${styles.boundarySecondaryAction} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#71834a]`}
           >
             Overview
           </Link>
-          <Link
-            href="/control/agents"
-            className={`${styles.boundarySecondaryAction} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#71834a]`}
-          >
-            Agents
-          </Link>
-        </nav>
+        </div>
       </ControlBoundary>
     </main>
-  );
+  )
 }

@@ -36,7 +36,6 @@ export type DemoSectionMeta = {
   eyebrow: string;
   title: string;
   detail: string;
-  chips: string[];
   heroStats: DemoHeroStat[];
   command: string;
   narrative: string[];
@@ -47,65 +46,6 @@ export type Metric = {
   value: string;
   meta: string;
   tone?: Tone;
-};
-
-export type SignalItem = {
-  title: string;
-  detail: string;
-  tone: Tone;
-  stamp: string;
-};
-
-export type AuditItem = {
-  title: string;
-  resource: string;
-  actor: string;
-  role: string;
-  stamp: string;
-};
-
-export type MatrixCell = {
-  value: string;
-  detail: string;
-  stamp: string;
-  tone: Tone;
-  badge: string;
-};
-
-export type MatrixRow = {
-  label: string;
-  meta: string;
-  cells: MatrixCell[];
-};
-
-export type DeploymentRow = {
-  agent: string;
-  runtime: string;
-  environment: string;
-  version: string;
-  region: string;
-  health: string;
-  tone: Tone;
-  rollout: string;
-};
-
-export type AgentCard = {
-  name: string;
-  role: string;
-  model: string;
-  env: string;
-  status: string;
-  tone: Tone;
-  lastSeen: string;
-  load: string;
-};
-
-export type ConnectorCard = {
-  name: string;
-  detail: string;
-  status: string;
-  tone: Tone;
-  stamp: string;
 };
 
 export type QuickAction = {
@@ -128,209 +68,162 @@ export const NAV_ITEMS: DemoNavItem[] = [
 
 export const SECTION_META: Record<DemoSection, DemoSectionMeta> = {
   overview: {
-    eyebrow: "Control Plane",
-    title: "Mission briefing for governed agent infrastructure",
-    detail: "Lead with posture, risk, and recovery so the demo immediately reads like an operator-grade surface rather than a generic dashboard.",
-    chips: ["Production narrative", "Governed actions", "BYOK aware"],
-    heroStats: [
-      { label: "Governed lanes", value: "03", detail: "prod, staging, development" },
-      { label: "Live operator score", value: "99.2%", detail: "control plane confidence" },
-      { label: "Recovery budget", value: "17s", detail: "median self-heal window" },
-    ],
-    command: "Walk the audience through posture first, then move into the operating lanes that prove actionability.",
+    eyebrow: "Overview",
+    title: "Run review",
+    detail: "Follow agent activity, inspect a run, and review a tool call with its context in view.",
+    heroStats: [],
+    command: "Start with the selected run, then show how its tool request reaches an operator decision.",
     narrative: [
-      "Open with the environment matrix because it frames risk, ownership, and readiness in one read.",
-      "Use live signals to show the surface is tuned for operating decisions, not vanity analytics.",
-      "Point out the split between infra cost, model spend, and governance so the product feels credible.",
+      "The agent submitted a request to compare three vendor proposals.",
+      "The run searched its connected documents before preparing a summary.",
+      "Sharing the summary outside the workspace needs an operator review.",
     ],
   },
   agents: {
-    eyebrow: "Agent Registry",
-    title: "A fleet board that feels owned, staffed, and alive",
-    detail: "Show the operating fleet as named assets with clear role, pressure, sync state, and command backlog.",
-    chips: ["56 agents", "12 heartbeats", "4 approvals"],
+    eyebrow: "Agents",
+    title: "Agents",
+    detail: "See each agent’s role, environment, and current state in one readable list.",
     heroStats: [
-      { label: "Fleet coverage", value: "56", detail: "named operating agents" },
-      { label: "Wake queue", value: "04", detail: "pending assignments" },
-      { label: "Command debt", value: "38%", detail: "review + orchestration pressure" },
+      { label: "Agents", value: "12", detail: "across the workspace" },
+      { label: "Ready", value: "09", detail: "available now" },
+      { label: "Needs attention", value: "01", detail: "review the agent record" },
     ],
-    command: "Tell the story of ownership: who is live, who is syncing, and who still needs operator judgment.",
+    command: "Use the agent list to connect each workload with an owner and an environment.",
     narrative: [
-      "Use the registry to make the fleet feel like a staffed system, not just rows of metadata.",
-      "Draw attention to load and last-seen signals to reinforce operational trust.",
-      "Close on the command queue so the audience sees the next action, not just current state.",
+      "Each agent has a named role and a bounded environment.",
+      "A clear state helps the operator decide what to inspect next.",
+      "Records make agent ownership and state easy to review.",
     ],
   },
   deployments: {
-    eyebrow: "Rollout Surface",
-    title: "Release posture with real rollout tension and rollback confidence",
-    detail: "The demo should feel like operators are making shipping decisions here, with regional capacity and watch items in sight.",
-    chips: ["24 versions", "3 rollout lanes", "2 watch items"],
+    eyebrow: "Deployments",
+    title: "Deployments",
+    detail: "Review the version, environment, and rollout state before promoting a change.",
     heroStats: [
-      { label: "Rollout lanes", value: "03", detail: "promotion windows active" },
-      { label: "Rollback cover", value: "2.4m", detail: "average rollback window" },
-      { label: "Regional load", value: "81%", detail: "ap-south at highest pressure" },
+      { label: "Deployments", value: "08", detail: "across the workspace" },
+      { label: "Ready", value: "06", detail: "within workspace policy" },
+      { label: "In review", value: "01", detail: "promotion needs attention" },
     ],
-    command: "Frame deployments as a release-control story: promotion, rollback, region pressure, and policy watch all in one lane.",
+    command: "Compare the current release with the version and environment it will change.",
     narrative: [
-      "Lead with the release table so the audience sees the breadth of active runtime posture.",
-      "Use the rollout lane to call out decisions still in flight.",
-      "Finish with regional capacity to prove the demo understands operational consequences, not just versions.",
+      "The current version is visible beside its target environment.",
+      "A review state keeps promotion decisions easy to spot.",
+      "Open a deployment record to understand the change before acting.",
     ],
   },
   runs: {
-    eyebrow: "Run Control",
-    title: "Execution pressure, failed work, and seal decisions in one lane",
-    detail: "This section should feel like the place an operator goes when throughput, failure, and approval debt collide.",
-    chips: ["187 runs", "94.7% success", "7 recoveries"],
+    eyebrow: "Runs",
+    title: "Runs",
+    detail: "Trace an agent request from its first event through each tool call and review.",
     heroStats: [
-      { label: "Live queue", value: "86", detail: "current active runs" },
-      { label: "Failure lane", value: "04", detail: "operator interventions open" },
-      { label: "Seal debt", value: "02", detail: "approval gates waiting" },
+      { label: "Runs today", value: "28", detail: "recorded today" },
+      { label: "Completed", value: "24", detail: "completed today" },
+      { label: "Awaiting review", value: "01", detail: "tool call needs a decision" },
     ],
-    command: "Explain that this surface keeps queue pressure, recovery work, and privileged decisions visible together.",
+    command: "Follow the selected run from request to tool call, then review the decision it needs.",
     narrative: [
-      "Start with throughput and recovery because that is where demos usually feel most real.",
-      "Use queue pressure to give the section motion and operating context.",
-      "Close on seal decisions so governance never feels disconnected from execution.",
+      "A run keeps its request and events together.",
+      "The tool and destination are shown before an external action proceeds.",
+      "An operator can review the request with the original context beside it.",
     ],
   },
   environments: {
-    eyebrow: "Environment Posture",
-    title: "Bounded systems, not three tabs pretending to be environments",
-    detail: "Production, staging, and development should read as materially different operating conditions with their own rules and readiness.",
-    chips: ["Prod isolated", "Staging warm", "Dev sandboxed"],
+    eyebrow: "Environments",
+    title: "Environments",
+    detail: "Compare production, staging, and development settings at a glance.",
     heroStats: [
-      { label: "Dedicated zones", value: "03", detail: "bounded operating envelopes" },
-      { label: "Readiness spread", value: "74-98%", detail: "across current environments" },
-      { label: "Shared gateways", value: "01", detail: "development-only default" },
+      { label: "Environments", value: "03", detail: "separate operating spaces" },
+      { label: "Production", value: "Ready", detail: "approval required for external tools" },
+      { label: "Development", value: "Sandbox", detail: "isolated workspace" },
     ],
-    command: "Use this tab to prove the product understands isolation, ownership, and readiness as separate ideas.",
+    command: "Compare each environment’s access and review rules before opening a run.",
     narrative: [
-      "Show that production is governed differently, not just labeled differently.",
-      "Use the matrix to compare policy, keys, and network posture side by side.",
-      "Keep the environment cards narrative-heavy so the demo lands quickly for non-operators too.",
+      "Production has stricter review rules than development.",
+      "Staging gives a place to check changes before release.",
+      "Each environment’s summary makes its boundary visible.",
     ],
   },
   access: {
-    eyebrow: "Access Surface",
-    title: "Credential lifecycle with anomalies, approvals, and BYOK posture",
-    detail: "Make trust boundaries legible: which keys are healthy, which requests look wrong, and where human approval still matters.",
-    chips: ["14 keys", "2 BYOK tenants", "1 watch item"],
+    eyebrow: "Access",
+    title: "Access",
+    detail: "Review who and what can reach each connected environment.",
     heroStats: [
-      { label: "Healthy keys", value: "14", detail: "governed credentials live" },
-      { label: "Open anomalies", value: "03", detail: "watch list events" },
-      { label: "Rotation cover", value: "91%", detail: "policy compliance" },
+      { label: "Access records", value: "06", detail: "across the workspace" },
+      { label: "Roles", value: "03", detail: "owner, operator, viewer" },
+      { label: "Review needed", value: "01", detail: "credential rotation" },
     ],
-    command: "Anchor the conversation on trust boundaries, not just key counts.",
+    command: "Show the role and scope before reviewing a credential or access change.",
     narrative: [
-      "The registry proves there is a real ledger, not a fake access wall.",
-      "Anomalies and policy posture make the section feel active and accountable.",
-      "Keep the BYOK note visible so enterprise buyers see their model ownership reflected.",
+      "Roles make the person’s level of access clear.",
+      "Credentials are shown by purpose without exposing their values.",
+      "Rotation history gives the operator a useful review point.",
     ],
   },
   connectors: {
-    eyebrow: "Connector Plane",
-    title: "Delivery health, retry posture, and contract ownership",
-    detail: "This should feel like a real integration control room, with queue stress, retry history, and contract isolation visible at a glance.",
-    chips: ["12 connectors", "2 retries", "1 delayed lane"],
+    eyebrow: "Connectors",
+    title: "Connectors",
+    detail: "See where events and tool requests are sent, and whether delivery needs a look.",
     heroStats: [
-      { label: "Active contracts", value: "12", detail: "signed delivery surfaces" },
-      { label: "Retry pressure", value: "24%", detail: "current exception load" },
-      { label: "Dead letters", value: "00", detail: "recovered backlog" },
+      { label: "Connectors", value: "08", detail: "across the workspace" },
+      { label: "Delivering", value: "07", detail: "currently ready" },
+      { label: "Needs review", value: "01", detail: "check delivery settings" },
     ],
-    command: "Use connectors to show operational detail beyond core runtime control.",
+    command: "Open a connector to review its destination, purpose, and delivery state.",
     narrative: [
-      "Start with the connector grid so the audience sees breadth immediately.",
-      "Then move into exceptions to prove the product handles ugly real-world delivery cases.",
-      "Finish on contracts so the integrations feel governed instead of bolted on.",
+      "Each connector has a clear destination and purpose.",
+      "Delivery state helps focus attention on the records that need review.",
+      "Configuration can be checked without losing the event context.",
     ],
   },
   audit: {
-    eyebrow: "Governance Record",
-    title: "A reviewable timeline of who changed what and why",
-    detail: "The audit tab should read like evidence: attributable actions, ownership shifts, and policy changes that survive scrutiny.",
-    chips: ["73 events", "4 transfers", "0 missing actors"],
+    eyebrow: "Audit",
+    title: "Audit history",
+    detail: "Keep changes, decisions, and their owners together in a readable timeline.",
     heroStats: [
-      { label: "Timeline depth", value: "73", detail: "structured events in view" },
-      { label: "Ownership shifts", value: "04", detail: "recent control transfers" },
-      { label: "Missing actors", value: "00", detail: "every record attributed" },
+      { label: "Events", value: "18", detail: "in recent history" },
+      { label: "Decisions", value: "04", detail: "operator reviews" },
+      { label: "Actors", value: "06", detail: "named records" },
     ],
-    command: "This is where you prove the control plane leaves receipts.",
+    command: "Use the timeline to connect an operator action with the resource it changed.",
     narrative: [
-      "Use the timeline to show that actions are attributable, not just logged.",
-      "Ownership changes give the section human stakes and organizational realism.",
-      "Policy records make governance feel operational, not ceremonial.",
+      "Each entry names the actor and resource.",
+      "Decisions sit alongside the event that prompted them.",
+      "The history helps operators understand how the current state came to be.",
     ],
   },
   usage: {
-    eyebrow: "Usage Split",
-    title: "Spend posture with infra, model, and queue pressure separated cleanly",
-    detail: "The demo should make budget and capacity feel legible, with enough narrative to explain what is climbing and why.",
-    chips: ["$1.7k infra", "$970 model", "57% headroom"],
+    eyebrow: "Usage",
+    title: "Usage and spend",
+    detail: "Understand how infrastructure and model usage compare with the workspace budget.",
     heroStats: [
-      { label: "Infra envelope", value: "$1.7k", detail: "control plane overhead today" },
-      { label: "Model envelope", value: "$970", detail: "BYOK + shared spend" },
-      { label: "Headroom", value: "57%", detail: "remaining daily capacity" },
+      { label: "Infrastructure", value: "$1,730", detail: "monthly spend" },
+      { label: "Model usage", value: "$970", detail: "monthly spend" },
+      { label: "Budget remaining", value: "57%", detail: "of monthly allowance" },
     ],
-    command: "Use usage to show discipline: not just how much, but what kind of spend is growing.",
+    command: "Compare infrastructure and model usage against the same budget window.",
     narrative: [
-      "Keep infra and model cost visually distinct so the product feels mature.",
-      "Use the trend chart as atmospheric proof of ongoing runtime activity.",
-      "The budget posture panel should give operators a decision, not just a number.",
+      "Infrastructure and model usage have separate totals.",
+      "The budget bar makes the remaining allowance easy to compare.",
+      "Compare current usage with the remaining allowance.",
     ],
   },
   settings: {
-    eyebrow: "Control Settings",
-    title: "Defaults, policy packs, and runtime contracts that shape the whole surface",
-    detail: "This tab should feel like the command center behind the command center: the rules, routes, and defaults that keep the rest coherent.",
-    chips: ["2 policy packs", "Dedicated envs", "Guardrails on"],
+    eyebrow: "Settings",
+    title: "Workspace settings",
+    detail: "Review the default environment, approval rules, and notification preferences.",
     heroStats: [
-      { label: "Policy packs", value: "02", detail: "enforced + simulate lanes" },
-      { label: "Webhook isolation", value: "92%", detail: "delivery boundary coverage" },
-      { label: "Approval fallback", value: "100%", detail: "manual safety path intact" },
+      { label: "Default environment", value: "Staging", detail: "for new deployments" },
+      { label: "External tools", value: "Review", detail: "operator approval required" },
+      { label: "Notifications", value: "On", detail: "for decisions and failures" },
     ],
-    command: "Describe settings as runtime design, not admin clutter.",
+    command: "Review the workspace defaults that shape new runs and deployments.",
     narrative: [
-      "Policy packs connect every other tab back to a coherent operating model.",
-      "Environment defaults and notification rules make the product feel configured for scale.",
-      "Runtime contracts close the loop by showing what must be true before production moves.",
+      "New deployments start in the staging environment.",
+      "External tool calls can wait for an operator decision.",
+      "Decision and failure notifications keep the right events visible.",
     ],
   },
 };
-
-export const BASE_SIGNALS: Array<Omit<SignalItem, "stamp">> = [
-  {
-    title: "Deployment succeeded",
-    detail: "Sales Ops Assistant promoted to production on OpenClaw with no dropped runs.",
-    tone: "healthy",
-  },
-  {
-    title: "Webhook retry succeeded",
-    detail: "Stripe delivery recovered after a transient 502; backlog drained.",
-    tone: "healthy",
-  },
-  {
-    title: "Policy block",
-    detail: "Unauthorized tool action stopped before egress crossed the tenant boundary.",
-    tone: "warning",
-  },
-  {
-    title: "Self-heal restart",
-    detail: "Research Automator replaced a hot replica and returned to ready in 17 seconds.",
-    tone: "focus",
-  },
-  {
-    title: "Budget threshold warning",
-    detail: "Model spend crossed 78% of the daily envelope; infra cost remains inside target.",
-    tone: "warning",
-  },
-  {
-    title: "API key rotated",
-    detail: "Operator credential rotated without invalidating governed webhook deliveries.",
-    tone: "focus",
-  },
-];
 
 export const QUICK_ACTIONS: QuickAction[] = [
   { label: "Deploy new version", detail: "Promote rollout" },
@@ -339,108 +232,3 @@ export const QUICK_ACTIONS: QuickAction[] = [
   { label: "Provision environment", detail: "Create environment" },
   { label: "Create webhook", detail: "Add connector" },
 ];
-
-export const AGENT_NAMES = [
-  "dogfood",
-  "jarv",
-  "research",
-  "ops",
-  "security",
-  "kb-manager",
-  "automation-architect",
-  "sales-assistant",
-  "data-processor",
-  "crawler",
-  "council-ada",
-  "council-aristotle",
-];
-
-export function relativeStamp(totalMinutes: number) {
-  if (totalMinutes < 60) {
-    return `${totalMinutes}m ago`;
-  }
-
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return minutes === 0 ? `${hours}h ago` : `${hours}h ${minutes}m ago`;
-}
-
-export function rotate<T>(items: T[], offset: number) {
-  if (items.length === 0) {
-    return items;
-  }
-
-  const normalized = ((offset % items.length) + items.length) % items.length;
-  return [...items.slice(normalized), ...items.slice(0, normalized)];
-}
-
-export function toneBadgeClasses(tone: Tone) {
-  switch (tone) {
-    case "healthy":
-      return "border-[#285a43] bg-[#0f2018] text-[#78e3b4]";
-    case "warning":
-      return "border-[#65502b] bg-[#211a0e] text-[#f4cc82]";
-    case "critical":
-      return "border-[#66302e] bg-[#241312] text-[#ff9b96]";
-    case "focus":
-      return "border-[#294d6c] bg-[#101c26] text-[#8ac7ff]";
-    default:
-      return "border-[#34342e] bg-[#171813] text-[#aaa397]";
-  }
-}
-
-export function toneTextClasses(tone: Tone) {
-  switch (tone) {
-    case "healthy":
-      return "text-[#78e3b4]";
-    case "warning":
-      return "text-[#f4cc82]";
-    case "critical":
-      return "text-[#ff9b96]";
-    case "focus":
-      return "text-[#8ac7ff]";
-    default:
-      return "text-[#aaa397]";
-  }
-}
-
-export function toneDotClasses(tone: Tone) {
-  switch (tone) {
-    case "healthy":
-      return "bg-[#4bd69b]";
-    case "warning":
-      return "bg-[#efb654]";
-    case "critical":
-      return "bg-[#ff6d66]";
-    case "focus":
-      return "bg-[#58aaff]";
-    default:
-      return "bg-[#77766d]";
-  }
-}
-
-export function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: value >= 1000 ? 0 : 1,
-  }).format(value);
-}
-
-export function buildPath(points: number[], width: number, height: number) {
-  const max = Math.max(...points);
-  const min = Math.min(...points);
-  const range = max - min || 1;
-
-  return points
-    .map((point, index) => {
-      const x = (index / (points.length - 1)) * width;
-      const y = height - ((point - min) / range) * height;
-      return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
-}
-
-export function buildArea(points: number[], width: number, height: number) {
-  return `${buildPath(points, width, height)} L ${width} ${height} L 0 ${height} Z`;
-}

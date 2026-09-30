@@ -3,36 +3,33 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 
 import { appFontVariables } from "@/app/fonts/app";
-import { ErrorBoundary } from "@/components/app/ErrorBoundary";
+import { ControlDemoStateProvider } from "@/components/dashboard/demo/ControlDemoState";
+import { ControlErrorBoundary } from "@/components/dashboard/demo/ControlErrorBoundary";
 import { DemoViewportLock } from "@/components/dashboard/demo/DemoViewportLock";
 import { buildPageMetadata, getAppUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getAppUrl()),
   ...buildPageMetadata({
-    title: "MUTX Simulated Control Demo",
-    description: "A sample-data walkthrough of the MUTX operator flight recorder. No live workspace or write controls are connected.",
+    title: "MUTX Product Demo",
+    description: "Explore sample agent runs, inspect tool calls, and see where an operator reviews each action.",
     path: "/control",
     host: getAppUrl(),
-    siteName: "MUTX App",
-    badge: "CONTROL PLANE",
+    siteName: "MUTX",
+    badge: "PRODUCT DEMO",
   }),
   robots: {
     index: true,
     follow: true,
     nocache: false,
   },
-  title: "MUTX Simulated Control Demo",
-  description: "A sample-data walkthrough of the MUTX operator flight recorder. No live workspace or write controls are connected.",
+  title: "MUTX Product Demo",
+  description: "Explore sample agent runs, inspect tool calls, and see where an operator reviews each action.",
   keywords: [
-    "agent control plane",
-    "agent deployments",
+    "agent runs",
+    "tool call review",
+    "operator decisions",
     "agent environments",
-    "agent governance",
-    "webhooks",
-    "api keys",
-    "runs",
-    "audit trail",
   ],
 };
 
@@ -46,13 +43,15 @@ export default async function AppDemoLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <ErrorBoundary>
+      <ControlErrorBoundary>
         <DemoViewportLock>
-          <div className={`${appFontVariables} h-full overflow-hidden font-(--font-site-body)`}>
-            {children}
-          </div>
+          <ControlDemoStateProvider>
+            <div className={`${appFontVariables} h-full overflow-hidden font-(--font-site-body)`}>
+              {children}
+            </div>
+          </ControlDemoStateProvider>
         </DemoViewportLock>
-      </ErrorBoundary>
+      </ControlErrorBoundary>
     </NextIntlClientProvider>
   );
 }

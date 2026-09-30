@@ -5,7 +5,7 @@ import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactNode;
+  fallback?: ReactNode | ((reset: () => void) => ReactNode);
 }
 
 interface State {
@@ -34,7 +34,9 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback;
+        return typeof this.props.fallback === "function"
+          ? this.props.fallback(this.handleRetry)
+          : this.props.fallback;
       }
 
       return (

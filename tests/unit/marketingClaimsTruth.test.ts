@@ -62,8 +62,8 @@ describe('public capability claim truth', () => {
 
     expect(marketing).toMatch(/for tools routed through the MUTX runtime, a configured policy can pause a call/i)
     expect(marketing).toMatch(/coverage depends on the events your integration reports/i)
-    expect(marketing).toMatch(/runtime budget cutoffs remain an integration concern/i)
-    expect(marketing).toMatch(/provider rollout remains operator-owned/i)
+    expect(marketing).toMatch(/your runtime decides whether to act on a threshold/i)
+    expect(marketing).toMatch(/your integration applies deployment changes and reports the result/i)
     expect(marketing).toMatch(/explore the demo/i)
 
     expect(status).toMatch(/process-local/i)
