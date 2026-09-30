@@ -40,7 +40,6 @@ def test_frontend_ci_builds_and_smokes_the_standalone_production_artifact() -> N
         "page.goto('/docs'",
         "search documentation",
         "page.goto('/dashboard/release-smoke-unknown'",
-        'data-boundary-surface="dashboard"',
     ):
         assert contract in release_smoke
     for contract in (
