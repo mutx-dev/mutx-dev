@@ -15,10 +15,10 @@ import logging
 import json
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,8 +31,6 @@ from src.api.models import (
     AgentStatus,
     AgentVersion,
     Command,
-    Deployment,
-    DeploymentEvent as DeploymentEventModel,
     User,
 )
 from src.api.models.schemas import AgentResponse, AgentRollbackRequest, AgentVersionHistoryResponse
@@ -42,8 +40,8 @@ from src.api.models.numeric import (
     PercentageFloat,
 )
 from src.api.services.user_service import generate_agent_api_key, hash_api_key
+from src.api.services.deployment_lifecycle import create_agent_record, record_runtime_heartbeat
 from src.api.services.webhook_service import trigger_deployment_event, trigger_webhook_event
-from src.api.time_utils import as_utc, as_utc_naive
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +63,10 @@ class AgentRegisterResponse(BaseModel):
     api_key: str
     status: str
     message: str
+    desired_action: str | None = None
+    desired_state: str | None = None
+    observed_state: str | None = None
+    target_revision: int = 0
 
 
 class HeartbeatRequest(BaseModel):
@@ -74,6 +76,16 @@ class HeartbeatRequest(BaseModel):
     timestamp: str
     platform: Optional[str] = None
     hostname: Optional[str] = None
+    component: Literal["agent_runtime", "command_listener"] = "agent_runtime"
+    deployment_id: uuid.UUID | None = None
+    target_revision: int | None = Field(default=None, ge=0)
+    node_id: str | None = None
+
+    @model_validator(mode="after")
+    def deployment_revision_pair(self):
+        if self.deployment_id is not None and self.target_revision is None:
+            raise ValueError("target_revision is required when deployment_id is provided")
+        return self
 
 
 class MetricsRequest(BaseModel):
@@ -109,6 +121,8 @@ class CommandResponse(BaseModel):
     action: str
     parameters: dict
     received_at: str
+    target_deployment_id: uuid.UUID | None = None
+    target_revision: int | None = None
 
 
 class CommandsListResponse(BaseModel):
@@ -141,44 +155,15 @@ class AgentStatusResponse(DegradedNumericResponseModel):
     status: str
     last_heartbeat: Optional[str]
     uptime_seconds: float | None
+    desired_action: str | None = None
+    desired_state: str | None = None
+    observed_state: str | None = None
+    target_revision: int = 0
+    observed_revision: int | None = None
+    observed_at: datetime | None = None
 
 
 # --- Routes ---
-
-
-async def _promote_latest_deployment_from_heartbeat(
-    *,
-    db: AsyncSession,
-    agent: Agent,
-    now: datetime,
-    new_status: str,
-) -> tuple[uuid.UUID | None, str | None]:
-    if new_status != AgentStatus.RUNNING.value:
-        return None, None
-
-    result = await db.execute(
-        select(Deployment)
-        .where(Deployment.agent_id == agent.id)
-        .order_by(Deployment.created_at.desc())
-        .limit(1)
-    )
-    deployment = result.scalar_one_or_none()
-    if deployment is None or deployment.status != "deploying":
-        return None, None
-
-    deployment.status = "running"
-    deployment.started_at = deployment.started_at or as_utc_naive(now)
-    deployment.ended_at = None
-    deployment.error_message = None
-    db.add(
-        DeploymentEventModel(
-            deployment_id=deployment.id,
-            event_type="heartbeat_running",
-            status="running",
-            node_id=deployment.node_id,
-        )
-    )
-    return deployment.id, "heartbeat_running"
 
 
 @router.post("/register", response_model=AgentRegisterResponse)
@@ -195,13 +180,10 @@ async def register_agent(
     agent = Agent(
         name=request.name,
         description=request.description or "",
-        status=AgentStatus.RUNNING.value,
         config=json.dumps(request.metadata) if request.metadata else None,
         user_id=current_user.id,
     )
-
-    db.add(agent)
-    await db.flush()  # Get agent.id before creating version
+    await create_agent_record(agent=agent, db=db, action="register")
     agent_api_key, api_key_prefix = generate_agent_api_key(agent.id)
     agent.api_key = hash_api_key(agent_api_key)
     agent.api_key_prefix = api_key_prefix
@@ -219,6 +201,10 @@ async def register_agent(
         api_key=agent_api_key,
         status="registered",
         message=f"Agent '{agent.name}' registered successfully",
+        desired_action=agent.desired_action,
+        desired_state=agent.desired_state,
+        observed_state=agent.observed_state,
+        target_revision=agent.target_revision,
     )
 
 
@@ -233,19 +219,24 @@ async def heartbeat(
     if str(agent.id) != request.agent_id:
         raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
-    # Update agent status and last heartbeat
-    previous_status = agent.status
     now = datetime.now(timezone.utc)
     heartbeat_timestamp = now.isoformat()
-    new_status = request.status.value
-    agent.status = new_status
-    agent.last_heartbeat = as_utc(now)
-    promoted_deployment_id, deployment_event_type = await _promote_latest_deployment_from_heartbeat(
+    observation = await record_runtime_heartbeat(
         db=db,
-        agent=agent,
+        agent_id=agent.id,
+        status=request.status.value,
+        component=request.component,
         now=now,
-        new_status=new_status,
+        deployment_id=request.deployment_id,
+        target_revision=request.target_revision,
+        node_id=request.node_id,
+        error_message=request.message if request.status == AgentStatus.FAILED else None,
     )
+    if observation is None:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    agent = observation.agent
+    previous_status = observation.previous_agent_status
+    new_status = agent.status
 
     await db.commit()
 
@@ -258,6 +249,7 @@ async def heartbeat(
                 "agent_id": str(agent.id),
                 "agent_name": agent.name,
                 "status": new_status,
+                "reported_status": request.status.value,
                 "previous_status": previous_status,
                 "message": request.message,
                 "platform": request.platform,
@@ -292,22 +284,23 @@ async def heartbeat(
                 "Failed to emit agent.status webhook", extra={"agent_id": str(agent.id)}
             )
 
-    if promoted_deployment_id and deployment_event_type:
+    if observation.deployment_event_type and observation.deployment is not None:
         try:
             await trigger_deployment_event(
                 db,
-                promoted_deployment_id,
+                agent.user_id,
+                observation.deployment.id,
                 agent.id,
-                event_type=deployment_event_type,
-                status="running",
+                event_type=observation.deployment_event_type,
+                status=observation.deployment_event_status,
             )
         except Exception:
             logger.exception(
                 "Failed to emit deployment.event webhook",
                 extra={
                     "agent_id": str(agent.id),
-                    "deployment_id": str(promoted_deployment_id),
-                    "event_type": deployment_event_type,
+                    "deployment_id": str(observation.deployment.id),
+                    "event_type": observation.deployment_event_type,
                 },
             )
 
@@ -382,6 +375,8 @@ async def poll_commands(
                 action=cmd.action,
                 parameters=cmd.parameters or {},
                 received_at=cmd.created_at.isoformat(),
+                target_deployment_id=cmd.target_deployment_id,
+                target_revision=cmd.target_revision,
             )
             for cmd in commands
         ]
@@ -467,21 +462,19 @@ async def get_agent_status(
     if not current_agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    uptime = 0.0
-    if current_agent.created_at:
-        # Handle both naive and timezone-aware datetimes
-        created = current_agent.created_at
-        if created.tzinfo is None:
-            created = created.replace(tzinfo=timezone.utc)
-        uptime = (datetime.now(timezone.utc) - created).total_seconds()
-
     return AgentStatusResponse(
         agent_id=str(current_agent.id),
         status=current_agent.status,
         last_heartbeat=(
             current_agent.last_heartbeat.isoformat() if current_agent.last_heartbeat else None
         ),
-        uptime_seconds=uptime,
+        uptime_seconds=None,
+        desired_action=current_agent.desired_action,
+        desired_state=current_agent.desired_state,
+        observed_state=current_agent.observed_state,
+        target_revision=current_agent.target_revision,
+        observed_revision=current_agent.observed_revision,
+        observed_at=current_agent.observed_at,
     )
 
 

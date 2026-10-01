@@ -39,7 +39,7 @@ async def test_agent_status_returns_authenticated_agent_status(client, db_sessio
     assert payload["agent_id"] == str(test_agent.id)
     assert payload["status"] == "running"
     assert payload["last_heartbeat"] is not None
-    assert payload["uptime_seconds"] >= 0
+    assert payload["uptime_seconds"] is None
 
 
 @pytest.mark.asyncio
@@ -137,7 +137,7 @@ async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbe
 
 
 @pytest.mark.asyncio
-async def test_heartbeat_promotes_latest_deploying_deployment_to_running(client, db_session):
+async def test_current_target_bound_heartbeat_completes_deployment_intent(client, db_session):
     from src.api.models import Deployment, DeploymentEvent
 
     register_response = await client.post(
@@ -157,9 +157,12 @@ async def test_heartbeat_promotes_latest_deploying_deployment_to_running(client,
 
     deployment = Deployment(
         agent_id=uuid.UUID(agent_id),
-        status="deploying",
+        status="pending",
         replicas=1,
         started_at=None,
+        desired_action="deploy",
+        desired_state="running",
+        target_revision=3,
     )
     db_session.add(deployment)
     await db_session.commit()
@@ -172,6 +175,8 @@ async def test_heartbeat_promotes_latest_deploying_deployment_to_running(client,
             "status": "running",
             "message": "runtime healthy",
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "deployment_id": str(deployment.id),
+            "target_revision": 3,
         },
     )
 
@@ -181,6 +186,8 @@ async def test_heartbeat_promotes_latest_deploying_deployment_to_running(client,
     assert deployment.status == "running"
     assert deployment.started_at is not None
     assert deployment.ended_at is None
+    assert deployment.observed_state == "running"
+    assert deployment.observed_revision == 3
 
     events = (
         (

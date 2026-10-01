@@ -190,7 +190,7 @@ def test_deploy_restart_hits_contract_route_and_renders_status(monkeypatch) -> N
         "path": "/v1/deployments/dep-789/restart",
         "json": None,
     }
-    assert "Restarted deployment: dep-789" in result.output
+    assert "Restart requested for deployment: dep-789" in result.output
     assert "Status: pending" in result.output
 
 
@@ -259,7 +259,7 @@ def test_deploy_rollback_hits_contract_route_and_renders_new_state(monkeypatch) 
             200,
             {
                 "id": "dep-789",
-                "status": "running",
+                "status": "pending",
                 "version": "v1.1.0",
                 "replicas": 1,
             },
@@ -278,8 +278,8 @@ def test_deploy_rollback_hits_contract_route_and_renders_new_state(monkeypatch) 
         "path": "/v1/deployments/dep-789/rollback",
         "json": {"version": 1},
     }
-    assert "Rolled back deployment: dep-789" in result.output
-    assert "Status: running" in result.output
+    assert "Rollback requested for deployment: dep-789" in result.output
+    assert "Status: pending" in result.output
     assert "Version: v1.1.0" in result.output
     assert "Replicas: 1" in result.output
 

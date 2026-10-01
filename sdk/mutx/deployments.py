@@ -48,6 +48,16 @@ class Deployment:
         self.id = UUID(data["id"])
         self.agent_id = UUID(data["agent_id"])
         self.status = data["status"]
+        self.allowed_actions = data.get("allowed_actions")
+        self.can_stop = data.get("can_stop")
+        self.can_restart = data.get("can_restart")
+        self.can_terminate = data.get("can_terminate")
+        self.desired_action = data.get("desired_action")
+        self.desired_state = data.get("desired_state")
+        self.target_revision = data.get("target_revision", 0)
+        self.observed_state = data.get("observed_state")
+        self.observed_revision = data.get("observed_revision")
+        self.observed_at = _parse_datetime(data.get("observed_at"))
         self.replicas = data["replicas"]
         self.node_id = data.get("node_id")
         self.started_at = _parse_datetime(data.get("started_at"))

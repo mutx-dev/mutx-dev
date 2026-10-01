@@ -14,7 +14,7 @@ from src.api.auth.ownership import (
     get_owned_deployment as _get_owned_deployment,
 )
 from src.api.database import get_db
-from src.api.models import Agent, AgentStatus, AgentType, User
+from src.api.models import Agent, AgentType, User
 from src.api.models.schemas import (
     AssistantTemplateResponse,
     StarterDeploymentCreate,
@@ -332,7 +332,6 @@ async def deploy_template(
             type=AgentType.OPENCLAW,
             config=serialize_config(config),
             user_id=current_user.id,
-            status=AgentStatus.CREATING.value,
         )
         db.add(agent)
         await db.flush()

@@ -3,7 +3,7 @@
 const [mode, rawUrl] = process.argv.slice(2)
 
 const VALID_MODES = new Set(['frontend', 'health', 'ready', 'release'])
-const FRONTEND_MARKER = 'aria-label="Example MUTX governed deployment record"'
+const FRONTEND_MARKER = 'id="home-title"'
 const REQUEST_TIMEOUT_MS = 10_000
 
 function usage() {

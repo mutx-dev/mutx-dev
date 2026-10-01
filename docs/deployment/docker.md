@@ -5,7 +5,9 @@ icon: box
 
 # Docker Guide
 
-This repo ships both a local development compose file and a production-oriented compose file.
+The supported local full-stack entry point is `infrastructure/docker/docker-compose.yml`.
+Its API and migration services use the `development` target of `Dockerfile.api`; the
+separate production Compose stack uses the locked production API image.
 
 ## Local Development Compose
 
@@ -25,8 +27,14 @@ The local compose file currently starts:
 
 * `postgres` on `5432`
 * `redis` on `6379`
+* one-shot `migrate` service before the API
 * `api` on `8000`
 * `frontend` on `3000`
+
+The Railway backend uses `infrastructure/docker/Dockerfile.backend`. Its runtime
+dependencies are installed from `requirements-runtime.lock` with hash checking into
+`/opt/venv`. Railway uses that image's default command, which applies Alembic migrations
+before starting Uvicorn and requires an explicit `FORWARDED_ALLOW_IPS` value.
 
 ## Useful Commands
 

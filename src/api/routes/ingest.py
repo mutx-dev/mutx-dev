@@ -26,11 +26,8 @@ from src.api.models.schemas import (
 from src.api.services.auth import Role, check_role
 from src.api.services.event_ingestion import process_ingest_event
 from src.api.services.webhook_service import (
-    trigger_agent_status_event,
-    trigger_deployment_event,
     trigger_webhook_event,
 )
-from src.api.time_utils import utc_now, utc_now_naive
 
 router = APIRouter(prefix="/ingest", tags=["ingest"])
 logger = logging.getLogger(__name__)
@@ -90,22 +87,16 @@ async def agent_status_update(
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    old_status = agent.status
-
-    # Determine final status: error_message overrides to FAILED
+    # Ingest is user-reported history, not authenticated runtime evidence.
     if status_data.error_message:
         final_status = AgentStatus.FAILED.value
     else:
         final_status = status_data.status.value
 
-    agent.status = final_status
-    agent.last_heartbeat = utc_now()
-    agent.updated_at = datetime.now(timezone.utc)
-
     log = AgentLog(
         agent_id=agent.id,
         level="info",
-        message=f"Status changed from {old_status} to {final_status}",
+        message=f"Reported agent status: {final_status}",
         extra_data=f"node_id: {status_data.node_id}",
     )
     db.add(log)
@@ -121,10 +112,26 @@ async def agent_status_update(
 
     await db.commit()
 
-    # Trigger webhook
-    await trigger_agent_status_event(
-        db, current_user.id, agent.id, old_status, agent.status, agent.name
-    )
+    try:
+        await trigger_webhook_event(
+            db,
+            current_user.id,
+            "agent.status",
+            {
+                "agent_id": str(agent.id),
+                "agent_name": agent.name,
+                "old_status": agent.status,
+                "new_status": agent.status,
+                "status": agent.status,
+                "reported_status": final_status,
+                "node_id": status_data.node_id,
+                "error_message": status_data.error_message,
+                "source": "ingest",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+        )
+    except Exception:
+        logger.exception("Failed to emit agent.status_reported webhook")
 
     logger.info(f"Agent {agent.id} status updated to {final_status}")
     return {"status": "updated"}
@@ -151,13 +158,8 @@ async def deployment_event(
         raise HTTPException(status_code=404, detail="Deployment not found")
     deployment, agent = deployment_row
 
-    if event_data.status:
-        deployment.status = event_data.status
-
-    if event_data.node_id:
-        deployment.node_id = event_data.node_id
-
-    # Record the event in the lifecycle history
+    # Preserve event status and payload as reported history. Only the runtime
+    # heartbeat path can update target-bound observation fields.
     new_event = DeploymentEventModel(
         deployment_id=deployment.id,
         event_type=event_data.event,
@@ -168,8 +170,6 @@ async def deployment_event(
     db.add(new_event)
 
     if event_data.error_message:
-        deployment.error_message = event_data.error_message
-        deployment.status = "failed"
         error_log = AgentLog(
             agent_id=deployment.agent_id,
             level="error",
@@ -178,21 +178,27 @@ async def deployment_event(
         )
         db.add(error_log)
 
-    if event_data.event == "stopped" or event_data.status == "stopped":
-        deployment.ended_at = utc_now_naive()
-        agent.status = AgentStatus.STOPPED.value
-
-    if event_data.event == "healthy" or event_data.status == "running":
-        deployment.status = "running"
-        if deployment.started_at is None:
-            deployment.started_at = utc_now_naive()
-
     await db.commit()
 
     # Trigger webhook
-    await trigger_deployment_event(
-        db, current_user.id, deployment.id, agent.id, event_data.event, deployment.status
-    )
+    try:
+        await trigger_webhook_event(
+            db,
+            current_user.id,
+            "deployment.event",
+            {
+                "deployment_id": str(deployment.id),
+                "agent_id": str(agent.id),
+                "event_type": event_data.event,
+                "status": deployment.status,
+                "reported_status": event_data.status,
+                "node_id": event_data.node_id,
+                "error_message": event_data.error_message,
+                "source": "ingest",
+            },
+        )
+    except Exception:
+        logger.exception("Failed to emit deployment.event_reported webhook")
 
     logger.info(f"Deployment {deployment.id} event: {event_data.event}")
     return {"status": "processed"}
@@ -216,7 +222,6 @@ async def receive_metrics(
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    agent.last_heartbeat = utc_now()
     metric = AgentMetric(
         agent_id=metrics_data.agent_id,
         cpu_usage=metrics_data.cpu_usage,

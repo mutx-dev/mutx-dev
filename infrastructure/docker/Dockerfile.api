@@ -1,16 +1,12 @@
-# =============================================================================
-# Development Dockerfile for MUTX API
-# Multi-stage build with dependency caching
-# =============================================================================
+# Local API image. Runtime dependencies come from the same immutable lock used
+# by the production API and Railway backend images.
 
-# -----------------------------------------------------------------------------
-# Stage 1: Base - Common dependencies
-# -----------------------------------------------------------------------------
-FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS base
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS builder
 
-WORKDIR /app
+WORKDIR /build
 
-# Install system dependencies (common for all stages)
+# Development needs curl for the Compose health check; compile-time packages
+# remain out of the production target below.
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -20,14 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# -----------------------------------------------------------------------------
-# Stage 2: Dependencies - Install Python packages
-# -----------------------------------------------------------------------------
-FROM base AS deps
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-WORKDIR /app
-
-# Copy only requirements first for better caching
 COPY requirements-runtime.lock .
 # hadolint ignore=DL3013
 RUN python -m pip install --no-cache-dir \
@@ -36,58 +27,41 @@ RUN python -m pip install --no-cache-dir \
     --only-binary=:all: \
     --requirement requirements-runtime.lock
 
-# -----------------------------------------------------------------------------
-# Stage 3: Builder - Prepare for development (optional, for future use)
-# -----------------------------------------------------------------------------
-FROM base AS builder
+FROM builder AS development
 
 WORKDIR /app
+ENV PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    ENVIRONMENT=development
 
-COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=deps /usr/local/bin /usr/local/bin
-
-# -----------------------------------------------------------------------------
-# Stage 4: Production - Runtime image
-# -----------------------------------------------------------------------------
-FROM base AS production
-
-WORKDIR /app
-
-# Copy installed dependencies from deps stage
-COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=deps /usr/local/bin /usr/local/bin
-
-# Copy source code
 COPY alembic.ini /app/alembic.ini
 COPY src /app/src
 
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
-ENV ENVIRONMENT=production
-
 EXPOSE 8000
-
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-# -----------------------------------------------------------------------------
-# Stage 5: Development - With hot reload
-# -----------------------------------------------------------------------------
-FROM base AS development
-
-WORKDIR /app
-
-# Copy installed dependencies from deps stage
-COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=deps /usr/local/bin /usr/local/bin
-
-# Copy source code
-COPY alembic.ini /app/alembic.ini
-COPY src /app/src
-
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
-ENV ENVIRONMENT=development
-
-EXPOSE 8000
-
 CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS production
+
+# Install only the PostgreSQL runtime library, matching Dockerfile.api.production.
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --shell /bin/bash appuser
+
+WORKDIR /app
+COPY --from=builder /opt/venv /opt/venv
+COPY src /app/src
+COPY pyproject.toml /app/pyproject.toml
+COPY alembic.ini /app/alembic.ini
+
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    ENVIRONMENT=production
+
+USER appuser
+EXPOSE 8000
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

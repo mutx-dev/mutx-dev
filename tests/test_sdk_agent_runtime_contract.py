@@ -119,7 +119,14 @@ async def test_mutx_agent_client_register_hits_contract_route():
     agent_id = str(uuid.uuid4())
     api_key = "mutx_agent_" + uuid.uuid4().hex
     requests, transport = _capture_transport(
-        _agent_info_response(agent_id=agent_id, api_key=api_key)
+        _agent_info_response(
+            agent_id=agent_id,
+            api_key=api_key,
+            desired_action="register",
+            desired_state="registered",
+            observed_state=None,
+            target_revision=1,
+        )
     )
     client = MutxAgentClient(mutx_url="https://api.test")
     client._client = httpx.AsyncClient(base_url=client.api_base_url, transport=transport)
@@ -134,6 +141,12 @@ async def test_mutx_agent_client_register_hits_contract_route():
     assert body["name"] == "test-agent"
     assert body["description"] == "Test agent"
     assert info.agent_id == agent_id
+    assert info.desired_action == "register"
+    assert info.desired_state == "registered"
+    assert info.target_revision == 1
+    assert info.observed_state is None
+    assert info.observed_revision is None
+    assert info.observed_at is None
 
 
 @pytest.mark.asyncio
@@ -210,7 +223,15 @@ async def test_mutx_agent_client_poll_commands_hits_contract_route():
     agent_id = str(uuid.uuid4())
     command_id = str(uuid.uuid4())
     requests, transport = _capture_transport(
-        {"commands": [_command_response(command_id=command_id)]}
+        {
+            "commands": [
+                _command_response(
+                    command_id=command_id,
+                    target_revision=7,
+                    target_deployment_id="33333333-3333-4333-a333-333333333333",
+                )
+            ]
+        }
     )
     client = MutxAgentClient(mutx_url="https://api.test", agent_id=agent_id, api_key="test-key")
     client._client = httpx.AsyncClient(base_url=client.api_base_url, transport=transport)
@@ -224,6 +245,8 @@ async def test_mutx_agent_client_poll_commands_hits_contract_route():
     assert len(commands) == 1
     assert commands[0].command_id == command_id
     assert commands[0].action == "run_task"
+    assert commands[0].target_revision == 7
+    assert commands[0].target_deployment_id == "33333333-3333-4333-a333-333333333333"
 
 
 @pytest.mark.asyncio
@@ -273,7 +296,14 @@ def test_mutx_agent_sync_client_register():
     agent_id = str(uuid.uuid4())
     api_key = "mutx_agent_" + uuid.uuid4().hex
     requests, transport = _capture_transport(
-        _agent_info_response(agent_id=agent_id, api_key=api_key),
+        _agent_info_response(
+            agent_id=agent_id,
+            api_key=api_key,
+            desired_action="register",
+            desired_state="registered",
+            observed_state=None,
+            target_revision=1,
+        ),
         status_code=201,
     )
     client = MutxAgentSyncClient(mutx_url="https://api.test")
@@ -284,6 +314,12 @@ def test_mutx_agent_sync_client_register():
     assert requests[0].url.path == "/v1/agents/register"
     assert json.loads(requests[0].content)["name"] == "sync-agent"
     assert info.agent_id == agent_id
+    assert info.desired_action == "register"
+    assert info.desired_state == "registered"
+    assert info.target_revision == 1
+    assert info.observed_state is None
+    assert info.observed_revision is None
+    assert info.observed_at is None
 
 
 def test_mutx_agent_sync_client_heartbeat():
@@ -414,3 +450,79 @@ def test_mutx_agent_client_increment_errors():
 
     client.increment_errors()
     assert client._errors_count == 1
+
+
+@pytest.mark.asyncio
+async def test_async_heartbeat_passes_explicit_target_evidence_unchanged():
+    agent_id = str(uuid.uuid4())
+    deployment_id = str(uuid.uuid4())
+    requests, transport = _capture_transport({"status": "ok"})
+    client = MutxAgentClient(mutx_url="https://api.test", agent_id=agent_id, api_key="test-key")
+    client._client = httpx.AsyncClient(base_url=client.api_base_url, transport=transport)
+    try:
+        await client.heartbeat(
+            status="running",
+            component="command_listener",
+            deployment_id=deployment_id,
+            target_revision=7,
+            node_id="node-proof",
+        )
+    finally:
+        await client.close()
+    body = json.loads(requests[0].content)
+    assert body["component"] == "command_listener"
+    assert body["deployment_id"] == deployment_id
+    assert body["target_revision"] == 7
+    assert body["node_id"] == "node-proof"
+
+
+def test_sync_heartbeat_passes_explicit_agent_revision_unchanged():
+    agent_id = str(uuid.uuid4())
+    requests, transport = _capture_transport({"status": "ok"})
+    client = MutxAgentSyncClient(mutx_url="https://api.test", agent_id=agent_id)
+    http = httpx.Client(base_url=client.api_base_url, transport=transport)
+    with patch("mutx.agent_runtime.httpx.Client", return_value=http):
+        client.heartbeat(status="stopped", target_revision=8)
+    body = json.loads(requests[0].content)
+    assert body["target_revision"] == 8
+    assert "deployment_id" not in body
+    assert "component" not in body
+
+
+@pytest.mark.asyncio
+async def test_async_agent_key_client_can_inspect_current_lifecycle_revision():
+    agent_id = str(uuid.uuid4())
+    payload = {
+        "agent_id": agent_id,
+        "target_revision": 8,
+        "desired_action": "stop",
+        "observed_state": "running",
+        "observed_revision": 7,
+    }
+    requests, transport = _capture_transport(payload)
+    client = MutxAgentClient(mutx_url="https://api.test", agent_id=agent_id, api_key="test-key")
+    client._client = httpx.AsyncClient(base_url=client.api_base_url, transport=transport)
+    try:
+        result = await client.get_status()
+    finally:
+        await client.close()
+    assert requests[0].url.path == f"/v1/agents/{agent_id}/status"
+    assert result == payload
+
+
+def test_sync_agent_key_client_can_inspect_current_lifecycle_revision():
+    agent_id = str(uuid.uuid4())
+    payload = {
+        "agent_id": agent_id,
+        "target_revision": 8,
+        "desired_action": "stop",
+        "observed_state": "running",
+        "observed_revision": 7,
+    }
+    requests, transport = _capture_transport(payload)
+    client = MutxAgentSyncClient(mutx_url="https://api.test", agent_id=agent_id, api_key="test-key")
+    http = httpx.Client(base_url=client.api_base_url, transport=transport)
+    with patch("mutx.agent_runtime.httpx.Client", return_value=http):
+        result = client.get_status()
+    assert requests[0].url.path == f"/v1/agents/{agent_id}/status"
+    assert result == payload

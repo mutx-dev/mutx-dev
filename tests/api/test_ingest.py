@@ -136,11 +136,13 @@ class TestIngestEndpoints:
         )
         assert response.status_code == 200
 
-        # Agent status should be FAILED, not running
+        # User-reported errors stay in the log and do not become runtime state.
         await db_session.refresh(agent)
-        assert agent.status == AgentStatus.FAILED.value
+        assert agent.status == AgentStatus.CREATING.value
+        assert agent.last_heartbeat is None
+        assert agent.observed_state is None
 
-        # The info log should record the FINAL status (failed), not the requested one (running)
+        # The info log records the reported status.
         logs = (
             (
                 await db_session.execute(
@@ -229,6 +231,7 @@ async def test_agent_runtime_heartbeat_returns_ok_when_webhook_dispatch_fails(
             "agent_id": str(test_agent.id),
             "status": "running",
             "timestamp": datetime.utcnow().isoformat(),
+            "target_revision": test_agent.target_revision,
         },
     )
 

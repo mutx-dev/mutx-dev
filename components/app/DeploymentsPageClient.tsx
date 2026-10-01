@@ -524,7 +524,7 @@ export function DeploymentsPageClient() {
         method: "DELETE",
       });
       await loadDeployments();
-      setActionNotice(`Terminated deployment ${deploymentId}.`);
+      setActionNotice(`Termination requested for deployment ${deploymentId}.`);
       setTerminationTarget(null);
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 401) setAuthRequired(true);

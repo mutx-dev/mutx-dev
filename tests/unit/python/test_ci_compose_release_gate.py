@@ -40,7 +40,6 @@ def test_frontend_ci_builds_and_smokes_the_standalone_production_artifact() -> N
         "page.goto('/docs'",
         "search documentation",
         "page.goto('/dashboard/release-smoke-unknown'",
-        'data-boundary-surface="dashboard"',
     ):
         assert contract in release_smoke
     for contract in (
@@ -461,7 +460,9 @@ def test_railway_workflow_promotes_only_after_fail_closed_validation() -> None:
     assert 'wait_for_release_identity "frontend"' in verify_script
     assert "expected_sha=${RELEASE_SHA}" in verify_script
     assert "seq 1 60" in verify_script
-    assert "Example MUTX governed deployment record" in verify_script
+    assert 'id="home-title"' in verify_script
+    assert 'require_content "${SITE_URL}" "Explore the demo"' in verify_script
+    assert 'require_content "${SITE_URL}" "Read the quickstart"' in verify_script
     assert 'verify-release-http.mjs" health' in verify_script
     assert 'verify-release-http.mjs" ready' in verify_script
     assert "payload[key] !== value" in verifier

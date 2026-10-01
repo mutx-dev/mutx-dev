@@ -110,7 +110,9 @@ verify_published_artifacts() {
   )
 }
 
-require_content "${SITE_URL}" "Example MUTX governed deployment record"
+require_content "${SITE_URL}" 'id="home-title"'
+require_content "${SITE_URL}" "Explore the demo"
+require_content "${SITE_URL}" "Read the quickstart"
 require_content "${SITE_URL}" "Releases"
 require_content "${SITE_URL}/download/macos" "Download MUTX for macOS"
 require_content "${APP_URL}/login" "Welcome back"

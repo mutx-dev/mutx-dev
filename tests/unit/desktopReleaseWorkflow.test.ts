@@ -92,14 +92,14 @@ describe('desktop release workflow', () => {
       readFileSync(join(process.cwd(), 'package-lock.json'), 'utf8')
     )
 
-    expect(packageJson.devDependencies.electron).toBe('43.7.3')
+    expect(packageJson.devDependencies.electron).toBe('43.7.7')
     expect(packageJson.build.mac.minimumSystemVersion).toBe('12.0')
-    expect(packageLock.packages[''].devDependencies.electron).toBe('43.7.3')
+    expect(packageLock.packages[''].devDependencies.electron).toBe('43.7.7')
     expect(packageLock.packages['node_modules/electron']).toMatchObject({
-      version: '43.7.3',
-      resolved: 'https://registry.npmjs.org/electron/-/electron-43.7.3.tgz',
+      version: '43.7.7',
+      resolved: 'https://registry.npmjs.org/electron/-/electron-43.7.7.tgz',
       integrity:
-        'sha512-I0MQyoe/6QIhQb6QFDUCLIplB8wq/IXR4q2IbOFQXq8AYlHqOAl6OmCknvNLSl4hVBH0bGsx1ypBqE5ns6LjoQ==',
+        'sha512-y0pg+KhWLAkW2Ts2njkFFNFl3KtB1FmbUp9Te9i+R2Og2v1fcI/I6MADJ7jvnzB5UKdt+U+0EUoCnVL79xMPMA==',
     })
   })
 

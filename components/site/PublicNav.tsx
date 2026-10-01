@@ -5,18 +5,30 @@ import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { getPicoUrl } from "@/lib/seo";
 
 import styles from "./PublicNav.module.css";
 
 const NAV_ITEMS = [
-  { label: "Product", href: "/ai-agent-control-plane", external: false },
-  { label: "Docs", href: "/docs", external: false },
+  { label: "Product", href: "/control", external: false },
+  { label: "Quickstart", href: "/docs/deployment/quickstart", external: false },
   { label: "GitHub", href: "https://github.com/mutx-dev/mutx-dev", external: true },
   { label: "Dashboard", href: "/dashboard", external: false },
 ] as const;
 
 export function PublicNav({ overlay = false }: { overlay?: boolean }) {
   const pathname = usePathname() ?? "/";
+  const picoUrl = getPicoUrl();
+  const navigationItems = NAV_ITEMS.map((item) => {
+    const current = !item.external && (pathname === item.href || pathname.startsWith(`${item.href}/`));
+    const productActive = item.label === "Product" && (pathname.startsWith("/ai-agent-") || pathname.startsWith("/control"));
+
+    return {
+      ...item,
+      active: !item.external && (current || productActive),
+      current,
+    };
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLElement>(null);
@@ -27,13 +39,13 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
   }, [pathname]);
 
   useEffect(() => {
-    const desktopQuery = window.matchMedia("(min-width: 901px)");
+    const mobileQuery = window.matchMedia("(max-width: 870px)");
     const closeAtDesktop = (event: MediaQueryListEvent) => {
-      if (event.matches) setMobileOpen(false);
+      if (!event.matches) setMobileOpen(false);
     };
 
-    desktopQuery.addEventListener("change", closeAtDesktop);
-    return () => desktopQuery.removeEventListener("change", closeAtDesktop);
+    mobileQuery.addEventListener("change", closeAtDesktop);
+    return () => mobileQuery.removeEventListener("change", closeAtDesktop);
   }, []);
 
   useEffect(() => {
@@ -113,35 +125,30 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
           <span className={styles.brandMark} aria-hidden="true">MX</span>
           <span className={styles.brandCopy}>
             <strong>MUTX</strong>
-            <small>Agent operations</small>
+            <small>AI agent workspace</small>
           </span>
         </Link>
 
         <nav className={styles.navLinks} aria-label="Primary navigation">
-          {NAV_ITEMS.map((item) => {
-            const productActive = item.label === "Product" && pathname.startsWith("/ai-agent-");
-            const active = !item.external && (productActive || pathname === item.href || pathname.startsWith(`${item.href}/`));
-            const current = !item.external && (pathname === item.href || pathname.startsWith(`${item.href}/`));
-
-            return item.external ? (
+          {navigationItems.map((item) => item.external ? (
               <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">
                 {item.label} <ArrowUpRight aria-hidden="true" />
                 <span className={styles.visuallyHidden}> (opens in a new tab)</span>
               </a>
             ) : (
-              <Link key={item.href} href={item.href} className={active ? styles.active : undefined} aria-current={current ? "page" : undefined}>
+              <Link key={item.href} href={item.href} className={item.active ? styles.active : undefined} aria-current={item.current ? "page" : undefined}>
                 {item.label}
               </Link>
-            );
-          })}
+            ))}
         </nav>
 
         <div className={styles.actions}>
-          <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer" className={styles.pico}>
-            Pico <ArrowUpRight aria-hidden="true" /><span className={styles.visuallyHidden}> (opens in a new tab)</span>
+          <a href={picoUrl} target="_blank" rel="noopener noreferrer" className={styles.pico}>
+            PicoMUTX <ArrowUpRight aria-hidden="true" />
+            <span className={styles.visuallyHidden}> (opens in a new tab)</span>
           </a>
-          <Link href="/download" className={styles.download}>
-            Download <ArrowRight className={styles.directionalIcon} aria-hidden="true" />
+          <Link href="/control" className={styles.cta}>
+            Demo <ArrowRight className="rtl-directional-icon" aria-hidden="true" />
           </Link>
           <button
             ref={menuButtonRef}
@@ -170,7 +177,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
           >
             <div className={styles.mobileMenuHeader}>
               <p id="public-mobile-navigation-title">
-                <span aria-hidden="true" /> Control plane navigation
+                <span aria-hidden="true" /> MUTX navigation
               </p>
               <button
                 type="button"
@@ -181,12 +188,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
                 <X aria-hidden="true" />
               </button>
             </div>
-            {NAV_ITEMS.map((item, index) => {
-              const productActive = item.label === "Product" && pathname.startsWith("/ai-agent-");
-              const active = !item.external && (productActive || pathname === item.href || pathname.startsWith(`${item.href}/`));
-              const current = !item.external && (pathname === item.href || pathname.startsWith(`${item.href}/`));
-
-              return item.external ? (
+            {navigationItems.map((item, index) => item.external ? (
                 <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">
                   <span>{String(index + 1).padStart(2, "0")}</span>{item.label}<ArrowUpRight aria-hidden="true" />
                   <span className={styles.visuallyHidden}> (opens in a new tab)</span>
@@ -195,19 +197,15 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={active ? styles.active : undefined}
+                  className={item.active ? styles.active : undefined}
                   onClick={() => setMobileOpen(false)}
-                  aria-current={current ? "page" : undefined}
+                  aria-current={item.current ? "page" : undefined}
                 >
                   <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
                 </Link>
-              );
-            })}
-            <Link href="/download" onClick={() => setMobileOpen(false)} className={styles.mobileDownload}>
-              <span>05</span>Download<ArrowRight className={styles.directionalIcon} aria-hidden="true" />
-            </Link>
-            <a href="https://pico.mutx.dev" target="_blank" rel="noopener noreferrer">
-              <span>06</span>Pico<ArrowUpRight aria-hidden="true" />
+              ))}
+            <a href={picoUrl} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>
+              <span>05</span>PicoMUTX<ArrowUpRight aria-hidden="true" />
               <span className={styles.visuallyHidden}> (opens in a new tab)</span>
             </a>
           </nav>

@@ -232,6 +232,12 @@ def test_agents_status_hits_canonical_route_and_renders_agent(monkeypatch) -> No
                 "name": "test-agent",
                 "description": "A test agent",
                 "status": "running",
+                "desired_action": "stop",
+                "desired_state": "stopped",
+                "target_revision": 8,
+                "observed_state": "running",
+                "observed_revision": 7,
+                "observed_at": "2026-03-14T10:01:00Z",
                 "created_at": "2026-03-14T10:00:00",
             },
         )
@@ -250,6 +256,10 @@ def test_agents_status_hits_canonical_route_and_renders_agent(monkeypatch) -> No
     assert "Name: test-agent" in result.output
     assert "Description: A test agent" in result.output
     assert "Status: running" in result.output
+
+    assert "Requested: stop (stopped), revision 8" in result.output
+    assert "Observed: running, revision 7" in result.output
+    assert "Observed at: 2026-03-14T10:01:00Z" in result.output
 
 
 def test_agents_logs_hits_canonical_route_and_renders_logs(monkeypatch) -> None:
@@ -419,3 +429,67 @@ def test_agents_list_with_simple_format(monkeypatch) -> None:
     assert result.exit_code == 0
     assert " | " in result.output
     assert agent_id in result.output
+
+
+def test_agents_stop_displays_pending_request_without_claiming_completion(monkeypatch):
+    agent_id = str(uuid.uuid4())
+    captured = []
+
+    def fake_post(path, json=None):
+        captured.append(path)
+        return DummyResponse(
+            200,
+            {
+                "status": "pending",
+                "desired_action": "stop",
+                "desired_state": "stopped",
+                "target_revision": 3,
+            },
+        )
+
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(post=fake_post)
+    )
+    result = CliRunner().invoke(cli, ["agents", "stop", agent_id])
+
+    assert result.exit_code == 0
+    assert captured == [f"/v1/agents/{agent_id}/stop"]
+    assert f"Stop requested for agent: {agent_id}" in result.output
+    assert "Status: pending" in result.output
+    assert "Stopped agent:" not in result.output
+
+
+def test_agent_json_list_keeps_intent_and_prior_observation_distinct(monkeypatch):
+    import json
+
+    agent_id = str(uuid.uuid4())
+    payload = {
+        "id": agent_id,
+        "name": "pending-stop",
+        "status": "running",
+        "desired_action": "stop",
+        "desired_state": "stopped",
+        "target_revision": 8,
+        "observed_state": "running",
+        "observed_revision": 7,
+        "observed_at": "2026-10-01T00:00:00+00:00",
+    }
+    monkeypatch.setattr("cli.commands.agent.current_config", lambda: DummyConfig())
+    monkeypatch.setattr(
+        "cli.commands.agent.get_client",
+        lambda config: SimpleNamespace(
+            get=lambda path, params=None: DummyResponse(200, {"items": [payload]})
+        ),
+    )
+    result = CliRunner().invoke(cli, ["agent", "list", "--output", "json"])
+
+    assert result.exit_code == 0
+    record = json.loads(result.output)[0]
+    assert record["status"] == "running"
+    assert record["desired_action"] == "stop"
+    assert record["desired_state"] == "stopped"
+    assert record["target_revision"] == 8
+    assert record["observed_state"] == "running"
+    assert record["observed_revision"] == 7
+    assert record["observed_at"] == "2026-10-01T00:00:00+00:00"

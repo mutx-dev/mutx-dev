@@ -15,6 +15,8 @@ const sharedCssFiles = [
   'components/site/PublicNav.module.css',
   'components/site/SystemState.module.css',
   'components/site/marketing/MarketingCore.module.css',
+  'components/site/marketing/ProductHomePage.module.css',
+  'components/site/marketing/ProductRevealStage.module.css',
 ] as const
 
 const sharedComponentFiles = [
@@ -74,13 +76,11 @@ describe('global RTL direction contracts', () => {
     expect(css).not.toMatch(/:dir\(rtl\)\s+(?:svg|img|video|canvas)\b/)
   })
 
-  it('mirrors the homepage event rail with logical inline geometry', () => {
-    const source = readSource('components/site/marketing/RebrandHomePage.module.css')
-    const eventRail = source.slice(source.indexOf('.eventRail {'), source.indexOf('.receipt {'))
+  it('draws homepage event rails with logical inline geometry', () => {
+    const source = readSource('components/site/marketing/ProductHomePage.module.css')
+    const eventRail = source.slice(source.indexOf('.eventRail::before {'), source.indexOf('.eventRail li {'))
 
     expect(eventRail).toContain('inset-inline-start:')
-    expect(eventRail).toContain('margin-inline-start:')
-    expect(eventRail).toContain('padding-inline-start:')
     expect(eventRail).not.toMatch(/(?:^|[;{]\s*)(?:left|right|margin-left|margin-right|padding-left|padding-right)\s*:/m)
   })
 

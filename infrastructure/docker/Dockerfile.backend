@@ -1,32 +1,22 @@
-# =============================================================================
-# Development Dockerfile for MUTX Backend
-# Multi-stage build with dependency caching
-# =============================================================================
+# Production image used by the Railway backend service.
+# Keep this dependency stage aligned with Dockerfile.api.production.
 
-# -----------------------------------------------------------------------------
-# Stage 1: Base - Common dependencies
-# -----------------------------------------------------------------------------
-FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS base
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS builder
 
-WORKDIR /app
+WORKDIR /build
 
-# Install system dependencies (common for all stages)
+# Build dependencies stay out of the runtime image.
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# -----------------------------------------------------------------------------
-# Stage 2: Dependencies - Install Python packages
-# -----------------------------------------------------------------------------
-FROM base AS deps
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-WORKDIR /app
-
-# Copy only requirements first for better caching
 COPY requirements-runtime.lock .
+# The runtime lock includes the psycopg 3 driver used by the API URL normalizer.
 # hadolint ignore=DL3013
 RUN python -m pip install --no-cache-dir \
     --disable-pip-version-check \
@@ -34,58 +24,45 @@ RUN python -m pip install --no-cache-dir \
     --only-binary=:all: \
     --requirement requirements-runtime.lock
 
-# -----------------------------------------------------------------------------
-# Stage 3: Builder - Prepare for development (optional, for future use)
-# -----------------------------------------------------------------------------
-FROM base AS builder
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS development
 
 WORKDIR /app
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    ENVIRONMENT=development
 
-COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=deps /usr/local/bin /usr/local/bin
-
-# -----------------------------------------------------------------------------
-# Stage 4: Production - Runtime image
-# -----------------------------------------------------------------------------
-FROM base AS production
-
-WORKDIR /app
-
-# Copy installed dependencies from deps stage
-COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=deps /usr/local/bin /usr/local/bin
-
-# Copy source code
 COPY alembic.ini /app/alembic.ini
 COPY src /app/src
 
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
-ENV ENVIRONMENT=production
-
 EXPOSE 8000
-
-CMD ["sh", "-c", "alembic upgrade head && uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips=\"${FORWARDED_ALLOW_IPS:?FORWARDED_ALLOW_IPS must list Railway trusted proxy CIDRs}\""]
-
-# -----------------------------------------------------------------------------
-# Stage 5: Development - With hot reload
-# -----------------------------------------------------------------------------
-FROM base AS development
-
-WORKDIR /app
-
-# Copy installed dependencies from deps stage
-COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=deps /usr/local/bin /usr/local/bin
-
-# Copy source code
-COPY alembic.ini /app/alembic.ini
-COPY src /app/src
-
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
-ENV ENVIRONMENT=development
-
-EXPOSE 8000
-
 CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+FROM python:3.12-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e AS production
+
+# libpq5 is retained for extensions or linked libraries that use the system client.
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --shell /bin/bash appuser
+
+WORKDIR /app
+COPY --from=builder --chown=appuser:appuser /opt/venv /opt/venv
+COPY --chown=appuser:appuser alembic.ini /app/alembic.ini
+COPY --chown=appuser:appuser src /app/src
+
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    ENVIRONMENT=production
+
+USER appuser
+EXPOSE 8000
+
+# Keep Railway migrations in the image's single boot contract. Railway's config
+# intentionally does not override this command.
+CMD ["sh", "-c", ": \"${FORWARDED_ALLOW_IPS:?FORWARDED_ALLOW_IPS must list Railway trusted proxy CIDRs}\" && alembic upgrade head && exec uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips=\"${FORWARDED_ALLOW_IPS}\""]

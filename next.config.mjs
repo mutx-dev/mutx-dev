@@ -1,6 +1,12 @@
 import withNextIntlPlugin from 'next-intl/plugin'
+import { getDocsPublicationManifest } from './lib/docs.ts'
 
 const withNextIntl = withNextIntlPlugin('./i18n/request.ts')
+const publicMarkdownFiles = Array.from(new Set([
+  './SUMMARY.md',
+  ...getDocsPublicationManifest().docs.map((doc) => `./${doc.sourcePath}`),
+])).sort()
+const socialImageFonts = ['./app/fonts/Geist-Bold.ttf', './app/fonts/Geist-Regular.ttf']
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,7 +21,16 @@ const nextConfig = {
     '/*': ['./dist/**/*'],
   },
   outputFileTracingIncludes: {
-    '/api/og-image': ['./node_modules/harfbuzzjs/hb.wasm'],
+    '/docs/\\[\\[\\.\\.\\.slug\\]\\]': publicMarkdownFiles,
+    '/sitemap.xml': publicMarkdownFiles,
+    '/sdk': ['./docs/sdk.md'],
+    '/support': ['./support.md'],
+    '/opengraph-image': socialImageFonts,
+    '/twitter-image': socialImageFonts,
+    '/api/og-image': [
+      ...socialImageFonts,
+      './node_modules/harfbuzzjs/hb.wasm',
+    ],
   },
   serverExternalPackages: ['@resvg/resvg-js', 'sharp', 'satori'],
   turbopack: {},
@@ -68,12 +83,14 @@ const nextConfig = {
         },
       ],
       afterFiles: [],
-      fallback: [
-        {
-          source: '/api/:path*',
-          destination: `${apiUrl}/:path*`,
-        },
-      ],
+      fallback: apiUrl
+        ? [
+            {
+              source: '/api/:path*',
+              destination: `${apiUrl}/:path*`,
+            },
+          ]
+        : [],
     }
   },
 }

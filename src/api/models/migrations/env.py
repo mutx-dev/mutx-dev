@@ -17,7 +17,8 @@ if config.config_file_name is not None:
 
 settings = get_settings()
 sync_db_url = build_sync_database_url(settings.database_url)
-config.set_main_option("sqlalchemy.url", sync_db_url)
+# Alembic uses ConfigParser interpolation; preserve URL-encoded characters.
+config.set_main_option("sqlalchemy.url", sync_db_url.replace("%", "%%"))
 
 target_metadata = Base.metadata
 

@@ -290,6 +290,16 @@ class Agent(Base):
     )  # Agent API key for self-auth
     api_key_prefix: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     last_heartbeat: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    desired_action: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    desired_state: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    observed_state: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    target_revision: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    stop_fence_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    stop_fence_completed_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    observed_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
@@ -359,6 +369,15 @@ class Deployment(Base):
     started_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     ended_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     error_message: Mapped[str] = mapped_column(Text, nullable=True)
+    desired_action: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    desired_state: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    observed_state: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    target_revision: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    agent_stop_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    observed_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="deployments")
     events: Mapped[list["DeploymentEvent"]] = relationship(
@@ -534,6 +553,10 @@ class Command(Base):
         UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
     )
     action: Mapped[str] = mapped_column(String(100), nullable=False)
+    target_deployment_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), nullable=True
+    )
+    target_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
     parameters: Mapped[Optional[dict]] = mapped_column(JSONText(), nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="pending")
     result: Mapped[Optional[dict]] = mapped_column(JSONText(), nullable=True)

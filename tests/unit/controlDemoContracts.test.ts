@@ -10,36 +10,40 @@ describe('control demo interaction contracts', () => {
   const primitivesSource = readSource('components/dashboard/demo/demoPrimitives.tsx')
   const contentSource = readSource('components/dashboard/demo/demoContent.ts')
   const sectionsSource = readSource('components/dashboard/demo/routeSections.tsx')
+  const styleSource = readSource('components/dashboard/demo/controlDemo.module.css')
   const boundarySource = [
     readSource('app/control/loading.tsx'),
     readSource('app/control/error.tsx'),
     readSource('app/control/not-found.tsx'),
   ].join('\n')
-  const visualSource = [appSource, primitivesSource, contentSource, sectionsSource, boundarySource].join('\n')
+  const demoVisualSource = [appSource, primitivesSource, contentSource, sectionsSource, styleSource].join('\n')
+  const visualSource = [demoVisualSource, boundarySource].join('\n')
 
-  it('uses the shared carbon, bone, and orange flight-recorder grammar', () => {
-    expect(appSource).toContain('data-control-visual-system="flight-recorder"')
-    expect(visualSource).toContain('#090a08')
-    expect(visualSource).toContain('#eee9dc')
-    expect(visualSource).toContain('#ff571c')
-    expect(visualSource).not.toMatch(/cyan-/)
-    expect(visualSource).not.toMatch(/rounded-\[(?:9|1\d|2\d)px\]/)
-    expect(visualSource).not.toMatch(/text-\[(?:8|9|10)px\]/)
-    expect(visualSource).not.toContain('group-hover:translate')
+  it('uses the shared charcoal, paper, and lime visual grammar', () => {
+    expect(appSource).toContain('data-control-visual-system="operator-workspace"')
+    expect(styleSource).toContain('--night: #0b0e0f')
+    expect(styleSource).toContain('--paper: #f0efe9')
+    expect(styleSource).toContain('--accent: #d7ee83')
+    expect(demoVisualSource).not.toContain('#ff571c')
+    expect(demoVisualSource).not.toMatch(/cyan-/)
+    expect(demoVisualSource).not.toMatch(/rounded-\[(?:9|1\d|2\d)px\]/)
+    expect(demoVisualSource).not.toMatch(/text-\[(?:8|9|10)px\]/)
+    expect(demoVisualSource).not.toContain('group-hover:translate')
   })
 
-  it('keeps the demo explicitly simulated and reduced-motion aware', () => {
-    expect(appSource).toContain('useReducedMotionPreference()')
-    expect(appSource).toContain('if (prefersReducedMotion)')
-    expect(appSource).toContain('data-motion={prefersReducedMotion ? "reduced" : "full"}')
+  it('keeps sample data clear and the interface free from simulated telemetry', () => {
     expect(appSource).toContain('data-no-live-writes="true"')
-    expect(appSource).toContain('Simulated interactive demo · sample data · actions stay local')
-    expect(primitivesSource).toContain('No live system was changed.')
+    expect(appSource).toContain('Demo · sample data · changes stay in this tab')
+    expect(appSource.match(/Demo · sample data · changes stay in this tab/g)).toHaveLength(1)
+    expect(appSource).not.toContain('setInterval')
+    expect(appSource).not.toContain('data-demo-tick')
+    expect(appSource).not.toContain('rotate(BASE_SIGNALS')
+    expect(styleSource).toContain('@media (prefers-reduced-motion: reduce)')
     expect(visualSource).not.toMatch(/(?:^|[\s"'`])animate-(?:pulse|spin|bounce)/m)
     expect(boundarySource).toContain('motion-reduce:animate-none')
   })
 
-  it('keeps the talk track behind an accessible, focus-managed presenter mode', () => {
+  it('keeps presenter notes behind an accessible, focus-managed dialog', () => {
     expect(appSource).toContain('const [presenterOpen, setPresenterOpen] = useState(false)')
     expect(appSource).toContain('role="dialog"')
     expect(appSource).toContain('aria-modal="true"')
@@ -48,16 +52,22 @@ describe('control demo interaction contracts', () => {
     expect(appSource).toContain('event.key === "Escape"')
     expect(appSource).toContain('presenterTriggerRef.current)?.focus')
     expect(appSource).toContain('presenterOpen ? (')
-    expect(appSource).toContain('Demo Script · talk track')
+    expect(appSource).toContain('>Presenter notes</h2>')
   })
 
-  it('keeps search, local interventions, and settings honest and keyboard operable', () => {
-    expect(appSource).toContain('aria-label="Open simulated settings"')
-    expect(primitivesSource).toContain('aria-label="Search simulated control plane"')
+  it('keeps search, local previews, and settings keyboard operable', () => {
+    expect(appSource).toContain('aria-label="Open settings"')
+    expect(primitivesSource).toContain('aria-label="Search demo pages"')
     expect(primitivesSource).toContain('event.key === "Escape"')
     expect(primitivesSource).toContain('href={item.href}')
-    expect(primitivesSource).toContain('onClick={() => setSimulated(true)}')
-    expect(sectionsSource).toContain('Write controls unavailable')
+    expect(primitivesSource).toContain('onClick={() => setSelected(true)}')
+    expect(primitivesSource).toContain('Preview selected: ${action.label}.')
     expect(sectionsSource).not.toContain('<button')
+    expect(primitivesSource).toContain('export function DecisionExampleActions(')
+    expect(primitivesSource).toContain('onClick={onApprove}')
+    expect(primitivesSource).toContain('onClick={onDecline}')
+    expect(primitivesSource).toContain('onClick={onReset}')
+    const stateSource = readSource('components/dashboard/demo/ControlDemoState.tsx')
+    expect([sectionsSource, primitivesSource, stateSource].join('\n')).not.toMatch(/\b(?:fetch|XMLHttpRequest|WebSocket|sendBeacon|useMutation)\b/)
   })
 })

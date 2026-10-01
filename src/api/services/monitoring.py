@@ -1,309 +1,128 @@
-"""
-Monitoring and Self-Healing logic for MUTX.
-"""
+"""Supervise qualified runtime observations and authenticated-agent liveness."""
 
 import logging
-import uuid
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select, update
+from sqlalchemy import and_, not_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType
+from src.api.models import Agent, Deployment
+from src.api.services.deployment_lifecycle import (
+    StaleObservation,
+    mark_agent_heartbeat_stale,
+    mark_stale_deployment_observation,
+)
 from src.api.services.webhook_service import trigger_agent_status_event, trigger_deployment_event
-from src.api.time_utils import as_utc, as_utc_naive
 
 logger = logging.getLogger(__name__)
 
-# --- Configuration ---
-HEARTBEAT_THRESHOLD_SECONDS = 60  # Agent is stale after 60s
-STALE_THRESHOLD_SECONDS = 120  # Agent is failed after 120s
-HEAL_THRESHOLD_SECONDS = 30  # Heal failed agents after 30s
+STALE_THRESHOLD_SECONDS = 120
 
 
-async def _get_latest_deployment(session: AsyncSession, agent_id: uuid.UUID) -> Deployment | None:
-    result = await session.execute(
-        select(Deployment)
-        .where(Deployment.agent_id == agent_id)
-        .order_by(Deployment.created_at.desc())
-        .limit(1)
-    )
-    return result.scalar_one_or_none()
+async def _emit_stale_observation(session: AsyncSession, result: StaleObservation) -> None:
+    agent = result.agent
+    for deployment in result.failed_deployments:
+        try:
+            await trigger_deployment_event(
+                session,
+                agent.user_id,
+                deployment.id,
+                agent.id,
+                event_type="monitor_failed",
+                status="failed",
+            )
+        except Exception:
+            logger.exception(
+                "Monitor webhook emission failed for deployment.event",
+                extra={"agent_id": str(agent.id), "deployment_id": str(deployment.id)},
+            )
+    if result.previous_status != agent.status:
+        try:
+            await trigger_agent_status_event(
+                session,
+                agent.user_id,
+                agent.id,
+                result.previous_status,
+                agent.status,
+                agent.name,
+            )
+        except Exception:
+            logger.exception(
+                "Monitor webhook emission failed for agent.status",
+                extra={"agent_id": str(agent.id), "new_status": agent.status},
+            )
 
 
-def _record_deployment_event(
-    session: AsyncSession,
-    deployment: Deployment,
-    *,
-    event_type: str,
-    status: str,
-    error_message: str | None = None,
-) -> None:
-    from src.api.models import DeploymentEvent
-
-    session.add(
-        DeploymentEvent(
-            deployment_id=deployment.id,
-            event_type=event_type,
-            status=status,
-            node_id=deployment.node_id,
-            error_message=error_message,
-        )
-    )
-
-
-async def _emit_agent_status_webhook(
-    session: AsyncSession,
-    *,
-    user_id: uuid.UUID,
-    agent_id: uuid.UUID,
-    old_status: str,
-    new_status: str,
-    agent_name: str,
-) -> None:
-    try:
-        await trigger_agent_status_event(
-            session, user_id, agent_id, old_status, new_status, agent_name
-        )
-    except Exception:
-        logger.exception(
-            "Monitor webhook emission failed for agent.status",
-            extra={"agent_id": str(agent_id), "old_status": old_status, "new_status": new_status},
-        )
-
-
-async def _emit_deployment_webhook(
-    session: AsyncSession,
-    *,
-    user_id: uuid.UUID,
-    deployment_id: uuid.UUID,
-    agent_id: uuid.UUID,
-    event_type: str,
-    status: str,
-) -> None:
-    try:
-        await trigger_deployment_event(
-            session,
-            user_id,
-            deployment_id,
-            agent_id,
-            event_type=event_type,
-            status=status,
-        )
-    except Exception:
-        logger.exception(
-            "Monitor webhook emission failed for deployment.event",
-            extra={
-                "agent_id": str(agent_id),
-                "deployment_id": str(deployment_id),
-                "event_type": event_type,
-                "status": status,
-            },
-        )
-
-
-async def monitor_agent_health(session: AsyncSession):
-    """
-    Main monitoring and self-healing lifecycle:
-    1. Promote 'creating' -> 'running' after a delay
-    2. Mark 'running' agents as 'failed' if heartbeat is missing
-    3. Auto-heal 'failed' agents back to 'running'
-    """
+async def monitor_agent_health(session: AsyncSession) -> None:
+    """Fail stale current targets after rechecking their revision and evidence time."""
     now = datetime.now(timezone.utc)
-    deployment_now = as_utc_naive(now)
+    stale_before = now - timedelta(seconds=STALE_THRESHOLD_SECONDS)
+    failure_message = (
+        "System: Agent deployment marked as FAILED due to stale qualified runtime evidence "
+        f"({STALE_THRESHOLD_SECONDS}s)."
+    )
 
-    # 1. Promote CREATING -> RUNNING
-    # This simulates the completion of provisioning
-    result = await session.execute(select(Agent).where(Agent.status == "creating"))
-    new_agents = result.scalars().all()
-    for agent in new_agents:
-        created = as_utc(agent.created_at) if agent.created_at else None
-        if created and now - created > timedelta(seconds=10):
-            old_status = agent.status
-            with session.no_autoflush:
-                dep_check = await session.execute(
-                    select(Deployment).where(Deployment.agent_id == agent.id)
-                )
-                deployment = dep_check.scalar_one_or_none()
-
-            agent.status = "running"
-            agent.last_heartbeat = as_utc(now)
-
-            created_deployment = False
-            if deployment is None:
-                deployment = Deployment(
-                    agent_id=agent.id,
-                    status="running",
-                    replicas=1,
-                    started_at=deployment_now,
-                    node_id=f"node-{uuid.uuid4().hex[:6]}",
-                )
-                session.add(deployment)
-                await session.flush()
-                _record_deployment_event(
-                    session,
-                    deployment,
-                    event_type="monitor_started",
-                    status="running",
-                )
-                created_deployment = True
-            await session.flush()
-
-            if created_deployment:
-                await _emit_deployment_webhook(
-                    session,
-                    user_id=agent.user_id,
-                    deployment_id=deployment.id,
-                    agent_id=agent.id,
-                    event_type="monitor_started",
-                    status="running",
-                )
-
-            await _emit_agent_status_webhook(
-                session,
-                user_id=agent.user_id,
-                agent_id=agent.id,
-                old_status=old_status,
-                new_status=agent.status,
-                agent_name=agent.name,
-            )
-
-            logger.info(f"Monitor: Agent {agent.name} ({agent.id}) promoted to RUNNING")
-
-    # 2. Detect Heartbeat Failures
-    result = await session.execute(select(Agent).where(Agent.status == "running"))
-    running_agents = result.scalars().all()
-
-    for agent in running_agents:
-        last_hb = (
-            as_utc(agent.last_heartbeat or agent.created_at)
-            if (agent.last_heartbeat or agent.created_at)
-            else None
+    stale_targets = await session.execute(
+        select(Deployment.id, Deployment.target_revision)
+        .where(
+            Deployment.observed_state.in_(["running", "ready"]),
+            Deployment.observed_revision == Deployment.target_revision,
+            Deployment.observed_at.is_not(None),
+            Deployment.observed_at < stale_before,
         )
-        if last_hb and now - last_hb > timedelta(seconds=STALE_THRESHOLD_SECONDS):
-            logger.warning(f"Monitor: Agent {agent.name} ({agent.id}) is STALE. Marking as FAILED.")
-            old_status = agent.status
-            failure_message = (
-                f"System: Agent marked as FAILED due to heartbeat timeout "
+        .order_by(Deployment.agent_id, Deployment.id)
+    )
+    for deployment_id, target_revision in stale_targets.all():
+        result = await mark_stale_deployment_observation(
+            db=session,
+            deployment_id=deployment_id,
+            expected_revision=target_revision,
+            stale_before=stale_before,
+            now=now,
+            failure_message=failure_message,
+        )
+        if result is not None:
+            logger.warning(
+                "Monitor marked stale deployment evidence failed",
+                extra={"agent_id": str(result.agent.id), "deployment_id": str(deployment_id)},
+            )
+            await _emit_stale_observation(session, result)
+
+    current_agent_observation = and_(
+        Agent.observed_revision == Agent.target_revision,
+        Agent.observed_at.is_not(None),
+    )
+    stale_agents = await session.execute(
+        select(Agent.id).where(
+            Agent.status == "running",
+            or_(
+                and_(
+                    current_agent_observation,
+                    Agent.observed_state.in_(["running", "ready"]),
+                    Agent.observed_at < stale_before,
+                ),
+                and_(
+                    not_(current_agent_observation),
+                    Agent.last_heartbeat.is_not(None),
+                    Agent.last_heartbeat < stale_before,
+                ),
+            ),
+        )
+    )
+    for (agent_id,) in stale_agents.all():
+        result = await mark_agent_heartbeat_stale(
+            db=session,
+            agent_id=agent_id,
+            stale_before=stale_before,
+            now=now,
+            failure_message=(
+                "System: Agent marked as FAILED due to stale current runtime evidence "
                 f"({STALE_THRESHOLD_SECONDS}s)."
+            ),
+        )
+        if result is not None:
+            logger.warning(
+                "Monitor marked stale agent evidence failed",
+                extra={"agent_id": str(agent_id)},
             )
-
-            with session.no_autoflush:
-                deployment = await _get_latest_deployment(session, agent.id)
-
-            agent.status = "failed"
-
-            # Create Alert
-            alert = Alert(
-                agent_id=agent.id,
-                type=AlertType.AGENT_DOWN,
-                message=f"Agent {agent.name} failed to report heartbeat for {STALE_THRESHOLD_SECONDS}s",
-            )
-            session.add(alert)
-
-            session.add(
-                AgentLog(
-                    agent_id=agent.id,
-                    level="error",
-                    message=failure_message,
-                    timestamp=now,
-                )
-            )
-
-            if deployment is not None:
-                deployment.status = "failed"
-                deployment.ended_at = deployment_now
-                deployment.error_message = failure_message
-                _record_deployment_event(
-                    session,
-                    deployment,
-                    event_type="monitor_failed",
-                    status="failed",
-                    error_message=failure_message,
-                )
-            await session.flush()
-
-            if deployment is not None:
-                await _emit_deployment_webhook(
-                    session,
-                    user_id=agent.user_id,
-                    deployment_id=deployment.id,
-                    agent_id=agent.id,
-                    event_type="monitor_failed",
-                    status="failed",
-                )
-
-            await _emit_agent_status_webhook(
-                session,
-                user_id=agent.user_id,
-                agent_id=agent.id,
-                old_status=old_status,
-                new_status=agent.status,
-                agent_name=agent.name,
-            )
-
-    # 3. Auto-Heal Failed Agents
-    result = await session.execute(select(Agent).where(Agent.status == "failed"))
-    failed_agents = result.scalars().all()
-
-    for agent in failed_agents:
-        updated = as_utc(agent.updated_at) if agent.updated_at else None
-        if updated and now - updated > timedelta(seconds=HEAL_THRESHOLD_SECONDS):
-            logger.info(f"Auto-Healer: Restarting agent {agent.name} ({agent.id})...")
-            old_status = agent.status
-            with session.no_autoflush:
-                deployment = await _get_latest_deployment(session, agent.id)
-            agent.status = "running"
-            agent.last_heartbeat = as_utc(now)
-
-            # Resolve active AGENT_DOWN alerts
-            await session.execute(
-                update(Alert)
-                .where(
-                    Alert.agent_id == agent.id,
-                    Alert.type == AlertType.AGENT_DOWN,
-                    Alert.resolved.is_(False),
-                )
-                .values(resolved=True, resolved_at=now)
-            )
-
-            session.add(
-                AgentLog(
-                    agent_id=agent.id,
-                    level="info",
-                    message="System: Control plane detected failure and initiated automatic recovery. Agent is back to RUNNING.",
-                    timestamp=now,
-                )
-            )
-
-            if deployment is not None:
-                deployment.status = "running"
-                deployment.started_at = deployment_now
-                deployment.ended_at = None
-                deployment.error_message = None
-                _record_deployment_event(
-                    session,
-                    deployment,
-                    event_type="monitor_restarted",
-                    status="running",
-                )
-            await session.flush()
-
-            if deployment is not None:
-                await _emit_deployment_webhook(
-                    session,
-                    user_id=agent.user_id,
-                    deployment_id=deployment.id,
-                    agent_id=agent.id,
-                    event_type="monitor_restarted",
-                    status="running",
-                )
-
-            await _emit_agent_status_webhook(
-                session,
-                user_id=agent.user_id,
-                agent_id=agent.id,
-                old_status=old_status,
-                new_status=agent.status,
-                agent_name=agent.name,
-            )
+            await _emit_stale_observation(session, result)

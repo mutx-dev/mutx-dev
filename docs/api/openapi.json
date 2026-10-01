@@ -14134,12 +14134,27 @@
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "desired_action": {
+            "type": "string",
+            "title": "Desired Action"
+          },
+          "desired_state": {
+            "type": "string",
+            "title": "Desired State"
+          },
+          "target_revision": {
+            "type": "integer",
+            "title": "Target Revision"
           }
         },
         "type": "object",
         "required": [
           "deployment_id",
-          "status"
+          "status",
+          "desired_action",
+          "desired_state",
+          "target_revision"
         ],
         "title": "AgentDeployResponse"
       },
@@ -14176,6 +14191,67 @@
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "desired_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired Action"
+          },
+          "desired_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired State"
+          },
+          "observed_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed State"
+          },
+          "target_revision": {
+            "type": "integer",
+            "title": "Target Revision",
+            "default": 0
+          },
+          "observed_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed Revision"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed At"
           },
           "config": {
             "anyOf": [
@@ -14601,6 +14677,44 @@
           "message": {
             "type": "string",
             "title": "Message"
+          },
+          "desired_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired Action"
+          },
+          "desired_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired State"
+          },
+          "observed_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed State"
+          },
+          "target_revision": {
+            "type": "integer",
+            "title": "Target Revision",
+            "default": 0
           }
         },
         "type": "object",
@@ -14880,6 +14994,67 @@
             "type": "string",
             "title": "Status"
           },
+          "desired_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired Action"
+          },
+          "desired_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired State"
+          },
+          "observed_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed State"
+          },
+          "target_revision": {
+            "type": "integer",
+            "title": "Target Revision",
+            "default": 0
+          },
+          "observed_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed Revision"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed At"
+          },
           "config": {
             "anyOf": [
               {
@@ -15006,6 +15181,67 @@
               }
             ],
             "title": "Uptime Seconds"
+          },
+          "desired_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired Action"
+          },
+          "desired_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired State"
+          },
+          "observed_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed State"
+          },
+          "target_revision": {
+            "type": "integer",
+            "title": "Target Revision",
+            "default": 0
+          },
+          "observed_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed Revision"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed At"
           }
         },
         "type": "object",
@@ -15062,11 +15298,26 @@
           "status": {
             "type": "string",
             "title": "Status"
+          },
+          "desired_action": {
+            "type": "string",
+            "title": "Desired Action"
+          },
+          "desired_state": {
+            "type": "string",
+            "title": "Desired State"
+          },
+          "target_revision": {
+            "type": "integer",
+            "title": "Target Revision"
           }
         },
         "type": "object",
         "required": [
-          "status"
+          "status",
+          "desired_action",
+          "desired_state",
+          "target_revision"
         ],
         "title": "AgentStopResponse"
       },
@@ -17551,6 +17802,29 @@
           "received_at": {
             "type": "string",
             "title": "Received At"
+          },
+          "target_deployment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Deployment Id"
+          },
+          "target_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Revision"
           }
         },
         "type": "object",
@@ -19930,6 +20204,50 @@
               }
             ],
             "title": "Hostname"
+          },
+          "component": {
+            "type": "string",
+            "enum": [
+              "agent_runtime",
+              "command_listener"
+            ],
+            "title": "Component",
+            "default": "agent_runtime"
+          },
+          "deployment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment Id"
+          },
+          "target_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Revision"
+          },
+          "node_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node Id"
           }
         },
         "type": "object",
@@ -30644,6 +30962,67 @@
             ],
             "title": "Error Message"
           },
+          "desired_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired Action"
+          },
+          "desired_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired State"
+          },
+          "observed_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed State"
+          },
+          "target_revision": {
+            "type": "integer",
+            "title": "Target Revision",
+            "default": 0
+          },
+          "observed_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed Revision"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed At"
+          },
           "events": {
             "items": {
               "$ref": "#/components/schemas/DeploymentEventResponse"
@@ -30666,6 +31045,24 @@
             "title": "Allowed Actions",
             "description": "Lifecycle actions currently accepted for this deployment state.",
             "readOnly": true
+          },
+          "can_stop": {
+            "type": "boolean",
+            "title": "Can Stop",
+            "description": "Whether a stop action is currently accepted.",
+            "readOnly": true
+          },
+          "can_restart": {
+            "type": "boolean",
+            "title": "Can Restart",
+            "description": "Whether a restart action is currently accepted.",
+            "readOnly": true
+          },
+          "can_terminate": {
+            "type": "boolean",
+            "title": "Can Terminate",
+            "description": "Whether a termination action is currently accepted.",
+            "readOnly": true
           }
         },
         "type": "object",
@@ -30677,7 +31074,10 @@
           "node_id",
           "ended_at",
           "error_message",
-          "allowed_actions"
+          "allowed_actions",
+          "can_stop",
+          "can_restart",
+          "can_terminate"
         ],
         "title": "DeploymentResponse"
       },

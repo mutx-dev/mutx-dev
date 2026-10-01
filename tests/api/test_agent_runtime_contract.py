@@ -1,9 +1,13 @@
 from datetime import datetime, timezone
 from pathlib import Path
+import uuid
 
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
+from sqlalchemy import select
+
+from src.api.models import Deployment
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -32,13 +36,20 @@ async def test_registered_agent_api_key_authenticates_runtime_status_and_heartbe
     agent_id = payload["agent_id"]
     api_key = payload["api_key"]
     assert api_key.startswith("mutx_agent_")
+    assert payload["desired_action"] == "register"
+    assert payload["desired_state"] == "registered"
+    assert payload["observed_state"] is None
+    assert payload["target_revision"] == 1
 
     runtime_headers = {"Authorization": f"Bearer {api_key}"}
 
     status_response = await client.get(f"/v1/agents/{agent_id}/status", headers=runtime_headers)
     assert status_response.status_code == 200
     assert status_response.json()["agent_id"] == agent_id
-    assert status_response.json()["status"] == "running"
+    assert status_response.json()["status"] == "creating"
+    assert status_response.json()["target_revision"] == 1
+    assert status_response.json()["observed_state"] is None
+    assert status_response.json()["uptime_seconds"] is None
 
     heartbeat_response = await client.post(
         "/v1/agents/heartbeat",
@@ -197,7 +208,7 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
     agent_id = payload["agent_id"]
     api_key = payload["api_key"]
 
-    # 1) first heartbeat keeps status unchanged => only heartbeat event
+    # 1) current Agent-scoped evidence records a live state transition.
     heartbeat_response = await client.post(
         "/v1/agents/heartbeat",
         headers={"Authorization": f"Bearer {api_key}"},
@@ -208,6 +219,7 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
             "timestamp": "2026-03-14T14:00:00Z",
             "platform": "test-platform",
             "hostname": "test-host",
+            "target_revision": payload["target_revision"],
         },
     )
     assert heartbeat_response.status_code == 200
@@ -217,19 +229,19 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
     assert body["agent_id"] == agent_id
     assert "timestamp" in body
 
-    assert len(emitted_events) == 1
+    assert len(emitted_events) == 2
     event_name, event_payload = emitted_events.pop(0)
     assert event_name == "agent.heartbeat"
-    assert event_payload == {
-        "agent_id": agent_id,
-        "agent_name": "runtime-heartbeat-shape",
-        "status": "running",
-        "previous_status": "running",
-        "message": "still running",
-        "platform": "test-platform",
-        "hostname": "test-host",
-        "timestamp": body["timestamp"],
-    }
+    assert event_payload["agent_id"] == agent_id
+    assert event_payload["agent_name"] == "runtime-heartbeat-shape"
+    assert event_payload["status"] == "running"
+    assert event_payload["reported_status"] == "running"
+    assert event_payload["previous_status"] == "creating"
+    assert event_payload["timestamp"] == body["timestamp"]
+    status_name, initial_status_payload = emitted_events.pop(0)
+    assert status_name == "agent.status"
+    assert initial_status_payload["old_status"] == "creating"
+    assert initial_status_payload["new_status"] == "running"
 
     # 2) status change emits heartbeat + status event with identical timestamp
     emitted_events.clear()
@@ -244,6 +256,7 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
             "timestamp": "2026-03-14T14:01:00Z",
             "platform": "test-platform",
             "hostname": "test-host",
+            "target_revision": payload["target_revision"],
         },
     )
     assert status_change_response.status_code == 200
@@ -262,6 +275,128 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
     assert status_event_payload["timestamp"] == status_body["timestamp"]
     assert status_event_payload["old_status"] == "running"
     assert status_event_payload["new_status"] == "failed"
+
+
+@pytest.mark.asyncio
+async def test_identical_current_deployment_heartbeat_does_not_repeat_transition_webhooks(
+    client: AsyncClient, db_session, monkeypatch
+):
+    emitted_events: list[str] = []
+
+    async def fake_trigger_webhook_event(_db, _user_id, event, _payload):
+        emitted_events.append(event)
+        return 1
+
+    async def fake_trigger_deployment_event(
+        _db, _user_id, _deployment_id, _agent_id, *, event_type, status=None
+    ):
+        emitted_events.append("deployment.event")
+        return 1
+
+    monkeypatch.setattr(
+        "src.api.routes.agent_runtime.trigger_webhook_event", fake_trigger_webhook_event
+    )
+    monkeypatch.setattr(
+        "src.api.routes.agent_runtime.trigger_deployment_event", fake_trigger_deployment_event
+    )
+
+    register = await client.post(
+        "/v1/agents/register",
+        json={"name": "duplicate-heartbeat", "metadata": {}, "capabilities": ["heartbeat"]},
+    )
+    assert register.status_code == 200
+    runtime = register.json()
+    deployed = await client.post(f"/v1/agents/{runtime['agent_id']}/deploy")
+    assert deployed.status_code == 200
+    deployment = (
+        await db_session.execute(
+            select(Deployment).where(Deployment.agent_id == uuid.UUID(runtime["agent_id"]))
+        )
+    ).scalar_one()
+    headers = {"Authorization": f"Bearer {runtime['api_key']}"}
+    body = {
+        "agent_id": runtime["agent_id"],
+        "status": "running",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "deployment_id": str(deployment.id),
+        "target_revision": deployment.target_revision,
+    }
+
+    first = await client.post("/v1/agents/heartbeat", headers=headers, json=body)
+    assert first.status_code == 200
+    assert emitted_events == ["agent.heartbeat", "agent.status", "deployment.event"]
+    emitted_events.clear()
+
+    second = await client.post(
+        "/v1/agents/heartbeat",
+        headers=headers,
+        json={**body, "timestamp": datetime.now(timezone.utc).isoformat()},
+    )
+    assert second.status_code == 200
+    assert emitted_events == ["agent.heartbeat"]
+
+
+@pytest.mark.asyncio
+async def test_authenticated_termination_requires_current_deployment_revision(
+    client: AsyncClient, db_session
+):
+    register = await client.post(
+        "/v1/agents/register",
+        json={"name": "termination-proof", "metadata": {}, "capabilities": ["heartbeat"]},
+    )
+    assert register.status_code == 200
+    runtime = register.json()
+    headers = {"Authorization": f"Bearer {runtime['api_key']}"}
+
+    deployed = await client.post(f"/v1/agents/{runtime['agent_id']}/deploy")
+    assert deployed.status_code == 200
+    deployment_id = uuid.UUID(deployed.json()["deployment_id"])
+    deployment = await db_session.get(Deployment, deployment_id)
+    old_revision = deployment.target_revision
+
+    terminated = await client.delete(f"/v1/deployments/{deployment_id}")
+    assert terminated.status_code == 204
+    await db_session.refresh(deployment)
+    assert deployment.status == "pending"
+    assert deployment.desired_action == "terminate"
+    assert deployment.desired_state == "terminated"
+    current_revision = deployment.target_revision
+    assert current_revision == old_revision + 1
+
+    stale = await client.post(
+        "/v1/agents/heartbeat",
+        headers=headers,
+        json={
+            "agent_id": runtime["agent_id"],
+            "status": "stopped",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "deployment_id": str(deployment_id),
+            "target_revision": old_revision,
+        },
+    )
+    assert stale.status_code == 200
+    await db_session.refresh(deployment)
+    assert deployment.status == "pending"
+    assert deployment.observed_state is None
+
+    confirmed = await client.post(
+        "/v1/agents/heartbeat",
+        headers=headers,
+        json={
+            "agent_id": runtime["agent_id"],
+            "status": "stopped",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "deployment_id": str(deployment_id),
+            "target_revision": current_revision,
+        },
+    )
+    assert confirmed.status_code == 200
+    await db_session.refresh(deployment)
+    assert deployment.status == "killed"
+    assert deployment.desired_action == "terminate"
+    assert deployment.desired_state == "terminated"
+    assert deployment.observed_state == "stopped"
+    assert deployment.observed_revision == current_revision
 
 
 @pytest.mark.asyncio
@@ -311,6 +446,7 @@ async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(
             "platform": "test-platform",
             "hostname": "test-host",
             "timestamp": "2026-03-14T14:02:00Z",
+            "target_revision": payload["target_revision"],
         },
     )
 
@@ -321,4 +457,4 @@ async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(
     assert "timestamp" in body
 
     assert call_log["agent.heartbeat"] == 1
-    assert call_log["agent.status"] == 0
+    assert call_log["agent.status"] == 1

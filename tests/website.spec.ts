@@ -1,6 +1,7 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import { createDefaultPicoProgress } from '../lib/pico/academy';
 import { type PicoTutorConnection, type PicoTutorEntitlement } from '../lib/pico/tutor';
+import { getPicoUrl } from '../lib/seo';
 
 type PicoProductStubOptions = {
   authenticated?: boolean
@@ -51,10 +52,11 @@ async function expectRouteSurfaceSplit(page: Page) {
   expect(metrics.crossingPanel).toBe(false);
 }
 
-async function expectAuthLedger(page: Page, variant: 'access' | 'recovery') {
+async function expectAuthSurface(page: Page, variant: 'access' | 'recovery') {
   await expect(page.getByTestId('public-auth-nav')).toBeVisible();
   await expect(page.locator(`main[data-auth-variant="${variant}"]`)).toBeVisible();
-  await expect(page.getByText(/identity ledger/i)).toBeVisible();
+  await expect(page.locator('main h1')).toBeVisible();
+  await expect(page.getByText(/identity ledger|secure channel/i)).toHaveCount(0);
 }
 
 async function getAverageRgb(locator: Locator) {
@@ -525,58 +527,70 @@ test.describe('mutx.dev QA', () => {
     });
   });
 
-  test('homepage opens directly into a concrete operational ledger', async ({ page }) => {
+  test('homepage opens on the agent-operations story with reachable primary actions', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('marketing-loader')).toHaveCount(0);
     await expect(page.getByText(/^Loading\.\.\.$/i)).toHaveCount(0);
+    const hero = page.locator('section[aria-labelledby="home-title"]');
+    await expect(hero).toBeVisible();
+    await expect(hero.locator('#home-title')).toHaveText('Inspect runs. Control tool calls.');
     await expect(
-      page.getByRole('heading', { name: /read the governed path\. hold the line\./i })
+      hero.getByText(/follow an agent request from its first event to the decision to let a tool run/i)
     ).toBeVisible();
-    await expect(
-      page.getByText(/records submitted runtime evidence and evaluates registered tool calls/i)
-    ).toBeVisible();
-    await expect(page.getByRole('link', { name: /check mac availability/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /open dashboard/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /github/i }).first()).toBeVisible();
 
-    const runRecord = page.getByLabel(/example mutx governed deployment record/i);
-    await expect(runRecord).toBeVisible();
-    await expect(runRecord.getByText(/production boundary matched/i)).toBeVisible();
-    await expect(runRecord.getByText(/approved by a\. rivera/i)).toBeVisible();
-    await expect(runRecord.getByText(/rcpt_7f2a91/i)).toBeVisible();
+    const demoLink = hero.getByRole('link', { name: /explore the demo/i });
+    await expect(demoLink).toBeVisible();
+    await expect(demoLink).toHaveAttribute('href', '/control');
+
+    const quickstartLink = hero.getByRole('link', { name: /read the quickstart/i });
+    await expect(quickstartLink).toBeVisible();
+    await expect(quickstartLink).toHaveAttribute('href', '/docs/deployment/quickstart');
   });
 
-  test('homepage tells one complete story from intent to evidence', async ({ page }) => {
+  test('homepage explains run history, operator review, and ways to get started', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    for (const heading of [
-      /one line from intent to evidence/i,
-      /signal first\. furniture last\./i,
-      /helpful is not the same as permitted\./i,
-      /from setup to first record\./i,
-      /instrument the run\. keep the evidence\./i,
-    ]) {
-      await expect(page.getByRole('heading', { name: heading })).toBeVisible();
-    }
+    const main = page.locator('main#main-content');
+    await expect(main.getByRole('heading', { name: /read each run in order\./i })).toBeVisible();
+    await expect(
+      main.getByText(/mutx records run events and tool calls that an integration submits/i)
+    ).toBeVisible();
+    await expect(main.getByText(/coverage depends on the events your integration reports/i)).toBeVisible();
 
-    for (const label of ['Observe', 'Bound', 'Approve', 'Execute', 'Prove']) {
-      await expect(page.getByRole('link', { name: new RegExp(label, 'i') }).first()).toBeVisible();
-    }
+    const approvalSection = main.locator('section[aria-labelledby="approval-title"]');
+    await expect(approvalSection.getByRole('heading', { name: /review tool calls before they run/i })).toBeVisible();
+    await expect(approvalSection.getByText(/waiting for a decision/i)).toBeVisible();
 
-    await expect(page.getByText(/no file moved\. scope and destination preserved/i)).toBeVisible();
-    await expect(page.getByText(/source-available agent operations/i).first()).toBeVisible();
+    const startingPoints = main.locator('section[aria-labelledby="start-title"]');
+    await expect(startingPoints.getByRole('heading', { name: /build, operate, or start with pico/i })).toBeVisible();
+    await expect(startingPoints.getByRole('link', { name: /read the quickstart/i })).toHaveAttribute(
+      'href',
+      '/docs/deployment/quickstart',
+    );
+    await expect(startingPoints.getByRole('link', { name: /open the dashboard/i })).toHaveAttribute(
+      'href',
+      '/dashboard',
+    );
+    await expect(startingPoints.getByRole('link', { name: /explore picomutx/i })).toHaveAttribute(
+      'href',
+      getPicoUrl(),
+    );
+    for (const link of await page.getByRole('link', { name: /picomutx/i }).all()) {
+      await expect(link).toHaveAttribute('href', getPicoUrl());
+    }
   });
 
-  test('homepage stays inside the mobile viewport and preserves the operating record', async ({ page }) => {
+  test('homepage keeps its mobile hero and example approval inside the viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(
-      page.getByRole('heading', { name: /read the governed path\. hold the line\./i })
-    ).toBeVisible();
-    await expect(page.getByLabel(/example mutx governed deployment record/i)).toBeVisible();
+    const hero = page.locator('section[aria-labelledby="home-title"]');
+    await expect(hero.getByRole('heading', { name: /inspect runs\. control tool calls\./i })).toBeVisible();
+    await expect(hero.getByRole('link', { name: /explore the demo/i })).toBeVisible();
+    await expect(hero.getByRole('link', { name: /read the quickstart/i })).toBeVisible();
+    await expect(page.getByText('Agent activity', { exact: true })).toBeVisible();
+    await expect(page.getByText(/operator review required before the call runs/i)).toBeVisible();
 
     const metrics = await page.evaluate(() => {
       const heading = document.querySelector('h1');
@@ -593,7 +607,6 @@ test.describe('mutx.dev QA', () => {
     expect(metrics.documentWidth).toBeLessThanOrEqual(metrics.viewportWidth);
     expect(metrics.headingLeft).toBeGreaterThanOrEqual(-1);
     expect(metrics.headingRight).toBeLessThanOrEqual(metrics.viewportWidth + 1);
-    await expect(page.getByRole('link', { name: /download/i }).first()).toBeVisible();
   });
 
   test('public mobile navigation behaves as a modal and releases state on resize', async ({ page }) => {
@@ -603,7 +616,7 @@ test.describe('mutx.dev QA', () => {
     const opener = page.getByRole('button', { name: /open navigation/i });
     await opener.click();
 
-    const dialog = page.getByRole('dialog', { name: /control plane navigation/i });
+    const dialog = page.getByRole('dialog', { name: /mutx navigation/i });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole('button', { name: /close navigation/i })).toBeFocused();
     expect(await page.evaluate(() => document.body.style.overflow)).toBe('hidden');
@@ -618,40 +631,93 @@ test.describe('mutx.dev QA', () => {
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
     await expect(opener).toBeFocused();
-    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe('hidden');
+    await expect.poll(() => page.evaluate(() => document.body.style.overflow)).not.toBe('hidden');
 
     await opener.click();
     await expect(dialog).toBeVisible();
-    await page.setViewportSize({ width: 1100, height: 844 });
+    await page.setViewportSize({ width: 880, height: 844 });
     await expect(dialog).toHaveCount(0);
-    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe('hidden');
+    await expect.poll(() => page.evaluate(() => document.body.style.overflow)).not.toBe('hidden');
+    await expect.poll(() => page.locator('main').evaluate((main) => Boolean(main.closest('[inert]')))).toBe(false);
   });
 
-  test('homepage remains scrollable with motion enabled or reduced', async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
+  test('homepage reveals approval on desktop and keeps its content available with reduced motion and on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.documentElement.scrollHeight > window.innerHeight);
 
-    const before = await page.evaluate(() => window.scrollY);
-    await page.mouse.move(320, 320);
-    await page.mouse.wheel(0, 1800);
-    await page.waitForTimeout(250);
-    const after = await page.evaluate(() => window.scrollY);
+    const reveal = page.locator('section[aria-labelledby="home-title"] > [data-phase]');
+    await expect(reveal).toHaveAttribute('data-phase', 'console');
 
-    expect(before).toBe(0);
-    expect(after).toBeGreaterThan(0);
-    await expect(page.getByRole('heading', { name: /one line from intent to evidence/i })).toBeVisible();
+    const approvalScrollTop = await reveal.evaluate((track) => {
+      const travel = Math.max(track.getBoundingClientRect().height - window.innerHeight, 1);
+      return window.scrollY + track.getBoundingClientRect().top + travel * 0.92;
+    });
+    await page.evaluate((top) => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, top);
+    }, approvalScrollTop);
+    await expect(reveal).toHaveAttribute('data-phase', 'approval');
+    expect(
+      await reveal.evaluate((track) => Number(getComputedStyle(track).getPropertyValue('--sheet-opacity'))),
+    ).toBeGreaterThan(0.95);
+
+    for (const width of [1024, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 800 });
+      await reveal.evaluate((track) => {
+        const travel = track.getBoundingClientRect().height - window.innerHeight;
+        window.scrollTo(0, window.scrollY + track.getBoundingClientRect().top + travel * 0.92);
+      });
+      await expect(reveal).toHaveAttribute('data-phase', 'approval');
+      const preview = page.getByTestId('home-approval-preview');
+      await expect(preview).toBeVisible();
+      await expect.poll(() => preview.evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.95);
+      await expect.poll(async () => preview.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        return bounds.width > 0 && bounds.height > 0 && bounds.left >= 0 && bounds.top >= 0
+          && bounds.right <= window.innerWidth && bounds.bottom <= window.innerHeight;
+      })).toBe(true);
+    }
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(reveal).toHaveAttribute('data-phase', 'console');
+    const reducedMotionOpacity = await reveal.evaluate((track) =>
+      Number(getComputedStyle(track).getPropertyValue('--sheet-opacity')),
+    );
+    expect(reducedMotionOpacity).toBe(0);
+
+    const approvalHeading = page.getByRole('heading', { name: /review tool calls before they run/i });
+    await approvalHeading.scrollIntoViewIfNeeded();
+    await expect(approvalHeading).toBeVisible();
+    await expect(
+      page.locator('section[aria-labelledby="approval-title"]').getByText(/waiting for a decision/i),
+    ).toBeVisible();
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(reveal).toHaveAttribute('data-phase', 'console');
+    await expect(page.getByText('Agent activity', { exact: true })).toBeVisible();
+    await expect(page.getByText(/operator review required before the call runs/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /explore the demo/i })).toHaveAttribute('href', '/control');
+
+    const mobileScroll = await page.evaluate(() => {
+      const before = window.scrollY;
+      window.scrollBy(0, 900);
+      return { before, after: window.scrollY, height: document.documentElement.scrollHeight };
+    });
+    expect(mobileScroll.height).toBeGreaterThan(844);
+    expect(mobileScroll.after).toBeGreaterThan(mobileScroll.before);
   });
 
   test('product artifacts clearly identify illustrative operational data', async ({ page }) => {
     await page.goto('/ai-agent-control-plane', { waitUntil: 'domcontentloaded' });
 
-    const recorder = page.getByLabel(/illustrative flight recorder/i);
-    await expect(recorder).toBeVisible();
-    await expect(recorder.getByText(/product example/i)).toBeVisible();
-    await expect(recorder.getByText(/sample \/ plane \/ healthy/i)).toBeVisible();
-    await expect(recorder.getByText(/sha-256 \/ sample/i)).toBeVisible();
-    await expect(recorder.getByText(/live record/i)).toHaveCount(0);
+    const example = page.getByRole('figure', { name: 'Example agent record' });
+    await expect(example).toBeVisible();
+    await expect(example.getByText('Example', { exact: true })).toBeVisible();
+    await expect(example.getByText('Submitted traces', { exact: true })).toBeVisible();
+    await expect(example.getByText('Reported by integration', { exact: true })).toBeVisible();
+    await expect(example.getByText(/live record/i)).toHaveCount(0);
   });
 
   test('download page exposes the mac release notes and checksum path', async ({ page }) => {
@@ -754,7 +820,7 @@ test.describe('mutx.dev QA', () => {
     expect(await getAverageRgb(page.getByText(/^effective date$/i))).toBeLessThan(140);
 
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'access');
+    await expectAuthSurface(page, 'access');
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByLabel(/^password$/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
@@ -763,7 +829,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: /continue with discord/i })).toBeVisible();
 
     await page.goto('/register', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'access');
+    await expectAuthSurface(page, 'access');
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByLabel(/^password$/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /sign up/i })).toBeVisible();
@@ -774,8 +840,8 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/verify-email?email=operator%40mutx.dev&next=%2Fdashboard%2Fwebhooks', {
       waitUntil: 'domcontentloaded',
     });
-    await expectAuthLedger(page, 'recovery');
-    await expect(page.getByText(/we sent a verification link to operator@mutx\.dev\./i)).toBeVisible();
+    await expectAuthSurface(page, 'recovery');
+    await expect(page.getByText(/check operator@mutx\.dev for your verification link\./i)).toBeVisible();
     await expect(page.getByRole('button', { name: /resend verification/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /^sign in$/i })).toHaveAttribute(
       'href',
@@ -783,21 +849,34 @@ test.describe('mutx.dev QA', () => {
     );
 
     await page.goto('/forgot-password', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'recovery');
+    await expectAuthSurface(page, 'recovery');
     await expect(page.getByText(/send reset instructions/i)).toBeVisible();
     await expect(page.getByLabel(/email address/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /send reset link/i })).toBeVisible();
 
     await page.goto('/reset-password', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'recovery');
+    await expectAuthSurface(page, 'recovery');
     await expect(page.getByText(/invalid reset link/i)).toBeVisible();
 
     await page.goto('/reset-password?token=test-token', { waitUntil: 'domcontentloaded' });
-    await expectAuthLedger(page, 'recovery');
-    await expect(page.getByText(/choose a new password/i)).toBeVisible();
+    await expectAuthSurface(page, 'recovery');
+    await expect(page.getByRole('heading', { name: 'Choose a new password', exact: true })).toBeVisible();
     await expect(page.getByLabel(/new password/i)).toBeVisible();
     await expect(page.getByLabel(/confirm password/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /reset password/i })).toBeVisible();
+  });
+
+  test('token-only expired verification points back to sign-in', async ({ page }) => {
+    await page.route('**/api/auth/verify-email', route => route.fulfill({
+      status: 400,
+      contentType: 'application/json',
+      body: JSON.stringify({ detail: 'Verification link expired' }),
+    }));
+    await page.goto('/verify-email?token=expired-example', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Verification failed', exact: true })).toBeVisible();
+    await expect(page.getByText('Return to sign in. If your email still needs verification, you can request a new link there.')).toBeVisible();
+    await expect(page.getByRole('button', { name: /resend verification/i })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toHaveAttribute('href', '/login?next=%2Fdashboard');
   });
 
   test('pico root exposes the live product path, plans, and durable support intake', async ({ page }) => {

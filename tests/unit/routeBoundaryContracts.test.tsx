@@ -86,7 +86,10 @@ const actionFiles = [
 ]
 
 function readSource(relativePath: string) {
-  return readFileSync(join(process.cwd(), relativePath), 'utf8')
+  const source = readFileSync(join(process.cwd(), relativePath), 'utf8')
+  return relativePath === 'app/control/error.tsx'
+    ? `${source}\n${readFileSync(join(process.cwd(), 'components/dashboard/demo/ControlErrorFallback.tsx'), 'utf8')}`
+    : source
 }
 
 describe('App Router boundary source contracts', () => {

@@ -26,17 +26,17 @@ const authContent = {
   default: {
     login: {
       eyebrow: "Sign in",
-      title: "Pick up where you left off.",
+      title: "Sign in to MUTX.",
       description:
         "Open the workspace, runs, and controls tied to your MUTX account.",
       asideEyebrow: "After sign-in",
-      asideTitle: "Your workspace, ready when you are.",
+      asideTitle: "Agents, deployments, and runs.",
       asideBody:
-        "Your team, permissions, deployment state, and run history load from the same account.",
+        "Open the records associated with your account in the dashboard.",
       highlights: [
-        "One account for hosted work and desktop control.",
-        "Your permissions load with the workspace.",
-        "Failed sign-ins explain what went wrong.",
+        "Continue to your dashboard.",
+        "Inspect your agents and run records.",
+        "Use email or a connected sign-in provider.",
       ],
       heading: "Welcome back",
       subheading:
@@ -46,21 +46,21 @@ const authContent = {
     },
     register: {
       eyebrow: "Create account",
-      title: "Set up your MUTX workspace.",
+      title: "Create your MUTX account.",
       description:
         "Create one account for the dashboard, desktop app, and the work your agents run.",
       asideEyebrow: "What you get",
-      asideTitle: "A workspace that belongs to your team.",
+      asideTitle: "Start with a personal account.",
       asideBody:
-        "Your identity, permissions, run history, and deployment records stay together from the first session.",
+        "When you register by email, verify it before your first sign-in. Then open the dashboard to set up an agent.",
       highlights: [
         "Sign up with email or a provider.",
-        "Verification returns you to the right workspace.",
-        "Account errors stay visible and actionable.",
+        "Email signup requires verification before sign-in.",
+        "Continue to the dashboard once your account is ready.",
       ],
       heading: "Create your account",
       subheading:
-        "Choose the fastest path into your hosted dashboard.",
+        "Use a provider or register with your email address.",
       submitLabel: "Sign up",
       loadingLabel: "Creating account",
     },

@@ -7,7 +7,7 @@ icon: file-lines
 
 ## 1. Abstract
 
-MUTX is a control plane for AI agents. It provides governance (policy evaluation, human approval workflows, cryptographic receipt chains), identity (JWT + API key + SPIFFE), observability (OpenTelemetry traces, Prometheus metrics, structured audit logs), and infrastructure management (deployment lifecycle, self-healing, credential brokering). The system is a FastAPI application backed by PostgreSQL (async via asyncpg), with a Python SDK and a Textual TUI.
+MUTX is a control plane for AI agents. It provides governance (policy evaluation, human approval workflows, cryptographic receipt chains), identity (JWT + API key + SPIFFE), observability (OpenTelemetry traces, Prometheus metrics, structured audit logs), and infrastructure management (deployment records, stale-heartbeat monitoring, credential brokering). The system is a FastAPI application backed by PostgreSQL (async via asyncpg), with a Python SDK and a Textual TUI.
 
 This document describes the internal architecture. It is not a getting-started guide. It assumes you are a senior engineer who needs to understand how the system works in order to extend, debug, or operate it.
 
@@ -22,7 +22,7 @@ Operating autonomous agents in production fails in predictable ways:
 | No human override | High-risk actions execute automatically with no approval path | Canonical durable approvals provide an authenticated human decision lifecycle; governed DEFER remains fail-closed until a durable resume binding exists |
 | No audit trail | After an incident, there is no record of what the agent did, why, or who approved it | ReceiptGenerator can create and sign ActionReceipts (partial current R5; full receipt evidence is not yet demonstrated) |
 | Credential sprawl | API keys and secrets embedded in agent configs or environment variables permanently | CredentialBroker retrieves on-demand with TTL, injects as ephemeral env vars |
-| Agent zombie processes | Agent crashes but its status remains "running" indefinitely | MonitorRuntimeState tracks heartbeats; SelfHealer recovers via RESTART/ROLLBACK |
+| Agent zombie processes | Agent crashes but its status remains "running" indefinitely | The background monitor records failures after a received heartbeat becomes stale; it does not restart agents |
 | Identity ambiguity | Cannot distinguish agent actions from developer actions or from different agents | JWT/API key auth plus agent, session, and user identifiers (partial current R6; service identity and privilege scope remain gaps) |
 
 ## 3. Design Principles
@@ -57,7 +57,7 @@ Operating autonomous agents in production fails in predictable ways:
 ├─────────────────────────────────────────────────────────────────┤
 │                        Services                                  │
 │  FarameshSupervisor │ CredentialBroker │ SPIFFEIdentityProvider  │
-│  SelfHealer │ AuditLog │ PolicyStore │ Monitoring │ Webhooks    │
+│  Credentials │ AuditLog │ PolicyStore │ Monitoring │ Webhooks  │
 ├─────────────────────────────────────────────────────────────────┤
 │                         Data Layer                               │
 │  PostgreSQL 16 (asyncpg) │ Redis 7 │ Alembic Migrations         │
@@ -89,7 +89,6 @@ src/api/                         # FastAPI control plane
     security.py                  # Security headers
   routes/                        # mounted route modules
   services/
-    self_healer.py               # Autonomous recovery
     credential_broker.py         # 6-backend credential broker
     faramesh_supervisor.py       # Process supervision
     spiffe_identity.py           # SPIFFE/SPIRE identity
@@ -1722,158 +1721,20 @@ Agent identities (X.509 SVIDs) are used to establish mutual TLS connections betw
 
 ## 12. Self-Healing
 
-Source: `src/api/services/self_healer.py`, `src/api/services/monitor.py`,
-`src/api/services/monitoring.py`
+Automatic runtime recovery is not active. The unused in-process recovery
+prototype has been removed.
 
-### RecoveryAction
+The active monitor is split between task supervision in
+`src/api/services/monitor.py` and stale-heartbeat detection in
+`src/api/services/monitoring.py`. `STALE_THRESHOLD_SECONDS` is 120 seconds since
+an agent's last received heartbeat. A running agent whose heartbeat becomes
+stale is marked failed; the monitor records an alert, an error log, and a failure
+event for its latest deployment, then attempts outgoing status webhooks.
 
-```python
-class RecoveryAction(str, Enum):
-    RESTART = "restart"
-    ROLLBACK = "rollback"
-    SCALE_UP = "scale_up"
-    SCALE_DOWN = "scale_down"
-    RECREATE = "recreate"
-    NONE = "none"
-```
-
-### RecoveryConfig
-
-```python
-@dataclass
-class RecoveryConfig:
-    max_retries: int = 3
-    retry_delay_seconds: float = 5.0
-    health_check_interval_seconds: int = 10
-    health_check_timeout_seconds: float = 5.0
-    max_consecutive_failures: int = 3
-    rollback_on_failure: bool = True
-    enable_auto_restart: bool = True
-    enable_auto_rollback: bool = True
-    min_recovery_interval_seconds: float = 60.0
-```
-
-### RecoveryStatus
-
-```python
-class RecoveryStatus(str, Enum):
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    SUCCESS = "success"
-    FAILED = "failed"
-    PARTIAL = "partial"
-```
-
-### RecoveryRecord
-
-```python
-@dataclass
-class RecoveryRecord:
-    record_id: str
-    agent_id: str
-    action: RecoveryAction
-    status: RecoveryStatus
-    started_at: datetime
-    completed_at: Optional[datetime]
-    previous_version: Optional[str]
-    new_version: Optional[str]
-    error_message: Optional[str]
-    recovery_time_seconds: float = 0.0
-    metadata: Dict[str, Any]
-```
-
-### VersionManager
-
-```python
-class VersionManager:
-    def __init__(self, max_versions: int = 10):
-        self._agent_versions: Dict[str, deque] = {}  # Bounded version history
-        self._current_versions: Dict[str, str]
-        self._stable_versions: Dict[str, str]          # Last known-good version
-
-    def mark_stable_version(self, agent_id, version=None):
-        """Mark current version as stable after health check passes."""
-```
-
-### Background Monitor
-
-Source: `src/api/services/monitor.py`
-
-```python
-@dataclass
-class MonitorRuntimeState:
-    started_at: datetime | None
-    last_success_at: datetime | None
-    last_error_at: datetime | None
-    last_error: str | None
-    consecutive_failures: int = 0
-
-    def mark_success(self):
-        self.last_success_at = datetime.now(timezone.utc)
-        self.last_error = None
-        self.consecutive_failures = 0
-
-    def mark_error(self, error):
-        self.last_error_at = datetime.now(timezone.utc)
-        self.last_error = str(error)
-        self.consecutive_failures += 1
-```
-
-### Health Monitoring Thresholds
-
-Source: `src/api/services/monitoring.py`
-
-```python
-HEARTBEAT_THRESHOLD_SECONDS = 60   # Agent is stale after 60s without heartbeat
-STALE_THRESHOLD_SECONDS = 120      # Agent is considered failed after 120s
-HEAL_THRESHOLD_SECONDS = 30        # Wait 30s before attempting recovery
-```
-
-### Webhook Emission
-
-```python
-async def _emit_agent_status_webhook(session, *, user_id, agent_id, old_status, new_status, agent_name):
-    await trigger_agent_status_event(session, user_id, agent_id, old_status, new_status, agent_name)
-
-async def _emit_deployment_webhook(session, *, user_id, deployment_id, agent_id, event_type, status):
-    await trigger_deployment_event(session, user_id, deployment_id, agent_id, event_type=event_type, status=status)
-```
-
-Webhooks are emitted on status transitions. Failures are logged but do not block the monitoring loop:
-
-```python
-try:
-    await trigger_agent_status_event(...)
-except Exception:
-    logger.exception("Monitor webhook emission failed for agent.status")
-```
-
-### Deployment Event Recording
-
-```python
-def _record_deployment_event(session, deployment, *, event_type, status, error_message=None):
-    session.add(DeploymentEvent(
-        deployment_id=deployment.id,
-        event_type=event_type,
-        status=status,
-        node_id=deployment.node_id,
-        error_message=error_message,
-    ))
-```
-
-This is an append-only event log. Events are never modified or deleted.
-
-### Recovery Flow
-
-The monitor checks agent health on a configurable interval:
-
-1. Query all agents with status `RUNNING`.
-2. For each agent, check if `last_heartbeat` exceeds `STALE_THRESHOLD_SECONDS`.
-3. If stale, attempt recovery via `SelfHealingService`:
-   - Skip if agent was explicitly stopped (`status == STOPPED`).
-   - Set status back to `RUNNING` and log a recovery event.
-   - Register health check callbacks.
-   - If consecutive failures exceed `max_consecutive_failures`, attempt `ROLLBACK` to previous stable version.
+The monitor does not generate runtime heartbeats, use creation time as heartbeat
+evidence, mark provisioning complete, or reset failed agents after a delay.
+Missing heartbeat data stays unknown. A later heartbeat does not automatically
+resolve existing failure alerts or restore an already-failed deployment.
 
 ## 13. Observability
 
@@ -2405,7 +2266,7 @@ Source: `infrastructure/monitoring/prometheus/`
 - Faramesh supervisor with 13 framework auto-patches
 - Credential broker with 6 backends (Vault, AWS, GCP, Azure, 1Password, Infisical)
 - SPIFFE/SPIRE identity integration
-- Self-healing with restart, rollback, scale recovery actions
+- Stale-heartbeat failure detection and status events; automatic recovery is not active
 - Observability: OpenTelemetry traces, Prometheus metrics, aiosqlite audit log
 - Policy store with SSE hot-reload
 - Python SDK with guardrails, policy client, and telemetry

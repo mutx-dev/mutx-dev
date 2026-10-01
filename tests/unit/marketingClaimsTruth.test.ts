@@ -3,7 +3,8 @@ import path from 'path'
 
 const marketingFiles = [
   'components/site/marketing/operationalStories.ts',
-  'components/site/marketing/RebrandHomePage.tsx',
+  'components/site/marketing/ProductHomePage.tsx',
+  'components/site/marketing/ProductRevealStage.tsx',
   'components/site/marketing/OperationalLedgerPage.tsx',
 ] as const
 
@@ -54,15 +55,16 @@ describe('public capability claim truth', () => {
     const marketing = readFiles(marketingFiles)
       .map(({ source }) => source)
       .join('\n')
+      .replace(/\s+/g, ' ')
     const status = readFiles(statusFiles)
       .map(({ source }) => source)
       .join('\n')
 
-    expect(marketing).toMatch(/calls routed through its governed runtime handler/i)
-    expect(marketing).toMatch(/instrumentation determines coverage/i)
-    expect(marketing).toMatch(/runtime budget cutoffs remain an integration concern/i)
-    expect(marketing).toMatch(/provider rollout remains operator-owned/i)
-    expect(marketing).toMatch(/check Mac availability/i)
+    expect(marketing).toMatch(/for tools routed through the MUTX runtime, a configured policy can pause a call/i)
+    expect(marketing).toMatch(/coverage depends on the events your integration reports/i)
+    expect(marketing).toMatch(/your runtime decides whether to act on a threshold/i)
+    expect(marketing).toMatch(/your integration applies deployment changes and reports the result/i)
+    expect(marketing).toMatch(/explore the demo/i)
 
     expect(status).toMatch(/process-local/i)
     expect(status).toMatch(/RAG is optional and disabled by default/i)

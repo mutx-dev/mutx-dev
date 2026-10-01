@@ -372,7 +372,7 @@ async def test_expired_claim_is_released_and_late_worker_cannot_overwrite_outcom
 
 
 @pytest.mark.asyncio
-async def test_heartbeat_task_updates_owned_agent_and_records_success(
+async def test_heartbeat_task_fails_unavailable_without_changing_runtime_state(
     client: AsyncClient,
     db_session: AsyncSession,
     test_agent,
@@ -380,6 +380,28 @@ async def test_heartbeat_task_updates_owned_agent_and_records_success(
 ):
     test_deployment.status = "deploying"
     await db_session.commit()
+    agent_before = (
+        test_agent.status,
+        test_agent.last_heartbeat,
+        test_agent.desired_action,
+        test_agent.desired_state,
+        test_agent.observed_state,
+        test_agent.target_revision,
+        test_agent.observed_revision,
+        test_agent.observed_at,
+    )
+    deployment_before = (
+        test_deployment.status,
+        test_deployment.desired_action,
+        test_deployment.desired_state,
+        test_deployment.observed_state,
+        test_deployment.target_revision,
+        test_deployment.observed_revision,
+        test_deployment.observed_at,
+        test_deployment.node_id,
+        test_deployment.started_at,
+        test_deployment.ended_at,
+    )
     created = await client.post(
         "/v1/scheduler",
         json={
@@ -392,19 +414,42 @@ async def test_heartbeat_task_updates_owned_agent_and_records_success(
     task_id = created.json()["id"]
 
     triggered = await client.post(f"/v1/scheduler/{task_id}/trigger")
-    assert triggered.status_code == 200
+    assert triggered.status_code == 503
+    assert "runtime_heartbeat_unavailable" in triggered.json()["detail"]
     await db_session.refresh(test_agent)
     await db_session.refresh(test_deployment)
-    assert test_agent.last_heartbeat is not None
-    assert test_agent.status == "running"
-    assert test_deployment.status == "running"
+    assert (
+        test_agent.status,
+        test_agent.last_heartbeat,
+        test_agent.desired_action,
+        test_agent.desired_state,
+        test_agent.observed_state,
+        test_agent.target_revision,
+        test_agent.observed_revision,
+        test_agent.observed_at,
+    ) == agent_before
+    assert (
+        test_deployment.status,
+        test_deployment.desired_action,
+        test_deployment.desired_state,
+        test_deployment.observed_state,
+        test_deployment.target_revision,
+        test_deployment.observed_revision,
+        test_deployment.observed_at,
+        test_deployment.node_id,
+        test_deployment.started_at,
+        test_deployment.ended_at,
+    ) == deployment_before
 
     task = (await client.get(f"/v1/scheduler/{task_id}")).json()
-    assert task["status"] == "succeeded"
-    assert task["run_count"] == task["success_count"] == 1
-    assert task["failure_count"] == 0
-    assert task["last_succeeded_at"] == task["last_finished_at"]
-    assert task["last_error"] is None
+    assert task["task_type"] == "agent_heartbeat"
+    assert task["payload"] == {"agent_id": str(test_agent.id)}
+    assert task["status"] == "failed"
+    assert task["run_count"] == task["success_count"] == 0
+    assert task["failure_count"] == 1
+    assert task["last_succeeded_at"] is None
+    assert task["last_failed_at"] == task["last_finished_at"]
+    assert task["last_error"].startswith("runtime_heartbeat_unavailable:")
 
 
 @pytest.mark.asyncio

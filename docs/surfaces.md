@@ -106,7 +106,7 @@ Surfaces marked **Demonstration** are:
 **Operational boundaries:**
 - Some flows remain CLI-first or API-first
 - RAG exposes embed, search, ingest, and health paths only when `ENABLE_RAG_API` is enabled; it is disabled by default. Collections and documents are tenant-owned and database-backed. Ingest enforces 64-collection, 10,000-document, and 256 MiB logical-storage safety ceilings per tenant; exhaustive similarity search refuses collections above 2,000 documents until indexed vector search is available.
-- The internal scheduler exposes tenant-scoped CRUD for log, webhook, and agent-heartbeat tasks. Tasks, counters, errors, due times, and execution leases are durable; conditional database claims coordinate multiple workers and recover expired claims.
+- The internal scheduler exposes tenant-scoped CRUD for log, webhook, and legacy agent-heartbeat task records. Tasks, counters, errors, due times, and execution leases are durable; conditional database claims coordinate multiple workers and recover expired claims. Triggering an `agent_heartbeat` task returns HTTP 503 with `runtime_heartbeat_unavailable` until an authenticated runtime executor exists; it does not update Agent or Deployment runtime state.
 - Full Mode is an explicit plan/capability boundary; the shell provides an actionable upgrade or configuration path when unavailable
 - Deployment actions update control-plane lifecycle records; provider-side rollout verification remains operator-owned
 

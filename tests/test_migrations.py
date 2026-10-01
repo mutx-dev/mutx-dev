@@ -457,7 +457,12 @@ def test_mutx_observability_and_approval_migrations_form_a_single_chain():
         "approval_enforcement", "a1c3e5f7b9d2_add_approval_enforcement.py"
     )
     assert approval.down_revision == module.revision
-    assert _current_head() == approval.revision
+    lifecycle = _load_migration_module(
+        "agent_lifecycle_authority",
+        "c2e7a9b4d6f1_add_agent_lifecycle_authority.py",
+    )
+    assert lifecycle.down_revision == approval.revision
+    assert _current_head() == lifecycle.revision
 
 
 def test_live_mode_schema_hardening_upgrade_is_idempotent_for_existing_live_schema(monkeypatch):
@@ -1229,6 +1234,7 @@ def test_durability_migrations_are_idempotent_on_current_schema(tmp_path, monkey
         "d8f1a3c5e7b9_add_durable_security_evidence.py",
         "e9a2c4d6f8b0_add_tenant_telemetry_backend_configs.py",
         "f0b4d6e8a2c5_add_durable_mutx_observability.py",
+        "c2e7a9b4d6f1_add_agent_lifecycle_authority.py",
     )
     engine = sa.create_engine(database_url)
     try:
@@ -1261,6 +1267,7 @@ def test_durability_downgrades_tolerate_absent_objects(monkeypatch):
         "d8f1a3c5e7b9_add_durable_security_evidence.py",
         "e9a2c4d6f8b0_add_tenant_telemetry_backend_configs.py",
         "f0b4d6e8a2c5_add_durable_mutx_observability.py",
+        "c2e7a9b4d6f1_add_agent_lifecycle_authority.py",
     )
     engine = sa.create_engine("sqlite://")
     try:

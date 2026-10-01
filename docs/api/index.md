@@ -54,7 +54,7 @@ See [authentication.md](./authentication.md) and [api-keys.md](./api-keys.md) fo
 | Leads | `/v1/leads` plus compatibility-shaped `/v1/leads/contacts` |
 | Observability | `/v1/observability/*` — runs, eval, provenance, status, steps |
 | Policies | `/v1/policies/*` — CRUD and reload |
-| Scheduler | `/v1/scheduler/*` — durable tenant-owned tasks with multi-worker-safe execution claims |
+| Scheduler | `/v1/scheduler/*` — durable tenant-owned tasks with multi-worker-safe execution claims; legacy `agent_heartbeat` records trigger as unavailable until an authenticated runtime executor exists |
 | Security | `/v1/security/*` — actions, approvals, compliance, MCP definition scanning, metrics, receipts, sessions |
 | Telemetry | `/v1/telemetry/*` — config and health |
 | Other mounted families | `/v1/analytics`, `/v1/budgets`, `/v1/clawhub`, `/v1/documents/*`, `/v1/events`, `/v1/governance/*`, `/v1/monitoring/*`, `/v1/onboarding/*`, `/v1/payments/*`, `/v1/pico/*`, `/v1/rag/*`, `/v1/reasoning/*`, `/v1/runtime/*`, `/v1/sessions`, `/v1/swarms`, `/v1/templates`, `/v1/usage` |

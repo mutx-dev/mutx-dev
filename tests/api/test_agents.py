@@ -539,16 +539,18 @@ class TestDeployAgent:
         assert response.status_code == 200
         data = response.json()
         assert "deployment_id" in data
-        assert data["status"] == "deploying"
+        assert data["status"] == "pending"
+        assert data["desired_action"] == "deploy"
+        assert data["desired_state"] == "running"
 
         deployment = await db_session.get(Deployment, uuid.UUID(data["deployment_id"]))
         assert deployment is not None
-        assert deployment.started_at is not None
-        assert deployment.started_at.tzinfo is None
+        assert deployment.started_at is None
+        assert deployment.observed_state is None
 
         # Verify agent status changed
         await db_session.refresh(test_agent)
-        assert test_agent.status == AgentStatus.RUNNING
+        assert test_agent.status == AgentStatus.CREATING
 
     @pytest.mark.asyncio
     async def test_deploy_agent_not_found(self, client: AsyncClient):
@@ -581,7 +583,16 @@ class TestStopAgent:
         response = await client.post(f"/v1/agents/{test_agent.id}/stop")
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "stopped"
+        assert data["status"] == "pending"
+        assert data["desired_action"] == "stop"
+        assert data["desired_state"] == "stopped"
+        assert data["target_revision"] == 1
+        await db_session.refresh(test_agent)
+        await db_session.refresh(test_deployment)
+        assert test_agent.status == AgentStatus.RUNNING.value
+        assert test_deployment.status == "pending"
+        assert test_deployment.ended_at is None
+        assert test_deployment.desired_action == "stop"
 
     @pytest.mark.asyncio
     async def test_stop_agent_not_found(self, client: AsyncClient):
