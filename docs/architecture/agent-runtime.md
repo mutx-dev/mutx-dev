@@ -14,7 +14,7 @@ This document distinguishes connected-agent heartbeat monitoring from internal e
 * When a heartbeat changes the persisted agent status, MUTX also emits an `agent.status` outgoing webhook event.
 * The background monitor marks running agents failed when a received heartbeat is older than 120 seconds. It records an alert, log, deployment failure event, and outgoing status webhooks.
 * Agents with no heartbeat are not failed based on their creation date. Elapsed time does not prove that provisioning succeeded or that a failed runtime recovered.
-* The monitor does not start `SelfHealingService`, restart processes, or resolve failure alerts automatically.
+* The monitor does not restart processes or resolve failure alerts automatically.
 
 ***
 
@@ -247,9 +247,9 @@ failure alert or reset an already-failed deployment.
 
 ## Self-Healing
 
-`src/api/services/self_healer.py` remains an internal recovery prototype. It is
-not started by the background monitor. Its restart, rollback, recreate, and scale
-handlers do not establish automatic recovery of a connected runtime.
+The unused in-process recovery prototype has been removed. The background
+monitor detects stale heartbeats; it does not execute restart, rollback,
+recreate, or scale actions. Recovery needs an executor and runtime evidence.
 
 ***
 

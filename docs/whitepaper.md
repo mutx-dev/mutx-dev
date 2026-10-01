@@ -89,7 +89,6 @@ src/api/                         # FastAPI control plane
     security.py                  # Security headers
   routes/                        # mounted route modules
   services/
-    self_healer.py               # Internal recovery prototype; not monitor-wired
     credential_broker.py         # 6-backend credential broker
     faramesh_supervisor.py       # Process supervision
     spiffe_identity.py           # SPIFFE/SPIRE identity
@@ -1722,8 +1721,8 @@ Agent identities (X.509 SVIDs) are used to establish mutual TLS connections betw
 
 ## 12. Self-Healing
 
-Automatic runtime recovery is not active. `src/api/services/self_healer.py`
-contains an internal prototype, but the background monitor does not start it.
+Automatic runtime recovery is not active. The unused in-process recovery
+prototype has been removed.
 
 The active monitor is split between task supervision in
 `src/api/services/monitor.py` and stale-heartbeat detection in
