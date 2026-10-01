@@ -118,6 +118,13 @@ class DeploymentRecord:
     error_message: str | None
     events: list[DeploymentEventRecord] = field(default_factory=list)
 
+    desired_action: str | None = None
+    desired_state: str | None = None
+    target_revision: int = 0
+    observed_state: str | None = None
+    observed_revision: int | None = None
+    observed_at: str | None = None
+
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> "DeploymentRecord":
         raw_events = payload.get("events") or []
@@ -125,6 +132,12 @@ class DeploymentRecord:
             id=str(payload.get("id", "")),
             agent_id=str(payload.get("agent_id", "")),
             status=str(payload.get("status", "unknown")),
+            desired_action=_as_optional_str(payload.get("desired_action")),
+            desired_state=_as_optional_str(payload.get("desired_state")),
+            target_revision=payload.get("target_revision", 0),
+            observed_state=_as_optional_str(payload.get("observed_state")),
+            observed_revision=payload.get("observed_revision"),
+            observed_at=_as_optional_str(payload.get("observed_at")),
             version=_as_optional_str(payload.get("version")),
             replicas=int(payload.get("replicas", 1)),
             node_id=_as_optional_str(payload.get("node_id")),
@@ -235,6 +248,13 @@ class AgentRecord:
     user_id: str | None
     deployments: list[DeploymentRecord] = field(default_factory=list)
 
+    desired_action: str | None = None
+    desired_state: str | None = None
+    target_revision: int = 0
+    observed_state: str | None = None
+    observed_revision: int | None = None
+    observed_at: str | None = None
+
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> "AgentRecord":
         raw_deployments = payload.get("deployments") or []
@@ -244,6 +264,12 @@ class AgentRecord:
             description=_as_optional_str(payload.get("description")),
             type=str(payload.get("type", "")),
             status=str(payload.get("status", "unknown")),
+            desired_action=_as_optional_str(payload.get("desired_action")),
+            desired_state=_as_optional_str(payload.get("desired_state")),
+            target_revision=payload.get("target_revision", 0),
+            observed_state=_as_optional_str(payload.get("observed_state")),
+            observed_revision=payload.get("observed_revision"),
+            observed_at=_as_optional_str(payload.get("observed_at")),
             config=payload.get("config"),
             config_version=int(payload.get("config_version", 1)),
             created_at=_as_optional_str(payload.get("created_at")),

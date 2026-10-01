@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Agent and deployment requests now record desired state and target revisions separately from authenticated runtime observations. Stops, starts, restarts, rollbacks, and termination remain pending until current runtime evidence confirms them.
+- Scheduled `agent_heartbeat` tasks return `runtime_heartbeat_unavailable` instead of fabricating runtime activity; existing task records and ownership checks remain.
+
+### Fixed
+- Agent-wide stops cannot be undone by deployment-local starts, repeated stop requests, or stale observations. Pending termination cannot be replaced by Stop.
+- Repeated identical runtime observations refresh evidence timestamps without creating duplicate deployment transition events. Migrated records retain their IDs and history without inferred execution evidence.
+
 ## [1.4.0] - 2026-04-09
 
 ### Added

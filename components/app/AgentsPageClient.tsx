@@ -604,12 +604,8 @@ export function AgentsPageClient() {
         setActionNotice(`Deleted agent ${agent.name} (${agent.id}).`);
       } else {
         await stopAgent(agent.id);
-        setAgents((current) =>
-          current.map((entry) =>
-            entry.id === agent.id ? { ...entry, status: "stopped" } : entry,
-          ),
-        );
-        setActionNotice(`Stopped agent ${agent.name} (${agent.id}).`);
+        await loadAgents();
+        setActionNotice(`Stop requested for agent ${agent.name} (${agent.id}).`);
       }
       setPendingAction(null);
     } catch (err) {

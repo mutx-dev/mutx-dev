@@ -20,6 +20,7 @@ from typing import Any, Callable, Optional
 import httpx
 
 from mutx._http import DEFAULT_BASE_URL, api_path, normalize_api_base_url
+from mutx.deployments import _parse_datetime
 from mutx.guardrails import (
     GuardrailMiddleware,
 )
@@ -37,6 +38,12 @@ class AgentInfo:
     api_key: str
     status: str
     registered_at: datetime
+    desired_action: str | None = None
+    desired_state: str | None = None
+    target_revision: int = 0
+    observed_state: str | None = None
+    observed_revision: int | None = None
+    observed_at: datetime | None = None
 
 
 @dataclass
@@ -47,6 +54,8 @@ class Command:
     action: str
     parameters: dict
     received_at: datetime
+    target_deployment_id: str | None = None
+    target_revision: int | None = None
 
 
 @dataclass
@@ -185,6 +194,12 @@ class MutxAgentClient:
                 api_key=self.api_key,
                 status=data.get("status", "registered"),
                 registered_at=datetime.now(timezone.utc),
+                desired_action=data.get("desired_action"),
+                desired_state=data.get("desired_state"),
+                target_revision=data.get("target_revision", 0),
+                observed_state=data.get("observed_state"),
+                observed_revision=data.get("observed_revision"),
+                observed_at=_parse_datetime(data.get("observed_at")),
             )
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 401:
@@ -226,17 +241,35 @@ class MutxAgentClient:
             logger.error(f"Failed to connect: {e}")
             return False
 
+    async def get_status(self) -> dict:
+        """Inspect this agent's requested state and current runtime evidence."""
+        if not self.agent_id:
+            raise ValueError("Agent not registered. Call register() or connect() first.")
+        client = await self._get_client()
+        response = await client.get(api_path("agents/{agent_id}/status", agent_id=self.agent_id))
+        response.raise_for_status()
+        return response.json()
+
     async def heartbeat(
         self,
         status: str = "running",
         message: Optional[str] = None,
+        *,
+        component: str | None = None,
+        deployment_id: str | None = None,
+        target_revision: int | None = None,
+        node_id: str | None = None,
     ) -> dict:
         """
         Send a heartbeat to MUTX.
 
         Args:
-            status: Agent status (running, idle, error, stopped)
+            status: Runtime status accepted by the API
             message: Optional status message
+            component: command_listener reports connectivity only.
+            deployment_id: Explicit deployment target, when reporting its state.
+            target_revision: Revision of the action actually observed; never inferred.
+            node_id: Runtime-reported node identity.
 
         Returns:
             Response from MUTX
@@ -254,6 +287,18 @@ class MutxAgentClient:
             "platform": platform.system(),
             "hostname": platform.node(),
         }
+        payload.update(
+            {
+                key: value
+                for key, value in {
+                    "component": component,
+                    "deployment_id": deployment_id,
+                    "target_revision": target_revision,
+                    "node_id": node_id,
+                }.items()
+                if value is not None
+            }
+        )
 
         try:
             response = await client.post("agents/heartbeat", json=payload)
@@ -335,6 +380,8 @@ class MutxAgentClient:
                         action=cmd["action"],
                         parameters=cmd.get("parameters", {}),
                         received_at=datetime.fromisoformat(cmd["received_at"]),
+                        target_deployment_id=cmd.get("target_deployment_id"),
+                        target_revision=cmd.get("target_revision"),
                     )
                 )
 
@@ -636,12 +683,32 @@ class MutxAgentSyncClient:
                 api_key=self.api_key,
                 status=data.get("status", "registered"),
                 registered_at=datetime.now(timezone.utc),
+                desired_action=data.get("desired_action"),
+                desired_state=data.get("desired_state"),
+                target_revision=data.get("target_revision", 0),
+                observed_state=data.get("observed_state"),
+                observed_revision=data.get("observed_revision"),
+                observed_at=_parse_datetime(data.get("observed_at")),
             )
+
+    def get_status(self) -> dict:
+        """Inspect this agent's requested state and current runtime evidence."""
+        if not self.agent_id:
+            raise ValueError("Agent not registered.")
+        with self._get_client() as client:
+            response = client.get(api_path("agents/{agent_id}/status", agent_id=self.agent_id))
+            response.raise_for_status()
+            return response.json()
 
     def heartbeat(
         self,
         status: str = "running",
         message: Optional[str] = None,
+        *,
+        component: str | None = None,
+        deployment_id: str | None = None,
+        target_revision: int | None = None,
+        node_id: str | None = None,
     ) -> dict:
         """Synchronous heartbeat."""
         if not self.agent_id:
@@ -654,6 +721,18 @@ class MutxAgentSyncClient:
                 "message": message,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
+            payload.update(
+                {
+                    key: value
+                    for key, value in {
+                        "component": component,
+                        "deployment_id": deployment_id,
+                        "target_revision": target_revision,
+                        "node_id": node_id,
+                    }.items()
+                    if value is not None
+                }
+            )
             response = client.post("agents/heartbeat", json=payload)
             response.raise_for_status()
             return response.json()

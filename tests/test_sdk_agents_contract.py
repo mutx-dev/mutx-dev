@@ -20,6 +20,7 @@ from sdk.mutx.agents import (
     Deployment,
     DeploymentEvent,
 )
+from mutx.deployments import Deployment as CanonicalDeployment
 from tests.sdk_contract_utils import assert_v1_request
 
 
@@ -1097,3 +1098,85 @@ class TestAgentsAsyncMethods:
         assert len(collected) == 2
         assert all(isinstance(agent_log, AgentLog) for agent_log in collected)
         assert callback_count == 2
+
+
+@pytest.mark.parametrize(
+    "model,payload_factory",
+    [
+        (Agent, _agent_payload),
+        (Deployment, _deployment_payload),
+        (CanonicalDeployment, _deployment_payload),
+    ],
+)
+def test_sdk_models_expose_intent_separately_from_prior_observation(model, payload_factory):
+    record = model(
+        payload_factory(
+            status="running",
+            desired_action="stop",
+            desired_state="stopped",
+            target_revision=8,
+            observed_state="running",
+            observed_revision=7,
+            observed_at="2026-10-01T00:00:00+00:00",
+        )
+    )
+
+    assert record.status == "running"
+    assert record.desired_action == "stop"
+    assert record.desired_state == "stopped"
+    assert record.target_revision == 8
+    assert record.observed_state == "running"
+    assert record.observed_revision == 7
+    assert record.observed_at == datetime.fromisoformat("2026-10-01T00:00:00+00:00")
+
+
+@pytest.mark.parametrize(
+    "model,payload_factory",
+    [
+        (Agent, _agent_payload),
+        (Deployment, _deployment_payload),
+        (CanonicalDeployment, _deployment_payload),
+    ],
+)
+def test_sdk_legacy_payload_does_not_invent_observed_evidence(model, payload_factory):
+    record = model(payload_factory())
+
+    assert record.desired_action is None
+    assert record.desired_state is None
+    assert record.target_revision == 0
+    assert record.observed_state is None
+    assert record.observed_revision is None
+    assert record.observed_at is None
+
+
+def test_deployment_exposes_server_action_availability_without_status_inference():
+    from mutx.deployments import Deployment as CanonicalDeployment
+
+    deployment = CanonicalDeployment(
+        {
+            "id": "33333333-3333-4333-a333-333333333333",
+            "agent_id": "22222222-2222-4222-a222-222222222222",
+            "status": "pending",
+            "replicas": 1,
+            "desired_state": "terminated",
+            "allowed_actions": [],
+            "can_stop": False,
+            "can_restart": False,
+            "can_terminate": False,
+        }
+    )
+    assert deployment.allowed_actions == []
+    assert deployment.can_stop is False
+    assert deployment.can_restart is False
+    assert deployment.can_terminate is False
+
+    legacy = CanonicalDeployment(
+        {
+            "id": "33333333-3333-4333-a333-333333333333",
+            "agent_id": "22222222-2222-4222-a222-222222222222",
+            "status": "pending",
+            "replicas": 1,
+        }
+    )
+    assert legacy.allowed_actions is None
+    assert legacy.can_stop is None

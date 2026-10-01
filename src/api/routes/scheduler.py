@@ -178,7 +178,7 @@ async def _send_agent_heartbeat(task: dict[str, Any], db: AsyncSession) -> None:
         ) from exc
 
     try:
-        agent = await _get_owned_heartbeat_agent(agent_id, db, SimpleNamespace(id=owner_id))
+        await _get_owned_heartbeat_agent(agent_id, db, SimpleNamespace(id=owner_id))
     except HTTPException as exc:
         raise ScheduledActionError(
             str(exc.detail),
@@ -186,13 +186,11 @@ async def _send_agent_heartbeat(task: dict[str, Any], db: AsyncSession) -> None:
             code="agent_not_found",
         ) from exc
 
-    from src.api.routes.agent_runtime import HeartbeatRequest, heartbeat
-
-    request = HeartbeatRequest(
-        agent_id=str(agent.id),
-        timestamp=datetime.now(tz=timezone.utc).isoformat(),
+    raise ScheduledActionError(
+        "runtime_heartbeat_unavailable: scheduled tasks cannot synthesize authenticated runtime evidence",
+        status_code=503,
+        code="runtime_heartbeat_unavailable",
     )
-    await heartbeat(request=request, db=db, agent=agent)
 
 
 async def _execute_task_action(task: dict[str, Any], *, db: AsyncSession) -> None:

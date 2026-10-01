@@ -11,6 +11,14 @@ MONITORS = (
     "src/api/services/monitor.py",
     "src/api/services/monitoring.py",
 )
+LIFECYCLE_ADAPTERS = (
+    "src/api/routes/agents.py",
+    "src/api/routes/deployments.py",
+    "src/api/routes/templates.py",
+    "src/api/routes/agent_runtime.py",
+    "src/api/routes/ingest.py",
+    "src/api/services/monitoring.py",
+)
 
 
 @pytest.mark.parametrize("path", MONITORS)
@@ -61,3 +69,65 @@ def test_background_monitor_has_no_second_recovery_owner(path):
         if isinstance(node, (ast.Import, ast.ImportFrom))
     ]
     assert not any("self_healer" in statement for statement in imports)
+
+
+def test_lifecycle_policy_is_framework_and_persistence_independent():
+    tree = ast.parse((ROOT / "src/api/domain/lifecycle.py").read_text())
+    imports = [
+        ast.unparse(node)
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.Import, ast.ImportFrom))
+    ]
+    forbidden = ("fastapi", "sqlalchemy", "src.api.models", "src.api.routes", "src.api.cli")
+    assert not [statement for statement in imports if any(item in statement for item in forbidden)]
+
+
+def test_scheduler_cannot_fabricate_or_submit_machine_heartbeat_evidence():
+    tree = ast.parse((ROOT / "src/api/routes/scheduler.py").read_text())
+    imports = [
+        ast.unparse(node)
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.Import, ast.ImportFrom))
+    ]
+    assert not any("src.api.routes.agent_runtime" in statement for statement in imports)
+
+    calls = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        name = node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, "attr", None)
+        if name in {"heartbeat", "record_runtime_heartbeat"}:
+            calls.append(f"line {node.lineno}: {ast.unparse(node.func)}")
+    assert not calls, "scheduler cannot call machine heartbeat owners: " + "; ".join(calls)
+
+
+@pytest.mark.parametrize("path", LIFECYCLE_ADAPTERS)
+def test_adapters_delegate_lifecycle_field_writes_to_the_transition_owner(path):
+    tree = ast.parse((ROOT / path).read_text())
+    lifecycle_fields = {
+        "status",
+        "desired_action",
+        "desired_state",
+        "observed_state",
+        "target_revision",
+        "observed_revision",
+        "observed_at",
+        "started_at",
+        "ended_at",
+        "last_heartbeat",
+        "replicas",
+        "version",
+    }
+    violations = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+            for target in targets:
+                if (
+                    isinstance(target, ast.Attribute)
+                    and target.attr in lifecycle_fields
+                    and isinstance(target.value, ast.Name)
+                    and target.value.id in {"agent", "deployment"}
+                ):
+                    violations.append(f"line {node.lineno}: {ast.unparse(target)}")
+    assert not violations, f"{path}: " + "; ".join(violations)

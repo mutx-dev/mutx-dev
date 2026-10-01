@@ -210,6 +210,42 @@ test.describe('Dashboard Agents List', () => {
     await expect(page.getByRole('button', { name: /load more/i })).toHaveCount(0);
   });
 
+  for (const viewport of [
+    { label: 'desktop', width: 1280, height: 720 },
+    { label: 'mobile', width: 390, height: 844 },
+  ]) {
+    test(`keeps observed state until a requested stop is confirmed (${viewport.label})`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.route('**/api/dashboard/agents**', async (route) => {
+        if (route.request().method() === 'POST') {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ status: 'pending', desired_action: 'stop', desired_state: 'stopped', target_revision: 2 }),
+          });
+          return;
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ items: mockAgents, total: mockAgents.length, skip: 0, limit: 20, has_more: false }),
+        });
+      });
+
+      await openAgentsPage(page);
+      await page.evaluate(() => document.fonts.ready);
+      const card = page.locator('article').filter({ hasText: 'test-agent-1' }).first();
+      await card.getByRole('button', { name: 'Stop', exact: true }).click();
+      const dialog = page.getByRole('dialog', { name: 'Stop agent' });
+      await dialog.getByRole('button', { name: 'Stop Agent', exact: true }).click();
+      await expect(dialog).toHaveCount(0);
+
+      await expect(card).toContainText('running');
+      await expect(page.getByText('Stop requested for agent test-agent-1 (a1b2c3d4-e5f6-7890-abcd-ef1234567890).')).toBeVisible();
+      await page.screenshot({ path: testInfo.outputPath('pending-stop.png'), fullPage: true });
+    });
+  }
+
   test('refresh button works', async ({ page }) => {
     await openAgentsPage(page);
 

@@ -251,16 +251,18 @@ class TestScaleDeployment:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "stopped"
+        assert data["status"] == "pending"
+        assert data["desired_action"] == "stop"
+        assert data["desired_state"] == "stopped"
         assert data["replicas"] == 3
-        assert data["ended_at"] is not None
-        assert data["allowed_actions"] == ["start", "terminate"]
+        assert data["ended_at"] is None
+        assert data["allowed_actions"] == ["stop", "terminate"]
         assert any(
-            event["event_type"] == "stop" and event["status"] == "stopped"
+            event["event_type"] == "stop" and event["status"] == "pending"
             for event in data["events"]
         )
         await db_session.refresh(test_agent)
-        assert test_agent.status == AgentStatus.STOPPED.value
+        assert test_agent.status == AgentStatus.RUNNING.value
 
     @pytest.mark.asyncio
     async def test_positive_scale_starts_stopped_deployment(
@@ -273,6 +275,7 @@ class TestScaleDeployment:
         test_deployment.status = "stopped"
         test_deployment.replicas = 2
         test_deployment.ended_at = datetime.now(timezone.utc)
+        previous_ended_at = test_deployment.ended_at
         test_agent.status = AgentStatus.STOPPED.value
         await db_session.commit()
 
@@ -283,16 +286,20 @@ class TestScaleDeployment:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "deploying"
+        assert data["status"] == "pending"
+        assert data["desired_action"] == "start"
+        assert data["desired_state"] == "running"
         assert data["replicas"] == 4
-        assert data["ended_at"] is None
+        assert data["ended_at"] is not None
         assert data["allowed_actions"] == ["stop", "terminate"]
         assert any(
-            event["event_type"] == "start" and event["status"] == "deploying"
+            event["event_type"] == "start" and event["status"] == "pending"
             for event in data["events"]
         )
         await db_session.refresh(test_agent)
-        assert test_agent.status == AgentStatus.RUNNING.value
+        await db_session.refresh(test_deployment)
+        assert test_agent.status == AgentStatus.STOPPED.value
+        assert test_deployment.ended_at == previous_ended_at.replace(tzinfo=None)
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize("replicas", [-1, 11])
@@ -537,8 +544,10 @@ class TestKillDeployment:
 
         # Verify deployment status changed
         await db_session.refresh(test_deployment)
-        assert test_deployment.status == "killed"
-        assert test_deployment.ended_at is not None
+        assert test_deployment.status == "pending"
+        assert test_deployment.desired_action == "terminate"
+        assert test_deployment.desired_state == "terminated"
+        assert test_deployment.ended_at is None
 
     @pytest.mark.asyncio
     async def test_kill_deployment_not_found(self, client: AsyncClient):
@@ -562,7 +571,7 @@ class TestKillDeployment:
         test_agent,
         db_session: AsyncSession,
     ):
-        """Test that killing a deployment stops the associated agent."""
+        """Termination intent preserves the last qualified agent observation."""
         # Set agent to running
         test_agent.status = AgentStatus.RUNNING.value
         test_deployment.status = "running"
@@ -573,11 +582,14 @@ class TestKillDeployment:
 
         # Verify agent status changed
         await db_session.refresh(test_agent)
-        assert test_agent.status == AgentStatus.STOPPED.value
+        assert test_agent.status == AgentStatus.RUNNING.value
 
         detail_response = await client.get(f"/v1/deployments/{test_deployment.id}")
         assert detail_response.status_code == 200
         assert detail_response.json()["allowed_actions"] == []
+        assert detail_response.json()["can_stop"] is False
+        assert detail_response.json()["can_restart"] is False
+        assert detail_response.json()["can_terminate"] is False
 
     @pytest.mark.asyncio
     async def test_kill_keeps_agent_running_when_another_deployment_is_active(
@@ -634,7 +646,7 @@ class TestCreateDeployment:
         assert response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_create_deployment_records_create_event_and_sets_agent_running(
+    async def test_create_deployment_records_intent_without_claiming_agent_running(
         self, client: AsyncClient, test_agent, db_session: AsyncSession
     ):
         """Test canonical deployment creation persists lifecycle event metadata."""
@@ -657,11 +669,13 @@ class TestCreateDeployment:
 
         created_deployment = await db_session.get(Deployment, uuid.UUID(data["id"]))
         assert created_deployment is not None
-        assert created_deployment.started_at is not None
-        assert created_deployment.started_at.tzinfo is None
+        assert created_deployment.started_at is None
+        assert created_deployment.observed_state is None
+        assert created_deployment.desired_action == "create"
+        assert created_deployment.desired_state == "running"
 
         await db_session.refresh(test_agent)
-        assert test_agent.status == AgentStatus.RUNNING.value
+        assert test_agent.status == AgentStatus.STOPPED.value
 
     @pytest.mark.asyncio
     async def test_create_deployment_rejects_agents_being_deleted(
@@ -761,12 +775,13 @@ class TestRestartDeployment:
 
         data = response.json()
         assert data["id"] == str(test_deployment.id)
-        assert data["status"] == "deploying"
-        assert data["ended_at"] is None
-        assert data["error_message"] is None
+        assert data["status"] == "pending"
+        assert data["desired_action"] == "restart"
+        assert data["desired_state"] == "running"
+        assert data["ended_at"] is not None
+        assert data["error_message"] == "boot failed"
         assert data["allowed_actions"] == ["stop", "terminate"]
-        assert test_deployment.started_at is not None
-        assert test_deployment.started_at.tzinfo is None
+        assert test_deployment.started_at is None
 
         events_response = await client.get(
             f"/v1/deployments/{test_deployment.id}/events?event_type=restart"
@@ -775,10 +790,10 @@ class TestRestartDeployment:
         events_data = events_response.json()
         assert events_data["total"] == 1
         assert events_data["items"][0]["event_type"] == "restart"
-        assert events_data["items"][0]["status"] == "deploying"
+        assert events_data["items"][0]["status"] == "pending"
 
         await db_session.refresh(test_agent)
-        assert test_agent.status == AgentStatus.RUNNING.value
+        assert test_agent.status == AgentStatus.STOPPED.value
 
     @pytest.mark.asyncio
     async def test_restart_deployment_rejects_stopped_deployments(
@@ -793,17 +808,19 @@ class TestRestartDeployment:
         assert "Cannot restart deployment with status 'stopped'" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_restart_running_deployment_enters_deploying_state(
+    async def test_restart_running_deployment_records_pending_intent(
         self, client: AsyncClient, test_deployment
     ):
         response = await client.post(f"/v1/deployments/{test_deployment.id}/restart")
 
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "deploying"
+        assert data["status"] == "pending"
+        assert data["desired_action"] == "restart"
+        assert data["desired_state"] == "running"
         assert data["allowed_actions"] == ["stop", "terminate"]
         assert any(
-            event["event_type"] == "restart" and event["status"] == "deploying"
+            event["event_type"] == "restart" and event["status"] == "pending"
             for event in data["events"]
         )
 

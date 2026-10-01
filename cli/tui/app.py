@@ -1530,7 +1530,7 @@ class MutxTUI(App[None]):
             return
         self.call_from_thread(
             self._after_action,
-            f"Deploy started for {shorten(agent.name, 18)} ({result.status or 'pending'})",
+            f"Deploy requested for {shorten(agent.name, 18)} ({result.status or 'pending'})",
         )
 
     @work(thread=True, exclusive=True, group="deployment-action")
@@ -1542,7 +1542,7 @@ class MutxTUI(App[None]):
             return
         self.call_from_thread(
             self._after_action,
-            f"Restarted {shorten(deployment.id, 12)} -> {deployment.status}",
+            f"Restart requested for {shorten(deployment.id, 12)} -> {deployment.status}",
         )
 
     @work(thread=True, exclusive=True, group="deployment-action")
@@ -1554,7 +1554,7 @@ class MutxTUI(App[None]):
             return
         self.call_from_thread(
             self._after_action,
-            f"Scaled {shorten(deployment.id, 12)} to {deployment.replicas} replicas",
+            f"Scale requested for {shorten(deployment.id, 12)}: replicas={replicas}",
         )
 
     @work(thread=True, exclusive=True, group="deployment-action")
@@ -1564,7 +1564,9 @@ class MutxTUI(App[None]):
         except CLIServiceError as exc:
             self.call_from_thread(self._handle_service_error, exc)
             return
-        self.call_from_thread(self._after_action, f"Deleted {shorten(deployment_id, 12)}")
+        self.call_from_thread(
+            self._after_action, f"Termination requested for {shorten(deployment_id, 12)}"
+        )
 
     def _after_action(self, message: str) -> None:
         self.notify(message, severity="information")

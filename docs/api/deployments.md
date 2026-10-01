@@ -18,16 +18,25 @@ The canonical create path is `POST /v1/deployments`.
 | `GET /v1/deployments/{deployment_id}/metrics` | Fetch metrics |
 | `GET /v1/deployments/{deployment_id}/versions` | Fetch version history |
 | `POST /v1/deployments/{deployment_id}/rollback` | Roll back to a prior version |
-| `DELETE /v1/deployments/{deployment_id}` | Mark the deployment as killed |
+| `DELETE /v1/deployments/{deployment_id}` | Request deployment termination |
 
 ## Current Lifecycle Rules
 
 - creation requires an owned `agent_id`
 - reads accept `VIEWER` or `DEVELOPER`; lifecycle mutations require `DEVELOPER`
-- scaling to zero stops an active deployment; scaling a stopped deployment above
-  zero starts it; positive scaling otherwise requires `running` or `ready`
-- restart succeeds only for `running`, `ready`, or `failed` deployments
-- delete does not hard-remove the record; it marks the deployment `killed`
+- scaling to zero requests a stop; scaling a stopped deployment above zero requests a start;
+  positive scaling otherwise requires `running` or `ready`. Each request remains pending
+  until current target-bound runtime evidence confirms it
+- restart requests are accepted only for `running`, `ready`, or `failed` deployments
+- delete does not hard-remove the record; it requests termination and remains pending until
+  current runtime evidence confirms it
+- while termination is pending, `allowed_actions`, `can_stop`, `can_restart`, and
+  `can_terminate` report no accepted action; a stop request cannot cancel termination
+- a per-deployment action that would request running is rejected while an Agent-wide stop fence
+  is active; an explicit Agent-wide create/deploy request supersedes that fence
+- `version` and `replicas` identify the selected configuration. They do not claim that an
+  executor has applied it; `observed_state`, `observed_revision`, and `observed_at` carry current
+  runtime evidence
 
 ## Create A Deployment
 
@@ -53,9 +62,15 @@ Example response:
   "version": "v1.0.0",
   "replicas": 1,
   "node_id": null,
-  "started_at": "2026-03-22T12:00:00Z",
+  "started_at": null,
   "ended_at": null,
   "error_message": null,
+  "desired_action": "create",
+  "desired_state": "running",
+  "observed_state": null,
+  "target_revision": 1,
+  "observed_revision": null,
+  "observed_at": null,
   "events": [
     {
       "id": "uuid",
@@ -67,7 +82,10 @@ Example response:
       "created_at": "2026-03-22T12:00:00Z"
     }
   ],
-  "allowed_actions": ["stop", "terminate"]
+  "allowed_actions": ["stop", "terminate"],
+  "can_stop": true,
+  "can_restart": false,
+  "can_terminate": true
 }
 ```
 
@@ -78,7 +96,10 @@ Example response:
 ```json
 {
   "deployment_id": "uuid",
-  "status": "deploying"
+  "status": "pending",
+  "desired_action": "deploy",
+  "desired_state": "running",
+  "target_revision": 1
 }
 ```
 
@@ -156,4 +177,5 @@ curl -X POST "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/rollback" \
   -d '{"version":1}'
 ```
 
-Rollback restores the stored deployment snapshot for the selected version and records a deployment event.
+Rollback selects the stored deployment snapshot, records a new pending intent and revision, and
+preserves prior runtime evidence. Completion requires current target-bound runtime evidence.

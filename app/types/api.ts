@@ -4263,6 +4263,12 @@ export interface components {
             deployment_id: string;
             /** Status */
             status: string;
+            /** Desired Action */
+            desired_action: string;
+            /** Desired State */
+            desired_state: string;
+            /** Target Revision */
+            target_revision: number;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -4283,6 +4289,21 @@ export interface components {
             type: components["schemas"]["AgentType"];
             /** Status */
             status: string;
+            /** Desired Action */
+            desired_action?: string | null;
+            /** Desired State */
+            desired_state?: string | null;
+            /** Observed State */
+            observed_state?: string | null;
+            /**
+             * Target Revision
+             * @default 0
+             */
+            target_revision: number;
+            /** Observed Revision */
+            observed_revision?: number | null;
+            /** Observed At */
+            observed_at?: string | null;
             /** Config */
             config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
                 [key: string]: unknown;
@@ -4482,6 +4503,17 @@ export interface components {
             status: string;
             /** Message */
             message: string;
+            /** Desired Action */
+            desired_action?: string | null;
+            /** Desired State */
+            desired_state?: string | null;
+            /** Observed State */
+            observed_state?: string | null;
+            /**
+             * Target Revision
+             * @default 0
+             */
+            target_revision: number;
         };
         /**
          * AgentResourceUsageCreate
@@ -4607,6 +4639,21 @@ export interface components {
             type: components["schemas"]["AgentType"];
             /** Status */
             status: string;
+            /** Desired Action */
+            desired_action?: string | null;
+            /** Desired State */
+            desired_state?: string | null;
+            /** Observed State */
+            observed_state?: string | null;
+            /**
+             * Target Revision
+             * @default 0
+             */
+            target_revision: number;
+            /** Observed Revision */
+            observed_revision?: number | null;
+            /** Observed At */
+            observed_at?: string | null;
             /** Config */
             config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
                 [key: string]: unknown;
@@ -4663,6 +4710,21 @@ export interface components {
             last_heartbeat: string | null;
             /** Uptime Seconds */
             uptime_seconds: number | null;
+            /** Desired Action */
+            desired_action?: string | null;
+            /** Desired State */
+            desired_state?: string | null;
+            /** Observed State */
+            observed_state?: string | null;
+            /**
+             * Target Revision
+             * @default 0
+             */
+            target_revision: number;
+            /** Observed Revision */
+            observed_revision?: number | null;
+            /** Observed At */
+            observed_at?: string | null;
         };
         /** AgentStatusUpdate */
         AgentStatusUpdate: {
@@ -4681,6 +4743,12 @@ export interface components {
         AgentStopResponse: {
             /** Status */
             status: string;
+            /** Desired Action */
+            desired_action: string;
+            /** Desired State */
+            desired_state: string;
+            /** Target Revision */
+            target_revision: number;
         };
         /**
          * AgentType
@@ -5689,6 +5757,10 @@ export interface components {
             };
             /** Received At */
             received_at: string;
+            /** Target Deployment Id */
+            target_deployment_id?: string | null;
+            /** Target Revision */
+            target_revision?: number | null;
         };
         /** CommandsListResponse */
         CommandsListResponse: {
@@ -6673,6 +6745,18 @@ export interface components {
             platform?: string | null;
             /** Hostname */
             hostname?: string | null;
+            /**
+             * Component
+             * @default agent_runtime
+             * @enum {string}
+             */
+            component: "agent_runtime" | "command_listener";
+            /** Deployment Id */
+            deployment_id?: string | null;
+            /** Target Revision */
+            target_revision?: number | null;
+            /** Node Id */
+            node_id?: string | null;
         };
         /** HeartbeatResponse */
         HeartbeatResponse: {
@@ -10703,6 +10787,21 @@ export interface components {
             ended_at: string | null;
             /** Error Message */
             error_message: string | null;
+            /** Desired Action */
+            desired_action?: string | null;
+            /** Desired State */
+            desired_state?: string | null;
+            /** Observed State */
+            observed_state?: string | null;
+            /**
+             * Target Revision
+             * @default 0
+             */
+            target_revision: number;
+            /** Observed Revision */
+            observed_revision?: number | null;
+            /** Observed At */
+            observed_at?: string | null;
             /** Events */
             events?: components["schemas"]["DeploymentEventResponse"][];
             /**
@@ -10710,6 +10809,21 @@ export interface components {
              * @description Lifecycle actions currently accepted for this deployment state.
              */
             readonly allowed_actions: ("start" | "stop" | "restart" | "scale" | "terminate")[];
+            /**
+             * Can Stop
+             * @description Whether a stop action is currently accepted.
+             */
+            readonly can_stop: boolean;
+            /**
+             * Can Restart
+             * @description Whether a restart action is currently accepted.
+             */
+            readonly can_restart: boolean;
+            /**
+             * Can Terminate
+             * @description Whether a termination action is currently accepted.
+             */
+            readonly can_terminate: boolean;
         };
         /**
          * UsageEventResponse

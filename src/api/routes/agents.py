@@ -16,11 +16,15 @@ from src.api.models import (
     AgentLog,
     AgentMetric,
     AgentResourceUsage,
-    AgentStatus,
     AgentType,
     Deployment,
-    DeploymentEvent as DeploymentEventModel,
     User,
+)
+from src.api.domain.lifecycle import LifecycleConflict
+from src.api.services.deployment_lifecycle import (
+    create_agent_record,
+    create_deployment_record,
+    request_agent_stop,
 )
 from src.api.services.usage import track_usage_best_effort
 from src.api.models.schemas import (
@@ -43,7 +47,6 @@ from src.api.models.schemas import (
     OpenAIAgentConfig,
 )
 from src.api.models.numeric import reject_non_finite_floats
-from src.api.time_utils import utc_now_naive
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 logger = logging.getLogger(__name__)
@@ -263,6 +266,12 @@ def _serialize_agent(agent: Agent, include_deployments: bool = False):
         "description": agent.description,
         "type": agent.type,
         "status": agent.status,
+        "desired_action": agent.desired_action,
+        "desired_state": agent.desired_state,
+        "observed_state": agent.observed_state,
+        "target_revision": agent.target_revision,
+        "observed_revision": agent.observed_revision,
+        "observed_at": agent.observed_at,
         "config": config_dict,
         "config_version": config_version,
         "created_at": agent.created_at,
@@ -297,10 +306,8 @@ async def create_agent(
         type=agent_data.type,
         config=config_json,
         user_id=current_user.id,
-        status=AgentStatus.CREATING.value,
     )
-    db.add(agent)
-    await db.flush()
+    await create_agent_record(agent=agent, db=db, action="create")
 
     await db.commit()
     await db.refresh(agent)
@@ -421,7 +428,6 @@ async def delete_agent(
         forbidden_detail="Not authorized to delete this agent",
     )
 
-    agent.status = AgentStatus.DELETING.value
     await db.delete(agent)
     await db.commit()
     logger.info(f"Deleted agent: {agent_id}")
@@ -430,10 +436,16 @@ async def delete_agent(
 class AgentDeployResponse(BaseModel):
     deployment_id: uuid.UUID
     status: str
+    desired_action: str
+    desired_state: str
+    target_revision: int
 
 
 class AgentStopResponse(BaseModel):
     status: str
+    desired_action: str
+    desired_state: str
+    target_revision: int
 
 
 @router.post("/{agent_id}/deploy", response_model=AgentDeployResponse)
@@ -450,26 +462,17 @@ async def deploy_agent(
             forbidden_detail="Not authorized to deploy this agent",
         )
 
-        deployment = Deployment(
-            agent_id=agent_id,
-            status="deploying",
-            replicas=1,
-            started_at=utc_now_naive(),
-        )
-        db.add(deployment)
-        await db.flush()
-
-        deploy_event = DeploymentEventModel(
-            deployment_id=deployment.id,
+        deployment = await create_deployment_record(
+            agent=agent,
+            db=db,
+            action="deploy",
             event_type="deploy",
-            status="deploying",
         )
-        db.add(deploy_event)
-
-        agent.status = AgentStatus.RUNNING.value
         await db.commit()
         await db.refresh(deployment)
-        logger.info(f"Deployed agent: {agent_id}, deployment: {deployment.id}")
+        logger.info(
+            f"Recorded deployment intent for agent: {agent_id}, deployment: {deployment.id}"
+        )
 
         await track_usage_best_effort(
             db=db,
@@ -480,9 +483,17 @@ async def deploy_agent(
             metadata={"deployment_id": str(deployment.id)},
         )
 
-        return {"deployment_id": deployment.id, "status": "deploying"}
+        return {
+            "deployment_id": deployment.id,
+            "status": deployment.status,
+            "desired_action": deployment.desired_action,
+            "desired_state": deployment.desired_state,
+            "target_revision": deployment.target_revision,
+        }
     except HTTPException:
         raise
+    except LifecycleConflict as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as e:
         logger.exception(f"Failed to deploy agent: {agent_id}")
         raise HTTPException(
@@ -497,31 +508,17 @@ async def stop_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_roles("DEVELOPER")),
 ):
-    agent = await get_owned_agent(
+    await get_owned_agent(
         agent_id,
         db,
         current_user,
         forbidden_detail="Not authorized to stop this agent",
     )
 
-    result = await db.execute(
-        select(Deployment).where(
-            Deployment.agent_id == agent_id, Deployment.status.in_(["running", "deploying"])
-        )
-    )
-    deployments = result.scalars().all()
-    for deployment in deployments:
-        deployment.status = "stopped"
-        deployment.ended_at = utc_now_naive()
-
-        stop_event = DeploymentEventModel(
-            deployment_id=deployment.id,
-            event_type="stop",
-            status="stopped",
-        )
-        db.add(stop_event)
-
-    agent.status = AgentStatus.STOPPED.value
+    try:
+        agent = await request_agent_stop(agent_id=agent_id, db=db)
+    except LifecycleConflict as exc:
+        raise HTTPException(status_code=404, detail="Agent not found") from exc
     await db.commit()
 
     await track_usage_best_effort(
@@ -532,8 +529,13 @@ async def stop_agent(
         resource_id=str(agent_id),
     )
 
-    logger.info(f"Stopped agent: {agent_id}")
-    return {"status": "stopped"}
+    logger.info(f"Recorded agent stop intent: {agent_id}")
+    return {
+        "status": "pending",
+        "desired_action": agent.desired_action or "stop",
+        "desired_state": agent.desired_state or "stopped",
+        "target_revision": agent.target_revision,
+    }
 
 
 @router.get("/{agent_id}/logs", response_model=AgentLogHistoryResponse)

@@ -12,8 +12,8 @@ The `/v1/agents*` surface covers control-plane CRUD for user-owned agents and ru
 | `GET /v1/agents/{agent_id}/config` | Read normalized config and config version |
 | `PATCH /v1/agents/{agent_id}/config` | Validate and update config, then bump version |
 | `DELETE /v1/agents/{agent_id}` | Delete an owned agent |
-| `POST /v1/agents/{agent_id}/deploy` | Legacy agent-scoped deployment shortcut |
-| `POST /v1/agents/{agent_id}/stop` | Stop running or deploying deployments for the agent |
+| `POST /v1/agents/{agent_id}/deploy` | Agent-scoped deployment intent |
+| `POST /v1/agents/{agent_id}/stop` | Record an agent-wide stop intent and target fence |
 | `GET /v1/agents/{agent_id}/logs` | List logs for the agent |
 | `GET /v1/agents/{agent_id}/metrics` | List metrics for the agent |
 | `POST /v1/agents/{agent_id}/resource-usage` | Record token and cost usage |
@@ -21,7 +21,7 @@ The `/v1/agents*` surface covers control-plane CRUD for user-owned agents and ru
 | `GET /v1/agents/{agent_id}/versions` | List agent config versions |
 | `POST /v1/agents/{agent_id}/rollback` | Roll back to a prior agent version |
 | `POST /v1/agents/register` | Runtime-style agent registration + API key issuance |
-| `POST /v1/agents/heartbeat` | Report runtime status |
+| `POST /v1/agents/heartbeat` | Report agent liveness or revision-bound runtime state |
 | `POST /v1/agents/metrics` | Report metrics |
 | `POST /v1/agents/logs` | Send runtime logs |
 | `GET /v1/agents/commands` | Poll pending commands for the authenticated agent |
@@ -68,6 +68,12 @@ Example response:
   "description": "Default assistant deployment",
   "type": "openclaw",
   "status": "creating",
+  "desired_action": "create",
+  "desired_state": "registered",
+  "observed_state": null,
+  "target_revision": 1,
+  "observed_revision": null,
+  "observed_at": null,
   "config": {
     "name": "Personal Assistant",
     "runtime": "personal_assistant",
@@ -159,7 +165,9 @@ curl -X PATCH "$BASE_URL/v1/agents/YOUR_AGENT_ID/config" \
 
 ## Deploy, Stop, And Delete
 
-`POST /v1/agents/{agent_id}/deploy` is still mounted, but the canonical full deployment create path is [`POST /v1/deployments`](./deployments.md).
+`POST /v1/agents/{agent_id}/deploy` is still mounted, and records a deployment
+intent through the same lifecycle owner as [`POST /v1/deployments`](./deployments.md).
+Both return a pending deployment; neither response means an executor has started it.
 
 ```bash
 curl -X POST "$BASE_URL/v1/agents/YOUR_AGENT_ID/deploy" \
@@ -219,6 +227,10 @@ It returns a runtime payload containing:
 - `api_key`
 - `status`
 - `message`
+- `desired_action`
+- `desired_state`
+- `observed_state`
+- `target_revision`
 
 Use the OpenAPI snapshot for the exact runtime request and response shapes if you are integrating at that layer.
 
@@ -226,3 +238,52 @@ The returned `mutx_agent_...` key is a Bearer credential for heartbeat, metrics,
 logs, command polling/acknowledgement, and runtime status. Those six
 agent-authenticated operations do not accept the managed-user `X-API-Key`
 header.
+
+The Python runtime client exposes the registration lifecycle fields on its
+registered-agent value and `get_status()` returns the agent-key status view.
+Heartbeat helpers pass `component`, `deployment_id`, `target_revision`, and
+`node_id` only when the caller supplies them; they never fetch a newer revision
+and apply it to work they did not perform.
+
+## Lifecycle Evidence
+
+Agent and deployment responses keep the existing `status` vocabulary and add
+`desired_action`, `desired_state`, `observed_state`, `target_revision`,
+`observed_revision`, and `observed_at`. A request changes desired state and
+increments its revision. It does not set a successful runtime status, node ID,
+or execution timestamp. Historical rows keep their status and receive no
+invented observed state during migration.
+
+An authenticated heartbeat without `deployment_id` refreshes Agent liveness.
+It cannot promote an unrelated or newer deployment. To report deployment
+evidence, send the exact deployment ID and current target revision:
+
+```json
+{
+  "agent_id": "agent-uuid",
+  "component": "agent_runtime",
+  "status": "running",
+  "timestamp": "2026-10-01T12:00:00Z",
+  "deployment_id": "deployment-uuid",
+  "target_revision": 4,
+  "node_id": "runtime-node-1"
+}
+```
+
+`target_revision` without `deployment_id` is Agent-scoped evidence. A standalone
+agent can use its current Agent revision to confirm a stop. Agent-scoped evidence
+does not confirm any deployment. `component` accepts `agent_runtime` and
+`command_listener`; a command-listener heartbeat refreshes liveness only, even
+when deployment fields are present. `GET /v1/agents/{agent_id}/status` reports
+`uptime_seconds: null` until a runtime uptime measurement is available.
+
+`POST /v1/agents/{agent_id}/stop` responds with `status: "pending"` and the
+desired stop revision. It fences active, pending, and ready deployment targets.
+The Agent stop completes only after every fenced target reports `stopped` at its
+current revision. A target-level action does not clear that fence; an explicit
+later deployment create/deploy intent supersedes it.
+
+The `/v1/ingest/agent-status`, `/v1/ingest/deployment`, and `/v1/ingest/metrics`
+routes retain submitted data as reported history. Their statuses, node IDs,
+errors, and metrics do not refresh the authenticated runtime heartbeat or alter
+observed lifecycle state.

@@ -150,7 +150,13 @@ class DeploymentEventHistoryResponse(BaseModel):
 DeploymentAction = Literal["start", "stop", "restart", "scale", "terminate"]
 
 
-def deployment_allowed_actions(status: str) -> list[DeploymentAction]:
+def deployment_allowed_actions(
+    status: str,
+    desired_action: str | None = None,
+    desired_state: str | None = None,
+) -> list[DeploymentAction]:
+    if status == "pending" and desired_action == "terminate" and desired_state == "terminated":
+        return []
     if status in {"running", "ready"}:
         return ["stop", "restart", "scale", "terminate"]
     if status in {"pending", "deploying"}:
@@ -174,12 +180,33 @@ class DeploymentResponse(BaseModel):
     started_at: Optional[datetime] = None
     ended_at: Optional[datetime]
     error_message: Optional[str]
+    desired_action: Optional[str] = None
+    desired_state: Optional[str] = None
+    observed_state: Optional[str] = None
+    target_revision: int = 0
+    observed_revision: Optional[int] = None
+    observed_at: Optional[datetime] = None
     events: list[DeploymentEventResponse] = Field(default_factory=list)
 
     @computed_field(description="Lifecycle actions currently accepted for this deployment state.")
     @property
     def allowed_actions(self) -> list[DeploymentAction]:
-        return deployment_allowed_actions(self.status)
+        return deployment_allowed_actions(self.status, self.desired_action, self.desired_state)
+
+    @computed_field(description="Whether a stop action is currently accepted.")
+    @property
+    def can_stop(self) -> bool:
+        return "stop" in self.allowed_actions
+
+    @computed_field(description="Whether a restart action is currently accepted.")
+    @property
+    def can_restart(self) -> bool:
+        return "restart" in self.allowed_actions
+
+    @computed_field(description="Whether a termination action is currently accepted.")
+    @property
+    def can_terminate(self) -> bool:
+        return "terminate" in self.allowed_actions
 
 
 class DeploymentListResponse(BaseModel):
@@ -316,6 +343,12 @@ class AgentResponse(DegradedNumericResponseModel):
     description: Optional[str]
     type: AgentType
     status: str
+    desired_action: Optional[str] = None
+    desired_state: Optional[str] = None
+    observed_state: Optional[str] = None
+    target_revision: int = 0
+    observed_revision: Optional[int] = None
+    observed_at: Optional[datetime] = None
     config: Optional[AgentConfigSchema | dict[str, Any]]
     config_version: int = Field(default=1, ge=1)
     created_at: datetime

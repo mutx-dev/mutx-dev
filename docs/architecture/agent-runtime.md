@@ -7,14 +7,50 @@ icon: microchip
 
 This document distinguishes connected-agent heartbeat monitoring from internal execution modules.
 
-## What is active today
+## Control-plane lifecycle authority
 
-* `POST /v1/agents/heartbeat` is the live runtime path for connected agents. It updates `agents.status` and `last_heartbeat` in the control plane.
-* Each runtime heartbeat now emits an `agent.heartbeat` outgoing webhook event for subscribers.
-* When a heartbeat changes the persisted agent status, MUTX also emits an `agent.status` outgoing webhook event.
-* The background monitor marks running agents failed when a received heartbeat is older than 120 seconds. It records an alert, log, deployment failure event, and outgoing status webhooks.
-* Agents with no heartbeat are not failed based on their creation date. Elapsed time does not prove that provisioning succeeded or that a failed runtime recovered.
-* The monitor does not restart processes or resolve failure alerts automatically.
+`src/api/domain/lifecycle.py` contains pure transition policy. The database-backed
+owner in `src/api/services/deployment_lifecycle.py` records intent, advances
+monotonic Agent and deployment revisions, accepts matching runtime observations,
+and derives the Agent state from current target evidence. API routes keep their
+authentication and ownership checks and translate the existing wire shapes.
+
+Agent and deployment `status` fields keep the supported vocabulary. The additive
+`desired_action`, `desired_state`, `observed_state`, `target_revision`,
+`observed_revision`, and `observed_at` fields distinguish a request from a
+runtime observation. Registration and deployment creation leave observed state
+empty. A create, start, restart, scale, stop, terminate, or rollback request does
+not invent a running state or `started_at` time.
+
+An authenticated heartbeat always refreshes Agent `last_heartbeat`. It updates a
+deployment only when its `deployment_id` and `target_revision` match the current
+target. An Agent-scoped revision can report the Agent itself, but it never
+completes a deployment. A heartbeat with `component: "command_listener"` is
+liveness only. User-authenticated ingest preserves submitted statuses, node IDs,
+errors, logs, and metrics as reported data; it does not set machine-observed
+state.
+
+Agent-wide stop increments and fences every active, pending, or ready target.
+Target-level actions leave that fence in place. It is confirmed only after each
+fenced target reports stopped at its current revision. A later explicit
+deployment create/deploy intent clears the fence; older observations remain
+bound to their prior deployment IDs and revisions.
+
+## Runtime heartbeat and monitoring
+
+The API emits `agent.heartbeat` for authenticated runtime heartbeats and emits
+`agent.status` only when the persisted Agent status changes. Deployment events
+are emitted only for a qualified target observation. The heartbeat `timestamp`
+is retained for compatibility; freshness uses the server receipt time.
+
+The monitor checks each current target’s qualified `observed_at` independently
+from Agent `last_heartbeat`. It locks and rechecks the target revision and
+observation time before recording stale evidence. Listener heartbeats therefore
+cannot mask stale deployment work, and a concurrent newer heartbeat makes an
+earlier stale scan a no-op. A current, target-bound runtime report can reconcile
+that target after monitor failure and resolve its alert; unbound or old-revision
+reports cannot. The monitor does not provision or restart work from elapsed
+time.
 
 ***
 
@@ -234,22 +270,12 @@ runtime.tool_handler.register_handler(
 and the monitor-worker health file. Each cycle calls `monitor_agent_health` in
 `src/api/services/monitoring.py`.
 
-For a running agent with a received heartbeat older than 120 seconds, the monitor
-marks the agent and its latest deployment failed, records an `AGENT_DOWN` alert
-and an error log, and emits `monitor_failed` and `agent.status` events. Webhook
-errors are logged. This legacy latest-deployment association does not establish
-which deployment actually sent the heartbeat.
-
-A missing heartbeat remains unknown. The monitor does not substitute the agent's
-creation time, generate heartbeats, promote provisioning state, or infer recovery
-from elapsed time. A later runtime report does not automatically resolve the
-failure alert or reset an already-failed deployment.
-
-## Self-Healing
-
-The unused in-process recovery prototype has been removed. The background
-monitor detects stale heartbeats; it does not execute restart, rollback,
-recreate, or scale actions. Recovery needs an executor and runtime evidence.
+When qualified work evidence goes stale, the current deployment observation is
+marked failed and an attributable event, error log, and `AGENT_DOWN` alert are
+recorded. Agent liveness without a tracked deployment is monitored separately.
+Webhook errors are logged without rolling back the state transition. A later
+current-revision runtime report may reconcile the matching target and alert; the
+monitor itself does not recover or relaunch it.
 
 ***
 

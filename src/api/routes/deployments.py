@@ -1,4 +1,3 @@
-import json
 import logging
 from typing import Any, Optional
 import uuid
@@ -16,7 +15,6 @@ from src.api.database import get_db
 from src.api.models import (
     Deployment,
     Agent,
-    AgentStatus,
     User,
     AgentLog,
     AgentMetric,
@@ -36,9 +34,12 @@ from src.api.models.schemas import (
     deployment_allowed_actions,
 )
 from src.api.auth.dependencies import require_roles
-from src.api.services.deployment_lifecycle import create_deployment_record
+from src.api.domain.lifecycle import LifecycleConflict
+from src.api.services.deployment_lifecycle import (
+    create_deployment_record,
+    request_deployment_action,
+)
 from src.api.services.usage import track_usage_best_effort
-from src.api.time_utils import utc_now_naive
 
 router = APIRouter(prefix="/deployments", tags=["deployments"])
 logger = logging.getLogger(__name__)
@@ -80,11 +81,6 @@ async def get_owned_deployment(
         ) from None
 
 
-ACTIVE_DEPLOYMENT_STATUSES = frozenset({"pending", "deploying", "running", "ready"})
-RUNNING_DEPLOYMENT_STATUSES = frozenset({"running", "ready"})
-RESTARTABLE_DEPLOYMENT_STATUSES = frozenset({"running", "ready", "failed"})
-
-
 def _serialize_deployment(deployment: Deployment) -> dict[str, object]:
     return {
         "id": deployment.id,
@@ -96,7 +92,15 @@ def _serialize_deployment(deployment: Deployment) -> dict[str, object]:
         "started_at": deployment.started_at,
         "ended_at": deployment.ended_at,
         "error_message": deployment.error_message,
-        "allowed_actions": deployment_allowed_actions(deployment.status),
+        "desired_action": deployment.desired_action,
+        "desired_state": deployment.desired_state,
+        "observed_state": deployment.observed_state,
+        "target_revision": deployment.target_revision,
+        "observed_revision": deployment.observed_revision,
+        "observed_at": deployment.observed_at,
+        "allowed_actions": deployment_allowed_actions(
+            deployment.status, deployment.desired_action, deployment.desired_state
+        ),
         "events": [
             {
                 "id": event.id,
@@ -110,35 +114,6 @@ def _serialize_deployment(deployment: Deployment) -> dict[str, object]:
             for event in getattr(deployment, "events", [])
         ],
     }
-
-
-async def _set_agent_running(deployment: Deployment, db: AsyncSession) -> None:
-    result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
-    agent = result.scalar_one_or_none()
-    if agent and agent.status != AgentStatus.DELETING.value:
-        agent.status = AgentStatus.RUNNING.value
-
-
-async def _stop_agent_without_active_deployments(
-    deployment: Deployment,
-    db: AsyncSession,
-) -> None:
-    active_result = await db.execute(
-        select(Deployment.id)
-        .where(
-            Deployment.agent_id == deployment.agent_id,
-            Deployment.id != deployment.id,
-            Deployment.status.in_(ACTIVE_DEPLOYMENT_STATUSES),
-        )
-        .limit(1)
-    )
-    if active_result.scalar_one_or_none() is not None:
-        return
-
-    result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
-    agent = result.scalar_one_or_none()
-    if agent and agent.status != AgentStatus.DELETING.value:
-        agent.status = AgentStatus.STOPPED.value
 
 
 @router.get("", response_model=DeploymentListResponse)
@@ -267,49 +242,17 @@ async def scale_deployment(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_roles("DEVELOPER")),
 ):
-    deployment = await get_owned_deployment(deployment_id, db, current_user)
-
-    if scale_data.replicas == 0:
-        if deployment.status not in ACTIVE_DEPLOYMENT_STATUSES:
-            raise HTTPException(
-                status_code=409,
-                detail=f"Cannot stop deployment with status '{deployment.status}'",
-            )
-
-        deployment.status = "stopped"
-        deployment.ended_at = utc_now_naive()
-        event_type = "stop"
-        event_status = "stopped"
-        usage_event_type = "deployment_stopped"
-        await _stop_agent_without_active_deployments(deployment, db)
-    elif deployment.status == "stopped":
-        deployment.replicas = scale_data.replicas
-        deployment.status = "deploying"
-        deployment.started_at = utc_now_naive()
-        deployment.ended_at = None
-        deployment.error_message = None
-        event_type = "start"
-        event_status = "deploying"
-        usage_event_type = "deployment_started"
-        await _set_agent_running(deployment, db)
-    elif deployment.status in RUNNING_DEPLOYMENT_STATUSES:
-        deployment.replicas = scale_data.replicas
-        event_type = "scale"
-        event_status = deployment.status
-        usage_event_type = "deployment_scaled"
-    else:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Cannot scale deployment with status '{deployment.status}'",
+    await get_owned_deployment(deployment_id, db, current_user)
+    try:
+        deployment, _agent, usage_event_type = await request_deployment_action(
+            deployment_id=deployment_id,
+            db=db,
+            action="scale",
+            requested_replicas=scale_data.replicas,
         )
-
-    scale_event = DeploymentEventModel(
-        deployment_id=deployment.id,
-        event_type=event_type,
-        status=event_status,
-        error_message=None,
-    )
-    db.add(scale_event)
+    except LifecycleConflict as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    event_type = deployment.desired_action
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
@@ -345,22 +288,14 @@ async def kill_deployment(
     current_user: User = Depends(require_roles("DEVELOPER")),
 ):
     deployment = await get_owned_deployment(deployment_id, db, current_user)
-
-    if deployment.status == "killed":
-        raise HTTPException(status_code=409, detail="Deployment is already terminated")
-
-    deployment.status = "killed"
-    deployment.ended_at = utc_now_naive()
-
-    # Record kill event
-    kill_event = DeploymentEventModel(
-        deployment_id=deployment.id,
-        event_type="kill",
-        status="killed",
-    )
-    db.add(kill_event)
-
-    await _stop_agent_without_active_deployments(deployment, db)
+    try:
+        await request_deployment_action(
+            deployment_id=deployment.id,
+            db=db,
+            action="terminate",
+        )
+    except LifecycleConflict as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     await db.commit()
 
@@ -372,7 +307,7 @@ async def kill_deployment(
         resource_id=str(deployment_id),
     )
 
-    logger.info(f"Killed deployment: {deployment_id}")
+    logger.info(f"Requested deployment termination: {deployment_id}")
 
 
 @router.post("", response_model=DeploymentResponse, status_code=201)
@@ -390,15 +325,14 @@ async def create_deployment(
         forbidden_detail="Not authorized to deploy this agent",
     )
 
-    # Check if agent is in a deployable state
-    if agent.status == AgentStatus.DELETING.value:
-        raise HTTPException(status_code=400, detail="Cannot deploy an agent that is being deleted")
-
-    deployment = await create_deployment_record(
-        agent=agent,
-        db=db,
-        replicas=deployment_data.replicas,
-    )
+    try:
+        deployment = await create_deployment_record(
+            agent=agent,
+            db=db,
+            replicas=deployment_data.replicas,
+        )
+    except LifecycleConflict as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
@@ -430,29 +364,14 @@ async def restart_deployment(
     """Restart an existing deployment."""
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
-    if deployment.status not in RESTARTABLE_DEPLOYMENT_STATUSES:
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                f"Cannot restart deployment with status '{deployment.status}'. "
-                "Only running, ready, or failed deployments can be restarted."
-            ),
+    try:
+        await request_deployment_action(
+            deployment_id=deployment.id,
+            db=db,
+            action="restart",
         )
-
-    deployment.status = "deploying"
-    deployment.started_at = utc_now_naive()
-    deployment.ended_at = None
-    deployment.error_message = None
-
-    # Record restart event
-    restart_event = DeploymentEventModel(
-        deployment_id=deployment.id,
-        event_type="restart",
-        status="deploying",
-    )
-    db.add(restart_event)
-
-    await _set_agent_running(deployment, db)
+    except LifecycleConflict as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
@@ -462,7 +381,7 @@ async def restart_deployment(
         current_user,
         include_events=True,
     )
-    logger.info(f"Restarted deployment: {deployment_id}")
+    logger.info(f"Requested deployment restart: {deployment_id}")
 
     await track_usage_best_effort(
         db=db,
@@ -594,48 +513,17 @@ async def rollback_deployment(
     """Rollback a deployment to a specific version."""
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
-    if deployment.status not in ["running", "ready", "stopped", "failed"]:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Cannot rollback deployment with status '{deployment.status}'",
+    try:
+        await request_deployment_action(
+            deployment_id=deployment.id,
+            db=db,
+            action="rollback",
+            rollback_version=rollback_data.version,
         )
-
-    target_version_query = select(DeploymentVersion).where(
-        DeploymentVersion.deployment_id == deployment.id,
-        DeploymentVersion.version == rollback_data.version,
-    )
-    result = await db.execute(target_version_query)
-    target_version = result.scalar_one_or_none()
-
-    if not target_version:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Version {rollback_data.version} not found for this deployment",
-        )
-
-    snapshot = json.loads(target_version.config_snapshot)
-    deployment.replicas = int(snapshot.get("replicas", deployment.replicas))
-    deployment.version = snapshot.get("version", deployment.version)
-
-    mark_old_query = select(DeploymentVersion).where(
-        DeploymentVersion.deployment_id == deployment.id,
-        DeploymentVersion.status == "current",
-    )
-    old_result = await db.execute(mark_old_query)
-    old_versions = old_result.scalars().all()
-    for old_v in old_versions:
-        old_v.status = "superseded"
-        old_v.rolled_back_at = utc_now_naive()
-
-    target_version.status = "current"
-    target_version.rolled_back_at = None
-
-    rollback_event = DeploymentEventModel(
-        deployment_id=deployment.id,
-        event_type="rollback",
-        status=deployment.status,
-    )
-    db.add(rollback_event)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except LifecycleConflict as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     await db.commit()
 

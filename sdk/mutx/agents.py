@@ -8,6 +8,8 @@ from uuid import UUID
 import httpx
 
 from mutx._http import api_path
+from mutx.deployments import Deployment, _parse_datetime
+from mutx.deployments import DeploymentEvent as DeploymentEvent
 from mutx.pagination import Page, parse_page
 
 
@@ -17,6 +19,12 @@ class Agent:
         self.name = data["name"]
         self.description = data.get("description")
         self.status = data["status"]
+        self.desired_action = data.get("desired_action")
+        self.desired_state = data.get("desired_state")
+        self.target_revision = data.get("target_revision", 0)
+        self.observed_state = data.get("observed_state")
+        self.observed_revision = data.get("observed_revision")
+        self.observed_at = _parse_datetime(data.get("observed_at"))
         self.config_json = data.get("config")
         self.config = self._parse_config(self.config_json)
         self.created_at = datetime.fromisoformat(data["created_at"])
@@ -36,34 +44,6 @@ class Agent:
 
     def __repr__(self) -> str:
         return f"Agent(id={self.id}, name={self.name}, status={self.status})"
-
-
-class DeploymentEvent:
-    def __init__(self, data: dict[str, Any]) -> None:
-        self.id = UUID(data["id"])
-        self.deployment_id = UUID(data["deployment_id"])
-        self.event_type = data["event_type"]
-        self.status = data["status"]
-        self.node_id = data.get("node_id")
-        self.error_message = data.get("error_message")
-        self.created_at = datetime.fromisoformat(data["created_at"])
-        self._data = data
-
-
-class Deployment:
-    def __init__(self, data: dict[str, Any]):
-        self.id = UUID(data["id"])
-        self.agent_id = UUID(data["agent_id"])
-        self.status = data["status"]
-        self.replicas = data["replicas"]
-        self.node_id = data.get("node_id")
-        self.started_at = (
-            datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
-        )
-        self.ended_at = datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
-        self.error_message = data.get("error_message")
-        self.events = [DeploymentEvent(item) for item in data.get("events", [])]
-        self._data = data
 
 
 class AgentDetail(Agent):

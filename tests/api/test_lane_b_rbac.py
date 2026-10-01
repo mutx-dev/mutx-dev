@@ -647,7 +647,6 @@ async def test_ingest_deployment_and_metrics_are_authorized_before_side_effects_
     async def no_webhook(*_args, **_kwargs) -> int:
         return 0
 
-    monkeypatch.setattr(ingest_route, "trigger_deployment_event", no_webhook)
     monkeypatch.setattr(ingest_route, "trigger_webhook_event", no_webhook)
 
     foreign_agent = Agent(

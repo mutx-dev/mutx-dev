@@ -24,12 +24,20 @@ async def test_monitoring_health_uses_app_state_start_time(client: AsyncClient, 
 
 
 @pytest.mark.asyncio
-async def test_monitor_marks_latest_deployment_failed_on_stale_heartbeat(
+async def test_monitor_marks_current_qualified_deployment_failed_on_stale_evidence(
     db_session, test_agent, test_deployment
 ):
+    stale_at = datetime.now(timezone.utc) - timedelta(seconds=121)
     test_agent.status = AgentStatus.RUNNING.value
-    test_agent.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=121)
+    test_agent.target_revision = 1
+    test_agent.last_heartbeat = stale_at
     test_deployment.status = "running"
+    test_deployment.desired_action = "deploy"
+    test_deployment.desired_state = "running"
+    test_deployment.target_revision = 1
+    test_deployment.observed_state = "running"
+    test_deployment.observed_revision = 1
+    test_deployment.observed_at = stale_at
     await db_session.commit()
 
     await monitor_agent_health(db_session)
@@ -73,7 +81,7 @@ async def test_monitor_does_not_fail_new_deployment_of_old_agent_without_heartbe
     await db_session.refresh(test_agent)
     await db_session.refresh(deployment)
 
-    assert deployment.status == "deploying"
+    assert deployment.status == "pending"
     assert deployment.ended_at is None
     assert deployment.error_message is None
     assert test_agent.last_heartbeat is None
@@ -207,8 +215,16 @@ async def test_monitor_emits_webhooks_for_observed_failure_without_fake_recovery
     )
 
     test_agent.status = AgentStatus.RUNNING.value
-    test_agent.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=121)
+    stale_at = datetime.now(timezone.utc) - timedelta(seconds=121)
+    test_agent.target_revision = 1
+    test_agent.last_heartbeat = stale_at
     test_deployment.status = "running"
+    test_deployment.desired_action = "deploy"
+    test_deployment.desired_state = "running"
+    test_deployment.target_revision = 1
+    test_deployment.observed_state = "running"
+    test_deployment.observed_revision = 1
+    test_deployment.observed_at = stale_at
     await db_session.commit()
 
     await monitor_agent_health(db_session)
@@ -242,8 +258,16 @@ async def test_monitor_status_transitions_survive_webhook_dispatch_failures(
     )
 
     test_agent.status = AgentStatus.RUNNING.value
-    test_agent.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=121)
+    stale_at = datetime.now(timezone.utc) - timedelta(seconds=121)
+    test_agent.target_revision = 1
+    test_agent.last_heartbeat = stale_at
     test_deployment.status = "running"
+    test_deployment.desired_action = "deploy"
+    test_deployment.desired_state = "running"
+    test_deployment.target_revision = 1
+    test_deployment.observed_state = "running"
+    test_deployment.observed_revision = 1
+    test_deployment.observed_at = stale_at
     await db_session.commit()
 
     await monitor_agent_health(db_session)
@@ -252,3 +276,101 @@ async def test_monitor_status_transitions_survive_webhook_dispatch_failures(
 
     assert test_agent.status == AgentStatus.FAILED.value
     assert test_deployment.status == "failed"
+
+
+@pytest.mark.asyncio
+async def test_listener_liveness_does_not_mask_stale_qualified_work(
+    db_session, test_agent, test_deployment
+):
+    test_agent.status = AgentStatus.RUNNING.value
+    test_agent.target_revision = 1
+    # A fresh listener heartbeat cannot replace the old bound work observation.
+    test_agent.last_heartbeat = datetime.now(timezone.utc)
+    test_deployment.status = "running"
+    test_deployment.desired_action = "deploy"
+    test_deployment.desired_state = "running"
+    test_deployment.target_revision = 1
+    test_deployment.observed_state = "running"
+    test_deployment.observed_revision = 1
+    test_deployment.observed_at = datetime.now(timezone.utc) - timedelta(seconds=121)
+    await db_session.commit()
+
+    await monitor_agent_health(db_session)
+    await db_session.refresh(test_agent)
+    await db_session.refresh(test_deployment)
+
+    assert test_agent.last_heartbeat is not None
+    assert test_agent.status == AgentStatus.FAILED.value
+    assert test_deployment.status == "failed"
+
+
+@pytest.mark.asyncio
+async def test_listener_liveness_does_not_mask_stale_standalone_agent_evidence(
+    db_session, test_agent
+):
+    stale_at = datetime.now(timezone.utc) - timedelta(seconds=121)
+    test_agent.status = AgentStatus.RUNNING.value
+    test_agent.target_revision = 4
+    test_agent.observed_state = AgentStatus.RUNNING.value
+    test_agent.observed_revision = 4
+    test_agent.observed_at = stale_at
+    test_agent.last_heartbeat = datetime.now(timezone.utc)
+    await db_session.commit()
+
+    await monitor_agent_health(db_session)
+    await db_session.refresh(test_agent)
+
+    assert test_agent.status == AgentStatus.FAILED.value
+    assert test_agent.observed_at.replace(tzinfo=timezone.utc) == stale_at
+
+
+@pytest.mark.asyncio
+async def test_current_standalone_agent_evidence_supersedes_stale_liveness(db_session, test_agent):
+    test_agent.status = AgentStatus.RUNNING.value
+    test_agent.target_revision = 4
+    test_agent.observed_state = AgentStatus.RUNNING.value
+    test_agent.observed_revision = 4
+    test_agent.observed_at = datetime.now(timezone.utc)
+    test_agent.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=121)
+    await db_session.commit()
+
+    await monitor_agent_health(db_session)
+    await db_session.refresh(test_agent)
+
+    assert test_agent.status == AgentStatus.RUNNING.value
+
+
+@pytest.mark.asyncio
+async def test_monitor_rechecks_target_observation_before_failing(
+    db_session, test_agent, test_deployment, monkeypatch
+):
+    import src.api.services.monitoring as monitoring
+
+    stale_at = datetime.now(timezone.utc) - timedelta(seconds=121)
+    test_agent.status = AgentStatus.RUNNING.value
+    test_agent.target_revision = 1
+    test_deployment.status = "running"
+    test_deployment.desired_action = "deploy"
+    test_deployment.desired_state = "running"
+    test_deployment.target_revision = 1
+    test_deployment.observed_state = "running"
+    test_deployment.observed_revision = 1
+    test_deployment.observed_at = stale_at
+    await db_session.commit()
+
+    original_mark_stale = monitoring.mark_stale_deployment_observation
+
+    async def refresh_before_recheck(**kwargs):
+        # Simulate a genuine runtime heartbeat arriving after the monitor query.
+        test_deployment.observed_at = datetime.now(timezone.utc)
+        await db_session.flush()
+        return await original_mark_stale(**kwargs)
+
+    monkeypatch.setattr(monitoring, "mark_stale_deployment_observation", refresh_before_recheck)
+    await monitoring.monitor_agent_health(db_session)
+    await db_session.refresh(test_agent)
+    await db_session.refresh(test_deployment)
+
+    assert test_deployment.status == "running"
+    assert test_deployment.observed_state == "running"
+    assert test_agent.status == AgentStatus.RUNNING.value

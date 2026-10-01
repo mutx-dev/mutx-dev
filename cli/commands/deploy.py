@@ -84,8 +84,8 @@ def create_deployment(agent_id: str, replicas: int):
 def scale_deployment(deployment_id: str, replicas: int):
     """Scale a deployment"""
     try:
-        deployment = _deployments_service().scale_deployment(deployment_id, replicas=replicas)
-        click.echo(f"Scaled deployment {deployment_id} to {deployment.replicas} replicas")
+        _deployments_service().scale_deployment(deployment_id, replicas=replicas)
+        click.echo(f"Scale requested for deployment {deployment_id}: replicas={replicas}")
     except CLIServiceError as exc:
         _echo_service_error(exc)
 
@@ -140,7 +140,7 @@ def restart_deployment(deployment_id: str):
     """Restart a deployment"""
     try:
         deployment = _deployments_service().restart_deployment(deployment_id)
-        click.echo(f"Restarted deployment: {deployment.id or deployment_id}")
+        click.echo(f"Restart requested for deployment: {deployment.id or deployment_id}")
         click.echo(f"Status: {deployment.status}")
     except CLIServiceError as exc:
         _echo_service_error(exc)
@@ -191,7 +191,7 @@ def rollback_deployment_command(deployment_id: str, target_version: int):
             deployment_id,
             version=target_version,
         )
-        click.echo(f"Rolled back deployment: {deployment.id or deployment_id}")
+        click.echo(f"Rollback requested for deployment: {deployment.id or deployment_id}")
         click.echo(f"Status: {deployment.status}")
         if deployment.version:
             click.echo(f"Version: {deployment.version}")

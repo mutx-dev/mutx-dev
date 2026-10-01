@@ -138,7 +138,7 @@ def stop_agent(agent_id: str):
     """Stop a running agent"""
     try:
         status = _agents_service().stop_agent(agent_id)
-        click.echo(f"Stopped agent: {agent_id}")
+        click.echo(f"Stop requested for agent: {agent_id}")
         click.echo(f"Status: {status}")
     except CLIServiceError as exc:
         _echo_service_error(exc)
@@ -159,3 +159,14 @@ def get_status(agent_id: str):
     click.echo(f"Description: {agent.description or 'N/A'}")
     click.echo(f"Status: {agent.status}")
     click.echo(f"Created at: {agent.created_at or 'N/A'}")
+    if agent.desired_action is not None:
+        click.echo(
+            f"Requested: {agent.desired_action} ({agent.desired_state or 'unknown'}), "
+            f"revision {agent.target_revision}"
+        )
+    if agent.observed_state is not None:
+        revision = agent.observed_revision if agent.observed_revision is not None else "unknown"
+        click.echo(f"Observed: {agent.observed_state}, revision {revision}")
+        click.echo(f"Observed at: {agent.observed_at or 'unknown'}")
+    else:
+        click.echo("Observed: unknown")
