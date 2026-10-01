@@ -1,26 +1,26 @@
 ---
-description: Runtime behavior, monitoring, recovery flows, and execution model.
+description: Runtime heartbeats, stale-agent monitoring, and internal execution modules.
 icon: microchip
 ---
 
 # Agent Runtime
 
-This document describes how agents run in mutx.dev, including their lifecycle, monitoring, and self-healing capabilities.
+This document distinguishes connected-agent heartbeat monitoring from internal execution modules.
 
 ## What is active today
 
 * `POST /v1/agents/heartbeat` is the live runtime path for connected agents. It updates `agents.status` and `last_heartbeat` in the control plane.
 * Each runtime heartbeat now emits an `agent.heartbeat` outgoing webhook event for subscribers.
 * When a heartbeat changes the persisted agent status, MUTX also emits an `agent.status` outgoing webhook event.
-* The background monitor in `src/api/services/monitoring.py` owns stale-agent detection, failure marking, alert resolution, and the active recovery loop.
-* The background monitor now wires tracked agents into `SelfHealingService` in `src/api/services/self_healer.py` (heartbeat-based health checks + recovery handlers) so those paths are now connected to real runtime paths.
-* Advanced self-healing actions such as rollback version trees, recreate, or scale-up/down are still aspirational until they are backed by real execution infrastructure.
+* The background monitor marks running agents failed when a received heartbeat is older than 120 seconds. It records an alert, log, deployment failure event, and outgoing status webhooks.
+* Agents with no heartbeat are not failed based on their creation date. Elapsed time does not prove that provisioning succeeded or that a failed runtime recovered.
+* The monitor does not start `SelfHealingService`, restart processes, or resolve failure alerts automatically.
 
 ***
 
 ## Overview
 
-The Agent Runtime (`src/api/services/agent_runtime.py`) is the core execution engine that manages agent lifecycles, tool routing, and resource allocation.
+The internal modules below provide embedding APIs for agent execution and tool routing. The API heartbeat path and background monitor do not launch this runtime manager.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -230,174 +230,26 @@ runtime.tool_handler.register_handler(
 
 ## Monitoring
 
-The `MonitoringService` in `src/api/services/monitoring.py` provides comprehensive observability.
+`src/api/services/monitor.py` owns the background task, its database transaction,
+and the monitor-worker health file. Each cycle calls `monitor_agent_health` in
+`src/api/services/monitoring.py`.
 
-### Metrics Collection
+For a running agent with a received heartbeat older than 120 seconds, the monitor
+marks the agent and its latest deployment failed, records an `AGENT_DOWN` alert
+and an error log, and emits `monitor_failed` and `agent.status` events. Webhook
+errors are logged. This legacy latest-deployment association does not establish
+which deployment actually sent the heartbeat.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                      Monitoring Service Architecture                            │
-│                                                                                  │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │                        MonitoringService                                  │  │
-│  │                                                                           │  │
-│  │  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────┐  │  │
-│  │  │ MetricsCollector │  │  HealthChecker   │  │    AlertManager     │  │  │
-│  │  │                  │  │                  │  │                      │  │  │
-│  │  │ - request_count  │  │ - health_checks  │  │ - create_alert      │  │  │
-│  │  │ - error_count    │  │ - retry logic    │  │ - severity levels   │  │  │
-│  │  │ - latency (p95)  │  │ - status types   │  │ - callbacks         │  │  │
-│  │  │ - success_rate   │  │                  │  │                      │  │  │
-│  │  └──────────────────┘  └──────────────────┘  └──────────────────────┘  │  │
-│  │                                                                           │  │
-│  │  ┌──────────────────┐  ┌──────────────────────────────────────────────┐  │  │
-│  │  │  UptimeTracker   │  │              SystemMetrics                    │  │  │
-│  │  │                  │  │                                               │  │  │
-│  │  │ - start/stop     │  │  - cpu_usage  - memory_usage                 │  │  │
-│  │  │ - uptime_pct     │  │  - disk_usage  - network_io                   │  │  │
-│  │  │ - downtime       │  │                                               │  │  │
-│  │  └──────────────────┘  └──────────────────────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Health Status Levels
-
-| Status        | Condition                   | Action           |
-| ------------- | --------------------------- | ---------------- |
-| **HEALTHY**   | All checks pass             | Normal operation |
-| **DEGRADED**  | Performance below threshold | Log warning      |
-| **UNHEALTHY** | Health check failed         | Trigger recovery |
-| **UNKNOWN**   | No health data              | Skip monitoring  |
-
-### Alert Severity
-
-| Level        | Threshold        | Example               |
-| ------------ | ---------------- | --------------------- |
-| **INFO**     | -                | Agent registered      |
-| **WARNING**  | Error rate > 10% | High latency detected |
-| **ERROR**    | Error rate > 25% | Agent unhealthy       |
-| **CRITICAL** | Error rate > 50% | System failure        |
-
-### Metrics Collected
-
-| Metric              | Type    | Description              |
-| ------------------- | ------- | ------------------------ |
-| `request_count`     | Counter | Total requests processed |
-| `error_count`       | Counter | Failed requests          |
-| `avg_latency_ms`    | Gauge   | Average response time    |
-| `p95_latency_ms`    | Gauge   | 95th percentile latency  |
-| `p99_latency_ms`    | Gauge   | 99th percentile latency  |
-| `cpu_usage`         | Gauge   | System CPU percentage    |
-| `memory_usage`      | Gauge   | System memory percentage |
-| `uptime_percentage` | Gauge   | Agent uptime ratio       |
-
-***
+A missing heartbeat remains unknown. The monitor does not substitute the agent's
+creation time, generate heartbeats, promote provisioning state, or infer recovery
+from elapsed time. A later runtime report does not automatically resolve the
+failure alert or reset an already-failed deployment.
 
 ## Self-Healing
 
-The `SelfHealingService` in `src/api/services/self_healer.py` provides automatic recovery.
-
-### Self-Healing Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                       Self-Healing Service Architecture                         │
-│                                                                                  │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │                       SelfHealingService                                  │  │
-│  │                                                                           │  │
-│  │  ┌────────────────────┐  ┌────────────────────────────────────────────┐ │  │
-│  │  │  HealthCheckScheduler │  │           RecoveryExecutor              │ │  │
-│  │  │                    │  │                                             │ │  │
-│  │  │ - check_interval   │  │ - RecoveryAction.ROLLBACK                  │ │  │
-│  │  │ - timeout          │  │ - RecoveryAction.RESTART                   │ │  │
-│  │  │ - max_retries      │  │ - RecoveryAction.RECREATE                  │ │  │
-│  │  │ - agent_health     │  │ - RecoveryAction.SCALE_UP                 │ │  │
-│  │  └────────────────────┘  └────────────────────────────────────────────┘ │  │
-│  │                                                                           │  │
-│  │  ┌────────────────────┐  ┌────────────────────────────────────────────┐ │  │
-│  │  │   VersionManager   │  │        RecoveryTimeTracker                │ │  │
-│  │  │                    │  │                                             │ │  │
-│  │  │ - record_version   │  │ - record_recovery_time                     │ │  │
-│  │  │ - mark_stable      │  │ - get_average_recovery_time                │ │  │
-│  │  │ - get_history      │  │ - recovery_stats                           │ │  │
-│  │  └────────────────────┘  └────────────────────────────────────────────┘ │  │
-│  │                                                                           │  │
-│  │  ┌───────────────────────────────────────────────────────────────────────┐ │  │
-│  │  │                    Recovery History (deque maxlen=1000)             │ │  │
-│  │  └───────────────────────────────────────────────────────────────────────┘ │  │
-│  └───────────────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Recovery Actions
-
-| Action          | Trigger                | Description                |
-| --------------- | ---------------------- | -------------------------- |
-| **RESTART**     | 3 consecutive failures | Restart agent process      |
-| **ROLLBACK**    | After failed restart   | Revert to stable version   |
-| **RECREATE**    | Persistent failure     | Destroy and recreate agent |
-| **SCALE\_UP**   | High load              | Add more agent instances   |
-| **SCALE\_DOWN** | Low load               | Reduce resource usage      |
-
-### Health Check Configuration
-
-```python
-@dataclass
-class RecoveryConfig:
-    max_retries: int = 3                    # Max recovery attempts
-    retry_delay_seconds: float = 5.0        # Delay between retries
-    health_check_interval_seconds: int = 10 # Check frequency
-    health_check_timeout_seconds: float = 5.0 # Timeout per check
-    max_consecutive_failures: int = 3       # Failures before recovery
-    rollback_on_failure: bool = True        # Auto-rollback enabled
-    enable_auto_restart: bool = True        # Auto-restart enabled
-    min_recovery_interval_seconds: float = 60.0 # Min time between recoveries
-```
-
-### Recovery Flow
-
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Health     │────▶│   Check      │────▶│   Consecutive│────▶│   Trigger    │
-│   Check      │     │   Result     │     │   Failures   │     │   Recovery  │
-│   (30s)      │     │   (FAIL)     │     │   >= 3       │     │              │
-└──────────────┘     └──────────────┘     └──────────────┘     └──────┬───────┘
-                                                                     │
-     ┌─────────────────────────────────────────────────────────────────┘
-     │
-     ▼
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Execute   │────▶│   Success?   │─No─▶│   Rollback   │────▶│   Mark       │
-│   Recovery  │     │              │     │   to Stable  │     │   Stable     │
-│   (RESTART)  │     └──────────────┘     └──────────────┘     │   Version    │
-     │                                                          └──────────────┘
-     │ Yes
-     ▼
-┌──────────────┐
-│   Record    │
-│   Recovery  │
-│   Time      │
-└──────────────┘
-```
-
-### Recovery Time Tracking
-
-The service tracks recovery metrics:
-
-```python
-{
-    "agent_id": "agent-001",
-    "total_recoveries": 5,
-    "average_recovery_time_seconds": 2.3,
-    "min_recovery_time_seconds": 1.1,
-    "max_recovery_time_seconds": 4.8,
-    "last_recovery_time_seconds": 2.1
-}
-```
-
-**Target**: Recovery time < 5 seconds
+`src/api/services/self_healer.py` remains an internal recovery prototype. It is
+not started by the background monitor. Its restart, rollback, recreate, and scale
+handlers do not establish automatic recovery of a connected runtime.
 
 ***
 

@@ -53,6 +53,7 @@ echo "Running expanded Python validation suite..."
 "$PYTHON_BIN" -m pytest \
   tests/api \
   tests/unit/python \
+  tests/test_architecture_boundaries.py \
   tests/test_cli_*.py \
   tests/test_agentic_risk_matrix_docs.py \
   tests/test_generate_homebrew_formula.py \
