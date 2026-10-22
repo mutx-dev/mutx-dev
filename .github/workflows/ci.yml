@@ -68,6 +68,8 @@ jobs:
               - 'src/api/**'
               - 'src/runtime/**'
               - 'src/security/**'
+              - 'packages/governed-runtime/**'
+              - 'benchmarks/governed-runtime/**'
               - 'cli/**'
               - 'sdk/**'
               - 'tests/api/**'
