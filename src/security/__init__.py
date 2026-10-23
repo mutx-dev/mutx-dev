@@ -19,13 +19,14 @@ See docs/legal/aarm-alignment.md for the evidence and remaining gaps.
 AARM documentation reference: MIT License, Copyright (c) 2023 Mintlify.
 """
 
-from src.security.mediator import ActionCategory, ActionMediator, NormalizedAction
-from src.security.context import ContextAccumulator, IntentSignal, SessionContext
-from src.security.policy import PolicyDecision, PolicyDecisionResult, PolicyEngine
-from src.security.approvals import ApprovalRequest, ApprovalService
-from src.security.receipts import ActionReceipt, ReceiptGenerator
-from src.security.telemetry import TelemetryEventType, TelemetryExporter
-from src.security.compliance import AARMComplianceChecker
+from .mediator import ActionCategory, ActionMediator, NormalizedAction
+from .context import ContextAccumulator, IntentSignal, SessionContext
+from .policy import PolicyDecision, PolicyDecisionResult, PolicyEngine
+from .approvals import ApprovalRequest, ApprovalService
+from .receipts import ActionReceipt, ReceiptGenerator
+from .telemetry import TelemetryEventType, TelemetryExporter
+from .compliance import AARMComplianceChecker
+from .audit_chain import AuditChain, ChainVerification, verify_chain_export
 
 __all__ = [
     "ActionCategory",
@@ -44,4 +45,7 @@ __all__ = [
     "TelemetryEventType",
     "TelemetryExporter",
     "AARMComplianceChecker",
+    "AuditChain",
+    "ChainVerification",
+    "verify_chain_export",
 ]

@@ -18,8 +18,8 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Optional
 
-from src.security.mediator import NormalizedAction
-from src.security.context import SessionContext
+from .mediator import NormalizedAction
+from .context import SessionContext
 
 
 class ApprovalStatus(str, Enum):

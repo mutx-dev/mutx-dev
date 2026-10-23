@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mutx-governed-runtime"
+version = "0.1.0"
+description = "Action mediation, policy decisions and a tamper-evident signed audit chain for AI agents"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BUSL-1.1"
+license-files = ["LICENSE"]
+dependencies = ["cryptography>=42"]
+
+[project.scripts]
+mutx-verify-chain = "mutx_governed_runtime.__main__:main"
+
+[tool.setuptools]
+packages = ["mutx_governed_runtime"]

@@ -18,9 +18,9 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Optional
 
-from src.security.mediator import NormalizedAction
-from src.security.policy import PolicyDecision, PolicyDecisionResult
-from src.security.receipts import ActionReceipt
+from .mediator import NormalizedAction
+from .policy import PolicyDecision, PolicyDecisionResult
+from .receipts import ActionReceipt
 
 
 class TelemetryEventType(str, Enum):

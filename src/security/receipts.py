@@ -20,9 +20,9 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-from src.security.mediator import NormalizedAction
-from src.security.context import SessionContext
-from src.security.policy import PolicyDecisionResult
+from .mediator import NormalizedAction
+from .context import SessionContext
+from .policy import PolicyDecisionResult
 
 
 TrustedPublicKeys = Mapping[str, bytes | str]

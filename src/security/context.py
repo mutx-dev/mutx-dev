@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Optional
 
-from src.security.mediator import NormalizedAction
+from .mediator import NormalizedAction
 
 
 class IntentSignal(str, Enum):
