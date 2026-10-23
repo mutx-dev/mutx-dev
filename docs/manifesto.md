@@ -12,7 +12,7 @@ It is turning token generation into something a team can trust, operate, budget,
 
 That is the problem MUTX exists to solve.
 
-We believe the next wave of software will be built around agents that can reason, call tools, write state, react to events, and operate continuously. But we also believe most of the market is still focused on the easiest layer to demo and the least important layer to own: prompts, wrappers, and orchestrated screenshots.
+We believe the next wave of software will be built around agents that can reason, call tools, write state, react to events, and operate continuously. But we also believe most of the market is still focused on the easiest layer to demo and the least important layer to own: prompts, harnesses, and orchestrated screenshots.
 
 The real bottleneck is everything that happens after the demo works once.
 
