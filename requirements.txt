@@ -22,7 +22,7 @@ redis==7.4.1
 python-jose[cryptography]==3.5.0
 cryptography>=50.0.0
 argon2-cffi==25.1.0
-Authlib==1.6.12
+Authlib==1.9.1
 python-multipart==0.0.31
 email-validator==2.3.0
 # Agent & AI
